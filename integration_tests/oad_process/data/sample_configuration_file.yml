@@ -1,7 +1,7 @@
 title: Sample OAD Process
 
 # List of folder paths where user added custom registered OpenMDAO components
-module_folders: ../../../src/fastga_plugin/models
+module_folders: ../../../src/fastga_he/models
 
 # Input and output files
 input_file: ../results/oad_process_inputs.xml
