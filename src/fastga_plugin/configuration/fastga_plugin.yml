@@ -1,0 +1,25 @@
+title: Sample configuration file for the use of the sample discipline
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+
+# Input and output files
+input_file: ./problem_inputs.xml
+output_file: ./problem_outputs.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-1, optimizer='COBYLA')
+
+model:
+    sample_discipline:
+        id: fastga.plugin.sample_discipline
+
+optimization: # This section is needed only if optimization process is run
+  design_variables:
+    - name: sample_input
+      lower: 0.0
+      upper: 1.0
+  objective:
+    - name: sample_output
+      scaler: 1.e-4
