@@ -1,0 +1,24 @@
+<FASTOAD_model>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <PMSM>
+                    <motor_1>
+                        <torque>
+                            <peak units="N*m">1379.0</peak>
+                        </torque>
+                        <omega>
+                            <peak units="rad/s">523.59</peak>
+                        </omega>
+                        <scaling>
+                            <diameter>1.10</diameter>
+                            <length>1.26</length>
+                            <alpha>0.54</alpha>
+                            <beta>1.52</beta>
+                        </scaling>
+                    </motor_1>
+                </PMSM>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
