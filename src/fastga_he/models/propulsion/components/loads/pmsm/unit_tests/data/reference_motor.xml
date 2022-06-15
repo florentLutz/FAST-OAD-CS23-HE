@@ -4,6 +4,8 @@
             <he_power_train>
                 <PMSM>
                     <motor_1>
+                        <alpha>0.02268</alpha>
+                        <beta>0.7296</beta>
                         <torque>
                             <peak units="N*m">1379.0</peak>
                         </torque>
