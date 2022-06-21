@@ -26,7 +26,7 @@ if __name__ == "__main__":
     fig = go.Figure()
 
     scatter_cu_orig = go.Scatter(
-        x=area_log,
+        x=np.exp(area_log),
         y=copper_ampacities,
         mode="lines+markers",
         name="Copper original data",
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     )
     fig.add_trace(scatter_cu_orig)
     scatter_al_orig = go.Scatter(
-        x=area_log,
+        x=np.exp(area_log),
         y=aluminium_ampacities,
         mode="lines+markers",
         name="Aluminium original data",
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     fig.add_trace(scatter_al_orig)
 
     scatter_cu = go.Scatter(
-        x=area_log,
+        x=np.exp(area_log),
         y=np.polyval(polyfit_copper, area_log),
         mode="lines+markers",
         name="Copper interpolated data",
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     )
     fig.add_trace(scatter_cu)
     scatter_al = go.Scatter(
-        x=area_log,
+        x=np.exp(area_log),
         y=np.polyval(polyfit_aluminium, area_log),
         mode="lines+markers",
         name="Aluminium interpolated data",
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         yaxis_title="Ampacities [A]",
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
     )
-
+    fig.update_xaxes(type="log")
     fig.show()
 
     print(polyfit_copper)
