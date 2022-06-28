@@ -10,9 +10,10 @@ import scipy.optimize as opt
 from utils.curve_reading import curve_reading
 from utils.curve_fitting_openmdao import curve_fit_openmdao
 
-PLOT = False
+PLOT = True
 MOTOR = "250"
-MODEL = "POLITO_mod"  # "SCALING", "MCDONALD", "POLITO", "POLITO_mod", "AUCKLAND", "VRATNY"
+MODEL = "SCALING"  # "SCALING", "MCDONALD", "POLITO", "POLITO_mod", "AUCKLAND", "VRATNY"
+THRESHOLD = 0.0
 
 
 def efficiency_for_curve_fit(parameter, alpha_test, beta_test):
@@ -114,7 +115,7 @@ if __name__ == "__main__":
     else:
         data_file = pth.join(pth.dirname(__file__), "data/powerphase_125_efficiency_plot.csv")
 
-    speed_array, torque_array, efficiency_array, fig = curve_reading(data_file)
+    speed_array, torque_array, efficiency_array, fig = curve_reading(data_file, threshold=THRESHOLD)
     speed_array_p = np.linspace(50.0, 1.1 * np.max(speed_array), 50)
     torque_array_p = np.linspace(10.0, 1.1 * np.max(torque_array), 50)
     [speed_array_plot, torque_array_plot] = np.meshgrid(speed_array_p, torque_array_p)

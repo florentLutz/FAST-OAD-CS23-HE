@@ -5,8 +5,6 @@
 import numpy as np
 import pytest
 import openmdao.api as om
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 from stdatm import Atmosphere
 
