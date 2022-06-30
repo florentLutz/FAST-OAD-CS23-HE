@@ -1,0 +1,23 @@
+<FASTOAD_model>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <propeller>
+                    <propeller_1>
+                        <blades_number is_input="True">2.0<!--number of blades on the propeller--></blades_number>
+                        <diameter units="m" is_input="True">1.93<!--propeller diameter--></diameter>
+                        <hub_diameter units="m" is_input="True">0.4<!--propeller hub diameter--></hub_diameter>
+                        <elements_radius units="m" is_input="True">[0.255, 0.364, 0.473, 0.582, 0.692, 0.801, 0.91]<!--propeller hub diameter--></elements_radius>
+                        <elements_twist units="deg" is_input="True">[56.0, 52.5, 49.6, 47.4, 45.5, 44.0, 42.8]<!--propeller hub diameter--></elements_twist>
+                        <elements_sweep units="deg" is_input="True">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--propeller hub diameter--></elements_sweep>
+                        <elements_chord units="m" is_input="True">[0.146, 0.161, 0.172, 0.199, 0.203, 0.186, 0.129]<!--propeller hub diameter--></elements_chord>
+                        <radius_ratio_vect is_input="True">[0.165, 0.3, 0.45, 0.655, 0.835, 0.975, 1.0]<!--blade station at which blade geometric properties are sampled, as a percent of blade radius--></radius_ratio_vect>
+                        <sweep_vect units="deg" is_input="True">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--blade sweep at the station along the radius stored in radius_ratio_vect--></sweep_vect>
+                        <chord_vect units="m" is_input="True">[0.11163526, 0.15856474, 0.16254664, 0.21189369, 0.18558474, 0.11163526, 0.11163526]<!--blade chord at the station along the radius stored in radius_ratio_vect--></chord_vect>
+                        <twist_vect units="deg" is_input="True">[59.9549991, 54.62741602, 50.40984436, 46.40324949, 43.92011437, 42.42629402, 42.19068494]<!--blade twist at the station along the radius stored in radius_ratio_vect--></twist_vect>
+                    </propeller_1>
+                </propeller>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
