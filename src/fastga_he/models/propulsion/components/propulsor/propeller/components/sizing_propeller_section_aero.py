@@ -172,10 +172,10 @@ class SizingPropellerSectionAeroIdentification(om.ExplicitComponent):
 
         valid_idx = len(alpha_interp)
 
-        for idx, _ in enumerate(elements_radius):
+        for idx, value in enumerate(elements_radius):
 
             index = np.where(
-                self.options["sections_profile_position_list"] < (elements_radius[idx] / radius_max)
+                self.options["sections_profile_position_list"] <= (value / radius_max)
             )[0]
             if index is None:
                 profile_name = self.options["sections_profile_position_list"][0]
