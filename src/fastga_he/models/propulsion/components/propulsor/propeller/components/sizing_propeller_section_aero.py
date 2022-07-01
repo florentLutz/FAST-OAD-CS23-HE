@@ -9,6 +9,11 @@ from fastga.models.aerodynamics.external.xfoil.xfoil_polar import XfoilPolar, PO
 
 
 class SizingPropellerSectionAero(om.Group):
+    """
+    Identification of the function Cl=f(alpha), Cd=f(alpha) for each radius, based on a profile
+    repartition.
+    """
+
     def initialize(self):
 
         self.options.declare(
