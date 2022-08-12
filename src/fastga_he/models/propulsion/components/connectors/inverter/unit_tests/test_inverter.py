@@ -224,11 +224,15 @@ def test_map_efficiency():
 
     current_orig = np.linspace(0.0, 500.0, nb_points_maps)
     switching_frequency_orig = np.linspace(3000.0, 12000.0, nb_points_maps)
-    current, switching_frequency = np.meshgrid(current_orig, switching_frequency_orig)
+    modulation_index_orig = np.linspace(0.0, 1.0, nb_points_maps)
+    # current, switching_frequency = np.meshgrid(current_orig, switching_frequency_orig)
+    current, modulation_index = np.meshgrid(current_orig, modulation_index_orig)
 
     current = current.flatten()
-    switching_frequency = switching_frequency.flatten()
-    modulation_index = np.full_like(switching_frequency, 0.9)
+    # switching_frequency = switching_frequency.flatten()
+    switching_frequency = np.full_like(current, 9000.0)
+    # modulation_index = np.full_like(current, 0.9)
+    modulation_index = modulation_index.flatten()
 
     ivc = get_indep_var_comp(
         list_inputs(PerformanceInverter(inverter_id="inverter_1", number_of_points=current.size)),
@@ -254,7 +258,7 @@ def test_map_efficiency():
 
     losses_contour = go.Contour(
         x=current_orig,
-        y=switching_frequency_orig,
+        y=modulation_index_orig,
         z=losses,
         ncontours=20,
         contours=dict(
@@ -269,4 +273,11 @@ def test_map_efficiency():
         zmin=np.min(losses),
     )
     fig.add_trace(losses_contour)
+    fig.update_layout(
+        title_text="Sampled inverter efficiency map",
+        title_x=0.5,
+        xaxis_title="Current [A]",
+        yaxis_title="Modulation index [-]",
+        legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
+    )
     fig.show()
