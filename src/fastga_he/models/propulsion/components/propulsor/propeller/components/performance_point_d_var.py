@@ -85,7 +85,6 @@ class _PreparePropellerDVariation(om.ExplicitComponent):
         self.add_input(
             "data:geometry:propeller:chord_to_diameter_vect",
             val=np.nan,
-            units="m",
             shape_by_conn=True,
         )
         self.add_input("data:geometry:propeller:diameter", val=np.nan, units="m")
