@@ -30,6 +30,7 @@ class ComputePropellerPointPerformanceDVar(om.Group):
         self.options.declare("elements_number", default=20, types=int)
 
     def setup(self):
+        self.add_subsystem("chord_law", _PrepareChordToDiameterLaw(), promotes=["*"])
         self.add_subsystem("diameter_variation", _PreparePropellerDVariation(), promotes=["*"])
         self.add_subsystem("ref_twist_adjust", _PreparePropellerTwist(), promotes=["*"])
         ivc = om.IndepVarComp()
@@ -78,6 +79,148 @@ class ComputePropellerPointPerformanceDVar(om.Group):
                 profile + "_polar_efficiency.xfoil:CD",
                 "propeller_point_perf." + profile + "_polar:CD",
             )
+
+        self.add_subsystem(
+            "similarity_ratios",
+            _ComputeSimilarityParameters(elements_number=self.options["elements_number"]),
+            promotes=["*"],
+        )
+
+
+class _ComputeSimilarityParameters(om.ExplicitComponent):
+    def initialize(self):
+        self.options.declare("elements_number", default=20, types=int)
+
+    def setup(self):
+        self.add_input("data:geometry:propeller:radius_ratio_vect", val=np.nan, shape_by_conn=True)
+        self.add_input(
+            "data:geometry:propeller:chord_vect",
+            val=np.nan,
+            units="m",
+            shape_by_conn=True,
+            copy_shape="data:geometry:propeller:radius_ratio_vect",
+        )
+        self.add_input("data:geometry:propeller:diameter", val=np.nan, units="m")
+        self.add_input("data:geometry:propeller:blades_number", val=np.nan)
+
+        self.add_output(
+            "data:geometry:propeller:solidity_ratio",
+            val=np.nan,
+        )
+        self.add_output(
+            "data:geometry:propeller:activity_factor",
+            val=np.nan,
+        )
+        self.add_output(
+            "data:geometry:propeller:aspect_ratio",
+            val=np.nan,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        propeller_diameter = inputs["data:geometry:propeller:diameter"]
+        radius_max = propeller_diameter / 2.0
+        radius_min = 0.2 * radius_max
+        radius_ratio_vect = inputs["data:geometry:propeller:radius_ratio_vect"]
+        radius_vect = radius_ratio_vect * propeller_diameter / 2.0
+        chord_vect = inputs["data:geometry:propeller:chord_vect"]
+        n_blades = inputs["data:geometry:propeller:blades_number"]
+
+        length = radius_max - radius_min
+        elements_number = np.arange(self.options["elements_number"])
+        element_length = length / self.options["elements_number"]
+        radius = radius_min + (elements_number + 0.5) * element_length
+
+        chord_array = np.interp(radius, radius_vect, chord_vect)
+
+        solidity = n_blades / np.pi / radius_max ** 2.0 * np.sum(chord_array * element_length)
+        activity_factor = (
+            100000 / 32 / radius_max ** 5.0 * np.sum(chord_array * radius ** 3.0 * element_length)
+        )
+        c_star = np.sum(chord_array * radius ** 2.0 * element_length) / np.sum(
+            radius ** 2.0 * element_length
+        )
+        aspect_ratio = radius_max / c_star
+
+        outputs["data:geometry:propeller:solidity_ratio"] = solidity
+        outputs["data:geometry:propeller:activity_factor"] = activity_factor
+        outputs["data:geometry:propeller:aspect_ratio"] = aspect_ratio
+
+
+class _PrepareChordToDiameterLaw(om.ExplicitComponent):
+    def setup(self):
+        self.add_input("data:geometry:propeller:radius_ratio_vect", val=np.nan, shape_by_conn=True)
+        self.add_input(
+            "data:geometry:propeller:mid_chord_ratio",
+            val=np.nan,
+            desc="Ratio of the maximum chord to diameter to the chord to diameter of the root",
+        )
+        self.add_input(
+            "data:geometry:propeller:mid_chord_radius_ratio",
+            val=np.nan,
+            desc="Position of the point of maximum chord as a ratio of the radius",
+        )
+
+        self.add_output(
+            "data:geometry:propeller:chord_to_diameter_vect",
+            val=np.nan,
+            shape_by_conn=True,
+            copy_shape="data:geometry:propeller:radius_ratio_vect",
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        chord_to_diameter_root = 0.043
+        root_radius_ratio = 0.2
+        chord_to_diameter_tip = 0.068
+        tip_radius_ratio = 0.999
+
+        radius_ratio_mid = float(inputs["data:geometry:propeller:mid_chord_radius_ratio"])
+        chord_to_diameter_ratio_mid = (
+            float(inputs["data:geometry:propeller:mid_chord_ratio"]) * chord_to_diameter_root
+        )
+
+        radius_ratio_vect = inputs["data:geometry:propeller:radius_ratio_vect"]
+
+        matrix_to_inv = np.array(
+            [
+                [root_radius_ratio ** 2.0, root_radius_ratio, 1.0, 0.0, 0.0, 0.0],
+                [radius_ratio_mid ** 2.0, radius_ratio_mid, 1.0, 0.0, 0.0, 0.0],
+                [2.0 * radius_ratio_mid, 1.0, 0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 2.0 * radius_ratio_mid, 1.0, 0.0],
+                [0.0, 0.0, 0.0, radius_ratio_mid ** 2.0, radius_ratio_mid, 1.0],
+                [0.0, 0.0, 0.0, tip_radius_ratio ** 2.0, tip_radius_ratio, 1.0],
+            ]
+        )
+        result_matrix = np.array(
+            [
+                [chord_to_diameter_root],
+                [chord_to_diameter_ratio_mid],
+                [
+                    (chord_to_diameter_tip - chord_to_diameter_root)
+                    / (tip_radius_ratio - root_radius_ratio)
+                ],
+                [
+                    (chord_to_diameter_tip - chord_to_diameter_root)
+                    / (tip_radius_ratio - root_radius_ratio)
+                ],
+                [chord_to_diameter_ratio_mid],
+                [chord_to_diameter_tip],
+            ]
+        )
+
+        k12, k11, k10, k22, k21, k20 = np.dot(
+            np.linalg.inv(matrix_to_inv), result_matrix
+        ).transpose()[0]
+        chord_distribution = np.where(
+            radius_ratio_vect < radius_ratio_mid,
+            k12 * radius_ratio_vect ** 2.0 + k11 * radius_ratio_vect + k10,
+            k22 * radius_ratio_vect ** 2.0 + k21 * radius_ratio_vect + k20,
+        )
+
+        chord_distribution[0] = chord_distribution[1]
+
+        outputs["data:geometry:propeller:chord_to_diameter_vect"] = chord_distribution
 
 
 class _PreparePropellerDVariation(om.ExplicitComponent):
@@ -217,7 +360,7 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         thrust, eta, torque = self.compute_pitch_performance(
             inputs, theta_75, speed, altitude, omega, radius, alpha_list, cl_list, cd_list
         )
-        power = torque * omega
+        power = torque * omega * np.pi / 30.0
 
         outputs["data:aerodynamics:propeller:point_performance:thrust"] = thrust
         outputs["data:aerodynamics:propeller:point_performance:efficiency"] = eta
