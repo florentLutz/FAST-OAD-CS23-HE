@@ -187,7 +187,7 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         thrust, eta, torque = self.compute_pitch_performance(
             inputs, theta_75, speed, altitude, omega, radius, alpha_list, cl_list, cd_list
         )
-        power = torque * omega
+        power = torque * omega * np.pi / 30.0
 
         outputs["data:aerodynamics:propeller:point_performance:thrust"] = thrust
         outputs["data:aerodynamics:propeller:point_performance:efficiency"] = eta

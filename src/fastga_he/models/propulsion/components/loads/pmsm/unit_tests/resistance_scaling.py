@@ -30,9 +30,6 @@ if __name__ == "__main__":
     length = np.array([77, 77, 77, 85, 85, 85, 86, 86, 86, 91, 91, 91])
     length_star = length / length[0]
 
-    x0 = (1.0, 2, -2, -1)
-    bnds = ((0.0, -np.inf, -np.inf, -np.inf), (np.inf, np.inf, np.inf, np.inf))
-
     B = np.log(resistance_star) - 2.0 * np.log(voltage_star)
 
     A = np.column_stack([np.log(diameter_star), np.log(length_star)])

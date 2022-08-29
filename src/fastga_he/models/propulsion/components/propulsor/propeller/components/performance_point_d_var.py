@@ -122,7 +122,7 @@ class _ComputeSimilarityParameters(om.ExplicitComponent):
         radius_max = propeller_diameter / 2.0
         radius_min = 0.2 * radius_max
         radius_ratio_vect = inputs["data:geometry:propeller:radius_ratio_vect"]
-        radius_vect = radius_ratio_vect * propeller_diameter / 2.0
+        radius_vect = radius_ratio_vect * radius_max
         chord_vect = inputs["data:geometry:propeller:chord_vect"]
         n_blades = inputs["data:geometry:propeller:blades_number"]
 
