@@ -115,32 +115,35 @@ def add_module_to_database(file_path, results_df, columns_title):
     return results_df
 
 
-columns_title_final = [
-    "Module name",
-    "Current caliber (IGBT)",
-    "Maximum voltage (IGBT)",
-    "Voltage drop (IGBT)",
-    "Dynamic resistance (IGBT)",
-    "Thermal resistance (IGBT)",
-    "Voltage drop (diode)",
-    "Dynamic resistance (diode)",
-    "Thermal resistance (diode)",
-    "Module weight",
-    "Module-level resistance",
-]
+if __name__ == "__main__":
+    columns_title_final = [
+        "Module name",
+        "Current caliber (IGBT)",
+        "Maximum voltage (IGBT)",
+        "Voltage drop (IGBT)",
+        "Dynamic resistance (IGBT)",
+        "Thermal resistance (IGBT)",
+        "Voltage drop (diode)",
+        "Dynamic resistance (diode)",
+        "Thermal resistance (diode)",
+        "Module weight",
+        "Module-level resistance",
+    ]
 
-data_folder = "D:/fl.lutz/Documents/Biblio/Electric Aircraft Design/Inverter/IGBT_7"
+    data_folder = "D:/fl.lutz/Documents/Biblio/Electric Aircraft Design/Inverter/IGBT_7"
 
-final_results_df = pd.DataFrame(columns=columns_title_final)
+    final_results_df = pd.DataFrame(columns=columns_title_final)
 
-filenames = listdir(data_folder)
-for file_name in filenames:
-    data_file = path.join(data_folder, file_name)
-    try:
-        final_results_df = add_module_to_database(data_file, final_results_df, columns_title_final)
-    except:
-        print("Could not read " + data_file)
+    filenames = listdir(data_folder)
+    for file_name in filenames:
+        data_file = path.join(data_folder, file_name)
+        try:
+            final_results_df = add_module_to_database(
+                data_file, final_results_df, columns_title_final
+            )
+        except:
+            print("Could not read " + data_file)
 
-final_results_df.to_csv(
-    "D:/fl.lutz/Documents/Biblio/Electric Aircraft Design/Inverter/IGBT_7/database_igbt7.csv"
-)
+    final_results_df.to_csv(
+        "D:/fl.lutz/Documents/Biblio/Electric Aircraft Design/Inverter/IGBT_7/database_igbt7.csv"
+    )

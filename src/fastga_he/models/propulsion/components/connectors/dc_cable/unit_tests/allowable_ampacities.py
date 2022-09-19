@@ -71,8 +71,8 @@ if __name__ == "__main__":
     fig.update_xaxes(type="log")
     fig.show()
 
-    print(polyfit_copper)
-    print(polyfit_aluminium)
+    # print(polyfit_copper)
+    # print(polyfit_aluminium)
 
     mean_error_copper = (
         np.mean((copper_ampacities - np.polyval(polyfit_copper, area_log)) / copper_ampacities)

@@ -170,9 +170,9 @@ class _PrepareChordToDiameterLaw(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        chord_to_diameter_root = 0.043
+        chord_to_diameter_root = 0.0380
         root_radius_ratio = 0.2
-        chord_to_diameter_tip = 0.068
+        chord_to_diameter_tip = 0.0380
         tip_radius_ratio = 0.999
 
         radius_ratio_mid = float(inputs["data:geometry:propeller:mid_chord_radius_ratio"])

@@ -12,14 +12,14 @@ from fastga_he.models.propulsion.components.propulsor.propeller.components.perfo
 
 if __name__ == "__main__":
 
-    j = 1.7914191419141914
-    rpm = 800.0
+    j = 2.153125
+    rpm = 700.0
 
     speed = j * rpm / 60 * 3.048
 
-    ct_target = 0.09
+    ct_target = 0.01
     ct = ct_target / 2.0
-    twist_75 = 43.25438708
+    twist_75 = 40
     iter_count = 0
 
     while abs(ct - ct_target) / ct_target > 1e-4 and iter_count < 50:
@@ -27,7 +27,7 @@ if __name__ == "__main__":
         ivc = om.IndepVarComp()
         ivc.add_output("data:geometry:propeller:diameter", val=3.048, units="m")
         ivc.add_output("data:geometry:propeller:hub_diameter", val=0.6096, units="m")
-        ivc.add_output("data:geometry:propeller:blades_number", val=2)
+        ivc.add_output("data:geometry:propeller:blades_number", val=3)
         ivc.add_output("data:geometry:propeller:average_rpm", val=rpm, units="rpm")
 
         ivc.add_output(
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
         print(ct, twist_75)
 
-        twist_75 *= 1.0 - 0.33 * (ct - ct_target) / ct_target
+        twist_75 *= 1.0 - 2.0 * ct_target * (ct - ct_target) / ct_target
         iter_count += 1
 
     print(ct, cp, twist_75)
