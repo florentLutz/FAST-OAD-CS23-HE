@@ -11,7 +11,6 @@
         <hub_diameter units="m" is_input="True">0.472<!--propeller hub diameter--></hub_diameter>
         <radius_ratio_vect is_input="True">[0.01, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]<!--propeller radius ratio points--></radius_ratio_vect>
         <sweep_vect units="deg" is_input="True">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.2, 3.4, 5.0]<!--propeller sweep angle defined at radius ratio points--></sweep_vect>
-        <twist_vect_ref units="deg" is_input="True">[34.01214457, 33.9318573 , 31.21982041, 27.3504266 , 23.15315073, 19.05463917, 16.24968782, 14.08764308, 12.36807196, 11.36709688]<!--propeller twist angle defined at radius ratio points--></twist_vect_ref>
       </propeller>
     </geometry>
     <aerodynamics>

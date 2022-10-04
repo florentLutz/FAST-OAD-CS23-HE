@@ -8,8 +8,10 @@ import numpy as np
 from scipy.optimize import fsolve
 from stdatm.atmosphere import Atmosphere
 
-from fastga.models.aerodynamics.external.xfoil.xfoil_polar import XfoilPolar
 from fastga.models.aerodynamics.external.propeller_code.propeller_core import PropellerCoreModule
+
+from .performance_point import _ComputePropellerPointPerformance, _AdjustTwistLaw
+from fastga_he.models.aerodynamics.external.xfoil.xfoil_polar import XfoilPolarMod
 
 
 class ComputePropellerPointPerformanceDVar(om.Group):
@@ -32,6 +34,7 @@ class ComputePropellerPointPerformanceDVar(om.Group):
     def setup(self):
         self.add_subsystem("chord_law", _PrepareChordToDiameterLaw(), promotes=["*"])
         self.add_subsystem("diameter_variation", _PreparePropellerDVariation(), promotes=["*"])
+        self.add_subsystem("rescale_twist", _AdjustTwistLaw(), promotes=["*"])
         self.add_subsystem("ref_twist_adjust", _PreparePropellerTwist(), promotes=["*"])
         ivc = om.IndepVarComp()
         ivc.add_output("data:aerodynamics:propeller:mach", val=0.0)
@@ -40,10 +43,20 @@ class ComputePropellerPointPerformanceDVar(om.Group):
         for profile in self.options["sections_profile_name_list"]:
             self.add_subsystem(
                 profile + "_polar_efficiency",
-                XfoilPolar(
+                XfoilPolarMod(
                     airfoil_file=profile + ".af",
                     alpha_end=30.0,
                     activate_negative_angle=True,
+                ),
+                promotes=[],
+            )
+            self.add_subsystem(
+                profile + "_polar_efficiency_inv",
+                XfoilPolarMod(
+                    airfoil_file=profile + ".af",
+                    alpha_end=30.0,
+                    activate_negative_angle=True,
+                    inviscid=True,
                 ),
                 promotes=[],
             )
@@ -54,6 +67,14 @@ class ComputePropellerPointPerformanceDVar(om.Group):
             self.connect(
                 "data:aerodynamics:propeller:reynolds",
                 profile + "_polar_efficiency.xfoil:reynolds",
+            )
+            self.connect(
+                "data:aerodynamics:propeller:mach",
+                profile + "_polar_efficiency_inv.xfoil:mach",
+            )
+            self.connect(
+                "data:aerodynamics:propeller:reynolds",
+                profile + "_polar_efficiency_inv.xfoil:reynolds",
             )
         self.add_subsystem(
             "propeller_point_perf",
@@ -78,6 +99,14 @@ class ComputePropellerPointPerformanceDVar(om.Group):
             self.connect(
                 profile + "_polar_efficiency.xfoil:CD",
                 "propeller_point_perf." + profile + "_polar:CD",
+            )
+            self.connect(
+                profile + "_polar_efficiency_inv.xfoil:CL",
+                "propeller_point_perf." + profile + "_polar:CL_inv",
+            )
+            self.connect(
+                profile + "_polar_efficiency.xfoil:CD_min_2D",
+                "propeller_point_perf." + profile + "_polar:CD_min_2D",
             )
 
         self.add_subsystem(
@@ -156,6 +185,11 @@ class _PrepareChordToDiameterLaw(om.ExplicitComponent):
             desc="Ratio of the maximum chord to diameter to the chord to diameter of the root",
         )
         self.add_input(
+            "data:geometry:propeller:root_chord_ratio",
+            val=np.nan,
+            desc="Ratio of the chord to diameter at the root",
+        )
+        self.add_input(
             "data:geometry:propeller:mid_chord_radius_ratio",
             val=np.nan,
             desc="Position of the point of maximum chord as a ratio of the radius",
@@ -170,7 +204,7 @@ class _PrepareChordToDiameterLaw(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        chord_to_diameter_root = 0.0380
+        chord_to_diameter_root = inputs["data:geometry:propeller:root_chord_ratio"]
         root_radius_ratio = 0.2
         chord_to_diameter_tip = 0.0380
         tip_radius_ratio = 0.999
@@ -286,7 +320,7 @@ class _PreparePropellerTwist(om.ExplicitComponent):
         outputs["data:geometry:propeller:twist_vect"] = twist_vect
 
 
-class _ComputePropellerPointPerformance(PropellerCoreModule):
+class _ComputePropellerPointPerformanceDVar(PropellerCoreModule):
     def setup(self):
 
         super().setup()
