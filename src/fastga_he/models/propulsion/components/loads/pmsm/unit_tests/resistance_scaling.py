@@ -41,6 +41,7 @@ if __name__ == "__main__":
 
     b_sol, c_sol = x[0]
     print(voltage_star ** 2.0 * diameter_star ** b_sol * length_star ** c_sol)
+    print(resistance_star)
 
     # log_k, a_sol, b_sol = x[0]
     # print(np.exp(log_k) * currents ** a_sol * torques ** b_sol)

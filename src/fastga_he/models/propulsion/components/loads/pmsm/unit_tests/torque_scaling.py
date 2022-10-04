@@ -7,23 +7,24 @@ import numpy as np
 
 if __name__ == "__main__":
 
-    diameter = np.array([188, 188, 188, 208, 208, 208, 228, 228, 228, 268, 268, 268])
+    diameter = np.array([188, 208, 228, 268, 348])
     diameter_star = diameter / diameter[0]
 
-    length = np.array([77, 77, 77, 85, 85, 85, 86, 86, 86, 91, 91, 91])
+    length = np.array([77, 85, 86, 91, 107])
     length_star = length / length[0]
 
-    torque = np.array([40, 40, 40, 64, 64, 64, 96, 96, 96, 200, 200, 200])
-    torque_star = torque / torque[0]
+    torque = np.array([40, 64, 96, 200, 400])
 
-    x0 = (1.0, 1.0)
-    bnds = ((-np.inf, -np.inf, -np.inf), (np.inf, np.inf, np.inf))
+    weight = np.array([7, 9.1, 12, 20, 41])
+
+    torque_star = torque / torque[0]
 
     B = np.log(torque_star)
 
     A = np.column_stack([np.log(diameter_star), np.log(length_star)])
     # A = np.column_stack([np.ones_like(np.log(currents)), np.log(currents), np.log(torques)])
 
+    print("===== Torque =====")
     x = np.linalg.lstsq(A, B, rcond=None)
     print(x[0])
     print(x[1])
@@ -33,3 +34,11 @@ if __name__ == "__main__":
 
     # log_k, a_sol, b_sol = x[0]
     # print(np.exp(log_k) * currents ** a_sol * torques ** b_sol)
+
+    print("===== Weight =====")
+    B = weight - 2.8
+    A = np.column_stack([torque, torque ** (3 / 3.5)])
+    x = np.linalg.lstsq(A, B, rcond=None)
+    print(x[0])
+    print(x[1])
+    print(2.8 + x[0][0] * torque + x[0][1] * torque ** (3 / 3.5))

@@ -9,10 +9,10 @@ import scipy.optimize as opt
 
 from utils.curve_reading import curve_reading
 
-PLOT = True
+PLOT = False
 MOTOR = "348"  # "188", "208", "228", "268", "348"
 THRESHOLD = 0.89
-MODEL = "FULL", "SIGNIFICANT"
+MODEL = "FULL"  # , "SIGNIFICANT"
 
 
 def efficiency_for_curve_fit_only_significant(parameter, alpha_test, beta_test, gamma_test):
@@ -25,6 +25,21 @@ def efficiency_for_curve_fit_only_significant(parameter, alpha_test, beta_test, 
         alpha_test * (torque / torque_to_adim) ** 2.0
         + beta_test * (speed / speed_to_adim)
         + gamma_test * (speed / speed_to_adim) ** 2.0
+    ) * (torque_to_adim * speed_to_adim)
+
+    computed_efficiency = power / (power + power_losses)
+
+    return computed_efficiency
+
+
+def efficiency_for_curve_fit_Marc(parameter, alpha_test, beta_test):
+    speed, torque, max_speed_array, max_torque_array = parameter
+    torque_to_adim = max_torque_array[0]
+    speed_to_adim = max_speed_array[0]
+
+    power = speed * torque
+    power_losses = (
+        alpha_test * (torque / torque_to_adim) ** 2.0 + beta_test * (speed / speed_to_adim) ** 1.5
     ) * (torque_to_adim * speed_to_adim)
 
     computed_efficiency = power / (power + power_losses)
@@ -91,40 +106,35 @@ if __name__ == "__main__":
         )
     )
 
-    x0 = (7e-2, 7e-2, 7e-2, 7e-2, 7e-2)
-    bnds = ((-0.0, -0.0, -0.0, -0.0, -0.0), (1.0, 1.0, 1.0, 1.0, 1.0))
+    # x0 = (7e-2, 7e-2, 7e-2, 7e-2, 7e-2)
+    x0 = (7e-2, 7e-2, 7e-2)
+    # bnds = ((-0.0, -0.0, -0.0, -0.0, -0.0), (1.0, 1.0, 1.0, 1.0, 1.0))
+    bnds = ((-0.0, -0.0, -0.0), (1.0, 1.0, 1.0))
 
     p_opt, p_cov = opt.curve_fit(
-        efficiency_for_curve_fit,
+        efficiency_for_curve_fit_only_significant,
         parameter_curve_fit,
         efficiency_array,
         x0,
         bounds=bnds,
     )
-    print("Optimal parameter", p_opt)
-    alpha, beta, gamma, delta, epsilon = p_opt
 
-    # B = efficiency_array
-    #
-    # A = np.column_stack(
-    #     [
-    #         torque_array / speed_array,
-    #         1.0 / torque_array,
-    #         speed_array ** 0.5 / torque_array,
-    #         speed_array / torque_array,
-    #         np.ones_like(torque_array),
-    #     ]
-    # )
-    #
-    # x = np.linalg.lstsq(A, B, rcond=None)
-    # alpha, beta, gamma, delta, epsilon = x[0]
+    np.set_printoptions(suppress=True)
+
+    print("Optimal parameter", p_opt)
+    # alpha, beta, gamma, delta, epsilon = p_opt
+    alpha, beta, delta = p_opt
+    print("Alpha: ", alpha / max_torque_orig ** 2.0 * (max_speed_orig * max_torque_orig))
+    # print("Beta: ", beta / max_speed_orig ** 1.5 * (max_speed_orig * max_torque_orig))
+    print("Beta: ", beta / max_speed_orig * (max_speed_orig * max_torque_orig))
+    print("Delta: ", delta / max_speed_orig ** 2.0 * (max_speed_orig * max_torque_orig))
 
     power_loss = (
         alpha * (torque_array_plot / max_torque_orig) ** 2.0
         + beta * (speed_array_plot / max_speed_orig)
-        + gamma * (speed_array_plot / max_speed_orig) ** 1.5
+        # + gamma * (speed_array_plot / max_speed_orig) ** 1.5
         + delta * (speed_array_plot / max_speed_orig) ** 2.0
-        + epsilon * (torque_array_plot / max_torque_orig) * (speed_array_plot / max_speed_orig)
+        # + epsilon * (torque_array_plot / max_torque_orig) * (speed_array_plot / max_speed_orig)
     ) * (max_speed_orig * max_torque_orig)
     efficiency_grid = (
         torque_array_plot * speed_array_plot / (power_loss + torque_array_plot * speed_array_plot)
@@ -134,9 +144,9 @@ if __name__ == "__main__":
         (
             alpha * (torque_array / max_torque_orig) ** 2.0
             + beta * (speed_array / max_speed_orig)
-            + gamma * (speed_array / max_speed_orig) ** 1.5
+            # + gamma * (speed_array / max_speed_orig) ** 1.5
             + delta * (speed_array / max_speed_orig) ** 2.0
-            + epsilon * (torque_array / max_torque_orig) * (speed_array / max_speed_orig)
+            # + epsilon * (torque_array / max_torque_orig) * (speed_array / max_speed_orig)
         )
         * max_speed_orig
         * max_torque_orig
