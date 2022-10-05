@@ -4,19 +4,19 @@
             <he_power_train>
                 <PMSM>
                     <motor_1>
-                        <alpha>0.02268</alpha>
-                        <beta>0.7296</beta>
+                        <voltage>
+                            <peak units="V">700.0</peak>
+                        </voltage>
                         <torque>
-                            <peak units="N*m">1379.0</peak>
+                            <cont units="N*m">150.0</cont>
                         </torque>
                         <omega>
                             <peak units="rad/s">523.59</peak>
                         </omega>
                         <scaling>
-                            <diameter>1.10</diameter>
-                            <length>1.26</length>
-                            <alpha>0.54</alpha>
-                            <beta>1.52</beta>
+                            <diameter>0.9</diameter>
+                            <length>0.97</length>
+                            <phase_resistance>0.93308789</phase_resistance>
                         </scaling>
                     </motor_1>
                 </PMSM>
