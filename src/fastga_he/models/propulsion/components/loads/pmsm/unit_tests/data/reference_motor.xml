@@ -4,6 +4,7 @@
             <he_power_train>
                 <PMSM>
                     <motor_1>
+                        <torque_constant units="N*m/A">1.46</torque_constant>
                         <voltage>
                             <peak units="V">700.0</peak>
                         </voltage>
@@ -13,10 +14,19 @@
                         <omega>
                             <peak units="rad/s">523.59</peak>
                         </omega>
+                        <loss_coefficient>
+                            <alpha units="W/N**2/m**2">0.025</alpha>
+                            <beta units="W*s/rad">3.38</beta>
+                            <gamma units="W*s**2/rad**2">0.00825</gamma>
+                        </loss_coefficient>
                         <scaling>
                             <diameter>0.9</diameter>
                             <length>0.97</length>
                             <phase_resistance>0.93308789</phase_resistance>
+                            <torque_constant>0.77</torque_constant>
+                            <alpha>1.57</alpha>
+                            <beta>0.51</beta>
+                            <gamma>0.55</gamma>
                         </scaling>
                     </motor_1>
                 </PMSM>

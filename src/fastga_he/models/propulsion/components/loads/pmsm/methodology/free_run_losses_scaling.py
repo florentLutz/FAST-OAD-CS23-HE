@@ -60,8 +60,8 @@ if __name__ == "__main__":
     length = np.array([77, 85, 86, 91, 107])
     length_star = length / length[0]
 
-    B = np.log(beta_star)
-    A = np.column_stack([np.log(diameter_star), np.log(length_star)])
+    B = np.log(beta_star[:-1])
+    A = np.column_stack([np.log(diameter_star[:-1]), np.log(length_star[:-1])])
 
     print("===== Beta scaling =====")
     x = np.linalg.lstsq(A, B, rcond=None)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     print((beta_star - diameter_star ** c_1 * length_star ** c_2) / beta_star * 100.0)
 
     print("===== Gamma scaling =====")
-    B = np.log(gamma_star)
+    B = np.log(gamma_star[:-1])
     x = np.linalg.lstsq(A, B, rcond=None)
     c_1, c_2 = x[0]
     print(c_1, c_2)

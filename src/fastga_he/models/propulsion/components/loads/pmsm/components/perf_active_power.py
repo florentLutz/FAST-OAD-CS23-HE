@@ -6,8 +6,8 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesTorque(om.ExplicitComponent):
-    """Computation of the torque from power and rpm."""
+class PerformancesActivePower(om.ExplicitComponent):
+    """Computation of the electric active power required to run the motor."""
 
     def initialize(self):
 
@@ -20,28 +20,21 @@ class PerformancesTorque(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("shaft_power", units="W", val=np.nan, shape=number_of_points)
-        self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
+        self.add_input("efficiency", val=np.nan, shape=number_of_points)
 
-        self.add_output("torque", units="N*m", val=0.0, shape=number_of_points)
+        self.add_output(
+            "active_power", units="W", val=np.full(number_of_points, 50e3), shape=number_of_points
+        )
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        power = inputs["shaft_power"]
-        rpm = inputs["rpm"]
-        omega = rpm * 2.0 * np.pi / 60
-
-        torque = power / omega
-
-        outputs["torque"] = torque
+        outputs["active_power"] = inputs["shaft_power"] / inputs["efficiency"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        power = inputs["shaft_power"]
-        rpm = inputs["rpm"]
-
-        omega = rpm * 2.0 * np.pi / 60
-
-        partials["torque", "shaft_power"] = np.diag(1.0 / omega)
-        partials["torque", "rpm"] = -np.diag(power / omega ** 2.0) * 2.0 * np.pi / 60
+        partials["active_power", "shaft_power"] = np.diag(1.0 / inputs["efficiency"])
+        partials["active_power", "efficiency"] = -np.diag(
+            inputs["shaft_power"] / inputs["efficiency"] ** 2.0
+        )

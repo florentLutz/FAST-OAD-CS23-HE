@@ -16,7 +16,7 @@ class SizingMotorPhaseResistance(om.ExplicitComponent):
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
         self.options.declare(
-            "resistance_ref", default=22.9, desc="Length of the reference motor in [mOhm]"
+            "resistance_ref", default=22.9, desc="Phase resistance of the reference motor in [mOhm]"
         )
 
     def setup(self):
