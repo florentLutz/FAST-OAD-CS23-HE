@@ -1,0 +1,23 @@
+<FASTOAD_model>
+  <data>
+    <geometry>
+      <propeller>
+        <average_rpm is_input="True">2000.0<!--average rotation speed of the propeller--></average_rpm>
+        <blades_number is_input="True">5.0<!--number of blades on the propeller--></blades_number>
+        <depth units="m" is_input="True">0.4<!--depth of the propeller--></depth>
+        <mid_chord_radius_ratio>0.7</mid_chord_radius_ratio>
+        <mid_chord_ratio>2.813</mid_chord_ratio>
+        <diameter units="m" is_input="True">2.31<!--propeller diameter--></diameter>
+        <hub_diameter units="m" is_input="True">0.472<!--propeller hub diameter--></hub_diameter>
+        <radius_ratio_vect is_input="True">[0.01, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]<!--propeller radius ratio points--></radius_ratio_vect>
+        <sweep_vect units="deg" is_input="True">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.2, 3.4, 5.0]<!--propeller sweep angle defined at radius ratio points--></sweep_vect>
+      </propeller>
+    </geometry>
+    <aerodynamics>
+      <propeller>
+        <mach is_input="True">0.0<!--mach number used to compute the polar of the airfoil used in the propeller computation--></mach>
+        <reynolds is_input="True">1000000.0<!--reynolds number used to compute the polar of the airfoil used in the propeller computation--></reynolds>
+      </propeller>
+    </aerodynamics>
+  </data>
+</FASTOAD_model>

@@ -1,0 +1,13 @@
+<FASTOAD_model>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <propeller>
+                    <propeller_1>
+
+                    </propeller_1>
+                </propeller>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
