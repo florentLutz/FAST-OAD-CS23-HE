@@ -8,17 +8,17 @@ import openmdao.api as om
 
 from stdatm import Atmosphere
 
-from ..components.sizing_material_core import MaterialCore
-from ..components.sizing_current_per_cable import CurrentPerCable
-from ..components.sizing_cable_gauge import CableGauge
-from ..components.sizing_resistance_per_length import ResistancePerLength
-from ..components.sizing_insulation_thickness import InsulationThickness
-from ..components.sizing_mass_per_length import MassPerLength
-from ..components.sizing_harness_mass import HarnessMass
-from ..components.sizing_reference_resistance import ReferenceResistance
-from ..components.sizing_heat_capacity_per_length import HeatCapacityPerLength
-from ..components.sizing_heat_capacity import HeatCapacityCable
-from ..components.sizing_cable_radius import CableRadius
+from ..components.sizing_material_core import SizingMaterialCore
+from ..components.sizing_current_per_cable import SizingCurrentPerCable
+from ..components.sizing_cable_gauge import SizingCableGauge
+from ..components.sizing_resistance_per_length import SizingResistancePerLength
+from ..components.sizing_insulation_thickness import SizingInsulationThickness
+from ..components.sizing_mass_per_length import SizingMassPerLength
+from ..components.sizing_harness_mass import SizingHarnessMass
+from ..components.sizing_reference_resistance import SizingReferenceResistance
+from ..components.sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
+from ..components.sizing_heat_capacity import SizingHeatCapacityCable
+from ..components.sizing_cable_radius import SizingCableRadius
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
 from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
@@ -37,10 +37,12 @@ NB_POINTS_TEST = 10
 def test_material_core():
 
     # Research independent input value in .xml file
-    ivc = get_indep_var_comp(list_inputs(MaterialCore(harness_id="harness_1")), __file__, XML_FILE)
+    ivc = get_indep_var_comp(
+        list_inputs(SizingMaterialCore(harness_id="harness_1")), __file__, XML_FILE
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(MaterialCore(harness_id="harness_1"), ivc)
+    problem = run_system(SizingMaterialCore(harness_id="harness_1"), ivc)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:properties:density",
@@ -70,11 +72,11 @@ def test_compute_current_per_cable():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(CurrentPerCable(harness_id="harness_1")), __file__, XML_FILE
+        list_inputs(SizingCurrentPerCable(harness_id="harness_1")), __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(CurrentPerCable(harness_id="harness_1"), ivc)
+    problem = run_system(SizingCurrentPerCable(harness_id="harness_1"), ivc)
     assert problem[
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:current"
     ] == pytest.approx(47.0, rel=1e-2)
@@ -97,7 +99,7 @@ def test_compute_diameter():
     model = problem.model
     model.add_subsystem("ivc", ivc, promotes=["data:*"])
     model.add_subsystem(
-        "diameter_computation", CableGauge(harness_id="harness_1"), promotes=["data:*"]
+        "diameter_computation", SizingCableGauge(harness_id="harness_1"), promotes=["data:*"]
     )
     problem.setup()
     problem.run_model()
@@ -114,11 +116,11 @@ def test_compute_diameter():
 def test_compute_resistance():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ResistancePerLength(harness_id="harness_1")), __file__, XML_FILE
+        list_inputs(SizingResistancePerLength(harness_id="harness_1")), __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(ResistancePerLength(harness_id="harness_1"), ivc)
+    problem = run_system(SizingResistancePerLength(harness_id="harness_1"), ivc)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:resistance_per_length",
@@ -133,11 +135,11 @@ def test_compute_resistance():
 def test_insulation_thickness():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(InsulationThickness(harness_id="harness_1")), __file__, XML_FILE
+        list_inputs(SizingInsulationThickness(harness_id="harness_1")), __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(InsulationThickness(harness_id="harness_1"), ivc)
+    problem = run_system(SizingInsulationThickness(harness_id="harness_1"), ivc)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:thickness",
@@ -151,10 +153,12 @@ def test_insulation_thickness():
 
 def test_mass_per_length():
     # Research independent input value in .xml file
-    ivc = get_indep_var_comp(list_inputs(MassPerLength(harness_id="harness_1")), __file__, XML_FILE)
+    ivc = get_indep_var_comp(
+        list_inputs(SizingMassPerLength(harness_id="harness_1")), __file__, XML_FILE
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(MassPerLength(harness_id="harness_1"), ivc)
+    problem = run_system(SizingMassPerLength(harness_id="harness_1"), ivc)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:mass_per_length",
@@ -169,11 +173,11 @@ def test_mass_per_length():
 def test_resistance():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ReferenceResistance(harness_id="harness_1")), __file__, XML_FILE
+        list_inputs(SizingReferenceResistance(harness_id="harness_1")), __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(ReferenceResistance(harness_id="harness_1"), ivc)
+    problem = run_system(SizingReferenceResistance(harness_id="harness_1"), ivc)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:resistance",
@@ -188,11 +192,11 @@ def test_resistance():
 def test_heat_capacity_per_length():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(HeatCapacityPerLength(harness_id="harness_1")), __file__, XML_FILE
+        list_inputs(SizingHeatCapacityPerLength(harness_id="harness_1")), __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(HeatCapacityPerLength(harness_id="harness_1"), ivc)
+    problem = run_system(SizingHeatCapacityPerLength(harness_id="harness_1"), ivc)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable"
@@ -207,10 +211,12 @@ def test_heat_capacity_per_length():
 
 def test_cable_radius():
     # Research independent input value in .xml file
-    ivc = get_indep_var_comp(list_inputs(CableRadius(harness_id="harness_1")), __file__, XML_FILE)
+    ivc = get_indep_var_comp(
+        list_inputs(SizingCableRadius(harness_id="harness_1")), __file__, XML_FILE
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(CableRadius(harness_id="harness_1"), ivc)
+    problem = run_system(SizingCableRadius(harness_id="harness_1"), ivc)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:radius",
@@ -225,11 +231,11 @@ def test_cable_radius():
 def test_heat_capacity():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(HeatCapacityCable(harness_id="harness_1")), __file__, XML_FILE
+        list_inputs(SizingHeatCapacityCable(harness_id="harness_1")), __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(HeatCapacityCable(harness_id="harness_1"), ivc)
+    problem = run_system(SizingHeatCapacityCable(harness_id="harness_1"), ivc)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:heat_capacity",
@@ -243,10 +249,12 @@ def test_heat_capacity():
 
 def test_cable_mass():
     # Research independent input value in .xml file
-    ivc = get_indep_var_comp(list_inputs(HarnessMass(harness_id="harness_1")), __file__, XML_FILE)
+    ivc = get_indep_var_comp(
+        list_inputs(SizingHarnessMass(harness_id="harness_1")), __file__, XML_FILE
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(HarnessMass(harness_id="harness_1"), ivc)
+    problem = run_system(SizingHarnessMass(harness_id="harness_1"), ivc)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:mass",

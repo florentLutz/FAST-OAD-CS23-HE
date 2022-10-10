@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class InsulationThickness(om.ExplicitComponent):
+class SizingInsulationThickness(om.ExplicitComponent):
     """Computation of max current per cable ."""
 
     def initialize(self):

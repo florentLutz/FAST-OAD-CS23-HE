@@ -14,7 +14,7 @@ C1_ALU = -70.68
 C2_ALU = 60.33
 
 
-class CableGauge(om.Group):
+class SizingCableGauge(om.Group):
     """Computation of the cable gauge."""
 
     def initialize(self):

@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class CurrentPerCable(om.ExplicitComponent):
+class SizingCurrentPerCable(om.ExplicitComponent):
     """Computation of max current per cable ."""
 
     def initialize(self):

@@ -14,7 +14,7 @@ ALPHA_COPPER = 0.00393
 ALPHA_ALU = 0.004308
 
 
-class MaterialCore(om.ExplicitComponent):
+class SizingMaterialCore(om.ExplicitComponent):
 
     """Computation of max current per cable ."""
 

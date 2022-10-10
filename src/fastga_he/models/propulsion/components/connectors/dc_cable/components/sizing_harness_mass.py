@@ -9,7 +9,7 @@ LENGTH_FACTOR = 1.2  # For the mass and resistance computation we will consider 
 # longer than it actually is to account for the fact that he is stranded to shield EMI
 
 
-class HarnessMass(om.ExplicitComponent):
+class SizingHarnessMass(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
             name="harness_id",

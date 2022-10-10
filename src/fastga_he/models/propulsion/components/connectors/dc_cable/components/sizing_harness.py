@@ -4,17 +4,17 @@
 
 import openmdao.api as om
 
-from .sizing_material_core import MaterialCore
-from .sizing_current_per_cable import CurrentPerCable
-from .sizing_cable_gauge import CableGauge
-from .sizing_resistance_per_length import ResistancePerLength
-from .sizing_insulation_thickness import InsulationThickness
-from .sizing_mass_per_length import MassPerLength
-from .sizing_harness_mass import HarnessMass
-from .sizing_reference_resistance import ReferenceResistance
-from .sizing_heat_capacity_per_length import HeatCapacityPerLength
-from .sizing_heat_capacity import HeatCapacityCable
-from .sizing_cable_radius import CableRadius
+from .sizing_material_core import SizingMaterialCore
+from .sizing_current_per_cable import SizingCurrentPerCable
+from .sizing_cable_gauge import SizingCableGauge
+from .sizing_resistance_per_length import SizingResistancePerLength
+from .sizing_insulation_thickness import SizingInsulationThickness
+from .sizing_mass_per_length import SizingMassPerLength
+from .sizing_harness_mass import SizingHarnessMass
+from .sizing_reference_resistance import SizingReferenceResistance
+from .sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
+from .sizing_heat_capacity import SizingHeatCapacityCable
+from .sizing_cable_radius import SizingCableRadius
 
 
 class SizingHarness(om.Group):
@@ -31,44 +31,46 @@ class SizingHarness(om.Group):
         harness_id = self.options["harness_id"]
 
         self.add_subsystem(
-            "core_material", MaterialCore(harness_id=harness_id), promotes=["data:*"]
+            "core_material", SizingMaterialCore(harness_id=harness_id), promotes=["data:*"]
         )
         self.add_subsystem(
-            "current_per_cable", CurrentPerCable(harness_id=harness_id), promotes=["data:*"]
+            "current_per_cable", SizingCurrentPerCable(harness_id=harness_id), promotes=["data:*"]
         )
 
         self.add_subsystem(
-            "cable_conductor_sizing", CableGauge(harness_id=harness_id), promotes=["data:*"]
+            "cable_conductor_sizing", SizingCableGauge(harness_id=harness_id), promotes=["data:*"]
         )
         self.add_subsystem(
             "cable_insulation_sizing",
-            InsulationThickness(harness_id=harness_id),
+            SizingInsulationThickness(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
         )
         self.add_subsystem(
             "cable_total_radius",
-            CableRadius(harness_id=harness_id),
+            SizingCableRadius(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
         )
 
         self.add_subsystem(
-            "resistance_per_length", ResistancePerLength(harness_id=harness_id), promotes=["data:*"]
+            "resistance_per_length",
+            SizingResistancePerLength(harness_id=harness_id),
+            promotes=["data:*"],
         )
         self.add_subsystem(
             "mass_per_length",
-            MassPerLength(harness_id=harness_id),
+            SizingMassPerLength(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
         )
         self.add_subsystem(
             "heat_capacity_per_length",
-            HeatCapacityPerLength(harness_id=harness_id),
+            SizingHeatCapacityPerLength(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
         )
 
         self.add_subsystem(
-            "resistance", ReferenceResistance(harness_id=harness_id), promotes=["data:*"]
+            "resistance", SizingReferenceResistance(harness_id=harness_id), promotes=["data:*"]
         )
-        self.add_subsystem("mass", HarnessMass(harness_id=harness_id), promotes=["data:*"])
+        self.add_subsystem("mass", SizingHarnessMass(harness_id=harness_id), promotes=["data:*"])
         self.add_subsystem(
-            "heat_capacity", HeatCapacityCable(harness_id=harness_id), promotes=["data:*"]
+            "heat_capacity", SizingHeatCapacityCable(harness_id=harness_id), promotes=["data:*"]
         )

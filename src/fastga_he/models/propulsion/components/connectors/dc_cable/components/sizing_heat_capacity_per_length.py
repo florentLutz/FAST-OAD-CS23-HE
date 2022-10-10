@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class HeatCapacityPerLength(om.ExplicitComponent):
+class SizingHeatCapacityPerLength(om.ExplicitComponent):
     """Computation of mass per length of cable."""
 
     def initialize(self):
