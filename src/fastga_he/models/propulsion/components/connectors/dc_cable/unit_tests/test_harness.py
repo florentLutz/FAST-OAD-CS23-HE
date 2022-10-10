@@ -573,12 +573,6 @@ def test_sizing_cable():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingHarness(harness_id="harness_1"), ivc)
 
-    print(
-        problem.get_val(
-            "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:radius",
-            units="mm",
-        )
-    )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:mass_per_length",
