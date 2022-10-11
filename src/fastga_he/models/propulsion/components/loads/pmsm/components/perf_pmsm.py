@@ -10,6 +10,7 @@ from .perf_efficiency import PerformancesEfficiency
 from .perf_active_power import PerformancesActivePower
 from .perf_apparent_power import PerformancesApparentPower
 from .perf_current_rms import PerformancesCurrentRMS
+from .perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from .perf_voltage_rms import PerformancesVoltageRMS
 from .perf_voltage_peak import PerformancesVoltagePeak
 
@@ -62,14 +63,19 @@ class PerformancePMSM(om.Group):
             promotes=["data:*", "rms_current"],
         )
         self.add_subsystem(
+            "rms_current_one_phase",
+            PerformancesCurrentRMS1Phase(number_of_points=number_of_points),
+            promotes=["rms_current", "rms_current_one_phase"],
+        )
+        self.add_subsystem(
             "rms_voltage",
             PerformancesVoltageRMS(number_of_points=number_of_points),
-            promotes=["rms_current"],
+            promotes=["rms_current", "rms_voltage"],
         )
         self.add_subsystem(
             "peak_voltage",
             PerformancesVoltagePeak(number_of_points=number_of_points),
-            promotes=["peak_voltage"],
+            promotes=["peak_voltage", "rms_voltage"],
         )
 
         self.connect(
@@ -95,9 +101,4 @@ class PerformancePMSM(om.Group):
         self.connect(
             "apparent_power.apparent_power",
             "rms_voltage.apparent_power",
-        )
-
-        self.connect(
-            "rms_voltage.rms_voltage",
-            "peak_voltage.rms_voltage",
         )

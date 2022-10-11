@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class PerformancesCurrentRMS(om.ExplicitComponent):
-    """Computation of the rms current in one phase from the torque and torque constant."""
+    """Computation of the rms current in all phases based on the torque and torque constant."""
 
     def initialize(self):
 
@@ -25,7 +25,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
 
         self.add_input("torque", units="N*m", val=np.nan, shape=number_of_points)
         self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:torque_constant",
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant",
             val=1.0,
             units="N*m/A",
         )
@@ -35,7 +35,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
             units="A",
             val=np.full(number_of_points, 10.0),
             shape=number_of_points,
-            desc="RMS current in one of the phase of the motor",
+            desc="RMS current in all the phases of the motor",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -45,7 +45,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         torque = inputs["torque"]
-        k_t = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:torque_constant"]
+        k_t = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant"]
 
         rms_current = torque / k_t
 
@@ -57,12 +57,12 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         torque = inputs["torque"]
-        k_t = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:torque_constant"]
+        k_t = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant"]
 
         partials["rms_current", "torque"] = np.eye(number_of_points) / k_t
         partials[
             "rms_current",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:torque_constant",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant",
         ] = (
             -torque / k_t ** 2.0
         )

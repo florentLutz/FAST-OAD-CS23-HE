@@ -23,6 +23,7 @@ from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_active_power import PerformancesActivePower
 from ..components.perf_apparent_power import PerformancesApparentPower
 from ..components.perf_current_rms import PerformancesCurrentRMS
+from ..components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
 
@@ -339,7 +340,32 @@ def test_rms_current():
     )
 
     assert problem.get_val("rms_current", units="A") == pytest.approx(
-        [106.5, 118.2, 129.9, 140.3, 150.6, 159.7, 168.8, 176.6, 185.7, 193.5], rel=1e-2
+        [56.1, 62.3, 68.4, 73.9, 79.4, 84.2, 89.0, 93.1, 97.9, 102.0],
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_rms_current_1_phase():
+
+    ivc = get_indep_var_comp(
+        list_inputs(PerformancesCurrentRMS1Phase(number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "rms_current",
+        np.array([56.1, 62.3, 68.4, 73.9, 79.4, 84.2, 89.0, 93.1, 97.9, 102.0]),
+        units="A",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PerformancesCurrentRMS1Phase(number_of_points=NB_POINTS_TEST), ivc)
+
+    assert problem.get_val("rms_current_one_phase", units="A") == pytest.approx(
+        [18.7, 20.8, 22.8, 24.6, 26.5, 28.1, 29.7, 31.0, 32.6, 34.0],
+        rel=1e-2,
     )
 
     problem.check_partials(compact_print=True)
@@ -367,7 +393,8 @@ def test_rms_voltage():
     problem = run_system(PerformancesVoltageRMS(number_of_points=NB_POINTS_TEST), ivc)
 
     assert problem.get_val("rms_voltage", units="V") == pytest.approx(
-        [101.7, 104.6, 107.0, 110.0, 112.7, 115.8, 118.9, 122.1, 124.6, 127.5], rel=1e-2
+        [305.1, 313.8, 321.0, 330.0, 337.9, 347.5, 356.6, 366.3, 373.7, 382.4],
+        rel=1e-2,
     )
 
     problem.check_partials(compact_print=True)
@@ -439,13 +466,19 @@ def test_performance_pmsm():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(PerformancePMSM(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc)
 
-    om.n2(problem)
+    # om.n2(problem)
 
     assert problem.get_val("rms_current", units="A") == pytest.approx(
-        [106.5, 118.2, 129.9, 140.3, 150.6, 159.7, 168.8, 176.6, 185.7, 193.5], rel=1e-2
+        [56.1, 62.4, 68.3, 73.9, 79.2, 84.2, 89.0, 93.4, 97.7, 101.7], rel=1e-2
+    )
+    assert problem.get_val("rms_current_one_phase", units="A") == pytest.approx(
+        [18.7, 20.8, 22.8, 24.6, 26.4, 28.1, 29.7, 31.1, 32.6, 33.9], rel=1e-2
+    )
+    assert problem.get_val("rms_voltage", units="V") == pytest.approx(
+        [580.0, 594.8, 610.4, 626.4, 642.7, 659.3, 676.0, 692.9, 710.0, 727.1], rel=1e-2
     )
     assert problem.get_val("peak_voltage", units="V") == pytest.approx(
-        [124.6, 128.1, 131.0, 134.7, 138.0, 141.8, 145.6, 149.5, 152.6, 156.2], rel=1e-2
+        [710.4, 728.5, 747.6, 767.2, 787.1, 807.5, 827.9, 848.6, 869.6, 890.5], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
