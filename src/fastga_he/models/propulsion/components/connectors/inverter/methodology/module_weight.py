@@ -20,6 +20,7 @@ if __name__ == "__main__":
     log_k, a, b = x[0]
 
     print(np.exp(log_k) * I_cal_star ** a * V_cal_star ** b)
+    print(W_star)
 
     plt.plot(W_star)
     plt.plot(np.exp(log_k) * I_cal_star ** a * V_cal_star ** b)
