@@ -17,39 +17,40 @@ TWIST = 40  # 40, 35, 30, 25, 20, 15
 
 def cp_from_ct(j, tip_mach, re_d, solidity, ct, activity_factor, twist_blade):
 
+    # Careful, new definition of the tip mach which should now be computed using the absolute
+    # speed on the blades
+
     cp = (
-        10 ** 0.97966
+        10 ** 2.31538
         * j
         ** (
-            -0.01288 * np.log10(re_d)
-            + 0.06626 * np.log10(j) * np.log10(activity_factor) ** 2
-            + 0.12256 * np.log10(solidity) * np.log10(ct) * np.log10(activity_factor)
-            + 0.27017 * np.log10(ct) * np.log10(activity_factor) * np.log10(twist_blade)
-            + 0.08618 * np.log10(solidity) * np.log10(twist_blade) ** 2
-            - 0.01302 * np.log10(j) ** 2 * np.log10(re_d)
-            - 0.51762 * np.log10(solidity) * np.log10(activity_factor) * np.log10(twist_blade)
-            + 0.06004 * np.log10(ct) ** 3
-            + 0.71752
-            + 0.10064 * np.log10(re_d) * np.log10(solidity) * np.log10(twist_blade)
+            +0.05414 * np.log10(re_d)
+            + 0.06795 * np.log10(j) * np.log10(activity_factor) ** 2
+            - 0.47030 * np.log10(ct)
+            - 0.05973 * np.log10(j) ** 2
+            + 0.17931 * np.log10(ct) * np.log10(activity_factor) * np.log10(twist_blade)
+            - 0.19079 * np.log10(twist_blade) ** 2
+            - 0.07782 * np.log10(j) * np.log10(activity_factor) * np.log10(twist_blade)
+            - 0.07683 * np.log10(ct) ** 2 * np.log10(activity_factor)
         )
-        * tip_mach ** (-0.00087 * np.log10(re_d) ** 2 * np.log10(twist_blade))
+        * tip_mach ** (+0.00011 * np.log10(re_d) ** 3)
         * re_d
         ** (
-            +0.02225 * np.log10(solidity) * np.log10(ct) ** 2
-            + 0.00060 * np.log10(re_d) ** 3
-            + 0.00190 * np.log10(re_d) * np.log10(ct) ** 2
-            - 0.00613 * np.log10(re_d) ** 2
-            + 0.02932 * np.log10(ct) ** 2
+            +0.02100 * np.log10(solidity) * np.log10(ct) ** 2
+            - 0.32454
+            - 0.00078 * np.log10(ct) ** 2 * np.log10(twist_blade)
+            + 0.00371 * np.log10(re_d) * np.log10(ct) ** 2
+            + 0.00015 * np.log10(re_d) ** 3
         )
-        * solidity ** (-0.02670 * np.log10(solidity) ** 2 * np.log10(activity_factor))
+        * solidity ** (-0.02698 * np.log10(solidity) ** 2 * np.log10(activity_factor))
         * ct
         ** (
-            +1.45291
-            + 0.01386 * np.log10(ct) ** 2 * np.log10(activity_factor)
-            + 0.00362 * np.log10(ct) * np.log10(twist_blade) ** 2
-            - 0.05156 * np.log10(ct) ** 2
+            +1.48237
+            + 0.01548 * np.log10(ct) ** 2 * np.log10(activity_factor)
+            + 0.10762 * np.log10(ct)
+            - 0.05141 * np.log10(ct) ** 2
         )
-        * activity_factor ** (-0.00472 * np.log10(activity_factor) ** 2 * np.log10(twist_blade))
+        * activity_factor ** (-0.00292 * np.log10(activity_factor) ** 2 * np.log10(twist_blade))
     )
 
     return cp
@@ -553,7 +554,9 @@ if __name__ == "__main__":
         cp_list[idx] = cp_from_ct(
             j_loop,
             (j_loop ** 2.0 + np.pi ** 2.0) * (rpm / 60 * 3.048) ** 2.0 / atm.speed_of_sound ** 2.0,
-            j_loop * rpm / 60 * 3.048 ** 2.0 / atm.kinematic_viscosity,
+            np.sqrt((j_loop ** 2.0 + np.pi ** 2.0) * (rpm / 60 * 3.048) ** 2.0)
+            * 3.048
+            / atm.kinematic_viscosity,
             solidity_naca,
             ct_loop,
             activity_factor_naca,

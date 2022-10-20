@@ -47,7 +47,7 @@ class SizingPropellerWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:propeller:" + propeller_id + ":material",
             val=1.0,
-            desc="0.0 for composite, 1.0 for aluminium",
+            desc="1.0 for composite, 0.0 for aluminium",
         )
 
         self.add_output(

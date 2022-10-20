@@ -4,7 +4,15 @@
             <he_power_train>
                 <propeller>
                     <propeller_1>
-
+                        <solidity>0.2</solidity>
+                        <activity_factor>150</activity_factor>
+                        <blade_twist units="deg">22.6</blade_twist>
+                        <diameter units="inch">78.0</diameter>
+                        <number_blades>3</number_blades>
+                        <material>0.0</material>
+                        <torque>
+                            <cont units="N*m">817.0</cont>
+                        </torque>
                     </propeller_1>
                 </propeller>
             </he_power_train>

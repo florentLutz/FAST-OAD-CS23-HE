@@ -19,10 +19,10 @@ class PerformancePMSM(om.Group):
     def initialize(self):
 
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
         self.options.declare(
-            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
