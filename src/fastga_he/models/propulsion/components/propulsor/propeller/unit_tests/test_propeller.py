@@ -11,6 +11,7 @@ from ..components.perf_tip_mach import PerformancesTipMach
 from ..components.perf_thrust_coefficient import PerformancesThrustCoefficient
 from ..components.perf_blade_reynolds import PerformancesBladeReynoldsNumber
 from ..components.perf_power_coefficient import PerformancesPowerCoefficient
+from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_shaft_power import PerformancesShaftPower
 
 from ..components.perf_propeller import PerformancesPropeller
@@ -211,6 +212,44 @@ def test_power_coefficient():
 
     assert problem.get_val("power_coefficient") == pytest.approx(
         np.array([0.0658, 0.0661, 0.0662, 0.0671, 0.0672, 0.0675, 0.0677, 0.0678, 0.0681, 0.0689]),
+        rel=1e-2,
+    )
+
+    # Derivative wrt Re is accurate with the proper step (at least 1)
+    problem.check_partials(compact_print=True)
+
+
+def test_efficiency():
+    ivc = get_indep_var_comp(
+        list_inputs(PerformancesEfficiency(number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "thrust_coefficient",
+        val=np.array(
+            [0.0473, 0.047, 0.0466, 0.0463, 0.0459, 0.0456, 0.0453, 0.0449, 0.0446, 0.0443]
+        ),
+    )
+    ivc.add_output(
+        "power_coefficient",
+        val=np.array(
+            [0.0658, 0.0661, 0.0662, 0.0671, 0.0672, 0.0675, 0.0677, 0.0678, 0.0681, 0.0689]
+        ),
+    )
+    ivc.add_output(
+        "advance_ratio",
+        val=np.array([0.99, 1.0, 1.01, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.1]),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesEfficiency(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("efficiency") == pytest.approx(
+        np.array([0.712, 0.711, 0.711, 0.711, 0.71, 0.709, 0.709, 0.709, 0.707, 0.707]),
         rel=1e-2,
     )
 
