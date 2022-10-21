@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class InverterEnergyCoefficients(om.ExplicitComponent):
+class SizingInverterEnergyCoefficients(om.ExplicitComponent):
     """Computation of coefficients of the computation of commutation energy in diodes and IGBT.
-    Reference for IGBT and diode is the SEMiX703GB126HDs from Semikron."""
+    Reference for IGBT and diode is the SEMiX453GB12M7p from Semikron."""
 
     def initialize(self):
         self.options.declare(
@@ -21,57 +21,57 @@ class InverterEnergyCoefficients(om.ExplicitComponent):
         self.options.declare(
             name="a_on_ref",
             types=float,
-            default=1.36e-9,
+            default=1.283669488899433e-07,
             desc="Reference coefficient in front of current square for ON commutation energy",
         )
         self.options.declare(
             name="a_off_ref",
             types=float,
-            default=-9.624e-11,
+            default=-1.1279134596923756e-08,
             desc="Reference coefficient in front of current square for OFF commutation energy",
         )
         self.options.declare(
             name="a_rr_ref",
             types=float,
-            default=-8.285e-10,
+            default=-4.347644706692315e-08,
             desc="Reference coefficient in front of current square for RR commutation energy",
         )
 
         self.options.declare(
             name="b_on_ref",
             types=float,
-            default=3.986e-6,
+            default=1.058587405970034e-05,
             desc="Reference coefficient in front of current for ON commutation energy",
         )
         self.options.declare(
             name="b_off_ref",
             types=float,
-            default=1.330e-5,
+            default=0.00010832184425303843,
             desc="Reference coefficient in front of current for OFF commutation energy",
         )
         self.options.declare(
             name="b_rr_ref",
             types=float,
-            default=1.116e-5,
+            default=8.082183571138373e-05,
             desc="Reference coefficient in front of current for RR commutation energy",
         )
 
         self.options.declare(
             name="c_on_ref",
             types=float,
-            default=1.214e-3,
+            default=0.00793142842339549,
             desc="Reference constant coefficient for ON commutation energy",
         )
         self.options.declare(
             name="c_off_ref",
             types=float,
-            default=9.064e-4,
+            default=0.002124079855514512,
             desc="Reference constant coefficient for OFF commutation energy",
         )
         self.options.declare(
             name="c_rr_ref",
             types=float,
-            default=1.249e-3,
+            default=0.007536814077525891,
             desc="Reference constant coefficient for RR commutation energy",
         )
 

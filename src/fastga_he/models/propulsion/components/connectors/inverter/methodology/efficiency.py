@@ -11,7 +11,7 @@ import plotly.graph_objects as go
 if __name__ == "__main__":
 
     # Obtaining the reference parameters
-    data_file = pth.join(pth.dirname(__file__), "data/reference_IGBT_module.csv")
+    data_file = pth.join(pth.dirname(__file__), "data/new_reference_IGBT_module.csv")
 
     energy_data = pd.read_csv(data_file)
 

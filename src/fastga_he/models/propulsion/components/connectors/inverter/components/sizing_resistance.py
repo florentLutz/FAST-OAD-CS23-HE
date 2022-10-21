@@ -6,8 +6,11 @@ import numpy as np
 import openmdao.api as om
 
 
-class InverterResistances(om.ExplicitComponent):
-    """Computation of resistances of the diodes and IGBT."""
+class SizingInverterResistances(om.ExplicitComponent):
+    """
+    Computation of resistances of the diodes and IGBT, reference IGBT module for this is the
+    SEMiX453GB12M7p.
+    """
 
     def initialize(self):
         self.options.declare(
@@ -20,13 +23,13 @@ class InverterResistances(om.ExplicitComponent):
         self.options.declare(
             name="R_igbt_ref",
             types=float,
-            default=2.0e-3,
+            default=1.51e-3,
             desc="Reference IGBT resistance (Ohm)",
         )
         self.options.declare(
             name="R_diode_ref",
             types=float,
-            default=1.6e-3,
+            default=1.87e-3,
             desc="Reference diode resistance (Ohm)",
         )
 

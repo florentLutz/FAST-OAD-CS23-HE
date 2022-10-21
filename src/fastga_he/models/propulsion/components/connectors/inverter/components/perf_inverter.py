@@ -9,7 +9,7 @@ from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_total_loss import PerformancesLosses
 
 
-class PerformanceInverter(om.Group):
+class PerformancesInverter(om.Group):
     def initialize(self):
 
         self.options.declare(

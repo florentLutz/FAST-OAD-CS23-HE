@@ -6,8 +6,8 @@ import numpy as np
 import openmdao.api as om
 
 
-class InverterScalingRatio(om.ExplicitComponent):
-    """Computation of scaling ratio for the inverter components."""
+class SizingInverterResistanceScaling(om.ExplicitComponent):
+    """Computation of scaling ratio for the resistances of the inverter."""
 
     def initialize(self):
         self.options.declare(
@@ -35,20 +35,10 @@ class InverterScalingRatio(om.ExplicitComponent):
             desc="Current caliber of one arm of the inverter",
         )
 
-        self.add_output("data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a")
-        self.add_output("data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c")
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance"
         )
 
-        self.declare_partials(
-            of="data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
-            wrt="data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c",
-            wrt="data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
-        )
         self.declare_partials(
             of="data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance",
             wrt="data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
@@ -66,12 +56,6 @@ class InverterScalingRatio(om.ExplicitComponent):
         current_caliber_star = current_caliber / current_caliber_ref
 
         outputs[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a"
-        ] = current_caliber_star
-        outputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c"] = (
-            current_caliber_star ** -1
-        )
-        outputs[
             "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance"
         ] = (current_caliber_star ** -1)
 
@@ -82,18 +66,6 @@ class InverterScalingRatio(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber"
         ]
 
-        partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
-        ] = (
-            1.0 / current_caliber_ref
-        )
-        partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
-        ] = (
-            -current_caliber_ref / current_caliber ** 2.0
-        )
         partials[
             "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance",
             "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",

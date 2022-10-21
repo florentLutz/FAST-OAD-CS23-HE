@@ -7,13 +7,14 @@ import openmdao.api as om
 import pytest
 import plotly.graph_objects as go
 
-from ..components.sizing_scaling_ratio import InverterScalingRatio
-from ..components.sizing_energy_coefficients import InverterEnergyCoefficients
-from ..components.sizing_resistance import InverterResistances
+from ..components.sizing_loss_coefficient_scaling import SizingInverterLossCoefficientScaling
+from ..components.sizing_energy_coefficients import SizingInverterEnergyCoefficients
+from ..components.sizing_resistance_scaling import SizingInverterResistanceScaling
+from ..components.sizing_resistance import SizingInverterResistances
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_total_loss import PerformancesLosses
-from ..components.perf_inverter import PerformanceInverter
+from ..components.perf_inverter import PerformancesInverter
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -25,19 +26,18 @@ def test_scaling_ratio():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(InverterScalingRatio(inverter_id="inverter_1")), __file__, XML_FILE
+        list_inputs(SizingInverterLossCoefficientScaling(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(InverterScalingRatio(inverter_id="inverter_1"), ivc)
+    problem = run_system(SizingInverterLossCoefficientScaling(inverter_id="inverter_1"), ivc)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:a"
     ) == pytest.approx(1.111, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:c"
-    ) == pytest.approx(0.9, rel=1e-2)
-    assert problem.get_val(
-        "data:propulsion:he_power_train:inverter:inverter_1:scaling:resistance"
     ) == pytest.approx(0.9, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -47,10 +47,10 @@ def test_energy_coefficient():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(InverterEnergyCoefficients(inverter_id="inverter_1")), __file__, XML_FILE
+        list_inputs(SizingInverterEnergyCoefficients(inverter_id="inverter_1")), __file__, XML_FILE
     )
 
-    problem = run_system(InverterEnergyCoefficients(inverter_id="inverter_1"), ivc)
+    problem = run_system(SizingInverterEnergyCoefficients(inverter_id="inverter_1"), ivc)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_on:a"
     ) == pytest.approx(1.5106e-9, rel=1e-2)
@@ -84,14 +84,30 @@ def test_energy_coefficient():
     problem.check_partials(compact_print=True)
 
 
+def test_resistance_scaling():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterResistanceScaling(inverter_id="inverter_1")), __file__, XML_FILE
+    )
+
+    problem = run_system(SizingInverterResistanceScaling(inverter_id="inverter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:scaling:resistance"
+    ) == pytest.approx(0.9, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_resistance():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(InverterResistances(inverter_id="inverter_1")), __file__, XML_FILE
+        list_inputs(SizingInverterResistances(inverter_id="inverter_1")), __file__, XML_FILE
     )
 
-    problem = run_system(InverterResistances(inverter_id="inverter_1"), ivc)
+    problem = run_system(SizingInverterResistances(inverter_id="inverter_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:igbt:resistance", units="ohm"
@@ -199,7 +215,9 @@ def test_total_losses_inverter():
 
 def test_performances_inverter_tot():
     ivc = get_indep_var_comp(
-        list_inputs(PerformanceInverter(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST)),
+        list_inputs(
+            PerformancesInverter(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST)
+        ),
         __file__,
         XML_FILE,
     )
@@ -209,7 +227,7 @@ def test_performances_inverter_tot():
     ivc.add_output("modulation_index", np.linspace(0.1, 1.0, NB_POINTS_TEST))
 
     problem = run_system(
-        PerformanceInverter(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
+        PerformancesInverter(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
     expected_losses = np.array(
@@ -235,7 +253,7 @@ def test_map_efficiency():
     modulation_index = modulation_index.flatten()
 
     ivc = get_indep_var_comp(
-        list_inputs(PerformanceInverter(inverter_id="inverter_1", number_of_points=current.size)),
+        list_inputs(PerformancesInverter(inverter_id="inverter_1", number_of_points=current.size)),
         __file__,
         XML_FILE,
     )
@@ -245,7 +263,7 @@ def test_map_efficiency():
     ivc.add_output("modulation_index", modulation_index)
 
     problem = run_system(
-        PerformanceInverter(inverter_id="inverter_1", number_of_points=current.size), ivc
+        PerformancesInverter(inverter_id="inverter_1", number_of_points=current.size), ivc
     )
 
     print(problem["losses_inverter"])
