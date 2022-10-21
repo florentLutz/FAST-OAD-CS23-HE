@@ -126,18 +126,13 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         f_sw = inputs["switching_frequency"]
         current = inputs["current"]
 
-        loss_diode = f_sw * (a_rr / 2.0 + b_rr * current / np.pi + c_rr * current ** 2.0 / 4) * 1e-3
-        loss_igbt = (
-            f_sw
-            * (
-                (a_on + a_off) / 2.0
-                + (b_on + b_off) * current / np.pi
-                + (c_on + c_off) * current ** 2.0 / 4
-            )
-            * 1e-3
+        loss_diode = f_sw * (a_rr / 2.0 + b_rr * current / np.pi + c_rr * current ** 2.0 / 4)
+        loss_igbt = f_sw * (
+            (a_on + a_off) / 2.0
+            + (b_on + b_off) * current / np.pi
+            + (c_on + c_off) * current ** 2.0 / 4
         )
-        # a, b and c coefficient on reference were interpolated to give the results in mJ so we
-        # convert to J
+        # a, b and c coefficient on reference were interpolated to give the results in J
 
         outputs["switching_losses_diode"] = loss_diode
         outputs["switching_losses_IGBT"] = loss_igbt

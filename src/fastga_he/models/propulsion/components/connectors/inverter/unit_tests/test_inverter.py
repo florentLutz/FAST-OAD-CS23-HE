@@ -7,7 +7,7 @@ import openmdao.api as om
 import pytest
 import plotly.graph_objects as go
 
-from ..components.sizing_loss_coefficient_scaling import SizingInverterLossCoefficientScaling
+from ..components.sizing_energy_coefficient_scaling import SizingInverterLossCoefficientScaling
 from ..components.sizing_energy_coefficients import SizingInverterEnergyCoefficients
 from ..components.sizing_resistance_scaling import SizingInverterResistanceScaling
 from ..components.sizing_resistance import SizingInverterResistances
@@ -35,10 +35,10 @@ def test_scaling_ratio():
     problem = run_system(SizingInverterLossCoefficientScaling(inverter_id="inverter_1"), ivc)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:a"
-    ) == pytest.approx(1.111, rel=1e-2)
+    ) == pytest.approx(1.385, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:c"
-    ) == pytest.approx(0.9, rel=1e-2)
+    ) == pytest.approx(0.722, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -53,33 +53,33 @@ def test_energy_coefficient():
     problem = run_system(SizingInverterEnergyCoefficients(inverter_id="inverter_1"), ivc)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_on:a"
-    ) == pytest.approx(1.5106e-9, rel=1e-2)
+    ) == pytest.approx(0.0176, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_rr:a"
-    ) == pytest.approx(-9.204e-10, rel=1e-2)
+    ) == pytest.approx(0.00472, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_off:a"
-    ) == pytest.approx(-1.07e-10, rel=1e-2)
+    ) == pytest.approx(0.0167, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_on:b"
-    ) == pytest.approx(3.986e-06, rel=1e-2)
+    ) == pytest.approx(3.326e-05, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_rr:b"
-    ) == pytest.approx(1.116e-05, rel=1e-2)
+    ) == pytest.approx(0.000340, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_off:b"
-    ) == pytest.approx(1.33e-05, rel=1e-2)
+    ) == pytest.approx(0.000254, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_on:c"
-    ) == pytest.approx(0.0010926, rel=1e-2)
+    ) == pytest.approx(4.621e-7, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_rr:c"
-    ) == pytest.approx(0.0011241, rel=1e-2)
+    ) == pytest.approx(-4.060e-8, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_off:c"
-    ) == pytest.approx(0.00081576, rel=1e-2)
+    ) == pytest.approx(-1.565e-07, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -95,7 +95,7 @@ def test_resistance_scaling():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:resistance"
-    ) == pytest.approx(0.9, rel=1e-2)
+    ) == pytest.approx(1.385, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -110,11 +110,11 @@ def test_resistance():
     problem = run_system(SizingInverterResistances(inverter_id="inverter_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:inverter:inverter_1:igbt:resistance", units="ohm"
-    ) == pytest.approx(1.8e-3, rel=1e-2)
+        "data:propulsion:he_power_train:inverter:inverter_1:igbt:reference_resistance", units="ohm"
+    ) == pytest.approx(0.001359, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:inverter:inverter_1:diode:resistance", units="ohm"
-    ) == pytest.approx(1.44e-3, rel=1e-2)
+        "data:propulsion:he_power_train:inverter:inverter_1:diode:reference_resistance", units="ohm"
+    ) == pytest.approx(0.001683, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -135,13 +135,13 @@ def test_switching_losses():
         PerformancesSwitchingLosses(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
     )
     expected_losses_igbt = np.array(
-        [57.3, 103.9, 169.6, 257.6, 371.1, 513.2, 687.0, 895.9, 1142.9, 1431.3]
+        [115.5, 170.6, 234.8, 308.7, 392.8, 487.6, 593.5, 711.2, 841.1, 983.6]
     )
     assert problem.get_val("switching_losses_IGBT", units="W") == pytest.approx(
         expected_losses_igbt, rel=1e-2
     )
     expected_losses_diode = np.array(
-        [33.7, 61.2, 99.9, 151.8, 218.6, 302.3, 404.7, 527.7, 673.2, 843.1]
+        [70.8, 108.2, 152.5, 203.5, 261.2, 325.4, 396.2, 473.5, 557.2, 647.2]
     )
     assert problem.get_val("switching_losses_diode", units="W") == pytest.approx(
         expected_losses_diode, rel=1e-2
@@ -184,12 +184,12 @@ def test_total_losses_inverter():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "switching_losses_IGBT",
-        [57.3, 103.9, 169.6, 257.6, 371.1, 513.2, 687.0, 895.9, 1142.9, 1431.3],
+        [115.5, 170.6, 234.8, 308.7, 392.8, 487.6, 593.5, 711.2, 841.1, 983.6],
         units="W",
     )
     ivc.add_output(
         "switching_losses_diode",
-        [33.7, 61.2, 99.9, 151.8, 218.6, 302.3, 404.7, 527.7, 673.2, 843.1],
+        [70.8, 108.2, 152.5, 203.5, 261.2, 325.4, 396.2, 473.5, 557.2, 647.2],
         units="W",
     )
     ivc.add_output(
@@ -206,7 +206,7 @@ def test_total_losses_inverter():
     problem = run_system(PerformancesLosses(number_of_points=NB_POINTS_TEST), ivc)
 
     expected_losses = np.array(
-        [1084.8, 1641.0, 2385.6, 3349.2, 4563.0, 6056.4, 7859.4, 10003.8, 12519.6, 15437.4]
+        [1656.6, 2323.2, 3092.4, 3966.0, 4948.8, 6041.4, 7247.4, 8570.4, 10012.8, 11575.8]
     )
     assert problem.get_val("losses_inverter", units="W") == pytest.approx(expected_losses, rel=1e-2)
 
@@ -231,7 +231,7 @@ def test_performances_inverter_tot():
     )
 
     expected_losses = np.array(
-        [1084.8, 1641.0, 2385.6, 3349.2, 4563.0, 6056.4, 7859.4, 10003.8, 12519.6, 15437.4]
+        [1656.6, 2323.2, 3092.4, 3966.0, 4948.8, 6041.4, 7247.4, 8570.4, 10012.8, 11575.8]
     )
     assert problem.get_val("losses_inverter", units="W") == pytest.approx(expected_losses, rel=1e-2)
 
@@ -298,4 +298,4 @@ def test_map_efficiency():
         yaxis_title="Modulation index [-]",
         legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
     )
-    fig.show()
+    # fig.show()

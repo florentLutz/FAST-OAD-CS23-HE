@@ -43,18 +43,24 @@ class SizingInverterResistances(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":igbt:resistance",
+            "data:propulsion:he_power_train:inverter:" + inverted_id + ":igbt:reference_resistance",
             units="ohm",
         )
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":diode:resistance",
+            "data:propulsion:he_power_train:inverter:"
+            + inverted_id
+            + ":diode:reference_resistance",
             units="ohm",
         )
 
         self.declare_partials(
             of=[
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":igbt:resistance",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":diode:resistance",
+                "data:propulsion:he_power_train:inverter:"
+                + inverted_id
+                + ":igbt:reference_resistance",
+                "data:propulsion:he_power_train:inverter:"
+                + inverted_id
+                + ":diode:reference_resistance",
             ],
             wrt="data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance",
             method="exact",
@@ -64,12 +70,16 @@ class SizingInverterResistances(om.ExplicitComponent):
 
         inverted_id = self.options["inverter_id"]
 
-        outputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":igbt:resistance"] = (
+        outputs[
+            "data:propulsion:he_power_train:inverter:" + inverted_id + ":igbt:reference_resistance"
+        ] = (
             inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance"]
             * self.options["R_igbt_ref"]
         )
 
-        outputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":diode:resistance"] = (
+        outputs[
+            "data:propulsion:he_power_train:inverter:" + inverted_id + ":diode:reference_resistance"
+        ] = (
             inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance"]
             * self.options["R_diode_ref"]
         )
@@ -79,11 +89,13 @@ class SizingInverterResistances(om.ExplicitComponent):
         inverted_id = self.options["inverter_id"]
 
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":igbt:resistance",
+            "data:propulsion:he_power_train:inverter:" + inverted_id + ":igbt:reference_resistance",
             "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance",
         ] = self.options["R_igbt_ref"]
 
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":diode:resistance",
+            "data:propulsion:he_power_train:inverter:"
+            + inverted_id
+            + ":diode:reference_resistance",
             "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance",
         ] = self.options["R_diode_ref"]

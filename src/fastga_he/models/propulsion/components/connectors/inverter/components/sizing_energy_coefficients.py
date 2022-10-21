@@ -21,58 +21,58 @@ class SizingInverterEnergyCoefficients(om.ExplicitComponent):
         self.options.declare(
             name="a_on_ref",
             types=float,
-            default=1.283669488899433e-07,
-            desc="Reference coefficient in front of current square for ON commutation energy",
+            default=0.015862856846788793,
+            desc="Reference constant coefficient for ON commutation energy",
         )
         self.options.declare(
             name="a_off_ref",
             types=float,
-            default=-1.1279134596923756e-08,
-            desc="Reference coefficient in front of current square for OFF commutation energy",
+            default=0.01507362815506554,
+            desc="Reference constant coefficient for OFF commutation energy",
         )
         self.options.declare(
             name="a_rr_ref",
             types=float,
-            default=-4.347644706692315e-08,
-            desc="Reference coefficient in front of current square for RR commutation energy",
+            default=0.004248159711027629,
+            desc="Reference constant coefficient for RR commutation energy",
         )
 
         self.options.declare(
             name="b_on_ref",
             types=float,
-            default=1.058587405970034e-05,
+            default=3.3256504177779456e-05,
             desc="Reference coefficient in front of current for ON commutation energy",
         )
         self.options.declare(
             name="b_off_ref",
             types=float,
-            default=0.00010832184425303843,
+            default=0.0002539092853205021,
             desc="Reference coefficient in front of current for OFF commutation energy",
         )
         self.options.declare(
             name="b_rr_ref",
             types=float,
-            default=8.082183571138373e-05,
+            default=0.00034030311012866587,
             desc="Reference coefficient in front of current for RR commutation energy",
         )
 
         self.options.declare(
             name="c_on_ref",
             types=float,
-            default=0.00793142842339549,
-            desc="Reference constant coefficient for ON commutation energy",
+            default=5.134677955597825e-07,
+            desc="Reference coefficient in front of current square for ON commutation energy",
         )
         self.options.declare(
             name="c_off_ref",
             types=float,
-            default=0.002124079855514512,
-            desc="Reference constant coefficient for OFF commutation energy",
+            default=-1.739057882676467e-07,
+            desc="Reference coefficient in front of current square for OFF commutation energy",
         )
         self.options.declare(
             name="c_rr_ref",
             types=float,
-            default=0.007536814077525891,
-            desc="Reference constant coefficient for RR commutation energy",
+            default=-4.5116538387667774e-08,
+            desc="Reference coefficient in front of current square for RR commutation energy",
         )
 
     def setup(self):

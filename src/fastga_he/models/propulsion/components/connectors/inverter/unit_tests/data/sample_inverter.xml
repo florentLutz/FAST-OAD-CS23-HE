@@ -4,7 +4,7 @@
             <he_power_train>
                 <inverter>
                     <inverter_1>
-                        <current_caliber units="A">500.0</current_caliber>
+                        <current_caliber units="A">433.0</current_caliber>
                         <power_factor>0.9</power_factor>
                         <scaling>
                             <a>1.111</a>
@@ -20,19 +20,19 @@
                             <gate_voltage units="V">1.1</gate_voltage>
                         </diode>
                         <energy_on>
-                            <a>1.5106e-9</a>
-                            <b>3.986e-6</b>
-                            <c>0.0010926</c>
+                            <a>0.0176</a>
+                            <b>3.326e-05</b>
+                            <c>4.621e-7</c>
                         </energy_on>
                         <energy_off>
-                            <a>-1.07e-10</a>
-                            <b>1.33e-05</b>
-                            <c>0.00081576</c>
+                            <a>0.0167</a>
+                            <b>0.000254</b>
+                            <c>-1.565e-07</c>
                         </energy_off>
                         <energy_rr>
-                            <a>-9.204e-10</a>
-                            <b>1.116e-05</b>
-                            <c>0.0011241</c>
+                            <a>0.00472</a>
+                            <b>0.000340</b>
+                            <c>-4.060e-8</c>
                         </energy_rr>
                     </inverter_1>
                 </inverter>
