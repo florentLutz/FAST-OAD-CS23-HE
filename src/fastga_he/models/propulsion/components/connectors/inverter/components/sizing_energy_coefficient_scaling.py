@@ -26,64 +26,64 @@ class SizingInverterLossCoefficientScaling(om.ExplicitComponent):
 
     def setup(self):
 
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
             units="A",
             val=np.nan,
             desc="Current caliber of one arm of the inverter",
         )
 
-        self.add_output("data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a")
-        self.add_output("data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c")
+        self.add_output("data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a")
+        self.add_output("data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c")
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:resistance"
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
-            wrt="data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
+            of="data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
         )
         self.declare_partials(
-            of="data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c",
-            wrt="data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
+            of="data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
 
         current_caliber_ref = self.options["current_caliber_ref"]
         current_caliber = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"
         ]
 
         current_caliber_star = current_caliber / current_caliber_ref
 
-        outputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a"] = (
             current_caliber_star ** -1
         )
         outputs[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c"
         ] = current_caliber_star
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
         current_caliber_ref = self.options["current_caliber_ref"]
         current_caliber = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"
         ]
 
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
         ] = (
             -current_caliber_ref / current_caliber ** 2.0
         )
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
         ] = (
             1.0 / current_caliber_ref
         )

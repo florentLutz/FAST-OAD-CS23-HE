@@ -77,149 +77,149 @@ class SizingInverterEnergyCoefficients(om.ExplicitComponent):
 
     def setup(self):
 
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a", val=np.nan
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a", val=np.nan
         )
         self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c", val=np.nan
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c", val=np.nan
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a",
         )
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:b",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b",
         )
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:c",
-        )
-
-        self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:a",
-        )
-        self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:b",
-        )
-        self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a",
         )
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:b",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b",
         )
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c",
+        )
+
+        self.add_output(
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a",
+        )
+        self.add_output(
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b",
+        )
+        self.add_output(
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c",
         )
 
         self.declare_partials(
             of=[
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:a",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:a",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:a",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a",
             ],
-            wrt="data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
             method="exact",
         )
         self.declare_partials(
             of=[
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:b",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:b",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:b",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b",
             ],
-            wrt="data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
             method="exact",
         )
         self.declare_partials(
             of=[
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:c",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:c",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:c",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c",
             ],
-            wrt="data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c",
             method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
 
-        a_star = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a"]
-        c_star = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c"]
+        a_star = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a"]
+        c_star = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c"]
 
-        outputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:a"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a"] = (
             a_star * self.options["a_on_ref"]
         )
-        outputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:a"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a"] = (
             a_star * self.options["a_rr_ref"]
         )
-        outputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:a"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a"] = (
             a_star * self.options["a_off_ref"]
         )
 
         outputs[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:b"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b"
         ] = self.options["b_on_ref"]
         outputs[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:b"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b"
         ] = self.options["b_rr_ref"]
         outputs[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:b"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b"
         ] = self.options["b_off_ref"]
 
-        outputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:c"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c"] = (
             c_star * self.options["c_on_ref"]
         )
-        outputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:c"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c"] = (
             c_star * self.options["c_rr_ref"]
         )
-        outputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:c"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c"] = (
             c_star * self.options["c_off_ref"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
 
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:a",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
         ] = self.options["a_on_ref"]
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:a",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
         ] = self.options["a_rr_ref"]
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:a",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
         ] = self.options["a_off_ref"]
 
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:b",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
         ] = 0.0
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:b",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
         ] = 0.0
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:b",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
         ] = 0.0
 
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:c",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c",
         ] = self.options["c_on_ref"]
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:c",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c",
         ] = self.options["c_rr_ref"]
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:c",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c",
         ] = self.options["c_off_ref"]

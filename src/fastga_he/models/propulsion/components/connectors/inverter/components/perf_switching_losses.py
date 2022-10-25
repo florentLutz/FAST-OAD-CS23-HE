@@ -24,48 +24,48 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
 
     def setup(self):
 
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
         self.add_input("switching_frequency", units="Hz", val=np.full(number_of_points, np.nan))
         self.add_input("current", units="A", val=np.full(number_of_points, np.nan))
 
         self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a",
             val=np.nan,
         )
         self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:b",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b",
             val=np.nan,
         )
         self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:c",
-            val=np.nan,
-        )
-
-        self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:a",
-            val=np.nan,
-        )
-        self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:b",
-            val=np.nan,
-        )
-        self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c",
             val=np.nan,
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a",
             val=np.nan,
         )
         self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:b",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b",
             val=np.nan,
         )
         self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c",
+            val=np.nan,
+        )
+
+        self.add_input(
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c",
             val=np.nan,
         )
 
@@ -85,9 +85,9 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         self.declare_partials(
             of="switching_losses_diode",
             wrt=[
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:a",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:b",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:c",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c",
                 "switching_frequency",
                 "current",
             ],
@@ -96,12 +96,12 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         self.declare_partials(
             of="switching_losses_IGBT",
             wrt=[
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:a",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:b",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:c",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:a",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:b",
-                "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:c",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c",
                 "switching_frequency",
                 "current",
             ],
@@ -109,19 +109,19 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
 
-        a_on = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:a"]
-        b_on = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:b"]
-        c_on = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:c"]
+        a_on = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a"]
+        b_on = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b"]
+        c_on = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c"]
 
-        a_off = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:a"]
-        b_off = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:b"]
-        c_off = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:c"]
+        a_off = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a"]
+        b_off = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b"]
+        c_off = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c"]
 
-        a_rr = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:a"]
-        b_rr = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:b"]
-        c_rr = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:c"]
+        a_rr = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a"]
+        b_rr = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b"]
+        c_rr = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c"]
 
         f_sw = inputs["switching_frequency"]
         current = inputs["current"]
@@ -138,38 +138,38 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         outputs["switching_losses_IGBT"] = loss_igbt
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
 
-        a_on = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:a"]
-        b_on = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:b"]
-        c_on = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:c"]
+        a_on = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a"]
+        b_on = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b"]
+        c_on = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c"]
 
-        a_off = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:a"]
-        b_off = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:b"]
-        c_off = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:c"]
+        a_off = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a"]
+        b_off = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b"]
+        c_off = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c"]
 
-        a_rr = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:a"]
-        b_rr = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:b"]
-        c_rr = inputs["data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:c"]
+        a_rr = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a"]
+        b_rr = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b"]
+        c_rr = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c"]
 
         f_sw = inputs["switching_frequency"]
         current = inputs["current"]
 
         partials[
             "switching_losses_diode",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a",
         ] = (
             f_sw / 2.0 * 1e-3
         )
         partials[
             "switching_losses_diode",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:b",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b",
         ] = (
             f_sw * current / np.pi * 1e-3
         )
         partials[
             "switching_losses_diode",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_rr:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c",
         ] = (
             f_sw * current ** 2.0 / 4 * 1e-3
         )
@@ -182,37 +182,37 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
 
         partials[
             "switching_losses_IGBT",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a",
         ] = (
             f_sw / 2.0 * 1e-3
         )
         partials[
             "switching_losses_IGBT",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:a",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a",
         ] = (
             f_sw / 2.0 * 1e-3
         )
         partials[
             "switching_losses_IGBT",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:b",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b",
         ] = (
             f_sw * current / np.pi * 1e-3
         )
         partials[
             "switching_losses_IGBT",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:b",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b",
         ] = (
             f_sw * current / np.pi * 1e-3
         )
         partials[
             "switching_losses_IGBT",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_on:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c",
         ] = (
             f_sw * current ** 2.0 / 4 * 1e-3
         )
         partials[
             "switching_losses_IGBT",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":energy_off:c",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c",
         ] = (
             f_sw * current ** 2.0 / 4 * 1e-3
         )

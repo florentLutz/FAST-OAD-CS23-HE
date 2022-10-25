@@ -4,35 +4,43 @@
             <he_power_train>
                 <inverter>
                     <inverter_1>
+                        <casing>
+                            <weight units="kg">1.0446</weight>
+                            <heat_capacity units="J/degK">208.92</heat_capacity>
+                            <thermal_resistance units="K/W">0.021</thermal_resistance>
+                        </casing>
                         <current_caliber units="A">433.0</current_caliber>
+                        <voltage_caliber units="V">500.0</voltage_caliber>
                         <power_factor>0.9</power_factor>
                         <scaling>
-                            <a>1.111</a>
-                            <c>0.9</c>
-                            <resistance>0.9</resistance>
+                            <a>1.385</a>
+                            <c>0.722</c>
+                            <resistance>1.385</resistance>
                         </scaling>
                         <igbt>
-                            <resistance units="ohm">1.8e-3</resistance>
-                            <gate_voltage units="V">1.2</gate_voltage>
+                            <resistance units="ohm">0.00209135</resistance>
+                            <thermal_resistance units="K/W">0.114955</thermal_resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
                         </igbt>
                         <diode>
-                            <resistance units="ohm">1.44e-3</resistance>
-                            <gate_voltage units="V">1.1</gate_voltage>
+                            <resistance units="ohm">0.00258995</resistance>
+                            <thermal_resistance units="K/W">0.148195</thermal_resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
                         </diode>
                         <energy_on>
-                            <a>0.0176</a>
+                            <a>0.02197006</a>
                             <b>3.326e-05</b>
-                            <c>4.621e-7</c>
+                            <c>3.707e-7</c>
                         </energy_on>
                         <energy_off>
-                            <a>0.0167</a>
+                            <a>0.02087697</a>
                             <b>0.000254</b>
-                            <c>-1.565e-07</c>
+                            <c>-1.256e-7</c>
                         </energy_off>
                         <energy_rr>
-                            <a>0.00472</a>
+                            <a>0.0058837</a>
                             <b>0.000340</b>
-                            <c>-4.060e-8</c>
+                            <c>-3.257e-8</c>
                         </energy_rr>
                     </inverter_1>
                 </inverter>

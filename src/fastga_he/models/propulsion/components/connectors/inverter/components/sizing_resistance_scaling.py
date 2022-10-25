@@ -26,49 +26,49 @@ class SizingInverterResistanceScaling(om.ExplicitComponent):
 
     def setup(self):
 
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
             units="A",
             val=np.nan,
             desc="Current caliber of one arm of the inverter",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:resistance"
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance",
-            wrt="data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
+            of="data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:resistance",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
 
         current_caliber_ref = self.options["current_caliber_ref"]
         current_caliber = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"
         ]
 
         current_caliber_star = current_caliber / current_caliber_ref
 
         outputs[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:resistance"
         ] = (current_caliber_star ** -1)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        inverted_id = self.options["inverter_id"]
+        inverter_id = self.options["inverter_id"]
         current_caliber_ref = self.options["current_caliber_ref"]
         current_caliber = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"
         ]
 
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":scaling:resistance",
-            "data:propulsion:he_power_train:inverter:" + inverted_id + ":current_caliber",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:resistance",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
         ] = (
             -current_caliber_ref / current_caliber ** 2.0
         )
