@@ -35,7 +35,12 @@
                         <maximum_losses units="W">11808.0</maximum_losses>
                         <current_caliber units="A">433.0</current_caliber>
                         <voltage_caliber units="V">500.0</voltage_caliber>
+                        <switching_frequency units="Hz">15.0e3</switching_frequency>
                         <power_factor>0.9</power_factor>
+                        <capacitor>
+                            <capacity units="F">2.02e-3</capacity>
+                            <current_caliber units="A">199.18</current_caliber>
+                        </capacitor>
                         <scaling>
                             <a>1.385</a>
                             <c>0.722</c>
