@@ -5,10 +5,34 @@
                 <inverter>
                     <inverter_1>
                         <casing>
-                            <weight units="kg">1.0446</weight>
+                            <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>
                             <thermal_resistance units="K/W">0.021</thermal_resistance>
                         </casing>
+                        <module>
+                            <length units="m">0.156</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
+                        <heat_sink>
+                            <length units="m">0.2145</length>
+                            <width units="m">0.1716</width>
+                            <height units="m">0.005655</height>
+                            <max_temperature units="degK">373.15</max_temperature>
+                            <coolant>
+                                <max_input_temperature units="degK">323.15</max_input_temperature>
+                                <max_output_temperature units="degK">353.15</max_output_temperature>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                            <tube>
+                                <inner_diameter units="m">1.27e-3</inner_diameter>
+                                <outer_diameter units="m">3.77e-3</outer_diameter>
+                                <length units="m">0.858</length>
+                                <mass units="kg">0.083</mass>
+                            </tube>
+                        </heat_sink>
+                        <maximum_losses units="W">11808.0</maximum_losses>
                         <current_caliber units="A">433.0</current_caliber>
                         <voltage_caliber units="V">500.0</voltage_caliber>
                         <power_factor>0.9</power_factor>

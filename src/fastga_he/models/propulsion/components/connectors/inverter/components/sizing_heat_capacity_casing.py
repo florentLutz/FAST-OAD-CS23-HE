@@ -26,7 +26,7 @@ class SizingInverterCasingsWeight(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:weight",
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:mass",
             units="kg",
             val=np.nan,
             desc="Weight of the casings (3 of them in the inverter)",
@@ -61,7 +61,7 @@ class SizingInverterCasingsWeight(om.ExplicitComponent):
                 + inverter_id
                 + ":casing:specific_heat"
             ]
-            * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:weight"]
+            * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:mass"]
         ) / 3.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -70,7 +70,7 @@ class SizingInverterCasingsWeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:heat_capacity",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:weight",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:mass",
         ] = (
             inputs[
                 "settings:propulsion:he_power_train:inverter:"
@@ -83,6 +83,5 @@ class SizingInverterCasingsWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:heat_capacity",
             "settings:propulsion:he_power_train:inverter:" + inverter_id + ":casing:specific_heat",
         ] = (
-            inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:weight"]
-            / 3.0
+            inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:mass"] / 3.0
         )

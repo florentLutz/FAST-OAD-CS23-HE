@@ -5,7 +5,6 @@
 import numpy as np
 import openmdao.api as om
 import pytest
-import plotly.graph_objects as go
 
 from ..components.sizing_energy_coefficient_scaling import SizingInverterLossCoefficientScaling
 from ..components.sizing_energy_coefficients import SizingInverterEnergyCoefficients
@@ -15,6 +14,21 @@ from ..components.sizing_thermal_resistance import SizingInverterThermalResistan
 from ..components.sizing_thermal_resistance_casing import SizingInverterCasingThermalResistance
 from ..components.sizing_weight_casing import SizingInverterCasingsWeight
 from ..components.sizing_heat_capacity_casing import SizingInverterCasingsWeight
+from ..components.sizing_dimension_module import SizingInverterModuleDimension
+from ..components.sizing_dimension_heat_sink import SizingInverterHeatSinkDimension
+from ..components.sizing_heat_sink_tube_length import SizingInverterHeatSinkTubeLength
+from ..components.sizing_heat_sink_tube_mass_flow import SizingInverterHeatSinkTubeMassFlow
+from ..components.sizing_heat_sink_coolant_prandtl import SizingInverterHeatSinkCoolantPrandtl
+from ..components.sizing_heat_sink_tube_inner_diameter import (
+    SizingInverterHeatSinkTubeInnerDiameter,
+)
+from ..components.sizing_heat_sink_tube_outer_diameter import (
+    SizingInverterHeatSinkTubeOuterDiameter,
+)
+from ..components.sizing_heat_sink_tube_weight import SizingInverterHeatSinkTubeWeight
+from ..components.sizing_height_heat_sink import SizingInverterHeatSinkHeight
+from ..components.sizing_heat_sink_weight import SizingInverterHeatSinkWeight
+from ..components.sizing_heat_sink import SizingHeatSink
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_conduction_loss import PerformancesConductionLosses
@@ -176,7 +190,7 @@ def test_weight_casings():
     problem = run_system(SizingInverterCasingsWeight(inverter_id="inverter_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:inverter:inverter_1:casing:weight", units="kg"
+        "data:propulsion:he_power_train:inverter:inverter_1:casing:mass", units="kg"
     ) == pytest.approx(1.0446, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -196,6 +210,243 @@ def test_heat_capacity_casing():
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:casing:heat_capacity", units="J/degK"
     ) == pytest.approx(208.92, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_dimension_module():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterModuleDimension(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterModuleDimension(inverter_id="inverter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:module:length", units="m"
+    ) == pytest.approx(0.156, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:module:width", units="m"
+    ) == pytest.approx(0.065, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:module:height", units="m"
+    ) == pytest.approx(0.021, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_dimension_heat_sink():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterHeatSinkDimension(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterHeatSinkDimension(inverter_id="inverter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:length", units="m"
+    ) == pytest.approx(0.2145, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:width", units="m"
+    ) == pytest.approx(0.1716, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_length_heat_sink_tube():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterHeatSinkTubeLength(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterHeatSinkTubeLength(inverter_id="inverter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:tube:length", units="m"
+    ) == pytest.approx(0.858, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_mass_flow_heat_sink_tube():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterHeatSinkTubeMassFlow(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterHeatSinkTubeMassFlow(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:coolant:max_mass_flow",
+            units="m**3/s",
+        )
+        == pytest.approx(11.1e-5, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_mass_flow_heat_sink_coolant_prandtl():
+
+    problem = om.Problem()
+    model = problem.model
+    model.add_subsystem(
+        "component", SizingInverterHeatSinkCoolantPrandtl(inverter_id="inverter_1"), promotes=["*"]
+    )
+    problem.setup()
+    problem.run_model()
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:coolant:Prandtl_number",
+        )
+        == pytest.approx(39.5, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink_tube_inner_diameter():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterHeatSinkTubeInnerDiameter(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterHeatSinkTubeInnerDiameter(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:tube:inner_diameter",
+            units="mm",
+        )
+        == pytest.approx(1.27, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink_tube_outer_diameter():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterHeatSinkTubeOuterDiameter(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterHeatSinkTubeOuterDiameter(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:tube:outer_diameter",
+            units="mm",
+        )
+        == pytest.approx(3.77, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink_height():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterHeatSinkHeight(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterHeatSinkHeight(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:height",
+            units="mm",
+        )
+        == pytest.approx(5.655, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink_tube_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterHeatSinkTubeWeight(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterHeatSinkTubeWeight(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:tube:mass",
+            units="kg",
+        )
+        == pytest.approx(0.083, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterHeatSinkWeight(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterHeatSinkWeight(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:mass",
+            units="kg",
+        )
+        == pytest.approx(0.619, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingHeatSink(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingHeatSink(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:mass",
+            units="kg",
+        )
+        == pytest.approx(0.634, rel=1e-2)
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -465,70 +716,3 @@ def test_performances_inverter_tot():
     assert problem.get_val(
         "component.temperature_inverter.inverter_temperature", units="degK"
     ) == pytest.approx(expected_temperature, rel=1e-2)
-
-
-def test_map_efficiency():
-
-    nb_points_maps = 50
-
-    current_orig = np.linspace(0.0, 500.0, nb_points_maps)
-    switching_frequency_orig = np.linspace(3000.0, 12000.0, nb_points_maps)
-    modulation_index_orig = np.linspace(0.0, 1.0, nb_points_maps)
-    # current, switching_frequency = np.meshgrid(current_orig, switching_frequency_orig)
-    current, modulation_index = np.meshgrid(current_orig, modulation_index_orig)
-
-    current = current.flatten()
-    # switching_frequency = switching_frequency.flatten()
-    switching_frequency = np.full_like(current, 9000.0)
-    temperature = np.full_like(current, 273.5)
-    # modulation_index = np.full_like(current, 0.9)
-    modulation_index = modulation_index.flatten()
-
-    ivc = get_indep_var_comp(
-        list_inputs(PerformancesInverter(inverter_id="inverter_1", number_of_points=current.size)),
-        __file__,
-        XML_FILE,
-    )
-
-    ivc.add_output("heat_sink_temperature", units="degK", val=np.full_like(current, 288.15))
-    ivc.add_output("current", current, units="A")
-    ivc.add_output("switching_frequency", switching_frequency)
-    ivc.add_output("modulation_index", modulation_index)
-
-    problem = run_system(
-        PerformancesInverter(inverter_id="inverter_1", number_of_points=current.size), ivc
-    )
-
-    print(problem["losses_inverter"])
-
-    current = current.reshape((nb_points_maps, nb_points_maps))
-    switching_frequency = current.reshape((nb_points_maps, nb_points_maps))
-    losses = problem["losses_inverter"].reshape((nb_points_maps, nb_points_maps))
-
-    fig = go.Figure()
-
-    losses_contour = go.Contour(
-        x=current_orig,
-        y=modulation_index_orig,
-        z=losses,
-        ncontours=20,
-        contours=dict(
-            coloring="heatmap",
-            showlabels=True,  # show labels on contours
-            labelfont=dict(  # label font properties
-                size=12,
-                color="white",
-            ),
-        ),
-        zmax=np.max(losses),
-        zmin=np.min(losses),
-    )
-    fig.add_trace(losses_contour)
-    fig.update_layout(
-        title_text="Sampled inverter efficiency map",
-        title_x=0.5,
-        xaxis_title="Current [A]",
-        yaxis_title="Modulation index [-]",
-        legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
-    )
-    # fig.show()
