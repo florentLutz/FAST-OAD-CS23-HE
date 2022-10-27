@@ -2,12 +2,15 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
+import numpy as np
 
 
-class SizingCableRadius(om.ExplicitComponent):
-    """Computation of mass per length of cable."""
+class SizingCableSheathThickness(om.ExplicitComponent):
+    """
+    Computation of the thickness of the sheath based on the diameter of the bare cable (without
+    sheath). Formula taken from :cite:`stuckl:2016`
+    """
 
     def initialize(self):
 
@@ -19,7 +22,6 @@ class SizingCableRadius(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -41,15 +43,11 @@ class SizingCableRadius(om.ExplicitComponent):
             units="m",
             val=0.2e-3,
         )
-        self.add_input(
+
+        self.add_output(
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
             units="m",
             val=0.2e-2,
-        )
-
-        self.add_output(
-            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
-            units="m",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -58,49 +56,45 @@ class SizingCableRadius(om.ExplicitComponent):
 
         harness_id = self.options["harness_id"]
 
-        r_c = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius"
-        ]
-        t_in = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":insulation:thickness"
-        ]
-        t_shield = inputs[
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness"
-        ]
-        t_sheath = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
-        ]
-
-        r_cable = r_c + t_in + t_shield + t_sheath
-
-        outputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius"
-        ] = r_cable
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        harness_id = self.options["harness_id"]
-
-        output_str = (
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius"
+        bare_cable_diameter = 2.0 * (
+            inputs[
+                "data:propulsion:he_power_train:DC_cable_harness:"
+                + harness_id
+                + ":conductor:radius"
+            ]
+            + inputs[
+                "data:propulsion:he_power_train:DC_cable_harness:"
+                + harness_id
+                + ":insulation:thickness"
+            ]
+            + inputs["settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness"]
         )
 
+        outputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
+        ] = (0.035 * bare_cable_diameter + 1e-3)
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+
+        harness_id = self.options["harness_id"]
+
         partials[
-            output_str,
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
-        ] = 1.0
+        ] = (
+            0.035 * 2.0
+        )
         partials[
-            output_str,
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":insulation:thickness",
-        ] = 1.0
+        ] = (
+            0.035 * 2.0
+        )
         partials[
-            output_str,
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
-        ] = 1.0
-        partials[
-            output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
-        ] = 1.0
+            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
+        ] = (
+            0.035 * 2.0
+        )

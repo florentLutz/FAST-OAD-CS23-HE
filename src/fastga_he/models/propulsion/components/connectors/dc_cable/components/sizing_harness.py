@@ -9,7 +9,9 @@ from .sizing_current_per_cable import SizingCurrentPerCable
 from .sizing_cable_gauge import SizingCableGauge
 from .sizing_resistance_per_length import SizingResistancePerLength
 from .sizing_insulation_thickness import SizingInsulationThickness
+from .sizing_sheath_thickness import SizingCableSheathThickness
 from .sizing_mass_per_length import SizingMassPerLength
+from .sizing_contactor_mass import SizingHarnessContactorMass
 from .sizing_harness_mass import SizingHarnessMass
 from .sizing_reference_resistance import SizingReferenceResistance
 from .sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
@@ -46,6 +48,11 @@ class SizingHarness(om.Group):
             promotes=["data:*", "settings:*"],
         )
         self.add_subsystem(
+            "cable_sheath_sizing",
+            SizingCableSheathThickness(harness_id=harness_id),
+            promotes=["data:*", "settings:*"],
+        )
+        self.add_subsystem(
             "cable_total_radius",
             SizingCableRadius(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
@@ -60,6 +67,11 @@ class SizingHarness(om.Group):
             "mass_per_length",
             SizingMassPerLength(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
+        )
+        self.add_subsystem(
+            "contactor_mass",
+            SizingHarnessContactorMass(harness_id=harness_id),
+            promotes=["data:*"],
         )
         self.add_subsystem(
             "heat_capacity_per_length",

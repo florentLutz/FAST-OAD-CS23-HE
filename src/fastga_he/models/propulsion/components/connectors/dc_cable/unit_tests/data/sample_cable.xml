@@ -16,6 +16,12 @@
                         <insulation>
                             <thickness units="m">0.327e-2</thickness>
                         </insulation>
+                        <sheath>
+                            <thickness units="mm">1.41</thickness>
+                        </sheath>
+                        <contactor>
+                            <mass units="kg">1.25</mass>
+                        </contactor>
                         <cable>
                             <resistance units="ohm">0.0263</resistance>
                             <initial_temperature units="degK">288.15</initial_temperature>

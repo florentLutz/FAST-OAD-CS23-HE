@@ -13,7 +13,9 @@ from ..components.sizing_current_per_cable import SizingCurrentPerCable
 from ..components.sizing_cable_gauge import SizingCableGauge
 from ..components.sizing_resistance_per_length import SizingResistancePerLength
 from ..components.sizing_insulation_thickness import SizingInsulationThickness
+from ..components.sizing_sheath_thickness import SizingCableSheathThickness
 from ..components.sizing_mass_per_length import SizingMassPerLength
+from ..components.sizing_contactor_mass import SizingHarnessContactorMass
 from ..components.sizing_harness_mass import SizingHarnessMass
 from ..components.sizing_reference_resistance import SizingReferenceResistance
 from ..components.sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
@@ -151,6 +153,25 @@ def test_insulation_thickness():
     problem.check_partials(compact_print=True)
 
 
+def test_sheath_thickness():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingCableSheathThickness(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingCableSheathThickness(harness_id="harness_1"), ivc)
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:thickness",
+            units="mm",
+        )
+        == pytest.approx(1.41, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_mass_per_length():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -164,7 +185,26 @@ def test_mass_per_length():
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:mass_per_length",
             units="kg/m",
         )
-        == pytest.approx(0.429, rel=1e-2)
+        == pytest.approx(0.402, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_contactor_mass():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingHarnessContactorMass(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingHarnessContactorMass(harness_id="harness_1"), ivc)
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_cable_harness:harness_1:contactor:mass",
+            units="kg",
+        )
+        == pytest.approx(1.25, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -203,7 +243,7 @@ def test_heat_capacity_per_length():
             ":heat_capacity_per_length",
             units="J/degK/m",
         )
-        == pytest.approx(551.37, rel=1e-2)
+        == pytest.approx(510.02, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -222,7 +262,7 @@ def test_cable_radius():
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:radius",
             units="mm",
         )
-        == pytest.approx(7.87, rel=1e-2)
+        == pytest.approx(7.28, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -260,7 +300,7 @@ def test_cable_mass():
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:mass",
             units="kg",
         )
-        == pytest.approx(9.07, rel=1e-2)
+        == pytest.approx(10.32, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -546,7 +586,7 @@ def test_sizing_harness():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:mass", units="kg"
-    ) == pytest.approx(2.90, rel=1e-2)
+    ) == pytest.approx(3.37, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -572,11 +612,6 @@ def test_sizing_cable():
     ivc.add_output(
         name="data:propulsion:he_power_train:DC_cable_harness:harness_1:length", val=1.0, units="m"
     )
-    ivc.add_output(
-        name="settings:propulsion:he_power_train:DC_cable_harness:sheath:thickness",
-        val=3.3,
-        units="mm",
-    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingHarness(harness_id="harness_1"), ivc)
@@ -586,5 +621,5 @@ def test_sizing_cable():
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:mass_per_length",
             units="kg/m",
         )
-        == pytest.approx(0.29, rel=1e-2)
+        == pytest.approx(0.213, rel=1e-2)
     )

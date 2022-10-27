@@ -38,6 +38,14 @@ class SizingHarnessMass(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
             val=1,
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":contactor:mass",
+            units="kg",
+            val=np.nan,
+            desc="Mass of all the contactors in the harness",
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":mass",
@@ -62,6 +70,9 @@ class SizingHarnessMass(om.ExplicitComponent):
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
             ]
             * LENGTH_FACTOR
+            + inputs[
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":contactor:mass"
+            ]
         )
 
         outputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":mass"] = mass
@@ -108,3 +119,7 @@ class SizingHarnessMass(om.ExplicitComponent):
             ]
             * LENGTH_FACTOR
         )
+        partials[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":mass",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":contactor:mass",
+        ] = 1.0
