@@ -30,6 +30,10 @@ class SizingInverterCapacitorCurrentCaliber(om.ExplicitComponent):
             val=np.nan,
             desc="Current caliber of one arm of the inverter",
         )
+        self.add_input(
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor",
+            val=np.nan,
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:inverter:"
@@ -46,12 +50,19 @@ class SizingInverterCapacitorCurrentCaliber(om.ExplicitComponent):
 
         inverter_id = self.options["inverter_id"]
 
-        # Maximum of the term that multiplies the current caliber of the modules is found at a
-        # modulation index of 0.6126 which gives a maximum of 0.46
+        cos_phi = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor"]
+
+        # Maximum of the term that multiplies the current caliber of the modules is found thanks
+        # to the following formula obtained by a simple derivative computation
+
+        factor = np.sqrt(
+            2.0 / (3.0 * np.pi ** 2.0) * (1 + 2.0 * cos_phi ** 2.0 + 1.0 / (8.0 * cos_phi ** 2.0))
+        )
+
         outputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:current_caliber"
         ] = (
-            0.46
+            factor
             * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"]
         )
 
@@ -59,7 +70,23 @@ class SizingInverterCapacitorCurrentCaliber(om.ExplicitComponent):
 
         inverter_id = self.options["inverter_id"]
 
+        cos_phi = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor"]
+
+        factor = np.sqrt(
+            2.0 / (3.0 * np.pi ** 2.0) * (1 + 2.0 * cos_phi ** 2.0 + 1.0 / (8.0 * cos_phi ** 2.0))
+        )
+
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:current_caliber",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
-        ] = 0.46
+        ] = factor
+        partials[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:current_caliber",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor",
+        ] = (
+            inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"]
+            / (2.0 * factor)
+            * 2.0
+            / (3.0 * np.pi ** 2.0)
+            * (4.0 * cos_phi - 1.0 / (4.0 * cos_phi ** 3.0))
+        )
