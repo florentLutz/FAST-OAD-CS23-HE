@@ -4,11 +4,14 @@
 
 import openmdao.api as om
 
+from .perf_modulation_index import PerformancesModulationIndex
 from .perf_resistance import PerformancesResistance
 from .perf_conduction_loss import PerformancesConductionLosses
 from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_total_loss import PerformancesLosses
 from .perf_temperature import PerformancesTemperature
+from .perf_efficiency import PerformancesEfficiency
+from .perf_dc_current import PerformancesDCCurrent
 
 
 class PerformancesInverter(om.Group):
@@ -40,6 +43,11 @@ class PerformancesInverter(om.Group):
         number_of_points = self.options["number_of_points"]
 
         self.add_subsystem(
+            "modulation_idx",
+            PerformancesModulationIndex(number_of_points=number_of_points),
+            promotes=["peak_ac_voltage", "dc_voltage"],
+        )
+        self.add_subsystem(
             "resistance",
             PerformancesResistance(inverter_id=inverter_id, number_of_points=number_of_points),
             promotes=["data:*"],
@@ -49,7 +57,7 @@ class PerformancesInverter(om.Group):
             PerformancesConductionLosses(
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
-            promotes=["data:*", "current", "modulation_index"],
+            promotes=["data:*", "current"],
         )
         self.add_subsystem(
             "switching_losses",
@@ -59,14 +67,25 @@ class PerformancesInverter(om.Group):
         self.add_subsystem(
             "total_losses",
             PerformancesLosses(number_of_points=number_of_points),
-            promotes=["losses_inverter"],
+            promotes=[],
         )
         self.add_subsystem(
             "temperature_inverter",
             PerformancesTemperature(inverter_id=inverter_id, number_of_points=number_of_points),
-            promotes=["data:*", "losses_inverter", "heat_sink_temperature"],
+            promotes=["data:*", "heat_sink_temperature"],
+        )
+        self.add_subsystem(
+            "efficiency",
+            PerformancesEfficiency(number_of_points=number_of_points),
+            promotes=["current", "rms_voltage"],
+        )
+        self.add_subsystem(
+            "dc_side_current",
+            PerformancesDCCurrent(number_of_points=number_of_points),
+            promotes=["current", "dc_voltage", "rms_voltage", "dc_current"],
         )
 
+        self.connect("modulation_idx.modulation_index", "conduction_losses.modulation_index")
         self.connect("resistance.resistance_igbt", "conduction_losses.resistance_igbt")
         self.connect("resistance.resistance_diode", "conduction_losses.resistance_diode")
         self.connect(
@@ -79,4 +98,9 @@ class PerformancesInverter(om.Group):
             "switching_losses.switching_losses_diode", "total_losses.switching_losses_diode"
         )
         self.connect("switching_losses.switching_losses_IGBT", "total_losses.switching_losses_IGBT")
+        self.connect(
+            "total_losses.losses_inverter",
+            ["temperature_inverter.losses_inverter", "efficiency.losses_inverter"],
+        )
         self.connect("temperature_inverter.inverter_temperature", "resistance.inverter_temperature")
+        self.connect("efficiency.efficiency", "dc_side_current.efficiency")

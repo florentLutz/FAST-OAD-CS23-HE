@@ -38,6 +38,7 @@ from ..components.sizing_contactor_weight import SizingInverterContactorWeight
 from ..components.sizing_inverter_weight import SizingInverterWeight
 from ..components.sizing_inverter_power_density import SizingInverterPowerDensity
 from ..components.sizing_inverter import SizingInverter
+from ..components.perf_modulation_index import PerformancesModulationIndex
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_conduction_loss import PerformancesConductionLosses
@@ -45,6 +46,8 @@ from ..components.perf_total_loss import PerformancesLosses
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
 from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
 from ..components.perf_temperature import PerformancesTemperature
+from ..components.perf_efficiency import PerformancesEfficiency
+from ..components.perf_dc_current import PerformancesDCCurrent
 from ..components.perf_inverter import PerformancesInverter
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -663,6 +666,45 @@ def test_inverter_sizing():
     )
 
 
+def test_modulation_idx():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("dc_voltage", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
+    ivc.add_output(
+        "peak_ac_voltage",
+        units="V",
+        val=np.array([710.4, 728.5, 747.6, 767.2, 787.1, 807.5, 827.9, 848.6, 869.6, 890.5]),
+    )
+
+    problem = om.Problem()
+    model = problem.model
+    model.add_subsystem(
+        name="ivc",
+        subsys=ivc,
+        promotes=["*"],
+    )
+    model.add_subsystem(
+        name="modulation_idx",
+        subsys=PerformancesModulationIndex(number_of_points=NB_POINTS_TEST),
+        promotes=["*"],
+    )
+    model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+    model.nonlinear_solver.options["iprint"] = 0
+    model.nonlinear_solver.options["maxiter"] = 50
+    model.nonlinear_solver.options["rtol"] = 1e-5
+    model.linear_solver = om.DirectSolver()
+
+    problem.setup()
+    problem.run_model()
+
+    assert problem.get_val("modulation_index") == pytest.approx(
+        np.array([0.71, 0.73, 0.75, 0.77, 0.79, 0.81, 0.83, 0.85, 0.87, 0.89]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_switching_losses():
 
     ivc = get_indep_var_comp(
@@ -900,6 +942,82 @@ def test_perf_temperature():
     problem.check_partials(compact_print=True)
 
 
+def test_inverter_efficiency():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        name="rms_voltage",
+        val=np.array([580.0, 594.8, 610.4, 626.4, 642.7, 659.3, 676.0, 692.9, 710.0, 727.1]),
+        units="V",
+    )
+    ivc.add_output(name="current", val=np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A")
+    total_losses = np.array(
+        [1740.54, 2434.2, 3230.22, 4129.62, 5134.44, 6246.0, 7464.96, 8795.46, 10234.44, 11784.72]
+    )
+    ivc.add_output("losses_inverter", val=total_losses, units="W")
+
+    # Won't be representative since the modulation index used for the computation of the losses
+    # is not equal to the modulation index computed based on bus voltage
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesEfficiency(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    expected_efficiency = np.array(
+        [0.995, 0.994, 0.993, 0.993, 0.992, 0.991, 0.991, 0.99, 0.99, 0.989]
+    )
+    assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_dc_current():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("dc_voltage", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
+    ivc.add_output(
+        "efficiency",
+        val=np.array([0.995, 0.994, 0.993, 0.993, 0.992, 0.991, 0.991, 0.99, 0.99, 0.989]),
+    )
+    ivc.add_output(
+        name="rms_voltage",
+        val=np.array([580.0, 594.8, 610.4, 626.4, 642.7, 659.3, 676.0, 692.9, 710.0, 727.1]),
+        units="V",
+    )
+    ivc.add_output(name="current", val=np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A")
+
+    problem = om.Problem()
+    model = problem.model
+    model.add_subsystem(
+        name="ivc",
+        subsys=ivc,
+        promotes=["*"],
+    )
+    model.add_subsystem(
+        name="dc_current",
+        subsys=PerformancesDCCurrent(number_of_points=NB_POINTS_TEST),
+        promotes=["*"],
+    )
+    model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+    model.nonlinear_solver.options["iprint"] = 0
+    model.nonlinear_solver.options["maxiter"] = 50
+    model.nonlinear_solver.options["rtol"] = 1e-5
+    model.linear_solver = om.DirectSolver()
+
+    problem.setup()
+    problem.run_model()
+
+    assert problem.get_val("dc_current", units="A") == pytest.approx(
+        np.array(
+            [349.75, 418.87, 491.76, 567.73, 647.88, 731.82, 818.57, 909.87, 1004.04, 1102.78]
+        ),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_performances_inverter_tot():
     ivc = get_indep_var_comp(
         list_inputs(
@@ -911,20 +1029,36 @@ def test_performances_inverter_tot():
 
     ivc.add_output("heat_sink_temperature", units="degK", val=np.full(NB_POINTS_TEST, 288.15))
     ivc.add_output("current", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A")
-    ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST))
-    ivc.add_output("modulation_index", np.linspace(0.1, 1.0, NB_POINTS_TEST))
+    ivc.add_output("switching_frequency", np.linspace(12000.0, 12000.0, NB_POINTS_TEST))
+    ivc.add_output("dc_voltage", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
+    ivc.add_output(
+        "peak_ac_voltage",
+        units="V",
+        val=np.array([710.4, 728.5, 747.6, 767.2, 787.1, 807.5, 827.9, 848.6, 869.6, 890.5]),
+    )
+    ivc.add_output(
+        name="rms_voltage",
+        val=np.array([580.0, 594.8, 610.4, 626.4, 642.7, 659.3, 676.0, 692.9, 710.0, 727.1]),
+        units="V",
+    )
 
     problem = run_system(
         PerformancesInverter(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    expected_losses = np.array(
-        [1747.3, 2438.8, 3230.6, 4125.8, 5127.3, 6238.2, 7462.0, 8802.1, 10262.3, 11846.3]
+    expected_efficiency = np.array(
+        [0.985, 0.986, 0.987, 0.987, 0.988, 0.988, 0.988, 0.989, 0.989, 0.989]
     )
-    assert problem.get_val("losses_inverter", units="W") == pytest.approx(expected_losses, rel=1e-2)
+    assert problem.get_val("component.efficiency.efficiency") == pytest.approx(
+        expected_efficiency, rel=1e-2
+    )
     expected_temperature = np.array(
-        [300.4, 305.2, 310.8, 317.0, 324.0, 331.8, 340.4, 349.8, 360.0, 371.1]
+        [325.24, 329.8, 334.48, 339.29, 344.24, 349.32, 354.54, 359.91, 365.42, 371.09]
     )
     assert problem.get_val(
         "component.temperature_inverter.inverter_temperature", units="degK"
     ) == pytest.approx(expected_temperature, rel=1e-2)
+    expected_dc_current = np.array(
+        [353.3, 422.31, 494.94, 571.07, 650.71, 733.97, 820.68, 911.02, 1005.04, 1102.5]
+    )
+    assert problem.get_val("dc_current", units="A") == pytest.approx(expected_dc_current, rel=1e-2)

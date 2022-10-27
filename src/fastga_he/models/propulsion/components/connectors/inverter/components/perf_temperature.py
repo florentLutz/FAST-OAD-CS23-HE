@@ -54,7 +54,7 @@ class PerformancesTemperature(om.ExplicitComponent):
 
         self.add_output(
             "inverter_temperature",
-            val=np.full(number_of_points, 0.0),
+            val=np.full(number_of_points, 273.15),
             units="degK",
             desc="temperature inside of the inverter",
             shape=number_of_points,

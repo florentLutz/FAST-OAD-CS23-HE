@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class PerformancesLosses(om.ExplicitComponent):
-    """Computation of Conduction losses for the IGBT and the diode."""
+    """Computation of total losses for the IGBT and the diode."""
 
     def initialize(self):
 
