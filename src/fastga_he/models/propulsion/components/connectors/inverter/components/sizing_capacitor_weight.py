@@ -33,10 +33,10 @@ class SizingInverterCapacitorWeight(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:weight",
-            val=5.0,
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:mass",
+            val=5000.0,
             units="g",
-            desc="Weight of the capacitor",
+            desc="Mass of the capacitor",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -45,13 +45,13 @@ class SizingInverterCapacitorWeight(om.ExplicitComponent):
 
         inverter_id = self.options["inverter_id"]
 
-        # We need the capcity in microF
+        # We need the capacity in microF
         capacity = (
             inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:capacity"]
             * 1e6
         )
 
-        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:weight"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:mass"] = (
             10.524 * capacity ** 0.7749
         )
 
@@ -60,7 +60,7 @@ class SizingInverterCapacitorWeight(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:weight",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:mass",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:capacity",
         ] = (
             10.524

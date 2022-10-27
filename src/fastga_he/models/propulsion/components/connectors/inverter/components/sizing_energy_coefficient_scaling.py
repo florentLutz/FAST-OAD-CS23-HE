@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingInverterLossCoefficientScaling(om.ExplicitComponent):
+class SizingInverterEnergyCoefficientScaling(om.ExplicitComponent):
     """Computation of scaling ratio for the loss coefficient of the inverter."""
 
     def initialize(self):
@@ -37,9 +37,6 @@ class SizingInverterLossCoefficientScaling(om.ExplicitComponent):
 
         self.add_output("data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a")
         self.add_output("data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c")
-        self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:resistance"
-        )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",

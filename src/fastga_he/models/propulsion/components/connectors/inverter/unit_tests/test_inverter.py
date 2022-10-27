@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 import pytest
 
-from ..components.sizing_energy_coefficient_scaling import SizingInverterLossCoefficientScaling
+from ..components.sizing_energy_coefficient_scaling import SizingInverterEnergyCoefficientScaling
 from ..components.sizing_energy_coefficients import SizingInverterEnergyCoefficients
 from ..components.sizing_resistance_scaling import SizingInverterResistanceScaling
 from ..components.sizing_reference_resistance import SizingInverterResistances
@@ -32,6 +32,12 @@ from ..components.sizing_heat_sink import SizingHeatSink
 from ..components.sizing_capacitor_current_caliber import SizingInverterCapacitorCurrentCaliber
 from ..components.sizing_capacitor_capacity import SizingInverterCapacitorCapacity
 from ..components.sizing_capacitor_weight import SizingInverterCapacitorWeight
+from ..components.sizing_inductor_inductance import SizingInverterInductorInductance
+from ..components.sizing_inductor_weight import SizingInverterInductorWeight
+from ..components.sizing_contactor_weight import SizingInverterContactorWeight
+from ..components.sizing_inverter_weight import SizingInverterWeight
+from ..components.sizing_inverter_power_density import SizingInverterPowerDensity
+from ..components.sizing_inverter import SizingInverter
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_conduction_loss import PerformancesConductionLosses
@@ -51,13 +57,13 @@ def test_scaling_ratio():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingInverterLossCoefficientScaling(inverter_id="inverter_1")),
+        list_inputs(SizingInverterEnergyCoefficientScaling(inverter_id="inverter_1")),
         __file__,
         XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(SizingInverterLossCoefficientScaling(inverter_id="inverter_1"), ivc)
+    problem = run_system(SizingInverterEnergyCoefficientScaling(inverter_id="inverter_1"), ivc)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:a"
     ) == pytest.approx(1.385, rel=1e-2)
@@ -511,13 +517,150 @@ def test_capacitor_weight():
 
     assert (
         problem.get_val(
-            "data:propulsion:he_power_train:inverter:inverter_1:capacitor:weight",
+            "data:propulsion:he_power_train:inverter:inverter_1:capacitor:mass",
             units="kg",
         )
         == pytest.approx(3.832, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_inductor_inductance():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterInductorInductance(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterInductorInductance(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:inductor:inductance",
+            units="H",
+        )
+        == pytest.approx(11.5e-6, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterInductorWeight(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterInductorWeight(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:inductor:mass",
+            units="kg",
+        )
+        == pytest.approx(31.064, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_contactor_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterContactorWeight(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterContactorWeight(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:contactor:mass",
+            units="kg",
+        )
+        == pytest.approx(4.85, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inverter_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterWeight(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterWeight(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:mass",
+            units="kg",
+        )
+        == pytest.approx(42.41, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inverter_power_density():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverterPowerDensity(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterPowerDensity(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:power_density",
+            units="kW/kg",
+        )
+        == pytest.approx(15.17, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inverter_sizing():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInverter(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverter(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:mass",
+            units="kg",
+        )
+        == pytest.approx(42.41, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:power_density",
+            units="kW/kg",
+        )
+        == pytest.approx(15.17, rel=1e-2)
+    )
 
 
 def test_switching_losses():
@@ -608,13 +751,13 @@ def test_conduction_losses():
         PerformancesConductionLosses(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
     )
     expected_losses_igbt = np.array(
-        [40.68, 53.82, 69.56, 87.95, 109.3, 133.82, 161.37, 192.63, 227.0, 264.8]
+        [40.99, 54.58, 70.94, 90.15, 112.55, 138.36, 167.46, 200.56, 237.06, 277.29]
     )
     assert problem.get_val("conduction_losses_IGBT", units="W") == pytest.approx(
         expected_losses_igbt, rel=1e-2
     )
     expected_losses_diode = np.array(
-        [50.23, 56.79, 62.45, 66.86, 69.83, 71.09, 70.28, 67.34, 61.84, 53.64]
+        [49.8, 55.72, 60.53, 63.82, 65.39, 64.94, 62.1, 56.75, 48.48, 37.13]
     )
     assert problem.get_val("conduction_losses_diode", units="W") == pytest.approx(
         expected_losses_diode, rel=1e-2
@@ -638,19 +781,19 @@ def test_total_losses_inverter():
     )
     ivc.add_output(
         "conduction_losses_IGBT",
-        [40.68, 53.82, 69.56, 87.95, 109.3, 133.82, 161.37, 192.63, 227.0, 264.8],
+        [40.99, 54.58, 70.94, 90.15, 112.55, 138.36, 167.46, 200.56, 237.06, 277.29],
         units="W",
     )
     ivc.add_output(
         "conduction_losses_diode",
-        [50.23, 56.79, 62.45, 66.86, 69.83, 71.09, 70.28, 67.34, 61.84, 53.64],
+        [49.8, 55.72, 60.53, 63.82, 65.39, 64.94, 62.1, 56.75, 48.48, 37.13],
         units="W",
     )
 
     problem = run_system(PerformancesLosses(number_of_points=NB_POINTS_TEST), ivc)
 
     expected_losses = np.array(
-        [1741.26, 2436.06, 3233.46, 4134.66, 5141.58, 6255.66, 7477.5, 8811.42, 10254.24, 11808.84]
+        [1740.54, 2434.2, 3230.22, 4129.62, 5134.44, 6246.0, 7464.96, 8795.46, 10234.44, 11784.72]
     )
     assert problem.get_val("losses_inverter", units="W") == pytest.approx(expected_losses, rel=1e-2)
 
@@ -669,7 +812,7 @@ def test_temperature_derivative():
         XML_FILE,
     )
     total_losses = np.array(
-        [1773.0, 2481.6, 3295.2, 4215.0, 5242.8, 6379.8, 7627.8, 8989.2, 10462.2, 12049.8]
+        [1740.54, 2434.2, 3230.22, 4129.62, 5134.44, 6246.0, 7464.96, 8795.46, 10234.44, 11784.72]
     )
     ivc.add_output("losses_inverter", val=total_losses, units="W")
     temperature = np.array(
@@ -686,7 +829,7 @@ def test_temperature_derivative():
     )
 
     assert problem.get_val("inverter_temperature_time_derivative", units="degK/s") == pytest.approx(
-        np.array([2.83, 0.89, -0.57, -1.54, -2.03, -2.03, -1.54, -0.56, 0.91, 2.88]),
+        np.array([2.78, 0.81, -0.67, -1.68, -2.2, -2.24, -1.8, -0.87, 0.55, 2.46]),
         rel=1e-2,
     )
 
@@ -699,7 +842,7 @@ def test_perf_temperature_increase():
         __file__,
         XML_FILE,
     )
-    derivative = np.array([2.83, 0.89, -0.57, -1.54, -2.03, -2.03, -1.54, -0.56, 0.91, 2.88])
+    derivative = np.array([2.78, 0.81, -0.67, -1.68, -2.2, -2.24, -1.8, -0.87, 0.55, 2.46])
     ivc.add_output("inverter_temperature_time_derivative", units="degK/s", val=derivative)
     ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 300.0))
 
@@ -710,7 +853,7 @@ def test_perf_temperature_increase():
     )
 
     expected_increase = np.array(
-        [849.0, 267.0, -171.0, -462.0, -609.0, -609.0, -462.0, -168.0, 273.0, 864.0]
+        [834.0, 243.0, -201.0, -504.0, -660.0, -672.0, -540.0, -261.0, 165.0, 738.0]
     )
     assert (
         problem.get_val(
@@ -732,7 +875,7 @@ def test_perf_temperature():
         XML_FILE,
     )
     total_losses = np.array(
-        [1741.26, 2436.06, 3233.46, 4134.66, 5141.58, 6255.66, 7477.5, 8811.42, 10254.24, 11808.84]
+        [1740.54, 2434.2, 3230.22, 4129.62, 5134.44, 6246.0, 7464.96, 8795.46, 10234.44, 11784.72]
     )
     ivc.add_output("losses_inverter", val=total_losses, units="W")
     ivc.add_output("heat_sink_temperature", units="degK", val=np.full_like(total_losses, 288.15))
@@ -744,7 +887,7 @@ def test_perf_temperature():
     )
 
     expected_temperature = np.array(
-        [300.56, 305.52, 311.22, 317.65, 324.85, 332.81, 341.54, 351.07, 361.39, 372.5]
+        [300.33, 305.19, 310.76, 317.06, 324.09, 331.87, 340.4, 349.72, 359.79, 370.64]
     )
     assert (
         problem.get_val(

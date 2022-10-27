@@ -19,6 +19,7 @@
                             <width units="m">0.1716</width>
                             <height units="m">0.005655</height>
                             <max_temperature units="degK">373.15</max_temperature>
+                            <mass units="kg">0.619</mass>
                             <coolant>
                                 <max_input_temperature units="degK">323.15</max_input_temperature>
                                 <max_output_temperature units="degK">353.15</max_output_temperature>
@@ -36,11 +37,20 @@
                         <current_caliber units="A">433.0</current_caliber>
                         <voltage_caliber units="V">500.0</voltage_caliber>
                         <switching_frequency units="Hz">15.0e3</switching_frequency>
-                        <power_factor>0.9</power_factor>
+                        <power_factor>1.0</power_factor>
+                        <mass units="kg">42.82</mass>
                         <capacitor>
                             <capacity units="F">2.02e-3</capacity>
                             <current_caliber units="A">199.18</current_caliber>
+                            <mass units="kg">3.832</mass>
                         </capacitor>
+                        <inductor>
+                            <inductance units="H">11.5e-6</inductance>
+                            <mass units="kg">31.064</mass>
+                        </inductor>
+                        <contactor>
+                            <mass units="kg">4.85</mass>
+                        </contactor>
                         <scaling>
                             <a>1.385</a>
                             <c>0.722</c>
