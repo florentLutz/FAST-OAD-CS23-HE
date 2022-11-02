@@ -15,7 +15,7 @@ def curve_fit_openmdao(speed_array, torque_array, efficiency_target):
     ivc.add_output("speed", speed_array, shape=size, units="rad/s")
     ivc.add_output("target_efficiency", efficiency_target, shape=size)
 
-    problem = om.Problem()
+    problem = om.Problem(reports=False)
     model = problem.model
     model.add_subsystem("inputs", ivc, promotes_outputs=["*"])
     model.add_subsystem("power_losses", PowerLossPolito(number_of_points=size), promotes=["*"])

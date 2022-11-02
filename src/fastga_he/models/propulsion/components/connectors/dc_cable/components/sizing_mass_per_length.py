@@ -35,7 +35,6 @@ class SizingMassPerLength(om.ExplicitComponent):
             + ":properties:density",
             val=8960.0,
             units="kg/m**3",
-            desc="1.0 for copper, 0.0 for aluminium",
         )
 
         self.add_input(

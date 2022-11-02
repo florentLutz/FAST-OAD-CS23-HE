@@ -7,7 +7,11 @@ import openmdao.api as om
 
 
 class SizingInsulationThickness(om.ExplicitComponent):
-    """Computation of max current per cable ."""
+    """
+    Computation of insulation thickness.
+
+    Based on the formula from :cite:`aretskin:2021`
+    """
 
     def initialize(self):
 
@@ -59,7 +63,7 @@ class SizingInsulationThickness(om.ExplicitComponent):
             units="m",
         )
 
-        self.declare_partials(of="*", wrt="*")
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

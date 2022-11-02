@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 
 import pandas as pd
 
-ORDER = 4
+ORDER = 2
 
 if __name__ == "__main__":
 
@@ -71,8 +71,8 @@ if __name__ == "__main__":
     fig.update_xaxes(type="log")
     fig.show()
 
-    # print(polyfit_copper)
-    # print(polyfit_aluminium)
+    print(polyfit_copper)
+    print(polyfit_aluminium)
 
     mean_error_copper = (
         np.mean((copper_ampacities - np.polyval(polyfit_copper, area_log)) / copper_ampacities)
@@ -99,3 +99,17 @@ if __name__ == "__main__":
     print("Max error copper: ", max_error_copper)
     print("Mean error aluminium: ", mean_error_aluminium)
     print("Max error aluminium: ", max_error_aluminium)
+
+    print("========== Other way around ================")
+    polyfit_copper_inv = np.polyfit(copper_ampacities, area_log, ORDER)
+
+    print(polyfit_copper_inv)
+
+    mean_error_copper_inv = (
+        np.mean((area_log - np.polyval(polyfit_copper_inv, copper_ampacities)) / area_log) * 100.0
+    )
+    max_error_copper_inv = (
+        np.max((area_log - np.polyval(polyfit_copper_inv, copper_ampacities)) / area_log) * 100.0
+    )
+    print("Mean error copper inv: ", mean_error_copper_inv)
+    print("Max error copper inv: ", max_error_copper_inv)

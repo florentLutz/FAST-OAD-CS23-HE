@@ -313,7 +313,7 @@ def test_mass_flow_heat_sink_tube():
 
 def test_mass_flow_heat_sink_coolant_prandtl():
 
-    problem = om.Problem()
+    problem = om.Problem(reports=False)
     model = problem.model
     model.add_subsystem(
         "component", SizingInverterHeatSinkCoolantPrandtl(inverter_id="inverter_1"), promotes=["*"]
@@ -676,7 +676,7 @@ def test_modulation_idx():
         val=np.array([710.4, 728.5, 747.6, 767.2, 787.1, 807.5, 827.9, 848.6, 869.6, 890.5]),
     )
 
-    problem = om.Problem()
+    problem = om.Problem(reports=False)
     model = problem.model
     model.add_subsystem(
         name="ivc",
@@ -987,7 +987,7 @@ def test_dc_current():
     )
     ivc.add_output(name="current", val=np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A")
 
-    problem = om.Problem()
+    problem = om.Problem(reports=False)
     model = problem.model
     model.add_subsystem(
         name="ivc",

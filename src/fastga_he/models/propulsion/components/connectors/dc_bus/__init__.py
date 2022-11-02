@@ -2,5 +2,5 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-from .components.perf_harness import PerformanceHarness
-from .components.sizing_harness import SizingHarness
+from .components.perf_dc_bus import PerformancesDCBus
+from .components.sizing_dc_bus import SizingDCBus

@@ -35,7 +35,7 @@ def run_system(
     check=False,
 ):
     """Runs and returns an OpenMDAO problem with provided component and data"""
-    problem = oad.FASTOADProblem()
+    problem = oad.FASTOADProblem(reports=False)
     model = problem.model
     model.add_subsystem("inputs", input_vars, promotes=["*"])
     model.add_subsystem("component", component, promotes=["*"])
@@ -97,7 +97,7 @@ class VariableListLocal(oad.VariableList):
         :return: VariableList instance.
         """
 
-        problem = oad.FASTOADProblem()
+        problem = oad.FASTOADProblem(reports=False)
         if isinstance(system, om.Group):
             problem.model = deepcopy(system)
         else:

@@ -97,7 +97,7 @@ def test_compute_diameter():
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = om.Problem()
+    problem = om.Problem(reports=False)
     model = problem.model
     model.add_subsystem("ivc", ivc, promotes=["data:*"])
     model.add_subsystem(
