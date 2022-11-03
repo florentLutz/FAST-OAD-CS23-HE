@@ -690,7 +690,7 @@ def test_modulation_idx():
     )
     model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
     model.nonlinear_solver.options["iprint"] = 0
-    model.nonlinear_solver.options["maxiter"] = 50
+    model.nonlinear_solver.options["maxiter"] = 200
     model.nonlinear_solver.options["rtol"] = 1e-5
     model.linear_solver = om.DirectSolver()
 
@@ -1001,7 +1001,7 @@ def test_dc_current():
     )
     model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
     model.nonlinear_solver.options["iprint"] = 0
-    model.nonlinear_solver.options["maxiter"] = 50
+    model.nonlinear_solver.options["maxiter"] = 200
     model.nonlinear_solver.options["rtol"] = 1e-5
     model.linear_solver = om.DirectSolver()
 

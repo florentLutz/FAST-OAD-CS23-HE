@@ -19,8 +19,6 @@ from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
 XML_FILE = "simple_assembly.xml"
 NB_POINTS_TEST = 10
 
-# TODO: Not functioning until the DC/DC converter model from Hendricks et al. is coded !
-
 
 class PerformancesAssembly(om.Group):
     def __init__(self, **kwargs):
@@ -108,7 +106,7 @@ class PerformancesAssembly(om.Group):
             PerformancesDCDCConverter(
                 # dc_dc_converter_id="dc_dc_converter_1",
                 number_of_points=number_of_points,
-                voltage_target=750,
+                voltage_target=850,
             ),
             promotes=[],
         )
