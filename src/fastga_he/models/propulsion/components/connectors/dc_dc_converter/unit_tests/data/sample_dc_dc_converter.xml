@@ -1,0 +1,12 @@
+<FASTOAD_model>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <DC_DC_converter>
+                    <dc_dc_converter_1>
+                    </dc_dc_converter_1>
+                </DC_DC_converter>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>

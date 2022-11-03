@@ -33,7 +33,7 @@ class PerformancesMaximumVoltage(om.ExplicitComponent):
             name="voltage",
             val=np.full(number_of_points, np.nan),
             units="V",
-            desc="Voltage of the " "bus",
+            desc="Voltage of the bus",
         )
 
         self.add_output(

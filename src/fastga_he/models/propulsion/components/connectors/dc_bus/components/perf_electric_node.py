@@ -61,7 +61,7 @@ class PerformancesElectricalNode(om.ImplicitComponent):
             )
 
         self.add_output(
-            name="voltage", val=np.ones(number_of_points), units="V", desc="Voltage of the bus"
+            name="voltage", val=np.full(number_of_points, 350), units="V", desc="Voltage of the bus"
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
