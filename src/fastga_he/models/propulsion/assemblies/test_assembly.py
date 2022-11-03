@@ -50,12 +50,20 @@ class PerformancesAssembly(om.Group):
         ivc3 = om.IndepVarComp()
         ivc3.add_output("heat_sink_temperature", units="degK", val=np.full(NB_POINTS_TEST, 288.15))
 
+        ivc4 = om.IndepVarComp()
+        ivc4.add_output("efficiency", val=np.full(NB_POINTS_TEST, 0.98))
+
+        ivc5 = om.IndepVarComp()
+        ivc5.add_output("voltage_out_target", val=np.full(NB_POINTS_TEST, 850.0))
+
         ivc6 = om.IndepVarComp()
         ivc6.add_output("voltage_in", val=np.full(NB_POINTS_TEST, 860.0))
 
         self.add_subsystem("propeller_rot_speed", ivc, promotes=[])
         self.add_subsystem("control_inverter", ivc2, promotes=[])
         self.add_subsystem("inverter_heat_sink", ivc3, promotes=[])
+        self.add_subsystem("converter_efficiency", ivc4, promotes=[])
+        self.add_subsystem("converter_voltage_target", ivc5, promotes=[])
         self.add_subsystem("dc_dc_converter_voltage_in", ivc6, promotes=[])
 
         self.add_subsystem(
@@ -106,7 +114,6 @@ class PerformancesAssembly(om.Group):
             PerformancesDCDCConverter(
                 # dc_dc_converter_id="dc_dc_converter_1",
                 number_of_points=number_of_points,
-                voltage_target=850,
             ),
             promotes=[],
         )
@@ -127,6 +134,10 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_dc_converter_1.current_out", "dc_bus_2.current_in_1")
         self.connect("dc_bus_2.voltage", "dc_dc_converter_1.voltage_out")
         self.connect("dc_dc_converter_voltage_in.voltage_in", "dc_dc_converter_1.voltage_in")
+        self.connect("converter_efficiency.efficiency", "dc_dc_converter_1.efficiency")
+        self.connect(
+            "converter_voltage_target.voltage_out_target", "dc_dc_converter_1.voltage_out_target"
+        )
 
 
 def test_assembly():

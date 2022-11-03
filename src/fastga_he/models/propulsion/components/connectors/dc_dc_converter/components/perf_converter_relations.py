@@ -18,10 +18,6 @@ class PerformancesConverterRelations(om.ImplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
-        self.options.declare(
-            "voltage_target", default=1000, desc="Target output voltage of the converter"
-        )
-        self.options.declare("efficiency", default=0.98, desc="Efficiency of the converter")
 
     def setup(self):
 
@@ -31,13 +27,24 @@ class PerformancesConverterRelations(om.ImplicitComponent):
             "voltage_out",
             val=np.full(number_of_points, np.nan),
             units="V",
-            desc="voltage to output side",
+            desc="Voltage at the output side of the converter",
+        )
+        self.add_input(
+            "voltage_out_target",
+            val=np.full(number_of_points, np.nan),
+            units="V",
+            desc="Target voltage at the output side of the converter",
         )
         self.add_input(
             "current_out",
             val=np.full(number_of_points, np.nan),
             units="A",
-            desc="current to output side",
+            desc="Current at the output side of the converter",
+        )
+        self.add_input(
+            "efficiency",
+            val=np.full(number_of_points, np.nan),
+            desc="Efficiency of the converter",
         )
 
         self.add_output(
@@ -54,23 +61,29 @@ class PerformancesConverterRelations(om.ImplicitComponent):
         )
 
         self.declare_partials(
-            of="power_rel", wrt=["voltage_out", "current_out", "power_rel"], method="exact"
+            of="power_rel",
+            wrt=["voltage_out", "current_out", "power_rel", "efficiency"],
+            method="exact",
         )
-        self.declare_partials(of="voltage_out_rel", wrt="voltage_out_rel", method="exact")
+        self.declare_partials(
+            of="voltage_out_rel", wrt=["voltage_out_rel", "voltage_out_target"], method="exact"
+        )
 
     def apply_nonlinear(self, inputs, outputs, residuals):
 
-        residuals["voltage_out_rel"] = outputs["voltage_out_rel"] - self.options["voltage_target"]
+        residuals["voltage_out_rel"] = outputs["voltage_out_rel"] - inputs["voltage_out_target"]
         residuals["power_rel"] = (inputs["voltage_out"] * inputs["current_out"]) - outputs[
             "power_rel"
-        ] * self.options["efficiency"]
+        ] * inputs["efficiency"]
 
     def linearize(self, inputs, outputs, partials):
 
         number_of_points = self.options["number_of_points"]
 
-        partials["power_rel", "power_rel"] = -np.eye(number_of_points) * self.options["efficiency"]
+        partials["power_rel", "power_rel"] = -np.diag(inputs["efficiency"])
+        partials["power_rel", "efficiency"] = -np.diag(outputs["power_rel"])
         partials["power_rel", "voltage_out"] = np.diag(inputs["current_out"])
         partials["power_rel", "current_out"] = np.diag(inputs["voltage_out"])
 
         partials["voltage_out_rel", "voltage_out_rel"] = np.eye(number_of_points)
+        partials["voltage_out_rel", "voltage_out_target"] = -np.eye(number_of_points)

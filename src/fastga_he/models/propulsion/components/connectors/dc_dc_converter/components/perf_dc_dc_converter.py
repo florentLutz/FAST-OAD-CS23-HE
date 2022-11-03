@@ -14,12 +14,8 @@ class PerformancesDCDCConverter(om.Group):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
-        self.options.declare("efficiency", default=0.98, desc="Converter efficiency")
-        self.options.declare("voltage_target", desc="Target voltage")
 
     def setup(self):
-        efficiency = self.options["efficiency"]
-        voltage_target = self.options["voltage_target"]
         number_of_points = self.options["number_of_points"]
 
         self.add_subsystem(
@@ -35,11 +31,9 @@ class PerformancesDCDCConverter(om.Group):
         self.add_subsystem(
             "converter_relation",
             PerformancesConverterRelations(
-                voltage_target=voltage_target,
-                efficiency=efficiency,
                 number_of_points=number_of_points,
             ),
-            promotes=["voltage_out"],
+            promotes=["voltage_out", "efficiency", "voltage_out_target"],
         )
 
         self.connect("converter_relation.power_rel", "load_side.power")
