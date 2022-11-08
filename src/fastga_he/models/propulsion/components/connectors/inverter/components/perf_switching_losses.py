@@ -159,71 +159,68 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
             "switching_losses_diode",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a",
         ] = (
-            f_sw / 2.0 * 1e-3
+            f_sw / 2.0
         )
         partials[
             "switching_losses_diode",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b",
         ] = (
-            f_sw * current / np.pi * 1e-3
+            f_sw * current / np.pi
         )
         partials[
             "switching_losses_diode",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c",
         ] = (
-            f_sw * current ** 2.0 / 4 * 1e-3
+            f_sw * current ** 2.0 / 4
         )
-        partials["switching_losses_diode", "switching_frequency"] = (
-            np.diag(a_rr / 2.0 + b_rr * current / np.pi + c_rr * current ** 2.0 / 4) * 1e-3
+        partials["switching_losses_diode", "switching_frequency"] = np.diag(
+            a_rr / 2.0 + b_rr * current / np.pi + c_rr * current ** 2.0 / 4
         )
         partials["switching_losses_diode", "current"] = np.diag(
-            f_sw * (b_rr / np.pi + c_rr * current / 2.0) * 1e-3
+            f_sw * (b_rr / np.pi + c_rr * current / 2.0)
         )
 
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a",
         ] = (
-            f_sw / 2.0 * 1e-3
+            f_sw / 2.0
         )
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a",
         ] = (
-            f_sw / 2.0 * 1e-3
+            f_sw / 2.0
         )
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b",
         ] = (
-            f_sw * current / np.pi * 1e-3
+            f_sw * current / np.pi
         )
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b",
         ] = (
-            f_sw * current / np.pi * 1e-3
+            f_sw * current / np.pi
         )
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c",
         ] = (
-            f_sw * current ** 2.0 / 4 * 1e-3
+            f_sw * current ** 2.0 / 4
         )
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c",
         ] = (
-            f_sw * current ** 2.0 / 4 * 1e-3
+            f_sw * current ** 2.0 / 4
         )
-        partials["switching_losses_IGBT", "switching_frequency"] = (
-            np.diag(
-                (a_on + a_off) / 2.0
-                + (b_on + b_off) * current / np.pi
-                + (c_on + c_off) * current ** 2.0 / 4
-            )
-            * 1e-3
+        partials["switching_losses_IGBT", "switching_frequency"] = np.diag(
+            (a_on + a_off) / 2.0
+            + (b_on + b_off) * current / np.pi
+            + (c_on + c_off) * current ** 2.0 / 4
         )
-        partials["switching_losses_IGBT", "current"] = (
-            np.diag(f_sw * ((b_on + b_off) / np.pi + (c_on + c_off) * current / 2.0)) * 1e-3
+        partials["switching_losses_IGBT", "current"] = np.diag(
+            f_sw * ((b_on + b_off) / np.pi + (c_on + c_off) * current / 2.0)
         )

@@ -26,7 +26,7 @@ class PerformancesAssembly(om.Group):
 
         # Solvers setup
         self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        self.nonlinear_solver.options["iprint"] = 0
+        self.nonlinear_solver.options["iprint"] = 2
         self.nonlinear_solver.options["maxiter"] = 200
         self.nonlinear_solver.options["rtol"] = 1e-5
         self.linear_solver = om.DirectSolver()
@@ -42,7 +42,7 @@ class PerformancesAssembly(om.Group):
         number_of_points = self.options["number_of_points"]
 
         ivc = om.IndepVarComp()
-        ivc.add_output("rpm", units="min**-1", val=np.full(number_of_points, 4000))
+        ivc.add_output("rpm", units="min**-1", val=np.full(number_of_points, 2000))
 
         ivc2 = om.IndepVarComp()
         ivc2.add_output("switching_frequency", units="Hz", val=np.full(number_of_points, 12000.0))
@@ -51,7 +51,7 @@ class PerformancesAssembly(om.Group):
         ivc3.add_output("heat_sink_temperature", units="degK", val=np.full(NB_POINTS_TEST, 288.15))
 
         ivc4 = om.IndepVarComp()
-        ivc4.add_output("efficiency", val=np.full(NB_POINTS_TEST, 0.98))
+        ivc4.add_output("switching_frequency", units="Hz", val=np.full(NB_POINTS_TEST, 12000))
 
         ivc5 = om.IndepVarComp()
         ivc5.add_output("voltage_out_target", val=np.full(NB_POINTS_TEST, 850.0))
@@ -62,7 +62,7 @@ class PerformancesAssembly(om.Group):
         self.add_subsystem("propeller_rot_speed", ivc, promotes=[])
         self.add_subsystem("control_inverter", ivc2, promotes=[])
         self.add_subsystem("inverter_heat_sink", ivc3, promotes=[])
-        self.add_subsystem("converter_efficiency", ivc4, promotes=[])
+        self.add_subsystem("control_converter", ivc4, promotes=[])
         self.add_subsystem("converter_voltage_target", ivc5, promotes=[])
         self.add_subsystem("dc_dc_converter_voltage_in", ivc6, promotes=[])
 
@@ -112,15 +112,18 @@ class PerformancesAssembly(om.Group):
         self.add_subsystem(
             "dc_dc_converter_1",
             PerformancesDCDCConverter(
-                # dc_dc_converter_id="dc_dc_converter_1",
+                dc_dc_converter_id="dc_dc_converter_1",
                 number_of_points=number_of_points,
             ),
-            promotes=[],
+            promotes=["data:*"],
         )
 
         self.connect("propeller_rot_speed.rpm", ["propeller_1.rpm", "motor_1.rpm"])
         self.connect("control_inverter.switching_frequency", "inverter_1.switching_frequency")
         self.connect("inverter_heat_sink.heat_sink_temperature", "inverter_1.heat_sink_temperature")
+        self.connect(
+            "control_converter.switching_frequency", "dc_dc_converter_1.switching_frequency"
+        )
         self.connect("propeller_1.shaft_power", "motor_1.shaft_power")
         self.connect("motor_1.rms_current_one_phase", "inverter_1.current")
         self.connect("motor_1.peak_voltage", "inverter_1.peak_ac_voltage")
@@ -134,7 +137,6 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_dc_converter_1.current_out", "dc_bus_2.current_in_1")
         self.connect("dc_bus_2.voltage", "dc_dc_converter_1.voltage_out")
         self.connect("dc_dc_converter_voltage_in.voltage_in", "dc_dc_converter_1.voltage_in")
-        self.connect("converter_efficiency.efficiency", "dc_dc_converter_1.efficiency")
         self.connect(
             "converter_voltage_target.voltage_out_target", "dc_dc_converter_1.voltage_out_target"
         )
@@ -196,25 +198,27 @@ def test_assembly():
     # Result is not really accurate since we used a ICE propeller coupled to a small PMSM not
     # sized for the demand, though it shows that the assembly works just fine
 
+    print(problem.get_val("component.dc_dc_converter_1.current_in", units="A"))
+
     # om.n2(problem)
 
-    _, _, residuals = problem.model.get_nonlinear_vectors()
+    _, _, residuals = problem.model.component.get_nonlinear_vectors()
 
     assert problem.get_val("component.dc_line_1.total_current", units="A") * problem.get_val(
         "component.dc_line_1.voltage_b", units="V"
     ) == pytest.approx(
         np.array(
             [
-                283233.7,
-                284871.2,
-                286503.9,
-                288122.0,
-                289725.1,
-                291314.1,
-                292890.0,
-                294453.3,
-                296004.0,
-                297542.2,
+                184568.4,
+                185649.2,
+                186467.8,
+                187142.6,
+                187793.3,
+                188469.2,
+                189169.0,
+                189873.3,
+                190563.8,
+                191229.6,
             ]
         ),
         rel=1e-2,

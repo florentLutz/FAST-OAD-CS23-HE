@@ -33,7 +33,7 @@ class PerformancesConverterGeneratorSide(om.ImplicitComponent):
             "voltage_out",
             val=np.full(number_of_points, np.nan),
             units="V",
-            desc="voltage to output side",
+            desc="Voltage to output side",
         )
 
         self.add_output(

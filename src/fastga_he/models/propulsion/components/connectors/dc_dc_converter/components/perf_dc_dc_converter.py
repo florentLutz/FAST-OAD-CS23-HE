@@ -7,6 +7,11 @@ import openmdao.api as om
 from .perf_converter_relations import PerformancesConverterRelations
 from .perf_generator_side import PerformancesConverterGeneratorSide
 from .perf_load_side import PerformancesConverterLoadSide
+from .perf_duty_cycle import PerformancesDutyCycle
+from .perf_switching_losses import PerformancesSwitchingLosses
+from .perf_conduction_losses import PerformancesConductionLosses
+from .perf_total_losses import PerformancesLosses
+from .perf_efficiency import PerformancesEfficiency
 
 
 class PerformancesDCDCConverter(om.Group):
@@ -14,9 +19,16 @@ class PerformancesDCDCConverter(om.Group):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            name="dc_dc_converter_id",
+            default=None,
+            desc="Identifier of the DC/DC converter",
+            allow_none=False,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_subsystem(
             "load_side",
@@ -29,13 +41,55 @@ class PerformancesDCDCConverter(om.Group):
             promotes=["voltage_out", "current_out"],
         )
         self.add_subsystem(
+            "duty_cycle",
+            PerformancesDutyCycle(number_of_points=number_of_points),
+            promotes=["voltage_in", "voltage_out"],
+        )
+        self.add_subsystem(
+            "switching_losses",
+            PerformancesSwitchingLosses(
+                number_of_points=number_of_points, dc_dc_converter_id=dc_dc_converter_id
+            ),
+            promotes=["data:*", "current_out", "switching_frequency"],
+        )
+        self.add_subsystem(
+            "conduction_losses",
+            PerformancesConductionLosses(
+                number_of_points=number_of_points, dc_dc_converter_id=dc_dc_converter_id
+            ),
+            promotes=["data:*", "current_out"],
+        )
+        self.add_subsystem(
+            "total_losses",
+            PerformancesLosses(number_of_points=number_of_points),
+            promotes=[],
+        )
+        self.add_subsystem(
+            "efficiency",
+            PerformancesEfficiency(number_of_points=number_of_points),
+            promotes=["current_out", "voltage_out"],
+        )
+        self.add_subsystem(
             "converter_relation",
             PerformancesConverterRelations(
                 number_of_points=number_of_points,
             ),
-            promotes=["voltage_out", "efficiency", "voltage_out_target"],
+            promotes=["voltage_out", "voltage_out_target"],
         )
 
         self.connect("converter_relation.power_rel", "load_side.power")
         self.connect("current_out", "converter_relation.current_out")
         self.connect("converter_relation.voltage_out_rel", "generator_side.voltage_target")
+        self.connect("duty_cycle.duty_cycle", "conduction_losses.duty_cycle")
+        self.connect(
+            "switching_losses.switching_losses_diode", "total_losses.switching_losses_diode"
+        )
+        self.connect("switching_losses.switching_losses_IGBT", "total_losses.switching_losses_IGBT")
+        self.connect(
+            "conduction_losses.conduction_losses_diode", "total_losses.conduction_losses_diode"
+        )
+        self.connect(
+            "conduction_losses.conduction_losses_IGBT", "total_losses.conduction_losses_IGBT"
+        )
+        self.connect("total_losses.losses_converter", "efficiency.losses_converter")
+        self.connect("efficiency.efficiency", "converter_relation.efficiency")

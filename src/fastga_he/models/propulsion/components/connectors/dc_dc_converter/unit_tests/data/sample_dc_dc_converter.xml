@@ -4,6 +4,35 @@
             <he_power_train>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
+                        <igbt>
+                            <resistance units="ohm">0.002265</resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.002805</resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                        </diode>
+                        <current_caliber units="A">400.0</current_caliber>
+                        <scaling>
+                            <a>1.5</a>
+                            <resistance>1.5</resistance>
+                            <c>0.666</c>
+                        </scaling>
+                        <energy_on>
+                            <a>0.02379429</a>
+                            <b>3.326e-05</b>
+                            <c>3.420e-7</c>
+                        </energy_on>
+                        <energy_rr>
+                            <a>0.00637224</a>
+                            <b>0.000340</b>
+                            <c>-3.005e-8</c>
+                        </energy_rr>
+                        <energy_off>
+                            <a>0.02261044</a>
+                            <b>0.000254</b>
+                            <c>-1.158e-7</c>
+                        </energy_off>
                     </dc_dc_converter_1>
                 </DC_DC_converter>
             </he_power_train>

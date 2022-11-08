@@ -52,7 +52,7 @@ class PerformancesAssembly(om.Group):
         ivc3.add_output("heat_sink_temperature", units="degK", val=np.full(NB_POINTS_TEST, 288.15))
 
         ivc4 = om.IndepVarComp()
-        ivc4.add_output("efficiency", val=np.full(NB_POINTS_TEST, 0.98))
+        ivc4.add_output("switching_frequency", units="Hz", val=np.full(NB_POINTS_TEST, 12000))
 
         ivc5 = om.IndepVarComp()
         ivc5.add_output("voltage_out_target", val=np.full(NB_POINTS_TEST, 850.0))
@@ -63,7 +63,7 @@ class PerformancesAssembly(om.Group):
         self.add_subsystem("propeller_rot_speed", ivc, promotes=[])
         self.add_subsystem("control_inverter", ivc2, promotes=[])
         self.add_subsystem("inverter_heat_sink", ivc3, promotes=[])
-        self.add_subsystem("converter_efficiency", ivc4, promotes=[])
+        self.add_subsystem("control_converter", ivc4, promotes=[])
         self.add_subsystem("converter_voltage_target", ivc5, promotes=[])
         self.add_subsystem("dc_dc_converter_voltage_in", ivc6, promotes=[])
 
@@ -267,10 +267,10 @@ class PerformancesAssembly(om.Group):
         self.add_subsystem(
             "dc_dc_converter_1",
             PerformancesDCDCConverter(
-                # dc_dc_converter_id="dc_dc_converter_1",
+                dc_dc_converter_id="dc_dc_converter_1",
                 number_of_points=number_of_points,
             ),
-            promotes=[],
+            promotes=["data:*"],
         )
 
         self.connect(
@@ -380,7 +380,9 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_bus_5.voltage", "dc_dc_converter_1.voltage_out")
 
         self.connect("dc_dc_converter_voltage_in.voltage_in", "dc_dc_converter_1.voltage_in")
-        self.connect("converter_efficiency.efficiency", "dc_dc_converter_1.efficiency")
+        self.connect(
+            "control_converter.switching_frequency", "dc_dc_converter_1.switching_frequency"
+        )
         self.connect(
             "converter_voltage_target.voltage_out_target", "dc_dc_converter_1.voltage_out_target"
         )
