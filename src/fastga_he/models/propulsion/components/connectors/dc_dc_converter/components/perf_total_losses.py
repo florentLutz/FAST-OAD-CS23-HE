@@ -32,6 +32,18 @@ class PerformancesLosses(om.ExplicitComponent):
             shape=number_of_points,
         )
         self.add_input(
+            "conduction_losses_inductor",
+            units="W",
+            val=np.full(number_of_points, np.nan),
+            shape=number_of_points,
+        )
+        self.add_input(
+            "conduction_losses_capacitor",
+            units="W",
+            val=np.full(number_of_points, np.nan),
+            shape=number_of_points,
+        )
+        self.add_input(
             "switching_losses_diode",
             units="W",
             val=np.full(number_of_points, np.nan),
@@ -62,6 +74,8 @@ class PerformancesLosses(om.ExplicitComponent):
             + inputs["switching_losses_diode"]
             + inputs["conduction_losses_IGBT"]
             + inputs["conduction_losses_diode"]
+            + inputs["conduction_losses_inductor"]
+            + inputs["conduction_losses_capacitor"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -72,3 +86,5 @@ class PerformancesLosses(om.ExplicitComponent):
         partials["losses_converter", "switching_losses_diode"] = np.eye(number_of_points)
         partials["losses_converter", "conduction_losses_IGBT"] = np.eye(number_of_points)
         partials["losses_converter", "conduction_losses_diode"] = np.eye(number_of_points)
+        partials["losses_converter", "conduction_losses_inductor"] = np.eye(number_of_points)
+        partials["losses_converter", "conduction_losses_capacitor"] = np.eye(number_of_points)

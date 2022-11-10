@@ -12,6 +12,8 @@ from ..components.sizing_energy_coefficient_scaling import (
 from ..components.sizing_energy_coefficients import SizingDCDCConverterEnergyCoefficients
 from ..components.sizing_resistance_scaling import SizingDCDCConverterResistanceScaling
 from ..components.sizing_reference_resistance import SizingDCDCConverterResistances
+from ..components.sizing_inductor_inductance import SizingDCDCConverterInductorInductance
+from ..components.sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
 from ..components.perf_load_side import PerformancesConverterLoadSide
 from ..components.perf_duty_cycle import PerformancesDutyCycle
 from ..components.perf_conduction_losses import PerformancesConductionLosses
@@ -151,6 +153,54 @@ def test_resistance():
     problem.check_partials(compact_print=True)
 
 
+def test_inductor_inductance():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductorInductance(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorInductance(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:inductance",
+            units="mH",
+        )
+        == pytest.approx(0.447, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_capacitor_capacity():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterCapacitorCapacity(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterCapacitorCapacity(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:capacitor:capacity",
+            units="mF",
+        )
+        == pytest.approx(0.484, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_load_side():
 
     ivc = om.IndepVarComp()
@@ -225,6 +275,18 @@ def test_conduction_losses():
     assert problem.get_val("conduction_losses_diode", units="W") == pytest.approx(
         expected_losses_diode, rel=1e-2
     )
+    expected_losses_inductor = np.array(
+        [197.1, 250.8, 311.8, 381.3, 461.8, 548.6, 647.9, 758.7, 878.1, 1009.7]
+    )
+    assert problem.get_val("conduction_losses_inductor", units="W") == pytest.approx(
+        expected_losses_inductor, rel=1e-2
+    )
+    expected_losses_capacitor = np.array(
+        [49.1, 62.6, 77.8, 95.3, 115.4, 137.1, 161.9, 189.4, 219.1, 251.6]
+    )
+    assert problem.get_val("conduction_losses_capacitor", units="W") == pytest.approx(
+        expected_losses_capacitor, rel=1e-2
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -266,7 +328,7 @@ def test_switching_losses():
     problem.check_partials(compact_print=True)
 
 
-def test_total_losses_inverter():
+def test_total_losses_dc_dc_converter():
 
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -289,11 +351,21 @@ def test_total_losses_inverter():
         [470.5, 552.7, 641.3, 737.0, 841.0, 950.7, 1069.4, 1196.4, 1330.4, 1472.9],
         units="W",
     )
+    ivc.add_output(
+        "conduction_losses_inductor",
+        [197.1, 250.8, 311.8, 381.3, 461.8, 548.6, 647.9, 758.7, 878.1, 1009.7],
+        units="W",
+    )
+    ivc.add_output(
+        "conduction_losses_capacitor",
+        [49.1, 62.6, 77.8, 95.3, 115.4, 137.1, 161.9, 189.4, 219.1, 251.6],
+        units="W",
+    )
 
     problem = run_system(PerformancesLosses(number_of_points=NB_POINTS_TEST), ivc)
 
     expected_losses = np.array(
-        [824.3, 1038.3, 1275.1, 1537.3, 1829.5, 2143.1, 2489.5, 2866.8, 3270.4, 3706.3]
+        [1070.5, 1351.7, 1664.7, 2013.9, 2406.7, 2828.8, 3299.3, 3814.9, 4367.6, 4967.6]
     )
     assert problem.get_val("losses_converter", units="W") == pytest.approx(
         expected_losses, rel=1e-2
@@ -310,7 +382,7 @@ def test_converter_efficiency():
     current_out = np.linspace(200.0, 400.0, NB_POINTS_TEST)
     ivc.add_output("current_out", current_out, units="A")
     total_losses = np.array(
-        [824.3, 1038.3, 1275.1, 1537.3, 1829.5, 2143.1, 2489.5, 2866.8, 3270.4, 3706.3]
+        [1070.5, 1351.7, 1664.7, 2013.9, 2406.7, 2828.8, 3299.3, 3814.9, 4367.6, 4967.6]
     )
     ivc.add_output("losses_converter", val=total_losses, units="W")
 
@@ -323,7 +395,7 @@ def test_converter_efficiency():
     )
 
     expected_efficiency = np.array(
-        [0.995, 0.994, 0.993, 0.993, 0.992, 0.991, 0.991, 0.99, 0.99, 0.989]
+        [0.993, 0.992, 0.991, 0.99, 0.99, 0.989, 0.988, 0.988, 0.987, 0.987]
     )
     assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-2)
 
