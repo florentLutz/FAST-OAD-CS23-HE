@@ -1,0 +1,16 @@
+<FASTOAD_model>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <battery_pack>
+                    <battery_pack_1>
+                        <number_modules>40.0</number_modules>
+                        <module>
+                            <number_cells>200.0</number_cells>
+                        </module>
+                    </battery_pack_1>
+                </battery_pack>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>

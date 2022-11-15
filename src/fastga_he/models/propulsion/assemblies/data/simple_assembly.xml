@@ -2,6 +2,14 @@
     <data>
         <propulsion>
             <he_power_train>
+                <battery_pack>
+                    <battery_pack_1>
+                        <number_modules>40.0</number_modules>
+                        <module>
+                            <number_cells>200.0</number_cells>
+                        </module>
+                    </battery_pack_1>
+                </battery_pack>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
                         <igbt>

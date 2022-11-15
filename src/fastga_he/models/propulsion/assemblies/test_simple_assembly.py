@@ -15,6 +15,7 @@ from ..components.connectors.inverter import PerformancesInverter, SizingInverte
 from ..components.connectors.dc_cable import PerformanceHarness, SizingHarness
 from ..components.connectors.dc_bus import PerformancesDCBus, SizingDCBus
 from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
+from ..components.source.battery import PerformancesBatteryPack
 
 XML_FILE = "simple_assembly.xml"
 NB_POINTS_TEST = 10
@@ -57,14 +58,16 @@ class PerformancesAssembly(om.Group):
         ivc5.add_output("voltage_out_target", val=np.full(NB_POINTS_TEST, 850.0))
 
         ivc6 = om.IndepVarComp()
-        ivc6.add_output("voltage_in", val=np.full(NB_POINTS_TEST, 860.0))
+        ivc6.add_output(
+            "state_of_charge", val=np.linspace(100.0, 40.0, NB_POINTS_TEST), units="percent"
+        )
 
         self.add_subsystem("propeller_rot_speed", ivc, promotes=[])
         self.add_subsystem("control_inverter", ivc2, promotes=[])
         self.add_subsystem("inverter_heat_sink", ivc3, promotes=[])
         self.add_subsystem("control_converter", ivc4, promotes=[])
         self.add_subsystem("converter_voltage_target", ivc5, promotes=[])
-        self.add_subsystem("dc_dc_converter_voltage_in", ivc6, promotes=[])
+        self.add_subsystem("battery_soc", ivc6, promotes=[])
 
         self.add_subsystem(
             "propeller_1",
@@ -117,6 +120,14 @@ class PerformancesAssembly(om.Group):
             ),
             promotes=["data:*"],
         )
+        self.add_subsystem(
+            "battery_pack_1",
+            PerformancesBatteryPack(
+                battery_pack_id="battery_pack_1",
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*"],
+        )
 
         self.connect("propeller_rot_speed.rpm", ["propeller_1.rpm", "motor_1.rpm"])
         self.connect("control_inverter.switching_frequency", "inverter_1.switching_frequency")
@@ -136,10 +147,12 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_line_1.total_current", "dc_bus_2.current_out_1")
         self.connect("dc_dc_converter_1.current_out", "dc_bus_2.current_in_1")
         self.connect("dc_bus_2.voltage", "dc_dc_converter_1.voltage_out")
-        self.connect("dc_dc_converter_voltage_in.voltage_in", "dc_dc_converter_1.voltage_in")
         self.connect(
             "converter_voltage_target.voltage_out_target", "dc_dc_converter_1.voltage_out_target"
         )
+        self.connect("battery_pack_1.voltage_out", "dc_dc_converter_1.voltage_in")
+        self.connect("dc_dc_converter_1.current_in", "battery_pack_1.current_out")
+        self.connect("battery_soc.state_of_charge", "battery_pack_1.state_of_charge")
 
 
 def test_assembly():
@@ -199,27 +212,28 @@ def test_assembly():
     # sized for the demand, though it shows that the assembly works just fine
 
     print(problem.get_val("component.dc_dc_converter_1.current_in", units="A"))
+    print(problem.get_val("component.dc_dc_converter_1.voltage_in", units="V"))
 
     # om.n2(problem)
 
     _, _, residuals = problem.model.component.get_nonlinear_vectors()
 
-    assert problem.get_val("component.dc_line_1.total_current", units="A") * problem.get_val(
-        "component.dc_line_1.voltage_b", units="V"
+    assert problem.get_val("component.dc_dc_converter_1.current_in", units="A") * problem.get_val(
+        "component.dc_dc_converter_1.voltage_in", units="V"
     ) == pytest.approx(
         np.array(
             [
-                184568.4,
-                185649.2,
-                186467.8,
-                187142.6,
-                187793.3,
-                188469.2,
-                189169.0,
-                189873.3,
-                190563.8,
-                191229.6,
+                186568.90533,
+                187512.11569,
+                188437.43933,
+                189344.82085,
+                190234.3432,
+                191106.16732,
+                191960.55363,
+                192797.90293,
+                193618.79218,
+                194424.00902,
             ]
         ),
-        rel=1e-2,
+        rel=1e-5,
     )
