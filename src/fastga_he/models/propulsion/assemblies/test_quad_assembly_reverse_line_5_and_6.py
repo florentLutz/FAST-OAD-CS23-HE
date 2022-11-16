@@ -164,8 +164,8 @@ class PerformancesAssembly(om.Group):
             PerformancesDCBus(
                 dc_bus_id="dc_bus_1",
                 number_of_points=number_of_points,
-                number_of_inputs=2,
-                number_of_outputs=1,
+                number_of_inputs=1,
+                number_of_outputs=2,
             ),
             promotes=["data:*"],
         )
@@ -174,8 +174,8 @@ class PerformancesAssembly(om.Group):
             PerformancesDCBus(
                 dc_bus_id="dc_bus_2",
                 number_of_points=number_of_points,
-                number_of_inputs=1,
-                number_of_outputs=2,
+                number_of_inputs=2,
+                number_of_outputs=1,
             ),
             promotes=["data:*"],
         )
@@ -184,8 +184,8 @@ class PerformancesAssembly(om.Group):
             PerformancesDCBus(
                 dc_bus_id="dc_bus_3",
                 number_of_points=number_of_points,
-                number_of_inputs=1,
-                number_of_outputs=2,
+                number_of_inputs=2,
+                number_of_outputs=1,
             ),
             promotes=["data:*"],
         )
@@ -194,8 +194,8 @@ class PerformancesAssembly(om.Group):
             PerformancesDCBus(
                 dc_bus_id="dc_bus_4",
                 number_of_points=number_of_points,
-                number_of_inputs=2,
-                number_of_outputs=1,
+                number_of_inputs=1,
+                number_of_outputs=2,
             ),
             promotes=["data:*"],
         )
@@ -343,27 +343,27 @@ class PerformancesAssembly(om.Group):
 
         # DC bus 1
         self.connect("dc_bus_1.voltage", "dc_line_1.voltage_out")
-        self.connect("dc_bus_1.voltage", "dc_line_5.voltage_out")
+        self.connect("dc_bus_1.voltage", "dc_line_5.voltage_in")
         self.connect("dc_line_1.total_current", "dc_bus_1.current_in_1")
-        self.connect("dc_line_5.total_current", "dc_bus_1.current_in_2")
+        self.connect("dc_line_5.total_current", "dc_bus_1.current_out_2")
 
         # DC bus 2
         self.connect("dc_bus_2.voltage", "dc_line_2.voltage_out")
-        self.connect("dc_bus_2.voltage", "dc_line_5.voltage_in")
+        self.connect("dc_bus_2.voltage", "dc_line_5.voltage_out")
         self.connect("dc_line_2.total_current", "dc_bus_2.current_in_1")
-        self.connect("dc_line_5.total_current", "dc_bus_2.current_out_2")
+        self.connect("dc_line_5.total_current", "dc_bus_2.current_in_2")
 
         # DC bus 3
         self.connect("dc_bus_3.voltage", "dc_line_3.voltage_out")
-        self.connect("dc_bus_3.voltage", "dc_line_6.voltage_in")
+        self.connect("dc_bus_3.voltage", "dc_line_6.voltage_out")
         self.connect("dc_line_3.total_current", "dc_bus_3.current_in_1")
-        self.connect("dc_line_6.total_current", "dc_bus_3.current_out_2")
+        self.connect("dc_line_6.total_current", "dc_bus_3.current_in_2")
 
         # DC bus 4
         self.connect("dc_bus_4.voltage", "dc_line_4.voltage_out")
-        self.connect("dc_bus_4.voltage", "dc_line_6.voltage_out")
+        self.connect("dc_bus_4.voltage", "dc_line_6.voltage_in")
         self.connect("dc_line_4.total_current", "dc_bus_4.current_in_1")
-        self.connect("dc_line_6.total_current", "dc_bus_4.current_in_2")
+        self.connect("dc_line_6.total_current", "dc_bus_4.current_out_2")
 
         self.connect("dc_bus_5.voltage", "dc_line_1.voltage_in")
         self.connect("dc_bus_5.voltage", "dc_line_2.voltage_in")

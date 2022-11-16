@@ -48,7 +48,7 @@ class PerformanceHarness(om.Group):
         self.add_subsystem(
             "cable_current",
             PerformancesCurrent(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "voltage_a", "voltage_b"],
+            promotes=["data:*", "voltage_out", "voltage_in"],
         )
         self.add_subsystem(
             "harness_current",
@@ -75,7 +75,7 @@ class PerformanceHarness(om.Group):
         self.add_subsystem(
             "maxima",
             PerformancesMaximum(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "total_current", "voltage_a", "voltage_b"],
+            promotes=["data:*", "total_current", "voltage_out", "voltage_in"],
         )
 
         self.connect(

@@ -303,8 +303,8 @@ def test_perf_current():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("voltage_b", units="V", val=np.linspace(780, 800, NB_POINTS_TEST))
-    ivc.add_output("voltage_a", units="V", val=np.linspace(760, 770, NB_POINTS_TEST))
+    ivc.add_output("voltage_in", units="V", val=np.linspace(780, 800, NB_POINTS_TEST))
+    ivc.add_output("voltage_out", units="V", val=np.linspace(760, 770, NB_POINTS_TEST))
     ivc.add_output("resistance_per_cable", units="ohm", val=np.full(NB_POINTS_TEST, 0.0263))
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -517,8 +517,8 @@ def test_performances_harness():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("voltage_b", units="V", val=np.linspace(800, 800, NB_POINTS_TEST))
-    ivc.add_output("voltage_a", units="V", val=np.linspace(799, 799, NB_POINTS_TEST))
+    ivc.add_output("voltage_in", units="V", val=np.linspace(800, 800, NB_POINTS_TEST))
+    ivc.add_output("voltage_out", units="V", val=np.linspace(799, 799, NB_POINTS_TEST))
     ivc.add_output(
         "exterior_temperature",
         units="degK",

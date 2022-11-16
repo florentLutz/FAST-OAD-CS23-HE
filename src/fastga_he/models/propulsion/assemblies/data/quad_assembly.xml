@@ -56,7 +56,7 @@
                             <mass units="kg">4.95</mass>
                         </contactor>
                         <cable>
-                            <resistance units="ohm">0.00333</resistance>
+                            <resistance units="ohm">0.00475</resistance>
                             <initial_temperature units="degK">288.15</initial_temperature>
                             <resistance_per_length units="ohm/km">0.397</resistance_per_length>
                             <mass_per_length units="kg/m">0.537</mass_per_length>
@@ -161,7 +161,7 @@
                             <mass units="kg">4.95</mass>
                         </contactor>
                         <cable>
-                            <resistance units="ohm">0.00333</resistance>
+                            <resistance units="ohm">0.00475</resistance>
                             <initial_temperature units="degK">288.15</initial_temperature>
                             <resistance_per_length units="ohm/km">0.397</resistance_per_length>
                             <mass_per_length units="kg/m">0.537</mass_per_length>
@@ -196,7 +196,7 @@
                             <mass units="kg">4.95</mass>
                         </contactor>
                         <cable>
-                            <resistance units="ohm">0.00333</resistance>
+                            <resistance units="ohm">0.00142</resistance>
                             <initial_temperature units="degK">288.15</initial_temperature>
                             <resistance_per_length units="ohm/km">0.397</resistance_per_length>
                             <mass_per_length units="kg/m">0.537</mass_per_length>
@@ -231,7 +231,7 @@
                             <mass units="kg">4.95</mass>
                         </contactor>
                         <cable>
-                            <resistance units="ohm">0.00333</resistance>
+                            <resistance units="ohm">0.00142</resistance>
                             <initial_temperature units="degK">288.15</initial_temperature>
                             <resistance_per_length units="ohm/km">0.397</resistance_per_length>
                             <mass_per_length units="kg/m">0.537</mass_per_length>

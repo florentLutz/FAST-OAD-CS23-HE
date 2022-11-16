@@ -139,9 +139,9 @@ class PerformancesAssembly(om.Group):
         self.connect("motor_1.rms_voltage", "inverter_1.rms_voltage")
         self.connect("dc_bus_1.voltage", "inverter_1.dc_voltage")
         self.connect("inverter_1.dc_current", "dc_bus_1.current_out_1")
-        self.connect("dc_bus_1.voltage", "dc_line_1.voltage_a")
+        self.connect("dc_bus_1.voltage", "dc_line_1.voltage_out")
         self.connect("dc_line_1.total_current", "dc_bus_1.current_in_1")
-        self.connect("dc_bus_2.voltage", "dc_line_1.voltage_b")
+        self.connect("dc_bus_2.voltage", "dc_line_1.voltage_in")
         self.connect("dc_line_1.total_current", "dc_bus_2.current_out_1")
         self.connect("dc_dc_converter_1.current_out", "dc_bus_2.current_in_1")
         self.connect("dc_bus_2.voltage", "dc_dc_converter_1.voltage_out")
@@ -198,13 +198,13 @@ def test_assembly():
     print("\n=========== DC power before bus/end of cable ===========")
     print(
         problem.get_val("component.dc_line_1.total_current", units="A")
-        * problem.get_val("component.dc_line_1.voltage_a", units="V")
+        * problem.get_val("component.dc_line_1.voltage_out", units="V")
     )
 
     print("\n=========== DC power start of cable ===========")
     print(
         problem.get_val("component.dc_line_1.total_current", units="A")
-        * problem.get_val("component.dc_line_1.voltage_b", units="V")
+        * problem.get_val("component.dc_line_1.voltage_in", units="V")
     )
     # Result is not really accurate since we used a ICE propeller coupled to a small PMSM not
     # sized for the demand, though it shows that the assembly works just fine

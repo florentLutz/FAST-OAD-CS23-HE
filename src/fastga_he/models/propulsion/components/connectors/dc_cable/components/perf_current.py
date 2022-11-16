@@ -29,17 +29,17 @@ class PerformancesCurrent(om.ExplicitComponent):
             val=1.0,
         )
         self.add_input(
-            "voltage_a",
+            "voltage_out",
             val=np.full(number_of_points, np.nan),
             units="V",
-            desc="real voltage at side a",
+            desc="Voltage at the expected output (current flows from source/input to load/output)",
             shape=number_of_points,
         )
         self.add_input(
-            "voltage_b",
+            "voltage_in",
             val=np.full(number_of_points, np.nan),
             units="V",
-            desc="real voltage at side b",
+            desc="Voltage at the expected input (current flows from source/input to load/output)",
             shape=number_of_points,
         )
         self.add_input(
@@ -65,16 +65,16 @@ class PerformancesCurrent(om.ExplicitComponent):
         number_cables = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
         ]
-        voltage_a = inputs["voltage_a"]
-        voltage_b = inputs["voltage_b"]
+        voltage_out = inputs["voltage_out"]
+        voltage_in = inputs["voltage_in"]
         resistance_per_cable = inputs["resistance_per_cable"]
 
         equivalent_resistance = resistance_per_cable / number_cables
-        total_current = (voltage_b - voltage_a) / equivalent_resistance
+        total_current = (voltage_in - voltage_out) / equivalent_resistance
         current = total_current / number_cables
 
         # Equivalent to :
-        # current = (voltage_b - voltage_a) / resistance_per_cable ?
+        # current = (voltage_in - voltage_out) / resistance_per_cable ?
 
         outputs["current"] = current
 
@@ -82,14 +82,14 @@ class PerformancesCurrent(om.ExplicitComponent):
 
         harness_id = self.options["harness_id"]
 
-        voltage_a = inputs["voltage_a"]
-        voltage_b = inputs["voltage_b"]
+        voltage_out = inputs["voltage_out"]
+        voltage_in = inputs["voltage_in"]
         resistance_per_cable = inputs["resistance_per_cable"]
 
-        partials["current", "voltage_b"] = np.diag(1.0 / resistance_per_cable)
-        partials["current", "voltage_a"] = np.diag(-1.0 / resistance_per_cable)
+        partials["current", "voltage_in"] = np.diag(1.0 / resistance_per_cable)
+        partials["current", "voltage_out"] = np.diag(-1.0 / resistance_per_cable)
         partials["current", "resistance_per_cable"] = np.diag(
-            -(voltage_b - voltage_a) / resistance_per_cable ** 2.0
+            -(voltage_in - voltage_out) / resistance_per_cable ** 2.0
         )
         partials[
             "current",
