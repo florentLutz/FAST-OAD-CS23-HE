@@ -58,16 +58,14 @@ class PerformancesAssembly(om.Group):
         ivc5.add_output("voltage_out_target", val=np.full(NB_POINTS_TEST, 850.0))
 
         ivc6 = om.IndepVarComp()
-        ivc6.add_output(
-            "state_of_charge", val=np.linspace(100.0, 40.0, NB_POINTS_TEST), units="percent"
-        )
+        ivc6.add_output("cell_temperature", val=np.full(NB_POINTS_TEST, 288.15), units="degK")
 
         self.add_subsystem("propeller_rot_speed", ivc, promotes=[])
         self.add_subsystem("control_inverter", ivc2, promotes=[])
         self.add_subsystem("inverter_heat_sink", ivc3, promotes=[])
         self.add_subsystem("control_converter", ivc4, promotes=[])
         self.add_subsystem("converter_voltage_target", ivc5, promotes=[])
-        self.add_subsystem("battery_soc", ivc6, promotes=[])
+        self.add_subsystem("battery_temperature", ivc6, promotes=[])
 
         self.add_subsystem(
             "propeller_1",
@@ -126,7 +124,7 @@ class PerformancesAssembly(om.Group):
                 battery_pack_id="battery_pack_1",
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "time_step"],
         )
 
         self.connect("propeller_rot_speed.rpm", ["propeller_1.rpm", "motor_1.rpm"])
@@ -152,7 +150,7 @@ class PerformancesAssembly(om.Group):
         )
         self.connect("battery_pack_1.voltage_out", "dc_dc_converter_1.voltage_in")
         self.connect("dc_dc_converter_1.current_in", "battery_pack_1.current_out")
-        self.connect("battery_soc.state_of_charge", "battery_pack_1.state_of_charge")
+        self.connect("battery_temperature.cell_temperature", "battery_pack_1.cell_temperature")
 
 
 def test_assembly():
@@ -211,8 +209,17 @@ def test_assembly():
     # Result is not really accurate since we used a ICE propeller coupled to a small PMSM not
     # sized for the demand, though it shows that the assembly works just fine
 
-    print(problem.get_val("component.dc_dc_converter_1.current_in", units="A"))
-    print(problem.get_val("component.dc_dc_converter_1.voltage_in", units="V"))
+    print("\n=========== DC power input of the DC/DC converter ===========")
+    print(
+        problem.get_val("component.dc_dc_converter_1.current_in", units="A")
+        * problem.get_val("component.dc_dc_converter_1.voltage_in", units="V")
+    )
+
+    print("\n=========== Battery SOC ===========")
+    print(problem.get_val("component.battery_pack_1.state_of_charge", units="percent"))
+
+    print("\n=========== Battery losses ===========")
+    print(problem.get_val("component.battery_pack_1.battery_losses.losses_battery", units="W"))
 
     # om.n2(problem)
 
@@ -223,17 +230,17 @@ def test_assembly():
     ) == pytest.approx(
         np.array(
             [
-                186568.90533,
-                187512.11569,
-                188437.43933,
-                189344.82085,
-                190234.3432,
-                191106.16732,
-                191960.55363,
-                192797.90293,
-                193618.79218,
-                194424.00902,
+                186568.9,
+                187505.3,
+                188425.1,
+                189328.3,
+                190214.8,
+                191084.6,
+                191937.5,
+                192773.5,
+                193592.5,
+                194394.5,
             ]
         ),
-        rel=1e-5,
+        abs=1,
     )

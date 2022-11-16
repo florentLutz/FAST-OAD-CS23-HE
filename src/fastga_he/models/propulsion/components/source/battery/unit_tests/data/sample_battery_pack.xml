@@ -7,7 +7,12 @@
                         <number_modules>40.0</number_modules>
                         <module>
                             <number_cells>200.0</number_cells>
+                            <mass units="kg">198.4</mass>
                         </module>
+                        <cell>
+                            <capacity units="A*h">20.0</capacity>
+                            <mass units="g">496</mass>
+                        </cell>
                     </battery_pack_1>
                 </battery_pack>
             </he_power_train>

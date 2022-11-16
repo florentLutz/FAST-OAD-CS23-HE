@@ -8,6 +8,9 @@
                         <module>
                             <number_cells>200.0</number_cells>
                         </module>
+                        <cell>
+                            <capacity units="A*h">20.0</capacity>
+                        </cell>
                     </battery_pack_1>
                 </battery_pack>
                 <DC_DC_converter>
