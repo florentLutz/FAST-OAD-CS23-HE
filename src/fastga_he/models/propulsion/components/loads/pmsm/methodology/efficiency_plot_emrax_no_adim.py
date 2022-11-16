@@ -79,12 +79,13 @@ if __name__ == "__main__":
     x0 = (7e-2, 7e-2, 7e-2, 7e-2, 7e-2)
     bnds = ((-0.0, -0.0, -0.0, -0.0, -0.0), (100.0, 100.0, 100.0, 100.0, 1e6))
 
-    p_opt, p_cov = opt.curve_fit(
+    p_opt, p_cov, _, _, _ = opt.curve_fit(
         efficiency_for_curve_fit,
         parameter_curve_fit,
         efficiency_array,
         x0,
         bounds=bnds,
+        full_output=True,
     )
     print("Optimal parameter", p_opt)
     alpha, beta, gamma, delta, epsilon = p_opt

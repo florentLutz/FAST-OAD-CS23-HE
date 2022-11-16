@@ -8,7 +8,6 @@ import plotly.graph_objects as go
 import scipy.optimize as opt
 
 from utils.curve_reading import curve_reading
-from utils.curve_fitting_openmdao import curve_fit_openmdao
 
 PLOT = True
 MOTOR = "250"
@@ -126,8 +125,13 @@ if __name__ == "__main__":
         x0 = (7e-2, 7e-2)
         bnds = ((0, 0.0), (1.0, 1.0))
 
-        p_opt, p_cov = opt.curve_fit(
-            efficiency_for_curve_fit, parameter_curve_fit, efficiency_array, x0, bounds=bnds
+        p_opt, p_cov, _, _, _ = opt.curve_fit(
+            efficiency_for_curve_fit,
+            parameter_curve_fit,
+            efficiency_array,
+            x0,
+            bounds=bnds,
+            full_output=True,
         )
         print("Optimal parameter", p_opt)
         alpha, beta = p_opt
@@ -149,8 +153,12 @@ if __name__ == "__main__":
 
         x0 = (1000.0, 3.0, 4.0e-6, 1e-1)
         bounds_mc = ((0.0, 0.0, 0.0, 0.0), np.inf)
-        p_opt_mc, p_cov_mc = opt.curve_fit(
-            efficiency_for_curve_fit_mac_donalds, parameter_curve_fit, efficiency_array, x0
+        p_opt_mc, p_cov_mc, _, _, _ = opt.curve_fit(
+            efficiency_for_curve_fit_mac_donalds,
+            parameter_curve_fit,
+            efficiency_array,
+            x0,
+            full_output=True,
         )
         print("Optimal parameter for McDonald formula", p_opt_mc)
         c_0_opt, c_1_opt, c_2_opt, c_3_opt = p_opt_mc
@@ -186,12 +194,13 @@ if __name__ == "__main__":
 
         x0_polito = (1.0, 1.0, 1.0, 1.0, 1.0)
         bounds_polito = ((0.0, 0.0, 0.0, 0.0, 0.0), np.inf)
-        p_opt_polito, p_cov_polito = opt.curve_fit(
+        p_opt_polito, p_cov_polito, _, _, _ = opt.curve_fit(
             efficiency_for_curve_fit_polito,
             parameter_curve_fit,
             efficiency_array,
             x0_polito,
             bounds=bounds_polito,
+            full_output=True,
         )
         print("Optimal parameter for Polito formula", p_opt_polito)
         a, b, c, d, e = p_opt_polito
@@ -228,12 +237,13 @@ if __name__ == "__main__":
 
         x0_polito = (1.0, 1.0, 1.0, 1.0)
         bounds_polito = ((0.0, 0.0, 0.0, 0.0), np.inf)
-        p_opt_polito_mod, p_cov_polito_mod = opt.curve_fit(
+        p_opt_polito_mod, p_cov_polito_mod, _, _, _ = opt.curve_fit(
             efficiency_for_curve_fit_polito_mod,
             parameter_curve_fit,
             efficiency_array,
             x0_polito,
             bounds=bounds_polito,
+            full_output=True,
         )
         print("Optimal parameter for Polito formula", p_opt_polito_mod)
         a, b, c, d = p_opt_polito_mod
@@ -268,12 +278,13 @@ if __name__ == "__main__":
 
         x0_auckland = (1.0, 1.0, 1.0, 1.0)
         bounds_polito = ((0.0, 0.0, 0.0, 0.0), np.inf)
-        p_opt_auckland, p_cov_auckland = opt.curve_fit(
+        p_opt_auckland, p_cov_auckland, _, _, _ = opt.curve_fit(
             efficiency_for_curve_fit_auckland,
             parameter_curve_fit,
             efficiency_array,
             x0_auckland,
             bounds=bounds_polito,
+            full_output=True,
         )
         print("Optimal parameter for Auckland formula", p_opt_auckland)
         a, b, c, d = p_opt_auckland
@@ -302,12 +313,13 @@ if __name__ == "__main__":
 
         x0_vratny = (1.0, 1.0, 1.0, 1.0, 1.0)
         bounds_vratny = ((0.0, 0.0, 0.0, 0.0, 0.0), np.inf)
-        p_opt_vratny, p_cov_vratny = opt.curve_fit(
+        p_opt_vratny, p_cov_vratny, _, _, _ = opt.curve_fit(
             efficiency_for_curve_fit_vratny,
             parameter_curve_fit,
             efficiency_array,
             x0_vratny,
             bounds=bounds_vratny,
+            full_output=True,
         )
         print("Optimal parameter for Vratny formula", p_opt_vratny)
         a, b, c, d, e = p_opt_vratny

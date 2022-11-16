@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 from .sizing_module_weight import SizingBatteryModuleWeight
 from .sizing_battery_weight import SizingBatteryWeight
@@ -28,10 +27,10 @@ class SizingBatteryPack(om.Group):
         self.add_subsystem(
             name="module_weight",
             subsys=SizingBatteryModuleWeight(battery_pack_id=battery_pack_id),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             name="battery_weight",
             subsys=SizingBatteryWeight(battery_pack_id=battery_pack_id),
-            promotes=["data:*"],
+            promotes=["*"],
         )

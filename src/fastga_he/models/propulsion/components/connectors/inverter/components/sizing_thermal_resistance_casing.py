@@ -53,12 +53,12 @@ class SizingInverterCasingThermalResistance(om.ExplicitComponent):
 
         inverter_id = self.options["inverter_id"]
 
-        current_caliber = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"
-        ]
-        voltage_caliber = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber"
-        ]
+        # current_caliber = inputs[
+        #     "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"
+        # ]
+        # voltage_caliber = inputs[
+        #     "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber"
+        # ]
 
         # outputs[
         #     "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:thermal_resistance"

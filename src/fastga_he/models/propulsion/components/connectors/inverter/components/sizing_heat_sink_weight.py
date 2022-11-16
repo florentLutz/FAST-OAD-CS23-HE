@@ -124,9 +124,6 @@ class SizingInverterHeatSinkWeight(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         inverter_id = self.options["inverter_id"]
 
-        tube_weight = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:tube:mass"
-        ]
         length_hs = inputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:length"
         ]

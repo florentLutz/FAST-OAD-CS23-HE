@@ -72,7 +72,9 @@ if __name__ == "__main__":
 
     # TBM900 ---------------------------------------------------------------------------------------
 
-    p_opt, p_cov = opt.curve_fit(generic_chord_law, radius_tbm900, chord_tbm900, x0, bounds=bnds)
+    p_opt, _, _, _, _ = opt.curve_fit(
+        generic_chord_law, radius_tbm900, chord_tbm900, x0, bounds=bnds, full_output=True
+    )
     fit_coeff_1, fit_coeff_2, fit_coeff_3, fit_coeff_4, fit_coeff_5, fit_coeff_6 = p_opt
 
     fig = go.Figure()
@@ -106,7 +108,9 @@ if __name__ == "__main__":
 
     # NACA report ----------------------------------------------------------------------------------
 
-    p_opt, p_cov = opt.curve_fit(generic_chord_law, radius_naca, chord_naca, x0, bounds=bnds)
+    p_opt, p_cov, _, _, _ = opt.curve_fit(
+        generic_chord_law, radius_naca, chord_naca, x0, bounds=bnds, full_output=True
+    )
     fit_coeff_1, fit_coeff_2, fit_coeff_3, fit_coeff_4, fit_coeff_5, fit_coeff_6 = p_opt
 
     orig_chord_naca = go.Scatter(

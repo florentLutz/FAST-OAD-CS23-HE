@@ -36,7 +36,9 @@ if __name__ == "__main__":
     x0 = (3.637, -0.0005747, -0.3091, -0.1366, 7.033e-5)
     bnds = ((0.0, -1.0, -100.0, -1.0, -1.0), (100.0, 1.0, 0.0, 1.0, 1.0))
 
-    p_opt, p_cov = opt.curve_fit(open_circuit_function, soc, voltage, x0, bounds=bnds, maxfev=2000)
+    p_opt, p_cov, _, _, _ = opt.curve_fit(
+        open_circuit_function, soc, voltage, x0, bounds=bnds, maxfev=2000, full_output=True
+    )
 
     np.set_printoptions(suppress=True)
 

@@ -182,9 +182,9 @@ def compute_lambda_af(radius_ratio_mid, chord_ratio_mid, diameter, chord_to_diam
     )
     aspect_ratio = radius_max / c_star
 
-    product = 100000 / 96 / radius_max * analytical_integral_af / analytical_integral_c_star
+    product_ar_af = 100000 / 96 / radius_max * analytical_integral_af / analytical_integral_c_star
 
-    return activity_factor, aspect_ratio, product
+    return activity_factor, aspect_ratio, product_ar_af
 
 
 if __name__ == "__main__":

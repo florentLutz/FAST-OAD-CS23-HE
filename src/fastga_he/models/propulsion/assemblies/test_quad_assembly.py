@@ -14,7 +14,7 @@ from ..components.propulsor.propeller import PerformancesPropeller, SizingPropel
 from ..components.connectors.inverter import PerformancesInverter, SizingInverter
 from ..components.connectors.dc_cable import PerformanceHarness, SizingHarness
 from ..components.connectors.dc_bus import PerformancesDCBus, SizingDCBus
-from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
+from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter, SizingDCDCConverter
 
 XML_FILE = "quad_assembly.xml"
 NB_POINTS_TEST = 25

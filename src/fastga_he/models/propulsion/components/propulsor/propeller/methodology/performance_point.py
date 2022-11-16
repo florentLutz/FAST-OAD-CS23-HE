@@ -336,6 +336,11 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         element [-].
         :param cd_list: cd list for aerodynamic coefficient of profile at discretized blade
         element [-].
+        :param cl_inv_list: cl list for inviscid aerodynamic coefficient of profile at discretized
+        blade
+        element [-].
+        :param cd_min_list: cd_min list for aerodynamic coefficient of profile at discretized blade
+        element [-].
 
         :return: thrust [N], eta (efficiency) [-] and power [W].
         """
@@ -668,6 +673,9 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         :param alpha_element: reference angle vector for element polars [DEG]
         :param cl_element: cl vector for element [-]
         :param cd_element: cd vector for element [-]
+        :param cl_inv_element: cl list for inviscid aerodynamic coefficient of the profile
+        element [-].
+        :param cd_min_element: minimum drag coefficient of the profile [-].
         :param atm: atmosphere properties
         :param reference_reynolds: Reynolds number at which the aerodynamic properties were computed
 

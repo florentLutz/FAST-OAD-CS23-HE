@@ -32,7 +32,7 @@ def efficiency_for_curve_fit_only_significant(parameter, alpha_test, beta_test, 
     return computed_efficiency
 
 
-def efficiency_for_curve_fit_Marc(parameter, alpha_test, beta_test):
+def efficiency_for_curve_fit_marc(parameter, alpha_test, beta_test):
     speed, torque, max_speed_array, max_torque_array = parameter
     torque_to_adim = max_torque_array[0]
     speed_to_adim = max_speed_array[0]
@@ -111,12 +111,13 @@ if __name__ == "__main__":
     # bnds = ((-0.0, -0.0, -0.0, -0.0, -0.0), (1.0, 1.0, 1.0, 1.0, 1.0))
     bnds = ((-0.0, -0.0, -0.0), (1.0, 1.0, 1.0))
 
-    p_opt, p_cov = opt.curve_fit(
+    p_opt, p_cov, _, _, _ = opt.curve_fit(
         efficiency_for_curve_fit_only_significant,
         parameter_curve_fit,
         efficiency_array,
         x0,
         bounds=bnds,
+        full_output=True,
     )
 
     np.set_printoptions(suppress=True)

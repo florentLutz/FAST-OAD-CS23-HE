@@ -2,4 +2,5 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+from .components.sizing_dc_dc_converter import SizingDCDCConverter
 from .components.perf_dc_dc_converter import PerformancesDCDCConverter

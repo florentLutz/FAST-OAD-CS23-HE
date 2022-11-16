@@ -2160,6 +2160,17 @@ python-versions = ">=3.7"
 mpmath = ">=0.19"
 
 [[package]]
+name = "tabula"
+version = "1.0.5"
+description = "Ascii table"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+numpy = "*"
+
+[[package]]
 name = "tabulate"
 version = "0.8.10"
 description = "Pretty-print tabular data"
@@ -2417,7 +2428,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8, <3.10"
-content-hash = "9f7037343a0f26389110165c8f81c11caa68e288980e5c943c34157cacd7b082"
+content-hash = "df3fd63119144bd05c07c4e4a80498065f530e142b5947cc517a72f7905913e7"
 
 [metadata.files]
 aenum = []
@@ -2581,6 +2592,7 @@ sphinxcontrib-serializinghtml = []
 stack-data = []
 stdatm = []
 sympy = []
+tabula = []
 tabulate = []
 tenacity = []
 terminado = []

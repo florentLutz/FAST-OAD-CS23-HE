@@ -60,6 +60,7 @@ sphinx = "*"
 sphinx-rtd-theme = "*"
 sphinxcontrib-bibtex = "*"
 click = "8.0.4"
+tabula = "*"
 
 [tool.poetry.plugins."fastoad.plugins"]
 "cs23_he_plugin" = "fastga_he"
