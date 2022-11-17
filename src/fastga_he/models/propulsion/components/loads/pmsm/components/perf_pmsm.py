@@ -15,7 +15,7 @@ from .perf_voltage_rms import PerformancesVoltageRMS
 from .perf_voltage_peak import PerformancesVoltagePeak
 
 
-class PerformancePMSM(om.Group):
+class PerformancesPMSM(om.Group):
     def initialize(self):
 
         self.options.declare(

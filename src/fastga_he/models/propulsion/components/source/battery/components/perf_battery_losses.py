@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformanceBatteryLosses(om.ExplicitComponent):
+class PerformancesBatteryLosses(om.ExplicitComponent):
     """
     Computation of the total losses inside the battery based on the losses at cell level and the
     number of cells.

@@ -16,8 +16,8 @@ from ..components.perf_update_soc import PerformancesUpdateSOC
 from ..components.perf_joule_losses import PerformancesCellJouleLosses
 from ..components.perf_entropic_heat_coefficient import PerformancesEntropicHeatCoefficient
 from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
-from ..components.perf_cell_losses import PerformanceCellLosses
-from ..components.perf_battery_losses import PerformanceBatteryLosses
+from ..components.perf_cell_losses import PerformancesCellLosses
+from ..components.perf_battery_losses import PerformancesBatteryLosses
 
 
 class PerformancesBatteryPack(om.Group):
@@ -118,12 +118,12 @@ class PerformancesBatteryPack(om.Group):
         )
         self.add_subsystem(
             "losses_cell",
-            PerformanceCellLosses(number_of_points=number_of_points),
+            PerformancesCellLosses(number_of_points=number_of_points),
             promotes=[],
         )
         self.add_subsystem(
             "battery_losses",
-            PerformanceBatteryLosses(
+            PerformancesBatteryLosses(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
             promotes=["data:*"],

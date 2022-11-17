@@ -27,7 +27,7 @@ from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
 
 from ..components.sizing_pmsm import SizingPMSM
-from ..components.perf_pmsm import PerformancePMSM
+from ..components.perf_pmsm import PerformancesPMSM
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -455,7 +455,7 @@ def test_sizing_pmsm():
 def test_performance_pmsm():
 
     ivc = get_indep_var_comp(
-        list_inputs(PerformancePMSM(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
+        list_inputs(PerformancesPMSM(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
         __file__,
         XML_FILE,
     )
@@ -463,7 +463,7 @@ def test_performance_pmsm():
     ivc.add_output("rpm", np.linspace(3500, 4500, 10), units="min**-1")
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PerformancePMSM(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc)
+    problem = run_system(PerformancesPMSM(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc)
 
     # om.n2(problem)
 

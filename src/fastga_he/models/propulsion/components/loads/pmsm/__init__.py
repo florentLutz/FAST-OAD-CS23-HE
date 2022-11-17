@@ -3,4 +3,4 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 from .components.sizing_pmsm import SizingPMSM
-from .components.perf_pmsm import PerformancePMSM
+from .components.perf_pmsm import PerformancesPMSM

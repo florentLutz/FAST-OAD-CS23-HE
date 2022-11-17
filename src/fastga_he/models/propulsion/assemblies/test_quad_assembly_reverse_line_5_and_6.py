@@ -8,10 +8,10 @@ from stdatm import Atmosphere
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
-from ..components.loads.pmsm import PerformancePMSM, SizingPMSM
+from ..components.loads.pmsm import PerformancesPMSM, SizingPMSM
 from ..components.propulsor.propeller import PerformancesPropeller, SizingPropeller
 from ..components.connectors.inverter import PerformancesInverter, SizingInverter
-from ..components.connectors.dc_cable import PerformanceHarness, SizingHarness
+from ..components.connectors.dc_cable import PerformancesHarness, SizingHarness
 from ..components.connectors.dc_bus import PerformancesDCBus, SizingDCBus
 from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter, SizingDCDCConverter
 
@@ -117,22 +117,22 @@ class PerformancesAssembly(om.Group):
         # Motors
         self.add_subsystem(
             "motor_1",
-            PerformancePMSM(motor_id="motor_1", number_of_points=number_of_points),
+            PerformancesPMSM(motor_id="motor_1", number_of_points=number_of_points),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "motor_2",
-            PerformancePMSM(motor_id="motor_2", number_of_points=number_of_points),
+            PerformancesPMSM(motor_id="motor_2", number_of_points=number_of_points),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "motor_3",
-            PerformancePMSM(motor_id="motor_3", number_of_points=number_of_points),
+            PerformancesPMSM(motor_id="motor_3", number_of_points=number_of_points),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "motor_4",
-            PerformancePMSM(motor_id="motor_4", number_of_points=number_of_points),
+            PerformancesPMSM(motor_id="motor_4", number_of_points=number_of_points),
             promotes=["data:*"],
         )
 
@@ -203,7 +203,7 @@ class PerformancesAssembly(om.Group):
         # DC lines
         self.add_subsystem(
             "dc_line_1",
-            PerformanceHarness(
+            PerformancesHarness(
                 harness_id="harness_1",
                 number_of_points=number_of_points,
             ),
@@ -211,7 +211,7 @@ class PerformancesAssembly(om.Group):
         )
         self.add_subsystem(
             "dc_line_2",
-            PerformanceHarness(
+            PerformancesHarness(
                 harness_id="harness_2",
                 number_of_points=number_of_points,
             ),
@@ -219,7 +219,7 @@ class PerformancesAssembly(om.Group):
         )
         self.add_subsystem(
             "dc_line_3",
-            PerformanceHarness(
+            PerformancesHarness(
                 harness_id="harness_3",
                 number_of_points=number_of_points,
             ),
@@ -227,7 +227,7 @@ class PerformancesAssembly(om.Group):
         )
         self.add_subsystem(
             "dc_line_4",
-            PerformanceHarness(
+            PerformancesHarness(
                 harness_id="harness_4",
                 number_of_points=number_of_points,
             ),
@@ -235,7 +235,7 @@ class PerformancesAssembly(om.Group):
         )
         self.add_subsystem(
             "dc_line_5",
-            PerformanceHarness(
+            PerformancesHarness(
                 harness_id="harness_5",
                 number_of_points=number_of_points,
             ),
@@ -243,7 +243,7 @@ class PerformancesAssembly(om.Group):
         )
         self.add_subsystem(
             "dc_line_6",
-            PerformanceHarness(
+            PerformancesHarness(
                 harness_id="harness_6",
                 number_of_points=number_of_points,
             ),

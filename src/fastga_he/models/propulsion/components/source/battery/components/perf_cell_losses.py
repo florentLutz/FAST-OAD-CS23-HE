@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformanceCellLosses(om.ExplicitComponent):
+class PerformancesCellLosses(om.ExplicitComponent):
     """
     Computation of the total losses inside one cell. It account for joules losses and entropic
     losses as the other one can be neglected for now see :cite:`cicconi:2017`.

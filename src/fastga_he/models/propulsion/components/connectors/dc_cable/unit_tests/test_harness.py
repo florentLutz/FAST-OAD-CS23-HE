@@ -27,7 +27,7 @@ from ..components.perf_temperature_increase import PerformancesTemperatureIncrea
 from ..components.perf_temperature import PerformancesTemperature
 from ..components.perf_resistance import PerformancesResistance
 
-from ..components.perf_harness import PerformanceHarness
+from ..components.perf_harness import PerformancesHarness
 from ..components.sizing_harness import SizingHarness
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -513,7 +513,7 @@ def test_performances_harness():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(PerformanceHarness(harness_id="harness_1", number_of_points=NB_POINTS_TEST)),
+        list_inputs(PerformancesHarness(harness_id="harness_1", number_of_points=NB_POINTS_TEST)),
         __file__,
         XML_FILE,
     )
@@ -528,7 +528,7 @@ def test_performances_harness():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformanceHarness(harness_id="harness_1", number_of_points=NB_POINTS_TEST), ivc
+        PerformancesHarness(harness_id="harness_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
     expected_temperature = np.array(

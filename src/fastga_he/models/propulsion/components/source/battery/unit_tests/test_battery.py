@@ -20,8 +20,8 @@ from ..components.perf_update_soc import PerformancesUpdateSOC
 from ..components.perf_joule_losses import PerformancesCellJouleLosses
 from ..components.perf_entropic_heat_coefficient import PerformancesEntropicHeatCoefficient
 from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
-from ..components.perf_cell_losses import PerformanceCellLosses
-from ..components.perf_battery_losses import PerformanceBatteryLosses
+from ..components.perf_cell_losses import PerformancesCellLosses
+from ..components.perf_battery_losses import PerformancesBatteryLosses
 
 from ..components.sizing_battery_pack import SizingBatteryPack
 from ..components.perf_battery_pack import PerformancesBatteryPack
@@ -410,7 +410,7 @@ def test_cell_total_losses():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformanceCellLosses(number_of_points=NB_POINTS_TEST),
+        PerformancesCellLosses(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     assert problem.get_val("losses_cell", units="mW") == pytest.approx(
@@ -425,7 +425,7 @@ def test_battery_losses():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
-            PerformanceBatteryLosses(
+            PerformancesBatteryLosses(
                 number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"
             )
         ),
@@ -440,7 +440,9 @@ def test_battery_losses():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformanceBatteryLosses(number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"),
+        PerformancesBatteryLosses(
+            number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"
+        ),
         ivc,
     )
     assert problem.get_val("losses_battery", units="W") == pytest.approx(

@@ -9,10 +9,10 @@ from stdatm import Atmosphere
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
-from ..components.loads.pmsm import PerformancePMSM, SizingPMSM
+from ..components.loads.pmsm import PerformancesPMSM, SizingPMSM
 from ..components.propulsor.propeller import PerformancesPropeller, SizingPropeller
 from ..components.connectors.inverter import PerformancesInverter, SizingInverter
-from ..components.connectors.dc_cable import PerformanceHarness, SizingHarness
+from ..components.connectors.dc_cable import PerformancesHarness, SizingHarness
 from ..components.connectors.dc_bus import PerformancesDCBus, SizingDCBus
 from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter, SizingDCDCConverter
 from ..components.source.battery import PerformancesBatteryPack, SizingBatteryPack
@@ -74,7 +74,7 @@ class PerformancesAssembly(om.Group):
         )
         self.add_subsystem(
             "motor_1",
-            PerformancePMSM(motor_id="motor_1", number_of_points=number_of_points),
+            PerformancesPMSM(motor_id="motor_1", number_of_points=number_of_points),
             promotes=["data:*"],
         )
         self.add_subsystem(
@@ -94,7 +94,7 @@ class PerformancesAssembly(om.Group):
         )
         self.add_subsystem(
             "dc_line_1",
-            PerformanceHarness(
+            PerformancesHarness(
                 harness_id="harness_1",
                 number_of_points=number_of_points,
             ),

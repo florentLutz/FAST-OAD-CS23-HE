@@ -12,7 +12,7 @@ from .perf_temperature import PerformancesTemperature
 from .perf_maximum import PerformancesMaximum
 
 
-class PerformanceHarness(om.Group):
+class PerformancesHarness(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
