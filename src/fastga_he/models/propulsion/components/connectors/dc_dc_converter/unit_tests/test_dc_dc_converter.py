@@ -51,10 +51,10 @@ def test_energy_coefficients_scaling_ratio():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:scaling:a"
-    ) == pytest.approx(1.5, rel=1e-2)
+    ) == pytest.approx(1.125, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:scaling:c"
-    ) == pytest.approx(0.666, rel=1e-2)
+    ) == pytest.approx(0.888, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -119,7 +119,7 @@ def test_resistance_scaling():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:scaling:resistance"
-    ) == pytest.approx(1.5, rel=1e-2)
+    ) == pytest.approx(1.125, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -255,7 +255,7 @@ def test_dc_dc_converter_sizing():
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:diode:resistance",
             units="ohm",
         )
-        == pytest.approx(0.002805, rel=1e-2)
+        == pytest.approx(0.002103, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)

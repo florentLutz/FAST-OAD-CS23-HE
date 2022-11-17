@@ -43,9 +43,14 @@ from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_total_loss import PerformancesLosses
-from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
-from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
-from ..components.perf_temperature import PerformancesTemperature
+from fastga_he.models.propulsion.components.connectors.inverter.components.stale.perf_temperature_derivative import (
+    PerformancesTemperatureDerivative,
+)
+from fastga_he.models.propulsion.components.connectors.inverter.components.stale.perf_temperature_increase import (
+    PerformancesTemperatureIncrease,
+)
+from ..components.perf_casing_temperature import PerformancesCasingTemperature
+from ..components.perf_junction_temperature import PerformancesJunctionTemperature
 from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_dc_current import PerformancesDCCurrent
 from ..components.perf_inverter import PerformancesInverter
@@ -69,10 +74,10 @@ def test_scaling_ratio():
     problem = run_system(SizingInverterEnergyCoefficientScaling(inverter_id="inverter_1"), ivc)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:a"
-    ) == pytest.approx(1.385, rel=1e-2)
+    ) == pytest.approx(1.039, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:c"
-    ) == pytest.approx(0.722, rel=1e-2)
+    ) == pytest.approx(0.962, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -129,7 +134,7 @@ def test_resistance_scaling():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:resistance"
-    ) == pytest.approx(1.385, rel=1e-2)
+    ) == pytest.approx(1.039, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -185,7 +190,7 @@ def test_thermal_resistance_casing():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:casing:thermal_resistance", units="K/W"
-    ) == pytest.approx(0.021, rel=1e-2)
+    ) == pytest.approx(0.010, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -750,7 +755,8 @@ def test_resistance_profile():
     temperature = np.array(
         [288.15, 301.626, 313.719, 324.429, 333.762, 341.721, 348.306, 353.523, 357.375, 359.862]
     )
-    ivc.add_output("inverter_temperature", units="degK", val=temperature)
+    ivc.add_output("diode_temperature", units="degK", val=temperature)
+    ivc.add_output("IGBT_temperature", units="degK", val=temperature)
 
     problem = run_system(
         PerformancesResistance(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
@@ -846,7 +852,7 @@ def test_total_losses_inverter():
     problem.check_partials(compact_print=True)
 
 
-def test_temperature_derivative():
+def _test_temperature_derivative():
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -882,7 +888,7 @@ def test_temperature_derivative():
     problem.check_partials(compact_print=True)
 
 
-def test_perf_temperature_increase():
+def _test_perf_temperature_increase():
     ivc = get_indep_var_comp(
         list_inputs(PerformancesTemperatureIncrease(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -912,10 +918,10 @@ def test_perf_temperature_increase():
     problem.check_partials(compact_print=True)
 
 
-def test_perf_temperature():
+def test_perf_casing_temperature():
     ivc = get_indep_var_comp(
         list_inputs(
-            PerformancesTemperature(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST)
+            PerformancesCasingTemperature(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST)
         ),
         __file__,
         XML_FILE,
@@ -928,19 +934,87 @@ def test_perf_temperature():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesTemperature(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST),
+        PerformancesCasingTemperature(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST),
         ivc,
     )
 
     expected_temperature = np.array(
-        [300.33, 305.19, 310.76, 317.06, 324.09, 331.87, 340.4, 349.72, 359.79, 370.64]
+        [293.95, 296.26, 298.92, 301.92, 305.26, 308.97, 313.03, 317.47, 322.26, 327.43]
     )
     assert (
         problem.get_val(
-            "inverter_temperature",
+            "casing_temperature",
             units="degK",
         )
         == pytest.approx(expected_temperature, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_perf_junction_temperature():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesJunctionTemperature(
+                inverter_id="inverter_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "casing_temperature",
+        units="degK",
+        val=np.array(
+            [293.95, 296.26, 298.92, 301.92, 305.26, 308.97, 313.03, 317.47, 322.26, 327.43]
+        ),
+    )
+    ivc.add_output(
+        "switching_losses_IGBT",
+        [126.5, 184.4, 250.8, 326.2, 411.0, 505.5, 610.2, 725.5, 851.8, 989.5],
+        units="W",
+    )
+    ivc.add_output(
+        "switching_losses_diode",
+        [72.8, 111.0, 156.1, 208.1, 266.8, 332.2, 404.4, 483.1, 568.4, 660.2],
+        units="W",
+    )
+    ivc.add_output(
+        "conduction_losses_IGBT",
+        [40.99, 54.58, 70.94, 90.15, 112.55, 138.36, 167.46, 200.56, 237.06, 277.29],
+        units="W",
+    )
+    ivc.add_output(
+        "conduction_losses_diode",
+        [49.8, 55.72, 60.53, 63.82, 65.39, 64.94, 62.1, 56.75, 48.48, 37.13],
+        units="W",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesJunctionTemperature(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    expected_temperature_diode = np.array(
+        [312.12, 320.97, 331.02, 342.22, 354.49, 367.82, 382.16, 397.47, 413.68, 430.77]
+    )
+    assert (
+        problem.get_val(
+            "diode_temperature",
+            units="degK",
+        )
+        == pytest.approx(expected_temperature_diode, rel=1e-2)
+    )
+    expected_temperature_igbt = np.array(
+        [313.2, 323.73, 335.91, 349.78, 365.44, 382.98, 402.43, 423.93, 447.43, 473.05]
+    )
+    assert (
+        problem.get_val(
+            "IGBT_temperature",
+            units="degK",
+        )
+        == pytest.approx(expected_temperature_igbt, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -1066,12 +1140,18 @@ def test_performances_inverter_tot():
     assert problem.get_val("component.efficiency.efficiency") == pytest.approx(
         expected_efficiency, rel=1e-2
     )
-    expected_temperature = np.array(
-        [325.24, 329.8, 334.48, 339.29, 344.24, 349.32, 354.54, 359.91, 365.42, 371.09]
+    expected_temperature_igbt = np.array(
+        [371.6, 381.1, 391.2, 401.8, 413.1, 424.9, 437.4, 450.6, 464.5, 479.3]
     )
     assert problem.get_val(
-        "component.temperature_inverter.inverter_temperature", units="degK"
-    ) == pytest.approx(expected_temperature, rel=1e-2)
+        "component.temperature_junction.IGBT_temperature", units="degK"
+    ) == pytest.approx(expected_temperature_igbt, rel=1e-2)
+    expected_temperature_diode = np.array(
+        [352.7, 361.7, 370.8, 380.0, 389.2, 398.4, 407.6, 416.9, 426.2, 435.5]
+    )
+    assert problem.get_val(
+        "component.temperature_junction.diode_temperature", units="degK"
+    ) == pytest.approx(expected_temperature_diode, rel=1e-2)
     expected_dc_current_in = np.array(
         [353.3, 422.31, 494.94, 571.07, 650.71, 733.97, 820.68, 911.02, 1005.04, 1102.5]
     )

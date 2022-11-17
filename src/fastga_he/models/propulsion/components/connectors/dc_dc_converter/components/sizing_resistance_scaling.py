@@ -23,7 +23,7 @@ class SizingDCDCConverterResistanceScaling(om.ExplicitComponent):
         self.options.declare(
             name="current_caliber_ref",
             types=float,
-            default=600.0,
+            default=450.0,
             desc="Current caliber of the reference component",
         )
 

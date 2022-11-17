@@ -7,7 +7,7 @@
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>
-                            <thermal_resistance units="K/W">0.021</thermal_resistance>
+                            <thermal_resistance units="K/W">0.010</thermal_resistance>
                         </casing>
                         <module>
                             <length units="m">0.156</length>

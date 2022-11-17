@@ -49,7 +49,14 @@ class PerformancesResistance(om.ExplicitComponent):
             units="degK**-1",
         )
         self.add_input(
-            "inverter_temperature",
+            "diode_temperature",
+            val=np.full(number_of_points, np.nan),
+            units="degK",
+            desc="temperature inside of the cable",
+            shape=number_of_points,
+        )
+        self.add_input(
+            "IGBT_temperature",
             val=np.full(number_of_points, np.nan),
             units="degK",
             desc="temperature inside of the cable",
@@ -83,7 +90,7 @@ class PerformancesResistance(om.ExplicitComponent):
                 "data:propulsion:he_power_train:inverter:"
                 + inverter_id
                 + ":properties:resistance_temperature_scale_factor:igbt",
-                "inverter_temperature",
+                "IGBT_temperature",
                 "settings:propulsion:he_power_train:inverter:"
                 + inverter_id
                 + ":reference_temperature",
@@ -97,7 +104,7 @@ class PerformancesResistance(om.ExplicitComponent):
                 "data:propulsion:he_power_train:inverter:"
                 + inverter_id
                 + ":properties:resistance_temperature_scale_factor:diode",
-                "inverter_temperature",
+                "diode_temperature",
                 "settings:propulsion:he_power_train:inverter:"
                 + inverter_id
                 + ":reference_temperature",
@@ -108,7 +115,9 @@ class PerformancesResistance(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         inverter_id = self.options["inverter_id"]
 
-        inverter_temperature = inputs["inverter_temperature"]
+        diode_temperature = inputs["diode_temperature"]
+        igbt_temperature = inputs["IGBT_temperature"]
+
         inverter_reference_temperature = inputs[
             "settings:propulsion:he_power_train:inverter:" + inverter_id + ":reference_temperature"
         ]
@@ -132,10 +141,10 @@ class PerformancesResistance(om.ExplicitComponent):
         ]
 
         resistance_igbt = reference_resistance_igbt * (
-            1.0 + alpha_igbt * (inverter_temperature - inverter_reference_temperature)
+            1.0 + alpha_igbt * (igbt_temperature - inverter_reference_temperature)
         )
         resistance_diode = reference_resistance_diode * (
-            1.0 + alpha_diode * (inverter_temperature - inverter_reference_temperature)
+            1.0 + alpha_diode * (diode_temperature - inverter_reference_temperature)
         )
 
         outputs["resistance_igbt"] = resistance_igbt
@@ -146,7 +155,9 @@ class PerformancesResistance(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
-        inverter_temperature = inputs["inverter_temperature"]
+        diode_temperature = inputs["diode_temperature"]
+        igbt_temperature = inputs["IGBT_temperature"]
+
         inverter_reference_temperature = inputs[
             "settings:propulsion:he_power_train:inverter:" + inverter_id + ":reference_temperature"
         ]
@@ -172,14 +183,14 @@ class PerformancesResistance(om.ExplicitComponent):
         partials[
             "resistance_igbt",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:resistance",
-        ] = 1.0 + alpha_igbt * (inverter_temperature - inverter_reference_temperature)
+        ] = 1.0 + alpha_igbt * (igbt_temperature - inverter_reference_temperature)
         partials[
             "resistance_igbt",
             "data:propulsion:he_power_train:inverter:"
             + inverter_id
             + ":properties:resistance_temperature_scale_factor:igbt",
-        ] = reference_resistance_igbt * (inverter_temperature - inverter_reference_temperature)
-        partials["resistance_igbt", "inverter_temperature"] = np.eye(number_of_points) * (
+        ] = reference_resistance_igbt * (igbt_temperature - inverter_reference_temperature)
+        partials["resistance_igbt", "IGBT_temperature"] = np.eye(number_of_points) * (
             reference_resistance_igbt * alpha_igbt
         )
         partials[
@@ -192,14 +203,14 @@ class PerformancesResistance(om.ExplicitComponent):
         partials[
             "resistance_diode",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":diode:resistance",
-        ] = 1.0 + alpha_diode * (inverter_temperature - inverter_reference_temperature)
+        ] = 1.0 + alpha_diode * (diode_temperature - inverter_reference_temperature)
         partials[
             "resistance_diode",
             "data:propulsion:he_power_train:inverter:"
             + inverter_id
             + ":properties:resistance_temperature_scale_factor:diode",
-        ] = reference_resistance_diode * (inverter_temperature - inverter_reference_temperature)
-        partials["resistance_diode", "inverter_temperature"] = (
+        ] = reference_resistance_diode * (diode_temperature - inverter_reference_temperature)
+        partials["resistance_diode", "diode_temperature"] = (
             np.eye(number_of_points) * alpha_diode * reference_resistance_diode
         )
         partials[

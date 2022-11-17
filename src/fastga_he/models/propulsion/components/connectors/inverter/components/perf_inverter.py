@@ -9,7 +9,8 @@ from .perf_resistance import PerformancesResistance
 from .perf_conduction_loss import PerformancesConductionLosses
 from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_total_loss import PerformancesLosses
-from .perf_temperature import PerformancesTemperature
+from .perf_casing_temperature import PerformancesCasingTemperature
+from .perf_junction_temperature import PerformancesJunctionTemperature
 from .perf_efficiency import PerformancesEfficiency
 from .perf_dc_current import PerformancesDCCurrent
 
@@ -70,9 +71,18 @@ class PerformancesInverter(om.Group):
             promotes=[],
         )
         self.add_subsystem(
-            "temperature_inverter",
-            PerformancesTemperature(inverter_id=inverter_id, number_of_points=number_of_points),
+            "temperature_casing",
+            PerformancesCasingTemperature(
+                inverter_id=inverter_id, number_of_points=number_of_points
+            ),
             promotes=["data:*", "heat_sink_temperature"],
+        )
+        self.add_subsystem(
+            "temperature_junction",
+            PerformancesJunctionTemperature(
+                inverter_id=inverter_id, number_of_points=number_of_points
+            ),
+            promotes=["data:*"],
         )
         self.add_subsystem(
             "efficiency",
@@ -94,18 +104,31 @@ class PerformancesInverter(om.Group):
         self.connect("resistance.resistance_igbt", "conduction_losses.resistance_igbt")
         self.connect("resistance.resistance_diode", "conduction_losses.resistance_diode")
         self.connect(
-            "conduction_losses.conduction_losses_diode", "total_losses.conduction_losses_diode"
+            "conduction_losses.conduction_losses_diode",
+            [
+                "total_losses.conduction_losses_diode",
+                "temperature_junction.conduction_losses_diode",
+            ],
         )
         self.connect(
-            "conduction_losses.conduction_losses_IGBT", "total_losses.conduction_losses_IGBT"
+            "conduction_losses.conduction_losses_IGBT",
+            ["total_losses.conduction_losses_IGBT", "temperature_junction.conduction_losses_IGBT"],
         )
         self.connect(
-            "switching_losses.switching_losses_diode", "total_losses.switching_losses_diode"
+            "switching_losses.switching_losses_diode",
+            ["total_losses.switching_losses_diode", "temperature_junction.switching_losses_diode"],
         )
-        self.connect("switching_losses.switching_losses_IGBT", "total_losses.switching_losses_IGBT")
+        self.connect(
+            "switching_losses.switching_losses_IGBT",
+            ["total_losses.switching_losses_IGBT", "temperature_junction.switching_losses_IGBT"],
+        )
         self.connect(
             "total_losses.losses_inverter",
-            ["temperature_inverter.losses_inverter", "efficiency.losses_inverter"],
+            ["temperature_casing.losses_inverter", "efficiency.losses_inverter"],
         )
-        self.connect("temperature_inverter.inverter_temperature", "resistance.inverter_temperature")
+        self.connect(
+            "temperature_casing.casing_temperature", "temperature_junction.casing_temperature"
+        )
+        self.connect("temperature_junction.diode_temperature", "resistance.diode_temperature")
+        self.connect("temperature_junction.IGBT_temperature", "resistance.IGBT_temperature")
         self.connect("efficiency.efficiency", "dc_side_current.efficiency")

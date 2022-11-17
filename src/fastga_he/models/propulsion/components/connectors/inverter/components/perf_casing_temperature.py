@@ -6,11 +6,18 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesTemperature(om.ExplicitComponent):
+class PerformancesCasingTemperature(om.ExplicitComponent):
     """
-    Computation of the inverter temperature based on the losses on the previous point. Assumes
-    that the thermal constant is so small that we can consider that the losses equals the power
-    we can dissipate in steady state. Can be seen in :cite:`erroui:2019` and :cite:`tan:2022`.
+    Computation the temperature of one of the inverter casing based on the losses on the previous
+    point. The temperature can be calculated for one module and generalized to the two other
+    since we assume they are identical. Assumes that the thermal constant is so small that we can
+    consider that the losses equals the power we can dissipate in steady state.
+
+    According to Semikron technical information, the heat transfer from junction to heat sink
+    can be either modeled with a casing plate considered common to all junctions (consequently,
+    a common R_th_cs for all modules), or consider individual R_th_cs. We will choose the former.
+
+    Can be seen in :cite:`erroui:2019` and :cite:`tan:2022`.
     """
 
     def initialize(self):
@@ -53,10 +60,10 @@ class PerformancesTemperature(om.ExplicitComponent):
         )
 
         self.add_output(
-            "inverter_temperature",
+            "casing_temperature",
             val=np.full(number_of_points, 273.15),
             units="degK",
-            desc="temperature inside of the inverter",
+            desc="Temperature of the inverter casing",
             shape=number_of_points,
         )
 
@@ -74,7 +81,7 @@ class PerformancesTemperature(om.ExplicitComponent):
         # evolution in one module
         losses_one_module = inputs["losses_inverter"] / 3.0
 
-        outputs["inverter_temperature"] = temp_hs + losses_one_module * r_th_js
+        outputs["casing_temperature"] = temp_hs + losses_one_module * r_th_js
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -86,11 +93,9 @@ class PerformancesTemperature(om.ExplicitComponent):
         ]
         losses_one_module = inputs["losses_inverter"] / 3.0
 
-        partials["inverter_temperature", "heat_sink_temperature"] = np.eye(number_of_points)
-        partials["inverter_temperature", "losses_inverter"] = (
-            r_th_js / 3.0 * np.eye(number_of_points)
-        )
+        partials["casing_temperature", "heat_sink_temperature"] = np.eye(number_of_points)
+        partials["casing_temperature", "losses_inverter"] = r_th_js / 3.0 * np.eye(number_of_points)
         partials[
-            "inverter_temperature",
+            "casing_temperature",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:thermal_resistance",
         ] = losses_one_module
