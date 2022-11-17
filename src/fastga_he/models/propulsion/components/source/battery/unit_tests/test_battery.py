@@ -107,8 +107,8 @@ def test_current_module():
         __file__,
         XML_FILE,
     )
-    current_out = np.linspace(400, 410, NB_POINTS_TEST)
-    ivc.add_output("current_out", current_out, units="A")
+    dc_current_out = np.linspace(400, 410, NB_POINTS_TEST)
+    ivc.add_output("dc_current_out", dc_current_out, units="A")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -463,8 +463,8 @@ def test_performances_battery_pack():
         __file__,
         XML_FILE,
     )
-    current_out = np.linspace(400, 410, NB_POINTS_TEST)
-    ivc.add_output("current_out", current_out, units="A")
+    dc_current_out = np.linspace(400, 410, NB_POINTS_TEST)
+    ivc.add_output("dc_current_out", dc_current_out, units="A")
     ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
     ivc.add_output("cell_temperature", units="degK", val=np.full(NB_POINTS_TEST, 288.15))
 

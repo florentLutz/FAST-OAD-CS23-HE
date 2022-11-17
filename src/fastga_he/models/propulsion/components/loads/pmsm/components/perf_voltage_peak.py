@@ -24,7 +24,7 @@ class PerformancesVoltagePeak(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "rms_voltage",
+            "ac_voltage_rms_in",
             units="V",
             val=np.nan,
             shape=number_of_points,
@@ -32,7 +32,7 @@ class PerformancesVoltagePeak(om.ExplicitComponent):
         )
 
         self.add_output(
-            "peak_voltage",
+            "ac_voltage_peak_in",
             units="V",
             val=np.full(number_of_points, 0.0),
             shape=number_of_points,
@@ -43,10 +43,12 @@ class PerformancesVoltagePeak(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["peak_voltage"] = inputs["rms_voltage"] * np.sqrt(3.0 / 2.0)
+        outputs["ac_voltage_peak_in"] = inputs["ac_voltage_rms_in"] * np.sqrt(3.0 / 2.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         number_of_points = self.options["number_of_points"]
 
-        partials["peak_voltage", "rms_voltage"] = np.sqrt(3.0 / 2.0) * np.eye(number_of_points)
+        partials["ac_voltage_peak_in", "ac_voltage_rms_in"] = np.sqrt(3.0 / 2.0) * np.eye(
+            number_of_points
+        )

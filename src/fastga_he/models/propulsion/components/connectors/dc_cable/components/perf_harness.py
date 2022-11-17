@@ -48,12 +48,12 @@ class PerformanceHarness(om.Group):
         self.add_subsystem(
             "cable_current",
             PerformancesCurrent(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "voltage_out", "voltage_in"],
+            promotes=["data:*", "dc_voltage_out", "dc_voltage_in"],
         )
         self.add_subsystem(
             "harness_current",
             PerformancesHarnessCurrent(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "total_current"],
+            promotes=["data:*", "dc_current"],
         )
         self.add_subsystem(
             "temperature_derivative",
@@ -75,7 +75,7 @@ class PerformanceHarness(om.Group):
         self.add_subsystem(
             "maxima",
             PerformancesMaximum(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "total_current", "voltage_out", "voltage_in"],
+            promotes=["data:*", "dc_current", "dc_voltage_out", "dc_voltage_in"],
         )
 
         self.connect(
@@ -84,7 +84,8 @@ class PerformanceHarness(om.Group):
         )
 
         self.connect(
-            "cable_current.current", ["harness_current.current", "temperature_derivative.current"]
+            "cable_current.dc_current_one_cable",
+            ["harness_current.dc_current_one_cable", "temperature_derivative.dc_current_one_cable"],
         )
 
         self.connect(

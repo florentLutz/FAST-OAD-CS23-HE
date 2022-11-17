@@ -68,7 +68,7 @@ class PerformancesPropeller(om.Group):
         self.add_subsystem(
             "shaft_power",
             PerformancesShaftPower(propeller_id=propeller_id, number_of_points=number_of_points),
-            promotes=["data:*", "altitude", "shaft_power", "rpm"],
+            promotes=["data:*", "altitude", "shaft_power_in", "rpm"],
         )
 
         self.connect(

@@ -53,7 +53,7 @@ class PerformancesBatteryPack(om.Group):
             PerformancesModuleCurrent(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
-            promotes=["data:*", "current_out"],
+            promotes=["data:*", "dc_current_out"],
         )
         self.add_subsystem(
             "open_circuit_voltage",

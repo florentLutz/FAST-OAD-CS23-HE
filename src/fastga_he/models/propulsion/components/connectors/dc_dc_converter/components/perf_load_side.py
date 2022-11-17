@@ -26,7 +26,7 @@ class PerformancesConverterLoadSide(om.ExplicitComponent):
         batman = np.full(number_of_points, np.nan)
 
         self.add_input(
-            "voltage_in",
+            "dc_voltage_in",
             val=batman,
             units="V",
             desc="Voltage at the input side of the converter",
@@ -36,20 +36,22 @@ class PerformancesConverterLoadSide(om.ExplicitComponent):
         )
 
         self.add_output(
-            "current_in",
+            "dc_current_in",
             val=np.full(number_of_points, 400.0),
             units="A",
             desc="Current at the input side of the converter",
             lower=1e-4,
         )
 
-        self.declare_partials(of="current_in", wrt="*", method="exact")
+        self.declare_partials(of="dc_current_in", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["current_in"] = inputs["power"] / inputs["voltage_in"]
+        outputs["dc_current_in"] = inputs["power"] / inputs["dc_voltage_in"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["current_in", "voltage_in"] = -np.diag(inputs["power"] / inputs["voltage_in"] ** 2)
-        partials["current_in", "power"] = np.diag(1.0 / inputs["voltage_in"])
+        partials["dc_current_in", "dc_voltage_in"] = -np.diag(
+            inputs["power"] / inputs["dc_voltage_in"] ** 2
+        )
+        partials["dc_current_in", "power"] = np.diag(1.0 / inputs["dc_voltage_in"])

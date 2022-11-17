@@ -35,10 +35,10 @@ class PerformancesShaftPower(om.ExplicitComponent):
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input("altitude", units="m", val=0.0, shape=number_of_points)
 
-        self.add_output("shaft_power", val=5e3, shape=number_of_points, units="W")
+        self.add_output("shaft_power_in", val=5e3, shape=number_of_points, units="W")
 
         self.declare_partials(
-            of="shaft_power",
+            of="shaft_power_in",
             wrt=[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
                 "rpm",
@@ -47,7 +47,7 @@ class PerformancesShaftPower(om.ExplicitComponent):
             method="exact",
         )
         self.declare_partials(
-            of="shaft_power", wrt="altitude", method="fd", form="central", step=1.0e2
+            of="shaft_power_in", wrt="altitude", method="fd", form="central", step=1.0e2
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -60,7 +60,7 @@ class PerformancesShaftPower(om.ExplicitComponent):
         rho = Atmosphere(inputs["altitude"], altitude_in_feet=False).density
         rps = inputs["rpm"] / 60.0
 
-        outputs["shaft_power"] = power_coefficient * (rho * rps ** 3.0 * diameter ** 5.0)
+        outputs["shaft_power_in"] = power_coefficient * (rho * rps ** 3.0 * diameter ** 5.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -72,10 +72,15 @@ class PerformancesShaftPower(om.ExplicitComponent):
         rho = Atmosphere(inputs["altitude"], altitude_in_feet=False).density
         rps = inputs["rpm"] / 60.0
 
-        partials["shaft_power", "power_coefficient"] = np.diag(rho * rps ** 3.0 * diameter ** 5.0)
+        partials["shaft_power_in", "power_coefficient"] = np.diag(
+            rho * rps ** 3.0 * diameter ** 5.0
+        )
         partials[
-            "shaft_power", "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"
-        ] = (5.0 * power_coefficient * rho * rps ** 3.0 * diameter ** 4.0)
-        partials["shaft_power", "rpm"] = (
+            "shaft_power_in",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
+        ] = (
+            5.0 * power_coefficient * rho * rps ** 3.0 * diameter ** 4.0
+        )
+        partials["shaft_power_in", "rpm"] = (
             np.diag(3.0 * power_coefficient * rho * rps ** 2.0 * diameter ** 5.0) / 60.0
         )

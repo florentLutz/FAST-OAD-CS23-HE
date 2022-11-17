@@ -39,7 +39,7 @@ class PerformancesMaximumCurrent(om.ExplicitComponent):
 
         for i in range(self.options["number_of_inputs"]):
             self.add_input(
-                name="current_in_" + str(i + 1),
+                name="dc_current_in_" + str(i + 1),
                 units="A",
                 val=np.full(number_of_points, np.nan),
                 shape=number_of_points,
@@ -61,7 +61,7 @@ class PerformancesMaximumCurrent(om.ExplicitComponent):
 
         total_current = np.zeros(number_of_points)
         for i in range(self.options["number_of_inputs"]):
-            total_current += inputs["current_in_" + str(i + 1)]
+            total_current += inputs["dc_current_in_" + str(i + 1)]
 
         outputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_max"] = np.max(
             total_current
@@ -74,7 +74,7 @@ class PerformancesMaximumCurrent(om.ExplicitComponent):
 
         total_current = np.zeros(number_of_points)
         for i in range(self.options["number_of_inputs"]):
-            total_current += inputs["current_in_" + str(i + 1)]
+            total_current += inputs["dc_current_in_" + str(i + 1)]
 
         idx_max_current = np.argmax(total_current)
         partials_flat = np.zeros(number_of_points)
@@ -83,5 +83,5 @@ class PerformancesMaximumCurrent(om.ExplicitComponent):
         for i in range(self.options["number_of_inputs"]):
             partials[
                 "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_max",
-                "current_in_" + str(i + 1),
+                "dc_current_in_" + str(i + 1),
             ] = partials_flat

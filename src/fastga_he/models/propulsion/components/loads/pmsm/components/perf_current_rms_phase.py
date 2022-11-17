@@ -22,14 +22,14 @@ class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "rms_current",
+            "ac_current_rms_in",
             units="A",
             val=np.nan,
             shape=number_of_points,
         )
 
         self.add_output(
-            "rms_current_one_phase",
+            "ac_current_rms_in_one_phase",
             units="A",
             val=75.0,
             shape=number_of_points,
@@ -39,10 +39,12 @@ class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["rms_current_one_phase"] = inputs["rms_current"] / 3.0
+        outputs["ac_current_rms_in_one_phase"] = inputs["ac_current_rms_in"] / 3.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         number_of_points = self.options["number_of_points"]
 
-        partials["rms_current_one_phase", "rms_current"] = np.eye(number_of_points) / 3.0
+        partials["ac_current_rms_in_one_phase", "ac_current_rms_in"] = (
+            np.eye(number_of_points) / 3.0
+        )

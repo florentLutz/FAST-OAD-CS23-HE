@@ -43,7 +43,7 @@ class PerformancesElectricalNode(om.ImplicitComponent):
             # Choice was made to start current numbering at 1 to irritate any future programmer
             # working on the code
             self.add_input(
-                name="current_in_" + str(i + 1),
+                name="dc_current_in_" + str(i + 1),
                 units="A",
                 val=np.full(number_of_points, np.nan),
                 shape=number_of_points,
@@ -53,7 +53,7 @@ class PerformancesElectricalNode(om.ImplicitComponent):
         for j in range(self.options["number_of_outputs"]):
 
             self.add_input(
-                name="current_out_" + str(j + 1),
+                name="dc_current_out_" + str(j + 1),
                 units="A",
                 val=np.full(number_of_points, np.nan),
                 shape=number_of_points,
@@ -61,7 +61,10 @@ class PerformancesElectricalNode(om.ImplicitComponent):
             )
 
         self.add_output(
-            name="voltage", val=np.full(number_of_points, 350), units="V", desc="Voltage of the bus"
+            name="dc_voltage",
+            val=np.full(number_of_points, 350),
+            units="V",
+            desc="Voltage of the bus",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -72,20 +75,20 @@ class PerformancesElectricalNode(om.ImplicitComponent):
 
         # Kirchoff's law: the sum of current is zero with the sign convention we defined
 
-        residuals["voltage"] = np.zeros(number_of_points)
+        residuals["dc_voltage"] = np.zeros(number_of_points)
 
         for i in range(self.options["number_of_inputs"]):
-            residuals["voltage"] += inputs["current_in_" + str(i + 1)]
+            residuals["dc_voltage"] += inputs["dc_current_in_" + str(i + 1)]
 
         for j in range(self.options["number_of_outputs"]):
-            residuals["voltage"] -= inputs["current_out_" + str(j + 1)]
+            residuals["dc_voltage"] -= inputs["dc_current_out_" + str(j + 1)]
 
     def linearize(self, inputs, outputs, partials):
 
         number_of_points = self.options["number_of_points"]
 
         for i in range(self.options["number_of_inputs"]):
-            partials["voltage", "current_in_" + str(i + 1)] = np.eye(number_of_points)
+            partials["dc_voltage", "dc_current_in_" + str(i + 1)] = np.eye(number_of_points)
 
         for j in range(self.options["number_of_outputs"]):
-            partials["voltage", "current_out_" + str(j + 1)] = -np.eye(number_of_points)
+            partials["dc_voltage", "dc_current_out_" + str(j + 1)] = -np.eye(number_of_points)

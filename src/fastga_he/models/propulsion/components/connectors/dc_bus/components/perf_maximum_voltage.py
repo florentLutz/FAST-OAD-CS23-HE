@@ -30,7 +30,7 @@ class PerformancesMaximumVoltage(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            name="voltage",
+            name="dc_voltage",
             val=np.full(number_of_points, np.nan),
             units="V",
             desc="Voltage of the bus",
@@ -49,7 +49,7 @@ class PerformancesMaximumVoltage(om.ExplicitComponent):
         dc_bus_id = self.options["dc_bus_id"]
 
         outputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_max"] = np.max(
-            inputs["voltage"]
+            inputs["dc_voltage"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -57,10 +57,10 @@ class PerformancesMaximumVoltage(om.ExplicitComponent):
         dc_bus_id = self.options["dc_bus_id"]
         number_of_points = self.options["number_of_points"]
 
-        idx_max_voltage = np.argmax(inputs["voltage"])
+        idx_max_voltage = np.argmax(inputs["dc_voltage"])
         partials_flat = np.zeros(number_of_points)
         partials_flat[idx_max_voltage] = 1.0
 
         partials[
-            "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_max", "voltage"
+            "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_max", "dc_voltage"
         ] = partials_flat

@@ -267,7 +267,7 @@ def test_load_side():
     power = np.linspace(350, 400, NB_POINTS_TEST)
     ivc.add_output("power", power, units="kW")
     voltage_in = np.full(NB_POINTS_TEST, 810)
-    ivc.add_output("voltage_in", voltage_in, units="V")
+    ivc.add_output("dc_voltage_in", voltage_in, units="V")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(PerformancesConverterLoadSide(number_of_points=NB_POINTS_TEST), ivc)
@@ -275,7 +275,7 @@ def test_load_side():
     expected_current = np.array(
         [432.1, 439.0, 445.8, 452.7, 459.5, 466.4, 473.3, 480.1, 487.0, 493.8]
     )
-    assert problem.get_val("current_in", units="A") == pytest.approx(expected_current, rel=1e-2)
+    assert problem.get_val("dc_current_in", units="A") == pytest.approx(expected_current, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -284,9 +284,9 @@ def test_duty_cycle():
 
     ivc = om.IndepVarComp()
     voltage_out = np.linspace(710, 910, NB_POINTS_TEST)
-    ivc.add_output("voltage_out", voltage_out, units="V")
+    ivc.add_output("dc_voltage_out", voltage_out, units="V")
     voltage_in = np.full(NB_POINTS_TEST, 810)
-    ivc.add_output("voltage_in", voltage_in, units="V")
+    ivc.add_output("dc_voltage_in", voltage_in, units="V")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(PerformancesDutyCycle(number_of_points=NB_POINTS_TEST), ivc)
@@ -312,8 +312,8 @@ def test_conduction_losses():
     )
     duty_cycle = np.array([0.467, 0.475, 0.482, 0.489, 0.497, 0.503, 0.51, 0.517, 0.523, 0.529])
     ivc.add_output("duty_cycle", duty_cycle)
-    current_out = np.linspace(200.0, 400.0, NB_POINTS_TEST)
-    ivc.add_output("current_out", current_out, units="A")
+    dc_current_out = np.linspace(200.0, 400.0, NB_POINTS_TEST)
+    ivc.add_output("dc_current_out", dc_current_out, units="A")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -362,8 +362,8 @@ def test_switching_losses():
         __file__,
         XML_FILE,
     )
-    current_out = np.linspace(200.0, 400.0, NB_POINTS_TEST)
-    ivc.add_output("current_out", current_out, units="A")
+    dc_current_out = np.linspace(200.0, 400.0, NB_POINTS_TEST)
+    ivc.add_output("dc_current_out", dc_current_out, units="A")
     ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST))
 
     problem = run_system(
@@ -438,9 +438,9 @@ def test_converter_efficiency():
 
     ivc = om.IndepVarComp()
     voltage_out = np.linspace(710, 910, NB_POINTS_TEST)
-    ivc.add_output("voltage_out", voltage_out, units="V")
-    current_out = np.linspace(200.0, 400.0, NB_POINTS_TEST)
-    ivc.add_output("current_out", current_out, units="A")
+    ivc.add_output("dc_voltage_out", voltage_out, units="V")
+    dc_current_out = np.linspace(200.0, 400.0, NB_POINTS_TEST)
+    ivc.add_output("dc_current_out", dc_current_out, units="A")
     total_losses = np.array(
         [1070.5, 1351.7, 1664.7, 2013.9, 2406.7, 2828.8, 3299.3, 3814.9, 4367.6, 4967.6]
     )

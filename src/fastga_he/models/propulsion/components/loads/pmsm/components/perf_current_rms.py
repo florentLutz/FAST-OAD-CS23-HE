@@ -31,7 +31,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         )
 
         self.add_output(
-            "rms_current",
+            "ac_current_rms_in",
             units="A",
             val=np.full(number_of_points, 10.0),
             shape=number_of_points,
@@ -49,7 +49,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
 
         rms_current = torque / k_t
 
-        outputs["rms_current"] = rms_current
+        outputs["ac_current_rms_in"] = rms_current
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -59,9 +59,9 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         torque = inputs["torque"]
         k_t = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant"]
 
-        partials["rms_current", "torque"] = np.eye(number_of_points) / k_t
+        partials["ac_current_rms_in", "torque"] = np.eye(number_of_points) / k_t
         partials[
-            "rms_current",
+            "ac_current_rms_in",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant",
         ] = (
             -torque / k_t ** 2.0

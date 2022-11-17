@@ -45,7 +45,7 @@ class PerformancesInverter(om.Group):
         self.add_subsystem(
             "modulation_idx",
             PerformancesModulationIndex(number_of_points=number_of_points),
-            promotes=["peak_ac_voltage", "dc_voltage"],
+            promotes=["ac_voltage_peak_out", "dc_voltage_in"],
         )
         self.add_subsystem(
             "resistance",
@@ -57,12 +57,12 @@ class PerformancesInverter(om.Group):
             PerformancesConductionLosses(
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
-            promotes=["data:*", "current"],
+            promotes=["data:*", "ac_current_rms_out_one_phase"],
         )
         self.add_subsystem(
             "switching_losses",
             PerformancesSwitchingLosses(inverter_id=inverter_id, number_of_points=number_of_points),
-            promotes=["data:*", "current", "switching_frequency"],
+            promotes=["data:*", "ac_current_rms_out_one_phase", "switching_frequency"],
         )
         self.add_subsystem(
             "total_losses",
@@ -77,12 +77,17 @@ class PerformancesInverter(om.Group):
         self.add_subsystem(
             "efficiency",
             PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=["current", "rms_voltage"],
+            promotes=["ac_current_rms_out_one_phase", "ac_voltage_rms_out"],
         )
         self.add_subsystem(
             "dc_side_current",
             PerformancesDCCurrent(number_of_points=number_of_points),
-            promotes=["current", "dc_voltage", "rms_voltage", "dc_current"],
+            promotes=[
+                "ac_current_rms_out_one_phase",
+                "dc_voltage_in",
+                "ac_voltage_rms_out",
+                "dc_current_in",
+            ],
         )
 
         self.connect("modulation_idx.modulation_index", "conduction_losses.modulation_index")

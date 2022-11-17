@@ -281,7 +281,7 @@ def test_shaft_power():
         ivc,
     )
 
-    assert problem.get_val("shaft_power", units="kW") == pytest.approx(
+    assert problem.get_val("shaft_power_in", units="kW") == pytest.approx(
         np.array([178.0, 178.8, 179.1, 181.5, 181.8, 182.6, 183.1, 183.4, 184.2, 186.4]),
         rel=1e-2,
     )
@@ -329,7 +329,7 @@ def test_propeller_performances():
         ivc,
     )
 
-    assert problem.get_val("shaft_power", units="kW") == pytest.approx(
+    assert problem.get_val("shaft_power_in", units="kW") == pytest.approx(
         np.array([178.0, 178.8, 179.1, 181.5, 181.8, 182.6, 183.1, 183.4, 184.2, 186.4]),
         rel=1e-2,
     )

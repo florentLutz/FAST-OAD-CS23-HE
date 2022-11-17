@@ -33,31 +33,31 @@ class PerformancesDCDCConverter(om.Group):
         self.add_subsystem(
             "load_side",
             PerformancesConverterLoadSide(number_of_points=number_of_points),
-            promotes=["voltage_in", "current_in"],
+            promotes=["dc_voltage_in", "dc_current_in"],
         )
         self.add_subsystem(
             "generator_side",
             PerformancesConverterGeneratorSide(number_of_points=number_of_points),
-            promotes=["voltage_out", "current_out"],
+            promotes=["dc_voltage_out", "dc_current_out"],
         )
         self.add_subsystem(
             "duty_cycle",
             PerformancesDutyCycle(number_of_points=number_of_points),
-            promotes=["voltage_in", "voltage_out"],
+            promotes=["dc_voltage_in", "dc_voltage_out"],
         )
         self.add_subsystem(
             "switching_losses",
             PerformancesSwitchingLosses(
                 number_of_points=number_of_points, dc_dc_converter_id=dc_dc_converter_id
             ),
-            promotes=["data:*", "current_out", "switching_frequency"],
+            promotes=["data:*", "dc_current_out", "switching_frequency"],
         )
         self.add_subsystem(
             "conduction_losses",
             PerformancesConductionLosses(
                 number_of_points=number_of_points, dc_dc_converter_id=dc_dc_converter_id
             ),
-            promotes=["data:*", "current_out"],
+            promotes=["data:*", "dc_current_out"],
         )
         self.add_subsystem(
             "total_losses",
@@ -67,18 +67,18 @@ class PerformancesDCDCConverter(om.Group):
         self.add_subsystem(
             "efficiency",
             PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=["current_out", "voltage_out"],
+            promotes=["dc_current_out", "dc_voltage_out"],
         )
         self.add_subsystem(
             "converter_relation",
             PerformancesConverterRelations(
                 number_of_points=number_of_points,
             ),
-            promotes=["voltage_out", "voltage_out_target"],
+            promotes=["dc_voltage_out", "voltage_out_target"],
         )
 
         self.connect("converter_relation.power_rel", "load_side.power")
-        self.connect("current_out", "converter_relation.current_out")
+        self.connect("dc_current_out", "converter_relation.dc_current_out")
         self.connect("converter_relation.voltage_out_rel", "generator_side.voltage_target")
         self.connect("duty_cycle.duty_cycle", "conduction_losses.duty_cycle")
         self.connect(

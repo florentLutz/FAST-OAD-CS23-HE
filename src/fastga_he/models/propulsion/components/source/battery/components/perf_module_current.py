@@ -29,7 +29,7 @@ class PerformancesModuleCurrent(om.ExplicitComponent):
         battery_pack_id = self.options["battery_pack_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("current_out", units="A", val=np.full(number_of_points, np.nan))
+        self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
         self.add_input(
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
             val=np.nan,
@@ -45,7 +45,7 @@ class PerformancesModuleCurrent(om.ExplicitComponent):
         battery_pack_id = self.options["battery_pack_id"]
 
         outputs["current_one_module"] = (
-            inputs["current_out"]
+            inputs["dc_current_out"]
             / inputs[
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules"
             ]
@@ -56,7 +56,7 @@ class PerformancesModuleCurrent(om.ExplicitComponent):
         battery_pack_id = self.options["battery_pack_id"]
         number_of_points = self.options["number_of_points"]
 
-        partials["current_one_module", "current_out"] = (
+        partials["current_one_module", "dc_current_out"] = (
             np.eye(number_of_points)
             / inputs[
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules"
@@ -66,7 +66,7 @@ class PerformancesModuleCurrent(om.ExplicitComponent):
             "current_one_module",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
         ] = (
-            -inputs["current_out"]
+            -inputs["dc_current_out"]
             / inputs[
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules"
             ]

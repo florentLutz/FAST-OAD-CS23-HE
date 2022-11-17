@@ -27,7 +27,9 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("modulation_index", val=np.full(number_of_points, np.nan))
-        self.add_input("current", units="A", val=np.full(number_of_points, np.nan))
+        self.add_input(
+            "ac_current_rms_out_one_phase", units="A", val=np.full(number_of_points, np.nan)
+        )
 
         self.add_input(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor",
@@ -71,7 +73,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             of="conduction_losses_diode",
             wrt=[
                 "modulation_index",
-                "current",
+                "ac_current_rms_out_one_phase",
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor",
                 "resistance_diode",
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":diode:gate_voltage",
@@ -81,7 +83,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             of="conduction_losses_IGBT",
             wrt=[
                 "modulation_index",
-                "current",
+                "ac_current_rms_out_one_phase",
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor",
                 "resistance_igbt",
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:gate_voltage",
@@ -101,7 +103,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         r_d = inputs["resistance_diode"]
 
         beta = inputs["modulation_index"]
-        current = inputs["current"]
+        current = inputs["ac_current_rms_out_one_phase"]
 
         conduction_loss_diode = v_d0 * current / (2.0 * np.pi) * (
             1.0 - np.pi / 4.0 * beta * cos_phi
@@ -127,7 +129,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         r_d = inputs["resistance_diode"]
 
         beta = inputs["modulation_index"]
-        current = inputs["current"]
+        current = inputs["ac_current_rms_out_one_phase"]
 
         partials[
             "conduction_losses_diode",
@@ -147,7 +149,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             "conduction_losses_diode",
             "modulation_index",
         ] = -np.diag(cos_phi * (v_d0 * current / 8.0 + r_d * current ** 2.0 / (3.0 * np.pi)))
-        partials["conduction_losses_diode", "current"] = np.diag(
+        partials["conduction_losses_diode", "ac_current_rms_out_one_phase"] = np.diag(
             v_d0 / (2.0 * np.pi) * (1.0 - np.pi / 4.0 * beta * cos_phi)
             + r_d * current / 4.0 * (1.0 - 8.0 / (3.0 * np.pi) * beta * cos_phi)
         )
@@ -171,7 +173,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         partials["conduction_losses_IGBT", "modulation_index"] = np.diag(
             v_ce0 * current / 8.0 * cos_phi + r_igbt * current ** 2.0 / (3.0 * np.pi) * cos_phi
         )
-        partials["conduction_losses_IGBT", "current"] = np.diag(
+        partials["conduction_losses_IGBT", "ac_current_rms_out_one_phase"] = np.diag(
             v_ce0 / (2.0 * np.pi) * (1.0 + np.pi / 4.0 * beta * cos_phi)
             + r_igbt * current / 4.0 * (1.0 + 8.0 / (3.0 * np.pi) * beta * cos_phi)
         )

@@ -22,7 +22,7 @@ However, be careful: while for the cable, what we connect are voltage_in and vol
 > self.connect("dc_bus_1.voltage", "dc_line_1.voltage_in") <br>
 > self.connect("dc_line_1.total_current", "dc_bus_1.current_in_1")
 
-## Rule II: Similars repel
+## Rule II: "Opposites of opposite do the opposite of attracting" [PLS2, 2022]
 
 This rule is a corollary of Rule I). Since a cable only has one input and one output, it means one cable cannot be connected to the output or input of two bus simultaneously.
 

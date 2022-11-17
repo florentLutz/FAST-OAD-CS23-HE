@@ -23,11 +23,11 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("rms_current", units="A", val=np.nan, shape=number_of_points)
+        self.add_input("ac_current_rms_in", units="A", val=np.nan, shape=number_of_points)
         self.add_input("apparent_power", units="W", val=np.nan, shape=number_of_points)
 
         self.add_output(
-            "rms_voltage",
+            "ac_voltage_rms_in",
             units="V",
             val=np.full(number_of_points, 10.0),
             shape=number_of_points,
@@ -38,11 +38,13 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["rms_voltage"] = inputs["apparent_power"] / inputs["rms_current"]
+        outputs["ac_voltage_rms_in"] = inputs["apparent_power"] / inputs["ac_current_rms_in"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["rms_voltage", "apparent_power"] = np.diag(1.0 / (inputs["rms_current"]))
-        partials["rms_voltage", "rms_current"] = -np.diag(
-            inputs["apparent_power"] / (inputs["rms_current"] ** 2.0)
+        partials["ac_voltage_rms_in", "apparent_power"] = np.diag(
+            1.0 / (inputs["ac_current_rms_in"])
+        )
+        partials["ac_voltage_rms_in", "ac_current_rms_in"] = -np.diag(
+            inputs["apparent_power"] / (inputs["ac_current_rms_in"] ** 2.0)
         )

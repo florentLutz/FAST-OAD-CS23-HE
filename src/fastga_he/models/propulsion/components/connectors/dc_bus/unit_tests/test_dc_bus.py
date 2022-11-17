@@ -31,9 +31,9 @@ def test_maximum_current():
 
     ivc = om.IndepVarComp()
     current_1 = np.array([385.5, 430.0, 334.8, 494.6, 374.2, 427.3, 495.3, 468.6, 368.9, 354.2])
-    ivc.add_output("current_in_1", units="A", val=current_1)
+    ivc.add_output("dc_current_in_1", units="A", val=current_1)
     current_2 = np.array([356.5, 360.1, 345.2, 446.6, 324.2, 352.8, 332.1, 388.2, 434.4, 428.0])
-    ivc.add_output("current_in_2", units="A", val=current_2)
+    ivc.add_output("dc_current_in_2", units="A", val=current_2)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -54,7 +54,7 @@ def test_maximum_voltage():
 
     ivc = om.IndepVarComp()
     voltage = np.array([539.1, 506.3, 588.2, 425.0, 572.7, 512.8, 483.4, 466.9, 497.9, 511.4])
-    ivc.add_output("voltage", units="V", val=voltage)
+    ivc.add_output("dc_voltage", units="V", val=voltage)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(

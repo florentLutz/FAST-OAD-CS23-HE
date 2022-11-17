@@ -33,7 +33,7 @@ class PerformancePMSM(om.Group):
         self.add_subsystem(
             "torque",
             PerformancesTorque(number_of_points=number_of_points),
-            promotes=["shaft_power", "rpm"],
+            promotes=["shaft_power_out", "rpm"],
         )
 
         self.add_subsystem(
@@ -44,12 +44,12 @@ class PerformancePMSM(om.Group):
         self.add_subsystem(
             "efficiency",
             PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=["shaft_power"],
+            promotes=["shaft_power_out"],
         )
         self.add_subsystem(
             "active_power",
             PerformancesActivePower(number_of_points=number_of_points),
-            promotes=["shaft_power"],
+            promotes=["shaft_power_out"],
         )
         self.add_subsystem(
             "apparent_power",
@@ -58,29 +58,29 @@ class PerformancePMSM(om.Group):
         )
 
         self.add_subsystem(
-            "rms_current",
+            "current_rms",
             PerformancesCurrentRMS(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["data:*", "rms_current"],
+            promotes=["data:*", "ac_current_rms_in"],
         )
         self.add_subsystem(
-            "rms_current_one_phase",
+            "current_rms_one_phase",
             PerformancesCurrentRMS1Phase(number_of_points=number_of_points),
-            promotes=["rms_current", "rms_current_one_phase"],
+            promotes=["ac_current_rms_in", "ac_current_rms_in_one_phase"],
         )
         self.add_subsystem(
-            "rms_voltage",
+            "voltage_rms",
             PerformancesVoltageRMS(number_of_points=number_of_points),
-            promotes=["rms_current", "rms_voltage"],
+            promotes=["ac_current_rms_in", "ac_voltage_rms_in"],
         )
         self.add_subsystem(
-            "peak_voltage",
+            "voltage_peak",
             PerformancesVoltagePeak(number_of_points=number_of_points),
-            promotes=["peak_voltage", "rms_voltage"],
+            promotes=["ac_voltage_peak_in", "ac_voltage_rms_in"],
         )
 
         self.connect(
             "torque.torque",
-            ["losses.torque", "rms_current.torque"],
+            ["losses.torque", "current_rms.torque"],
         )
 
         self.connect(
@@ -100,5 +100,5 @@ class PerformancePMSM(om.Group):
 
         self.connect(
             "apparent_power.apparent_power",
-            "rms_voltage.apparent_power",
+            "voltage_rms.apparent_power",
         )

@@ -133,23 +133,25 @@ class PerformancesAssembly(om.Group):
         self.connect(
             "control_converter.switching_frequency", "dc_dc_converter_1.switching_frequency"
         )
-        self.connect("propeller_1.shaft_power", "motor_1.shaft_power")
-        self.connect("motor_1.rms_current_one_phase", "inverter_1.current")
-        self.connect("motor_1.peak_voltage", "inverter_1.peak_ac_voltage")
-        self.connect("motor_1.rms_voltage", "inverter_1.rms_voltage")
-        self.connect("dc_bus_1.voltage", "inverter_1.dc_voltage")
-        self.connect("inverter_1.dc_current", "dc_bus_1.current_out_1")
-        self.connect("dc_bus_1.voltage", "dc_line_1.voltage_out")
-        self.connect("dc_line_1.total_current", "dc_bus_1.current_in_1")
-        self.connect("dc_bus_2.voltage", "dc_line_1.voltage_in")
-        self.connect("dc_line_1.total_current", "dc_bus_2.current_out_1")
-        self.connect("dc_dc_converter_1.current_out", "dc_bus_2.current_in_1")
-        self.connect("dc_bus_2.voltage", "dc_dc_converter_1.voltage_out")
+        self.connect("propeller_1.shaft_power_in", "motor_1.shaft_power_out")
+        self.connect(
+            "motor_1.ac_current_rms_in_one_phase", "inverter_1.ac_current_rms_out_one_phase"
+        )
+        self.connect("motor_1.ac_voltage_peak_in", "inverter_1.ac_voltage_peak_out")
+        self.connect("motor_1.ac_voltage_rms_in", "inverter_1.ac_voltage_rms_out")
+        self.connect("dc_bus_1.dc_voltage", "inverter_1.dc_voltage_in")
+        self.connect("inverter_1.dc_current_in", "dc_bus_1.dc_current_out_1")
+        self.connect("dc_bus_1.dc_voltage", "dc_line_1.dc_voltage_out")
+        self.connect("dc_line_1.dc_current", "dc_bus_1.dc_current_in_1")
+        self.connect("dc_bus_2.dc_voltage", "dc_line_1.dc_voltage_in")
+        self.connect("dc_line_1.dc_current", "dc_bus_2.dc_current_out_1")
+        self.connect("dc_dc_converter_1.dc_current_out", "dc_bus_2.dc_current_in_1")
+        self.connect("dc_bus_2.dc_voltage", "dc_dc_converter_1.dc_voltage_out")
         self.connect(
             "converter_voltage_target.voltage_out_target", "dc_dc_converter_1.voltage_out_target"
         )
-        self.connect("battery_pack_1.voltage_out", "dc_dc_converter_1.voltage_in")
-        self.connect("dc_dc_converter_1.current_in", "battery_pack_1.current_out")
+        self.connect("battery_pack_1.voltage_out", "dc_dc_converter_1.dc_voltage_in")
+        self.connect("dc_dc_converter_1.dc_current_in", "battery_pack_1.dc_current_out")
         self.connect("battery_temperature.cell_temperature", "battery_pack_1.cell_temperature")
 
 
@@ -181,38 +183,38 @@ def test_assembly():
     print(problem.get_val("true_airspeed", units="m/s") * problem.get_val("thrust", units="N"))
 
     print("\n=========== Shaft power ===========")
-    print(problem.get_val("component.propeller_1.shaft_power", units="W"))
+    print(problem.get_val("component.propeller_1.shaft_power_in", units="W"))
 
     print("\n=========== AC power ===========")
     print(
-        problem.get_val("component.motor_1.rms_current", units="A")
-        * problem.get_val("component.motor_1.rms_voltage", units="V")
+        problem.get_val("component.motor_1.ac_current_rms_in", units="A")
+        * problem.get_val("component.motor_1.ac_voltage_rms_in", units="V")
     )
 
     print("\n=========== DC power before inverter ===========")
     print(
-        problem.get_val("component.inverter_1.dc_current", units="A")
-        * problem.get_val("component.inverter_1.dc_voltage", units="V")
+        problem.get_val("component.inverter_1.dc_current_in", units="A")
+        * problem.get_val("component.inverter_1.dc_voltage_in", units="V")
     )
 
     print("\n=========== DC power before bus/end of cable ===========")
     print(
-        problem.get_val("component.dc_line_1.total_current", units="A")
-        * problem.get_val("component.dc_line_1.voltage_out", units="V")
+        problem.get_val("component.dc_line_1.dc_current", units="A")
+        * problem.get_val("component.dc_line_1.dc_voltage_out", units="V")
     )
 
     print("\n=========== DC power start of cable ===========")
     print(
-        problem.get_val("component.dc_line_1.total_current", units="A")
-        * problem.get_val("component.dc_line_1.voltage_in", units="V")
+        problem.get_val("component.dc_line_1.dc_current", units="A")
+        * problem.get_val("component.dc_line_1.dc_voltage_in", units="V")
     )
     # Result is not really accurate since we used a ICE propeller coupled to a small PMSM not
     # sized for the demand, though it shows that the assembly works just fine
 
     print("\n=========== DC power input of the DC/DC converter ===========")
     print(
-        problem.get_val("component.dc_dc_converter_1.current_in", units="A")
-        * problem.get_val("component.dc_dc_converter_1.voltage_in", units="V")
+        problem.get_val("component.dc_dc_converter_1.dc_current_in", units="A")
+        * problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V")
     )
 
     print("\n=========== Battery SOC ===========")
@@ -225,9 +227,9 @@ def test_assembly():
 
     _, _, residuals = problem.model.component.get_nonlinear_vectors()
 
-    assert problem.get_val("component.dc_dc_converter_1.current_in", units="A") * problem.get_val(
-        "component.dc_dc_converter_1.voltage_in", units="V"
-    ) == pytest.approx(
+    assert problem.get_val(
+        "component.dc_dc_converter_1.dc_current_in", units="A"
+    ) * problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
                 186568.9,

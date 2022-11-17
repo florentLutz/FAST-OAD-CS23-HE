@@ -311,74 +311,82 @@ class PerformancesAssembly(om.Group):
         self.connect("ivc_thrust_3.thrust_3", "propeller_3.thrust")
         self.connect("ivc_thrust_4.thrust_4", "propeller_4.thrust")
 
-        self.connect("propeller_1.shaft_power", "motor_1.shaft_power")
-        self.connect("propeller_2.shaft_power", "motor_2.shaft_power")
-        self.connect("propeller_3.shaft_power", "motor_3.shaft_power")
-        self.connect("propeller_4.shaft_power", "motor_4.shaft_power")
+        self.connect("propeller_1.shaft_power_in", "motor_1.shaft_power_out")
+        self.connect("propeller_2.shaft_power_in", "motor_2.shaft_power_out")
+        self.connect("propeller_3.shaft_power_in", "motor_3.shaft_power_out")
+        self.connect("propeller_4.shaft_power_in", "motor_4.shaft_power_out")
 
-        self.connect("motor_1.rms_current_one_phase", "inverter_1.current")
-        self.connect("motor_2.rms_current_one_phase", "inverter_2.current")
-        self.connect("motor_3.rms_current_one_phase", "inverter_3.current")
-        self.connect("motor_4.rms_current_one_phase", "inverter_4.current")
+        self.connect(
+            "motor_1.ac_current_rms_in_one_phase", "inverter_1.ac_current_rms_out_one_phase"
+        )
+        self.connect(
+            "motor_2.ac_current_rms_in_one_phase", "inverter_2.ac_current_rms_out_one_phase"
+        )
+        self.connect(
+            "motor_3.ac_current_rms_in_one_phase", "inverter_3.ac_current_rms_out_one_phase"
+        )
+        self.connect(
+            "motor_4.ac_current_rms_in_one_phase", "inverter_4.ac_current_rms_out_one_phase"
+        )
 
-        self.connect("motor_1.peak_voltage", "inverter_1.peak_ac_voltage")
-        self.connect("motor_2.peak_voltage", "inverter_2.peak_ac_voltage")
-        self.connect("motor_3.peak_voltage", "inverter_3.peak_ac_voltage")
-        self.connect("motor_4.peak_voltage", "inverter_4.peak_ac_voltage")
+        self.connect("motor_1.ac_voltage_peak_in", "inverter_1.ac_voltage_peak_out")
+        self.connect("motor_2.ac_voltage_peak_in", "inverter_2.ac_voltage_peak_out")
+        self.connect("motor_3.ac_voltage_peak_in", "inverter_3.ac_voltage_peak_out")
+        self.connect("motor_4.ac_voltage_peak_in", "inverter_4.ac_voltage_peak_out")
 
-        self.connect("motor_1.rms_voltage", "inverter_1.rms_voltage")
-        self.connect("motor_2.rms_voltage", "inverter_2.rms_voltage")
-        self.connect("motor_3.rms_voltage", "inverter_3.rms_voltage")
-        self.connect("motor_4.rms_voltage", "inverter_4.rms_voltage")
+        self.connect("motor_1.ac_voltage_rms_in", "inverter_1.ac_voltage_rms_out")
+        self.connect("motor_2.ac_voltage_rms_in", "inverter_2.ac_voltage_rms_out")
+        self.connect("motor_3.ac_voltage_rms_in", "inverter_3.ac_voltage_rms_out")
+        self.connect("motor_4.ac_voltage_rms_in", "inverter_4.ac_voltage_rms_out")
 
-        self.connect("dc_bus_1.voltage", "inverter_1.dc_voltage")
-        self.connect("dc_bus_2.voltage", "inverter_2.dc_voltage")
-        self.connect("dc_bus_3.voltage", "inverter_3.dc_voltage")
-        self.connect("dc_bus_4.voltage", "inverter_4.dc_voltage")
+        self.connect("dc_bus_1.dc_voltage", "inverter_1.dc_voltage_in")
+        self.connect("dc_bus_2.dc_voltage", "inverter_2.dc_voltage_in")
+        self.connect("dc_bus_3.dc_voltage", "inverter_3.dc_voltage_in")
+        self.connect("dc_bus_4.dc_voltage", "inverter_4.dc_voltage_in")
 
-        self.connect("inverter_1.dc_current", "dc_bus_1.current_out_1")
-        self.connect("inverter_2.dc_current", "dc_bus_2.current_out_1")
-        self.connect("inverter_3.dc_current", "dc_bus_3.current_out_1")
-        self.connect("inverter_4.dc_current", "dc_bus_4.current_out_1")
+        self.connect("inverter_1.dc_current_in", "dc_bus_1.dc_current_out_1")
+        self.connect("inverter_2.dc_current_in", "dc_bus_2.dc_current_out_1")
+        self.connect("inverter_3.dc_current_in", "dc_bus_3.dc_current_out_1")
+        self.connect("inverter_4.dc_current_in", "dc_bus_4.dc_current_out_1")
 
         # DC bus 1
-        self.connect("dc_bus_1.voltage", "dc_line_1.voltage_out")
-        self.connect("dc_bus_1.voltage", "dc_line_5.voltage_in")
-        self.connect("dc_line_1.total_current", "dc_bus_1.current_in_1")
-        self.connect("dc_line_5.total_current", "dc_bus_1.current_out_2")
+        self.connect("dc_bus_1.dc_voltage", "dc_line_1.dc_voltage_out")
+        self.connect("dc_bus_1.dc_voltage", "dc_line_5.dc_voltage_in")
+        self.connect("dc_line_1.dc_current", "dc_bus_1.dc_current_in_1")
+        self.connect("dc_line_5.dc_current", "dc_bus_1.dc_current_out_2")
 
         # DC bus 2
-        self.connect("dc_bus_2.voltage", "dc_line_2.voltage_out")
-        self.connect("dc_bus_2.voltage", "dc_line_5.voltage_out")
-        self.connect("dc_line_2.total_current", "dc_bus_2.current_in_1")
-        self.connect("dc_line_5.total_current", "dc_bus_2.current_in_2")
+        self.connect("dc_bus_2.dc_voltage", "dc_line_2.dc_voltage_out")
+        self.connect("dc_bus_2.dc_voltage", "dc_line_5.dc_voltage_out")
+        self.connect("dc_line_2.dc_current", "dc_bus_2.dc_current_in_1")
+        self.connect("dc_line_5.dc_current", "dc_bus_2.dc_current_in_2")
 
         # DC bus 3
-        self.connect("dc_bus_3.voltage", "dc_line_3.voltage_out")
-        self.connect("dc_bus_3.voltage", "dc_line_6.voltage_out")
-        self.connect("dc_line_3.total_current", "dc_bus_3.current_in_1")
-        self.connect("dc_line_6.total_current", "dc_bus_3.current_in_2")
+        self.connect("dc_bus_3.dc_voltage", "dc_line_3.dc_voltage_out")
+        self.connect("dc_bus_3.dc_voltage", "dc_line_6.dc_voltage_out")
+        self.connect("dc_line_3.dc_current", "dc_bus_3.dc_current_in_1")
+        self.connect("dc_line_6.dc_current", "dc_bus_3.dc_current_in_2")
 
         # DC bus 4
-        self.connect("dc_bus_4.voltage", "dc_line_4.voltage_out")
-        self.connect("dc_bus_4.voltage", "dc_line_6.voltage_in")
-        self.connect("dc_line_4.total_current", "dc_bus_4.current_in_1")
-        self.connect("dc_line_6.total_current", "dc_bus_4.current_out_2")
+        self.connect("dc_bus_4.dc_voltage", "dc_line_4.dc_voltage_out")
+        self.connect("dc_bus_4.dc_voltage", "dc_line_6.dc_voltage_in")
+        self.connect("dc_line_4.dc_current", "dc_bus_4.dc_current_in_1")
+        self.connect("dc_line_6.dc_current", "dc_bus_4.dc_current_out_2")
 
-        self.connect("dc_bus_5.voltage", "dc_line_1.voltage_in")
-        self.connect("dc_bus_5.voltage", "dc_line_2.voltage_in")
-        self.connect("dc_bus_5.voltage", "dc_line_3.voltage_in")
-        self.connect("dc_bus_5.voltage", "dc_line_4.voltage_in")
+        self.connect("dc_bus_5.dc_voltage", "dc_line_1.dc_voltage_in")
+        self.connect("dc_bus_5.dc_voltage", "dc_line_2.dc_voltage_in")
+        self.connect("dc_bus_5.dc_voltage", "dc_line_3.dc_voltage_in")
+        self.connect("dc_bus_5.dc_voltage", "dc_line_4.dc_voltage_in")
 
-        self.connect("dc_line_1.total_current", "dc_bus_5.current_out_1")
-        self.connect("dc_line_2.total_current", "dc_bus_5.current_out_2")
-        self.connect("dc_line_3.total_current", "dc_bus_5.current_out_3")
-        self.connect("dc_line_4.total_current", "dc_bus_5.current_out_4")
+        self.connect("dc_line_1.dc_current", "dc_bus_5.dc_current_out_1")
+        self.connect("dc_line_2.dc_current", "dc_bus_5.dc_current_out_2")
+        self.connect("dc_line_3.dc_current", "dc_bus_5.dc_current_out_3")
+        self.connect("dc_line_4.dc_current", "dc_bus_5.dc_current_out_4")
 
-        self.connect("dc_dc_converter_1.current_out", "dc_bus_5.current_in_1")
-        self.connect("dc_bus_5.voltage", "dc_dc_converter_1.voltage_out")
+        self.connect("dc_dc_converter_1.dc_current_out", "dc_bus_5.dc_current_in_1")
+        self.connect("dc_bus_5.dc_voltage", "dc_dc_converter_1.dc_voltage_out")
 
-        self.connect("dc_dc_converter_voltage_in.voltage_in", "dc_dc_converter_1.voltage_in")
+        self.connect("dc_dc_converter_voltage_in.voltage_in", "dc_dc_converter_1.dc_voltage_in")
         self.connect(
             "control_converter.switching_frequency", "dc_dc_converter_1.switching_frequency"
         )
@@ -430,105 +438,105 @@ def test_assembly():
     )
 
     print("\n=========== Shaft power ===========")
-    print(problem.get_val("component.propeller_1.shaft_power", units="W")[0])
-    print(problem.get_val("component.propeller_2.shaft_power", units="W")[0])
-    print(problem.get_val("component.propeller_3.shaft_power", units="W")[0])
-    print(problem.get_val("component.propeller_4.shaft_power", units="W")[0])
+    print(problem.get_val("component.propeller_1.shaft_power_in", units="W")[0])
+    print(problem.get_val("component.propeller_2.shaft_power_in", units="W")[0])
+    print(problem.get_val("component.propeller_3.shaft_power_in", units="W")[0])
+    print(problem.get_val("component.propeller_4.shaft_power_in", units="W")[0])
 
     print("\n=========== AC power ===========")
     print(
-        problem.get_val("component.motor_1.rms_current", units="A")[0]
-        * problem.get_val("component.motor_1.rms_voltage", units="V")[0]
+        problem.get_val("component.motor_1.ac_current_rms_in", units="A")[0]
+        * problem.get_val("component.motor_1.ac_voltage_rms_in", units="V")[0]
     )
     print(
-        problem.get_val("component.motor_2.rms_current", units="A")[0]
-        * problem.get_val("component.motor_2.rms_voltage", units="V")[0]
+        problem.get_val("component.motor_2.ac_current_rms_in", units="A")[0]
+        * problem.get_val("component.motor_2.ac_voltage_rms_in", units="V")[0]
     )
     print(
-        problem.get_val("component.motor_3.rms_current", units="A")[0]
-        * problem.get_val("component.motor_3.rms_voltage", units="V")[0]
+        problem.get_val("component.motor_3.ac_current_rms_in", units="A")[0]
+        * problem.get_val("component.motor_3.ac_voltage_rms_in", units="V")[0]
     )
     print(
-        problem.get_val("component.motor_4.rms_current", units="A")[0]
-        * problem.get_val("component.motor_4.rms_voltage", units="V")[0]
+        problem.get_val("component.motor_4.ac_current_rms_in", units="A")[0]
+        * problem.get_val("component.motor_4.ac_voltage_rms_in", units="V")[0]
     )
 
     print("\n=========== DC power before inverter ===========")
-    print(problem.get_val("component.inverter_1.dc_current", units="A")[0])
+    print(problem.get_val("component.inverter_1.dc_current_in", units="A")[0])
     print(
-        problem.get_val("component.inverter_1.dc_current", units="A")[0]
-        * problem.get_val("component.inverter_1.dc_voltage", units="V")[0]
+        problem.get_val("component.inverter_1.dc_current_in", units="A")[0]
+        * problem.get_val("component.inverter_1.dc_voltage_in", units="V")[0]
     )
-    print(problem.get_val("component.inverter_2.dc_current", units="A")[0])
+    print(problem.get_val("component.inverter_2.dc_current_in", units="A")[0])
     print(
-        problem.get_val("component.inverter_2.dc_current", units="A")[0]
-        * problem.get_val("component.inverter_2.dc_voltage", units="V")[0]
+        problem.get_val("component.inverter_2.dc_current_in", units="A")[0]
+        * problem.get_val("component.inverter_2.dc_voltage_in", units="V")[0]
     )
-    print(problem.get_val("component.inverter_3.dc_current", units="A")[0])
+    print(problem.get_val("component.inverter_3.dc_current_in", units="A")[0])
     print(
-        problem.get_val("component.inverter_3.dc_current", units="A")[0]
-        * problem.get_val("component.inverter_3.dc_voltage", units="V")[0]
+        problem.get_val("component.inverter_3.dc_current_in", units="A")[0]
+        * problem.get_val("component.inverter_3.dc_voltage_in", units="V")[0]
     )
-    print(problem.get_val("component.inverter_4.dc_current", units="A")[0])
+    print(problem.get_val("component.inverter_4.dc_current_in", units="A")[0])
     print(
-        problem.get_val("component.inverter_4.dc_current", units="A")[0]
-        * problem.get_val("component.inverter_4.dc_voltage", units="V")[0]
+        problem.get_val("component.inverter_4.dc_current_in", units="A")[0]
+        * problem.get_val("component.inverter_4.dc_voltage_in", units="V")[0]
     )
 
     print("\n=========== DC currents in cables ===========")
-    print(problem.get_val("component.dc_line_1.total_current", units="A")[0])
-    print(problem.get_val("component.dc_line_2.total_current", units="A")[0])
-    print(problem.get_val("component.dc_line_3.total_current", units="A")[0])
-    print(problem.get_val("component.dc_line_4.total_current", units="A")[0])
-    print(problem.get_val("component.dc_line_5.total_current", units="A")[0])
-    print(problem.get_val("component.dc_line_6.total_current", units="A")[0])
+    print(problem.get_val("component.dc_line_1.dc_current", units="A")[0])
+    print(problem.get_val("component.dc_line_2.dc_current", units="A")[0])
+    print(problem.get_val("component.dc_line_3.dc_current", units="A")[0])
+    print(problem.get_val("component.dc_line_4.dc_current", units="A")[0])
+    print(problem.get_val("component.dc_line_5.dc_current", units="A")[0])
+    print(problem.get_val("component.dc_line_6.dc_current", units="A")[0])
 
     print("\n=========== DC power before bus/end of cable ===========")
     print(
-        problem.get_val("component.dc_line_1.total_current", units="A")[0]
-        * problem.get_val("component.dc_line_1.voltage_out", units="V")[0]
+        problem.get_val("component.dc_line_1.dc_current", units="A")[0]
+        * problem.get_val("component.dc_line_1.dc_voltage_out", units="V")[0]
     )
     print(
-        problem.get_val("component.dc_line_2.total_current", units="A")[0]
-        * problem.get_val("component.dc_line_2.voltage_out", units="V")[0]
+        problem.get_val("component.dc_line_2.dc_current", units="A")[0]
+        * problem.get_val("component.dc_line_2.dc_voltage_out", units="V")[0]
     )
     print(
-        problem.get_val("component.dc_line_3.total_current", units="A")[0]
-        * problem.get_val("component.dc_line_3.voltage_out", units="V")[0]
+        problem.get_val("component.dc_line_3.dc_current", units="A")[0]
+        * problem.get_val("component.dc_line_3.dc_voltage_out", units="V")[0]
     )
     print(
-        problem.get_val("component.dc_line_4.total_current", units="A")[0]
-        * problem.get_val("component.dc_line_4.voltage_out", units="V")[0]
+        problem.get_val("component.dc_line_4.dc_current", units="A")[0]
+        * problem.get_val("component.dc_line_4.dc_voltage_out", units="V")[0]
     )
 
     print("\n=========== DC power start of cable ===========")
     print(
-        problem.get_val("component.dc_line_1.total_current", units="A")[0]
-        * problem.get_val("component.dc_line_1.voltage_in", units="V")[0]
+        problem.get_val("component.dc_line_1.dc_current", units="A")[0]
+        * problem.get_val("component.dc_line_1.dc_voltage_in", units="V")[0]
     )
     print(
-        problem.get_val("component.dc_line_2.total_current", units="A")[0]
-        * problem.get_val("component.dc_line_2.voltage_in", units="V")[0]
+        problem.get_val("component.dc_line_2.dc_current", units="A")[0]
+        * problem.get_val("component.dc_line_2.dc_voltage_in", units="V")[0]
     )
     print(
-        problem.get_val("component.dc_line_3.total_current", units="A")[0]
-        * problem.get_val("component.dc_line_3.voltage_in", units="V")[0]
+        problem.get_val("component.dc_line_3.dc_current", units="A")[0]
+        * problem.get_val("component.dc_line_3.dc_voltage_in", units="V")[0]
     )
     print(
-        problem.get_val("component.dc_line_4.total_current", units="A")[0]
-        * problem.get_val("component.dc_line_4.voltage_in", units="V")[0]
+        problem.get_val("component.dc_line_4.dc_current", units="A")[0]
+        * problem.get_val("component.dc_line_4.dc_voltage_in", units="V")[0]
     )
 
     print("\n=========== DC power after converter ===========")
     print(
-        problem.get_val("component.dc_dc_converter_1.current_out", units="A")[0]
-        * problem.get_val("component.dc_dc_converter_1.voltage_out", units="V")[0]
+        problem.get_val("component.dc_dc_converter_1.dc_current_out", units="A")[0]
+        * problem.get_val("component.dc_dc_converter_1.dc_voltage_out", units="V")[0]
     )
 
     print("\n=========== DC power before converter ===========")
     print(
-        problem.get_val("component.dc_dc_converter_1.current_in", units="A")[0]
-        * problem.get_val("component.dc_dc_converter_1.voltage_in", units="V")[0]
+        problem.get_val("component.dc_dc_converter_1.dc_current_in", units="A")[0]
+        * problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V")[0]
     )
     # Result is not really accurate since we used a ICE propeller coupled to a small PMSM not
     # sized for the demand, though it shows that the assembly works just fine

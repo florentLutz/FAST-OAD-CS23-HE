@@ -28,7 +28,9 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("switching_frequency", units="Hz", val=np.full(number_of_points, np.nan))
-        self.add_input("current", units="A", val=np.full(number_of_points, np.nan))
+        self.add_input(
+            "ac_current_rms_out_one_phase", units="A", val=np.full(number_of_points, np.nan)
+        )
 
         self.add_input(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a",
@@ -89,7 +91,7 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b",
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c",
                 "switching_frequency",
-                "current",
+                "ac_current_rms_out_one_phase",
             ],
         )
 
@@ -103,7 +105,7 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b",
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c",
                 "switching_frequency",
-                "current",
+                "ac_current_rms_out_one_phase",
             ],
         )
 
@@ -124,7 +126,7 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         c_rr = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c"]
 
         f_sw = inputs["switching_frequency"]
-        current = inputs["current"]
+        current = inputs["ac_current_rms_out_one_phase"]
 
         loss_diode = f_sw * (a_rr / 2.0 + b_rr * current / np.pi + c_rr * current ** 2.0 / 4)
         loss_igbt = f_sw * (
@@ -153,7 +155,7 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         c_rr = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c"]
 
         f_sw = inputs["switching_frequency"]
-        current = inputs["current"]
+        current = inputs["ac_current_rms_out_one_phase"]
 
         partials[
             "switching_losses_diode",
@@ -176,7 +178,7 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         partials["switching_losses_diode", "switching_frequency"] = np.diag(
             a_rr / 2.0 + b_rr * current / np.pi + c_rr * current ** 2.0 / 4
         )
-        partials["switching_losses_diode", "current"] = np.diag(
+        partials["switching_losses_diode", "ac_current_rms_out_one_phase"] = np.diag(
             f_sw * (b_rr / np.pi + c_rr * current / 2.0)
         )
 
@@ -221,6 +223,6 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
             + (b_on + b_off) * current / np.pi
             + (c_on + c_off) * current ** 2.0 / 4
         )
-        partials["switching_losses_IGBT", "current"] = np.diag(
+        partials["switching_losses_IGBT", "ac_current_rms_out_one_phase"] = np.diag(
             f_sw * ((b_on + b_off) / np.pi + (c_on + c_off) * current / 2.0)
         )

@@ -30,14 +30,14 @@ class PerformancesConverterGeneratorSide(om.ImplicitComponent):
             desc="Target voltage at the output side of the converter, solely used for convergence",
         )
         self.add_input(
-            "voltage_out",
+            "dc_voltage_out",
             val=np.full(number_of_points, np.nan),
             units="V",
             desc="Voltage to output side",
         )
 
         self.add_output(
-            "current_out",
+            "dc_current_out",
             val=np.full(number_of_points, 400.0),
             units="A",
             desc="current to output side",
@@ -47,11 +47,11 @@ class PerformancesConverterGeneratorSide(om.ImplicitComponent):
 
     def apply_nonlinear(self, inputs, outputs, residuals):
 
-        residuals["current_out"] = inputs["voltage_target"] - inputs["voltage_out"]
+        residuals["dc_current_out"] = inputs["voltage_target"] - inputs["dc_voltage_out"]
 
     def linearize(self, inputs, outputs, partials):
 
         number_of_points = self.options["number_of_points"]
 
-        partials["current_out", "voltage_target"] = np.eye(number_of_points)
-        partials["current_out", "voltage_out"] = -np.eye(number_of_points)
+        partials["dc_current_out", "voltage_target"] = np.eye(number_of_points)
+        partials["dc_current_out", "dc_voltage_out"] = -np.eye(number_of_points)

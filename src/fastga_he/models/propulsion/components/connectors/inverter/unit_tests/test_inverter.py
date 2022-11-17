@@ -669,9 +669,9 @@ def test_inverter_sizing():
 def test_modulation_idx():
 
     ivc = om.IndepVarComp()
-    ivc.add_output("dc_voltage", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
+    ivc.add_output("dc_voltage_in", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
     ivc.add_output(
-        "peak_ac_voltage",
+        "ac_voltage_peak_out",
         units="V",
         val=np.array([710.4, 728.5, 747.6, 767.2, 787.1, 807.5, 827.9, 848.6, 869.6, 890.5]),
     )
@@ -714,7 +714,9 @@ def test_switching_losses():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("current", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A")
+    ivc.add_output(
+        "ac_current_rms_out_one_phase", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A"
+    )
     ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST))
 
     problem = run_system(
@@ -776,7 +778,9 @@ def test_conduction_losses():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("current", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A")
+    ivc.add_output(
+        "ac_current_rms_out_one_phase", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A"
+    )
     ivc.add_output("modulation_index", np.linspace(0.1, 1.0, NB_POINTS_TEST))
     ivc.add_output(
         "resistance_igbt",
@@ -946,11 +950,15 @@ def test_inverter_efficiency():
 
     ivc = om.IndepVarComp()
     ivc.add_output(
-        name="rms_voltage",
+        name="ac_voltage_rms_out",
         val=np.array([580.0, 594.8, 610.4, 626.4, 642.7, 659.3, 676.0, 692.9, 710.0, 727.1]),
         units="V",
     )
-    ivc.add_output(name="current", val=np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A")
+    ivc.add_output(
+        name="ac_current_rms_out_one_phase",
+        val=np.linspace(200.0, 500.0, NB_POINTS_TEST),
+        units="A",
+    )
     total_losses = np.array(
         [1740.54, 2434.2, 3230.22, 4129.62, 5134.44, 6246.0, 7464.96, 8795.46, 10234.44, 11784.72]
     )
@@ -975,17 +983,21 @@ def test_inverter_efficiency():
 def test_dc_current():
 
     ivc = om.IndepVarComp()
-    ivc.add_output("dc_voltage", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
+    ivc.add_output("dc_voltage_in", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
     ivc.add_output(
         "efficiency",
         val=np.array([0.995, 0.994, 0.993, 0.993, 0.992, 0.991, 0.991, 0.99, 0.99, 0.989]),
     )
     ivc.add_output(
-        name="rms_voltage",
+        name="ac_voltage_rms_out",
         val=np.array([580.0, 594.8, 610.4, 626.4, 642.7, 659.3, 676.0, 692.9, 710.0, 727.1]),
         units="V",
     )
-    ivc.add_output(name="current", val=np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A")
+    ivc.add_output(
+        name="ac_current_rms_out_one_phase",
+        val=np.linspace(200.0, 500.0, NB_POINTS_TEST),
+        units="A",
+    )
 
     problem = om.Problem(reports=False)
     model = problem.model
@@ -1008,7 +1020,7 @@ def test_dc_current():
     problem.setup()
     problem.run_model()
 
-    assert problem.get_val("dc_current", units="A") == pytest.approx(
+    assert problem.get_val("dc_current_in", units="A") == pytest.approx(
         np.array(
             [349.75, 418.87, 491.76, 567.73, 647.88, 731.82, 818.57, 909.87, 1004.04, 1102.78]
         ),
@@ -1028,16 +1040,18 @@ def test_performances_inverter_tot():
     )
 
     ivc.add_output("heat_sink_temperature", units="degK", val=np.full(NB_POINTS_TEST, 288.15))
-    ivc.add_output("current", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A")
-    ivc.add_output("switching_frequency", np.linspace(12000.0, 12000.0, NB_POINTS_TEST))
-    ivc.add_output("dc_voltage", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
     ivc.add_output(
-        "peak_ac_voltage",
+        "ac_current_rms_out_one_phase", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A"
+    )
+    ivc.add_output("switching_frequency", np.linspace(12000.0, 12000.0, NB_POINTS_TEST))
+    ivc.add_output("dc_voltage_in", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
+    ivc.add_output(
+        "ac_voltage_peak_out",
         units="V",
         val=np.array([710.4, 728.5, 747.6, 767.2, 787.1, 807.5, 827.9, 848.6, 869.6, 890.5]),
     )
     ivc.add_output(
-        name="rms_voltage",
+        name="ac_voltage_rms_out",
         val=np.array([580.0, 594.8, 610.4, 626.4, 642.7, 659.3, 676.0, 692.9, 710.0, 727.1]),
         units="V",
     )
@@ -1058,7 +1072,9 @@ def test_performances_inverter_tot():
     assert problem.get_val(
         "component.temperature_inverter.inverter_temperature", units="degK"
     ) == pytest.approx(expected_temperature, rel=1e-2)
-    expected_dc_current = np.array(
+    expected_dc_current_in = np.array(
         [353.3, 422.31, 494.94, 571.07, 650.71, 733.97, 820.68, 911.02, 1005.04, 1102.5]
     )
-    assert problem.get_val("dc_current", units="A") == pytest.approx(expected_dc_current, rel=1e-2)
+    assert problem.get_val("dc_current_in", units="A") == pytest.approx(
+        expected_dc_current_in, rel=1e-2
+    )

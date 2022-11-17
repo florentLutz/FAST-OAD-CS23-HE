@@ -24,13 +24,13 @@ class PerformancesDutyCycle(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "voltage_in",
+            "dc_voltage_in",
             val=np.full(number_of_points, np.nan),
             units="V",
             desc="Voltage at the input side of the converter",
         )
         self.add_input(
-            "voltage_out",
+            "dc_voltage_out",
             val=np.full(number_of_points, np.nan),
             units="V",
             desc="Voltage to output side",
@@ -46,15 +46,15 @@ class PerformancesDutyCycle(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["duty_cycle"] = inputs["voltage_out"] / (
-            inputs["voltage_out"] + inputs["voltage_in"]
+        outputs["duty_cycle"] = inputs["dc_voltage_out"] / (
+            inputs["dc_voltage_out"] + inputs["dc_voltage_in"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["duty_cycle", "voltage_out"] = np.diag(
-            inputs["voltage_in"] / (inputs["voltage_out"] + inputs["voltage_in"]) ** 2.0
+        partials["duty_cycle", "dc_voltage_out"] = np.diag(
+            inputs["dc_voltage_in"] / (inputs["dc_voltage_out"] + inputs["dc_voltage_in"]) ** 2.0
         )
-        partials["duty_cycle", "voltage_in"] = -np.diag(
-            inputs["voltage_out"] / (inputs["voltage_out"] + inputs["voltage_in"]) ** 2.0
+        partials["duty_cycle", "dc_voltage_in"] = -np.diag(
+            inputs["dc_voltage_out"] / (inputs["dc_voltage_out"] + inputs["dc_voltage_in"]) ** 2.0
         )

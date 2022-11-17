@@ -25,7 +25,7 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "current",
+            "dc_current_one_cable",
             units="A",
             desc="current of line",
             shape=number_of_points,
@@ -91,7 +91,7 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         resistance_per_cable = inputs["resistance_per_cable"]
-        current = inputs["current"]
+        current = inputs["dc_current_one_cable"]
         cable_radius = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius"
         ]
@@ -119,7 +119,7 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         resistance_per_cable = inputs["resistance_per_cable"]
-        current = inputs["current"]
+        current = inputs["dc_current_one_cable"]
         cable_radius = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius"
         ]
@@ -138,7 +138,7 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         q_c = resistance_per_cable * current ** 2.0
         q_inf = 2.0 * cable_radius * cable_length * np.pi * h * (temp_cable - temp_ext)
 
-        partials["cable_temperature_time_derivative", "current"] = np.diag(
+        partials["cable_temperature_time_derivative", "dc_current_one_cable"] = np.diag(
             2.0 * resistance_per_cable * current / cable_heat_capacity
         )
         partials["cable_temperature_time_derivative", "resistance_per_cable"] = np.diag(

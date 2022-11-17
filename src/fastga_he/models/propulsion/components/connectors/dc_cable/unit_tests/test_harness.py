@@ -303,8 +303,8 @@ def test_perf_current():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("voltage_in", units="V", val=np.linspace(780, 800, NB_POINTS_TEST))
-    ivc.add_output("voltage_out", units="V", val=np.linspace(760, 770, NB_POINTS_TEST))
+    ivc.add_output("dc_voltage_in", units="V", val=np.linspace(780, 800, NB_POINTS_TEST))
+    ivc.add_output("dc_voltage_out", units="V", val=np.linspace(760, 770, NB_POINTS_TEST))
     ivc.add_output("resistance_per_cable", units="ohm", val=np.full(NB_POINTS_TEST, 0.0263))
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -316,7 +316,7 @@ def test_perf_current():
     )
     assert (
         problem.get_val(
-            "current",
+            "dc_current_one_cable",
             units="A",
         )
         == pytest.approx(expected_current, rel=1e-2)
@@ -338,7 +338,7 @@ def test_perf_tot_current():
     current = np.array(
         [760.46, 802.7, 844.95, 887.2, 929.45, 971.69, 1013.94, 1056.19, 1098.44, 1140.68]
     )
-    ivc.add_output("current", units="A", val=current)
+    ivc.add_output("dc_current_one_cable", units="A", val=current)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -349,7 +349,7 @@ def test_perf_tot_current():
     )
     assert (
         problem.get_val(
-            "total_current",
+            "dc_current",
             units="A",
         )
         == pytest.approx(expected_current, rel=1e-2)
@@ -372,7 +372,7 @@ def test_perf_temperature_derivative():
     )
     ivc.add_output("resistance_per_cable", units="ohm", val=np.full(NB_POINTS_TEST, 0.0263))
     ivc.add_output(
-        "current",
+        "dc_current_one_cable",
         units="A",
         val=np.linspace(110.0, 100.0, NB_POINTS_TEST),
     )
@@ -517,8 +517,8 @@ def test_performances_harness():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("voltage_in", units="V", val=np.linspace(800, 800, NB_POINTS_TEST))
-    ivc.add_output("voltage_out", units="V", val=np.linspace(799, 799, NB_POINTS_TEST))
+    ivc.add_output("dc_voltage_in", units="V", val=np.linspace(800, 800, NB_POINTS_TEST))
+    ivc.add_output("dc_voltage_out", units="V", val=np.linspace(799, 799, NB_POINTS_TEST))
     ivc.add_output(
         "exterior_temperature",
         units="degK",
