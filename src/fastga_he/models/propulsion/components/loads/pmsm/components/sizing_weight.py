@@ -27,7 +27,7 @@ class SizingMotorWeight(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque:cont",
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_caliber",
             val=np.nan,
             units="N*m",
             desc="Max continuous torque of the motor",
@@ -41,7 +41,7 @@ class SizingMotorWeight(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":mass",
-            wrt="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque:cont",
+            wrt="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_caliber",
             method="exact",
         )
 
@@ -49,7 +49,7 @@ class SizingMotorWeight(om.ExplicitComponent):
 
         motor_id = self.options["motor_id"]
 
-        torque_cont = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque:cont"]
+        torque_cont = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_caliber"]
 
         mass = 2.8 + 9.54e-3 * torque_cont + 0.1632 * torque_cont ** (3.0 / 3.5)
 
@@ -59,9 +59,9 @@ class SizingMotorWeight(om.ExplicitComponent):
 
         motor_id = self.options["motor_id"]
 
-        torque_cont = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque:cont"]
+        torque_cont = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_caliber"]
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":mass",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque:cont",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_caliber",
         ] = 9.54e-3 + 0.1632 * 3.0 / 3.5 * torque_cont ** (3.0 / 3.5 - 1.0)

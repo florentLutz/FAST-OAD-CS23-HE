@@ -20,9 +20,9 @@ class SizingMotorDiameterScaling(om.ExplicitComponent):
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
         self.options.declare(
-            "omega_max_ref",
-            default=4500.0 / 60 * 2.0 * np.pi,
-            desc="Max rotational speed of the reference motor in [rad/s]",
+            "rpm_max_ref",
+            default=4500.0,
+            desc="Max rotational speed of the reference motor in [rpm]",
         )
 
     def setup(self):
@@ -30,9 +30,9 @@ class SizingMotorDiameterScaling(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":omega:peak",
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_caliber",
             val=np.nan,
-            units="rad/s",
+            units="min**-1",
         )
 
         self.add_output(
@@ -41,7 +41,7 @@ class SizingMotorDiameterScaling(om.ExplicitComponent):
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter",
-            wrt="data:propulsion:he_power_train:PMSM:" + motor_id + ":omega:peak",
+            wrt="data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_caliber",
             method="exact",
         )
 
@@ -49,14 +49,14 @@ class SizingMotorDiameterScaling(om.ExplicitComponent):
 
         motor_id = self.options["motor_id"]
 
-        omega_max_ref = self.options["omega_max_ref"]
+        rpm_max_ref = self.options["rpm_max_ref"]
 
-        omega_max = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":omega:peak"]
+        rpm_max = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_caliber"]
 
-        omega_peak_scaling = omega_max / omega_max_ref
+        rpm_peak_scaling = rpm_max / rpm_max_ref
 
         # Mechanical limit
-        d_scaling = 1.0 / omega_peak_scaling
+        d_scaling = 1.0 / rpm_peak_scaling
 
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter"] = d_scaling
 
@@ -64,13 +64,13 @@ class SizingMotorDiameterScaling(om.ExplicitComponent):
 
         motor_id = self.options["motor_id"]
 
-        omega_max_ref = self.options["omega_max_ref"]
+        rpm_max_ref = self.options["rpm_max_ref"]
 
-        omega_max = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":omega:peak"]
+        rpm_max = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_caliber"]
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":omega:peak",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_caliber",
         ] = (
-            -1.0 * omega_max_ref / omega_max ** 2.0
+            -1.0 * rpm_max_ref / rpm_max ** 2.0
         )

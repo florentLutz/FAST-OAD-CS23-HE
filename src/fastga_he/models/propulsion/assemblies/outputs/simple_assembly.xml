@@ -75,7 +75,11 @@
         </DC_cable_harness>
         <PMSM>
           <motor_1>
+            <current_ac_max units="A" is_input="False">184.80516709572566<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
+            <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the motor rpm--></rpm_max>
             <torque_constant units="N*m/A" is_input="True">1.46</torque_constant>
+            <torque_max units="N*m" is_input="False">809.4466318792784<!--Maximum value of the torque the motor has to provide--></torque_max>
+            <voltage_ac_max units="V" is_input="False">413.0526427857553<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
             <loss_coefficient>
               <alpha units="W/N**2/m**2" is_input="True">0.025</alpha>
               <beta units="W*s/rad" is_input="True">3.38</beta>

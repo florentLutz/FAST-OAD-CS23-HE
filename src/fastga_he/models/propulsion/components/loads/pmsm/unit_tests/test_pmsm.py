@@ -5,6 +5,8 @@
 import numpy as np
 import pytest
 
+import openmdao.api as om
+
 from ..components.sizing_diameter_scaling import SizingMotorDiameterScaling
 from ..components.sizing_diameter import SizingMotorDiameter
 from ..components.sizing_length_scaling import SizingMotorLengthScaling
@@ -25,6 +27,7 @@ from ..components.perf_current_rms import PerformancesCurrentRMS
 from ..components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
+from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.sizing_pmsm import SizingPMSM
 from ..components.perf_pmsm import PerformancesPMSM
@@ -418,6 +421,47 @@ def test_peak_voltage():
     assert problem.get_val("ac_voltage_peak_in", units="V") == pytest.approx(
         [124.6, 128.1, 131.0, 134.7, 138.0, 141.8, 145.6, 149.5, 152.6, 156.2], rel=1e-2
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maximum():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "torque",
+        np.array([82.0, 91.0, 100.0, 108.0, 116.0, 123.0, 130.0, 136.0, 143.0, 149.0]),
+        units="N*m",
+    )
+    ivc.add_output("rpm", np.linspace(3500, 4500, NB_POINTS_TEST), units="min**-1")
+    ivc.add_output(
+        "ac_voltage_peak_in",
+        units="V",
+        val=np.array([124.6, 128.1, 131.0, 134.7, 138.0, 141.8, 145.6, 149.5, 152.6, 156.2]),
+    )
+    ivc.add_output(
+        "ac_current_rms_in_one_phase",
+        np.array([56.1, 62.3, 68.4, 73.9, 79.4, 84.2, 89.0, 93.1, 97.9, 102.0]),
+        units="A",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMaximum(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:current_ac_max", units="A"
+    ) == pytest.approx(102.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:voltage_ac_max", units="V"
+    ) == pytest.approx(156.2, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:torque_max", units="N*m"
+    ) == pytest.approx(149.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:rpm_max", units="min**-1"
+    ) == pytest.approx(4500.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

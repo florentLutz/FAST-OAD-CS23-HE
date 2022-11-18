@@ -5,15 +5,9 @@
                 <PMSM>
                     <motor_1>
                         <torque_constant units="N*m/A">1.46</torque_constant>
-                        <voltage>
-                            <peak units="V">700.0</peak>
-                        </voltage>
-                        <torque>
-                            <cont units="N*m">150.0</cont>
-                        </torque>
-                        <omega>
-                            <peak units="rad/s">523.59</peak>
-                        </omega>
+                        <torque_caliber units="N*m">150.0</torque_caliber>
+                        <voltage_caliber units="V">700.0</voltage_caliber>
+                        <rpm_caliber units="min**-1">5000.0</rpm_caliber>
                         <loss_coefficient>
                             <alpha units="W/N**2/m**2">0.025</alpha>
                             <beta units="W*s/rad">3.38</beta>

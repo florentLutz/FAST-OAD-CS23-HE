@@ -13,6 +13,7 @@ from .perf_current_rms import PerformancesCurrentRMS
 from .perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from .perf_voltage_rms import PerformancesVoltageRMS
 from .perf_voltage_peak import PerformancesVoltagePeak
+from .perf_maximum import PerformancesMaximum
 
 
 class PerformancesPMSM(om.Group):
@@ -78,9 +79,15 @@ class PerformancesPMSM(om.Group):
             promotes=["ac_voltage_peak_in", "ac_voltage_rms_in"],
         )
 
+        self.add_subsystem(
+            "maximum",
+            PerformancesMaximum(number_of_points=number_of_points, motor_id=motor_id),
+            promotes=["data:*", "ac_current_rms_in_one_phase", "ac_voltage_peak_in", "rpm"],
+        )
+
         self.connect(
             "torque.torque",
-            ["losses.torque", "current_rms.torque"],
+            ["losses.torque", "current_rms.torque", "maximum.torque"],
         )
 
         self.connect(

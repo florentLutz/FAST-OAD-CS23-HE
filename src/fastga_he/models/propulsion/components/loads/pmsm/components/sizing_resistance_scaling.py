@@ -32,7 +32,7 @@ class SizingMotorPhaseResistanceScaling(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage:peak",
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
             val=np.nan,
             units="V",
             desc="Max voltage of the motor",
@@ -55,7 +55,7 @@ class SizingMotorPhaseResistanceScaling(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:phase_resistance",
             wrt=[
-                "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage:peak",
+                "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter",
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length",
             ],
@@ -68,7 +68,7 @@ class SizingMotorPhaseResistanceScaling(om.ExplicitComponent):
 
         max_voltage_ref = self.options["max_voltage_ref"]
 
-        max_voltage = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage:peak"]
+        max_voltage = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber"]
         d_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter"]
         l_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length"]
 
@@ -86,7 +86,7 @@ class SizingMotorPhaseResistanceScaling(om.ExplicitComponent):
 
         max_voltage_ref = self.options["max_voltage_ref"]
 
-        max_voltage = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage:peak"]
+        max_voltage = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber"]
         d_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter"]
         l_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length"]
 
@@ -94,7 +94,7 @@ class SizingMotorPhaseResistanceScaling(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:phase_resistance",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage:peak",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
         ] = (
             2.0 * max_voltage / max_voltage_ref ** 2.0 * l_scaling ** -2.62 * d_scaling ** -1.12
         )
