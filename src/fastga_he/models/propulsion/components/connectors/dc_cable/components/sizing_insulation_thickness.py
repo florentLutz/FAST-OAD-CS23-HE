@@ -53,7 +53,14 @@ class SizingInsulationThickness(om.ExplicitComponent):
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:breakdown_voltage",
             units="V",
             val=340,
-            desc="Mininum breakdown voltage of air cavity",
+            desc="Minimum breakdown voltage of air cavity",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:k_factor_radius",
+            val=1.0,
+            desc="K-factor to increase the radius of the insulation",
         )
 
         self.add_output(
@@ -84,6 +91,11 @@ class SizingInsulationThickness(om.ExplicitComponent):
         alpha = inputs[
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:breakdown_voltage"
         ]
+        k_factor = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:k_factor_radius"
+        ]
 
         shape_factor = 3.0 * dielectric_permittivity / (1.0 + 2.0 * dielectric_permittivity)
 
@@ -103,7 +115,7 @@ class SizingInsulationThickness(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":insulation:thickness"
-        ] = t_i
+        ] = (t_i * k_factor)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -130,6 +142,11 @@ class SizingInsulationThickness(om.ExplicitComponent):
         alpha = inputs[
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:breakdown_voltage"
         ]
+        k_factor = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:k_factor_radius"
+        ]
 
         shape_factor = 3.0 * dielectric_permittivity / (1.0 + 2.0 * dielectric_permittivity)
         d_sf_d_permittivity = 3.0 / (1.0 + 2.0 * dielectric_permittivity) ** 2.0
@@ -140,6 +157,11 @@ class SizingInsulationThickness(om.ExplicitComponent):
         else:
             d_factor_d_v_max = shape_factor * t_v / (alpha * radius_conductor)
 
+        if v_max > 20000.0:
+            c_factor = 0.0
+        else:
+            c_factor = 0.1e-2
+
         factor_exp = (shape_factor * v_max * t_v) / (alpha * radius_conductor)
         d_factor_d_sf = v_max * t_v / (alpha * radius_conductor)
         d_factor_d_t_v = shape_factor * v_max / (alpha * radius_conductor)
@@ -149,34 +171,44 @@ class SizingInsulationThickness(om.ExplicitComponent):
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
-        ] = (np.exp(factor_exp) - 1.0) + radius_conductor * np.exp(factor_exp) * d_factor_d_r_c
+        ] = (np.exp(factor_exp) - 1.0) + radius_conductor * np.exp(
+            factor_exp
+        ) * d_factor_d_r_c * k_factor
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max",
         ] = (
-            radius_conductor * np.exp(factor_exp) * d_factor_d_v_max
+            radius_conductor * np.exp(factor_exp) * d_factor_d_v_max * k_factor
         )
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:dielectric_permittivity",
         ] = (
-            radius_conductor * np.exp(factor_exp) * d_factor_d_sf * d_sf_d_permittivity
+            radius_conductor * np.exp(factor_exp) * d_factor_d_sf * d_sf_d_permittivity * k_factor
         )
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:void_thickness",
         ] = (
-            radius_conductor * np.exp(factor_exp) * d_factor_d_t_v
+            radius_conductor * np.exp(factor_exp) * d_factor_d_t_v * k_factor
         )
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:breakdown_voltage",
         ] = (
-            radius_conductor * np.exp(factor_exp) * d_factor_d_alpha
+            radius_conductor * np.exp(factor_exp) * d_factor_d_alpha * k_factor
         )
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:breakdown_voltage",
         ] = (
-            radius_conductor * np.exp(factor_exp) * d_factor_d_alpha
+            radius_conductor * np.exp(factor_exp) * d_factor_d_alpha * k_factor
+        )
+        partials[
+            output_str,
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:k_factor_radius",
+        ] = (
+            radius_conductor * (np.exp(factor_exp) - 1.0) + c_factor
         )

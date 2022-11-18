@@ -5,8 +5,7 @@
 import openmdao.api as om
 
 from .perf_electric_node import PerformancesElectricalNode
-from .perf_maximum_current import PerformancesMaximumCurrent
-from .perf_maximum_voltage import PerformancesMaximumVoltage
+from .perf_maximum import PerformancesMaximum
 
 
 class PerformancesDCBus(om.Group):
@@ -54,19 +53,11 @@ class PerformancesDCBus(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            name="maximum_current",
-            subsys=PerformancesMaximumCurrent(
+            name="maximum",
+            subsys=PerformancesMaximum(
                 dc_bus_id=dc_bus_id,
                 number_of_points=number_of_points,
                 number_of_inputs=number_of_inputs,
-            ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="maximum_voltage",
-            subsys=PerformancesMaximumVoltage(
-                dc_bus_id=dc_bus_id,
-                number_of_points=number_of_points,
             ),
             promotes=["*"],
         )

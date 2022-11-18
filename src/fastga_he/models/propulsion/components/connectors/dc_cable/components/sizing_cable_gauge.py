@@ -195,6 +195,13 @@ class _SolutionGauge(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         self.add_input("log_solution")
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":conductor:k_factor_radius",
+            val=1.0,
+            desc="K-factor to increase the radius of the conducting core",
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:"
@@ -216,31 +223,57 @@ class _SolutionGauge(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         section = np.exp(inputs["log_solution"])
+        k_factor = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":conductor:k_factor_radius"
+        ]
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section"
-        ] = section
+        ] = (section * k_factor ** 2.0)
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius"
-        ] = np.sqrt(section / np.pi)
+        ] = (np.sqrt(section / np.pi) * k_factor)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         harness_id = self.options["harness_id"]
 
         section = np.exp(inputs["log_solution"])
+        k_factor = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":conductor:k_factor_radius"
+        ]
 
         d_section_d_log_solution = np.exp(inputs["log_solution"])
 
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section",
             "log_solution",
-        ] = d_section_d_log_solution
+        ] = (
+            d_section_d_log_solution * k_factor ** 2.0
+        )
+        partials[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section",
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":conductor:k_factor_radius",
+        ] = (
+            section * 2.0 * k_factor
+        )
 
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
             "log_solution",
         ] = (
-            0.5 * np.sqrt(1.0 / (section * np.pi)) * d_section_d_log_solution
+            0.5 * np.sqrt(1.0 / (section * np.pi)) * d_section_d_log_solution * k_factor
         )
+        partials[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":conductor:k_factor_radius",
+        ] = np.sqrt(section / np.pi)

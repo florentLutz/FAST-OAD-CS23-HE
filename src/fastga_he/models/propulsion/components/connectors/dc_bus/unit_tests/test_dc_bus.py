@@ -6,8 +6,7 @@ import openmdao.api as om
 import pytest
 import numpy as np
 
-from ..components.perf_maximum_current import PerformancesMaximumCurrent
-from ..components.perf_maximum_voltage import PerformancesMaximumVoltage
+from ..components.perf_maximum import PerformancesMaximum
 from ..components.sizing_bus_cross_section_area import SizingBusBarCrossSectionArea
 from ..components.sizing_bus_bar_cross_section_dimensions import SizingBusBarCrossSectionDimensions
 from ..components.sizing_insulation_thickness import SizingBusBarInsulationThickness
@@ -27,44 +26,30 @@ NB_POINTS_TEST = 10
 # in the assemblies
 
 
-def test_maximum_current():
-
-    ivc = om.IndepVarComp()
-    current_1 = np.array([385.5, 430.0, 334.8, 494.6, 374.2, 427.3, 495.3, 468.6, 368.9, 354.2])
-    ivc.add_output("dc_current_in_1", units="A", val=current_1)
-    current_2 = np.array([356.5, 360.1, 345.2, 446.6, 324.2, 352.8, 332.1, 388.2, 434.4, 428.0])
-    ivc.add_output("dc_current_in_2", units="A", val=current_2)
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesMaximumCurrent(
-            dc_bus_id="dc_bus_1", number_of_inputs=2, number_of_points=NB_POINTS_TEST
-        ),
-        ivc,
-    )
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:DC_bus:dc_bus_1:current_max", units="A"
-    ) == pytest.approx(941.2, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_maximum_voltage():
+def test_maximum():
 
     ivc = om.IndepVarComp()
     voltage = np.array([539.1, 506.3, 588.2, 425.0, 572.7, 512.8, 483.4, 466.9, 497.9, 511.4])
     ivc.add_output("dc_voltage", units="V", val=voltage)
+    current_1 = np.array([385.5, 430.0, 334.8, 494.6, 470.2, 427.3, 490.3, 468.6, 368.9, 354.2])
+    ivc.add_output("dc_current_in_1", units="A", val=current_1)
+    current_2 = np.array([356.5, 360.1, 345.2, 346.6, 470.2, 482.8, 332.1, 388.2, 434.4, 428.0])
+    ivc.add_output("dc_current_in_2", units="A", val=current_2)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesMaximumVoltage(dc_bus_id="dc_bus_1", number_of_points=NB_POINTS_TEST),
+        PerformancesMaximum(
+            dc_bus_id="dc_bus_1", number_of_points=NB_POINTS_TEST, number_of_inputs=2
+        ),
         ivc,
     )
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_bus:dc_bus_1:voltage_max", units="V"
     ) == pytest.approx(588.2, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_bus:dc_bus_1:current_max", units="A"
+    ) == pytest.approx(940.4, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
