@@ -1,0 +1,147 @@
+<FASTOAD_model>
+  <altitude units="m" is_input="True">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</altitude>
+  <exterior_temperature units="degK" is_input="True">[288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15]<!--temperature outside of the cable--></exterior_temperature>
+  <thrust units="N" is_input="True">[1550.0, 1538.888888888889, 1527.7777777777778, 1516.6666666666667, 1505.5555555555557, 1494.4444444444443, 1483.3333333333333, 1472.2222222222222, 1461.111111111111, 1450.0]</thrust>
+  <time_step units="s" is_input="True">[500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0]</time_step>
+  <true_airspeed units="m/s" is_input="True">[81.8, 82.76666666666667, 83.73333333333333, 84.7, 85.66666666666667, 86.63333333333333, 87.6, 88.56666666666666, 89.53333333333333, 90.5]</true_airspeed>
+  <data>
+    <propulsion>
+      <he_power_train>
+        <DC_DC_converter>
+          <dc_dc_converter_1>
+            <voltage_in_max units="V" is_input="False">803.9418220190063</voltage_in_max>
+            <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
+            <capacitor>
+              <current_max units="A" is_input="False">242.65781593372262</current_max>
+              <resistance units="ohm" is_input="True">0.0014</resistance>
+            </capacitor>
+            <diode>
+              <current_max units="A" is_input="False">331.70312303903376</current_max>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+              <resistance units="ohm" is_input="True">0.002805</resistance>
+            </diode>
+            <energy_off>
+              <a is_input="True">0.02261044</a>
+              <b is_input="True">0.000254</b>
+              <c is_input="True">-1.158e-07</c>
+            </energy_off>
+            <energy_on>
+              <a is_input="True">0.02379429</a>
+              <b is_input="True">3.326e-05</b>
+              <c is_input="True">3.42e-07</c>
+            </energy_on>
+            <energy_rr>
+              <a is_input="True">0.00637224</a>
+              <b is_input="True">0.00034</b>
+              <c is_input="True">-3.005e-08</c>
+            </energy_rr>
+            <igbt>
+              <current_max units="A" is_input="False">355.91466131316224</current_max>
+              <resistance units="ohm" is_input="True">0.002265</resistance>
+            </igbt>
+            <inductor>
+              <current_max units="A" is_input="False">486.5205113574466</current_max>
+              <resistance units="ohm" is_input="True">0.0014</resistance>
+            </inductor>
+          </dc_dc_converter_1>
+        </DC_DC_converter>
+        <DC_bus>
+          <dc_bus_1>
+            <current_max units="A" is_input="False">226.15071567457832</current_max>
+            <voltage_max units="V" is_input="False">849.2910473970165</voltage_max>
+          </dc_bus_1>
+          <dc_bus_2>
+            <current_max units="A" is_input="False">226.15071567457832</current_max>
+            <voltage_max units="V" is_input="False">850.0</voltage_max>
+          </dc_bus_2>
+        </DC_bus>
+        <DC_cable_harness>
+          <harness_1>
+            <current_max units="A" is_input="False">225.0029584032933</current_max>
+            <length units="m" is_input="True">7.0</length>
+            <number_cables is_input="True">1.0</number_cables>
+            <temperature_max units="degK" is_input="False">338.3847959107375</temperature_max>
+            <voltage_max units="V" is_input="False">850.0</voltage_max>
+            <cable>
+              <heat_capacity units="J/degK" is_input="True">7000.0</heat_capacity>
+              <initial_temperature units="degK" is_input="True">288.15</initial_temperature>
+              <radius units="mm" is_input="True">6.47</radius>
+              <resistance units="ohm" is_input="True">0.00333</resistance>
+            </cable>
+            <properties>
+              <resistance_temperature_scale_factor units="1/degK" is_input="True">0.00393</resistance_temperature_scale_factor>
+            </properties>
+          </harness_1>
+        </DC_cable_harness>
+        <PMSM>
+          <motor_1>
+            <torque_constant units="N*m/A" is_input="True">1.46</torque_constant>
+            <loss_coefficient>
+              <alpha units="W/N**2/m**2" is_input="True">0.025</alpha>
+              <beta units="W*s/rad" is_input="True">3.38</beta>
+              <gamma units="W*s**2/rad**2" is_input="True">0.00825</gamma>
+            </loss_coefficient>
+          </motor_1>
+        </PMSM>
+        <battery_pack>
+          <battery_pack_1>
+            <number_modules is_input="True">40.0<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <cell>
+              <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
+            </cell>
+            <module>
+              <number_cells is_input="True">200.0<!--Number of cells in series inside one battery module--></number_cells>
+            </module>
+          </battery_pack_1>
+        </battery_pack>
+        <inverter>
+          <inverter_1>
+            <power_factor is_input="True">1.0</power_factor>
+            <casing>
+              <thermal_resistance units="degK/W" is_input="True">0.021<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
+            </casing>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+              <resistance units="ohm" is_input="True">0.00258995</resistance>
+              <thermal_resistance units="degK/W" is_input="True">0.148195<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
+            </diode>
+            <energy_off>
+              <a is_input="True">0.02087697</a>
+              <b is_input="True">0.000254</b>
+              <c is_input="True">-1.256e-07</c>
+            </energy_off>
+            <energy_on>
+              <a is_input="True">0.02197006</a>
+              <b is_input="True">3.326e-05</b>
+              <c is_input="True">3.707e-07</c>
+            </energy_on>
+            <energy_rr>
+              <a is_input="True">0.0058837</a>
+              <b is_input="True">0.00034</b>
+              <c is_input="True">-3.257e-08</c>
+            </energy_rr>
+            <igbt>
+              <gate_voltage units="V" is_input="True">0.87</gate_voltage>
+              <resistance units="ohm" is_input="True">0.00209135</resistance>
+              <thermal_resistance units="degK/W" is_input="True">0.114955<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
+            </igbt>
+            <properties>
+              <resistance_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">0.0033</diode>
+                <igbt units="1/degK" is_input="True">0.0041</igbt>
+              </resistance_temperature_scale_factor>
+            </properties>
+          </inverter_1>
+        </inverter>
+        <propeller>
+          <propeller_1>
+            <activity_factor is_input="True">150.0<!--Activity factor of the propeller--></activity_factor>
+            <blade_twist units="deg" is_input="True">22.6<!--Twist between the propeller blade root and tip--></blade_twist>
+            <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
+            <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
+          </propeller_1>
+        </propeller>
+      </he_power_train>
+    </propulsion>
+  </data>
+</FASTOAD_model>

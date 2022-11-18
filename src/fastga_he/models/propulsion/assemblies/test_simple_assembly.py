@@ -8,6 +8,7 @@ import pytest
 from stdatm import Atmosphere
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
+from utils.write_outputs import write_outputs
 
 from ..components.loads.pmsm import PerformancesPMSM, SizingPMSM
 from ..components.propulsor.propeller import PerformancesPropeller, SizingPropeller
@@ -232,17 +233,19 @@ def test_assembly():
     ) * problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                186592.0,
-                187529.0,
-                188449.0,
-                189352.0,
-                190239.0,
-                191109.0,
-                191962.0,
-                192798.0,
-                193618.0,
-                194420.0,
+                186861.0,
+                187805.0,
+                188732.0,
+                189643.0,
+                190536.0,
+                191413.0,
+                192272.0,
+                193114.0,
+                193938.0,
+                194745.0,
             ]
         ),
         abs=1,
     )
+
+    write_outputs("outputs/simple_assembly.xml", problem)
