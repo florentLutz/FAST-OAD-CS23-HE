@@ -13,6 +13,7 @@ from .perf_casing_temperature import PerformancesCasingTemperature
 from .perf_junction_temperature import PerformancesJunctionTemperature
 from .perf_efficiency import PerformancesEfficiency
 from .perf_dc_current import PerformancesDCCurrent
+from .perf_maximum import PerformancesMaximum
 
 
 class PerformancesInverter(om.Group):
@@ -99,6 +100,17 @@ class PerformancesInverter(om.Group):
                 "dc_current_in",
             ],
         )
+        self.add_subsystem(
+            "maximum",
+            PerformancesMaximum(inverter_id=inverter_id, number_of_points=number_of_points),
+            promotes=[
+                "data:*",
+                "ac_current_rms_out_one_phase",
+                "dc_voltage_in",
+                "ac_voltage_peak_out",
+                "dc_current_in",
+            ],
+        )
 
         self.connect("modulation_idx.modulation_index", "conduction_losses.modulation_index")
         self.connect("resistance.resistance_igbt", "conduction_losses.resistance_igbt")
@@ -127,8 +139,15 @@ class PerformancesInverter(om.Group):
             ["temperature_casing.losses_inverter", "efficiency.losses_inverter"],
         )
         self.connect(
-            "temperature_casing.casing_temperature", "temperature_junction.casing_temperature"
+            "temperature_casing.casing_temperature",
+            ["temperature_junction.casing_temperature", "maximum.casing_temperature"],
         )
-        self.connect("temperature_junction.diode_temperature", "resistance.diode_temperature")
-        self.connect("temperature_junction.IGBT_temperature", "resistance.IGBT_temperature")
+        self.connect(
+            "temperature_junction.diode_temperature",
+            ["resistance.diode_temperature", "maximum.diode_temperature"],
+        )
+        self.connect(
+            "temperature_junction.IGBT_temperature",
+            ["resistance.IGBT_temperature", "maximum.IGBT_temperature"],
+        )
         self.connect("efficiency.efficiency", "dc_side_current.efficiency")

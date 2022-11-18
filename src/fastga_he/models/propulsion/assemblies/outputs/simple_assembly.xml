@@ -96,13 +96,19 @@
         </battery_pack>
         <inverter>
           <inverter_1>
+            <current_ac_max units="A" is_input="False">184.80516709572566<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
+            <current_dc_max units="A" is_input="False">226.15071955015515<!--Maximum value of the current at the input of the inverter--></current_dc_max>
             <power_factor is_input="True">1.0</power_factor>
+            <voltage_ac_max units="V" is_input="False">413.0526427857553<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
+            <voltage_dc_max units="V" is_input="False">849.2910473970165<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
             <casing>
+              <temperature_max units="degK" is_input="False">323.4898480142347</temperature_max>
               <thermal_resistance units="degK/W" is_input="True">0.021<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
             </casing>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="True">0.00258995</resistance>
+              <temperature_max units="degK" is_input="False">368.4975193341876</temperature_max>
               <thermal_resistance units="degK/W" is_input="True">0.148195<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
             </diode>
             <energy_off>
@@ -123,6 +129,7 @@
             <igbt>
               <gate_voltage units="V" is_input="True">0.87</gate_voltage>
               <resistance units="ohm" is_input="True">0.00209135</resistance>
+              <temperature_max units="degK" is_input="False">385.30336074801625</temperature_max>
               <thermal_resistance units="degK/W" is_input="True">0.114955<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <properties>

@@ -53,6 +53,7 @@ from ..components.perf_casing_temperature import PerformancesCasingTemperature
 from ..components.perf_junction_temperature import PerformancesJunctionTemperature
 from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_dc_current import PerformancesDCCurrent
+from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_inverter import PerformancesInverter
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -1100,6 +1101,78 @@ def test_dc_current():
         ),
         rel=1e-2,
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maximum():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("dc_voltage_in", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
+    ivc.add_output(
+        "dc_current_in",
+        units="A",
+        val=np.array(
+            [349.75, 418.87, 491.76, 567.73, 647.88, 731.82, 818.57, 909.87, 1004.04, 1102.78]
+        ),
+    )
+    ivc.add_output(
+        name="ac_current_rms_out_one_phase",
+        val=np.linspace(200.0, 500.0, NB_POINTS_TEST),
+        units="A",
+    )
+    ivc.add_output(
+        "ac_voltage_peak_out",
+        units="V",
+        val=np.array([710.4, 728.5, 747.6, 767.2, 787.1, 807.5, 827.9, 848.6, 869.6, 890.5]),
+    )
+    ivc.add_output(
+        "diode_temperature",
+        units="degK",
+        val=np.array(
+            [312.12, 320.97, 331.02, 342.22, 354.49, 367.82, 382.16, 397.47, 413.68, 430.77]
+        ),
+    )
+    ivc.add_output(
+        "IGBT_temperature",
+        units="degK",
+        val=np.array(
+            [313.2, 323.73, 335.91, 349.78, 365.44, 382.98, 402.43, 423.93, 447.43, 473.05]
+        ),
+    )
+    ivc.add_output(
+        "casing_temperature",
+        units="degK",
+        val=np.array(
+            [293.95, 296.26, 298.92, 301.92, 305.26, 308.97, 313.03, 317.47, 322.26, 327.43]
+        ),
+    )
+
+    problem = run_system(
+        PerformancesMaximum(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:current_ac_max", units="A"
+    ) == pytest.approx(500.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:voltage_ac_max", units="V"
+    ) == pytest.approx(890.5, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:current_dc_max", units="A"
+    ) == pytest.approx(1102.78, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:voltage_dc_max", units="V"
+    ) == pytest.approx(1000.5, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:igbt:temperature_max", units="degK"
+    ) == pytest.approx(473.05, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:diode:temperature_max", units="degK"
+    ) == pytest.approx(430.77, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:casing:temperature_max", units="degK"
+    ) == pytest.approx(327.43, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
