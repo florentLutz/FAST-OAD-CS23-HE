@@ -5,6 +5,8 @@
 import numpy as np
 import pytest
 
+import openmdao.api as om
+
 from ..components.sizing_weight import SizingPropellerWeight
 from ..components.perf_advance_ratio import PerformancesAdvanceRatio
 from ..components.perf_tip_mach import PerformancesTipMach
@@ -13,6 +15,8 @@ from ..components.perf_blade_reynolds import PerformancesBladeReynoldsNumber
 from ..components.perf_power_coefficient import PerformancesPowerCoefficient
 from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_shaft_power import PerformancesShaftPower
+from ..components.perf_torque import PerformancesTorque
+from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.perf_propeller import PerformancesPropeller
 from ..components.sizing_propeller import SizingPropeller
@@ -285,6 +289,70 @@ def test_shaft_power():
         np.array([178.0, 178.8, 179.1, 181.5, 181.8, 182.6, 183.1, 183.4, 184.2, 186.4]),
         rel=1e-2,
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_torque():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500), units="min**-1")
+    ivc.add_output(
+        "shaft_power_in",
+        val=np.array([178.0, 178.8, 179.1, 181.5, 181.8, 182.6, 183.1, 183.4, 184.2, 186.4]),
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTorque(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("torque_in", units="N*m") == pytest.approx(
+        np.array([679.9, 683.0, 684.1, 693.3, 694.4, 697.5, 699.4, 700.5, 703.6, 712.0]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maximum():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500), units="min**-1")
+    ivc.add_output(
+        "torque_in",
+        val=np.array([679.9, 683.0, 684.1, 693.3, 694.4, 697.5, 699.4, 700.5, 703.6, 712.0]),
+        units="N*m",
+    )
+    ivc.add_output(
+        "advance_ratio",
+        val=np.array([0.99, 1.0, 1.01, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.1]),
+    )
+    ivc.add_output(
+        "tip_mach",
+        val=np.array([0.639, 0.64, 0.641, 0.643, 0.644, 0.646, 0.647, 0.649, 0.65, 0.652]),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMaximum(propeller_id="propeller_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:tip_mach_max"
+    ) == pytest.approx(0.652, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:advance_ratio_max"
+    ) == pytest.approx(1.1, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:torque_max", units="N*m"
+    ) == pytest.approx(712.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:rpm_max", units="min**-1"
+    ) == pytest.approx(2500.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

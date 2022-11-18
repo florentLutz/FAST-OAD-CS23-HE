@@ -23,7 +23,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("torque", units="N*m", val=np.nan, shape=number_of_points)
+        self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
         self.add_input(
             name="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant",
             val=1.0,
@@ -44,7 +44,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
 
         motor_id = self.options["motor_id"]
 
-        torque = inputs["torque"]
+        torque = inputs["torque_out"]
         k_t = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant"]
 
         rms_current = torque / k_t
@@ -56,10 +56,10 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
-        torque = inputs["torque"]
+        torque = inputs["torque_out"]
         k_t = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant"]
 
-        partials["ac_current_rms_in", "torque"] = np.eye(number_of_points) / k_t
+        partials["ac_current_rms_in", "torque_out"] = np.eye(number_of_points) / k_t
         partials[
             "ac_current_rms_in",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant",

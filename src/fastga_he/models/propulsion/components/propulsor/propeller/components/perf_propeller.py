@@ -11,6 +11,8 @@ from .perf_thrust_coefficient import PerformancesThrustCoefficient
 from .perf_power_coefficient import PerformancesPowerCoefficient
 from .perf_efficiency import PerformancesEfficiency
 from .perf_shaft_power import PerformancesShaftPower
+from .perf_torque import PerformancesTorque
+from .perf_maximum import PerformancesMaximum
 
 
 class PerformancesPropeller(om.Group):
@@ -71,11 +73,26 @@ class PerformancesPropeller(om.Group):
             promotes=["data:*", "altitude", "shaft_power_in", "rpm"],
         )
 
+        self.add_subsystem(
+            "torque",
+            PerformancesTorque(number_of_points=number_of_points),
+            promotes=["shaft_power_in", "rpm"],
+        )
+        self.add_subsystem(
+            "maximum",
+            PerformancesMaximum(propeller_id=propeller_id, number_of_points=number_of_points),
+            promotes=["data:*", "rpm"],
+        )
+
         self.connect(
             "advance_ratio.advance_ratio",
-            ["power_coefficient.advance_ratio", "efficiency.advance_ratio"],
+            [
+                "power_coefficient.advance_ratio",
+                "efficiency.advance_ratio",
+                "maximum.advance_ratio",
+            ],
         )
-        self.connect("tip_mach.tip_mach", "power_coefficient.tip_mach")
+        self.connect("tip_mach.tip_mach", ["power_coefficient.tip_mach", "maximum.tip_mach"])
         self.connect("blade_diameter_reynolds.reynolds_D", "power_coefficient.reynolds_D")
         self.connect(
             "thrust_coefficient.thrust_coefficient",
@@ -85,3 +102,4 @@ class PerformancesPropeller(om.Group):
             "power_coefficient.power_coefficient",
             ["shaft_power.power_coefficient", "efficiency.power_coefficient"],
         )
+        self.connect("torque.torque_in", "maximum.torque_in")

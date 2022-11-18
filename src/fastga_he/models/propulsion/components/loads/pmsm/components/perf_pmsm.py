@@ -86,8 +86,8 @@ class PerformancesPMSM(om.Group):
         )
 
         self.connect(
-            "torque.torque",
-            ["losses.torque", "current_rms.torque", "maximum.torque"],
+            "torque.torque_out",
+            ["losses.torque_out", "current_rms.torque_out", "maximum.torque_out"],
         )
 
         self.connect(

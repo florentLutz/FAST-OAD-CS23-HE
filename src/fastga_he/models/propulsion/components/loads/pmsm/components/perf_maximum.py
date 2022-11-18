@@ -37,7 +37,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
             desc="Peak line to neutral voltage at the input of the motor",
         )
-        self.add_input("torque", units="N*m", val=np.nan, shape=number_of_points)
+        self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
 
         self.add_output(
@@ -72,7 +72,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_max",
-            wrt="torque",
+            wrt="torque_out",
             method="exact",
         )
 
@@ -99,7 +99,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             inputs["ac_voltage_peak_in"]
         )
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_max"] = np.max(
-            inputs["torque"]
+            inputs["torque_out"]
         )
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_max"] = np.max(
             inputs["rpm"]
@@ -122,8 +122,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             "ac_voltage_peak_in",
         ] = np.where(inputs["ac_voltage_peak_in"] == np.max(inputs["ac_voltage_peak_in"]), 1.0, 0.0)
         partials[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_max", "torque"
-        ] = np.where(inputs["torque"] == np.max(inputs["torque"]), 1.0, 0.0)
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_max", "torque_out"
+        ] = np.where(inputs["torque_out"] == np.max(inputs["torque_out"]), 1.0, 0.0)
         partials["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_max", "rpm"] = np.where(
             inputs["rpm"] == np.max(inputs["rpm"]), 1.0, 0.0
         )

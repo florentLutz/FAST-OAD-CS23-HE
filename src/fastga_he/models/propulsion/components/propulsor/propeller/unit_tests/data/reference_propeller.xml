@@ -10,9 +10,7 @@
                         <diameter units="inch">78.0</diameter>
                         <number_blades>3</number_blades>
                         <material>0.0</material>
-                        <torque>
-                            <cont units="N*m">817.0</cont>
-                        </torque>
+                        <torque_caliber units="N*m">817.0</torque_caliber>
                     </propeller_1>
                 </propeller>
             </he_power_train>

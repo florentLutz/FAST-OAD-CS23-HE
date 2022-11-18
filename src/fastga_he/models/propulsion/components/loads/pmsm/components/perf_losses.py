@@ -30,7 +30,7 @@ class PerformancesLosses(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("torque", units="N*m", val=np.nan, shape=number_of_points)
+        self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
 
         self.add_input(
@@ -57,7 +57,7 @@ class PerformancesLosses(om.ExplicitComponent):
 
         motor_id = self.options["motor_id"]
 
-        torque = inputs["torque"]
+        torque = inputs["torque_out"]
         rpm = inputs["rpm"]
 
         omega = rpm * 2.0 * np.pi / 60.0
@@ -78,7 +78,7 @@ class PerformancesLosses(om.ExplicitComponent):
 
         motor_id = self.options["motor_id"]
 
-        torque = inputs["torque"]
+        torque = inputs["torque_out"]
         rpm = inputs["rpm"]
 
         omega = rpm * 2.0 * np.pi / 60.0
@@ -91,7 +91,7 @@ class PerformancesLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":loss_coefficient:gamma"
         ]
 
-        partials["power_losses", "torque"] = np.diag(2.0 * alpha * torque)
+        partials["power_losses", "torque_out"] = np.diag(2.0 * alpha * torque)
         partials["power_losses", "rpm"] = np.diag(beta + 2.0 * gamma * omega) * 2.0 * np.pi / 60.0
         partials[
             "power_losses",

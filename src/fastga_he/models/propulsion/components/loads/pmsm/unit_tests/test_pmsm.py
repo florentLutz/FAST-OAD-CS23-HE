@@ -222,7 +222,7 @@ def test_torque():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(PerformancesTorque(number_of_points=NB_POINTS_TEST), ivc)
 
-    assert problem.get_val("torque", units="N*m") == pytest.approx(
+    assert problem.get_val("torque_out", units="N*m") == pytest.approx(
         [82.0, 91.0, 100.0, 108.0, 116.0, 123.0, 130.0, 136.0, 143.0, 149.0], rel=1e-2
     )
 
@@ -237,7 +237,7 @@ def test_losses():
         XML_FILE,
     )
     ivc.add_output(
-        "torque",
+        "torque_out",
         np.array([82.0, 91.0, 100.0, 108.0, 116.0, 123.0, 130.0, 136.0, 143.0, 149.0]),
         units="N*m",
     )
@@ -331,7 +331,7 @@ def test_rms_current():
         XML_FILE,
     )
     ivc.add_output(
-        "torque",
+        "torque_out",
         np.array([82.0, 91.0, 100.0, 108.0, 116.0, 123.0, 130.0, 136.0, 143.0, 149.0]),
         units="N*m",
     )
@@ -429,7 +429,7 @@ def test_maximum():
 
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "torque",
+        "torque_out",
         np.array([82.0, 91.0, 100.0, 108.0, 116.0, 123.0, 130.0, 136.0, 143.0, 149.0]),
         units="N*m",
     )
