@@ -89,9 +89,13 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
+            <SOC_min units="percent" is_input="False">61.31941619408079<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <c_rate_max units="1/h" is_input="False">0.32972442688062953<!--Minimum state-of-charge of the battery during the mission--></c_rate_max>
             <number_modules is_input="True">40.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
+              <voltage_max units="V" is_input="False">4.019709110095031<!--Maximum voltage needed by the cells during the mission--></voltage_max>
+              <voltage_min units="V" is_input="False">3.691444090697407<!--Minimum voltage provided by the cells during the mission--></voltage_min>
             </cell>
             <module>
               <number_cells is_input="True">200.0<!--Number of cells in series inside one battery module--></number_cells>

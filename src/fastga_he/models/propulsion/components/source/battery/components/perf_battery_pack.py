@@ -18,6 +18,7 @@ from ..components.perf_entropic_heat_coefficient import PerformancesEntropicHeat
 from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
 from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
+from ..components.perf_maximum import PerformancesMaximum
 
 
 class PerformancesBatteryPack(om.Group):
@@ -128,6 +129,11 @@ class PerformancesBatteryPack(om.Group):
             ),
             promotes=["data:*"],
         )
+        self.add_subsystem(
+            "maximum",
+            PerformancesMaximum(number_of_points=number_of_points, battery_pack_id=battery_pack_id),
+            promotes=["data:*", "state_of_charge"],
+        )
 
         self.connect(
             "current_per_module.current_one_module",
@@ -145,10 +151,13 @@ class PerformancesBatteryPack(om.Group):
             "internal_resistance.internal_resistance",
             ["cell_voltage.internal_resistance", "joule_losses_cell.internal_resistance"],
         )
-        self.connect("cell_voltage.terminal_voltage", "module_voltage.terminal_voltage")
+        self.connect(
+            "cell_voltage.terminal_voltage",
+            ["module_voltage.terminal_voltage", "maximum.terminal_voltage"],
+        )
         self.connect("module_voltage.module_voltage", "battery_voltage.module_voltage")
 
-        self.connect("battery_c_rate.c_rate", "battery_soc_decrease.c_rate")
+        self.connect("battery_c_rate.c_rate", ["battery_soc_decrease.c_rate", "maximum.c_rate"])
         self.connect(
             "battery_soc_decrease.state_of_charge_decrease", "update_soc.state_of_charge_decrease"
         )

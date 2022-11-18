@@ -22,6 +22,7 @@ from ..components.perf_entropic_heat_coefficient import PerformancesEntropicHeat
 from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
 from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
+from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.sizing_battery_pack import SizingBatteryPack
 from ..components.perf_battery_pack import PerformancesBatteryPack
@@ -447,6 +448,55 @@ def test_battery_losses():
     )
     assert problem.get_val("losses_battery", units="W") == pytest.approx(
         [2596.24, 2063.36, 3824.4, 5434.4, 5789.6, 4770.96, 2929.52, 1169.84, 448.88, 1380.88],
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maximum():
+
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "terminal_voltage",
+        units="V",
+        val=np.array([4.01, 3.93, 3.85, 3.8, 3.75, 3.7, 3.67, 3.63, 3.6, 3.57]),
+    )
+    ivc.add_output("state_of_charge", val=np.linspace(100, 40, NB_POINTS_TEST), units="percent")
+    ivc.add_output(
+        "c_rate",
+        units="h**-1",
+        val=np.array([0.5, 0.5015, 0.503, 0.504, 0.5055, 0.507, 0.5085, 0.5095, 0.511, 0.5125]),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMaximum(number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:voltage_min", units="V"
+    ) == pytest.approx(
+        3.57,
+        rel=1e-2,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:voltage_max", units="V"
+    ) == pytest.approx(
+        4.01,
+        rel=1e-2,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
+    ) == pytest.approx(
+        40.0,
+        rel=1e-2,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:c_rate_max", units="h**-1"
+    ) == pytest.approx(
+        0.5125,
         rel=1e-2,
     )
 
