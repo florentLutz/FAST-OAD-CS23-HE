@@ -92,7 +92,7 @@ class PerformancesPMSM(om.Group):
 
         self.connect(
             "losses.power_losses",
-            "efficiency.power_losses",
+            ["efficiency.power_losses", "maximum.power_losses"],
         )
 
         self.connect(

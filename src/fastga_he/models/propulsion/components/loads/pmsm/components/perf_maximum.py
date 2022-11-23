@@ -39,6 +39,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
         self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
+        self.add_input("power_losses", units="W", val=np.nan, shape=number_of_points)
 
         self.add_output(
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":current_ac_max",
@@ -88,6 +89,17 @@ class PerformancesMaximum(om.ExplicitComponent):
             method="exact",
         )
 
+        self.add_output(
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":losses_max",
+            units="W",
+            val=42.0,
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:PMSM:" + motor_id + ":losses_max",
+            wrt="power_losses",
+            method="exact",
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         motor_id = self.options["motor_id"]
@@ -103,6 +115,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_max"] = np.max(
             inputs["rpm"]
+        )
+        outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":losses_max"] = np.max(
+            inputs["power_losses"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -127,3 +142,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         partials["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_max", "rpm"] = np.where(
             inputs["rpm"] == np.max(inputs["rpm"]), 1.0, 0.0
         )
+        partials[
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":losses_max", "power_losses"
+        ] = np.where(inputs["power_losses"] == np.max(inputs["power_losses"]), 1.0, 0.0)

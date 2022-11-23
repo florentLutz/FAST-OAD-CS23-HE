@@ -31,6 +31,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_input("c_rate", units="h**-1", val=np.full(number_of_points, np.nan))
         self.add_input("terminal_voltage", units="V", val=np.full(number_of_points, np.nan))
         self.add_input("state_of_charge", units="percent", val=np.full(number_of_points, np.nan))
+        self.add_input("losses_cell", units="W", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:voltage_min",
@@ -81,6 +82,20 @@ class PerformancesMaximum(om.ExplicitComponent):
             method="exact",
         )
 
+        self.add_output(
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:losses_max",
+            val=2.0,
+            units="W",
+            desc="Minimum state-of-charge of the battery during the mission",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":cell:losses_max",
+            wrt="losses_cell",
+            method="exact",
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         battery_pack_id = self.options["battery_pack_id"]
@@ -97,6 +112,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max"
         ] = np.max(inputs["c_rate"])
+        outputs[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:losses_max"
+        ] = np.max(inputs["losses_cell"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -118,3 +136,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max",
             "c_rate",
         ] = np.where(inputs["c_rate"] == np.max(inputs["c_rate"]), 1.0, 0.0)
+        partials[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:losses_max",
+            "losses_cell",
+        ] = np.where(inputs["losses_cell"] == np.max(inputs["losses_cell"]), 1.0, 0.0)

@@ -78,6 +78,7 @@
         <PMSM>
           <motor_1>
             <current_ac_max units="A" is_input="False">184.80516709572566<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
+            <losses_max units="W" is_input="False">17449.88728583321</losses_max>
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the motor rpm--></rpm_max>
             <torque_constant units="N*m/A" is_input="True">1.46</torque_constant>
             <torque_max units="N*m" is_input="False">809.4466318792784<!--Maximum value of the torque the motor has to provide--></torque_max>
@@ -96,6 +97,7 @@
             <number_modules is_input="True">40.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
+              <losses_max units="W" is_input="False">0.357972460872831<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <voltage_max units="V" is_input="False">4.019709110095031<!--Maximum voltage needed by the cells during the mission--></voltage_max>
               <voltage_min units="V" is_input="False">3.691444090697407<!--Minimum voltage provided by the cells during the mission--></voltage_min>
             </cell>

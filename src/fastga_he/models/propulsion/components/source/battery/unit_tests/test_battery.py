@@ -469,6 +469,11 @@ def test_maximum():
         units="h**-1",
         val=np.array([0.5, 0.5015, 0.503, 0.504, 0.5055, 0.507, 0.5085, 0.5095, 0.511, 0.5125]),
     )
+    ivc.add_output(
+        "losses_cell",
+        units="mW",
+        val=np.array([324.53, 257.92, 478.05, 679.3, 723.7, 596.37, 366.19, 146.23, 56.11, 172.61]),
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -497,6 +502,12 @@ def test_maximum():
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:c_rate_max", units="h**-1"
     ) == pytest.approx(
         0.5125,
+        rel=1e-2,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:losses_max", units="mW"
+    ) == pytest.approx(
+        723.7,
         rel=1e-2,
     )
 

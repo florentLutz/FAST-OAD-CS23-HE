@@ -176,5 +176,5 @@ class PerformancesBatteryPack(om.Group):
         )
         self.connect(
             "losses_cell.losses_cell",
-            "battery_losses.losses_cell",
+            ["battery_losses.losses_cell", "maximum.losses_cell"],
         )

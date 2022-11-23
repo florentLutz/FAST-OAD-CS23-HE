@@ -30,7 +30,7 @@ class SizingMotorLengthScaling(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_caliber",
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating",
             val=np.nan,
             units="N*m",
             desc="Max continuous torque of the motor",
@@ -48,7 +48,7 @@ class SizingMotorLengthScaling(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length",
             wrt=[
-                "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_caliber",
+                "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating",
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter",
             ],
             method="exact",
@@ -60,7 +60,7 @@ class SizingMotorLengthScaling(om.ExplicitComponent):
 
         torque_cont_ref = self.options["torque_cont_ref"]
 
-        torque_cont = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_caliber"]
+        torque_cont = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating"]
         d_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter"]
 
         torque_scaling = torque_cont / torque_cont_ref
@@ -75,14 +75,14 @@ class SizingMotorLengthScaling(om.ExplicitComponent):
 
         torque_cont_ref = self.options["torque_cont_ref"]
 
-        torque_cont = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_caliber"]
+        torque_cont = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating"]
         d_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter"]
 
         torque_scaling = torque_cont / torque_cont_ref
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_caliber",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating",
         ] = (
             1.0 / torque_cont_ref * d_scaling ** -2.5
         )

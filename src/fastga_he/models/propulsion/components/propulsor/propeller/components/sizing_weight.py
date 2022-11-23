@@ -27,7 +27,7 @@ class SizingPropellerWeight(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_caliber",
+            name="data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
             val=np.nan,
             units="N*m",
             desc="Max continuous torque of the propeller",
@@ -67,7 +67,7 @@ class SizingPropellerWeight(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
 
         torque_cont = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_caliber"
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating"
         ]
         prop_diameter = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"
@@ -92,7 +92,7 @@ class SizingPropellerWeight(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
 
         torque_cont = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_caliber"
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating"
         ]
         prop_diameter = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"
@@ -127,7 +127,7 @@ class SizingPropellerWeight(om.ExplicitComponent):
         )
         partials[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":mass",
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_caliber",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
         ] = (
             nb_blades * 1.074e-3 / (1.0 + 0.66 * prop_material)
         )

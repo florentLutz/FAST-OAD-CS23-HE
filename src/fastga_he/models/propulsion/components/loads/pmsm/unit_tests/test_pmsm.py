@@ -444,6 +444,11 @@ def test_maximum():
         np.array([56.1, 62.3, 68.4, 73.9, 79.4, 84.2, 89.0, 93.1, 97.9, 102.0]),
         units="A",
     )
+    ivc.add_output(
+        "power_losses",
+        np.array([2.52, 2.66, 2.82, 2.98, 3.14, 3.3, 3.47, 3.63, 3.81, 3.98]),
+        units="kW",
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -462,6 +467,9 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:rpm_max", units="min**-1"
     ) == pytest.approx(4500.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:losses_max", units="kW"
+    ) == pytest.approx(3.98, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
