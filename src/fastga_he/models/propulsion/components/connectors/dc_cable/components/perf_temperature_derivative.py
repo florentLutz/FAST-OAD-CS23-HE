@@ -25,17 +25,10 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "dc_current_one_cable",
-            units="A",
-            desc="current of line",
-            shape=number_of_points,
-        )
-        self.add_input(
-            "resistance_per_cable",
+            "conduction_losses",
+            units="W",
+            desc="Joule losses in one cable of the harness",
             val=np.full(number_of_points, np.nan),
-            units="ohm",
-            desc="resistance of line",
-            shape=number_of_points,
         )
         self.add_input(
             "cable_temperature",
@@ -90,8 +83,6 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
 
         harness_id = self.options["harness_id"]
 
-        resistance_per_cable = inputs["resistance_per_cable"]
-        current = inputs["dc_current_one_cable"]
         cable_radius = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius"
         ]
@@ -107,7 +98,7 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
 
         temp_ext = inputs["exterior_temperature"]
 
-        q_c = resistance_per_cable * current ** 2.0
+        q_c = inputs["conduction_losses"]
         q_inf = 2.0 * cable_radius * cable_length * np.pi * h * (temp_cable - temp_ext)
 
         d_temp_d_t = (q_c - q_inf) / cable_heat_capacity
@@ -117,9 +108,8 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         harness_id = self.options["harness_id"]
+        number_of_points = self.options["number_of_points"]
 
-        resistance_per_cable = inputs["resistance_per_cable"]
-        current = inputs["dc_current_one_cable"]
         cable_radius = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius"
         ]
@@ -135,14 +125,11 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
 
         temp_ext = inputs["exterior_temperature"]
 
-        q_c = resistance_per_cable * current ** 2.0
+        q_c = inputs["conduction_losses"]
         q_inf = 2.0 * cable_radius * cable_length * np.pi * h * (temp_cable - temp_ext)
 
-        partials["cable_temperature_time_derivative", "dc_current_one_cable"] = np.diag(
-            2.0 * resistance_per_cable * current / cable_heat_capacity
-        )
-        partials["cable_temperature_time_derivative", "resistance_per_cable"] = np.diag(
-            current ** 2.0 / cable_heat_capacity
+        partials["cable_temperature_time_derivative", "conduction_losses"] = (
+            np.eye(number_of_points) / cable_heat_capacity
         )
 
         partials["cable_temperature_time_derivative", "cable_temperature"] = -np.diag(

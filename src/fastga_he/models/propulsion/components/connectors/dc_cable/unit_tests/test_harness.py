@@ -22,10 +22,12 @@ from ..components.sizing_heat_capacity_per_length import SizingHeatCapacityPerLe
 from ..components.sizing_heat_capacity import SizingHeatCapacityCable
 from ..components.sizing_cable_radius import SizingCableRadius
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
+from ..components.perf_losses_one_cable import PerformancesLossesOneCable
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
 from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
 from ..components.perf_temperature import PerformancesTemperature
 from ..components.perf_resistance import PerformancesResistance
+from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.perf_harness import PerformancesHarness
 from ..components.sizing_harness import SizingHarness
@@ -80,7 +82,7 @@ def test_compute_current_per_cable():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingCurrentPerCable(harness_id="harness_1"), ivc)
     assert problem[
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:current"
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:current_caliber"
     ] == pytest.approx(800.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -360,6 +362,30 @@ def test_perf_tot_current():
     problem.check_partials(compact_print=True)
 
 
+def test_perf_losses_one_cable():
+    ivc = om.IndepVarComp()
+    ivc.add_output("resistance_per_cable", units="ohm", val=np.full(NB_POINTS_TEST, 0.0263))
+    ivc.add_output(
+        "dc_current_one_cable",
+        units="A",
+        val=np.linspace(110.0, 100.0, NB_POINTS_TEST),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesLossesOneCable(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    expected_losses = np.array(
+        [318.2, 311.8, 305.5, 299.2, 293.0, 286.9, 280.8, 274.8, 268.9, 263.0]
+    )
+    assert problem.get_val("conduction_losses", units="W") == pytest.approx(
+        expected_losses, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_perf_temperature_derivative():
     ivc = get_indep_var_comp(
         list_inputs(
@@ -370,11 +396,10 @@ def test_perf_temperature_derivative():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("resistance_per_cable", units="ohm", val=np.full(NB_POINTS_TEST, 0.0263))
     ivc.add_output(
-        "dc_current_one_cable",
-        units="A",
-        val=np.linspace(110.0, 100.0, NB_POINTS_TEST),
+        "conduction_losses",
+        units="W",
+        val=np.array([318.2, 311.8, 305.5, 299.2, 293.0, 286.9, 280.8, 274.8, 268.9, 263.0]),
     )
     ivc.add_output(
         "heat_transfer_coefficient",
@@ -509,6 +534,60 @@ def test_resistance_profile():
     problem.check_partials(compact_print=True)
 
 
+def test_maximum():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(PerformancesMaximum(harness_id="harness_1", number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
+    current = np.array(
+        [760.46, 802.7, 844.95, 887.2, 929.45, 971.69, 1013.94, 1056.19, 1098.44, 1140.68]
+    )
+    ivc.add_output("dc_current_one_cable", units="A", val=current)
+    ivc.add_output("dc_voltage_in", units="V", val=np.linspace(800, 800, NB_POINTS_TEST))
+    ivc.add_output("dc_voltage_out", units="V", val=np.linspace(799, 799, NB_POINTS_TEST))
+    ivc.add_output(
+        "cable_temperature",
+        units="degK",
+        val=np.array([288.2, 316.8, 333.7, 343.7, 349.4, 352.5, 354.0, 354.4, 354.3, 353.7]),
+    )
+    ivc.add_output(
+        "conduction_losses",
+        units="W",
+        val=np.array([318.2, 311.8, 305.5, 299.2, 293.0, 286.9, 280.8, 274.8, 268.9, 263.0]),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMaximum(harness_id="harness_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert (
+        problem.get_val(
+            name="data:propulsion:he_power_train:DC_cable_harness:harness_1:current_max",
+            units="A",
+        )
+        == pytest.approx(1140.68, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            name="data:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_max",
+            units="V",
+        )
+        == pytest.approx(800.0, rel=1e-2)
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:temperature_max", units="degK"
+    ) == pytest.approx(354.4, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:losses_max", units="W"
+    ) == pytest.approx(318.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_performances_harness():
 
     # Research independent input value in .xml file
@@ -579,12 +658,12 @@ def test_sizing_cable():
 
     ivc.add_output(name="data:propulsion:he_power_train:DC_cable_harness:harness_1:material", val=1)
     ivc.add_output(
-        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:current_max",
+        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:current_caliber",
         val=800.0,
         units="A",
     )
     ivc.add_output(
-        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_max",
+        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_caliber",
         val=1000.0,
         units="V",
     )

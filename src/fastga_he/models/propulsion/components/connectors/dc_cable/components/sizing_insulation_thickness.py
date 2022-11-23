@@ -34,7 +34,9 @@ class SizingInsulationThickness(om.ExplicitComponent):
             val=np.nan,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max",
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":voltage_caliber",
             val=np.nan,
             units="V",
         )
@@ -83,7 +85,7 @@ class SizingInsulationThickness(om.ExplicitComponent):
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:dielectric_permittivity"
         ]
         v_max = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max"
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_caliber"
         ]
         t_v = inputs[
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:void_thickness"
@@ -134,7 +136,7 @@ class SizingInsulationThickness(om.ExplicitComponent):
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:dielectric_permittivity"
         ]
         v_max = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max"
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_caliber"
         ]
         t_v = inputs[
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:void_thickness"
@@ -176,7 +178,7 @@ class SizingInsulationThickness(om.ExplicitComponent):
         ) * d_factor_d_r_c * k_factor
         partials[
             output_str,
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_caliber",
         ] = (
             radius_conductor * np.exp(factor_exp) * d_factor_d_v_max * k_factor
         )

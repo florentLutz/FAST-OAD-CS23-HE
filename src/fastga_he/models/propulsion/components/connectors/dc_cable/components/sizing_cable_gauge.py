@@ -62,7 +62,9 @@ class _Discriminant(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current",
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber",
             val=np.nan,
             units="A",
         )
@@ -91,7 +93,9 @@ class _Discriminant(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         current = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current"
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber"
         ]
         material = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material"
@@ -111,7 +115,9 @@ class _Discriminant(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         current = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current"
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber"
         ]
         material = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material"
@@ -128,7 +134,9 @@ class _Discriminant(om.ExplicitComponent):
 
         partials[
             "discriminant",
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current",
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber",
         ] = (
             -4.0 * c_2 * d_c_0_d_current
         )

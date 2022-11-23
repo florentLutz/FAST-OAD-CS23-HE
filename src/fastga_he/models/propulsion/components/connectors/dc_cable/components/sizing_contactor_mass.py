@@ -25,7 +25,9 @@ class SizingHarnessContactorMass(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current",
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber",
             units="A",
             val=np.nan,
             desc="Maximum current flowing in one cable of the harness",
@@ -51,7 +53,9 @@ class SizingHarnessContactorMass(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         current_caliber = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current"
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber"
         ]
         nb_of_cables = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
@@ -66,7 +70,9 @@ class SizingHarnessContactorMass(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         current_caliber = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current"
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber"
         ]
         nb_of_cables = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
@@ -74,7 +80,9 @@ class SizingHarnessContactorMass(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":contactor:mass",
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current",
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber",
         ] = (
             2.0 * nb_of_cables * 0.0239 * 0.6942 * current_caliber ** (0.6942 - 1.0)
         )

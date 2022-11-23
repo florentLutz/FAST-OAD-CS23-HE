@@ -6,6 +6,7 @@ import openmdao.api as om
 
 from .perf_resistance import PerformancesResistance
 from .perf_current import PerformancesCurrent, PerformancesHarnessCurrent
+from .perf_losses_one_cable import PerformancesLossesOneCable
 from .perf_temperature_derivative import PerformancesTemperatureDerivative
 from .perf_temperature_increase import PerformancesTemperatureIncrease
 from .perf_temperature import PerformancesTemperature
@@ -56,6 +57,11 @@ class PerformancesHarness(om.Group):
             promotes=["data:*", "dc_current"],
         )
         self.add_subsystem(
+            "losses_one_cable",
+            PerformancesLossesOneCable(number_of_points=number_of_points),
+            promotes=[],
+        )
+        self.add_subsystem(
             "temperature_derivative",
             PerformancesTemperatureDerivative(
                 harness_id=harness_id, number_of_points=number_of_points
@@ -73,19 +79,28 @@ class PerformancesHarness(om.Group):
             promotes=["data:*"],
         )
         self.add_subsystem(
-            "maxima",
+            "maximum",
             PerformancesMaximum(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "dc_current", "dc_voltage_out", "dc_voltage_in"],
+            promotes=["data:*", "dc_voltage_out", "dc_voltage_in"],
         )
 
         self.connect(
             "resistance.resistance_per_cable",
-            ["cable_current.resistance_per_cable", "temperature_derivative.resistance_per_cable"],
+            ["cable_current.resistance_per_cable", "losses_one_cable.resistance_per_cable"],
         )
 
         self.connect(
             "cable_current.dc_current_one_cable",
-            ["harness_current.dc_current_one_cable", "temperature_derivative.dc_current_one_cable"],
+            [
+                "harness_current.dc_current_one_cable",
+                "losses_one_cable.dc_current_one_cable",
+                "maximum.dc_current_one_cable",
+            ],
+        )
+
+        self.connect(
+            "losses_one_cable.conduction_losses",
+            ["temperature_derivative.conduction_losses", "maximum.conduction_losses"],
         )
 
         self.connect(
@@ -103,6 +118,6 @@ class PerformancesHarness(om.Group):
             [
                 "resistance.cable_temperature",
                 "temperature_derivative.cable_temperature",
-                "maxima.cable_temperature",
+                "maximum.cable_temperature",
             ],
         )
