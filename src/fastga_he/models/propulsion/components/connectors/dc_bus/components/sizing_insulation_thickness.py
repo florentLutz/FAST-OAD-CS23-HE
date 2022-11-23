@@ -30,7 +30,7 @@ class SizingBusBarInsulationThickness(om.ExplicitComponent):
         dc_bus_id = self.options["dc_bus_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_max",
+            name="data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber",
             units="V",
             val=np.nan,
         )
@@ -73,7 +73,7 @@ class SizingBusBarInsulationThickness(om.ExplicitComponent):
         dielectric_permittivity = inputs[
             "settings:propulsion:he_power_train:DC_bus:insulation:dielectric_permittivity"
         ]
-        v_max = inputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_max"]
+        v_max = inputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber"]
         t_v = inputs["settings:propulsion:he_power_train:DC_bus:insulation:void_thickness"]
         alpha = inputs["settings:propulsion:he_power_train:DC_bus:insulation:breakdown_voltage"]
 
@@ -105,7 +105,7 @@ class SizingBusBarInsulationThickness(om.ExplicitComponent):
         dielectric_permittivity = inputs[
             "settings:propulsion:he_power_train:DC_bus:insulation:dielectric_permittivity"
         ]
-        v_max = inputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_max"]
+        v_max = inputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber"]
         t_v = inputs["settings:propulsion:he_power_train:DC_bus:insulation:void_thickness"]
         alpha = inputs["settings:propulsion:he_power_train:DC_bus:insulation:breakdown_voltage"]
 
@@ -132,7 +132,7 @@ class SizingBusBarInsulationThickness(om.ExplicitComponent):
         ] = (np.exp(factor_exp) - 1.0) + thickness_conductor * np.exp(factor_exp) * d_factor_d_r_c
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":insulation:thickness",
-            "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_max",
+            "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber",
         ] = (
             thickness_conductor * np.exp(factor_exp) * d_factor_d_v_max
         )

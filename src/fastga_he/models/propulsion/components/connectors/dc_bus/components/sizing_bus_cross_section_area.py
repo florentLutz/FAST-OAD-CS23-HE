@@ -30,7 +30,7 @@ class SizingBusBarCrossSectionArea(om.ExplicitComponent):
         dc_bus_id = self.options["dc_bus_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_max",
+            name="data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_caliber",
             units="A",
             val=np.nan,
         )
@@ -47,7 +47,9 @@ class SizingBusBarCrossSectionArea(om.ExplicitComponent):
 
         dc_bus_id = self.options["dc_bus_id"]
 
-        max_current = inputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_max"]
+        max_current = inputs[
+            "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_caliber"
+        ]
         number_of_plates = 1.0
 
         outputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:area"] = (
@@ -62,7 +64,7 @@ class SizingBusBarCrossSectionArea(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:area",
-            "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_max",
+            "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_caliber",
         ] = (
             400.0 * 0.785 * (1 + 0.05 * (number_of_plates - 1.0)) * 1e-6 / 0.155
         )

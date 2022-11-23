@@ -16,6 +16,9 @@ from ..components.sizing_conductor_self_inductance import SizingBusBarSelfInduct
 from ..components.sizing_conductor_mutual_inductance import SizingBusBarMutualInductance
 from ..components.sizing_dc_bus import SizingDCBus
 
+from ..components.cstr_enforce import ConstraintsEnforce
+from ..components.cstr_ensure import ConstraintsEnsure
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "sample_dc_bus.xml"
@@ -199,12 +202,50 @@ def test_dc_bus_bar_sizing():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_bus:dc_bus_1:mass", units="kg"
-    ) == pytest.approx(1.12, rel=1e-2)
+    ) == pytest.approx(0.96, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_bus:dc_bus_1:conductor:self_inductance", units="nH"
-    ) == pytest.approx(166.0, rel=1e-2)
+    ) == pytest.approx(171.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_bus:dc_bus_1:conductor:mutual_inductance", units="nH"
-    ) == pytest.approx(1271.0, rel=1e-2)
+    ) == pytest.approx(1273.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_enforce():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsEnforce(dc_bus_id="dc_bus_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsEnforce(dc_bus_id="dc_bus_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_bus:dc_bus_1:current_caliber", units="A"
+    ) == pytest.approx(800.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_bus:dc_bus_1:voltage_caliber", units="V"
+    ) == pytest.approx(500.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsEnsure(dc_bus_id="dc_bus_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsEnsure(dc_bus_id="dc_bus_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:DC_bus:dc_bus_1:current_caliber", units="A"
+    ) == pytest.approx(-141.2, rel=1e-2)
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:DC_bus:dc_bus_1:voltage_caliber", units="V"
+    ) == pytest.approx(-88.2, rel=1e-2)
 
     problem.check_partials(compact_print=True)

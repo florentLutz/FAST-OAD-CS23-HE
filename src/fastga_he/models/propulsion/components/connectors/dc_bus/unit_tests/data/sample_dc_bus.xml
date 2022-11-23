@@ -4,8 +4,10 @@
             <he_power_train>
                 <DC_bus>
                     <dc_bus_1>
-                        <current_max units="A">941.2</current_max>
-                        <voltage_max units="V">588.2</voltage_max>
+                        <current_caliber units="A">941.2</current_caliber>
+                        <current_max units="A">800.</current_max>
+                        <voltage_caliber units="V">588.2</voltage_caliber>
+                        <voltage_max units="V">500.</voltage_max>
                         <width units="cm">6.382</width>
                         <height units="cm">0.953</height>
                         <length units="cm">30.222</length>

@@ -4,6 +4,10 @@
 
 import openmdao.api as om
 
+import fastoad.api as oad
+
+from ..constants import SUBMODEL_CONSTRAINTS_DC_BUS
+
 from ..components.sizing_bus_cross_section_area import SizingBusBarCrossSectionArea
 from ..components.sizing_bus_bar_cross_section_dimensions import SizingBusBarCrossSectionDimensions
 from ..components.sizing_insulation_thickness import SizingBusBarInsulationThickness
@@ -30,6 +34,19 @@ class SizingDCBus(om.Group):
 
     def setup(self):
         dc_bus_id = self.options["dc_bus_id"]
+
+        # It was decided to add the constraints computation at the beginning of the sizing to
+        # ensure that both are ran along and to avoid having an additional id to add in the
+        # configuration file.
+        option_bus_id = {"dc_bus_id": dc_bus_id}
+
+        self.add_subsystem(
+            name="constraints_dc_bus",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_DC_BUS, options=option_bus_id
+            ),
+            promotes=["*"],
+        )
 
         self.add_subsystem(
             name="conductor_cross_section_area",
