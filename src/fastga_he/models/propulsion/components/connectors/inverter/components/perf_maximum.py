@@ -71,6 +71,12 @@ class PerformancesMaximum(om.ExplicitComponent):
             desc="temperature inside of the heat sink",
             shape=number_of_points,
         )
+        self.add_input(
+            "losses_inverter",
+            units="W",
+            val=np.full(number_of_points, np.nan),
+            shape=number_of_points,
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max",
@@ -153,6 +159,17 @@ class PerformancesMaximum(om.ExplicitComponent):
             method="exact",
         )
 
+        self.add_output(
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max",
+            units="W",
+            val=42.0,
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max",
+            wrt="losses_inverter",
+            method="exact",
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         inverter_id = self.options["inverter_id"]
@@ -178,6 +195,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:temperature_max"
         ] = np.max(inputs["casing_temperature"])
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max"] = np.max(
+            inputs["losses_inverter"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -218,3 +238,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:temperature_max",
             "casing_temperature",
         ] = np.where(inputs["casing_temperature"] == np.max(inputs["casing_temperature"]), 1.0, 0.0)
+        partials[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max",
+            "losses_inverter",
+        ] = np.where(inputs["losses_inverter"] == np.max(inputs["losses_inverter"]), 1.0, 0.0)

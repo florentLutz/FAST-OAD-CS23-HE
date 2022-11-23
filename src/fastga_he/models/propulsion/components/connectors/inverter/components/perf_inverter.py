@@ -136,7 +136,11 @@ class PerformancesInverter(om.Group):
         )
         self.connect(
             "total_losses.losses_inverter",
-            ["temperature_casing.losses_inverter", "efficiency.losses_inverter"],
+            [
+                "temperature_casing.losses_inverter",
+                "efficiency.losses_inverter",
+                "maximum.losses_inverter",
+            ],
         )
         self.connect(
             "temperature_casing.casing_temperature",

@@ -65,6 +65,12 @@ class PerformancesMaximum(om.ExplicitComponent):
             units="V",
             desc="Voltage to output side",
         )
+        self.add_input(
+            "losses_converter",
+            units="W",
+            val=np.full(number_of_points, np.nan),
+            shape=number_of_points,
+        )
 
         self.add_output(
             "data:propulsion:he_power_train:DC_DC_converter:"
@@ -156,6 +162,19 @@ class PerformancesMaximum(om.ExplicitComponent):
             method="exact",
         )
 
+        self.add_output(
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":losses_max",
+            units="W",
+            val=500,
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":losses_max",
+            wrt="losses_converter",
+            method="exact",
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
@@ -195,6 +214,10 @@ class PerformancesMaximum(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":voltage_out_max"
         ] = np.max(inputs["dc_voltage_out"])
+
+        outputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":losses_max"
+        ] = np.max(inputs["losses_converter"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -241,3 +264,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             + ":voltage_out_max",
             "dc_voltage_out",
         ] = np.where(inputs["dc_voltage_out"] == np.max(inputs["dc_voltage_out"]), 1.0, 0.0)
+
+        partials[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":losses_max",
+            "losses_converter",
+        ] = np.where(inputs["losses_converter"] == np.max(inputs["losses_converter"]), 1.0, 0.0)

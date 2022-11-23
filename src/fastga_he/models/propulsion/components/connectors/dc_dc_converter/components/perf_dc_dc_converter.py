@@ -137,5 +137,8 @@ class PerformancesDCDCConverter(om.Group):
             "conduction_losses.conduction_losses_capacitor",
             "total_losses.conduction_losses_capacitor",
         )
-        self.connect("total_losses.losses_converter", "efficiency.losses_converter")
+        self.connect(
+            "total_losses.losses_converter",
+            ["efficiency.losses_converter", "maximum.losses_converter"],
+        )
         self.connect("efficiency.efficiency", "converter_relation.efficiency")

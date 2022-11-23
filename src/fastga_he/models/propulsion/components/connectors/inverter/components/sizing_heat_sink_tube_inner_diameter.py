@@ -66,7 +66,7 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:inverter:"
             + inverter_id
-            + ":heat_sink:coolant:max_input_temperature",
+            + ":heat_sink:coolant:temperature_in_rating",
             units="degK",
             val=np.nan,
             desc="Density of the coolant fluid",
@@ -74,7 +74,7 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:inverter:"
             + inverter_id
-            + ":heat_sink:coolant:max_output_temperature",
+            + ":heat_sink:coolant:temperature_out_rating",
             units="degK",
             val=np.nan,
             desc="Density of the coolant fluid",
@@ -82,7 +82,7 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:inverter:"
             + inverter_id
-            + ":heat_sink:max_temperature",
+            + ":heat_sink:temperature_rating",
             units="degK",
             val=np.nan,
             desc="Density of the coolant fluid",
@@ -96,7 +96,7 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             desc="Length of the tube which is useful for the cooling of the inverter",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":maximum_losses",
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
             units="W",
             val=np.nan,
             desc="Maximum power losses of the inverter (all modules)",
@@ -118,7 +118,7 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         inverter_losses_max = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":maximum_losses"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat"
         ]
         density_coolant = inputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:coolant:density"
@@ -126,15 +126,17 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
         t_max_out_coolant = inputs[
             "data:propulsion:he_power_train:inverter:"
             + inverter_id
-            + ":heat_sink:coolant:max_output_temperature"
+            + ":heat_sink:coolant:temperature_out_rating"
         ]
         t_max_in_coolant = inputs[
             "data:propulsion:he_power_train:inverter:"
             + inverter_id
-            + ":heat_sink:coolant:max_input_temperature"
+            + ":heat_sink:coolant:temperature_in_rating"
         ]
         t_max_heat_sink = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:max_temperature"
+            "data:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":heat_sink:temperature_rating"
         ]
         mass_flow_max_coolant = inputs[
             "data:propulsion:he_power_train:inverter:"
@@ -185,7 +187,7 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         inverter_losses_max = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":maximum_losses"
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat"
         ]
         density_coolant = inputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:coolant:density"
@@ -193,15 +195,17 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
         t_max_out_coolant = inputs[
             "data:propulsion:he_power_train:inverter:"
             + inverter_id
-            + ":heat_sink:coolant:max_output_temperature"
+            + ":heat_sink:coolant:temperature_out_rating"
         ]
         t_max_in_coolant = inputs[
             "data:propulsion:he_power_train:inverter:"
             + inverter_id
-            + ":heat_sink:coolant:max_input_temperature"
+            + ":heat_sink:coolant:temperature_in_rating"
         ]
         t_max_heat_sink = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:max_temperature"
+            "data:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":heat_sink:temperature_rating"
         ]
         mass_flow_max_coolant = inputs[
             "data:propulsion:he_power_train:inverter:"
@@ -347,7 +351,7 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             + ":heat_sink:tube:inner_diameter",
             "data:propulsion:he_power_train:inverter:"
             + inverter_id
-            + ":heat_sink:coolant:max_input_temperature",
+            + ":heat_sink:coolant:temperature_in_rating",
         ] = -(
             (
                 (
@@ -370,7 +374,7 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             + ":heat_sink:tube:inner_diameter",
             "data:propulsion:he_power_train:inverter:"
             + inverter_id
-            + ":heat_sink:coolant:max_output_temperature",
+            + ":heat_sink:coolant:temperature_out_rating",
         ] = -(
             (
                 (
@@ -391,7 +395,9 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:"
             + inverter_id
             + ":heat_sink:tube:inner_diameter",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:max_temperature",
+            "data:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":heat_sink:temperature_rating",
         ] = -(
             (
                 (
@@ -433,7 +439,7 @@ class SizingInverterHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:"
             + inverter_id
             + ":heat_sink:tube:inner_diameter",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":maximum_losses",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
         ] = -(
             (
                 (

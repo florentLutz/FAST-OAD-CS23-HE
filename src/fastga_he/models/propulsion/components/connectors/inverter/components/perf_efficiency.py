@@ -38,9 +38,9 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         losses_inverter = inputs["losses_inverter"]
 
-        # We recall here that the variable "ac_current_rms_out_one_phase" contains the rms current of one arm of the
-        # inverter (see losses definition), so to get the actual effective power on the AC side
-        # we need to multiply it by 3
+        # We recall here that the variable "ac_current_rms_out_one_phase" contains the rms
+        # current of one arm of the inverter (see losses definition), so to get the actual
+        # effective power on the AC side we need to multiply it by 3
         current = inputs["ac_current_rms_out_one_phase"]
         ac_voltage_rms_out = inputs["ac_voltage_rms_out"]
 

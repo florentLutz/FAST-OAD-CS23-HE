@@ -9,6 +9,7 @@
       <he_power_train>
         <DC_DC_converter>
           <dc_dc_converter_1>
+            <losses_max units="W" is_input="False">2517.3772266965143</losses_max>
             <voltage_in_max units="V" is_input="False">803.9418220190063</voltage_in_max>
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
             <capacitor>
@@ -57,8 +58,9 @@
         </DC_bus>
         <DC_cable_harness>
           <harness_1>
-            <current_max units="A" is_input="False">225.0029584032933</current_max>
+            <current_max units="A" is_input="False">225.0029584032933<!--Maximum current flowing through the harness, all cables included--></current_max>
             <length units="m" is_input="True">7.0</length>
+            <losses_max units="W" is_input="False">198.55561902285692<!--Maximum losses in one cable of the harness--></losses_max>
             <number_cables is_input="True">1.0</number_cables>
             <temperature_max units="degK" is_input="False">338.3847959107375</temperature_max>
             <voltage_max units="V" is_input="False">850.0</voltage_max>
@@ -106,6 +108,7 @@
           <inverter_1>
             <current_ac_max units="A" is_input="False">184.80516709572566<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_dc_max units="A" is_input="False">226.15071955015515<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <losses_max units="W" is_input="False">5048.549716319248</losses_max>
             <power_factor is_input="True">1.0</power_factor>
             <voltage_ac_max units="V" is_input="False">413.0526427857553<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
             <voltage_dc_max units="V" is_input="False">849.2910473970165<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>

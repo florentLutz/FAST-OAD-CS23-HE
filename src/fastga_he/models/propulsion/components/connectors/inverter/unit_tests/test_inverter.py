@@ -1147,6 +1147,10 @@ def test_maximum():
             [293.95, 296.26, 298.92, 301.92, 305.26, 308.97, 313.03, 317.47, 322.26, 327.43]
         ),
     )
+    total_losses = np.array(
+        [1740.54, 2434.2, 3230.22, 4129.62, 5134.44, 6246.0, 7464.96, 8795.46, 10234.44, 11784.72]
+    )
+    ivc.add_output("losses_inverter", val=total_losses, units="W")
 
     problem = run_system(
         PerformancesMaximum(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
@@ -1173,6 +1177,9 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:casing:temperature_max", units="degK"
     ) == pytest.approx(327.43, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:losses_max", units="W"
+    ) == pytest.approx(11784.72, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

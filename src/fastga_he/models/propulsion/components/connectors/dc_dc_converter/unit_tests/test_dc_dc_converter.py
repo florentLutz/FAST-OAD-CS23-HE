@@ -558,6 +558,10 @@ def test_maximum():
     ivc.add_output("dc_voltage_out", voltage_out, units="V")
     voltage_in = np.full(NB_POINTS_TEST, 810)
     ivc.add_output("dc_voltage_in", voltage_in, units="V")
+    total_losses = np.array(
+        [1070.5, 1351.7, 1664.7, 2013.9, 2406.7, 2828.8, 3299.3, 3814.9, 4367.6, 4967.6]
+    )
+    ivc.add_output("losses_converter", val=total_losses, units="W")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -608,6 +612,13 @@ def test_maximum():
             units="V",
         )
         == pytest.approx(910.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:losses_max",
+            units="W",
+        )
+        == pytest.approx(4967.6, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
