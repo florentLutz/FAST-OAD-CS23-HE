@@ -35,7 +35,7 @@ trio = ["trio (>=0.16)"]
 name = "anytree"
 version = "2.8.0"
 description = "Powerful and Lightweight Python Tree Data Structure.."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -138,7 +138,7 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 name = "autograd"
 version = "1.5"
 description = "Efficiently computes derivatives of numpy code."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -226,7 +226,7 @@ dev = ["build (==0.8.0)", "flake8 (==4.0.1)", "hashin (==0.17.0)", "pip-tools (=
 name = "casadi"
 version = "3.5.5"
 description = "CasADi -- framework for algorithmic differentiation and numeric optimization"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -305,7 +305,7 @@ toml = ["tomli"]
 name = "cycler"
 version = "0.11.0"
 description = "Composable style cycles"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -490,7 +490,7 @@ testing = ["covdefaults (>=2.2)", "coverage (>=6.4.2)", "pytest (>=7.1.2)", "pyt
 name = "fonttools"
 version = "4.34.4"
 description = "Tools to manipulate font files"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -512,7 +512,7 @@ woff = ["zopfli (>=0.1.4)", "brotlicffi (>=0.8.0)", "brotli (>=1.0.1)"]
 name = "future"
 version = "0.18.2"
 description = "Clean single-source support for Python 3 and 2"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -539,7 +539,7 @@ python-versions = ">=3.5"
 name = "imageio"
 version = "2.22.4"
 description = "Library for reading and writing a wide range of image, video, scientific, and volumetric data formats."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -812,7 +812,7 @@ format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-
 name = "julia"
 version = "0.5.7"
 description = "Julia/Python bridge with IPython support."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -823,7 +823,7 @@ test = ["numpy", "ipython", "pytest (>=4.4)", "mock"]
 name = "jupyter"
 version = "1.0.0"
 description = "Jupyter metapackage. Install all the Jupyter components in one go."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -860,7 +860,7 @@ test = ["codecov", "coverage", "ipykernel (>=6.5)", "ipython", "mypy", "pre-comm
 name = "jupyter-console"
 version = "6.4.4"
 description = "Jupyter terminal console"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -983,7 +983,7 @@ python-versions = ">=3.6"
 name = "kiwisolver"
 version = "1.4.4"
 description = "A fast implementation of the Cassowary constraint solver"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -991,7 +991,7 @@ python-versions = ">=3.7"
 name = "latexcodec"
 version = "2.0.1"
 description = "A lexer and codec to work with LaTeX code in Python."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
@@ -1032,7 +1032,7 @@ python-versions = ">=3.7"
 name = "matplotlib"
 version = "3.5.3"
 description = "Python plotting package"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -1086,7 +1086,7 @@ python-versions = ">=3.5"
 name = "mpmath"
 version = "1.2.1"
 description = "Python library for arbitrary-precision floating-point arithmetic"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -1418,7 +1418,7 @@ python-versions = "*"
 name = "pillow"
 version = "9.2.0"
 description = "Python Imaging Library (Fork)"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -1561,7 +1561,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 name = "pybamm"
 version = "22.10"
 description = "Python Battery Mathematical Modelling."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.8,<3.10"
 
@@ -1588,7 +1588,7 @@ docs = ["sphinx (>=1.5)", "guzzle-sphinx-theme"]
 name = "pybtex"
 version = "0.24.0"
 description = "A BibTeX-compatible bibliography processor in Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*"
 
@@ -1780,7 +1780,7 @@ python-versions = ">=3.7"
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -1800,7 +1800,7 @@ py = {version = "*", markers = "implementation_name == \"pypy\""}
 name = "qtconsole"
 version = "5.4.0"
 description = "Jupyter Qt console"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">= 3.7"
 
@@ -1822,7 +1822,7 @@ test = ["flaky", "pytest", "pytest-qt"]
 name = "qtpy"
 version = "2.3.0"
 description = "Provides an abstraction layer on top of the various Qt bindings (PyQt5/6 and PySide2/6)."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -1885,7 +1885,7 @@ python-versions = ">=3.5"
 name = "scikit-fem"
 version = "7.0.1"
 description = "Simple finite element assemblers"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -1944,7 +1944,7 @@ win32 = ["pywin32"]
 name = "setuptools-scm"
 version = "6.4.2"
 description = "the blessed package to manage your versions by scm tags"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -2152,7 +2152,7 @@ scipy = ">=1.4.1,<2.0.0"
 name = "sympy"
 version = "1.10.1"
 description = "Computer algebra system (CAS) in Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -2251,7 +2251,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 name = "tomli"
 version = "1.2.3"
 description = "A lil' TOML parser"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -2428,7 +2428,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8, <3.10"
-content-hash = "6bb946863ef56b82c68bbc63b12476ac9228c06590f2b770718597302e25df19"
+content-hash = "df3fd63119144bd05c07c4e4a80498065f530e142b5947cc517a72f7905913e7"
 
 [metadata.files]
 aenum = []
