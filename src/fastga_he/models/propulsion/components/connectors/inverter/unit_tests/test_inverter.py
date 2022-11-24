@@ -13,7 +13,7 @@ from ..components.sizing_reference_resistance import SizingInverterResistances
 from ..components.sizing_thermal_resistance import SizingInverterThermalResistances
 from ..components.sizing_thermal_resistance_casing import SizingInverterCasingThermalResistance
 from ..components.sizing_weight_casing import SizingInverterCasingsWeight
-from ..components.sizing_heat_capacity_casing import SizingInverterCasingsWeight
+from ..components.sizing_heat_capacity_casing import SizingInverterCasingHeatCapacity
 from ..components.sizing_dimension_module import SizingInverterModuleDimension
 from ..components.sizing_dimension_heat_sink import SizingInverterHeatSinkDimension
 from ..components.sizing_heat_sink_tube_length import SizingInverterHeatSinkTubeLength
@@ -218,12 +218,12 @@ def test_heat_capacity_casing():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingInverterCasingsWeight(inverter_id="inverter_1")),
+        list_inputs(SizingInverterCasingHeatCapacity(inverter_id="inverter_1")),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(SizingInverterCasingsWeight(inverter_id="inverter_1"), ivc)
+    problem = run_system(SizingInverterCasingHeatCapacity(inverter_id="inverter_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:casing:heat_capacity", units="J/degK"
@@ -655,7 +655,7 @@ def test_inverter_sizing():
     )
 
     problem = run_system(SizingInverter(inverter_id="inverter_1"), ivc)
-
+    om.n2(problem)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:mass",

@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class SizingInverterCasingsWeight(om.ExplicitComponent):
+class SizingInverterCasingHeatCapacity(om.ExplicitComponent):
     """
     Computation of the heat capacity of one casing. Very simplistic approach based on a degraded
     specific heat capacity of Si materials (material of the IGBT) to account for the presence of

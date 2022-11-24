@@ -11,7 +11,7 @@ from .sizing_reference_resistance import SizingInverterResistances
 from .sizing_thermal_resistance import SizingInverterThermalResistances
 from .sizing_thermal_resistance_casing import SizingInverterCasingThermalResistance
 from .sizing_weight_casing import SizingInverterCasingsWeight
-from .sizing_heat_capacity_casing import SizingInverterCasingsWeight
+from .sizing_heat_capacity_casing import SizingInverterCasingHeatCapacity
 from .sizing_dimension_module import SizingInverterModuleDimension
 from .sizing_heat_sink import SizingHeatSink
 from .sizing_capacitor_current_caliber import SizingInverterCapacitorCurrentCaliber
@@ -74,6 +74,11 @@ class SizingInverter(om.Group):
         self.add_subsystem(
             name="casing_weight",
             subsys=SizingInverterCasingsWeight(inverter_id=inverter_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="casing_heat_capacity",
+            subsys=SizingInverterCasingHeatCapacity(inverter_id=inverter_id),
             promotes=["*"],
         )
         self.add_subsystem(
