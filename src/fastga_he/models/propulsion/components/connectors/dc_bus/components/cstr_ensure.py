@@ -11,11 +11,11 @@ import fastoad.api as oad
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_DC_BUS, "fastga_he.submodel.propulsion.constraints.dc_bus.enforce"
+    SUBMODEL_CONSTRAINTS_DC_BUS, "fastga_he.submodel.propulsion.constraints.dc_bus.ensure"
 )
 class ConstraintsEnsure(om.ExplicitComponent):
     """
-    Class that computes the differetence between the maximum seen by the DC bus during the
+    Class that computes the difference between the maximum seen by the DC bus during the
     mission and the value used for sizing, ensuring each component works below its maxima.
     """
 

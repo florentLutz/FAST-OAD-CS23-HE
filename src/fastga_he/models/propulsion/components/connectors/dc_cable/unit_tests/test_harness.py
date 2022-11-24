@@ -28,6 +28,8 @@ from ..components.perf_temperature_increase import PerformancesTemperatureIncrea
 from ..components.perf_temperature import PerformancesTemperature
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.cstr_enforce import ConstraintsEnforce
+from ..components.cstr_ensure import ConstraintsEnsure
 
 from ..components.perf_harness import PerformancesHarness
 from ..components.sizing_harness import SizingHarness
@@ -588,6 +590,52 @@ def test_maximum():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_enforce():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsEnforce(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsEnforce(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:current_caliber", units="A"
+    ) == pytest.approx(750.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_caliber", units="V"
+    ) == pytest.approx(800.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsEnsure(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsEnsure(harness_id="harness_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:DC_cable_harness:harness_1:current_caliber",
+            units="A",
+        )
+        == pytest.approx(-50.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_caliber",
+            units="V",
+        )
+        == pytest.approx(-200.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_performances_harness():
 
     # Research independent input value in .xml file
@@ -647,7 +695,7 @@ def test_sizing_harness():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:mass", units="kg"
-    ) == pytest.approx(9.48, rel=1e-2)
+    ) == pytest.approx(8.86, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -658,12 +706,12 @@ def test_sizing_cable():
 
     ivc.add_output(name="data:propulsion:he_power_train:DC_cable_harness:harness_1:material", val=1)
     ivc.add_output(
-        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:current_caliber",
+        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:current_max",
         val=800.0,
         units="A",
     )
     ivc.add_output(
-        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_caliber",
+        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_max",
         val=1000.0,
         units="V",
     )

@@ -6,7 +6,9 @@
                     <harness_1>
                         <material>1.0</material>
                         <current_caliber units="A">800.0</current_caliber>
+                        <current_max units="A">750.0</current_max>
                         <voltage_caliber units="V">1000.0</voltage_caliber>
+                        <voltage_max units="V">800.0</voltage_max>
                         <number_cables>1.0</number_cables>
                         <length units="m">7.0</length>
                         <conductor>
