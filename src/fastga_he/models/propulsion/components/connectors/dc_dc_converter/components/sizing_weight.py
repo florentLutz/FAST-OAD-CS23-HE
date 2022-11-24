@@ -26,7 +26,7 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":current_in_caliber",
             units="A",
             val=np.nan,
             desc="Current caliber of the DC/DC converter",
@@ -34,7 +34,7 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":voltage_caliber",
+            + ":voltage_in_caliber",
             units="V",
             val=np.nan,
             desc="Voltage caliber of the converter",
@@ -67,12 +67,12 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
-                + ":current_caliber"
+                + ":current_in_caliber"
             ]
             * inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
-                + ":voltage_caliber"
+                + ":voltage_in_caliber"
             ]
             / inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"
@@ -89,12 +89,12 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":current_in_caliber",
         ] = (
             inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
-                + ":voltage_caliber"
+                + ":voltage_in_caliber"
             ]
             / inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"
@@ -106,12 +106,12 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":voltage_caliber",
+            + ":voltage_in_caliber",
         ] = (
             inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
-                + ":current_caliber"
+                + ":current_in_caliber"
             ]
             / inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"
@@ -128,12 +128,12 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
-                + ":current_caliber"
+                + ":current_in_caliber"
             ]
             * inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
-                + ":voltage_caliber"
+                + ":voltage_in_caliber"
             ]
             / inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"

@@ -37,7 +37,7 @@ class SizingDCDCConverterEnergyCoefficientScaling(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":module:current_caliber",
             units="A",
             val=np.nan,
             desc="Current caliber of the DC/DC converter",
@@ -56,7 +56,7 @@ class SizingDCDCConverterEnergyCoefficientScaling(om.ExplicitComponent):
             + ":scaling:a",
             wrt="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":module:current_caliber",
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
@@ -64,7 +64,7 @@ class SizingDCDCConverterEnergyCoefficientScaling(om.ExplicitComponent):
             + ":scaling:c",
             wrt="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":module:current_caliber",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -75,7 +75,7 @@ class SizingDCDCConverterEnergyCoefficientScaling(om.ExplicitComponent):
         current_caliber = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber"
+            + ":module:current_caliber"
         ]
 
         current_caliber_star = current_caliber / current_caliber_ref
@@ -95,14 +95,14 @@ class SizingDCDCConverterEnergyCoefficientScaling(om.ExplicitComponent):
         current_caliber = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber"
+            + ":module:current_caliber"
         ]
 
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":scaling:a",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":module:current_caliber",
         ] = (
             -current_caliber_ref / current_caliber ** 2.0
         )
@@ -110,7 +110,7 @@ class SizingDCDCConverterEnergyCoefficientScaling(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":scaling:c",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":module:current_caliber",
         ] = (
             1.0 / current_caliber_ref
         )

@@ -27,7 +27,7 @@ class SizingDCDCConverterCapacitorCapacity(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":capacitor:current_caliber",
             units="A",
             val=np.nan,
             desc="Current caliber of the DC/DC converter",
@@ -74,7 +74,7 @@ class SizingDCDCConverterCapacitorCapacity(om.ExplicitComponent):
         current_caliber = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber"
+            + ":capacitor:current_caliber"
         ]
         voltage_caliber = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
@@ -106,7 +106,7 @@ class SizingDCDCConverterCapacitorCapacity(om.ExplicitComponent):
         current_caliber = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber"
+            + ":capacitor:current_caliber"
         ]
         voltage_caliber = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
@@ -130,7 +130,7 @@ class SizingDCDCConverterCapacitorCapacity(om.ExplicitComponent):
             + ":capacitor:capacity",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":capacitor:current_caliber",
         ] = 0.25 / (voltage_ripple * voltage_caliber * switching_frequency)
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"

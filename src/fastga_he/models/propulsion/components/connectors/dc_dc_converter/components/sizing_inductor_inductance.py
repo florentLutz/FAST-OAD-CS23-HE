@@ -27,7 +27,7 @@ class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":inductor:current_caliber",
             units="A",
             val=np.nan,
             desc="Current caliber of the DC/DC converter",
@@ -74,7 +74,7 @@ class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
         current_caliber = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber"
+            + ":inductor:current_caliber"
         ]
         current_ripple = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
@@ -108,7 +108,7 @@ class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
         current_caliber = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber"
+            + ":inductor:current_caliber"
         ]
         current_ripple = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
@@ -132,7 +132,7 @@ class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
             + ":inductor:inductance",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":inductor:current_caliber",
         ] = (
             -0.25
             * voltage_caliber

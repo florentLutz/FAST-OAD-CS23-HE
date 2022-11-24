@@ -3,6 +3,9 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
+import fastoad.api as oad
+
+from ..constants import SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER
 
 from ..components.sizing_energy_coefficient_scaling import (
     SizingDCDCConverterEnergyCoefficientScaling,
@@ -31,6 +34,19 @@ class SizingDCDCConverter(om.Group):
     def setup(self):
 
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        # It was decided to add the constraints computation at the beginning of the sizing to
+        # ensure that both are ran along and to avoid having an additional id to add in the
+        # configuration file.
+        option_dc_dc_converter_id = {"dc_dc_converter_id": dc_dc_converter_id}
+
+        self.add_subsystem(
+            name="constraints_dc_dc_converter",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER, options=option_dc_dc_converter_id
+            ),
+            promotes=["*"],
+        )
 
         self.add_subsystem(
             "energy_coefficients_scaling",

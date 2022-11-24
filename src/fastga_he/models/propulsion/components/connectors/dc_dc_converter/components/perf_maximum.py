@@ -30,6 +30,12 @@ class PerformancesMaximum(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
+            "dc_current_in",
+            val=np.full(number_of_points, np.nan),
+            units="A",
+            desc="Current at the input side of the converter",
+        )
+        self.add_input(
             "current_IGBT",
             val=np.full(number_of_points, np.nan),
             units="A",
@@ -70,6 +76,21 @@ class PerformancesMaximum(om.ExplicitComponent):
             units="W",
             val=np.full(number_of_points, np.nan),
             shape=number_of_points,
+        )
+
+        self.add_output(
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":current_in_max",
+            units="A",
+            val=500.0,
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":current_in_max",
+            wrt="dc_current_in",
+            method="exact",
         )
 
         self.add_output(
@@ -182,6 +203,12 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
+            + ":current_in_max"
+        ] = np.max(inputs["dc_current_in"])
+
+        outputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
             + ":igbt:current_max"
         ] = np.max(inputs["current_IGBT"])
 
@@ -222,6 +249,13 @@ class PerformancesMaximum(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        partials[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":current_in_max",
+            "dc_current_in",
+        ] = np.where(inputs["dc_current_in"] == np.max(inputs["dc_current_in"]), 1.0, 0.0)
 
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"

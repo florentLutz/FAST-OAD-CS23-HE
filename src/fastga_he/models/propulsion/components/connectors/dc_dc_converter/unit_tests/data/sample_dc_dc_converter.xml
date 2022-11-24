@@ -4,16 +4,33 @@
             <he_power_train>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
+                        <capacitor>
+                            <current_caliber units="A">400.0</current_caliber>
+                            <current_max units="A">380.0</current_max>
+                        </capacitor>
+                        <inductor>
+                            <current_caliber units="A">400.0</current_caliber>
+                            <current_max units="A">380.0</current_max>
+                        </inductor>
+                        <module>
+                            <current_caliber units="A">400.0</current_caliber>
+                        </module>
                         <igbt>
+                            <current_max units="A">390.0</current_max>
                             <resistance units="ohm">0.002265</resistance>
                             <gate_voltage units="V">0.87</gate_voltage>
                         </igbt>
                         <diode>
+                            <current_max units="A">380.0</current_max>
                             <resistance units="ohm">0.002805</resistance>
                             <gate_voltage units="V">1.3</gate_voltage>
                         </diode>
-                        <current_caliber units="A">400.0</current_caliber>
+                        <current_in_caliber units="A">400.0</current_in_caliber>
+                        <current_in_max units="A">400.0</current_in_max>
                         <voltage_caliber units="V">860.0</voltage_caliber>
+                        <voltage_in_caliber units="V">860.0</voltage_in_caliber>
+                        <voltage_in_max units="V">860.0</voltage_in_max>
+                        <voltage_out_max units="V">850.0</voltage_out_max>
                         <current_ripple>0.1</current_ripple>
                         <switching_frequency units="Hz">12000.0</switching_frequency>
                         <scaling>

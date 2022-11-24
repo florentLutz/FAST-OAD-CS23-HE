@@ -34,7 +34,7 @@ class SizingDCDCConverterResistanceScaling(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":module:current_caliber",
             units="A",
             val=np.nan,
             desc="Current caliber of the DC/DC converter",
@@ -52,7 +52,7 @@ class SizingDCDCConverterResistanceScaling(om.ExplicitComponent):
             + ":scaling:resistance",
             wrt="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":module:current_caliber",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -63,7 +63,7 @@ class SizingDCDCConverterResistanceScaling(om.ExplicitComponent):
         current_caliber = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber"
+            + ":module:current_caliber"
         ]
 
         current_caliber_star = current_caliber / current_caliber_ref
@@ -82,7 +82,7 @@ class SizingDCDCConverterResistanceScaling(om.ExplicitComponent):
         current_caliber = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber"
+            + ":module:current_caliber"
         ]
 
         partials[
@@ -91,7 +91,7 @@ class SizingDCDCConverterResistanceScaling(om.ExplicitComponent):
             + ":scaling:resistance",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":current_caliber",
+            + ":module:current_caliber",
         ] = (
             -current_caliber_ref / current_caliber ** 2.0
         )
