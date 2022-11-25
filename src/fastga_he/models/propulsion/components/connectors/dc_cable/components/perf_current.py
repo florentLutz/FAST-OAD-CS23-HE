@@ -55,6 +55,7 @@ class PerformancesCurrent(om.ExplicitComponent):
             units="A",
             desc="current of line",
             shape=number_of_points,
+            val=250.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -131,6 +132,7 @@ class PerformancesHarnessCurrent(om.ExplicitComponent):
             units="A",
             desc="current of the harness",
             shape=number_of_points,
+            val=400.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

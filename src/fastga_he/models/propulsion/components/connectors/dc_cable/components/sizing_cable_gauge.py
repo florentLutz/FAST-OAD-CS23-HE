@@ -216,12 +216,14 @@ class _SolutionGauge(om.ExplicitComponent):
             + harness_id
             + ":conductor:section",
             units="mm*mm",
+            val=10.0,
         )
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":conductor:radius",
             units="mm",
+            val=2.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

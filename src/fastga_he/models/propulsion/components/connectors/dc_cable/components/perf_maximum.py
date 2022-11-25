@@ -65,7 +65,7 @@ class PerformancesMaximum(om.ExplicitComponent):
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
-            val=1000.0,
+            val=500.0,
             units="A",
             desc="Maximum current flowing through the harness, all cables included",
         )

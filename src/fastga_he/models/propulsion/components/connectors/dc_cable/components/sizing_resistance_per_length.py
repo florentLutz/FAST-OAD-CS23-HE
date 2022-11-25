@@ -43,6 +43,7 @@ class SizingResistancePerLength(om.ExplicitComponent):
             + harness_id
             + ":cable:resistance_per_length",
             units="ohm/km",
+            val=1.21,
         )
 
         self.declare_partials(of="*", wrt="*")

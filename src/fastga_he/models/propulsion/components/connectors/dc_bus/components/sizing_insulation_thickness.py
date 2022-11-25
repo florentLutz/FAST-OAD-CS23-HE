@@ -59,6 +59,7 @@ class SizingBusBarInsulationThickness(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":insulation:thickness",
             units="m",
+            val=1e-3,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

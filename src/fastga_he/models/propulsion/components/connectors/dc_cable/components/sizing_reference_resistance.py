@@ -38,7 +38,7 @@ class SizingReferenceResistance(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":cable:resistance",
-            val=1,
+            val=1e-3,
             units="ohm",
         )
 

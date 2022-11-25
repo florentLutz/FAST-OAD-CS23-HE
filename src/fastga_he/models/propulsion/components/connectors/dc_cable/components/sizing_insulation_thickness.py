@@ -70,6 +70,7 @@ class SizingInsulationThickness(om.ExplicitComponent):
             + harness_id
             + ":insulation:thickness",
             units="m",
+            val=1e-3,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

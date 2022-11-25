@@ -55,7 +55,7 @@ class PerformancesResistance(om.ExplicitComponent):
 
         self.add_output(
             "resistance_per_cable",
-            val=np.full(number_of_points, 1.0),
+            val=np.full(number_of_points, 1.0e-3),
             units="ohm",
             shape=number_of_points,
         )

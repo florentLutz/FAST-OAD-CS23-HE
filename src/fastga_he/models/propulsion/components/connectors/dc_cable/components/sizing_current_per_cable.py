@@ -39,6 +39,7 @@ class SizingCurrentPerCable(om.ExplicitComponent):
             + harness_id
             + ":cable:current_caliber",
             units="A",
+            val=250.0,
         )
 
         self.declare_partials(of="*", wrt="*")

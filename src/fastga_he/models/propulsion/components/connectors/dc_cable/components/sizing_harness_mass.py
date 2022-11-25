@@ -49,7 +49,7 @@ class SizingHarnessMass(om.ExplicitComponent):
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":mass",
-            val=1,
+            val=10,
             units="kg",
         )
 

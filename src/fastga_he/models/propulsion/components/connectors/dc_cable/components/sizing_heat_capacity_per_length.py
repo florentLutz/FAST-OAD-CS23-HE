@@ -105,6 +105,7 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
             + harness_id
             + ":cable:heat_capacity_per_length",
             units="J/degK/m",
+            val=7000.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

@@ -50,6 +50,7 @@ class SizingCableRadius(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
             units="m",
+            val=5e-2,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

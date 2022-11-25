@@ -38,7 +38,7 @@ class SizingHeatCapacityCable(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":cable:heat_capacity",
-            val=1,
+            val=7000.0,
             units="J/degK",
         )
 
