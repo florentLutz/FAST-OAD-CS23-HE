@@ -9,6 +9,7 @@
       <he_power_train>
         <DC_DC_converter>
           <dc_dc_converter_1>
+            <current_in_max units="A" is_input="False">263.77954150450364</current_in_max>
             <losses_max units="W" is_input="False">2517.3772266965143</losses_max>
             <voltage_in_max units="V" is_input="False">803.9418220190063</voltage_in_max>
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>

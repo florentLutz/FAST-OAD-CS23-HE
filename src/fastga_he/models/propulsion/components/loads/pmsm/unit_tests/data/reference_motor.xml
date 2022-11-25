@@ -5,9 +5,11 @@
                 <PMSM>
                     <motor_1>
                         <torque_constant units="N*m/A">1.46</torque_constant>
+                        <torque_max units="N*m">150.0</torque_max>
                         <torque_rating units="N*m">150.0</torque_rating>
                         <voltage_caliber units="V">700.0</voltage_caliber>
                         <rpm_rating units="min**-1">5000.0</rpm_rating>
+                        <rpm_max units="min**-1">4500.0</rpm_max>
                         <loss_coefficient>
                             <alpha units="W/N**2/m**2">0.025</alpha>
                             <beta units="W*s/rad">3.38</beta>

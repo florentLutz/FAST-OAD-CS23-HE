@@ -81,7 +81,7 @@ class PerformancesDCDCConverter(om.Group):
             PerformancesMaximum(
                 number_of_points=number_of_points, dc_dc_converter_id=dc_dc_converter_id
             ),
-            promotes=["data:*", "dc_voltage_in", "dc_voltage_out"],
+            promotes=["data:*", "dc_voltage_in", "dc_voltage_out", "dc_current_in"],
         )
         self.add_subsystem(
             "converter_relation",
