@@ -3,9 +3,12 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
+import fastoad.api as oad
 
 from .sizing_module_weight import SizingBatteryModuleWeight
 from .sizing_battery_weight import SizingBatteryWeight
+
+from ..constants import SUBMODEL_CONSTRAINTS_BATTERY
 
 
 class SizingBatteryPack(om.Group):
@@ -23,6 +26,19 @@ class SizingBatteryPack(om.Group):
     def setup(self):
 
         battery_pack_id = self.options["battery_pack_id"]
+
+        # It was decided to add the constraints computation at the beginning of the sizing to
+        # ensure that both are ran along and to avoid having an additional id to add in the
+        # configuration file.
+        option_battery_pack_id = {"battery_pack_id": battery_pack_id}
+
+        self.add_subsystem(
+            name="constraints_propeller",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_BATTERY, options=option_battery_pack_id
+            ),
+            promotes=["*"],
+        )
 
         self.add_subsystem(
             name="module_weight",

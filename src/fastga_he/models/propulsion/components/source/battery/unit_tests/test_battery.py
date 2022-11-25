@@ -8,6 +8,7 @@ import numpy as np
 
 from ..components.sizing_module_weight import SizingBatteryModuleWeight
 from ..components.sizing_battery_weight import SizingBatteryWeight
+from ..components.sizing_number_cells import SizingBatteryNumberCells
 from ..components.perf_module_current import PerformancesModuleCurrent
 from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
 from ..components.perf_internal_resistance import PerformancesInternalResistance
@@ -23,6 +24,8 @@ from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
 from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.cstr_ensure import ConstraintsEnsure
+from ..components.cstr_enforce import ConstraintsEnforce
 
 from ..components.sizing_battery_pack import SizingBatteryPack
 from ..components.perf_battery_pack import PerformancesBatteryPack
@@ -71,6 +74,77 @@ def test_battery_weight():
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(7936.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_battery_cell_number():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingBatteryNumberCells(battery_pack_id="battery_pack_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingBatteryNumberCells(battery_pack_id="battery_pack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_cells"
+    ) == pytest.approx(8000.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsEnforce(battery_pack_id="battery_pack_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        ConstraintsEnforce(battery_pack_id="battery_pack_1"),
+        ivc,
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
+        )
+        == pytest.approx(27.0, rel=1e-2)
+    )
+
+    # Partials will be hard to justify here since there is a rounding inside the module
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsEnsure(battery_pack_id="battery_pack_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        ConstraintsEnsure(battery_pack_id="battery_pack_1"),
+        ivc,
+    )
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:battery_pack:battery_pack_1:min_safe_SOC",
+            units="percent",
+        )
+        == pytest.approx(-20.0, rel=1e-2)
+    )
 
     problem.check_partials(compact_print=True)
 

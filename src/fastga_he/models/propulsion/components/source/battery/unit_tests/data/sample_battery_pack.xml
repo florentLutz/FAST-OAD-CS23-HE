@@ -4,7 +4,10 @@
             <he_power_train>
                 <battery_pack>
                     <battery_pack_1>
+                        <SOC_min>40.0</SOC_min>
+                        <min_safe_SOC>20.0</min_safe_SOC>
                         <number_modules>40.0</number_modules>
+                        <number_cells>8000.0</number_cells>
                         <module>
                             <number_cells>200.0</number_cells>
                             <mass units="kg">198.4</mass>
