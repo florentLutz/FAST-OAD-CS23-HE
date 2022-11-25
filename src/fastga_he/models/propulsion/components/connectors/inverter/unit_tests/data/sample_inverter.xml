@@ -34,8 +34,11 @@
                             </tube>
                         </heat_sink>
                         <dissipable_heat units="W">11808.0</dissipable_heat>
+                        <losses_max units="W">11000.0</losses_max>
                         <current_caliber units="A">433.0</current_caliber>
+                        <current_ac_max units="A">400.0</current_ac_max>
                         <voltage_caliber units="V">500.0</voltage_caliber>
+                        <voltage_ac_max units="V">500.0</voltage_ac_max>
                         <switching_frequency units="Hz">15.0e3</switching_frequency>
                         <power_factor>1.0</power_factor>
                         <mass units="kg">42.82</mass>

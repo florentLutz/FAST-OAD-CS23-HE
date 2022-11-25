@@ -552,42 +552,43 @@ if __name__ == "__main__":
     fig = go.Figure()
 
     scatter_025 = go.Scatter(
-        x=np.flip(soc_c_rate_025),
+        x=soc_c_rate_025,
         y=voltage_c_rate_025,
         mode="lines+markers",
         name="0.25 C",
     )
     fig.add_trace(scatter_025)
     scatter_05 = go.Scatter(
-        x=np.flip(soc_c_rate_025),
+        x=soc_c_rate_05,
         y=voltage_c_rate_05,
         mode="lines+markers",
         name="0.5 C",
     )
     fig.add_trace(scatter_05)
     scatter_1 = go.Scatter(
-        x=np.flip(soc_c_rate_1),
+        x=soc_c_rate_1,
         y=voltage_c_rate_1,
         mode="lines+markers",
         name="1 C",
     )
     fig.add_trace(scatter_1)
     scatter_2 = go.Scatter(
-        x=np.flip(soc_c_rate_2),
+        x=soc_c_rate_2,
         y=voltage_c_rate_2,
         mode="lines+markers",
         name="2 C",
     )
     fig.add_trace(scatter_2)
     scatter_4 = go.Scatter(
-        x=np.flip(soc_c_rate_4),
+        x=soc_c_rate_4,
         y=voltage_c_rate_4,
         mode="lines+markers",
-        name="2 C",
+        name="4 C",
     )
     fig.add_trace(scatter_4)
 
     fig.update_layout(
+        xaxis=dict(autorange="reversed"),
         title_text="Polarization curve of the reference cell",
         title_x=0.5,
         yaxis_title="Terminal voltage [V]",

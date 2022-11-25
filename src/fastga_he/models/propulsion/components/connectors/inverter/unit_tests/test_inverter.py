@@ -56,6 +56,9 @@ from ..components.perf_dc_current import PerformancesDCCurrent
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_inverter import PerformancesInverter
 
+from ..components.cstr_enforce import ConstraintsEnforce
+from ..components.cstr_ensure import ConstraintsEnsure
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "sample_inverter.xml"
@@ -655,21 +658,93 @@ def test_inverter_sizing():
     )
 
     problem = run_system(SizingInverter(inverter_id="inverter_1"), ivc)
-    om.n2(problem)
+
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:mass",
             units="kg",
         )
-        == pytest.approx(42.41, rel=1e-2)
+        == pytest.approx(40.00, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:power_density",
             units="kW/kg",
         )
-        == pytest.approx(15.17, rel=1e-2)
+        == pytest.approx(15.0, rel=1e-2)
     )
+
+
+def test_constraints_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsEnforce(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsEnforce(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:current_caliber",
+            units="A",
+        )
+        == pytest.approx(400.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:voltage_caliber",
+            units="V",
+        )
+        == pytest.approx(500.00, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:dissipable_heat",
+            units="W",
+        )
+        == pytest.approx(11000.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsEnsure(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsEnsure(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:inverter:inverter_1:current_caliber",
+            units="A",
+        )
+        == pytest.approx(-33.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:inverter:inverter_1:voltage_caliber",
+            units="V",
+        )
+        == pytest.approx(0.00, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:inverter:inverter_1:dissipable_heat",
+            units="W",
+        )
+        == pytest.approx(-808.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
 
 
 def test_modulation_idx():
