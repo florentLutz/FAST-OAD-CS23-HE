@@ -36,7 +36,7 @@ class SizingPMSM(om.Group):
         option_motor_id = {"motor_id": motor_id}
 
         self.add_subsystem(
-            name="constraints_dc_dc_converter",
+            name="constraints_pmsm",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_PMSM, options=option_motor_id
             ),

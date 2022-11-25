@@ -50,7 +50,7 @@ class SizingInverter(om.Group):
         option_inverter_id = {"inverter_id": inverter_id}
 
         self.add_subsystem(
-            name="constraints_dc_dc_converter",
+            name="constraints_inverter",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_INVERTER, options=option_inverter_id
             ),

@@ -17,6 +17,8 @@ from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_shaft_power import PerformancesShaftPower
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.cstr_enforce import ConstraintsEnforce
+from ..components.cstr_ensure import ConstraintsEnsure
 
 from ..components.perf_propeller import PerformancesPropeller
 from ..components.sizing_propeller import SizingPropeller
@@ -40,6 +42,36 @@ def test_weight():
     ) == pytest.approx(
         80.1, rel=1e-2
     )  # Real value for Cirrus SR22 prop is 75 lbs
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_enforce():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsEnforce(propeller_id="propeller_1")), __file__, XML_FILE
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsEnforce(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:torque_rating", units="N*m"
+    ) == pytest.approx(817.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsEnsure(propeller_id="propeller_1")), __file__, XML_FILE
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsEnsure(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:propeller:propeller_1:torque_rating", units="N*m"
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
