@@ -207,7 +207,7 @@ class PerformancesAssembly(om.Group):
                 harness_id="harness_1",
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "time_step", "exterior_temperature"],
+            promotes=["data:*", "exterior_temperature"],
         )
         self.add_subsystem(
             "dc_line_2",
@@ -215,7 +215,7 @@ class PerformancesAssembly(om.Group):
                 harness_id="harness_2",
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "time_step", "exterior_temperature"],
+            promotes=["data:*", "exterior_temperature"],
         )
         self.add_subsystem(
             "dc_line_3",
@@ -223,7 +223,7 @@ class PerformancesAssembly(om.Group):
                 harness_id="harness_3",
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "time_step", "exterior_temperature"],
+            promotes=["data:*", "exterior_temperature"],
         )
         self.add_subsystem(
             "dc_line_4",
@@ -231,7 +231,7 @@ class PerformancesAssembly(om.Group):
                 harness_id="harness_4",
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "time_step", "exterior_temperature"],
+            promotes=["data:*", "exterior_temperature"],
         )
         self.add_subsystem(
             "dc_line_5",
@@ -239,7 +239,7 @@ class PerformancesAssembly(om.Group):
                 harness_id="harness_5",
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "time_step", "exterior_temperature"],
+            promotes=["data:*", "exterior_temperature"],
         )
         self.add_subsystem(
             "dc_line_6",
@@ -247,7 +247,7 @@ class PerformancesAssembly(om.Group):
                 harness_id="harness_6",
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "time_step", "exterior_temperature"],
+            promotes=["data:*", "exterior_temperature"],
         )
 
         # Source bus

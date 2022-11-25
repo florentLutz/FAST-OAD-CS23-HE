@@ -22,7 +22,7 @@ class PerformancesAssembly(om.Group):
         self.nonlinear_solver = om.BroydenSolver()
         self.nonlinear_solver.options["iprint"] = 2
         self.nonlinear_solver.options["maxiter"] = 200
-        self.nonlinear_solver.options["rtol"] = 1e-8
+        self.nonlinear_solver.options["rtol"] = 1e-5
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):
@@ -93,7 +93,7 @@ class PerformancesAssembly(om.Group):
                 harness_id="harness_1",
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "time_step", "exterior_temperature"],
+            promotes=["data:*", "exterior_temperature"],
         )
         self.add_subsystem(
             "dc_bus_2",

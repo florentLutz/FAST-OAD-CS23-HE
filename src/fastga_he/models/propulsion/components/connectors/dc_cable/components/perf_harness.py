@@ -7,8 +7,6 @@ import openmdao.api as om
 from .perf_resistance import PerformancesResistance
 from .perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from .perf_losses_one_cable import PerformancesLossesOneCable
-from .perf_temperature_derivative import PerformancesTemperatureDerivative
-from .perf_temperature_increase import PerformancesTemperatureIncrease
 from .perf_temperature import PerformancesTemperature
 from .perf_maximum import PerformancesMaximum
 
@@ -62,21 +60,9 @@ class PerformancesHarness(om.Group):
             promotes=[],
         )
         self.add_subsystem(
-            "temperature_derivative",
-            PerformancesTemperatureDerivative(
-                harness_id=harness_id, number_of_points=number_of_points
-            ),
-            promotes=["data:*", "exterior_temperature"],
-        )
-        self.add_subsystem(
-            "temperature_increase",
-            PerformancesTemperatureIncrease(number_of_points=number_of_points),
-            promotes=["time_step"],
-        )
-        self.add_subsystem(
             "temperature",
             PerformancesTemperature(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*"],
+            promotes=["data:*", "exterior_temperature"],
         )
         self.add_subsystem(
             "maximum",
@@ -100,24 +86,13 @@ class PerformancesHarness(om.Group):
 
         self.connect(
             "losses_one_cable.conduction_losses",
-            ["temperature_derivative.conduction_losses", "maximum.conduction_losses"],
-        )
-
-        self.connect(
-            "temperature_derivative.cable_temperature_time_derivative",
-            "temperature_increase.cable_temperature_time_derivative",
-        )
-
-        self.connect(
-            "temperature_increase.cable_temperature_increase",
-            "temperature.cable_temperature_increase",
+            ["temperature.conduction_losses", "maximum.conduction_losses"],
         )
 
         self.connect(
             "temperature.cable_temperature",
             [
                 "resistance.cable_temperature",
-                "temperature_derivative.cable_temperature",
                 "maximum.cable_temperature",
             ],
         )

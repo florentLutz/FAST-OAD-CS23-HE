@@ -23,8 +23,15 @@ from ..components.sizing_heat_capacity import SizingHeatCapacityCable
 from ..components.sizing_cable_radius import SizingCableRadius
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from ..components.perf_losses_one_cable import PerformancesLossesOneCable
-from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
-from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.stale.perf_temperature_derivative import (
+    PerformancesTemperatureDerivative,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.stale.perf_temperature_increase import (
+    PerformancesTemperatureIncrease,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.stale.perf_temperature_from_increase import (
+    PerformancesTemperatureFromIncrease,
+)
 from ..components.perf_temperature import PerformancesTemperature
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_maximum import PerformancesMaximum
@@ -473,7 +480,9 @@ def test_perf_temperature_increase():
 def test_perf_temperature_profile():
     ivc = get_indep_var_comp(
         list_inputs(
-            PerformancesTemperature(harness_id="harness_1", number_of_points=NB_POINTS_TEST)
+            PerformancesTemperatureFromIncrease(
+                harness_id="harness_1", number_of_points=NB_POINTS_TEST
+            )
         ),
         __file__,
         XML_FILE,
@@ -485,12 +494,54 @@ def test_perf_temperature_profile():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesTemperature(harness_id="harness_1", number_of_points=NB_POINTS_TEST),
+        PerformancesTemperatureFromIncrease(
+            harness_id="harness_1", number_of_points=NB_POINTS_TEST
+        ),
         ivc,
     )
 
     expected_temperature = np.array(
         [288.15, 316.119, 341.832, 365.298, 386.526, 405.519, 422.283, 436.824, 449.148, 459.264]
+    )
+    assert (
+        problem.get_val(
+            "cable_temperature",
+            units="degK",
+        )
+        == pytest.approx(expected_temperature, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_perf_temperature_profile_v2():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesTemperature(harness_id="harness_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "conduction_losses",
+        units="W",
+        val=np.array([318.2, 311.8, 305.5, 299.2, 293.0, 286.9, 280.8, 274.8, 268.9, 263.0]),
+    )
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=np.full(NB_POINTS_TEST, 288.15),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTemperature(harness_id="harness_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    expected_temperature = np.array(
+        [310.51, 310.06, 309.62, 309.18, 308.74, 308.31, 307.89, 307.46, 307.05, 306.63]
     )
     assert (
         problem.get_val(
@@ -659,10 +710,10 @@ def test_performances_harness():
     )
 
     expected_temperature = np.array(
-        [288.2, 316.8, 333.7, 343.7, 349.4, 352.5, 354.0, 354.4, 354.3, 353.7]
+        [308.09, 306.74, 305.4, 304.06, 302.71, 301.37, 300.03, 298.69, 297.36, 296.02]
     )
     expected_resistance = np.array(
-        [0.00326, 0.00364, 0.00386, 0.00399, 0.00407, 0.00411, 0.00413, 0.00413, 0.00413, 0.00412]
+        [0.00353, 0.00351, 0.00349, 0.00347, 0.00346, 0.00344, 0.00342, 0.0034, 0.00339, 0.00337]
     )
 
     assert problem.get_val("temperature.cable_temperature", units="degK") == pytest.approx(
@@ -673,7 +724,7 @@ def test_performances_harness():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:current_max", units="A"
-    ) == pytest.approx(306.0, rel=1e-2)
+    ) == pytest.approx(296.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_max", units="V"
     ) == pytest.approx(800.0, rel=1e-2)
