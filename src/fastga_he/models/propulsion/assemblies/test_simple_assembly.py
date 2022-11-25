@@ -115,12 +115,12 @@ def test_assembly_performances():
                 187797.0,
                 188725.0,
                 189635.0,
-                190528.0,
+                190529.0,
                 191405.0,
-                192264.0,
+                192265.0,
                 193106.0,
-                193930.0,
-                194737.0,
+                193931.0,
+                194738.0,
             ]
         ),
         abs=1,
@@ -203,12 +203,6 @@ def test_performances_sizing_assembly():
         name="full", subsys=FullSimpleAssembly(number_of_points=NB_POINTS_TEST), promotes=["*"]
     )
 
-    model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-    model.nonlinear_solver.options["iprint"] = 2
-    model.nonlinear_solver.options["maxiter"] = 200
-    model.nonlinear_solver.options["rtol"] = 1e-5
-    model.linear_solver = om.DirectSolver()
-
     problem.setup()
     # om.n2(problem)
     # Run problem and check obtained value(s) is/(are) correct
@@ -216,4 +210,7 @@ def test_performances_sizing_assembly():
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
 
-    test = 1.0
+    write_outputs(
+        pth.join(outputs.__path__[0], "full_assembly_sizing.xml"),
+        problem,
+    )

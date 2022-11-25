@@ -40,7 +40,7 @@ class SizingInverterCapacitorCurrentCaliber(om.ExplicitComponent):
             + inverter_id
             + ":capacitor:current_caliber",
             units="A",
-            val=np.nan,
+            val=200.0,
             desc="Current caliber of the capacitor of the inverter",
         )
 

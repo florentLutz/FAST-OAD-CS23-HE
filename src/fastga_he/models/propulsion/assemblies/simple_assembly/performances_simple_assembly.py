@@ -19,10 +19,10 @@ class PerformancesAssembly(om.Group):
         super().__init__(**kwargs)
 
         # Solvers setup
-        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+        self.nonlinear_solver = om.BroydenSolver()
         self.nonlinear_solver.options["iprint"] = 2
         self.nonlinear_solver.options["maxiter"] = 200
-        self.nonlinear_solver.options["rtol"] = 1e-5
+        self.nonlinear_solver.options["rtol"] = 1e-8
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):

@@ -44,10 +44,12 @@ class SizingInverterResistances(om.ExplicitComponent):
 
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:resistance",
+            val=1e-3,
             units="ohm",
         )
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":diode:resistance",
+            val=1e-3,
             units="ohm",
         )
 

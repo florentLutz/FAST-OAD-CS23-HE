@@ -88,32 +88,41 @@ class SizingInverterEnergyCoefficients(om.ExplicitComponent):
 
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:a",
+            val=self.options["a_on_ref"],
         )
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b",
+            val=self.options["b_on_ref"],
         )
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c",
+            val=self.options["c_on_ref"],
         )
 
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:a",
+            val=self.options["a_rr_ref"],
         )
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b",
+            val=self.options["b_rr_ref"],
         )
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:c",
+            val=self.options["c_rr_ref"],
         )
 
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:a",
+            val=self.options["a_off_ref"],
         )
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b",
+            val=self.options["b_off_ref"],
         )
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:c",
+            val=self.options["c_off_ref"],
         )
 
         self.declare_partials(

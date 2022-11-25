@@ -44,10 +44,12 @@ class SizingInverterThermalResistances(om.ExplicitComponent):
 
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:thermal_resistance",
+            val=1e-3,
             units="K/W",
         )
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":diode:thermal_resistance",
+            val=1e-3,
             units="K/W",
         )
 

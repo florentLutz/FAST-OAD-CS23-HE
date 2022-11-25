@@ -49,12 +49,14 @@ class SizingDCDCConverterResistances(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":igbt:resistance",
+            val=1e-3,
             units="ohm",
         )
         self.add_output(
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":diode:resistance",
+            val=1e-3,
             units="ohm",
         )
 

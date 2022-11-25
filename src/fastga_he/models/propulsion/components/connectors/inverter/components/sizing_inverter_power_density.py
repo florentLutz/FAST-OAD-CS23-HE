@@ -46,7 +46,7 @@ class SizingInverterPowerDensity(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":power_density",
             units="kW/kg",
-            val=np.nan,
+            val=10.0,
             desc="Power density of the inverter",
         )
 

@@ -51,7 +51,7 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass",
             units="kg",
-            val=np.nan,
+            val=20.0,
             desc="Mass of the converter",
         )
 
