@@ -6,10 +6,16 @@ class ComputeHydrogenTank(om.ExplicitComponent):
     
     def setup(self):
 
-        self.add_input(name="data:thermal:hydrogen:mass_flow", units = "kg/s", val=np.nan)
-        self.add_input(name="data:thermal:hydrogen:tank:gravimetric_efficiency", val=0.5)
-        self.add_input(name="data:thermal:hydrogen:tank:volumetric_efficiency", val=np.nan)
-        self.add_input(name="time", units="s", val=np.nan)
+        self.add_input(name="data:thermal:hydrogen:mass_flow", units = "kg/s", val=np.nan,
+        desc="required mass flow of hydrogen")
+        
+        self.add_input(name="data:thermal:hydrogen:tank:gravimetric_efficiency", val=0.5,
+        desc="tank gravimetric efficiency")
+        
+        self.add_input(name="data:thermal:hydrogen:tank:volumetric_efficiency", val=np.nan,
+        desc="tank volumetric efficiency")
+        
+        self.add_input(name="time", units="s", val=np.nan, desc="time of fuel cell operating")
 
         self.add_output(name="data:thermal:hydrogen:tank:mass", units="kg")
         self.add_output(name="data:thermal:hydrogen:tank:volume", units="m**3")
