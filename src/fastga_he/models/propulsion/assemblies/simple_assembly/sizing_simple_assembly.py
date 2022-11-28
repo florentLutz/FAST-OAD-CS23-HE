@@ -22,11 +22,11 @@ class SizingAssembly(om.Group):
             promotes=["*"],
         )
         # Problematic component !
-        # self.add_subsystem(
-        #     "motor_1",
-        #     SizingPMSM(motor_id="motor_1"),
-        #     promotes=["*"],
-        # )
+        self.add_subsystem(
+            "motor_1",
+            SizingPMSM(motor_id="motor_1"),
+            promotes=["*"],
+        )
         self.add_subsystem(
             "inverter_1",
             SizingInverter(inverter_id="inverter_1"),

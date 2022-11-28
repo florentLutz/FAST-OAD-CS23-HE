@@ -16,8 +16,7 @@ from .sizing_torque_constant_scaling import SizingMotorTorqueConstantScaling
 from .sizing_torque_constant import SizingMotorTorqueConstant
 from .sizing_loss_coefficient_scaling import SizingMotorLossCoefficientScaling
 from .sizing_loss_coefficient import SizingMotorLossCoefficient
-
-from ..constants import SUBMODEL_CONSTRAINTS_PMSM
+from .cstr_pmsm import ConstraintsPMSM
 
 
 class SizingPMSM(om.Group):
@@ -30,16 +29,9 @@ class SizingPMSM(om.Group):
 
         motor_id = self.options["motor_id"]
 
-        # It was decided to add the constraints computation at the beginning of the sizing to
-        # ensure that both are ran along and to avoid having an additional id to add in the
-        # configuration file.
-        option_motor_id = {"motor_id": motor_id}
-
         self.add_subsystem(
             name="constraints_pmsm",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_PMSM, options=option_motor_id
-            ),
+            subsys=ConstraintsPMSM(motor_id=motor_id),
             promotes=["*"],
         )
 

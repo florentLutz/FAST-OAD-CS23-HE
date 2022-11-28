@@ -180,6 +180,13 @@ def test_assembly_sizing():
 
 def test_performances_sizing_assembly():
 
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.constraints.pmsm.rpm"
+    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    # oad.RegisterSubmodel.active_models[
+    #     "submodel.propulsion.constraints.battery"
+    # ] = "fastga_he.submodel.propulsion.constraints.battery.enforce"
+
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,

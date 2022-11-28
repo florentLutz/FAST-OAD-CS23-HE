@@ -28,8 +28,8 @@ from ..components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
-from ..components.cstr_enforce import ConstraintsEnforce
-from ..components.cstr_ensure import ConstraintsEnsure
+from ..components.cstr_enforce import ConstraintsTorqueEnforce, ConstraintsRPMEnforce
+from ..components.cstr_ensure import ConstraintsTorqueEnsure, ConstraintsRPMEnsure
 
 from ..components.sizing_pmsm import SizingPMSM
 from ..components.perf_pmsm import PerformancesPMSM
@@ -213,17 +213,29 @@ def test_loss_coefficient():
     problem.check_partials(compact_print=True)
 
 
-def test_constraints_enforce():
+def test_constraints_torque_enforce():
 
     ivc = get_indep_var_comp(
-        list_inputs(ConstraintsEnforce(motor_id="motor_1")), __file__, XML_FILE
+        list_inputs(ConstraintsTorqueEnforce(motor_id="motor_1")), __file__, XML_FILE
     )
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(ConstraintsEnforce(motor_id="motor_1"), ivc)
+    problem = run_system(ConstraintsTorqueEnforce(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:torque_rating", units="N*m"
     ) == pytest.approx(150.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_rpm_enforce():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsRPMEnforce(motor_id="motor_1")), __file__, XML_FILE
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsRPMEnforce(motor_id="motor_1"), ivc)
+
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:rpm_rating", units="min**-1"
     ) == pytest.approx(4500.0, rel=1e-2)
@@ -231,14 +243,28 @@ def test_constraints_enforce():
     problem.check_partials(compact_print=True)
 
 
-def test_constraints_ensure():
-    ivc = get_indep_var_comp(list_inputs(ConstraintsEnsure(motor_id="motor_1")), __file__, XML_FILE)
+def test_constraints_torque_ensure():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsTorqueEnsure(motor_id="motor_1")), __file__, XML_FILE
+    )
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(ConstraintsEnsure(motor_id="motor_1"), ivc)
+    problem = run_system(ConstraintsTorqueEnsure(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
         "constraints:propulsion:he_power_train:PMSM:motor_1:torque_rating", units="N*m"
     ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_rpm_ensure():
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsRPMEnsure(motor_id="motor_1")), __file__, XML_FILE
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsRPMEnsure(motor_id="motor_1"), ivc)
+
     assert problem.get_val(
         "constraints:propulsion:he_power_train:PMSM:motor_1:rpm_rating", units="min**-1"
     ) == pytest.approx(-500.0, rel=1e-2)

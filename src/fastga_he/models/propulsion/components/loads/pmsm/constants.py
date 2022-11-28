@@ -2,4 +2,5 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-SUBMODEL_CONSTRAINTS_PMSM = "submodel.propulsion.constraints.pmsm"
+SUBMODEL_CONSTRAINTS_PMSM_TORQUE = "submodel.propulsion.constraints.pmsm.torque"
+SUBMODEL_CONSTRAINTS_PMSM_RPM = "submodel.propulsion.constraints.pmsm.rpm"
