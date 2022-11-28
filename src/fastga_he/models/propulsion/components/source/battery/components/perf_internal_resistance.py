@@ -32,7 +32,12 @@ class PerformancesInternalResistance(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        dod = 100.0 - inputs["state_of_charge"]
+        soc = np.clip(
+            inputs["state_of_charge"],
+            np.full_like(inputs["state_of_charge"], 10),
+            np.full_like(inputs["state_of_charge"], 100),
+        )
+        dod = 100.0 - soc
 
         internal_resistance = (
             7.94693564e-05 * dod

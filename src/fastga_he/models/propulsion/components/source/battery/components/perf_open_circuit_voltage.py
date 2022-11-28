@@ -32,7 +32,11 @@ class PerformancesOpenCircuitVoltage(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        soc = inputs["state_of_charge"]
+        soc = np.clip(
+            inputs["state_of_charge"],
+            np.full_like(inputs["state_of_charge"], 10),
+            np.full_like(inputs["state_of_charge"], 100),
+        )
 
         ocv = (
             94.501 * np.exp(-0.01292712 * soc)

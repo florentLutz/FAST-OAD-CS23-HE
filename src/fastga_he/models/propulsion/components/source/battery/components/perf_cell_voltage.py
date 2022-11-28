@@ -33,9 +33,13 @@ class PerformancesCellVoltage(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["terminal_voltage"] = (
-            inputs["open_circuit_voltage"]
-            - inputs["internal_resistance"] * inputs["current_one_module"]
+        outputs["terminal_voltage"] = np.clip(
+            (
+                inputs["open_circuit_voltage"]
+                - inputs["internal_resistance"] * inputs["current_one_module"]
+            ),
+            np.full_like(inputs["open_circuit_voltage"], 1.0),
+            np.full_like(inputs["open_circuit_voltage"], 5.0),
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):

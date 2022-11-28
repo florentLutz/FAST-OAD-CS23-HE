@@ -194,7 +194,7 @@ def test_performances_sizing_assembly():
         units="degK",
         val=Atmosphere(altitude, altitude_in_feet=False).temperature,
     )
-    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 50))
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
 
     problem = oad.FASTOADProblem(reports=False)
     model = problem.model

@@ -92,26 +92,30 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         self.add_output(
             "conduction_losses_diode",
             units="W",
-            val=np.full(number_of_points, 0.0),
+            val=np.full(number_of_points, 1.0),
             shape=number_of_points,
+            lower=np.full(number_of_points, 0.0),
         )
         self.add_output(
             "conduction_losses_IGBT",
             units="W",
-            val=np.full(number_of_points, 0.0),
+            val=np.full(number_of_points, 1.0),
             shape=number_of_points,
+            lower=np.full(number_of_points, 0.0),
         )
         self.add_output(
             "conduction_losses_inductor",
             units="W",
-            val=np.full(number_of_points, 0.0),
+            val=np.full(number_of_points, 1.0),
             shape=number_of_points,
+            lower=np.full(number_of_points, 0.0),
         )
         self.add_output(
             "conduction_losses_capacitor",
             units="W",
-            val=np.full(number_of_points, 0.0),
+            val=np.full(number_of_points, 1.0),
             shape=number_of_points,
+            lower=np.full(number_of_points, 0.0),
         )
 
         self.declare_partials(
