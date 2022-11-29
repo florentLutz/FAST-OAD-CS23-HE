@@ -49,8 +49,3 @@ jobs:
         run: |
           poetry run pytest src/fastga_he/models/propulsion/components
         shell: bash
-
-      - name: Assembly tests
-        run: |
-          poetry run pytest src/fastga_he/models/propulsion/assemblies
-        shell: bash
