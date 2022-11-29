@@ -117,7 +117,7 @@ def test_constraints_enforce():
         problem.get_val(
             "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
         )
-        == pytest.approx(27.0, rel=1e-2)
+        == pytest.approx(32.0, rel=1e-2)
     )
 
     # Partials will be hard to justify here since there is a rounding inside the module

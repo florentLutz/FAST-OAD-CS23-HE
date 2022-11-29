@@ -194,9 +194,10 @@
           <battery_pack_1>
             <SOC_min is_input="True">40.0<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <mass units="kg" is_input="False">7936.0<!--Mass of the battery pack--></mass>
+            <mass units="kg" is_input="False">4960.0<!--Mass of the battery pack--></mass>
             <min_safe_SOC is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_modules is_input="True">40.0<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <number_cells is_input="False">5000.0<!--Total number of cells in the battery pack--></number_cells>
+            <number_modules is_input="True">25.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <mass units="g" is_input="True">496.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
             </cell>

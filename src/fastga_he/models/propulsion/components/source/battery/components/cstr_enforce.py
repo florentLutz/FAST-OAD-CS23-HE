@@ -17,7 +17,7 @@ class ConstraintsEnforce(om.ExplicitComponent):
     """
     Class that enforces that the maxima seen by the battery during the mission are used for the
     sizing, ensuring a fitted design of each component. For now only enforces that the number of
-    module is readjusted to match the minimum SOC level required
+    module is readjusted to match the minimum SOC level required.
     """
 
     def initialize(self):
@@ -62,6 +62,7 @@ class ConstraintsEnforce(om.ExplicitComponent):
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
             val=20.0,
             desc="Number of modules in parallel inside the battery pack",
+            lower=5.0,
         )
 
         self.declare_partials(
@@ -90,25 +91,10 @@ class ConstraintsEnforce(om.ExplicitComponent):
         ]
 
         number_of_module_before = number_cells_tot / number_cells_module
-        # Because we want to downsize the battery in case it is too big, we check how much SOC we
-        # would "lose" when putting one less module. This way if the SOC at the end of the
-        # mission is above the safe minimum defined in input and below the safe minimum plus the
-        # SOC brought by one module, we know we have converge
-        soc_gain_one_module = (100.0 - soc_min_mission) / number_of_module_before
 
-        if (soc_min_mission > soc_min_required) and (
-            soc_min_mission < soc_min_required + soc_gain_one_module
-        ):
-            outputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules"
-            ] = number_of_module_before
-
-        else:
-
-            module_to_change = np.ceil((soc_min_required - soc_min_mission) / soc_gain_one_module)
-            outputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules"
-            ] = (number_of_module_before + module_to_change)
+        outputs[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules"
+        ] = number_of_module_before * (1.0 + (soc_min_required - soc_min_mission) / 100.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -130,84 +116,28 @@ class ConstraintsEnforce(om.ExplicitComponent):
         ]
 
         number_of_module_before = number_cells_tot / number_cells_module
-        soc_gain_one_module = (100.0 - soc_min_mission) / number_of_module_before
 
-        if (soc_min_mission > soc_min_required) and (
-            soc_min_mission < soc_min_required + soc_gain_one_module
-        ):
-
-            partials[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":number_modules",
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_cells",
-            ] = (
-                1.0 / number_cells_module
-            )
-            partials[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":number_modules",
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":module:number_cells",
-            ] = -(number_cells_tot / number_cells_module ** 2.0)
-            partials[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":number_modules",
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":SOC_min",
-            ] = 0.0
-            partials[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":number_modules",
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":min_safe_SOC",
-            ] = 0.0
-
-        else:
-
-            partials[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":number_modules",
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_cells",
-            ] = (
-                1.0 / number_cells_module
-                - (soc_min_required - soc_min_mission)
-                / (100.0 - soc_min_mission)
-                * number_cells_module
-                / number_cells_tot ** 2.0
-            )
-            partials[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":number_modules",
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":module:number_cells",
-            ] = (
-                -(number_cells_tot / number_cells_module ** 2.0)
-                + (soc_min_required - soc_min_mission)
-                / (100.0 - soc_min_mission)
-                / number_cells_tot
-            )
-            partials[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":number_modules",
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":SOC_min",
-            ] = (
-                number_cells_module
-                / number_cells_tot
-                * (soc_min_required - 100.0)
-                / (100.0 - soc_min_mission) ** 2.0
-            )
-            partials[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":number_modules",
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":min_safe_SOC",
-            ] = (
-                number_cells_module / number_cells_tot / (100.0 - soc_min_mission)
-            )
+        partials[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_cells",
+        ] = (1.0 + (soc_min_required - soc_min_mission) / 100.0) / number_cells_module
+        partials[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":module:number_cells",
+        ] = (
+            -number_cells_tot
+            * (1.0 + (soc_min_required - soc_min_mission) / 100.0)
+            / number_cells_module ** 2.0
+        )
+        partials[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":SOC_min",
+        ] = -(number_of_module_before / 100)
+        partials[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":min_safe_SOC",
+        ] = (
+            number_of_module_before / 100
+        )

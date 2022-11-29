@@ -7,6 +7,7 @@ import fastoad.api as oad
 
 from .sizing_module_weight import SizingBatteryModuleWeight
 from .sizing_battery_weight import SizingBatteryWeight
+from .sizing_number_cells import SizingBatteryNumberCells
 
 from ..constants import SUBMODEL_CONSTRAINTS_BATTERY
 
@@ -33,13 +34,18 @@ class SizingBatteryPack(om.Group):
         option_battery_pack_id = {"battery_pack_id": battery_pack_id}
 
         self.add_subsystem(
-            name="constraints_propeller",
+            name="constraints_battery",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_BATTERY, options=option_battery_pack_id
             ),
             promotes=["*"],
         )
 
+        self.add_subsystem(
+            name="number_of_cells",
+            subsys=SizingBatteryNumberCells(battery_pack_id=battery_pack_id),
+            promotes=["*"],
+        )
         self.add_subsystem(
             name="module_weight",
             subsys=SizingBatteryModuleWeight(battery_pack_id=battery_pack_id),

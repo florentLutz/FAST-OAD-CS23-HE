@@ -4,16 +4,17 @@
 
 import numpy as np
 import openmdao.api as om
+import pytest
 from stdatm import Atmosphere
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
-from ..components.loads.pmsm import PerformancesPMSM, SizingPMSM
-from ..components.propulsor.propeller import PerformancesPropeller, SizingPropeller
-from ..components.connectors.inverter import PerformancesInverter, SizingInverter
-from ..components.connectors.dc_cable import PerformancesHarness, SizingHarness
-from ..components.connectors.dc_bus import PerformancesDCBus, SizingDCBus
-from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter, SizingDCDCConverter
+from ..components.loads.pmsm import PerformancesPMSM
+from ..components.propulsor.propeller import PerformancesPropeller
+from ..components.connectors.inverter import PerformancesInverter
+from ..components.connectors.dc_cable import PerformancesHarness
+from ..components.connectors.dc_bus import PerformancesDCBus
+from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
 
 XML_FILE = "quad_assembly.xml"
 NB_POINTS_TEST = 25
@@ -540,5 +541,40 @@ def test_assembly():
     )
     # Result is not really accurate since we used a ICE propeller coupled to a small PMSM not
     # sized for the demand, though it shows that the assembly works just fine
+
+    assert problem.get_val(
+        "component.dc_dc_converter_1.dc_current_in", units="A"
+    ) * problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
+        np.array(
+            [
+                296834.0,
+                299031.0,
+                301239.0,
+                303458.0,
+                305688.0,
+                307930.0,
+                310182.0,
+                312445.0,
+                314719.0,
+                317005.0,
+                319301.0,
+                321609.0,
+                323928.0,
+                326258.0,
+                328600.0,
+                330953.0,
+                333317.0,
+                335693.0,
+                338080.0,
+                340478.0,
+                342888.0,
+                345310.0,
+                347743.0,
+                350187.0,
+                352644.0,
+            ]
+        ),
+        abs=1,
+    )
 
     # om.n2(problem)

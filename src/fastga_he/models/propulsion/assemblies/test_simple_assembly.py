@@ -111,16 +111,16 @@ def test_assembly_performances():
     ) * problem.get_val("performances.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                186860.0,
-                187798.0,
-                188721.0,
-                189627.0,
-                190517.0,
-                191390.0,
-                192246.0,
-                193085.0,
-                193907.0,
-                194712.0,
+                186864.0,
+                187813.0,
+                188744.0,
+                189658.0,
+                190554.0,
+                191431.0,
+                192291.0,
+                193134.0,
+                193961.0,
+                194774.0,
             ]
         ),
         abs=1,
@@ -170,7 +170,7 @@ def test_assembly_sizing():
     ) == pytest.approx(86.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(7936.0, rel=1e-2)
+    ) == pytest.approx(4960.0, rel=1e-2)
 
     write_outputs(
         pth.join(outputs.__path__[0], "simple_assembly_sizing.xml"),
@@ -178,14 +178,14 @@ def test_assembly_sizing():
     )
 
 
-def test_performances_sizing_assembly():
+def test_performances_sizing_assembly_battery_enforce():
 
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.pmsm.rpm"
     ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
-    # oad.RegisterSubmodel.active_models[
-    #     "submodel.propulsion.constraints.battery"
-    # ] = "fastga_he.submodel.propulsion.constraints.battery.enforce"
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.constraints.battery"
+    ] = "fastga_he.submodel.propulsion.constraints.battery.enforce"
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
@@ -218,6 +218,65 @@ def test_performances_sizing_assembly():
     _, _, residuals = problem.model.get_nonlinear_vectors()
 
     write_outputs(
-        pth.join(outputs.__path__[0], "full_assembly_sizing.xml"),
+        pth.join(outputs.__path__[0], "full_assembly_sizing_battery_enforce.xml"),
         problem,
     )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
+    ) == pytest.approx(20.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
+    ) == pytest.approx(3982.44, rel=1e-2)
+
+
+def test_performances_sizing_assembly_battery_ensure():
+
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.constraints.pmsm.rpm"
+    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.constraints.battery"
+    ] = "fastga_he.submodel.propulsion.constraints.battery.ensure"
+
+    ivc = get_indep_var_comp(
+        list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    problem = oad.FASTOADProblem(reports=False)
+    model = problem.model
+    model.add_subsystem(name="inputs", subsys=ivc, promotes=["*"])
+    model.add_subsystem(
+        name="full", subsys=FullSimpleAssembly(number_of_points=NB_POINTS_TEST), promotes=["*"]
+    )
+
+    problem.setup()
+    # om.n2(problem)
+    # Run problem and check obtained value(s) is/(are) correct
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+
+    write_outputs(
+        pth.join(outputs.__path__[0], "full_assembly_sizing_battery_ensure.xml"),
+        problem,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
+    ) == pytest.approx(36.7, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
+    ) == pytest.approx(4960.0, rel=1e-2)

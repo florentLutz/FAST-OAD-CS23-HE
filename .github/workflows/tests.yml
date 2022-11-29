@@ -47,6 +47,10 @@ jobs:
 
       - name: Unit tests
         run: |
-          poetry run pytest src
-          poetry run coverage xml  # for sending coverage report
+          poetry run pytest src/fastga_he/models/propulsion/components
+        shell: bash
+
+      - name: Assembly tests
+        run: |
+          poetry run pytest src/fastga_he/models/propulsion/assemblies
         shell: bash
