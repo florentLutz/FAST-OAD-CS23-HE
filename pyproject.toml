@@ -48,7 +48,7 @@ pybamm = "*"
 casadi = "3.5.5"
 
 [tool.poetry.dev-dependencies]
-pyvplm = "*"
+pyvplm = { git = "https://github.com/SizingLab/pyvplm.git", branch = "master" }
 wheel = "*"
 pytest = "^5.2"
 pytest-cov = "*"
