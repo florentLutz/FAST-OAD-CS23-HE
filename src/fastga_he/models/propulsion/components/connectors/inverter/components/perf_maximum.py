@@ -81,7 +81,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max",
             units="A",
-            val=400,
+            val=500.0,
             desc="Maximum RMS current flowing through one arm of the inverter",
         )
         self.declare_partials(
@@ -93,7 +93,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max",
             units="V",
-            val=300,
+            val=800.0,
             desc="Maximum value of the peak voltage at the output of the inverter (AC side)",
         )
         self.declare_partials(
@@ -105,7 +105,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_dc_max",
             units="A",
-            val=400,
+            val=500.0,
             desc="Maximum value of the current at the input of the inverter",
         )
         self.declare_partials(

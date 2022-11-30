@@ -56,7 +56,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_ac_max",
             units="V",
-            val=500.0,
+            val=800.0,
             desc="Maximum value of the peak voltage at the input of the motor",
         )
         self.declare_partials(
@@ -68,7 +68,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_max",
             units="N*m",
-            val=500.0,
+            val=1000.0,
             desc="Maximum value of the torque the motor has to provide",
         )
         self.declare_partials(
@@ -80,7 +80,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_max",
             units="min**-1",
-            val=500.0,
+            val=5000.0,
             desc="Maximum value of the motor rpm",
         )
         self.declare_partials(
@@ -92,7 +92,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":losses_max",
             units="W",
-            val=42.0,
+            val=4200.0,
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":losses_max",

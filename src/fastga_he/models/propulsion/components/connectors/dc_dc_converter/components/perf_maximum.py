@@ -158,7 +158,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":voltage_in_max",
             units="V",
-            val=500,
+            val=800.0,
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
@@ -173,7 +173,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":voltage_out_max",
             units="V",
-            val=500,
+            val=800.0,
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
@@ -186,7 +186,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":losses_max",
             units="W",
-            val=500,
+            val=10e3,
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"

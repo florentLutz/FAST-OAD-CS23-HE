@@ -65,7 +65,7 @@ class PerformancesMaximum(om.ExplicitComponent):
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
-            val=500.0,
+            val=1000.0,
             units="A",
             desc="Maximum current flowing through the harness, all cables included",
         )
@@ -78,12 +78,12 @@ class PerformancesMaximum(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":temperature_max",
-            val=288.15,
+            val=388.15,
             units="degK",
         )
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":losses_max",
-            val=200.0,
+            val=2.0e3,
             units="W",
             desc="Maximum losses in one cable of the harness",
         )
