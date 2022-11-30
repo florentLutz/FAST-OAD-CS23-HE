@@ -63,8 +63,11 @@ class ComputePipeMass(om.ExplicitComponent):
         # )
 
         self.add_output(name="data:thermal:pipes:coolant:mass", units="kg")
+
+        self.add_output(name="data:thermal:pipes:radius")
         # self.add_output(name="data:thermal:pipes:hydrogen:mass", units="kg")
         # self.add_output(name="data:thermal:pipes:air:mass", units="kg")
+        # self.add_output(name="data:thermal:pipes:mass", units="kg")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -80,5 +83,8 @@ class ComputePipeMass(om.ExplicitComponent):
         M_coolant_pipe = rho_pipe * np.pi * d_pipe * [(R_pipe + t_pipe) ** 2 - R_pipe**2]
         # M_H2_pipe =
         # M_air_pipe =
+        # M_total = M_coolant_pipe + M_H2_pipe + M_air_pipe
 
-        outputs["data:thermal:pipes:mass"] = M_coolant_pipe
+        outputs["data:thermal:pipes:radius"] = R_pipe
+        outputs["data:thermal:pipes:coolant:mass"] = M_coolant_pipe
+        # outputs["data:thermal:pipes:mass"] = M_total
