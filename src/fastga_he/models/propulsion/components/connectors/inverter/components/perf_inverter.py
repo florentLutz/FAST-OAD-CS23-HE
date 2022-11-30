@@ -6,6 +6,7 @@ import openmdao.api as om
 
 from .perf_modulation_index import PerformancesModulationIndex
 from .perf_resistance import PerformancesResistance
+from .perf_gate_voltage import PerformancesGateVoltage
 from .perf_conduction_loss import PerformancesConductionLosses
 from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_total_loss import PerformancesLosses
@@ -52,6 +53,11 @@ class PerformancesInverter(om.Group):
         self.add_subsystem(
             "resistance",
             PerformancesResistance(inverter_id=inverter_id, number_of_points=number_of_points),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "gate_voltage",
+            PerformancesGateVoltage(inverter_id=inverter_id, number_of_points=number_of_points),
             promotes=["data:*"],
         )
         self.add_subsystem(
@@ -114,7 +120,9 @@ class PerformancesInverter(om.Group):
 
         self.connect("modulation_idx.modulation_index", "conduction_losses.modulation_index")
         self.connect("resistance.resistance_igbt", "conduction_losses.resistance_igbt")
+        self.connect("gate_voltage.gate_voltage_igbt", "conduction_losses.gate_voltage_igbt")
         self.connect("resistance.resistance_diode", "conduction_losses.resistance_diode")
+        self.connect("gate_voltage.gate_voltage_diode", "conduction_losses.gate_voltage_diode")
         self.connect(
             "conduction_losses.conduction_losses_diode",
             [
@@ -148,10 +156,18 @@ class PerformancesInverter(om.Group):
         )
         self.connect(
             "temperature_junction.diode_temperature",
-            ["resistance.diode_temperature", "maximum.diode_temperature"],
+            [
+                "resistance.diode_temperature",
+                "maximum.diode_temperature",
+                "gate_voltage.diode_temperature",
+            ],
         )
         self.connect(
             "temperature_junction.IGBT_temperature",
-            ["resistance.IGBT_temperature", "maximum.IGBT_temperature"],
+            [
+                "resistance.IGBT_temperature",
+                "maximum.IGBT_temperature",
+                "gate_voltage.IGBT_temperature",
+            ],
         )
         self.connect("efficiency.efficiency", "dc_side_current.efficiency")

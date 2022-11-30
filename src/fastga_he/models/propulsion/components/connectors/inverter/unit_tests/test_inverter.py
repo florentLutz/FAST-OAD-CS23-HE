@@ -41,6 +41,7 @@ from ..components.sizing_inverter import SizingInverter
 from ..components.perf_modulation_index import PerformancesModulationIndex
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
+from ..components.perf_gate_voltage import PerformancesGateVoltage
 from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_total_loss import PerformancesLosses
 from fastga_he.models.propulsion.components.connectors.inverter.components.stale.perf_temperature_derivative import (
@@ -851,6 +852,40 @@ def test_resistance_profile():
     problem.check_partials(compact_print=True)
 
 
+def test_gate_voltage_profile():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesGateVoltage(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    temperature = np.array(
+        [288.15, 301.626, 313.719, 324.429, 333.762, 341.721, 348.306, 353.523, 357.375, 359.862]
+    )
+    ivc.add_output("diode_temperature", units="degK", val=temperature)
+    ivc.add_output("IGBT_temperature", units="degK", val=temperature)
+
+    problem = run_system(
+        PerformancesGateVoltage(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+    expected_gate_voltage_igbt = np.array(
+        [0.875, 0.862, 0.851, 0.841, 0.833, 0.826, 0.82, 0.815, 0.811, 0.809]
+    )
+    assert problem.get_val("gate_voltage_igbt", units="V") == pytest.approx(
+        expected_gate_voltage_igbt, rel=1e-2
+    )
+    expected_gate_voltage_diode = np.array(
+        [1.314, 1.276, 1.241, 1.211, 1.184, 1.161, 1.142, 1.127, 1.116, 1.109]
+    )
+    assert problem.get_val("gate_voltage_diode", units="V") == pytest.approx(
+        expected_gate_voltage_diode, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_conduction_losses():
 
     ivc = get_indep_var_comp(
@@ -874,19 +909,27 @@ def test_conduction_losses():
         np.array([2.55, 2.66, 2.77, 2.86, 2.94, 3.01, 3.06, 3.11, 3.14, 3.16]) * 1e-3,
         units="ohm",
     )
+    ivc.add_output(
+        "gate_voltage_igbt",
+        np.array([0.875, 0.862, 0.851, 0.841, 0.833, 0.826, 0.82, 0.815, 0.811, 0.809]),
+        units="V",
+    )
+    ivc.add_output(
+        "gate_voltage_diode",
+        np.array([1.314, 1.276, 1.241, 1.211, 1.184, 1.161, 1.142, 1.127, 1.116, 1.109]),
+        units="V",
+    )
 
     problem = run_system(
         PerformancesConductionLosses(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
     )
     expected_losses_igbt = np.array(
-        [40.99, 54.58, 70.94, 90.15, 112.55, 138.36, 167.46, 200.56, 237.06, 277.29]
+        [41.2, 54.2, 69.9, 88.3, 109.8, 134.6, 162.5, 194.4, 229.6, 268.6]
     )
     assert problem.get_val("conduction_losses_IGBT", units="W") == pytest.approx(
         expected_losses_igbt, rel=1e-2
     )
-    expected_losses_diode = np.array(
-        [49.8, 55.72, 60.53, 63.82, 65.39, 64.94, 62.1, 56.75, 48.48, 37.13]
-    )
+    expected_losses_diode = np.array([50.2, 55.0, 58.6, 60.9, 61.6, 60.6, 57.6, 52.3, 44.5, 33.9])
     assert problem.get_val("conduction_losses_diode", units="W") == pytest.approx(
         expected_losses_diode, rel=1e-2
     )

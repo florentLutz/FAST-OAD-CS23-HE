@@ -41,9 +41,9 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
         )
         self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:gate_voltage",
+            "gate_voltage_igbt",
             units="V",
-            val=np.nan,
+            val=np.full(number_of_points, np.nan),
         )
         self.add_input(
             "resistance_diode",
@@ -51,9 +51,9 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
         )
         self.add_input(
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":diode:gate_voltage",
+            "gate_voltage_diode",
             units="V",
-            val=np.nan,
+            val=np.full(number_of_points, np.nan),
         )
 
         self.add_output(
@@ -76,7 +76,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
                 "ac_current_rms_out_one_phase",
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor",
                 "resistance_diode",
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":diode:gate_voltage",
+                "gate_voltage_diode",
             ],
         )
         self.declare_partials(
@@ -86,19 +86,15 @@ class PerformancesConductionLosses(om.ExplicitComponent):
                 "ac_current_rms_out_one_phase",
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor",
                 "resistance_igbt",
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:gate_voltage",
+                "gate_voltage_igbt",
             ],
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         inverter_id = self.options["inverter_id"]
         cos_phi = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor"]
-        v_ce0 = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:gate_voltage"
-        ]
-        v_d0 = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":diode:gate_voltage"
-        ]
+        v_ce0 = inputs["gate_voltage_igbt"]
+        v_d0 = inputs["gate_voltage_diode"]
         r_igbt = inputs["resistance_igbt"]
         r_d = inputs["resistance_diode"]
 
@@ -119,12 +115,8 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         cos_phi = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor"]
-        v_ce0 = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:gate_voltage"
-        ]
-        v_d0 = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":diode:gate_voltage"
-        ]
+        v_ce0 = inputs["gate_voltage_igbt"]
+        v_d0 = inputs["gate_voltage_diode"]
         r_igbt = inputs["resistance_igbt"]
         r_d = inputs["resistance_diode"]
 
@@ -137,10 +129,8 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         ] = -beta * (v_d0 * current / 8.0 + r_d * current ** 2.0 / (3.0 * np.pi))
         partials[
             "conduction_losses_diode",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":diode:gate_voltage",
-        ] = (
-            current / (2.0 * np.pi) * (1.0 - np.pi / 4.0 * beta * cos_phi)
-        )
+            "gate_voltage_diode",
+        ] = np.diag(current / (2.0 * np.pi) * (1.0 - np.pi / 4.0 * beta * cos_phi))
         partials[
             "conduction_losses_diode",
             "resistance_diode",
@@ -162,10 +152,8 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         )
         partials[
             "conduction_losses_IGBT",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:gate_voltage",
-        ] = (
-            current / (2.0 * np.pi) * (1.0 + np.pi / 4.0 * beta * cos_phi)
-        )
+            "gate_voltage_igbt",
+        ] = np.diag(current / (2.0 * np.pi) * (1.0 + np.pi / 4.0 * beta * cos_phi))
         partials[
             "conduction_losses_IGBT",
             "resistance_igbt",
