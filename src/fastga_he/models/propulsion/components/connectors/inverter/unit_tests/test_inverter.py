@@ -665,14 +665,14 @@ def test_inverter_sizing():
             "data:propulsion:he_power_train:inverter:inverter_1:mass",
             units="kg",
         )
-        == pytest.approx(40.00, rel=1e-2)
+        == pytest.approx(40.69, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:power_density",
             units="kW/kg",
         )
-        == pytest.approx(15.0, rel=1e-2)
+        == pytest.approx(14.75, rel=1e-2)
     )
 
 
@@ -707,6 +707,13 @@ def test_constraints_enforce():
             units="W",
         )
         == pytest.approx(11000.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:switching_frequency",
+            units="Hz",
+        )
+        == pytest.approx(12.0e3, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -743,6 +750,13 @@ def test_constraints_ensure():
             units="W",
         )
         == pytest.approx(-808.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:inverter:inverter_1:switching_frequency",
+            units="Hz",
+        )
+        == pytest.approx(-3.0e3, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -1269,6 +1283,8 @@ def test_maximum():
         [1740.54, 2434.2, 3230.22, 4129.62, 5134.44, 6246.0, 7464.96, 8795.46, 10234.44, 11784.72]
     )
     ivc.add_output("losses_inverter", val=total_losses, units="W")
+    ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST))
+    ivc.add_output("modulation_index", np.linspace(0.1, 1.0, NB_POINTS_TEST))
 
     problem = run_system(
         PerformancesMaximum(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
@@ -1298,6 +1314,12 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:losses_max", units="W"
     ) == pytest.approx(11784.72, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:switching_frequency_max", units="Hz"
+    ) == pytest.approx(12.0e3, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:modulation_idx_max"
+    ) == pytest.approx(1.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

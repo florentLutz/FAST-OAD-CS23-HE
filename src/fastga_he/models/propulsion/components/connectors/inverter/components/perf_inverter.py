@@ -115,10 +115,14 @@ class PerformancesInverter(om.Group):
                 "dc_voltage_in",
                 "ac_voltage_peak_out",
                 "dc_current_in",
+                "switching_frequency",
             ],
         )
 
-        self.connect("modulation_idx.modulation_index", "conduction_losses.modulation_index")
+        self.connect(
+            "modulation_idx.modulation_index",
+            ["conduction_losses.modulation_index", "maximum.modulation_index"],
+        )
         self.connect("resistance.resistance_igbt", "conduction_losses.resistance_igbt")
         self.connect("gate_voltage.gate_voltage_igbt", "conduction_losses.gate_voltage_igbt")
         self.connect("resistance.resistance_diode", "conduction_losses.resistance_diode")

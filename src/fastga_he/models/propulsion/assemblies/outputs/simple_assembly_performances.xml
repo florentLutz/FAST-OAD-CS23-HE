@@ -9,17 +9,17 @@
       <he_power_train>
         <DC_DC_converter>
           <dc_dc_converter_1>
-            <current_in_max units="A" is_input="False">274.02258596628616</current_in_max>
-            <losses_max units="W" is_input="False">2578.185848900102</losses_max>
+            <current_in_max units="A" is_input="False">274.0225859662856</current_in_max>
+            <losses_max units="W" is_input="False">2578.1858489000992</losses_max>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <voltage_in_max units="V" is_input="False">801.8610747711582</voltage_in_max>
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
             <capacitor>
-              <current_max units="A" is_input="False">247.24250512126858</current_max>
+              <current_max units="A" is_input="False">247.24250512126835</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </capacitor>
             <diode>
-              <current_max units="A" is_input="False">335.01870336151524</current_max>
+              <current_max units="A" is_input="False">335.01870336151507</current_max>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="True">0.002805</resistance>
             </diode>
@@ -39,22 +39,22 @@
               <c is_input="True">-3.005e-08</c>
             </energy_rr>
             <igbt>
-              <current_max units="A" is_input="False">366.39106706834684</current_max>
+              <current_max units="A" is_input="False">366.3910670683462</current_max>
               <resistance units="ohm" is_input="True">0.002265</resistance>
             </igbt>
             <inductor>
-              <current_max units="A" is_input="False">496.467466838979</current_max>
+              <current_max units="A" is_input="False">496.4674668389785</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
           </dc_dc_converter_1>
         </DC_DC_converter>
         <DC_bus>
           <dc_bus_1>
-            <current_max units="A" is_input="False">226.07227884769603</current_max>
+            <current_max units="A" is_input="False">226.07227884769605</current_max>
             <voltage_max units="V" is_input="False">849.2590275195367</voltage_max>
           </dc_bus_1>
           <dc_bus_2>
-            <current_max units="A" is_input="False">226.07227884769603</current_max>
+            <current_max units="A" is_input="False">226.07227884769605</current_max>
             <voltage_max units="V" is_input="False">850.0</voltage_max>
           </dc_bus_2>
         </DC_bus>
@@ -92,14 +92,14 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <SOC_min units="percent" is_input="False">36.71401552906973<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <c_rate_max units="1/h" is_input="False">0.5480451719325723<!--Minimum state-of-charge of the battery during the mission--></c_rate_max>
+            <SOC_min units="percent" is_input="False">36.714015529069734<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <c_rate_max units="1/h" is_input="False">0.5480451719325712<!--Minimum state-of-charge of the battery during the mission--></c_rate_max>
             <number_modules is_input="True">25.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">0.7304818468162888<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <losses_max units="W" is_input="False">0.7304818468162866<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <voltage_max units="V" is_input="False">4.009305373097837<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">3.553344245033597<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <voltage_min units="V" is_input="False">3.5533442450336112<!--Minimum voltage provided by the cells during the mission--></voltage_min>
             </cell>
             <module>
               <number_cells is_input="True">200.0<!--Number of cells in series inside one battery module--></number_cells>
@@ -111,7 +111,9 @@
             <current_ac_max units="A" is_input="False">184.80516709572566<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_dc_max units="A" is_input="False">226.07227868146617<!--Maximum value of the current at the input of the inverter--></current_dc_max>
             <losses_max units="W" is_input="False">5006.361824940127</losses_max>
+            <modulation_idx_max is_input="False">0.48638744167652465<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_factor is_input="True">1.0</power_factor>
+            <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <voltage_ac_max units="V" is_input="False">413.0526427857553<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
             <voltage_dc_max units="V" is_input="False">849.2590275195367<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
             <casing>
@@ -121,7 +123,7 @@
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="True">0.00258995</resistance>
-              <temperature_max units="degK" is_input="False">349.3521616885224</temperature_max>
+              <temperature_max units="degK" is_input="False">349.35216168852236</temperature_max>
               <thermal_resistance units="degK/W" is_input="True">0.148195<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
             </diode>
             <energy_off>

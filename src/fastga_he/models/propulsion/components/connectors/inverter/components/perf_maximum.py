@@ -77,6 +77,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
             shape=number_of_points,
         )
+        self.add_input("switching_frequency", units="Hz", val=np.full(number_of_points, np.nan))
+        self.add_input("modulation_index", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max",
@@ -170,6 +172,29 @@ class PerformancesMaximum(om.ExplicitComponent):
             method="exact",
         )
 
+        self.add_output(
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency_max",
+            units="Hz",
+            val=12.0e3,
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":switching_frequency_max",
+            wrt="switching_frequency",
+            method="exact",
+        )
+        self.add_output(
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":modulation_idx_max",
+            val=1.0,
+            desc="Maximum modulation index during the mission",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:inverter:" + inverter_id + ":modulation_idx_max",
+            wrt="modulation_index",
+            method="exact",
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         inverter_id = self.options["inverter_id"]
@@ -198,6 +223,12 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max"] = np.max(
             inputs["losses_inverter"]
         )
+        outputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency_max"
+        ] = np.max(inputs["switching_frequency"])
+        outputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":modulation_idx_max"
+        ] = np.max(inputs["modulation_index"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -242,3 +273,9 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max",
             "losses_inverter",
         ] = np.where(inputs["losses_inverter"] == np.max(inputs["losses_inverter"]), 1.0, 0.0)
+        partials[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency_max",
+            "switching_frequency",
+        ] = np.where(
+            inputs["switching_frequency"] == np.max(inputs["switching_frequency"]), 1.0, 0.0
+        )

@@ -112,6 +112,43 @@ class ConstraintsEnsure(om.ExplicitComponent):
             method="exact",
         )
 
+        self.add_input(
+            name="data:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":switching_frequency_max",
+            val=np.nan,
+            units="Hz",
+            desc="Maximum switching frequency seen by the IGBT modules in the inverter during the "
+            "mission",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency",
+            val=np.nan,
+            units="Hz",
+            desc="Maximum switching frequency of the IGBT modules in the inverter, used for sizing",
+        )
+        self.add_output(
+            name="constraints:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":switching_frequency",
+            val=0.0,
+            units="Hz",
+            desc="Constraints on the maximum switching frequency of the IGBT modules in the "
+            "inverter, respected when <0",
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":switching_frequency",
+            wrt=[
+                "data:propulsion:he_power_train:inverter:"
+                + inverter_id
+                + ":switching_frequency_max",
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency",
+            ],
+            method="exact",
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         inverter_id = self.options["inverter_id"]
@@ -133,6 +170,18 @@ class ConstraintsEnsure(om.ExplicitComponent):
         ] = (
             inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max"]
             - inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat"]
+        )
+        outputs[
+            "constraints:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency"
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:inverter:"
+                + inverter_id
+                + ":switching_frequency_max"
+            ]
+            - inputs[
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency"
+            ]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -164,4 +213,17 @@ class ConstraintsEnsure(om.ExplicitComponent):
         partials[
             "constraints:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
+        ] = -1.0
+
+        partials[
+            "constraints:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":switching_frequency",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency_max",
+        ] = 1.0
+        partials[
+            "constraints:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":switching_frequency",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency",
         ] = -1.0

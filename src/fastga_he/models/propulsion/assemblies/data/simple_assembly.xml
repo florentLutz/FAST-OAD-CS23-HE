@@ -149,6 +149,7 @@
                         <voltage_caliber units="V">500.0</voltage_caliber>
                         <voltage_ac_max units="V">500.0</voltage_ac_max>
                         <switching_frequency units="Hz">15.0e3</switching_frequency>
+                        <switching_frequency_max units="Hz" is_input="True">12000.0</switching_frequency_max>
                         <power_factor>1.0</power_factor>
                         <mass units="kg">42.82</mass>
                         <capacitor>

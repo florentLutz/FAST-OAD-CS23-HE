@@ -84,6 +84,29 @@ class ConstraintsEnforce(om.ExplicitComponent):
             val=1.0,
         )
 
+        self.add_input(
+            name="data:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":switching_frequency_max",
+            val=np.nan,
+            units="Hz",
+            desc="Maximum switching frequency seen by the IGBT modules in the inverter during the "
+            "mission",
+        )
+        self.add_output(
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency",
+            val=12.0e3,
+            units="Hz",
+            desc="Maximum switching frequency of the IGBT modules in the inverter, used for sizing",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency",
+            wrt="data:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":switching_frequency_max",
+            val=1.0,
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         inverter_id = self.options["inverter_id"]
@@ -97,3 +120,8 @@ class ConstraintsEnforce(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat"
         ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max"]
+        outputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency"
+        ] = inputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency_max"
+        ]

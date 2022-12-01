@@ -215,17 +215,18 @@
             <current_ripple is_input="True">0.2<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <dissipable_heat units="W" is_input="False">11000.0<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <losses_max units="W" is_input="True">11000.0</losses_max>
-            <mass units="kg" is_input="False">40.01018544872945<!--Mass of the inverter--></mass>
-            <power_density units="kW/kg" is_input="False">14.996181429072914<!--Power density of the inverter--></power_density>
+            <mass units="kg" is_input="False">40.69162227488438<!--Mass of the inverter--></mass>
+            <power_density units="kW/kg" is_input="False">14.745049876527805<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
-            <switching_frequency units="Hz" is_input="True">15000.0<!--Maximum switching frequency of the IGBT modules--></switching_frequency>
+            <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
+            <switching_frequency_max units="Hz" is_input="True">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <voltage_ac_max units="V" is_input="True">500.0</voltage_ac_max>
             <voltage_caliber units="V" is_input="False">500.0<!--Voltage caliber of the inverter--></voltage_caliber>
             <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
             <capacitor>
-              <capacity units="F" is_input="False">0.001869866666666667<!--Capacity required to dampen the design voltage ripple--></capacity>
+              <capacity units="F" is_input="False">0.0023373333333333336<!--Capacity required to dampen the design voltage ripple--></capacity>
               <current_caliber units="A" is_input="False">183.7762984739307<!--Current caliber of the capacitor of the inverter--></current_caliber>
-              <mass units="g" is_input="False">3609.9975246458284<!--Mass of the capacitor--></mass>
+              <mass units="g" is_input="False">4291.434350800763<!--Mass of the capacitor--></mass>
             </capacitor>
             <casing>
               <heat_capacity units="J/degK" is_input="False">200.99999999999997<!--Heat capacity of one casing--></heat_capacity>
