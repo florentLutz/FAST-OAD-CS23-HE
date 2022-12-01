@@ -77,6 +77,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
             shape=number_of_points,
         )
+        self.add_input("switching_frequency", units="Hz", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             "data:propulsion:he_power_train:DC_DC_converter:"
@@ -196,6 +197,21 @@ class PerformancesMaximum(om.ExplicitComponent):
             method="exact",
         )
 
+        self.add_output(
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency_max",
+            units="Hz",
+            val=15e3,
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency_max",
+            wrt="switching_frequency",
+            method="exact",
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
@@ -245,6 +261,12 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":losses_max"
         ] = np.max(inputs["losses_converter"])
+
+        outputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency_max"
+        ] = np.max(inputs["switching_frequency"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -303,3 +325,12 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":losses_max",
             "losses_converter",
         ] = np.where(inputs["losses_converter"] == np.max(inputs["losses_converter"]), 1.0, 0.0)
+
+        partials[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency_max",
+            "switching_frequency",
+        ] = np.where(
+            inputs["switching_frequency"] == np.max(inputs["switching_frequency"]), 1.0, 0.0
+        )

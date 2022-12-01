@@ -287,6 +287,13 @@ def test_constraints_enforce():
         )
         == pytest.approx(860.0, rel=1e-2)
     )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency",
+            units="Hz",
+        )
+        == pytest.approx(12.0e3, rel=1e-2)
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -344,6 +351,13 @@ def test_constraints_ensure():
         problem.get_val(
             "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_caliber",
             units="V",
+        )
+        == pytest.approx(0.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency",
+            units="Hz",
         )
         == pytest.approx(0.0, rel=1e-2)
     )
@@ -682,6 +696,7 @@ def test_maximum():
         np.array([375.2, 423.3, 471.9, 521.9, 574.3, 626.0, 680.3, 736.1, 792.0, 849.3]),
         units="A",
     )
+    ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST))
     voltage_out = np.linspace(710, 910, NB_POINTS_TEST)
     ivc.add_output("dc_voltage_out", voltage_out, units="V")
     voltage_in = np.full(NB_POINTS_TEST, 810)
@@ -754,6 +769,13 @@ def test_maximum():
             units="W",
         )
         == pytest.approx(4967.6, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency_max",
+            units="Hz",
+        )
+        == pytest.approx(12000, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)

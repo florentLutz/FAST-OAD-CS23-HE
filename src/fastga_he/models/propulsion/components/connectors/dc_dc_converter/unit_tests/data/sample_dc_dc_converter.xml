@@ -33,6 +33,7 @@
                         <voltage_out_max units="V">850.0</voltage_out_max>
                         <current_ripple>0.1</current_ripple>
                         <switching_frequency units="Hz">12000.0</switching_frequency>
+                        <switching_frequency_max units="Hz">12000.0</switching_frequency_max>
                         <scaling>
                             <a>1.5</a>
                             <resistance>1.5</resistance>

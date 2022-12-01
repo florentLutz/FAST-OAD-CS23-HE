@@ -202,6 +202,32 @@ class ConstraintsEnforce(om.ExplicitComponent):
             val=1.0,
         )
 
+        self.add_input(
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency_max",
+            units="Hz",
+            val=np.nan,
+            desc="Maximum switching frequency seen during the mission in the converter",
+        )
+        self.add_output(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency",
+            units="Hz",
+            val=15.0e3,
+            desc="Maximum switching frequency of the IGBT module in the converter",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency_max",
+            val=1.0,
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
@@ -278,6 +304,16 @@ class ConstraintsEnforce(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":voltage_in_max"
+        ]
+
+        outputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency"
+        ] = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency_max"
         ]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):

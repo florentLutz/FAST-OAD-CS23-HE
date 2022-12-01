@@ -20,7 +20,8 @@
             <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <mass units="kg" is_input="False">86.0<!--Mass of the converter--></mass>
             <power_density units="W/kg" is_input="True">4000.0<!--Power density of the converter--></power_density>
-            <switching_frequency units="Hz" is_input="True">12000.0<!--Maximum switching frequency of the IGBT module in the converter--></switching_frequency>
+            <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT module in the converter--></switching_frequency>
+            <switching_frequency_max units="Hz" is_input="True">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
             <voltage_caliber units="V" is_input="False">860.0<!--Voltage caliber of the converter--></voltage_caliber>
             <voltage_in_caliber units="V" is_input="False">860.0<!--Voltage caliber of the converter--></voltage_in_caliber>
             <voltage_in_max units="V" is_input="True">860.0</voltage_in_max>

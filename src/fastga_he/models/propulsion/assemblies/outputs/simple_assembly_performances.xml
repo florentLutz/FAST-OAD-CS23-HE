@@ -11,6 +11,7 @@
           <dc_dc_converter_1>
             <current_in_max units="A" is_input="False">274.02258596628616</current_in_max>
             <losses_max units="W" is_input="False">2578.185848900102</losses_max>
+            <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <voltage_in_max units="V" is_input="False">801.8610747711582</voltage_in_max>
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
             <capacitor>
