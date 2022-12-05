@@ -4,6 +4,8 @@
             <he_power_train>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
+                        <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
+                        <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
                         <igbt>
                             <resistance units="ohm">0.002265</resistance>
                             <gate_voltage units="V">0.87</gate_voltage>

@@ -12,8 +12,10 @@
             <current_in_max units="A" is_input="False">274.0225859662856</current_in_max>
             <losses_max units="W" is_input="False">2578.185848900099</losses_max>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_in_max units="V" is_input="False">801.8610747711582</voltage_in_max>
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
+            <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <capacitor>
               <current_max units="A" is_input="False">247.24250512126832</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>

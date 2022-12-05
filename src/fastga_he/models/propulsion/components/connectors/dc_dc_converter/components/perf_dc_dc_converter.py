@@ -4,6 +4,8 @@
 
 import openmdao.api as om
 
+from .perf_switching_frequency import PerformancesSwitchingFrequencyMission
+from .perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from .perf_converter_relations import PerformancesConverterRelations
 from .perf_generator_side import PerformancesConverterGeneratorSide
 from .perf_load_side import PerformancesConverterLoadSide
@@ -32,6 +34,20 @@ class PerformancesDCDCConverter(om.Group):
         number_of_points = self.options["number_of_points"]
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
+        self.add_subsystem(
+            "switching_frequency",
+            PerformancesSwitchingFrequencyMission(
+                number_of_points=number_of_points, dc_dc_converter_id=dc_dc_converter_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "voltage_out_target",
+            PerformancesVoltageOutTargetMission(
+                number_of_points=number_of_points, dc_dc_converter_id=dc_dc_converter_id
+            ),
+            promotes=["*"],
+        )
         self.add_subsystem(
             "load_side",
             PerformancesConverterLoadSide(number_of_points=number_of_points),

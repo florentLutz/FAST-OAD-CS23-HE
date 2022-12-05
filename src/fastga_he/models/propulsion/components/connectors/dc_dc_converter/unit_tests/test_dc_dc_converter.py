@@ -15,6 +15,8 @@ from ..components.sizing_reference_resistance import SizingDCDCConverterResistan
 from ..components.sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from ..components.sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
 from ..components.sizing_weight import SizingDCDCConverterWeight
+from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
+from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_load_side import PerformancesConverterLoadSide
 from ..components.perf_duty_cycle import PerformancesDutyCycle
 from ..components.perf_currents import PerformancesCurrents
@@ -399,6 +401,149 @@ def test_dc_dc_converter_sizing():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_switching_frequency_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency_mission",
+        val=12.0e3,
+        units="Hz",
+    )
+
+    problem = run_system(
+        PerformancesSwitchingFrequencyMission(
+            dc_dc_converter_id="dc_dc_converter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("switching_frequency", units="Hz") == pytest.approx(
+        np.full(NB_POINTS_TEST, 12.0e3), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc2 = om.IndepVarComp()
+    ivc2.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency_mission",
+        val=[15e3, 12e3, 10e3],
+        units="Hz",
+    )
+
+    problem2 = run_system(
+        PerformancesSwitchingFrequencyMission(
+            dc_dc_converter_id="dc_dc_converter_1", number_of_points=250
+        ),
+        ivc2,
+    )
+
+    assert problem2.get_val("switching_frequency", units="Hz") == pytest.approx(
+        np.concatenate(
+            (
+                np.full(100, 15e3),
+                np.full(100, 12e3),
+                np.full(50, 10e3),
+            )
+        ),
+        rel=1e-2,
+    )
+
+    problem2.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency_mission",
+        val=[15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 420],
+        units="Hz",
+    )
+
+    problem3 = run_system(
+        PerformancesSwitchingFrequencyMission(
+            dc_dc_converter_id="dc_dc_converter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc3,
+    )
+
+    assert problem3.get_val("switching_frequency", units="Hz") == pytest.approx(
+        np.array([15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 420]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
+
+
+def test_voltage_out_target_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1"
+        ":voltage_out_target_mission",
+        val=850.0,
+        units="V",
+    )
+
+    problem = run_system(
+        PerformancesVoltageOutTargetMission(
+            dc_dc_converter_id="dc_dc_converter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("voltage_out_target", units="V") == pytest.approx(
+        np.full(NB_POINTS_TEST, 850), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc2 = om.IndepVarComp()
+    ivc2.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_out_target_mission",
+        val=[850, 800, 700],
+        units="V",
+    )
+
+    problem2 = run_system(
+        PerformancesVoltageOutTargetMission(
+            dc_dc_converter_id="dc_dc_converter_1", number_of_points=250
+        ),
+        ivc2,
+    )
+
+    assert problem2.get_val("voltage_out_target", units="V") == pytest.approx(
+        np.concatenate(
+            (
+                np.full(100, 850),
+                np.full(100, 800),
+                np.full(50, 700),
+            )
+        ),
+        rel=1e-2,
+    )
+
+    problem2.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_out_target_mission",
+        val=[850.0, 800.0, 700.0, 850.0, 800.0, 700.0, 850.0, 800.0, 700.0, 420.0],
+        units="V",
+    )
+
+    problem3 = run_system(
+        PerformancesVoltageOutTargetMission(
+            dc_dc_converter_id="dc_dc_converter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc3,
+    )
+
+    assert problem3.get_val("voltage_out_target", units="V") == pytest.approx(
+        np.array([850.0, 800.0, 700.0, 850.0, 800.0, 700.0, 850.0, 800.0, 700.0, 420.0]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
 
 
 def test_load_side():

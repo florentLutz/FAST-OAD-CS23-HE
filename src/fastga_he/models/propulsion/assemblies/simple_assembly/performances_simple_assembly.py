@@ -35,17 +35,9 @@ class PerformancesAssembly(om.Group):
 
         number_of_points = self.options["number_of_points"]
 
-        ivc4 = om.IndepVarComp()
-        ivc4.add_output("switching_frequency", units="Hz", val=np.full(number_of_points, 12000))
-
-        ivc5 = om.IndepVarComp()
-        ivc5.add_output("voltage_out_target", val=np.full(number_of_points, 850.0))
-
         ivc6 = om.IndepVarComp()
         ivc6.add_output("cell_temperature", val=np.full(number_of_points, 288.15), units="degK")
 
-        self.add_subsystem("control_converter", ivc4, promotes=[])
-        self.add_subsystem("converter_voltage_target", ivc5, promotes=[])
         self.add_subsystem("battery_temperature", ivc6, promotes=[])
 
         self.add_subsystem(
@@ -109,9 +101,6 @@ class PerformancesAssembly(om.Group):
         )
 
         self.connect("propeller_1.rpm", "motor_1.rpm")
-        self.connect(
-            "control_converter.switching_frequency", "dc_dc_converter_1.switching_frequency"
-        )
         self.connect("propeller_1.shaft_power_in", "motor_1.shaft_power_out")
         self.connect(
             "motor_1.ac_current_rms_in_one_phase", "inverter_1.ac_current_rms_out_one_phase"
@@ -126,9 +115,6 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_line_1.dc_current", "dc_bus_2.dc_current_out_1")
         self.connect("dc_dc_converter_1.dc_current_out", "dc_bus_2.dc_current_in_1")
         self.connect("dc_bus_2.dc_voltage", "dc_dc_converter_1.dc_voltage_out")
-        self.connect(
-            "converter_voltage_target.voltage_out_target", "dc_dc_converter_1.voltage_out_target"
-        )
         self.connect("battery_pack_1.voltage_out", "dc_dc_converter_1.dc_voltage_in")
         self.connect("dc_dc_converter_1.dc_current_in", "battery_pack_1.dc_current_out")
         self.connect("battery_temperature.cell_temperature", "battery_pack_1.cell_temperature")

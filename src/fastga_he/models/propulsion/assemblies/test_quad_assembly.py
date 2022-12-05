@@ -42,17 +42,9 @@ class PerformancesAssembly(om.Group):
 
         number_of_points = self.options["number_of_points"]
 
-        ivc4 = om.IndepVarComp()
-        ivc4.add_output("switching_frequency", units="Hz", val=np.full(NB_POINTS_TEST, 12000))
-
-        ivc5 = om.IndepVarComp()
-        ivc5.add_output("voltage_out_target", val=np.full(NB_POINTS_TEST, 850.0))
-
         ivc6 = om.IndepVarComp()
         ivc6.add_output("voltage_in", val=np.full(NB_POINTS_TEST, 860.0))
 
-        self.add_subsystem("control_converter", ivc4, promotes=[])
-        self.add_subsystem("converter_voltage_target", ivc5, promotes=[])
         self.add_subsystem("dc_dc_converter_voltage_in", ivc6, promotes=[])
 
         ivc_thrust_1 = om.IndepVarComp(
@@ -347,12 +339,6 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_bus_5.dc_voltage", "dc_dc_converter_1.dc_voltage_out")
 
         self.connect("dc_dc_converter_voltage_in.voltage_in", "dc_dc_converter_1.dc_voltage_in")
-        self.connect(
-            "control_converter.switching_frequency", "dc_dc_converter_1.switching_frequency"
-        )
-        self.connect(
-            "converter_voltage_target.voltage_out_target", "dc_dc_converter_1.voltage_out_target"
-        )
 
 
 def test_assembly():
