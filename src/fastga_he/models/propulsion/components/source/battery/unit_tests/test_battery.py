@@ -9,6 +9,7 @@ import numpy as np
 from ..components.sizing_module_weight import SizingBatteryModuleWeight
 from ..components.sizing_battery_weight import SizingBatteryWeight
 from ..components.sizing_number_cells import SizingBatteryNumberCells
+from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
 from ..components.perf_module_current import PerformancesModuleCurrent
 from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
 from ..components.perf_internal_resistance import PerformancesInternalResistance
@@ -168,6 +169,75 @@ def test_battery_pack_sizing():
     ) == pytest.approx(7936.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_cell_temperature_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell_temperature_mission",
+        val=290.0,
+        units="degK",
+    )
+
+    problem = run_system(
+        PerformancesCellTemperatureMission(
+            battery_pack_id="battery_pack_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("cell_temperature", units="degK") == pytest.approx(
+        np.full(NB_POINTS_TEST, 290), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc2 = om.IndepVarComp()
+    ivc2.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell_temperature_mission",
+        val=[290, 270, 290],
+        units="degK",
+    )
+
+    problem2 = run_system(
+        PerformancesCellTemperatureMission(battery_pack_id="battery_pack_1", number_of_points=250),
+        ivc2,
+    )
+
+    assert problem2.get_val("cell_temperature", units="degK") == pytest.approx(
+        np.concatenate(
+            (
+                np.full(100, 290),
+                np.full(100, 270),
+                np.full(50, 290),
+            )
+        ),
+        rel=1e-2,
+    )
+
+    problem2.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell_temperature_mission",
+        val=[290, 270, 290, 290, 270, 290, 290, 270, 290, 42],
+        units="degK",
+    )
+
+    problem3 = run_system(
+        PerformancesCellTemperatureMission(
+            battery_pack_id="battery_pack_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc3,
+    )
+
+    assert problem3.get_val("cell_temperature", units="degK") == pytest.approx(
+        np.array([290, 270, 290, 290, 270, 290, 290, 270, 290, 42]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
 
 
 def test_current_module():
@@ -603,7 +673,6 @@ def test_performances_battery_pack():
     dc_current_out = np.linspace(400, 410, NB_POINTS_TEST)
     ivc.add_output("dc_current_out", dc_current_out, units="A")
     ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
-    ivc.add_output("cell_temperature", units="degK", val=np.full(NB_POINTS_TEST, 288.15))
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(

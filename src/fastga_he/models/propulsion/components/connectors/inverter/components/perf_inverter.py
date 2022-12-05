@@ -5,7 +5,7 @@
 import openmdao.api as om
 
 from .perf_switching_frequency import PerformancesSwitchingFrequencyMission
-from .perf_heatsink_temperature import PerformancesHeatSinkTemperatureMission
+from .perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
 from .perf_modulation_index import PerformancesModulationIndex
 from .perf_resistance import PerformancesResistance
 from .perf_gate_voltage import PerformancesGateVoltage

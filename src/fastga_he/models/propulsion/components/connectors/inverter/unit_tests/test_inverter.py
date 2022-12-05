@@ -39,7 +39,7 @@ from ..components.sizing_inverter_weight import SizingInverterWeight
 from ..components.sizing_inverter_power_density import SizingInverterPowerDensity
 from ..components.sizing_inverter import SizingInverter
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
-from ..components.perf_heatsink_temperature import PerformancesHeatSinkTemperatureMission
+from ..components.perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
 from ..components.perf_modulation_index import PerformancesModulationIndex
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance

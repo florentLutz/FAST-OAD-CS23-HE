@@ -96,6 +96,7 @@
           <battery_pack_1>
             <SOC_min units="percent" is_input="False">36.714015529069734<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">0.5480451719325712<!--Minimum state-of-charge of the battery during the mission--></c_rate_max>
+            <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <number_modules is_input="True">25.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>

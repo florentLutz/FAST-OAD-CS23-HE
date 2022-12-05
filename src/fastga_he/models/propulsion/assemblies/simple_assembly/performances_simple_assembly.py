@@ -35,11 +35,6 @@ class PerformancesAssembly(om.Group):
 
         number_of_points = self.options["number_of_points"]
 
-        ivc6 = om.IndepVarComp()
-        ivc6.add_output("cell_temperature", val=np.full(number_of_points, 288.15), units="degK")
-
-        self.add_subsystem("battery_temperature", ivc6, promotes=[])
-
         self.add_subsystem(
             "propeller_1",
             PerformancesPropeller(propeller_id="propeller_1", number_of_points=number_of_points),
@@ -117,4 +112,3 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_bus_2.dc_voltage", "dc_dc_converter_1.dc_voltage_out")
         self.connect("battery_pack_1.voltage_out", "dc_dc_converter_1.dc_voltage_in")
         self.connect("dc_dc_converter_1.dc_current_in", "battery_pack_1.dc_current_out")
-        self.connect("battery_temperature.cell_temperature", "battery_pack_1.cell_temperature")

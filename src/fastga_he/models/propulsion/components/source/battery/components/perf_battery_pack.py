@@ -4,6 +4,7 @@
 
 import openmdao.api as om
 
+from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
 from ..components.perf_module_current import PerformancesModuleCurrent
 from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
 from ..components.perf_internal_resistance import PerformancesInternalResistance
@@ -49,6 +50,13 @@ class PerformancesBatteryPack(om.Group):
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
 
+        self.add_subsystem(
+            "cell_temperature",
+            PerformancesCellTemperatureMission(
+                number_of_points=number_of_points, battery_pack_id=battery_pack_id
+            ),
+            promotes=["*"],
+        )
         self.add_subsystem(
             "current_per_module",
             PerformancesModuleCurrent(
