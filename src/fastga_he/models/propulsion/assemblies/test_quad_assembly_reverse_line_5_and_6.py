@@ -42,12 +42,6 @@ class PerformancesAssembly(om.Group):
 
         number_of_points = self.options["number_of_points"]
 
-        ivc2 = om.IndepVarComp()
-        ivc2.add_output("switching_frequency", units="Hz", val=np.full(number_of_points, 12000.0))
-
-        ivc3 = om.IndepVarComp()
-        ivc3.add_output("heat_sink_temperature", units="degK", val=np.full(NB_POINTS_TEST, 288.15))
-
         ivc4 = om.IndepVarComp()
         ivc4.add_output("switching_frequency", units="Hz", val=np.full(NB_POINTS_TEST, 12000))
 
@@ -57,8 +51,6 @@ class PerformancesAssembly(om.Group):
         ivc6 = om.IndepVarComp()
         ivc6.add_output("voltage_in", val=np.full(NB_POINTS_TEST, 860.0))
 
-        self.add_subsystem("control_inverter", ivc2, promotes=[])
-        self.add_subsystem("inverter_heat_sink", ivc3, promotes=[])
         self.add_subsystem("control_converter", ivc4, promotes=[])
         self.add_subsystem("converter_voltage_target", ivc5, promotes=[])
         self.add_subsystem("dc_dc_converter_voltage_in", ivc6, promotes=[])
@@ -273,26 +265,6 @@ class PerformancesAssembly(om.Group):
         self.connect("propeller_2.rpm", "motor_2.rpm")
         self.connect("propeller_3.rpm", "motor_3.rpm")
         self.connect("propeller_4.rpm", "motor_4.rpm")
-
-        self.connect(
-            "control_inverter.switching_frequency",
-            [
-                "inverter_1.switching_frequency",
-                "inverter_2.switching_frequency",
-                "inverter_3.switching_frequency",
-                "inverter_4.switching_frequency",
-            ],
-        )
-
-        self.connect(
-            "inverter_heat_sink.heat_sink_temperature",
-            [
-                "inverter_1.heat_sink_temperature",
-                "inverter_2.heat_sink_temperature",
-                "inverter_3.heat_sink_temperature",
-                "inverter_4.heat_sink_temperature",
-            ],
-        )
 
         self.connect("ivc_thrust_1.thrust_1", "propeller_1.thrust")
         self.connect("ivc_thrust_2.thrust_2", "propeller_2.thrust")

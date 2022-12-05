@@ -10,12 +10,12 @@
         <DC_DC_converter>
           <dc_dc_converter_1>
             <current_in_max units="A" is_input="False">274.0225859662856</current_in_max>
-            <losses_max units="W" is_input="False">2578.1858489000992</losses_max>
+            <losses_max units="W" is_input="False">2578.185848900099</losses_max>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <voltage_in_max units="V" is_input="False">801.8610747711582</voltage_in_max>
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
             <capacitor>
-              <current_max units="A" is_input="False">247.24250512126835</current_max>
+              <current_max units="A" is_input="False">247.24250512126832</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </capacitor>
             <diode>
@@ -39,22 +39,22 @@
               <c is_input="True">-3.005e-08</c>
             </energy_rr>
             <igbt>
-              <current_max units="A" is_input="False">366.3910670683462</current_max>
+              <current_max units="A" is_input="False">366.39106706834616</current_max>
               <resistance units="ohm" is_input="True">0.002265</resistance>
             </igbt>
             <inductor>
-              <current_max units="A" is_input="False">496.4674668389785</current_max>
+              <current_max units="A" is_input="False">496.46746683897845</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
           </dc_dc_converter_1>
         </DC_DC_converter>
         <DC_bus>
           <dc_bus_1>
-            <current_max units="A" is_input="False">226.07227884769605</current_max>
+            <current_max units="A" is_input="False">226.07227884769603</current_max>
             <voltage_max units="V" is_input="False">849.2590275195367</voltage_max>
           </dc_bus_1>
           <dc_bus_2>
-            <current_max units="A" is_input="False">226.07227884769605</current_max>
+            <current_max units="A" is_input="False">226.07227884769603</current_max>
             <voltage_max units="V" is_input="False">850.0</voltage_max>
           </dc_bus_2>
         </DC_bus>
@@ -110,10 +110,12 @@
           <inverter_1>
             <current_ac_max units="A" is_input="False">184.80516709572566<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_dc_max units="A" is_input="False">226.07227868146617<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <losses_max units="W" is_input="False">5006.361824940127</losses_max>
-            <modulation_idx_max is_input="False">0.48638744167652465<!--Maximum modulation index during the mission--></modulation_idx_max>
+            <modulation_idx_max is_input="False">0.48638744167652337<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
             <voltage_ac_max units="V" is_input="False">413.0526427857553<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
             <voltage_dc_max units="V" is_input="False">849.2590275195367<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
             <casing>

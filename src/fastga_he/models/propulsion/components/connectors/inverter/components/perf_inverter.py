@@ -4,6 +4,8 @@
 
 import openmdao.api as om
 
+from .perf_switching_frequency import PerformancesSwitchingFrequencyMission
+from .perf_heatsink_temperature import PerformancesHeatSinkTemperatureMission
 from .perf_modulation_index import PerformancesModulationIndex
 from .perf_resistance import PerformancesResistance
 from .perf_gate_voltage import PerformancesGateVoltage
@@ -45,6 +47,20 @@ class PerformancesInverter(om.Group):
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
+        self.add_subsystem(
+            "switching_frequency",
+            PerformancesSwitchingFrequencyMission(
+                inverter_id=inverter_id, number_of_points=number_of_points
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "heat_sink_temperature",
+            PerformancesHeatSinkTemperatureMission(
+                inverter_id=inverter_id, number_of_points=number_of_points
+            ),
+            promotes=["*"],
+        )
         self.add_subsystem(
             "modulation_idx",
             PerformancesModulationIndex(number_of_points=number_of_points),

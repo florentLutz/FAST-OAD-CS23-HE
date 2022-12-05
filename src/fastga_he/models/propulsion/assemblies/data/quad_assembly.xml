@@ -249,6 +249,8 @@
                 </DC_cable_harness>
                 <inverter>
                     <inverter_1>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>
@@ -328,6 +330,8 @@
                         </energy_rr>
                     </inverter_1>
                     <inverter_2>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>
@@ -407,6 +411,8 @@
                         </energy_rr>
                     </inverter_2>
                     <inverter_3>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>
@@ -486,6 +492,8 @@
                         </energy_rr>
                     </inverter_3>
                     <inverter_4>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>

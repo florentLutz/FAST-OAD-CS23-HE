@@ -38,6 +38,8 @@ from ..components.sizing_contactor_weight import SizingInverterContactorWeight
 from ..components.sizing_inverter_weight import SizingInverterWeight
 from ..components.sizing_inverter_power_density import SizingInverterPowerDensity
 from ..components.sizing_inverter import SizingInverter
+from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
+from ..components.perf_heatsink_temperature import PerformancesHeatSinkTemperatureMission
 from ..components.perf_modulation_index import PerformancesModulationIndex
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
@@ -762,6 +764,143 @@ def test_constraints_ensure():
     problem.check_partials(compact_print=True)
 
 
+def test_switching_frequency_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:inverter:inverter_1:switching_frequency_mission",
+        val=12.0e3,
+        units="Hz",
+    )
+
+    problem = run_system(
+        PerformancesSwitchingFrequencyMission(
+            inverter_id="inverter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("switching_frequency", units="Hz") == pytest.approx(
+        np.full(NB_POINTS_TEST, 12.0e3), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc2 = om.IndepVarComp()
+    ivc2.add_output(
+        "data:propulsion:he_power_train:inverter:inverter_1:switching_frequency_mission",
+        val=[15e3, 12e3, 10e3],
+        units="Hz",
+    )
+
+    problem2 = run_system(
+        PerformancesSwitchingFrequencyMission(inverter_id="inverter_1", number_of_points=250),
+        ivc2,
+    )
+
+    assert problem2.get_val("switching_frequency", units="Hz") == pytest.approx(
+        np.concatenate(
+            (
+                np.full(100, 15e3),
+                np.full(100, 12e3),
+                np.full(50, 10e3),
+            )
+        ),
+        rel=1e-2,
+    )
+
+    problem2.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:inverter:inverter_1:switching_frequency_mission",
+        val=[15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 420],
+        units="Hz",
+    )
+
+    problem3 = run_system(
+        PerformancesSwitchingFrequencyMission(
+            inverter_id="inverter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc3,
+    )
+
+    assert problem3.get_val("switching_frequency", units="Hz") == pytest.approx(
+        np.array([15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 420]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
+
+
+def test_heat_sink_temperature_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink_temperature_mission",
+        val=290.0,
+        units="degK",
+    )
+
+    problem = run_system(
+        PerformancesHeatSinkTemperatureMission(
+            inverter_id="inverter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("heat_sink_temperature", units="degK") == pytest.approx(
+        np.full(NB_POINTS_TEST, 290), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc2 = om.IndepVarComp()
+    ivc2.add_output(
+        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink_temperature_mission",
+        val=[290, 270, 290],
+        units="degK",
+    )
+
+    problem2 = run_system(
+        PerformancesHeatSinkTemperatureMission(inverter_id="inverter_1", number_of_points=250), ivc2
+    )
+
+    assert problem2.get_val("heat_sink_temperature", units="degK") == pytest.approx(
+        np.concatenate(
+            (
+                np.full(100, 290),
+                np.full(100, 270),
+                np.full(50, 290),
+            )
+        ),
+        rel=1e-2,
+    )
+
+    problem2.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink_temperature_mission",
+        val=[290, 270, 290, 290, 270, 290, 290, 270, 290, 42],
+        units="degK",
+    )
+
+    problem3 = run_system(
+        PerformancesHeatSinkTemperatureMission(
+            inverter_id="inverter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc3,
+    )
+
+    assert problem3.get_val("heat_sink_temperature", units="degK") == pytest.approx(
+        np.array([290, 270, 290, 290, 270, 290, 290, 270, 290, 42]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
+
+
 def test_modulation_idx():
 
     ivc = om.IndepVarComp()
@@ -1333,11 +1472,9 @@ def test_performances_inverter_tot():
         XML_FILE,
     )
 
-    ivc.add_output("heat_sink_temperature", units="degK", val=np.full(NB_POINTS_TEST, 288.15))
     ivc.add_output(
         "ac_current_rms_out_one_phase", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A"
     )
-    ivc.add_output("switching_frequency", np.linspace(12000.0, 12000.0, NB_POINTS_TEST))
     ivc.add_output("dc_voltage_in", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
     ivc.add_output(
         "ac_voltage_peak_out",
