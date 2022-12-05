@@ -285,6 +285,10 @@ def test_performances_sizing_assembly_battery_ensure():
 
 def test_assembly_sizing_from_pt_file():
 
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.constraints.pmsm.rpm"
+    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+
     pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/sample_power_train_file.yml"
 
     ivc = get_indep_var_comp(
