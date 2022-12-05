@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://www.fast-oad.org/power_train.schema.json",
+  "title": "FAST-OAD-GA-HE power train file",
+  "description": "Schema for FAST-OAD-GA-HE power train files",
+  "type": "object",
+  "definitions": {
+    "float_or_ndarray": {
+      "$comment": "Definition of value that accepts float or list of floats",
+      "type": [
+        "number",
+        "array"
+      ],
+      "items": {
+        "type": "number"
+      }
+    },
+    "pt_component": {
+      "$comment": "Definition of a power train component",
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "pt_group": {
+      "$comment": "Definition of a group of power train components",
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/pt_component"
+          },
+          {
+            "$ref": "#/definitions/pt_group"
+          }
+        ]
+      },
+      "properties": {
+        "connections": {
+          "type": "array",
+          "required": [
+            "source",
+            "target"
+          ],
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "power_train_components": {
+      "$ref": "#/definitions/pt_group"
+    }
+  },
+  "required": [
+    "power_train_components"
+  ],
+  "additionalProperties": true
+}
