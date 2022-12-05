@@ -11,8 +11,15 @@ CN_ID = "OM_components_id"
 # CT is used to store the type of the components in question, "battery_pack", "propeller"
 CT = "components_type"
 ATT = "attributes"
+# The IN and OUT field contain the input and output in the system sense of the term,
+# meaning the output of the prop is the propulsive power while its input is the mechanical power.
+# In those inputs, there will be tuple of two element: the first filled when the system
+# input/output is an openmdao input the other if the opposite
 IN = "inputs"
 OUT = "outputs"
+# The PT field contains the variables that must be promoted from aircraft level for the component
+# to work
+PT = "promoted_variables"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -20,6 +27,9 @@ PROPELLER = {
     CN_ID: "propeller_id",
     CT: "propeller",
     ATT: None,
+    PT: ["true_airspeed", "altitude", "thrust"],
+    IN: [(None, "rpm"), (None, "shaft_power_in")],
+    OUT: None,
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -27,6 +37,13 @@ PMSM = {
     CN_ID: "motor_id",
     CT: "PMSM",
     ATT: None,
+    PT: None,
+    IN: [
+        (None, "ac_current_rms_in_one_phase"),
+        (None, "ac_voltage_peak_in"),
+        (None, "ac_voltage_rms_in"),
+    ],
+    OUT: [("rpm", None), ("shaft_power_out", None)],
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -34,6 +51,13 @@ INVERTER = {
     CN_ID: "inverter_id",
     CT: "inverter",
     ATT: None,
+    PT: None,
+    IN: [("dc_voltage_in", None), (None, "dc_current_in")],
+    OUT: [
+        ("ac_current_rms_out_one_phase", None),
+        ("ac_voltage_peak_out", None),
+        ("ac_voltage_rms_out", None),
+    ],
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -41,6 +65,9 @@ DC_BUS = {
     CN_ID: "dc_bus_id",
     CT: "DC_bus",
     ATT: ["number_of_inputs", "number_of_outputs"],
+    PT: None,
+    IN: [(None, "dc_voltage"), ("current_in_", None)],
+    OUT: [(None, "dc_voltage"), ("current_out_", None)],
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -48,6 +75,9 @@ DC_LINE = {
     CN_ID: "harness_id",
     CT: "DC_cable_harness",
     ATT: None,
+    PT: ["exterior_temperature"],
+    IN: [("dc_voltage_in", None), (None, "dc_current")],
+    OUT: [("dc_voltage_out", None), (None, "dc_current")],
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -55,6 +85,9 @@ DC_DC_CONVERTER = {
     CN_ID: "dc_dc_converter_id",
     CT: "DC_DC_converter",
     ATT: None,
+    PT: None,
+    IN: [("dc_voltage_in", None), (None, "dc_current_in")],
+    OUT: [("dc_voltage_out", None), (None, "dc_current_out")],
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -62,6 +95,9 @@ BATTERY_PACK = {
     CN_ID: "battery_pack_id",
     CT: "battery_pack",
     ATT: None,
+    PT: ["time_step"],
+    IN: None,
+    OUT: [(None, "voltage_out"), ("dc_current_out", None)],
 }
 
 KNOWN_COMPONENTS = [PROPELLER, PMSM, INVERTER, DC_BUS, DC_LINE, DC_DC_CONVERTER, BATTERY_PACK]
@@ -72,6 +108,9 @@ DICTIONARY_CN = {}
 DICTIONARY_CN_ID = {}
 DICTIONARY_CT = {}
 DICTIONARY_ATT = {}
+DICTIONARY_PT = {}
+DICTIONARY_IN = {}
+DICTIONARY_OUT = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -79,3 +118,6 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_CN_ID[known_component[ID]] = known_component[CN_ID]
     DICTIONARY_CT[known_component[ID]] = known_component[CT]
     DICTIONARY_ATT[known_component[ID]] = known_component[ATT]
+    DICTIONARY_PT[known_component[ID]] = known_component[PT]
+    DICTIONARY_IN[known_component[ID]] = known_component[IN]
+    DICTIONARY_OUT[known_component[ID]] = known_component[OUT]

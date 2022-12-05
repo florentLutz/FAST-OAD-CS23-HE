@@ -23,3 +23,25 @@ power_train_components:
     id: fastga_he.pt_component.dc_dc_converter
   battery_pack_1:
     id: fastga_he.pt_component.battery_pack
+
+connections:
+  - source: propeller_1
+    target: motor_1
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: inverter_1
+    target: [dc_bus_1, 1]
+
+  - source: [dc_bus_1, 1]
+    target: dc_line_1
+
+  - source: dc_line_1
+    target: [dc_bus_2, 1]
+
+  - source: [dc_bus_2, 1]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: battery_pack_1

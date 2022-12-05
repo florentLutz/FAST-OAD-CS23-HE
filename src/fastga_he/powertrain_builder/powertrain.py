@@ -16,7 +16,11 @@ from importlib.resources import open_text
 from jsonschema import validate
 from ruamel.yaml import YAML
 
-from .exceptions import FASTGAHEUnknownComponentID, FASTGAHEUnknownOption
+from .exceptions import (
+    FASTGAHEUnknownComponentID,
+    FASTGAHEUnknownOption,
+    FASTGAHEComponentsNotIdentified,
+)
 
 from . import resources
 
@@ -26,6 +30,7 @@ JSON_SCHEMA_NAME = "power_train.json"
 
 KEY_TITLE = "title"
 KEY_PT_COMPONENTS = "power_train_components"
+KEY_PT_CONNECTIONS = "connections"
 
 
 class FASTGAHEPowerTrainConfigurator:
@@ -41,6 +46,9 @@ class FASTGAHEPowerTrainConfigurator:
         self._power_train_file = None
 
         self._serializer = _YAMLSerializer()
+
+        # Contains the id of the components
+        self._components_id = None
 
         # Contains the name of the component as it will be found in the input/output file to
         # contain the data. Will also be used as subsystem name
@@ -59,6 +67,14 @@ class FASTGAHEPowerTrainConfigurator:
 
         # Contains the options of the component which will be given during object instantiation
         self._components_options = None
+
+        # Contains the list of all outputs (in the OpenMDAO sense of the term) needed to make the
+        # connections between components
+        self._components_connection_outputs = None
+
+        # Contains the list of all inputs (in the OpenMDAO sense of the term) needed to make the
+        # connections between components
+        self._components_connection_inputs = None
 
         if power_train_file_path:
             self.load(power_train_file_path)
@@ -88,6 +104,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
 
+        components_id = []
         components_name_list = []
         components_name_id_list = []
         components_type_list = []
@@ -97,6 +114,7 @@ class FASTGAHEPowerTrainConfigurator:
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
             component_id = component["id"]
+            components_id.append(component_id)
             if component_id not in resources.KNOWN_ID:
                 raise FASTGAHEUnknownComponentID(
                     component_id + " is not a known ID of a power train component"
@@ -123,11 +141,93 @@ class FASTGAHEPowerTrainConfigurator:
             else:
                 components_options_list.append(None)
 
+        self._components_id = components_id
         self._components_name = components_name_list
         self._components_name_id = components_name_id_list
         self._components_type = components_type_list
         self._components_om_type = components_om_type_list
         self._components_options = components_options_list
+
+    def _get_connections(self):
+        """
+        This function inspects all the connections detected in the power train file and prepare
+        the list necessary to do the connections in the performance file.
+
+        The _get_components method must be ran before hand.
+        """
+
+        # First check that the _get_components method has been ran
+        if not self._components_name:
+            raise FASTGAHEComponentsNotIdentified(
+                "The _get_components must be run before running the _get_connections method"
+            )
+
+        connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
+
+        # Create a dictionary to translate component name back to component_id to identify
+        # outputs and inputs in each case
+        translator = dict(zip(self._components_name, self._components_id))
+
+        openmdao_output_list = []
+        openmdao_input_list = []
+
+        for connection in connections_list:
+
+            # Check in case the source or target is not a string but an array, meaning we are
+            # dealing with a component which might have multiple inputs/outputs (buses, gearbox,
+            # splitter, ...)
+            if type(connection["source"]) is str:
+                source_name = connection["source"]
+                source_number = ""
+                source_inputs = resources.DICTIONARY_IN[translator[source_name]]
+            else:
+                source_name = connection["source"][0]
+                source_number = str(connection["source"][1])
+                source_inputs = resources.DICTIONARY_IN[translator[source_name]]
+
+            if type(connection["target"]) is str:
+                target_name = connection["target"]
+                target_number = ""
+                target_outputs = resources.DICTIONARY_OUT[translator[target_name]]
+            else:
+                target_name = connection["target"][0]
+                target_number = str(connection["target"][1])
+                target_outputs = resources.DICTIONARY_OUT[translator[target_name]]
+
+            for system_input, system_output in zip(source_inputs, target_outputs):
+
+                if system_input[0]:
+
+                    if system_input[0][-1] == "_":
+                        system_input_str = system_input[0] + source_number
+                    else:
+                        system_input_str = system_input[0]
+
+                    if system_output[1][-1] == "_":
+                        system_output_str = system_output[1] + target_number
+                    else:
+                        system_output_str = system_output[1]
+
+                    openmdao_input_list.append(source_name + "." + system_input_str)
+                    openmdao_output_list.append(target_name + "." + system_output_str)
+
+                else:
+
+                    if system_input[1][-1] == "_":
+                        system_input_str = system_input[1] + source_number
+                    else:
+                        system_input_str = system_input[1]
+
+                    if system_output[0][-1] == "_":
+                        system_output_str = system_output[0] + target_number
+                    else:
+                        system_output_str = system_output[0]
+
+                    openmdao_input_list.append(target_name + "." + system_output_str)
+                    openmdao_output_list.append(source_name + "." + system_input_str)
+
+        self._components_connection_outputs = openmdao_output_list
+        self._components_connection_inputs = openmdao_input_list
 
     def get_sizing_element_lists(self) -> tuple:
         """
@@ -142,6 +242,24 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_name_id,
             self._components_type,
             self._components_om_type,
+        )
+
+    def get_performances_element_lists(self) -> tuple:
+        """
+        Returns the list of parameters necessary to create the performances group based on what is
+        inside the power train file.
+        """
+
+        self._get_components()
+
+        return (
+            self._components_name,
+            self._components_name_id,
+            self._components_type,
+            self._components_om_type,
+            self._components_options,
+            self._components_connection_outputs,
+            self._components_connection_inputs,
         )
 
 

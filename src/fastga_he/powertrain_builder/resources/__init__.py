@@ -9,4 +9,6 @@ from .registered_components import (
     DICTIONARY_CN_ID,
     DICTIONARY_CT,
     DICTIONARY_ATT,
+    DICTIONARY_IN,
+    DICTIONARY_OUT,
 )

@@ -40,10 +40,10 @@
             "$ref": "#/definitions/pt_group"
           }
         ]
-      },
-      "properties": {
-        "connections": {
-          "type": "array",
+      }
+    },
+    "connections": {
+      "type": "array",
           "required": [
             "source",
             "target"
@@ -52,15 +52,13 @@
             "type": "object",
             "properties": {
               "source": {
-                "type": "string"
+                "type": ["string", "array"]
               },
               "target": {
-                "type": "string"
+                "type": ["string", "array"]
               }
             }
           }
-        }
-      }
     }
   },
   "properties": {
@@ -69,6 +67,9 @@
     },
     "power_train_components": {
       "$ref": "#/definitions/pt_group"
+    },
+    "component_connections": {
+      "$ref": "#/definitions/connections"
     }
   },
   "required": [
