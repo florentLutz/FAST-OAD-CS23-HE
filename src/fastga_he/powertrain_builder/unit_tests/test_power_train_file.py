@@ -16,4 +16,4 @@ def test_power_train_file():
         power_train_file_path=sample_power_train_file_path
     )
 
-    power_train_configurator._get_components()
+    test = power_train_configurator.get_sizing_element_lists()

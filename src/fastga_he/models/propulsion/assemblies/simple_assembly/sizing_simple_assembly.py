@@ -21,7 +21,6 @@ class SizingAssembly(om.Group):
             SizingPropeller(propeller_id="propeller_1"),
             promotes=["*"],
         )
-        # Problematic component !
         self.add_subsystem(
             "motor_1",
             SizingPMSM(motor_id="motor_1"),

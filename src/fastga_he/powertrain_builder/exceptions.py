@@ -10,3 +10,10 @@ class FASTGAHEUnknownComponentID(FastError):
     Class for managing errors that result from trying to add a component to the power train with
     an ID that is not recognized.
     """
+
+
+class FASTGAHEUnknownOption(FastError):
+    """
+    Class for managing errors that result from trying to add a component to the power train with
+    options that are not recognized or not all options needed.
+    """

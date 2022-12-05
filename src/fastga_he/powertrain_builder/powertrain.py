@@ -18,7 +18,7 @@ import openmdao.api as om
 from jsonschema import validate
 from ruamel.yaml import YAML
 
-from .exceptions import FASTGAHEUnknownComponentID
+from .exceptions import FASTGAHEUnknownComponentID, FASTGAHEUnknownOption
 
 from . import resources
 
@@ -32,8 +32,8 @@ KEY_PT_COMPONENTS = "power_train_components"
 
 class FASTGAHEPowerTrainConfigurator:
     """
-    Class for configurating the components necessary for the performances and sizing of the power
-    train.
+    Class for the configuration of the components necessary for the performances and sizing of the
+    power train.
 
     :param power_train_file_path: if provided, power train will be read directly from it
     """
@@ -42,6 +42,24 @@ class FASTGAHEPowerTrainConfigurator:
         self._power_train_file = None
 
         self._serializer = _YAMLSerializer()
+
+        # Contains the name of the component as it will be found in the input/output file to
+        # contain the data. Will also be used as subsystem name
+        self._components_name = None
+
+        # Contains the name of the options used to provide the names in self._components_name
+        self._components_name_id = None
+
+        # Contains the suffix of the component added to Performances and Sizing, will be used to
+        # instantiate the subsystems
+        self._components_om_type = None
+
+        # Contains the type of the component as it will be found in the input/output file to
+        # contain the data
+        self._components_type = None
+
+        # Contains the options of the component which will be given during object instantiation
+        self._components_options = None
 
         if power_train_file_path:
             self.load(power_train_file_path)
@@ -54,7 +72,6 @@ class FASTGAHEPowerTrainConfigurator:
         """
 
         self._power_train_file = pth.abspath(power_train_file)
-        power_train_dir_name = pth.dirname(self._power_train_file)
 
         self._serializer = _YAMLSerializer()
         self._serializer.read(self._power_train_file)
@@ -72,6 +89,12 @@ class FASTGAHEPowerTrainConfigurator:
 
         components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
 
+        components_name_list = []
+        components_name_id_list = []
+        components_type_list = []
+        components_om_type_list = []
+        components_options_list = []
+
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
             component_id = component["id"]
@@ -80,14 +103,47 @@ class FASTGAHEPowerTrainConfigurator:
                     component_id + " is not a known ID of a power train component"
                 )
 
-            # Look for the attributes of the component as read from the power train file if there
-            # are one
-            if len(component) > 1:
-                component.pop("id")
-                components_declared_attribute = list(component.keys())
-                print(components_declared_attribute)
+            components_name_list.append(component_name)
+            components_name_id_list.append(resources.DICTIONARY_CN_ID[component_id])
+            components_type_list.append(resources.DICTIONARY_CT[component_id])
+            components_om_type_list.append(resources.DICTIONARY_CN[component_id])
 
-        return components_list.keys()
+            if "options" in component.keys():
+                components_options_list.append(component["options"])
+
+                # While we are at it, we also check that we have the right options and with the
+                # right names
+
+                if set(component["options"].keys()) != set(resources.DICTIONARY_ATT[component_id]):
+                    raise FASTGAHEUnknownOption(
+                        "Component " + component_id + " does not have all options declare or they "
+                        "have an erroneous name. The following options should be declared: "
+                        + ", ".join(resources.DICTIONARY_ATT[component_id])
+                    )
+
+            else:
+                components_options_list.append(None)
+
+        self._components_name = components_name_list
+        self._components_name_id = components_name_id_list
+        self._components_type = components_type_list
+        self._components_om_type = components_om_type_list
+        self._components_options = components_options_list
+
+    def get_sizing_element_lists(self) -> tuple:
+        """
+        Returns the list of parameters necessary to create the sizing group based on what is
+        inside the power train file.
+        """
+
+        self._get_components()
+
+        return (
+            self._components_name,
+            self._components_name_id,
+            self._components_type,
+            self._components_om_type,
+        )
 
 
 class _YAMLSerializer(ABC):
