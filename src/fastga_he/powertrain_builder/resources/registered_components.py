@@ -37,7 +37,7 @@ INVERTER = {
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
-    CN: "DC_BUS",
+    CN: "DCBus",
     CN_ID: "dc_bus_id",
     CT: "DC_bus",
     ATT: ["number_of_inputs", "number_of_outputs"],

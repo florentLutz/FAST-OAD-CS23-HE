@@ -13,8 +13,6 @@ import os.path as pth
 from abc import ABC
 from importlib.resources import open_text
 
-import openmdao.api as om
-
 from jsonschema import validate
 from ruamel.yaml import YAML
 
@@ -39,6 +37,7 @@ class FASTGAHEPowerTrainConfigurator:
     """
 
     def __init__(self, power_train_file_path=None):
+
         self._power_train_file = None
 
         self._serializer = _YAMLSerializer()
