@@ -222,6 +222,7 @@
                 </PMSM>
                 <propeller>
                     <propeller_1>
+                        <rpm_mission>2000.0</rpm_mission>
                         <solidity>0.2</solidity>
                         <activity_factor>150</activity_factor>
                         <blade_twist units="deg">22.6</blade_twist>

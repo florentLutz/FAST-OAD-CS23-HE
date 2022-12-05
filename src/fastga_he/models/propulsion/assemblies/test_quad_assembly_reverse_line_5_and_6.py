@@ -42,9 +42,6 @@ class PerformancesAssembly(om.Group):
 
         number_of_points = self.options["number_of_points"]
 
-        ivc = om.IndepVarComp()
-        ivc.add_output("rpm", units="min**-1", val=np.full(number_of_points, 2000))
-
         ivc2 = om.IndepVarComp()
         ivc2.add_output("switching_frequency", units="Hz", val=np.full(number_of_points, 12000.0))
 
@@ -60,7 +57,6 @@ class PerformancesAssembly(om.Group):
         ivc6 = om.IndepVarComp()
         ivc6.add_output("voltage_in", val=np.full(NB_POINTS_TEST, 860.0))
 
-        self.add_subsystem("propeller_rot_speed", ivc, promotes=[])
         self.add_subsystem("control_inverter", ivc2, promotes=[])
         self.add_subsystem("inverter_heat_sink", ivc3, promotes=[])
         self.add_subsystem("control_converter", ivc4, promotes=[])
@@ -273,19 +269,10 @@ class PerformancesAssembly(om.Group):
             promotes=["data:*"],
         )
 
-        self.connect(
-            "propeller_rot_speed.rpm",
-            [
-                "propeller_1.rpm",
-                "motor_1.rpm",
-                "propeller_2.rpm",
-                "motor_2.rpm",
-                "propeller_3.rpm",
-                "motor_3.rpm",
-                "propeller_4.rpm",
-                "motor_4.rpm",
-            ],
-        )
+        self.connect("propeller_1.rpm", "motor_1.rpm")
+        self.connect("propeller_2.rpm", "motor_2.rpm")
+        self.connect("propeller_3.rpm", "motor_3.rpm")
+        self.connect("propeller_4.rpm", "motor_4.rpm")
 
         self.connect(
             "control_inverter.switching_frequency",

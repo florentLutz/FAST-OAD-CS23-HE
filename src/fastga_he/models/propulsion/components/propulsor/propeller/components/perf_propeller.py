@@ -4,6 +4,7 @@
 
 import openmdao.api as om
 
+from .perf_mission_rpm import PerformancesRPMMission
 from .perf_advance_ratio import PerformancesAdvanceRatio
 from .perf_tip_mach import PerformancesTipMach
 from .perf_blade_reynolds import PerformancesBladeReynoldsNumber
@@ -30,6 +31,11 @@ class PerformancesPropeller(om.Group):
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
+        self.add_subsystem(
+            "rpm_mission",
+            PerformancesRPMMission(propeller_id=propeller_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
         self.add_subsystem(
             "advance_ratio",
             PerformancesAdvanceRatio(propeller_id=propeller_id, number_of_points=number_of_points),

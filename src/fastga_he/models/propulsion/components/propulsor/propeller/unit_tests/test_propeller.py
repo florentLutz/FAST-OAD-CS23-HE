@@ -8,6 +8,7 @@ import pytest
 import openmdao.api as om
 
 from ..components.sizing_weight import SizingPropellerWeight
+from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_advance_ratio import PerformancesAdvanceRatio
 from ..components.perf_tip_mach import PerformancesTipMach
 from ..components.perf_thrust_coefficient import PerformancesThrustCoefficient
@@ -74,6 +75,68 @@ def test_constraints_ensure():
     ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_rpm_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:propeller:propeller_1:rpm_mission",
+        val=2500.0,
+        units="min**-1",
+    )
+
+    problem = run_system(
+        PerformancesRPMMission(propeller_id="propeller_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val("rpm", units="min**-1") == pytest.approx(
+        np.full(NB_POINTS_TEST, 2500), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc2 = om.IndepVarComp()
+    ivc2.add_output(
+        "data:propulsion:he_power_train:propeller:propeller_1:rpm_mission",
+        val=[2700, 2500, 2000],
+        units="min**-1",
+    )
+
+    problem2 = run_system(
+        PerformancesRPMMission(propeller_id="propeller_1", number_of_points=250), ivc2
+    )
+
+    assert problem2.get_val("rpm", units="min**-1") == pytest.approx(
+        np.concatenate(
+            (
+                np.full(100, 2700),
+                np.full(100, 2500),
+                np.full(50, 2000),
+            )
+        ),
+        rel=1e-2,
+    )
+
+    problem2.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:propeller:propeller_1:rpm_mission",
+        val=[2700, 2500, 2000, 2700, 2500, 2000, 2700, 2500, 2000, 420],
+        units="min**-1",
+    )
+
+    problem3 = run_system(
+        PerformancesRPMMission(propeller_id="propeller_1", number_of_points=NB_POINTS_TEST), ivc3
+    )
+
+    assert problem3.get_val("rpm", units="min**-1") == pytest.approx(
+        np.array([2700, 2500, 2000, 2700, 2500, 2000, 2700, 2500, 2000, 420]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
 
 
 def test_advance_ratio():
@@ -419,7 +482,6 @@ def test_propeller_performances():
         XML_FILE,
     )
     ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
-    ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500), units="min**-1")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
     ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
 

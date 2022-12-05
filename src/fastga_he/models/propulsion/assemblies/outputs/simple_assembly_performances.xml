@@ -166,6 +166,7 @@
             <blade_twist units="deg" is_input="True">22.6<!--Twist between the propeller blade root and tip--></blade_twist>
             <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the propeller rpm--></rpm_max>
+            <rpm_mission is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
             <tip_mach_max is_input="False">0.44243515198268096<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
             <torque_max units="N*m" is_input="False">809.4466318792784<!--Maximum value of the propeller torque--></torque_max>
