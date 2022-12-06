@@ -68,6 +68,10 @@ class FASTGAHEPowerTrainConfigurator:
         # Contains the options of the component which will be given during object instantiation
         self._components_options = None
 
+        # Contains the list of aircraft inputs that are necessary to promote in the performances
+        # modules for the code to work
+        self._components_promotes = None
+
         # Contains the list of all outputs (in the OpenMDAO sense of the term) needed to make the
         # connections between components
         self._components_connection_outputs = None
@@ -110,6 +114,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_type_list = []
         components_om_type_list = []
         components_options_list = []
+        components_promote_list = []
 
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
@@ -124,6 +129,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_name_id_list.append(resources.DICTIONARY_CN_ID[component_id])
             components_type_list.append(resources.DICTIONARY_CT[component_id])
             components_om_type_list.append(resources.DICTIONARY_CN[component_id])
+            components_promote_list.append(resources.DICTIONARY_PT[component_id])
 
             if "options" in component.keys():
                 components_options_list.append(component["options"])
@@ -147,6 +153,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_type = components_type_list
         self._components_om_type = components_om_type_list
         self._components_options = components_options_list
+        self._components_promotes = components_promote_list
 
     def _get_connections(self):
         """
@@ -251,6 +258,7 @@ class FASTGAHEPowerTrainConfigurator:
         """
 
         self._get_components()
+        self._get_connections()
 
         return (
             self._components_name,
@@ -260,6 +268,7 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_options,
             self._components_connection_outputs,
             self._components_connection_inputs,
+            self._components_promotes,
         )
 
 

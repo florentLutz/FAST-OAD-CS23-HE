@@ -37,7 +37,7 @@ PMSM = {
     CN_ID: "motor_id",
     CT: "PMSM",
     ATT: None,
-    PT: None,
+    PT: ["settings:*"],
     IN: [
         (None, "ac_current_rms_in_one_phase"),
         (None, "ac_voltage_peak_in"),
@@ -51,7 +51,7 @@ INVERTER = {
     CN_ID: "inverter_id",
     CT: "inverter",
     ATT: None,
-    PT: None,
+    PT: ["settings:*"],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [
         ("ac_current_rms_out_one_phase", None),
@@ -65,9 +65,9 @@ DC_BUS = {
     CN_ID: "dc_bus_id",
     CT: "DC_bus",
     ATT: ["number_of_inputs", "number_of_outputs"],
-    PT: None,
-    IN: [(None, "dc_voltage"), ("current_in_", None)],
-    OUT: [(None, "dc_voltage"), ("current_out_", None)],
+    PT: [],
+    IN: [(None, "dc_voltage"), ("dc_current_in_", None)],
+    OUT: [(None, "dc_voltage"), ("dc_current_out_", None)],
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -75,7 +75,7 @@ DC_LINE = {
     CN_ID: "harness_id",
     CT: "DC_cable_harness",
     ATT: None,
-    PT: ["exterior_temperature"],
+    PT: ["exterior_temperature", "settings:*"],
     IN: [("dc_voltage_in", None), (None, "dc_current")],
     OUT: [("dc_voltage_out", None), (None, "dc_current")],
 }
@@ -85,7 +85,7 @@ DC_DC_CONVERTER = {
     CN_ID: "dc_dc_converter_id",
     CT: "DC_DC_converter",
     ATT: None,
-    PT: None,
+    PT: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [("dc_voltage_out", None), (None, "dc_current_out")],
 }

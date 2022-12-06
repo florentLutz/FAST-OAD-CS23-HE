@@ -69,12 +69,12 @@ class PerformancesInverter(om.Group):
         self.add_subsystem(
             "resistance",
             PerformancesResistance(inverter_id=inverter_id, number_of_points=number_of_points),
-            promotes=["data:*"],
+            promotes=["data:*", "settings:*"],
         )
         self.add_subsystem(
             "gate_voltage",
             PerformancesGateVoltage(inverter_id=inverter_id, number_of_points=number_of_points),
-            promotes=["data:*"],
+            promotes=["data:*", "settings:*"],
         )
         self.add_subsystem(
             "conduction_losses",
