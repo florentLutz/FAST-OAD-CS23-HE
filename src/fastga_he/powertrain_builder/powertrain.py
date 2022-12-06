@@ -32,6 +32,8 @@ KEY_TITLE = "title"
 KEY_PT_COMPONENTS = "power_train_components"
 KEY_PT_CONNECTIONS = "connections"
 
+PT_DATA_PREFIX = "data:propulsion:he_power_train:"
+
 
 class FASTGAHEPowerTrainConfigurator:
     """
@@ -270,6 +272,21 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_connection_inputs,
             self._components_promotes,
         )
+
+    def get_mass_element_lists(self) -> list:
+        """
+        Returns the list of OpenMDAO variables necessary to create the component which computes
+        the mass of the power train.
+        """
+
+        self._get_components()
+
+        variable_names = []
+
+        for component_type, component_name in zip(self._components_type, self._components_name):
+            variable_names.append(PT_DATA_PREFIX + component_type + ":" + component_name + ":mass")
+
+        return variable_names
 
 
 class _YAMLSerializer(ABC):

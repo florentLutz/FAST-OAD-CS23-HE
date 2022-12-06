@@ -18,7 +18,7 @@ from fastga_he.models.propulsion.components import (
     SizingBatteryPack,
 )
 
-from .constants import SUBMODEL_POWER_TRAIN_SIZING
+from .constants import SUBMODEL_POWER_TRAIN_SIZING, SUBMODEL_POWER_TRAIN_MASS
 
 
 @oad.RegisterSubmodel(
@@ -59,3 +59,12 @@ class PowerTrainSizingFromFile(om.Group):
             local_sub_sys.options[component_name_id] = component_name
 
             self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
+
+        option_pt_file = {"power_train_file_path": self.options["power_train_file_path"]}
+        self.add_subsystem(
+            name="power_train_mass",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_POWER_TRAIN_MASS, options=option_pt_file
+            ),
+            promotes=["*"],
+        )

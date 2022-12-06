@@ -1,18 +1,8 @@
 <FASTOAD_model>
-  <constraints>
-    <propulsion>
-      <he_power_train>
-        <battery_pack>
-          <battery_pack_1>
-            <min_safe_SOC units="percent" is_input="False">-20.0<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
-          </battery_pack_1>
-        </battery_pack>
-      </he_power_train>
-    </propulsion>
-  </constraints>
   <data>
     <propulsion>
       <he_power_train>
+        <mass units="kg" is_input="False">5150.03480805918</mass>
         <DC_DC_converter>
           <dc_dc_converter_1>
             <current_in_caliber units="A" is_input="False">400.0<!--Current caliber of the DC/DC converter--></current_in_caliber>
@@ -321,6 +311,17 @@
       </he_power_train>
     </propulsion>
   </data>
+  <constraints>
+    <propulsion>
+      <he_power_train>
+        <battery_pack>
+          <battery_pack_1>
+            <min_safe_SOC units="percent" is_input="False">-20.0<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
+          </battery_pack_1>
+        </battery_pack>
+      </he_power_train>
+    </propulsion>
+  </constraints>
   <settings>
     <propulsion>
       <he_power_train>

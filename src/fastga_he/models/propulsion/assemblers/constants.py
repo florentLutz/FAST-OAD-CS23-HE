@@ -3,4 +3,5 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 SUBMODEL_POWER_TRAIN_SIZING = "submodel.propulsion.sizing"
+SUBMODEL_POWER_TRAIN_MASS = "submodel.propulsion.mass"
 SUBMODEL_POWER_TRAIN_PERF = "submodel.propulsion.performances"

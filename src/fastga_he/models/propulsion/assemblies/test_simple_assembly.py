@@ -19,6 +19,7 @@ from .simple_assembly.full_simple_assembly import FullSimpleAssembly
 
 from ..assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
+from ..assemblers.mass_from_pt_file import PowerTrainMassFromFile
 
 from . import outputs
 
@@ -315,9 +316,6 @@ def test_assembly_sizing_from_pt_file():
         "data:propulsion:he_power_train:DC_bus:dc_bus_1:mass", units="kg"
     ) == pytest.approx(0.96, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:DC_bus:dc_bus_1:mass", units="kg"
-    ) == pytest.approx(0.96, rel=1e-2)
-    assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:mass", units="kg"
     ) == pytest.approx(8.86, rel=1e-2)
     assert problem.get_val(
@@ -329,6 +327,10 @@ def test_assembly_sizing_from_pt_file():
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(4960.0, rel=1e-2)
+
+    assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
+        5150.0, rel=1e-2
+    )
 
     write_outputs(
         pth.join(outputs.__path__[0], "assembly_sizing_from_pt_file.xml"),
@@ -397,3 +399,24 @@ def test_performances_from_pt_file():
         pth.join(outputs.__path__[0], "assembly_performances_from_pt_file.xml"),
         problem,
     )
+
+
+def test_mass_from_pt_file():
+
+    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/simple_assembly.yml"
+
+    ivc = get_indep_var_comp(
+        list_inputs(PowerTrainMassFromFile(power_train_file_path=pt_file_path)),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        PowerTrainMassFromFile(power_train_file_path=pt_file_path),
+        ivc,
+    )
+
+    assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
+        5150.0, rel=1e-2
+    )
+    problem.check_partials(compact_print=True)
