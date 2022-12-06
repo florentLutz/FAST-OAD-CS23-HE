@@ -19,7 +19,7 @@ from fastga_he.models.propulsion.components import (
     PerformancesBatteryPack,
 )
 
-from .constants import SUBMODEL_POWER_TRAIN_PERF
+from .constants import SUBMODEL_POWER_TRAIN_PERF, SUBMODEL_THRUST_DISTRIBUTOR
 
 
 @oad.RegisterSubmodel(
@@ -56,6 +56,8 @@ class PowerTrainPerformancesFromFile(om.Group):
 
         self.configurator.load(self.options["power_train_file_path"])
 
+        propulsor_names = self.configurator.get_thrust_element_list()
+
         (
             components_name,
             components_name_id,
@@ -66,6 +68,18 @@ class PowerTrainPerformancesFromFile(om.Group):
             components_connection_inputs,
             components_promotes,
         ) = self.configurator.get_performances_element_lists()
+
+        option_thrust_splitter = {
+            "power_train_file_path": self.options["power_train_file_path"],
+            "number_of_points": number_of_points,
+        }
+        self.add_subsystem(
+            name="thrust_splitter",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_THRUST_DISTRIBUTOR, options=option_thrust_splitter
+            ),
+            promotes=["data:*", "thrust"],
+        )
 
         for (
             component_name,
@@ -94,6 +108,11 @@ class PowerTrainPerformancesFromFile(om.Group):
                 name=component_name,
                 subsys=local_sub_sys,
                 promotes=["data:*"] + component_promote,
+            )
+
+        for propulsor_name in propulsor_names:
+            self.connect(
+                "thrust_splitter." + propulsor_name + "_thrust", propulsor_name + ".thrust"
             )
 
         for om_output, om_input in zip(components_connection_outputs, components_connection_inputs):

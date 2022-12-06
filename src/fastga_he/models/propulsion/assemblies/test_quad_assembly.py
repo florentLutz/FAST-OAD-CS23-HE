@@ -21,6 +21,8 @@ from ..components.connectors.dc_bus import PerformancesDCBus
 from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
 from ..components.source.battery import PerformancesBatteryPack
 
+from ..assemblers.thrust_distributor import ThrustDistributor
+
 XML_FILE = "quad_assembly.xml"
 NB_POINTS_TEST = 25
 COEFF_DIFF = 0.0
@@ -520,7 +522,7 @@ def test_assembly_from_pt_file():
     altitude = np.full(NB_POINTS_TEST, 0.0)
     ivc.add_output("altitude", val=altitude, units="m")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
-    ivc.add_output("thrust", val=np.linspace(500, 550, NB_POINTS_TEST), units="N")
+    ivc.add_output("thrust", val=np.linspace(500, 550, NB_POINTS_TEST) * 4.0, units="N")
     ivc.add_output(
         "exterior_temperature",
         units="degK",
@@ -530,7 +532,9 @@ def test_assembly_from_pt_file():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesAssembly(number_of_points=NB_POINTS_TEST),
+        PowerTrainPerformancesFromFile(
+            power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+        ),
         ivc,
     )
 
@@ -554,15 +558,15 @@ def test_assembly_from_pt_file():
                 324283.0,
                 326630.0,
                 328989.0,
-                331360.0,
-                333742.0,
+                331359.0,
+                333741.0,
                 336135.0,
-                338541.0,
-                340958.0,
+                338540.0,
+                340957.0,
                 343386.0,
-                345827.0,
-                348279.0,
-                350743.0,
+                345826.0,
+                348278.0,
+                350742.0,
                 353218.0,
             ]
         ),
@@ -570,3 +574,38 @@ def test_assembly_from_pt_file():
     )
 
     # om.n2(problem)
+
+
+def test_thrust_distributor():
+
+    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/quad_assembly.yml"
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            ThrustDistributor(power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output("thrust", val=np.linspace(500, 550, NB_POINTS_TEST) * 4.0, units="N")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        ThrustDistributor(power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("propeller_1_thrust", units="N") == pytest.approx(
+        np.linspace(500, 550, NB_POINTS_TEST), rel=1e-2
+    )
+    assert problem.get_val("propeller_2_thrust", units="N") == pytest.approx(
+        np.linspace(500, 550, NB_POINTS_TEST), rel=1e-2
+    )
+    assert problem.get_val("propeller_3_thrust", units="N") == pytest.approx(
+        np.linspace(500, 550, NB_POINTS_TEST), rel=1e-2
+    )
+    assert problem.get_val("propeller_4_thrust", units="N") == pytest.approx(
+        np.linspace(500, 550, NB_POINTS_TEST), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)

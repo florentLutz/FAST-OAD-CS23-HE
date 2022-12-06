@@ -67,6 +67,10 @@ class FASTGAHEPowerTrainConfigurator:
         # contain the data
         self._components_type = None
 
+        # Contains a special tag on the class of element as some may need specific assemblers to
+        # work such as propulsor
+        self._components_type_class = None
+
         # Contains the options of the component which will be given during object instantiation
         self._components_options = None
 
@@ -117,6 +121,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_om_type_list = []
         components_options_list = []
         components_promote_list = []
+        components_type_class_list = []
 
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
@@ -132,6 +137,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_type_list.append(resources.DICTIONARY_CT[component_id])
             components_om_type_list.append(resources.DICTIONARY_CN[component_id])
             components_promote_list.append(resources.DICTIONARY_PT[component_id])
+            components_type_class_list.append(resources.DICTIONARY_CTC[component_id])
 
             if "options" in component.keys():
                 components_options_list.append(component["options"])
@@ -156,6 +162,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_om_type = components_om_type_list
         self._components_options = components_options_list
         self._components_promotes = components_promote_list
+        self._components_type_class = components_type_class_list
 
     def _get_connections(self):
         """
@@ -287,6 +294,23 @@ class FASTGAHEPowerTrainConfigurator:
             variable_names.append(PT_DATA_PREFIX + component_type + ":" + component_name + ":mass")
 
         return variable_names
+
+    def get_thrust_element_list(self) -> list:
+        """
+        Returns the list of OpenMDAO variables necessary to create the component which computes
+        the repartition of thrust among propellers.
+        """
+
+        self._get_components()
+        components_names = []
+
+        for component_type_class, component_name in zip(
+            self._components_type_class, self._components_name
+        ):
+            if component_type_class == "propulsor":
+                components_names.append(component_name)
+
+        return components_names
 
 
 class _YAMLSerializer(ABC):

@@ -2,6 +2,7 @@
     <data>
         <propulsion>
             <he_power_train>
+                <thrust_distribution>[1.0, 1.0, 1.0, 1.0]</thrust_distribution>
                 <battery_pack>
                     <battery_pack_1>
                         <cell_temperature_mission units="degK">288.15</cell_temperature_mission>
