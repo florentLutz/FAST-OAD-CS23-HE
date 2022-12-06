@@ -28,10 +28,10 @@ class ComputeCoolantMass(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:thermal:pipes:density",
+            name="data:thermal:coolant:density",
             units="kg/m**3",
-            val=8920,
-            desc="density of pipes",
+            val=np.nan,
+            desc="density of coolant",
         )
 
         self.add_output(name="data:thermal:coolant:mass", units="kg")

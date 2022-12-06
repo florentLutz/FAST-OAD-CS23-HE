@@ -64,7 +64,7 @@ class ComputePipeMass(om.ExplicitComponent):
 
         self.add_output(name="data:thermal:pipes:coolant:mass", units="kg")
 
-        self.add_output(name="data:thermal:pipes:radius")
+        self.add_output(name="data:thermal:pipes:radius", units="m")
         # self.add_output(name="data:thermal:pipes:hydrogen:mass", units="kg")
         # self.add_output(name="data:thermal:pipes:air:mass", units="kg")
         # self.add_output(name="data:thermal:pipes:mass", units="kg")
