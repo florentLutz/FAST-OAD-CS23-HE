@@ -290,7 +290,7 @@ def test_assembly_sizing_from_pt_file():
         "submodel.propulsion.constraints.pmsm.rpm"
     ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
 
-    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/sample_power_train_file.yml"
+    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/simple_assembly.yml"
 
     ivc = get_indep_var_comp(
         list_inputs(PowerTrainSizingFromFile(power_train_file_path=pt_file_path)),
@@ -338,7 +338,7 @@ def test_assembly_sizing_from_pt_file():
 
 def test_performances_from_pt_file():
 
-    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/sample_power_train_file.yml"
+    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/simple_assembly.yml"
 
     ivc = get_indep_var_comp(
         list_inputs(

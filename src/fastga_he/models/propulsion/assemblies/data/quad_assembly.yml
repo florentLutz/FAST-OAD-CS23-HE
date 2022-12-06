@@ -1,0 +1,144 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+  propeller_3:
+    id: fastga_he.pt_component.propeller
+  propeller_4:
+    id: fastga_he.pt_component.propeller
+
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+  motor_2:
+    id: fastga_he.pt_component.pmsm
+  motor_3:
+    id: fastga_he.pt_component.pmsm
+  motor_4:
+    id: fastga_he.pt_component.pmsm
+
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+  inverter_3:
+    id: fastga_he.pt_component.inverter
+  inverter_4:
+    id: fastga_he.pt_component.inverter
+
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 2
+      number_of_outputs: 1
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 2
+  dc_bus_3:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 2
+  dc_bus_4:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 2
+      number_of_outputs: 1
+
+  harness_1:
+    id: fastga_he.pt_component.dc_line
+  harness_2:
+    id: fastga_he.pt_component.dc_line
+  harness_3:
+    id: fastga_he.pt_component.dc_line
+  harness_4:
+    id: fastga_he.pt_component.dc_line
+  harness_5:
+    id: fastga_he.pt_component.dc_line
+  harness_6:
+    id: fastga_he.pt_component.dc_line
+
+  dc_bus_5:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+
+  battery_pack_1:
+    id: fastga_he.pt_component.battery_pack
+
+connections:
+  - source: propeller_1
+    target: motor_1
+  - source: propeller_2
+    target: motor_2
+  - source: propeller_3
+    target: motor_3
+  - source: propeller_4
+    target: motor_4
+
+  - source: motor_1
+    target: inverter_1
+  - source: motor_2
+    target: inverter_2
+  - source: motor_3
+    target: inverter_3
+  - source: motor_4
+    target: inverter_4
+
+  - source: inverter_1
+    target: [dc_bus_1, 1]
+  - source: inverter_2
+    target: [dc_bus_2, 1]
+  - source: inverter_3
+    target: [dc_bus_3, 1]
+  - source: inverter_4
+    target: [dc_bus_4, 1]
+
+  # DC BUS 1
+  - source: [dc_bus_1, 1]
+    target: harness_1
+  - source: [dc_bus_1, 2]
+    target: harness_5
+
+  # DC BUS 2
+  - source: [dc_bus_2, 1]
+    target: harness_2
+  - source: harness_5
+    target: [dc_bus_2, 2]
+
+  # DC BUS 3
+  - source: [ dc_bus_3, 1 ]
+    target: harness_3
+  - source: harness_6
+    target: [ dc_bus_3, 2 ]
+
+  # DC BUS 4
+  - source: [ dc_bus_4, 1 ]
+    target: harness_4
+  - source: [ dc_bus_4, 2 ]
+    target: harness_6
+
+  # DC BUS 5
+  - source: harness_1
+    target: [dc_bus_5, 1]
+  - source: harness_2
+    target: [dc_bus_5, 2]
+  - source: harness_3
+    target: [dc_bus_5, 3]
+  - source: harness_4
+    target: [dc_bus_5, 4]
+
+  - source: [dc_bus_5, 1]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: battery_pack_1

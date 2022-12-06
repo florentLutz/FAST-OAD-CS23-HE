@@ -2,6 +2,23 @@
     <data>
         <propulsion>
             <he_power_train>
+                <battery_pack>
+                    <battery_pack_1>
+                        <cell_temperature_mission units="degK">288.15</cell_temperature_mission>
+                        <SOC_min>40.0</SOC_min>
+                        <min_safe_SOC>20.0</min_safe_SOC>
+                        <number_modules>25.0</number_modules>
+                        <number_cells>8000.0</number_cells>
+                        <module>
+                            <number_cells>200.0</number_cells>
+                            <mass units="kg">198.4</mass>
+                        </module>
+                        <cell>
+                            <capacity units="A*h">20.0</capacity>
+                            <mass units="g">496.0</mass>
+                        </cell>
+                    </battery_pack_1>
+                </battery_pack>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>

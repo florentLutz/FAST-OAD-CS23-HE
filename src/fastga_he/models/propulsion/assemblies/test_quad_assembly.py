@@ -9,12 +9,17 @@ from stdatm import Atmosphere
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
+from fastga_he.models.propulsion.assemblers.performances_from_pt_file import (
+    PowerTrainPerformancesFromFile,
+)
+
 from ..components.loads.pmsm import PerformancesPMSM
 from ..components.propulsor.propeller import PerformancesPropeller
 from ..components.connectors.inverter import PerformancesInverter
 from ..components.connectors.dc_cable import PerformancesHarness
 from ..components.connectors.dc_bus import PerformancesDCBus
 from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
+from ..components.source.battery import PerformancesBatteryPack
 
 XML_FILE = "quad_assembly.xml"
 NB_POINTS_TEST = 25
@@ -42,57 +47,26 @@ class PerformancesAssembly(om.Group):
 
         number_of_points = self.options["number_of_points"]
 
-        ivc6 = om.IndepVarComp()
-        ivc6.add_output("voltage_in", val=np.full(NB_POINTS_TEST, 860.0))
-
-        self.add_subsystem("dc_dc_converter_voltage_in", ivc6, promotes=[])
-
-        ivc_thrust_1 = om.IndepVarComp(
-            "thrust_1",
-            val=np.linspace(
-                500 * (1 - 2.0 * COEFF_DIFF), 550 * (1 - 2.0 * COEFF_DIFF), NB_POINTS_TEST
-            ),
-        )
-        ivc_thrust_2 = om.IndepVarComp(
-            "thrust_2",
-            val=np.linspace(500 * (1 - COEFF_DIFF), 550 * (1 - COEFF_DIFF), NB_POINTS_TEST),
-        )
-        ivc_thrust_3 = om.IndepVarComp(
-            "thrust_3",
-            val=np.linspace(500 * (1 + COEFF_DIFF), 550 * (1 + COEFF_DIFF), NB_POINTS_TEST),
-        )
-        ivc_thrust_4 = om.IndepVarComp(
-            "thrust_4",
-            val=np.linspace(
-                500 * (1 + 2.0 * COEFF_DIFF), 550 * (1 + 2.0 * COEFF_DIFF), NB_POINTS_TEST
-            ),
-        )
-
-        self.add_subsystem("ivc_thrust_1", ivc_thrust_1, promotes=[])
-        self.add_subsystem("ivc_thrust_2", ivc_thrust_2, promotes=[])
-        self.add_subsystem("ivc_thrust_3", ivc_thrust_3, promotes=[])
-        self.add_subsystem("ivc_thrust_4", ivc_thrust_4, promotes=[])
-
         # Propellers
         self.add_subsystem(
             "propeller_1",
             PerformancesPropeller(propeller_id="propeller_1", number_of_points=number_of_points),
-            promotes=["true_airspeed", "altitude", "data:*"],
+            promotes=["true_airspeed", "altitude", "data:*", "thrust"],
         )
         self.add_subsystem(
             "propeller_2",
             PerformancesPropeller(propeller_id="propeller_2", number_of_points=number_of_points),
-            promotes=["true_airspeed", "altitude", "data:*"],
+            promotes=["true_airspeed", "altitude", "data:*", "thrust"],
         )
         self.add_subsystem(
             "propeller_3",
             PerformancesPropeller(propeller_id="propeller_3", number_of_points=number_of_points),
-            promotes=["true_airspeed", "altitude", "data:*"],
+            promotes=["true_airspeed", "altitude", "data:*", "thrust"],
         )
         self.add_subsystem(
             "propeller_4",
             PerformancesPropeller(propeller_id="propeller_4", number_of_points=number_of_points),
-            promotes=["true_airspeed", "altitude", "data:*"],
+            promotes=["true_airspeed", "altitude", "data:*", "thrust"],
         )
 
         # Motors
@@ -253,15 +227,19 @@ class PerformancesAssembly(om.Group):
             promotes=["data:*"],
         )
 
+        self.add_subsystem(
+            "battery_pack_1",
+            PerformancesBatteryPack(
+                battery_pack_id="battery_pack_1",
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*", "time_step"],
+        )
+
         self.connect("propeller_1.rpm", "motor_1.rpm")
         self.connect("propeller_2.rpm", "motor_2.rpm")
         self.connect("propeller_3.rpm", "motor_3.rpm")
         self.connect("propeller_4.rpm", "motor_4.rpm")
-
-        self.connect("ivc_thrust_1.thrust_1", "propeller_1.thrust")
-        self.connect("ivc_thrust_2.thrust_2", "propeller_2.thrust")
-        self.connect("ivc_thrust_3.thrust_3", "propeller_3.thrust")
-        self.connect("ivc_thrust_4.thrust_4", "propeller_4.thrust")
 
         self.connect("propeller_1.shaft_power_in", "motor_1.shaft_power_out")
         self.connect("propeller_2.shaft_power_in", "motor_2.shaft_power_out")
@@ -338,7 +316,8 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_dc_converter_1.dc_current_out", "dc_bus_5.dc_current_in_1")
         self.connect("dc_bus_5.dc_voltage", "dc_dc_converter_1.dc_voltage_out")
 
-        self.connect("dc_dc_converter_voltage_in.voltage_in", "dc_dc_converter_1.dc_voltage_in")
+        self.connect("battery_pack_1.voltage_out", "dc_dc_converter_1.dc_voltage_in")
+        self.connect("dc_dc_converter_1.dc_current_in", "battery_pack_1.dc_current_out")
 
 
 def test_assembly():
@@ -351,13 +330,13 @@ def test_assembly():
     altitude = np.full(NB_POINTS_TEST, 0.0)
     ivc.add_output("altitude", val=altitude, units="m")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
-
+    ivc.add_output("thrust", val=np.linspace(500, 550, NB_POINTS_TEST), units="N")
     ivc.add_output(
         "exterior_temperature",
         units="degK",
         val=Atmosphere(altitude, altitude_in_feet=False).temperature,
     )
-    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 50))
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -492,31 +471,99 @@ def test_assembly():
     ) * problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                296795.0,
-                298992.0,
-                301200.0,
-                303418.0,
-                305648.0,
-                307889.0,
-                310140.0,
-                312403.0,
-                314677.0,
-                316962.0,
-                319258.0,
-                321565.0,
-                323884.0,
-                326213.0,
-                328555.0,
-                330907.0,
-                333271.0,
-                335646.0,
-                338032.0,
-                340430.0,
-                342840.0,
-                345261.0,
-                347693.0,
-                350138.0,
-                352593.0,
+                297007.0,
+                299218.0,
+                301440.0,
+                303673.0,
+                305917.0,
+                308173.0,
+                310440.0,
+                312719.0,
+                315009.0,
+                317310.0,
+                319623.0,
+                321947.0,
+                324283.0,
+                326630.0,
+                328989.0,
+                331360.0,
+                333742.0,
+                336135.0,
+                338541.0,
+                340958.0,
+                343386.0,
+                345827.0,
+                348279.0,
+                350743.0,
+                353218.0,
+            ]
+        ),
+        abs=1,
+    )
+
+    # om.n2(problem)
+
+
+def test_assembly_from_pt_file():
+
+    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/quad_assembly.yml"
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PowerTrainPerformancesFromFile(
+                power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(500, 550, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 50))
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesAssembly(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "component.dc_dc_converter_1.dc_current_in", units="A"
+    ) * problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
+        np.array(
+            [
+                297007.0,
+                299218.0,
+                301440.0,
+                303673.0,
+                305917.0,
+                308173.0,
+                310440.0,
+                312719.0,
+                315009.0,
+                317310.0,
+                319623.0,
+                321947.0,
+                324283.0,
+                326630.0,
+                328989.0,
+                331360.0,
+                333742.0,
+                336135.0,
+                338541.0,
+                340958.0,
+                343386.0,
+                345827.0,
+                348279.0,
+                350743.0,
+                353218.0,
             ]
         ),
         abs=1,
