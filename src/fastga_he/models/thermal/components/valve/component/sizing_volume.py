@@ -17,7 +17,6 @@ class ComputeValvzVolume(om.ExplicitComponent):
 
         m_flow = inputs["data:thermal:coolant:mass_flow"]
 
-        if m_flow
-        V_valve = 0.0003*m_flow-0.0001 
+        V_valve = 6e-05 * m_flow + 8e-05
 
         outputs["data:thermal:valvevolume"] = V_valve
