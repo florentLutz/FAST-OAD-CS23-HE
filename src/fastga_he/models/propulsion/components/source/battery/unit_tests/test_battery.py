@@ -25,6 +25,7 @@ from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
 from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 from ..components.cstr_ensure import ConstraintsEnsure
 from ..components.cstr_enforce import ConstraintsEnforce
 
@@ -653,6 +654,28 @@ def test_maximum():
     ) == pytest.approx(
         723.7,
         rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_energy_consumption():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "voltage_out",
+        units="V",
+        val=np.array([802.0, 786.0, 770.0, 760.0, 750.0, 740.0, 734.0, 726.0, 720.0, 714.0]),
+    )
+    ivc.add_output("dc_current_out", np.linspace(400, 410, NB_POINTS_TEST), units="A")
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    problem = run_system(
+        PerformancesEnergyConsumption(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    assert problem.get_val("non_consumable_energy_t_econ", units="kW*h") == pytest.approx(
+        [44.556, 43.788, 43.015, 42.574, 42.13, 41.682, 41.457, 41.118, 40.889, 40.658], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)

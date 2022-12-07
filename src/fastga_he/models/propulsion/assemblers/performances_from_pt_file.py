@@ -6,7 +6,9 @@ import openmdao.api as om
 import fastoad.api as oad
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
-
+from fastga_he.models.propulsion.assemblers.energy_consumption_from_pt_file import (
+    EnergyConsumptionFromPTFile,
+)
 
 # noinspection PyUnresolvedReferences
 from fastga_he.models.propulsion.components import (
@@ -58,6 +60,7 @@ class PowerTrainPerformancesFromFile(om.Group):
         self.configurator.load(self.options["power_train_file_path"])
 
         propulsor_names = self.configurator.get_thrust_element_list()
+        source_names = self.configurator.get_energy_consumption_list()
 
         (
             components_name,
@@ -70,15 +73,13 @@ class PowerTrainPerformancesFromFile(om.Group):
             components_promotes,
         ) = self.configurator.get_performances_element_lists()
 
-        option_thrust_splitter = {
+        options = {
             "power_train_file_path": self.options["power_train_file_path"],
             "number_of_points": number_of_points,
         }
         self.add_subsystem(
             name="thrust_splitter",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_THRUST_DISTRIBUTOR, options=option_thrust_splitter
-            ),
+            subsys=oad.RegisterSubmodel.get_submodel(SUBMODEL_THRUST_DISTRIBUTOR, options=options),
             promotes=["data:*", "thrust"],
         )
 
@@ -111,6 +112,15 @@ class PowerTrainPerformancesFromFile(om.Group):
                 promotes=["data:*"] + component_promote,
             )
 
+        self.add_subsystem(
+            name="energy_consumption",
+            subsys=EnergyConsumptionFromPTFile(
+                number_of_points=number_of_points,
+                power_train_file_path=self.options["power_train_file_path"],
+            ),
+            promotes=["non_consumable_energy_t_econ", "fuel_consumed_t_econ"],
+        )
+
         for propulsor_name in propulsor_names:
             self.connect(
                 "thrust_splitter." + propulsor_name + "_thrust", propulsor_name + ".thrust"
@@ -118,3 +128,13 @@ class PowerTrainPerformancesFromFile(om.Group):
 
         for om_output, om_input in zip(components_connection_outputs, components_connection_inputs):
             self.connect(om_output, om_input)
+
+        for source_name in source_names:
+            self.connect(
+                source_name + ".non_consumable_energy_t",
+                "energy_consumption." + source_name + "_non_consumable_energy_t",
+            )
+            self.connect(
+                source_name + ".fuel_consumed_t",
+                "energy_consumption." + source_name + "_fuel_consumed_t",
+            )

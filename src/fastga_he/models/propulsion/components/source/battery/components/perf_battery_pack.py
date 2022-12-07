@@ -2,6 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import numpy as np
 import openmdao.api as om
 
 from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
@@ -20,6 +21,7 @@ from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
 from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 
 
 class PerformancesBatteryPack(om.Group):
@@ -143,6 +145,22 @@ class PerformancesBatteryPack(om.Group):
             "maximum",
             PerformancesMaximum(number_of_points=number_of_points, battery_pack_id=battery_pack_id),
             promotes=["data:*", "state_of_charge"],
+        )
+        self.add_subsystem(
+            "energy_consumption",
+            PerformancesEnergyConsumption(number_of_points=number_of_points),
+            promotes=["dc_current_out", "voltage_out", "time_step", "non_consumable_energy_t"],
+        )
+
+        fuel_consumed = om.IndepVarComp()
+        fuel_consumed.add_output(
+            "fuel_consumed_t",
+            np.full(number_of_points, 0.0),
+        )
+        self.add_subsystem(
+            "fuel_consumed",
+            fuel_consumed,
+            promotes=["fuel_consumed_t"],
         )
 
         self.connect(

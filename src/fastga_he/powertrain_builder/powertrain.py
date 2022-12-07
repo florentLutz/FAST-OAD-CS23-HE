@@ -312,6 +312,23 @@ class FASTGAHEPowerTrainConfigurator:
 
         return components_names
 
+    def get_energy_consumption_list(self) -> list:
+        """
+        Returns the list of OpenMDAO variables necessary to create the component which sum the
+        contribution of each source to the global energy consumption.
+        """
+
+        self._get_components()
+        components_names = []
+
+        for component_type_class, component_name in zip(
+            self._components_type_class, self._components_name
+        ):
+            if component_type_class == "source":
+                components_names.append(component_name)
+
+        return components_names
+
 
 class _YAMLSerializer(ABC):
     """YAML-format serializer."""
