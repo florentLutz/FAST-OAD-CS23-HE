@@ -13,12 +13,12 @@ class FullSimpleAssembly(om.Group):
         super().__init__(**kwargs)
 
         # Solvers setup
-        self.nonlinear_solver = om.BroydenSolver()
+        self.nonlinear_solver = om.NonlinearBlockGS()
         self.nonlinear_solver.options["iprint"] = 2
         self.nonlinear_solver.options["maxiter"] = 200
         self.nonlinear_solver.options["rtol"] = 1e-5
         self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
-        self.linear_solver = om.DirectSolver()
+        self.linear_solver = om.LinearBlockGS()
 
     def initialize(self):
         self.options.declare(

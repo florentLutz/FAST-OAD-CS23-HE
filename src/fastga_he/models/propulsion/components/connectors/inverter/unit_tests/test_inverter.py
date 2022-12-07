@@ -1488,7 +1488,9 @@ def test_performances_inverter_tot():
     )
 
     problem = run_system(
-        PerformancesInverter(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST), ivc
+        PerformancesInverter(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+        add_solvers=True,
     )
 
     expected_efficiency = np.array(

@@ -674,7 +674,7 @@ def test_energy_consumption():
         PerformancesEnergyConsumption(number_of_points=NB_POINTS_TEST),
         ivc,
     )
-    assert problem.get_val("non_consumable_energy_t_econ", units="kW*h") == pytest.approx(
+    assert problem.get_val("non_consumable_energy_t", units="kW*h") == pytest.approx(
         [44.556, 43.788, 43.015, 42.574, 42.13, 41.682, 41.457, 41.118, 40.889, 40.658], rel=1e-2
     )
 

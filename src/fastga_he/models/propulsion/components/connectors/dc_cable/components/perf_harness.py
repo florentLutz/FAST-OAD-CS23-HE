@@ -16,11 +16,11 @@ class PerformancesHarness(om.Group):
         super().__init__(**kwargs)
 
         # Solvers setup
-        self.nonlinear_solver = om.BroydenSolver()
+        self.nonlinear_solver = om.NonlinearBlockGS()
         self.nonlinear_solver.options["iprint"] = 0
         self.nonlinear_solver.options["maxiter"] = 200
         self.nonlinear_solver.options["rtol"] = 1e-5
-        self.linear_solver = om.DirectSolver()
+        self.linear_solver = om.LinearBlockGS()
 
     def initialize(self):
 
