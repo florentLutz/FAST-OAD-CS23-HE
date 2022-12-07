@@ -66,6 +66,13 @@ class PerformancesInverter(om.Group):
             PerformancesModulationIndex(number_of_points=number_of_points),
             promotes=["ac_voltage_peak_out", "dc_voltage_in"],
         )
+        # Switching losses do not depend on current and gate voltage so we take them out of the
+        # loop to save some time
+        self.add_subsystem(
+            "switching_losses",
+            PerformancesSwitchingLosses(inverter_id=inverter_id, number_of_points=number_of_points),
+            promotes=["data:*", "ac_current_rms_out_one_phase", "switching_frequency"],
+        )
         self.add_subsystem(
             "resistance",
             PerformancesResistance(inverter_id=inverter_id, number_of_points=number_of_points),
@@ -82,11 +89,6 @@ class PerformancesInverter(om.Group):
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
             promotes=["data:*", "ac_current_rms_out_one_phase"],
-        )
-        self.add_subsystem(
-            "switching_losses",
-            PerformancesSwitchingLosses(inverter_id=inverter_id, number_of_points=number_of_points),
-            promotes=["data:*", "ac_current_rms_out_one_phase", "switching_frequency"],
         )
         self.add_subsystem(
             "total_losses",

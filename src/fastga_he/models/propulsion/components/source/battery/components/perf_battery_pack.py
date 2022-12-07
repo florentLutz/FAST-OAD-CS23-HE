@@ -64,6 +64,26 @@ class PerformancesBatteryPack(om.Group):
             ),
             promotes=["data:*", "dc_current_out"],
         )
+
+        self.add_subsystem(
+            "battery_c_rate",
+            PerformancesModuleCRate(
+                number_of_points=number_of_points, battery_pack_id=battery_pack_id
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "battery_soc_decrease",
+            PerformancesSOCDecrease(number_of_points=number_of_points),
+            promotes=["time_step"],
+        )
+        self.add_subsystem(
+            "update_soc",
+            PerformancesUpdateSOC(number_of_points=number_of_points),
+            promotes=["state_of_charge"],
+        )
+        # Though these variable depends on variables that are looped on, they don't affect the
+        # value that we loop on hence why they are put here to save time.
         self.add_subsystem(
             "open_circuit_voltage",
             PerformancesOpenCircuitVoltage(number_of_points=number_of_points),
@@ -91,24 +111,6 @@ class PerformancesBatteryPack(om.Group):
             "battery_voltage",
             PerformancesBatteryVoltage(number_of_points=number_of_points),
             promotes=["voltage_out"],
-        )
-
-        self.add_subsystem(
-            "battery_c_rate",
-            PerformancesModuleCRate(
-                number_of_points=number_of_points, battery_pack_id=battery_pack_id
-            ),
-            promotes=["data:*"],
-        )
-        self.add_subsystem(
-            "battery_soc_decrease",
-            PerformancesSOCDecrease(number_of_points=number_of_points),
-            promotes=["time_step"],
-        )
-        self.add_subsystem(
-            "update_soc",
-            PerformancesUpdateSOC(number_of_points=number_of_points),
-            promotes=["state_of_charge"],
         )
         self.add_subsystem(
             "joule_losses_cell",
