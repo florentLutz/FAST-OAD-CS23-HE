@@ -2,6 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import time
+
 import numpy as np
 import openmdao.api as om
 import pytest
@@ -547,9 +549,9 @@ def test_assembly_from_pt_file():
                 299218.0,
                 301440.0,
                 303673.0,
-                305917.0,
+                305918.0,
                 308173.0,
-                310440.0,
+                310441.0,
                 312719.0,
                 315009.0,
                 317310.0,
@@ -563,11 +565,11 @@ def test_assembly_from_pt_file():
                 336135.0,
                 338540.0,
                 340957.0,
-                343386.0,
-                345826.0,
-                348278.0,
-                350742.0,
-                353218.0,
+                343385.0,
+                345825.0,
+                348277.0,
+                350741.0,
+                353216.0,
             ]
         ),
         abs=1,
