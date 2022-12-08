@@ -21,9 +21,12 @@ class DEPEquilibrium(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        # Solvers setup
-        self.nonlinear_solver = om.NonlinearBlockGS()
-        self.linear_solver = om.LinearBlockGS()
+        # Solvers setup and configuration
+        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+        self.nonlinear_solver.options["iprint"] = 0
+        self.nonlinear_solver.options["maxiter"] = 50
+        self.nonlinear_solver.options["rtol"] = 1e-4
+        self.linear_solver = om.DirectSolver()
 
     def initialize(self):
 
@@ -157,13 +160,3 @@ class DEPEquilibrium(om.Group):
                 "compute_equilibrium.thrust",
                 "preparation_for_energy_consumption.thrust",
             )
-
-        # Solver configuration
-        self.nonlinear_solver.options["debug_print"] = False
-        self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 50
-        self.nonlinear_solver.options["rtol"] = 1e-4
-
-        self.linear_solver.options["iprint"] = 0
-        self.linear_solver.options["maxiter"] = 50
-        self.linear_solver.options["rtol"] = 1e-4

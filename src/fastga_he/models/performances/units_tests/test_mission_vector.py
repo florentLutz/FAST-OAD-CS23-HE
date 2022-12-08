@@ -15,7 +15,6 @@ Test mission vector module.
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-import numpy as np
 
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
 
