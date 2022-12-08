@@ -4,14 +4,8 @@
 
 import numpy as np
 import openmdao.api as om
-from fastoad.constants import EngineSetting
 
-# noinspection PyProtectedMember
-from fastoad.module_management._bundle_loader import BundleLoader
-import fastoad.api as oad
 from stdatm import Atmosphere
-
-from fastga.models.propulsion.fuel_propulsion.base import FuelEngineSet
 
 
 class ThrustTaxi(om.ExplicitComponent):
@@ -19,17 +13,35 @@ class ThrustTaxi(om.ExplicitComponent):
 
     def setup(self):
 
-        self.add_input("data:mission:sizing:taxi_out:thrust_rate", np.nan)
+        self.add_input("data:aerodynamics:aircraft:low_speed:CD0", np.nan)
+        self.add_input("data:aerodynamics:wing:low_speed:CL0_clean", val=np.nan)
+        self.add_input("data:aerodynamics:wing:low_speed:induced_drag_coefficient", np.nan)
+
+        self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
+
         self.add_input("data:mission:sizing:taxi_out:speed", np.nan, units="m/s")
         self.add_output("data:mission:sizing:taxi_out:thrust", 1500, units="N")
 
-        self.add_input("data:mission:sizing:taxi_in:thrust_rate", np.nan)
         self.add_input("data:mission:sizing:taxi_in:speed", np.nan, units="m/s")
         self.add_output("data:mission:sizing:taxi_in:thrust", 1500, units="N")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        # TODO: Proper formula based on the speed, AoA = 0.0 and aerodynamics
+        cd0 = inputs["data:aerodynamics:aircraft:low_speed:CD0"]
+        coeff_k_wing = inputs["data:aerodynamics:wing:low_speed:induced_drag_coefficient"]
+        cl0_wing = inputs["data:aerodynamics:wing:low_speed:CL0_clean"]
 
-        outputs["data:mission:sizing:taxi_out:thrust"] = 300.0
-        outputs["data:mission:sizing:taxi_in:thrust"] = 300.0
+        wing_area = inputs["data:geometry:wing:area"]
+
+        speed_to = inputs["data:mission:sizing:taxi_out:speed"]
+        speed_ti = inputs["data:mission:sizing:taxi_in:speed"]
+
+        cd = cd0 + coeff_k_wing * cl0_wing ** 2.0
+        density = Atmosphere(altitude=0.0).density
+
+        outputs["data:mission:sizing:taxi_out:thrust"] = (
+            0.5 * density * speed_to ** 2.0 * wing_area * cd
+        )
+        outputs["data:mission:sizing:taxi_in:thrust"] = (
+            0.5 * density * speed_ti ** 2.0 * wing_area * cd
+        )

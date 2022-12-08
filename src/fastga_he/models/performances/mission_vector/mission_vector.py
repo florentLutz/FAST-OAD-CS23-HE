@@ -45,16 +45,18 @@ class MissionVector(om.Group):
             default=50,
             desc="number of equilibrium to be treated in descent",
         )
+        self.options.declare("propulsion_id", default="", types=str)
+        self.options.declare(
+            name="power_train_file_path",
+            default="",
+            desc="Path to the file containing the description of the power",
+        )
 
     def setup(self):
 
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
-
-        number_of_points = (
-            number_of_points_climb + number_of_points_cruise + number_of_points_descent
-        )
 
         self.add_subsystem("in_flight_cg_variation", InFlightCGVariation(), promotes=["*"])
         self.add_subsystem(
@@ -73,6 +75,8 @@ class MissionVector(om.Group):
                 number_of_points_climb=number_of_points_climb,
                 number_of_points_cruise=number_of_points_cruise,
                 number_of_points_descent=number_of_points_descent,
+                propulsion_id=self.options["propulsion_id"],
+                power_train_file_path=self.options["power_train_file_path"],
             ),
             promotes_inputs=["data:*", "settings:*"],
             promotes_outputs=["data:*"],

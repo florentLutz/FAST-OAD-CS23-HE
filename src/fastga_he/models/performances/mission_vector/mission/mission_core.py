@@ -19,6 +19,13 @@ class MissionCore(om.Group):
 
     def initialize(self):
 
+        # We have to declare them even if not used to preserve compatibility
+        self.options.declare("propulsion_id", default="", types=str)
+        self.options.declare(
+            name="power_train_file_path",
+            default="",
+            desc="Path to the file containing the description of the power",
+        )
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -58,6 +65,8 @@ class MissionCore(om.Group):
             "number_of_points_climb": number_of_points_climb,
             "number_of_points_cruise": number_of_points_cruise,
             "number_of_points_descent": number_of_points_descent,
+            "propulsion_id": self.options["propulsion_id"],
+            "power_train_file_path": self.options["power_train_file_path"],
         }
         self.add_subsystem(
             "compute_dep_equilibrium",

@@ -5,12 +5,13 @@
 import numpy as np
 import openmdao.api as om
 
-# noinspection PyProtectedMember
-from fastoad.module_management._bundle_loader import BundleLoader
 import fastoad.api as oad
-from stdatm import Atmosphere
 
 from ..constants import HE_SUBMODEL_ENERGY_CONSUMPTION
+
+oad.RegisterSubmodel.active_models[
+    HE_SUBMODEL_ENERGY_CONSUMPTION
+] = "fastga_he.submodel.performances.energy_consumption.basic"
 
 
 @oad.RegisterSubmodel(
@@ -21,6 +22,13 @@ class FuelConsumed(om.ExplicitComponent):
 
     def initialize(self):
 
+        # We have to declare them even if not used to preserve compatibility
+        self.options.declare("propulsion_id", default="", types=str)
+        self.options.declare(
+            name="power_train_file_path",
+            default="",
+            desc="Path to the file containing the description of the power",
+        )
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
