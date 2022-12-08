@@ -786,31 +786,6 @@ def test_switching_frequency_mission():
 
     problem.check_partials(compact_print=True)
 
-    ivc2 = om.IndepVarComp()
-    ivc2.add_output(
-        "data:propulsion:he_power_train:inverter:inverter_1:switching_frequency_mission",
-        val=[15e3, 12e3, 10e3],
-        units="Hz",
-    )
-
-    problem2 = run_system(
-        PerformancesSwitchingFrequencyMission(inverter_id="inverter_1", number_of_points=250),
-        ivc2,
-    )
-
-    assert problem2.get_val("switching_frequency", units="Hz") == pytest.approx(
-        np.concatenate(
-            (
-                np.full(100, 15e3),
-                np.full(100, 12e3),
-                np.full(50, 10e3),
-            )
-        ),
-        rel=1e-2,
-    )
-
-    problem2.check_partials(compact_print=True)
-
     ivc3 = om.IndepVarComp()
     ivc3.add_output(
         "data:propulsion:he_power_train:inverter:inverter_1:switching_frequency_mission",
@@ -854,30 +829,6 @@ def test_heat_sink_temperature_mission():
     )
 
     problem.check_partials(compact_print=True)
-
-    ivc2 = om.IndepVarComp()
-    ivc2.add_output(
-        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink_temperature_mission",
-        val=[290, 270, 290],
-        units="degK",
-    )
-
-    problem2 = run_system(
-        PerformancesHeatSinkTemperatureMission(inverter_id="inverter_1", number_of_points=250), ivc2
-    )
-
-    assert problem2.get_val("heat_sink_temperature", units="degK") == pytest.approx(
-        np.concatenate(
-            (
-                np.full(100, 290),
-                np.full(100, 270),
-                np.full(50, 290),
-            )
-        ),
-        rel=1e-2,
-    )
-
-    problem2.check_partials(compact_print=True)
 
     ivc3 = om.IndepVarComp()
     ivc3.add_output(

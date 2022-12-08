@@ -7,12 +7,6 @@ import openmdao.api as om
 
 from fastga_he.exceptions import ControlParameterInconsistentShapeError
 
-from fastga.models.performances.mission.mission_components import (
-    POINTS_NB_CLIMB,
-    POINTS_NB_CRUISE,
-    POINTS_NB_DESCENT,
-)
-
 
 class PerformancesSwitchingFrequencyMission(om.ExplicitComponent):
     """
@@ -21,8 +15,7 @@ class PerformancesSwitchingFrequencyMission(om.ExplicitComponent):
     than the original way to simplify the construction of the power train file.
 
     The input switching frequency can either be a float (then during the whole mission the
-    frequency is going to be the same), an array of three element (different frequency for the
-    whole climb, whole cruise and whole descent) or an array of number of points elements for the
+    frequency is going to be the same) or an array of number of points elements for the
     individual control of each point.
     """
 
@@ -71,15 +64,6 @@ class PerformancesSwitchingFrequencyMission(om.ExplicitComponent):
         if len(f_switch_mission) == 1:
             outputs["switching_frequency"] = np.full(number_of_points, f_switch_mission)
 
-        elif len(f_switch_mission) == 3:
-            outputs["switching_frequency"] = np.concatenate(
-                (
-                    np.full(POINTS_NB_CLIMB, f_switch_mission[0]),
-                    np.full(POINTS_NB_CRUISE, f_switch_mission[1]),
-                    np.full(POINTS_NB_DESCENT, f_switch_mission[2]),
-                )
-            )
-
         elif len(f_switch_mission) == number_of_points:
             outputs["switching_frequency"] = f_switch_mission
 
@@ -89,7 +73,7 @@ class PerformancesSwitchingFrequencyMission(om.ExplicitComponent):
                 + "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
                 + ":switching_frequency_mission"
-                + " should be 1, 3 or equal to the number of points"
+                + " should be 1 or equal to the number of points"
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -111,19 +95,7 @@ class PerformancesSwitchingFrequencyMission(om.ExplicitComponent):
                 + ":switching_frequency_mission",
             ] = np.full(number_of_points, 1.0)
 
-        elif len(f_switch_mission) == 3:
-            tmp_partials = np.zeros((number_of_points, 3))
-            tmp_partials[:POINTS_NB_CLIMB, 0] = 1
-            tmp_partials[POINTS_NB_CLIMB : POINTS_NB_CLIMB + POINTS_NB_CRUISE, 1] = 1
-            tmp_partials[POINTS_NB_CLIMB + POINTS_NB_CRUISE :, 2] = 1
-            partials[
-                "switching_frequency",
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":switching_frequency_mission",
-            ] = tmp_partials
-
-        elif len(f_switch_mission) == number_of_points:
+        else:
             partials[
                 "switching_frequency",
                 "data:propulsion:he_power_train:DC_DC_converter:"

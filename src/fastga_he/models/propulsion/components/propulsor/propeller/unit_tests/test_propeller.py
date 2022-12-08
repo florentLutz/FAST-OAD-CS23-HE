@@ -96,30 +96,6 @@ def test_rpm_mission():
 
     problem.check_partials(compact_print=True)
 
-    ivc2 = om.IndepVarComp()
-    ivc2.add_output(
-        "data:propulsion:he_power_train:propeller:propeller_1:rpm_mission",
-        val=[2700, 2500, 2000],
-        units="min**-1",
-    )
-
-    problem2 = run_system(
-        PerformancesRPMMission(propeller_id="propeller_1", number_of_points=250), ivc2
-    )
-
-    assert problem2.get_val("rpm", units="min**-1") == pytest.approx(
-        np.concatenate(
-            (
-                np.full(100, 2700),
-                np.full(100, 2500),
-                np.full(50, 2000),
-            )
-        ),
-        rel=1e-2,
-    )
-
-    problem2.check_partials(compact_print=True)
-
     ivc3 = om.IndepVarComp()
     ivc3.add_output(
         "data:propulsion:he_power_train:propeller:propeller_1:rpm_mission",

@@ -7,12 +7,6 @@ import openmdao.api as om
 
 from fastga_he.exceptions import ControlParameterInconsistentShapeError
 
-from fastga.models.performances.mission.mission_components import (
-    POINTS_NB_CLIMB,
-    POINTS_NB_CRUISE,
-    POINTS_NB_DESCENT,
-)
-
 
 class PerformancesRPMMission(om.ExplicitComponent):
     """
@@ -21,8 +15,7 @@ class PerformancesRPMMission(om.ExplicitComponent):
     way to simplify the construction of the power train file.
 
     The input rpm can either be a float (then during the whole mission the rpm is going to be the
-    same), an array of three element (different rpm for the whole climb, whole cruise and whole
-    descent) or an array of number of points elements for the individual control of each point.
+    same) or an array of number of points elements for the individual control of each point.
     """
 
     def initialize(self):
@@ -63,15 +56,6 @@ class PerformancesRPMMission(om.ExplicitComponent):
         if len(rpm_mission) == 1:
             outputs["rpm"] = np.full(number_of_points, rpm_mission)
 
-        elif len(rpm_mission) == 3:
-            outputs["rpm"] = np.concatenate(
-                (
-                    np.full(POINTS_NB_CLIMB, rpm_mission[0]),
-                    np.full(POINTS_NB_CRUISE, rpm_mission[1]),
-                    np.full(POINTS_NB_DESCENT, rpm_mission[2]),
-                )
-            )
-
         elif len(rpm_mission) == number_of_points:
             outputs["rpm"] = rpm_mission
 
@@ -81,7 +65,7 @@ class PerformancesRPMMission(om.ExplicitComponent):
                 + "data:propulsion:he_power_train:propeller:"
                 + propeller_id
                 + ":rpm_mission"
-                + " should be 1, 3 or equal to the number of points"
+                + " should be 1 or equal to the number of points"
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -98,16 +82,7 @@ class PerformancesRPMMission(om.ExplicitComponent):
                 "rpm", "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_mission"
             ] = np.full(number_of_points, 1.0)
 
-        elif len(rpm_mission) == 3:
-            tmp_partials = np.zeros((number_of_points, 3))
-            tmp_partials[:POINTS_NB_CLIMB, 0] = 1
-            tmp_partials[POINTS_NB_CLIMB : POINTS_NB_CLIMB + POINTS_NB_CRUISE, 1] = 1
-            tmp_partials[POINTS_NB_CLIMB + POINTS_NB_CRUISE :, 2] = 1
-            partials[
-                "rpm", "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_mission"
-            ] = tmp_partials
-
-        elif len(rpm_mission) == number_of_points:
+        else:
             partials[
                 "rpm", "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_mission"
             ] = np.eye(number_of_points)
