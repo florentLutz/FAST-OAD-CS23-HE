@@ -7,11 +7,6 @@ import openmdao.api as om
 from scipy.constants import g
 from stdatm import Atmosphere
 
-from fastga.models.performances.mission.mission_components import (
-    POINTS_NB_CLIMB,
-    POINTS_NB_CRUISE,
-)
-
 
 class InitializeAirspeed(om.ExplicitComponent):
     """Initializes the airspeeds at each time step."""
@@ -19,12 +14,28 @@ class InitializeAirspeed(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
+            "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
+        )
+        self.options.declare(
+            "number_of_points_cruise",
+            default=1,
+            desc="number of equilibrium to be treated in " "cruise",
+        )
+        self.options.declare(
+            "number_of_points_descent",
+            default=1,
+            desc="number of equilibrium to be treated in descent",
         )
 
     def setup(self):
 
-        number_of_points = self.options["number_of_points"]
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+
+        number_of_points = (
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+        )
 
         self.add_input("data:TLAR:v_cruise", val=np.nan, units="m/s")
 
@@ -47,6 +58,9 @@ class InitializeAirspeed(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+
         v_tas_cruise = inputs["data:TLAR:v_cruise"]
 
         cd0 = inputs["data:aerodynamics:aircraft:cruise:CD0"]
@@ -58,9 +72,11 @@ class InitializeAirspeed(om.ExplicitComponent):
         mass = inputs["mass"]
         altitude = inputs["altitude"]
 
-        altitude_climb = altitude[0:POINTS_NB_CLIMB]
-        altitude_cruise = altitude[POINTS_NB_CLIMB : POINTS_NB_CLIMB + POINTS_NB_CRUISE]
-        altitude_descent = altitude[POINTS_NB_CLIMB + POINTS_NB_CRUISE :]
+        altitude_climb = altitude[0:number_of_points_climb]
+        altitude_cruise = altitude[
+            number_of_points_climb : number_of_points_climb + number_of_points_cruise
+        ]
+        altitude_descent = altitude[number_of_points_climb + number_of_points_cruise :]
 
         # Computes the airspeed that gives the best climb rate
         # FIXME: VCAS constant-speed strategy is specific to ICE-propeller configuration,
@@ -83,7 +99,7 @@ class InitializeAirspeed(om.ExplicitComponent):
 
         cl_opt = inputs["data:aerodynamics:aircraft:cruise:optimal_CL"]
 
-        mass_descent = mass[POINTS_NB_CLIMB + POINTS_NB_CRUISE + 1]
+        mass_descent = mass[number_of_points_climb + number_of_points_cruise + 1]
         atm_descent = Atmosphere(altitude_descent, altitude_in_feet=False)
         vs1 = np.sqrt(
             (mass_descent * g) / (0.5 * atm_descent.density[0] * wing_area * cl_max_clean)

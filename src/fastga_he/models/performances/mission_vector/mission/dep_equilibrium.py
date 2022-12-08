@@ -31,7 +31,17 @@ class DEPEquilibrium(om.Group):
     def initialize(self):
 
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
+            "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
+        )
+        self.options.declare(
+            "number_of_points_cruise",
+            default=1,
+            desc="number of equilibrium to be treated in cruise",
+        )
+        self.options.declare(
+            "number_of_points_descent",
+            default=1,
+            desc="number of equilibrium to be treated in descent",
         )
         self.options.declare(
             "promotes_all_variables",
@@ -47,12 +57,22 @@ class DEPEquilibrium(om.Group):
 
     def setup(self):
 
-        number_of_points = self.options["number_of_points"]
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+
+        number_of_points = (
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+        )
 
         if self.options["promotes_all_variables"]:
             self.add_subsystem(
                 "preparation_for_energy_consumption",
-                PrepareForEnergyConsumption(number_of_points=number_of_points),
+                PrepareForEnergyConsumption(
+                    number_of_points_climb=number_of_points_climb,
+                    number_of_points_cruise=number_of_points_cruise,
+                    number_of_points_descent=number_of_points_descent,
+                ),
                 promotes_inputs=["*"],
                 promotes_outputs=["*"],
             )
@@ -88,7 +108,11 @@ class DEPEquilibrium(om.Group):
         else:
             self.add_subsystem(
                 "preparation_for_energy_consumption",
-                PrepareForEnergyConsumption(number_of_points=number_of_points),
+                PrepareForEnergyConsumption(
+                    number_of_points_climb=number_of_points_climb,
+                    number_of_points_cruise=number_of_points_cruise,
+                    number_of_points_descent=number_of_points_descent,
+                ),
                 promotes_inputs=["data:*"],
                 promotes_outputs=[],
             )

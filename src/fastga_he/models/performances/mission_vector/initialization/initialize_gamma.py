@@ -1,13 +1,9 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO.
+
 import numpy as np
 import openmdao.api as om
-
-from fastga.models.performances.mission.mission_components import (
-    POINTS_NB_CLIMB,
-    POINTS_NB_CRUISE,
-)
 
 
 class InitializeGamma(om.ExplicitComponent):
@@ -16,12 +12,28 @@ class InitializeGamma(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
+            "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
+        )
+        self.options.declare(
+            "number_of_points_cruise",
+            default=1,
+            desc="number of equilibrium to be treated in " "cruise",
+        )
+        self.options.declare(
+            "number_of_points_descent",
+            default=1,
+            desc="number of equilibrium to be treated in descent",
         )
 
     def setup(self):
 
-        number_of_points = self.options["number_of_points"]
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+
+        number_of_points = (
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+        )
 
         self.add_input("data:mission:sizing:main_route:cruise:altitude", val=np.nan, units="m")
         self.add_input(
@@ -46,6 +58,9 @@ class InitializeGamma(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+
         cruise_altitude = inputs["data:mission:sizing:main_route:cruise:altitude"]
         climb_rate_sl = float(inputs["data:mission:sizing:main_route:climb:climb_rate:sea_level"])
         climb_rate_cl = float(
@@ -55,9 +70,11 @@ class InitializeGamma(om.ExplicitComponent):
         altitude = inputs["altitude"]
         true_airspeed = inputs["true_airspeed"]
 
-        altitude_climb = altitude[0:POINTS_NB_CLIMB]
-        altitude_cruise = altitude[POINTS_NB_CLIMB : POINTS_NB_CLIMB + POINTS_NB_CRUISE]
-        altitude_descent = altitude[POINTS_NB_CLIMB + POINTS_NB_CRUISE :]
+        altitude_climb = altitude[0:number_of_points_climb]
+        altitude_cruise = altitude[
+            number_of_points_climb : number_of_points_climb + number_of_points_cruise
+        ]
+        altitude_descent = altitude[number_of_points_climb + number_of_points_cruise :]
 
         vertical_speed_climb = np.interp(
             altitude_climb, [0.0, cruise_altitude], [climb_rate_sl, climb_rate_cl]

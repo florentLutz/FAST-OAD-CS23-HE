@@ -4,11 +4,6 @@
 import numpy as np
 import openmdao.api as om
 
-from fastga.models.performances.mission.mission_components import (
-    POINTS_NB_CLIMB,
-    POINTS_NB_CRUISE,
-    POINTS_NB_DESCENT,
-)
 from ..initialization.initialize_cg import InitializeCoG
 from ..initialization.initialize_airspeed import InitializeAirspeed
 from ..initialization.initialize_airspeed_derivatives import InitializeAirspeedDerivatives
@@ -24,64 +19,103 @@ class Initialize(om.Group):
     def initialize(self):
 
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
+            "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
+        )
+        self.options.declare(
+            "number_of_points_cruise",
+            default=1,
+            desc="number of equilibrium to be treated in " "cruise",
+        )
+        self.options.declare(
+            "number_of_points_descent",
+            default=1,
+            desc="number of equilibrium to be treated in " "descen",
         )
 
     def setup(self):
 
-        number_of_points = self.options["number_of_points"]
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+
         engine_setting = np.concatenate(
             (
-                np.full(POINTS_NB_CLIMB, 2),
-                np.full(POINTS_NB_CRUISE, 3),
-                np.full(POINTS_NB_DESCENT, 2),
+                np.full(number_of_points_climb, 2),
+                np.full(number_of_points_cruise, 3),
+                np.full(number_of_points_descent, 2),
             )
         )
         ivc_engine_setting = om.IndepVarComp()
-        ivc_engine_setting.add_output(
-            "engine_setting", val=engine_setting, units=None, shape=number_of_points
-        )
+        ivc_engine_setting.add_output("engine_setting", val=engine_setting, units=None)
 
         self.add_subsystem("initialize_engine_setting", subsys=ivc_engine_setting, promotes=[])
         self.add_subsystem(
             "initialize_altitude",
-            InitializeAltitude(number_of_points=number_of_points),
+            InitializeAltitude(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+            ),
             promotes_inputs=["data:*"],
             promotes_outputs=[],
         )
         self.add_subsystem(
             "initialize_airspeed",
-            InitializeAirspeed(number_of_points=number_of_points),
+            InitializeAirspeed(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+            ),
             promotes_inputs=["data:*"],
             promotes_outputs=[],
         )
         self.add_subsystem(
             "initialize_gamma",
-            InitializeGamma(number_of_points=number_of_points),
+            InitializeGamma(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+            ),
             promotes_inputs=["data:*"],
             promotes_outputs=[],
         )
         self.add_subsystem(
             "initialize_horizontal_speed",
-            InitializeHorizontalSpeed(number_of_points=number_of_points),
+            InitializeHorizontalSpeed(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+            ),
             promotes_inputs=[],
             promotes_outputs=[],
         )
         self.add_subsystem(
             "initialize_time_and_distance",
-            InitializeTimeAndDistance(number_of_points=number_of_points),
+            InitializeTimeAndDistance(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+            ),
             promotes_inputs=["data:*"],
             promotes_outputs=[],
         )
         self.add_subsystem(
             "initialize_airspeed_time_derivatives",
-            InitializeAirspeedDerivatives(number_of_points=number_of_points),
+            InitializeAirspeedDerivatives(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+            ),
             promotes_inputs=[],
             promotes_outputs=[],
         )
         self.add_subsystem(
             "initialize_center_of_gravity",
-            InitializeCoG(number_of_points=number_of_points),
+            InitializeCoG(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+            ),
             promotes_inputs=["data:*"],
             promotes_outputs=[],
         )

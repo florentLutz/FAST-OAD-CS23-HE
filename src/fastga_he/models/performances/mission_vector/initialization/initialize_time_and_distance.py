@@ -5,11 +5,6 @@
 import numpy as np
 import openmdao.api as om
 
-from fastga.models.performances.mission.mission_components import (
-    POINTS_NB_CLIMB,
-    POINTS_NB_CRUISE,
-)
-
 
 class InitializeTimeAndDistance(om.ExplicitComponent):
     """Initializes time and ground distance at each time step."""
@@ -17,12 +12,28 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
+            "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
+        )
+        self.options.declare(
+            "number_of_points_cruise",
+            default=1,
+            desc="number of equilibrium to be treated in " "cruise",
+        )
+        self.options.declare(
+            "number_of_points_descent",
+            default=1,
+            desc="number of equilibrium to be treated in descent",
         )
 
     def setup(self):
 
-        number_of_points = self.options["number_of_points"]
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+
+        number_of_points = (
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+        )
 
         # Cannot use the vertical speed vector previously computed since it is gonna be
         # initialized at 0.0 which will cause a problem for the time computation
@@ -57,6 +68,9 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+
         altitude = inputs["altitude"]
         horizontal_speed = inputs["horizontal_speed"]
 
@@ -69,10 +83,12 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
         )
         descent_rate = -abs(inputs["data:mission:sizing:main_route:descent:descent_rate"])
 
-        altitude_climb = altitude[0:POINTS_NB_CLIMB]
-        horizontal_speed_climb = horizontal_speed[0:POINTS_NB_CLIMB]
-        altitude_descent = altitude[POINTS_NB_CLIMB + POINTS_NB_CRUISE :]
-        horizontal_speed_descent = horizontal_speed[POINTS_NB_CLIMB + POINTS_NB_CRUISE :]
+        altitude_climb = altitude[0:number_of_points_climb]
+        horizontal_speed_climb = horizontal_speed[0:number_of_points_climb]
+        altitude_descent = altitude[number_of_points_climb + number_of_points_cruise :]
+        horizontal_speed_descent = horizontal_speed[
+            number_of_points_climb + number_of_points_cruise :
+        ]
 
         # Computing the time evolution during the climb phase, based on the altitude sampling and
         # the desired climb rate
@@ -105,11 +121,11 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
 
         # Cruise position computation
         cruise_range = mission_range - position_climb[-1] - position_descent[-1]
-        cruise_distance_step = cruise_range / (POINTS_NB_CRUISE + 1)
+        cruise_distance_step = cruise_range / (number_of_points_cruise + 1)
         position_cruise = np.linspace(
             position_climb[-1] + cruise_distance_step,
             position_climb[-1] + cruise_range - cruise_distance_step,
-            POINTS_NB_CRUISE,
+            number_of_points_cruise,
         )[:, 0]
 
         cruise_time_array = (position_cruise - position_climb[-1]) / v_tas_cruise + time_climb[-1]

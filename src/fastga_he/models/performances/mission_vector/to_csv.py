@@ -9,12 +9,6 @@ import openmdao.api as om
 import pandas as pd
 from stdatm import Atmosphere
 
-from fastga.models.performances.mission.mission_components import (
-    POINTS_NB_CRUISE,
-    POINTS_NB_CLIMB,
-    POINTS_NB_DESCENT,
-)
-
 CSV_DATA_LABELS = [
     "time",
     "altitude",
@@ -49,13 +43,31 @@ CSV_DATA_LABELS = [
 
 class ToCSV(om.ExplicitComponent):
     def initialize(self):
+
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be " "treated"
+            "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
+        )
+        self.options.declare(
+            "number_of_points_cruise",
+            default=1,
+            desc="number of equilibrium to be treated in cruise",
+        )
+        self.options.declare(
+            "number_of_points_descent",
+            default=1,
+            desc="number of equilibrium to be treated in descent",
         )
         self.options.declare("out_file", default="", types=str)
 
     def setup(self):
-        number_of_points = self.options["number_of_points"]
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+
+        number_of_points = (
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+        )
 
         self.add_input(
             "d_vx_dt", shape=number_of_points, val=np.full(number_of_points, np.nan), units="m/s**2"
@@ -139,6 +151,10 @@ class ToCSV(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+
         time = inputs["time"]
         altitude = inputs["altitude"]
         distance = inputs["position"]
@@ -189,9 +205,9 @@ class ToCSV(om.ExplicitComponent):
 
         name = np.concatenate(
             (
-                np.full(POINTS_NB_CLIMB, "sizing:main_route:climb"),
-                np.full(POINTS_NB_CRUISE, "sizing:main_route:cruise"),
-                np.full(POINTS_NB_DESCENT, "sizing:main_route:descent"),
+                np.full(number_of_points_climb, "sizing:main_route:climb"),
+                np.full(number_of_points_cruise, "sizing:main_route:cruise"),
+                np.full(number_of_points_descent, "sizing:main_route:descent"),
             )
         )
 

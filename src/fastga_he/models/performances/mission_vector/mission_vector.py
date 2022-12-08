@@ -4,17 +4,16 @@
 
 import openmdao.api as om
 
-from fastga.models.performances.mission.mission_components import (
-    POINTS_NB_CLIMB,
-    POINTS_NB_CRUISE,
-    POINTS_NB_DESCENT,
-)
+import fastoad.api as oad
+from fastoad.module_management.constants import ModelDomain
+
 from .initialization.initialize import Initialize
 from .mission.mission_core import MissionCore
 from .to_csv import ToCSV
 from fastga.models.weight.cg.cg_variation import InFlightCGVariation
 
 
+@oad.RegisterOpenMDAOSystem("fastga_he.performances.mission_vector", domain=ModelDomain.OTHER)
 class MissionVector(om.Group):
     """Computes and potentially save mission based on options."""
 
@@ -31,27 +30,61 @@ class MissionVector(om.Group):
     def initialize(self):
 
         self.options.declare("out_file", default="", types=str)
+        self.options.declare(
+            "number_of_points_climb",
+            default=100,
+            desc="number of equilibrium to be treated in climb",
+        )
+        self.options.declare(
+            "number_of_points_cruise",
+            default=100,
+            desc="number of equilibrium to be treated in cruise",
+        )
+        self.options.declare(
+            "number_of_points_descent",
+            default=50,
+            desc="number of equilibrium to be treated in descent",
+        )
 
     def setup(self):
 
-        number_of_points = POINTS_NB_CLIMB + POINTS_NB_CRUISE + POINTS_NB_DESCENT
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+
+        number_of_points = (
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+        )
 
         self.add_subsystem("in_flight_cg_variation", InFlightCGVariation(), promotes=["*"])
         self.add_subsystem(
             "initialization",
-            Initialize(number_of_points=number_of_points),
+            Initialize(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+            ),
             promotes_inputs=["data:*"],
             promotes_outputs=[],
         )
         self.add_subsystem(
             "solve_equilibrium",
-            MissionCore(number_of_points=number_of_points),
+            MissionCore(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+            ),
             promotes_inputs=["data:*", "settings:*"],
             promotes_outputs=["data:*"],
         )
         self.add_subsystem(
             "to_csv",
-            ToCSV(number_of_points=number_of_points, out_file=self.options["out_file"]),
+            ToCSV(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+                out_file=self.options["out_file"],
+            ),
             promotes_inputs=["data:*"],
             promotes_outputs=[],
         )

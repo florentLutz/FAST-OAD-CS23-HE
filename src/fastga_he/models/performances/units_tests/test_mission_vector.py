@@ -27,13 +27,23 @@ def test_mission_vector():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(MissionVector()),
+        list_inputs(
+            MissionVector(
+                number_of_points_climb=100,
+                number_of_points_cruise=100,
+                number_of_points_descent=50,
+            )
+        ),
         __file__,
         XML_FILE,
     )
 
     problem = run_system(
-        MissionVector(),
+        MissionVector(
+            number_of_points_climb=100,
+            number_of_points_cruise=100,
+            number_of_points_descent=50,
+        ),
         ivc,
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
