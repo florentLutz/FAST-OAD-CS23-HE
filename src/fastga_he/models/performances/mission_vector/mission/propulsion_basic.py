@@ -67,7 +67,7 @@ class FuelConsumed(om.ExplicitComponent):
             "data:propulsion:IC_engine:tsfc",
             shape=number_of_points + 2,
             val=np.full(number_of_points + 2, 7.3e-6),
-            units="s",
+            units="kg/s/N",
         )
 
         self.add_output(
