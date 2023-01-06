@@ -24,6 +24,7 @@ from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
 from ..components.source.battery import PerformancesBatteryPack
 
 from ..assemblers.thrust_distributor import ThrustDistributor
+from ..assemblers.power_rate import PowerRate
 
 XML_FILE = "quad_assembly.xml"
 NB_POINTS_TEST = 50
@@ -660,6 +661,41 @@ def test_thrust_distributor():
     )
     assert problem.get_val("propeller_4_thrust", units="N") == pytest.approx(
         np.linspace(500, 550, NB_POINTS_TEST), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_power_rate():
+    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/quad_assembly.yml"
+
+    ivc = get_indep_var_comp(
+        list_inputs(PowerRate(power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "motor_1_shaft_power_out", val=np.linspace(32.5, 65.0, NB_POINTS_TEST), units="kW"
+    )
+    ivc.add_output(
+        "motor_2_shaft_power_out", val=np.linspace(35.0, 70.0, NB_POINTS_TEST), units="kW"
+    )
+    ivc.add_output(
+        "motor_3_shaft_power_out", val=np.linspace(37.5, 75.0, NB_POINTS_TEST), units="kW"
+    )
+    ivc.add_output(
+        "motor_4_shaft_power_out", val=np.linspace(40.0, 80.0, NB_POINTS_TEST), units="kW"
+    )
+    ivc.add_output("engine_setting_econ", val=np.ones(NB_POINTS_TEST), units="N")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PowerRate(power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("thrust_rate_t_econ") == pytest.approx(
+        np.linspace(0.5, 1.0, NB_POINTS_TEST), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)

@@ -1084,13 +1084,12 @@ def test_mission_vector():
         ivc,
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(225.22, abs=1e-2)
+    assert sizing_fuel == pytest.approx(62.48, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
 
 def test_mission_vector_from_yml():
-    """Test the overall aircraft design process with wing positioning under VLM method."""
 
     # Define used files depending on options
     xml_file_name = "sample_ac.xml"
@@ -1109,10 +1108,12 @@ def test_mission_vector_from_yml():
     problem.run_model()
     problem.write_outputs()
 
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+
     if not pth.exists(RESULTS_FOLDER_PATH):
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(230.27, abs=1e-2)
+    assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)

@@ -40,6 +40,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input("power_losses", units="W", val=np.nan, shape=number_of_points)
+        self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
 
         self.add_output(
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":current_ac_max",
@@ -100,6 +101,17 @@ class PerformancesMaximum(om.ExplicitComponent):
             method="exact",
         )
 
+        self.add_output(
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max",
+            units="W",
+            val=42000.0,
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max",
+            wrt="shaft_power_out",
+            method="exact",
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         motor_id = self.options["motor_id"]
@@ -118,6 +130,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":losses_max"] = np.max(
             inputs["power_losses"]
+        )
+        outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max"] = np.max(
+            inputs["shaft_power_out"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -145,3 +160,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":losses_max", "power_losses"
         ] = np.where(inputs["power_losses"] == np.max(inputs["power_losses"]), 1.0, 0.0)
+        partials[
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max",
+            "shaft_power_out",
+        ] = np.where(inputs["shaft_power_out"] == np.max(inputs["shaft_power_out"]), 1.0, 0.0)

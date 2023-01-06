@@ -82,6 +82,7 @@
             <current_ac_max units="A" is_input="False">184.80516709572566<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <losses_max units="W" is_input="False">17449.88728583321</losses_max>
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the motor rpm--></rpm_max>
+            <shaft_power_max units="W" is_input="False">169530.10614566284</shaft_power_max>
             <torque_constant units="N*m/A" is_input="True">1.46</torque_constant>
             <torque_max units="N*m" is_input="False">809.4466318792784<!--Maximum value of the torque the motor has to provide--></torque_max>
             <voltage_ac_max units="V" is_input="False">413.0526427857553<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>

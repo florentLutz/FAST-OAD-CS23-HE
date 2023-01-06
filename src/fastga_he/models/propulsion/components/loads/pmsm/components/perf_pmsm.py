@@ -34,7 +34,7 @@ class PerformancesPMSM(om.Group):
         self.add_subsystem(
             "torque",
             PerformancesTorque(number_of_points=number_of_points),
-            promotes=["shaft_power_out", "rpm"],
+            promotes=["shaft_power_out", "rpm", "shaft_power_for_power_rate"],
         )
 
         self.add_subsystem(
@@ -82,7 +82,13 @@ class PerformancesPMSM(om.Group):
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(number_of_points=number_of_points, motor_id=motor_id),
-            promotes=["data:*", "ac_current_rms_in_one_phase", "ac_voltage_peak_in", "rpm"],
+            promotes=[
+                "data:*",
+                "ac_current_rms_in_one_phase",
+                "ac_voltage_peak_in",
+                "rpm",
+                "shaft_power_out",
+            ],
         )
 
         self.connect(

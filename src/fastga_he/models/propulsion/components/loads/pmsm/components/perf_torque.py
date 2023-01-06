@@ -23,8 +23,19 @@ class PerformancesTorque(om.ExplicitComponent):
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
 
         self.add_output("torque_out", units="N*m", val=0.0, shape=number_of_points)
+        # Dear god of IT, forgive me for what I'm doing. The following is completely unnecessary
+        # as a standalone but since for the mission we need to know the "power rate" we need the
+        # shaft power. However, since the shaft power is an input of the propulsive load and of
+        # the power rate component they can't be connected. However connecting to the propulsor
+        # shaft power (which is equal to the load shaft power) feels off, so instead we will just
+        # create a new variable identical to the shaft_power_out but with a different name.
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(of="torque_out", wrt="*", method="exact")
+
+        self.add_output("shaft_power_for_power_rate", units="W", val=50e3, shape=number_of_points)
+        self.declare_partials(
+            of="shaft_power_for_power_rate", wrt="shaft_power_out", val=np.eye(number_of_points)
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -35,6 +46,7 @@ class PerformancesTorque(om.ExplicitComponent):
         torque = power / omega
 
         outputs["torque_out"] = torque
+        outputs["shaft_power_for_power_rate"] = power
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 

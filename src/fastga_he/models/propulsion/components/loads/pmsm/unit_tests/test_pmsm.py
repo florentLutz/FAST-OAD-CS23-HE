@@ -286,6 +286,9 @@ def test_torque():
     assert problem.get_val("torque_out", units="N*m") == pytest.approx(
         [82.0, 91.0, 100.0, 108.0, 116.0, 123.0, 130.0, 136.0, 143.0, 149.0], rel=1e-2
     )
+    assert problem.get_val("shaft_power_for_power_rate", units="kW") == pytest.approx(
+        np.linspace(30, 70, NB_POINTS_TEST), rel=1e-2
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -510,6 +513,7 @@ def test_maximum():
         np.array([2.52, 2.66, 2.82, 2.98, 3.14, 3.3, 3.47, 3.63, 3.81, 3.98]),
         units="kW",
     )
+    ivc.add_output("shaft_power_out", np.linspace(30, 70, 10), units="kW")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -531,6 +535,9 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:losses_max", units="kW"
     ) == pytest.approx(3.98, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:shaft_power_max", units="kW"
+    ) == pytest.approx(70.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

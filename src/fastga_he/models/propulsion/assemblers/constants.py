@@ -8,3 +8,4 @@ SUBMODEL_POWER_TRAIN_PERF = "submodel.propulsion.performances"
 SUBMODEL_POWER_TRAIN_FULL_PERF = "submodel.propulsion.full_performances"
 
 SUBMODEL_THRUST_DISTRIBUTOR = "submodel.propulsion.thrust_distributor"
+SUBMODEL_POWER_RATE = "submodel.propulsion.power_rate"

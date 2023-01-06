@@ -47,7 +47,7 @@ PMSM = {
         (None, "ac_voltage_rms_in"),
     ],
     OUT: [("rpm", None), ("shaft_power_out", None)],
-    CTC: "load",
+    CTC: "propulsive_load",
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -132,5 +132,3 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_IN[known_component[ID]] = known_component[IN]
     DICTIONARY_OUT[known_component[ID]] = known_component[OUT]
     DICTIONARY_CTC[known_component[ID]] = known_component[CTC]
-
-test = 1

@@ -47,7 +47,13 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
             method="exact",
         )
         self.declare_partials(
-            of="reynolds_D", wrt="altitude", method="fd", form="central", step=1.0e2
+            of="reynolds_D",
+            wrt="altitude",
+            method="fd",
+            form="central",
+            step=1.0e2,
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

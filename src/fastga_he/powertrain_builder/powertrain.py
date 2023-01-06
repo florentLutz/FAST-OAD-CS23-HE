@@ -312,6 +312,25 @@ class FASTGAHEPowerTrainConfigurator:
 
         return components_names
 
+    def get_propulsive_element_list(self) -> tuple:
+        """
+        Returns the list of OpenMDAO variables necessary to create the component which computes
+        the ratio between the required power and the max available power on propulsive loads.
+        """
+
+        self._get_components()
+        components_names = []
+        components_types = []
+
+        for component_type_class, component_name, component_type in zip(
+            self._components_type_class, self._components_name, self._components_type
+        ):
+            if component_type_class == "propulsive_load":
+                components_names.append(component_name)
+                components_types.append(component_type)
+
+        return components_names, components_types
+
     def get_energy_consumption_list(self) -> list:
         """
         Returns the list of OpenMDAO variables necessary to create the component which sum the
