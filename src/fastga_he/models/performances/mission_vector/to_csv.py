@@ -57,6 +57,11 @@ class ToCSV(om.ExplicitComponent):
             default=1,
             desc="number of equilibrium to be treated in descent",
         )
+        self.options.declare(
+            "number_of_points_reserve",
+            default=1,
+            desc="number of equilibrium to be treated in reserve",
+        )
         self.options.declare("out_file", default="", types=str)
 
     def setup(self):
@@ -64,9 +69,13 @@ class ToCSV(om.ExplicitComponent):
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         number_of_points = (
-            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
         )
 
         self.add_input(
@@ -154,6 +163,7 @@ class ToCSV(om.ExplicitComponent):
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         time = inputs["time"]
         altitude = inputs["altitude"]
@@ -208,6 +218,7 @@ class ToCSV(om.ExplicitComponent):
                 np.full(number_of_points_climb, "sizing:main_route:climb"),
                 np.full(number_of_points_cruise, "sizing:main_route:cruise"),
                 np.full(number_of_points_descent, "sizing:main_route:descent"),
+                np.full(number_of_points_reserve, "sizing:main_route:reserve"),
             )
         )
 

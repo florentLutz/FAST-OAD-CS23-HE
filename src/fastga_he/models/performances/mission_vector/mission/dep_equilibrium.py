@@ -51,6 +51,11 @@ class DEPEquilibrium(om.Group):
             desc="number of equilibrium to be treated in descent",
         )
         self.options.declare(
+            "number_of_points_reserve",
+            default=1,
+            desc="number of equilibrium to be treated in reserve",
+        )
+        self.options.declare(
             "promotes_all_variables",
             default=False,
             desc="Set to True if we need to be able to see the flight conditions variables, "
@@ -67,9 +72,13 @@ class DEPEquilibrium(om.Group):
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         number_of_points = (
-            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
         )
 
         if self.options["promotes_all_variables"]:
@@ -79,6 +88,7 @@ class DEPEquilibrium(om.Group):
                     number_of_points_climb=number_of_points_climb,
                     number_of_points_cruise=number_of_points_cruise,
                     number_of_points_descent=number_of_points_descent,
+                    number_of_points_reserve=number_of_points_reserve,
                 ),
                 promotes_inputs=["*"],
                 promotes_outputs=["*"],
@@ -121,6 +131,7 @@ class DEPEquilibrium(om.Group):
                     number_of_points_climb=number_of_points_climb,
                     number_of_points_cruise=number_of_points_cruise,
                     number_of_points_descent=number_of_points_descent,
+                    number_of_points_reserve=number_of_points_reserve,
                 ),
                 promotes_inputs=["data:*"],
                 promotes_outputs=[],

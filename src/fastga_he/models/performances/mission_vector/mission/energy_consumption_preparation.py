@@ -27,15 +27,24 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
             default=1,
             desc="number of equilibrium to be treated in " "descen",
         )
+        self.options.declare(
+            "number_of_points_reserve",
+            default=1,
+            desc="number of equilibrium to be treated in reserve",
+        )
 
     def setup(self):
 
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         number_of_points = (
-            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
         )
 
         self.add_input("data:mission:sizing:taxi_out:speed", np.nan, units="m/s")
@@ -119,9 +128,13 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         number_of_points = (
-            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
         )
 
         thrust_taxi_out = float(inputs["data:mission:sizing:taxi_out:thrust"])
@@ -147,7 +160,10 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         time_step = inputs["time_step"]
         if (
             number_of_points
-            == number_of_points_climb + number_of_points_cruise + number_of_points_descent
+            == number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
         ):
             time_step[number_of_points_climb - 1] = time_step[number_of_points_climb - 2]
         outputs["time_step_econ"] = np.concatenate(
@@ -169,9 +185,13 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         number_of_points = (
-            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
         )
 
         d_thrust_econ_d_thrust = np.zeros((number_of_points + 2, number_of_points))

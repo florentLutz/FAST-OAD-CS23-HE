@@ -45,6 +45,11 @@ class MissionVector(om.Group):
             default=50,
             desc="number of equilibrium to be treated in descent",
         )
+        self.options.declare(
+            "number_of_points_reserve",
+            default=1,
+            desc="number of equilibrium to be treated in reserve",
+        )
         self.options.declare("propulsion_id", default="", types=str)
         self.options.declare(
             name="power_train_file_path",
@@ -57,6 +62,7 @@ class MissionVector(om.Group):
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         self.add_subsystem("in_flight_cg_variation", InFlightCGVariation(), promotes=["*"])
         self.add_subsystem(
@@ -65,6 +71,7 @@ class MissionVector(om.Group):
                 number_of_points_climb=number_of_points_climb,
                 number_of_points_cruise=number_of_points_cruise,
                 number_of_points_descent=number_of_points_descent,
+                number_of_points_reserve=number_of_points_reserve,
             ),
             promotes_inputs=["data:*"],
             promotes_outputs=[],
@@ -75,10 +82,11 @@ class MissionVector(om.Group):
                 number_of_points_climb=number_of_points_climb,
                 number_of_points_cruise=number_of_points_cruise,
                 number_of_points_descent=number_of_points_descent,
+                number_of_points_reserve=number_of_points_reserve,
                 propulsion_id=self.options["propulsion_id"],
                 power_train_file_path=self.options["power_train_file_path"],
             ),
-            promotes_inputs=["data:*", "settings:*"],
+            promotes_inputs=["data:*"],
             promotes_outputs=["data:*"],
         )
         self.add_subsystem(
@@ -87,6 +95,7 @@ class MissionVector(om.Group):
                 number_of_points_climb=number_of_points_climb,
                 number_of_points_cruise=number_of_points_cruise,
                 number_of_points_descent=number_of_points_descent,
+                number_of_points_reserve=number_of_points_reserve,
                 out_file=self.options["out_file"],
             ),
             promotes_inputs=["data:*"],
@@ -179,7 +188,7 @@ class MissionVector(om.Group):
             "solve_equilibrium.update_mass.mass",
             [
                 "to_csv.mass",
-                "initialization.initialize_airspeed.mass",
+                "initialization.mass",
             ],
         )
 
@@ -208,7 +217,7 @@ class MissionVector(om.Group):
         )
 
         self.connect(
-            "initialization.initialize_altitude.altitude",
+            "initialization.altitude",
             [
                 "to_csv.altitude",
                 "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.altitude",

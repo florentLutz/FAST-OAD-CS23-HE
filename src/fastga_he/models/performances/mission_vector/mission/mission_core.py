@@ -39,15 +39,24 @@ class MissionCore(om.Group):
             default=1,
             desc="number of equilibrium to be treated in descent",
         )
+        self.options.declare(
+            "number_of_points_reserve",
+            default=1,
+            desc="number of equilibrium to be treated in reserve",
+        )
 
     def setup(self):
 
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         number_of_points = (
-            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
         )
 
         self.add_subsystem(
@@ -65,6 +74,7 @@ class MissionCore(om.Group):
             "number_of_points_climb": number_of_points_climb,
             "number_of_points_cruise": number_of_points_cruise,
             "number_of_points_descent": number_of_points_descent,
+            "number_of_points_reserve": number_of_points_reserve,
             "propulsion_id": self.options["propulsion_id"],
             "power_train_file_path": self.options["power_train_file_path"],
         }
@@ -80,11 +90,11 @@ class MissionCore(om.Group):
                 number_of_points_climb=number_of_points_climb,
                 number_of_points_cruise=number_of_points_cruise,
                 number_of_points_descent=number_of_points_descent,
+                number_of_points_reserve=number_of_points_reserve,
             ),
             promotes_inputs=[],
             promotes_outputs=["data:*"],
         )
-        self.add_subsystem("reserve_fuel", ReserveEnergy(), promotes=["*"])
         self.add_subsystem("sizing_fuel", SizingEnergy(), promotes=["*"])
         self.add_subsystem(
             "update_mass",

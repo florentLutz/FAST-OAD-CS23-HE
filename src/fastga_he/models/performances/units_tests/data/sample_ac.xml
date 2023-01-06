@@ -540,7 +540,7 @@
             <distance units="m" is_input="False">24555.545714401196<!--covered ground distance during climb phase--></distance>
             <duration units="s" is_input="False">512.8065421459966<!--duration of climb phase in sizing mission--></duration>
             <fuel units="kg" is_input="False">8.107527736335692<!--mass of consumed fuel during climb phase in sizing mission--></fuel>
-            <v_cas units="m/s" is_input="False">45.11466637623613<!--calibrated airspeed at which the climb segment was made (climb is made at constant vcas)--></v_cas>
+            <v_eas units="m/s">44.48</v_eas>
             <climb_rate>
               <cruise_level units="ft/min" is_input="True">700.0<!--target climb rate at the end of climb--></cruise_level>
               <sea_level units="ft/min" is_input="True">1200.0<!--target climb rate at sea level--></sea_level>
@@ -557,9 +557,11 @@
             <distance units="m" is_input="False">78932.47788602494<!--covered ground distance during descent phase--></distance>
             <duration units="s" is_input="False">1507.0131880557774<!--duration of descent phase in sizing mission--></duration>
             <fuel units="kg" is_input="False">7.660470157501762<!--mass of consumed fuel during descent phase in sizing mission--></fuel>
-            <v_cas units="knot">104.35</v_cas>
+            <v_eas units="m/s">56.27</v_eas>
           </descent>
           <reserve>
+            <v_tas units="m/s">60.0</v_tas>
+            <altitude units="m" is_input="True">1000.0<!--altitude of the reserve segment--></altitude>
             <duration units="min" is_input="True">45.0<!--duration of the reserve segment--></duration>
             <fuel units="kg" is_input="False">29.627936910928756<!--fuel consumed during the reserve segment--></fuel>
           </reserve>
