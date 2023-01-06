@@ -7,7 +7,8 @@ will contain models and methods for the sizing of a hybrid electric aircraft.
 
 This repository was created to contain the files created for the thesis *Optimization of an 
 aircraft design problem for hybrid-electric configurations
-under manufacturing and certification constraints*
+under manufacturing and certification constraints* and *Intégration de la discipline de gestion 
+thermique dans la conception conceptuelle et préliminaire de nouvelles configurations d'avions*
 
 Install
 -------
