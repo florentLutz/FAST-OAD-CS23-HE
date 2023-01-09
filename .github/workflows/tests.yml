@@ -45,7 +45,17 @@ jobs:
           poetry run black --check .
         shell: bash
 
-      - name: Unit tests
+      - name: Component unit tests
         run: |
           poetry run pytest src/fastga_he/models/propulsion/components
+        shell: bash
+
+      - name: Assembly unit tests
+        run: |
+          poetry run pytest src/fastga_he/models/propulsion/assemblies
+        shell: bash
+
+      - name: Mission unit tests
+        run: |
+          poetry run pytest src/fastga_he/models/performances
         shell: bash
