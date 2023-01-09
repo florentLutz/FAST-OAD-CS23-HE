@@ -52,7 +52,12 @@ PMSM = {
     ],
     OUT: [("rpm", None), ("shaft_power_out", None)],
     CTC: "propulsive_load",
-    MP: [],
+    MP: [
+        {"efficiency": None},
+        {"torque_out": "N*m"},
+        {"ac_current_rms_in": "A"},
+        {"ac_voltage_rms_in": "V"},
+    ],
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -68,7 +73,13 @@ INVERTER = {
         ("ac_voltage_rms_out", None),
     ],
     CTC: "connector",
-    MP: [],
+    MP: [
+        {"modulation_index": None},
+        {"efficiency": None},
+        {"dc_current_in": "A"},
+        {"diode_temperature": "degK"},
+        {"IGBT_temperature": "degK"},
+    ],
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -80,7 +91,7 @@ DC_BUS = {
     IN: [(None, "dc_voltage"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out_", None)],
     CTC: "connector",
-    MP: [],
+    MP: [{"dc_voltage": "V"}],
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -92,7 +103,7 @@ DC_LINE = {
     IN: [("dc_voltage_in", None), (None, "dc_current")],
     OUT: [("dc_voltage_out", None), (None, "dc_current")],
     CTC: "connector",
-    MP: [],
+    MP: [{"dc_current": "A"}, {"cable_temperature": "degK"}],
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -104,7 +115,12 @@ DC_DC_CONVERTER = {
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [("dc_voltage_out", None), (None, "dc_current_out")],
     CTC: "connector",
-    MP: [],
+    MP: [
+        {"efficiency": None},
+        {"duty_cycle": None},
+        {"dc_current_in": "A"},
+        {"dc_current_out": "A"},
+    ],
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -116,7 +132,13 @@ BATTERY_PACK = {
     IN: None,
     OUT: [(None, "voltage_out"), ("dc_current_out", None)],
     CTC: "source",
-    MP: [],
+    MP: [
+        {"c_rate": "1/h"},
+        {"state_of_charge": "percent"},
+        {"open_circuit_voltage": "V"},
+        {"internal_resistance": "ohm"},
+        {"voltage_out": "V"},
+    ],
 }
 
 KNOWN_COMPONENTS = [PROPELLER, PMSM, INVERTER, DC_BUS, DC_LINE, DC_DC_CONVERTER, BATTERY_PACK]

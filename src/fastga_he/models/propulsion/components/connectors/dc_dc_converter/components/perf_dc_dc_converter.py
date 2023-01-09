@@ -61,12 +61,12 @@ class PerformancesDCDCConverter(om.Group):
         self.add_subsystem(
             "duty_cycle",
             PerformancesDutyCycle(number_of_points=number_of_points),
-            promotes=["dc_voltage_in", "dc_voltage_out"],
+            promotes=["dc_voltage_in", "dc_voltage_out", "duty_cycle"],
         )
         self.add_subsystem(
             "currents",
             PerformancesCurrents(number_of_points=number_of_points),
-            promotes=["dc_current_out"],
+            promotes=["dc_current_out", "duty_cycle"],
         )
         self.add_subsystem(
             "switching_losses",
@@ -90,7 +90,7 @@ class PerformancesDCDCConverter(om.Group):
         self.add_subsystem(
             "efficiency",
             PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=["dc_current_out", "dc_voltage_out"],
+            promotes=["dc_current_out", "dc_voltage_out", "efficiency"],
         )
         self.add_subsystem(
             "maximum",
@@ -110,13 +110,12 @@ class PerformancesDCDCConverter(om.Group):
             PerformancesConverterRelations(
                 number_of_points=number_of_points,
             ),
-            promotes=["dc_voltage_out", "voltage_out_target"],
+            promotes=["dc_voltage_out", "voltage_out_target", "efficiency"],
         )
 
         self.connect("converter_relation.power_rel", "load_side.power")
         self.connect("dc_current_out", "converter_relation.dc_current_out")
         self.connect("converter_relation.voltage_out_rel", "generator_side.voltage_target")
-        self.connect("duty_cycle.duty_cycle", "currents.duty_cycle")
         self.connect(
             "currents.current_IGBT",
             [
@@ -163,4 +162,3 @@ class PerformancesDCDCConverter(om.Group):
             "total_losses.losses_converter",
             ["efficiency.losses_converter", "maximum.losses_converter"],
         )
-        self.connect("efficiency.efficiency", "converter_relation.efficiency")

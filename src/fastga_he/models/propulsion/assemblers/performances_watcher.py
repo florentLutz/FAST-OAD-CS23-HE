@@ -66,6 +66,10 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
                 val=np.nan,
                 shape=number_of_points,
             )
+
+            if component_performances_watcher_unit is None:
+                component_performances_watcher_unit = "-"
+
             self.header_name.append(
                 component_name
                 + " "

@@ -42,7 +42,7 @@ class PerformancesHarness(om.Group):
         self.add_subsystem(
             "resistance",
             PerformancesResistance(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "settings:*"],
+            promotes=["data:*", "settings:*", "cable_temperature"],
         )
         self.add_subsystem(
             "cable_current",
@@ -57,7 +57,7 @@ class PerformancesHarness(om.Group):
         self.add_subsystem(
             "temperature",
             PerformancesTemperature(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "exterior_temperature"],
+            promotes=["data:*", "exterior_temperature", "cable_temperature"],
         )
         # Though harness current depend on a variable stuck in the loop its output is not used in
         # the loop so we can take it out
@@ -69,7 +69,7 @@ class PerformancesHarness(om.Group):
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "dc_voltage_out", "dc_voltage_in"],
+            promotes=["data:*", "dc_voltage_out", "dc_voltage_in", "cable_temperature"],
         )
 
         self.connect(
@@ -89,12 +89,4 @@ class PerformancesHarness(om.Group):
         self.connect(
             "losses_one_cable.conduction_losses",
             ["temperature.conduction_losses", "maximum.conduction_losses"],
-        )
-
-        self.connect(
-            "temperature.cable_temperature",
-            [
-                "resistance.cable_temperature",
-                "maximum.cable_temperature",
-            ],
         )

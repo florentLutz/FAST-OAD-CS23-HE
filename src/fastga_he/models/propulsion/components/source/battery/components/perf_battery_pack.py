@@ -72,12 +72,12 @@ class PerformancesBatteryPack(om.Group):
             PerformancesModuleCRate(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "c_rate"],
         )
         self.add_subsystem(
             "battery_soc_decrease",
             PerformancesSOCDecrease(number_of_points=number_of_points),
-            promotes=["time_step"],
+            promotes=["time_step", "c_rate"],
         )
         self.add_subsystem(
             "update_soc",
@@ -89,17 +89,17 @@ class PerformancesBatteryPack(om.Group):
         self.add_subsystem(
             "open_circuit_voltage",
             PerformancesOpenCircuitVoltage(number_of_points=number_of_points),
-            promotes=["state_of_charge"],
+            promotes=["state_of_charge", "open_circuit_voltage"],
         )
         self.add_subsystem(
             "internal_resistance",
             PerformancesInternalResistance(number_of_points=number_of_points),
-            promotes=["state_of_charge"],
+            promotes=["state_of_charge", "internal_resistance"],
         )
         self.add_subsystem(
             "cell_voltage",
             PerformancesCellVoltage(number_of_points=number_of_points),
-            promotes=[],
+            promotes=["internal_resistance", "open_circuit_voltage"],
         )
         self.add_subsystem(
             "module_voltage",
@@ -117,7 +117,7 @@ class PerformancesBatteryPack(om.Group):
         self.add_subsystem(
             "joule_losses_cell",
             PerformancesCellJouleLosses(number_of_points=number_of_points),
-            promotes=[],
+            promotes=["internal_resistance"],
         )
         self.add_subsystem(
             "entropic_heat_coefficient",
@@ -144,7 +144,7 @@ class PerformancesBatteryPack(om.Group):
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(number_of_points=number_of_points, battery_pack_id=battery_pack_id),
-            promotes=["data:*", "state_of_charge"],
+            promotes=["data:*", "state_of_charge", "c_rate"],
         )
         self.add_subsystem(
             "energy_consumption",
@@ -173,19 +173,11 @@ class PerformancesBatteryPack(om.Group):
             ],
         )
         self.connect(
-            "open_circuit_voltage.open_circuit_voltage", "cell_voltage.open_circuit_voltage"
-        )
-        self.connect(
-            "internal_resistance.internal_resistance",
-            ["cell_voltage.internal_resistance", "joule_losses_cell.internal_resistance"],
-        )
-        self.connect(
             "cell_voltage.terminal_voltage",
             ["module_voltage.terminal_voltage", "maximum.terminal_voltage"],
         )
         self.connect("module_voltage.module_voltage", "battery_voltage.module_voltage")
 
-        self.connect("battery_c_rate.c_rate", ["battery_soc_decrease.c_rate", "maximum.c_rate"])
         self.connect(
             "battery_soc_decrease.state_of_charge_decrease", "update_soc.state_of_charge_decrease"
         )

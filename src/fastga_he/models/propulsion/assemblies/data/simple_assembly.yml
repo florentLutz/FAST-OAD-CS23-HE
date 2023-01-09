@@ -46,4 +46,4 @@ connections:
   - source: dc_dc_converter_1
     target: battery_pack_1
 
-watcher_file_path: D:/tmp/test.csv
+watcher_file_path: ../simple_assembly_performances.csv

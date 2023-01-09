@@ -716,7 +716,7 @@ def test_performances_harness():
         [0.00353, 0.00351, 0.00349, 0.00347, 0.00346, 0.00344, 0.00342, 0.0034, 0.00339, 0.00337]
     )
 
-    assert problem.get_val("temperature.cable_temperature", units="degK") == pytest.approx(
+    assert problem.get_val("cable_temperature", units="degK") == pytest.approx(
         expected_temperature, rel=1e-2
     )
     assert problem.get_val("resistance.resistance_per_cable", units="ohm") == pytest.approx(

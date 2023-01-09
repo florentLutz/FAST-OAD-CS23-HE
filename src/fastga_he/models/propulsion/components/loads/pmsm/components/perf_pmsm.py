@@ -34,23 +34,23 @@ class PerformancesPMSM(om.Group):
         self.add_subsystem(
             "torque",
             PerformancesTorque(number_of_points=number_of_points),
-            promotes=["shaft_power_out", "rpm", "shaft_power_for_power_rate"],
+            promotes=["shaft_power_out", "rpm", "shaft_power_for_power_rate", "torque_out"],
         )
 
         self.add_subsystem(
             "losses",
             PerformancesLosses(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["data:*", "rpm"],
+            promotes=["data:*", "rpm", "torque_out"],
         )
         self.add_subsystem(
             "efficiency",
             PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=["shaft_power_out"],
+            promotes=["shaft_power_out", "efficiency"],
         )
         self.add_subsystem(
             "active_power",
             PerformancesActivePower(number_of_points=number_of_points),
-            promotes=["shaft_power_out"],
+            promotes=["shaft_power_out", "efficiency"],
         )
         self.add_subsystem(
             "apparent_power",
@@ -61,7 +61,7 @@ class PerformancesPMSM(om.Group):
         self.add_subsystem(
             "current_rms",
             PerformancesCurrentRMS(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["data:*", "ac_current_rms_in"],
+            promotes=["data:*", "ac_current_rms_in", "torque_out"],
         )
         self.add_subsystem(
             "current_rms_one_phase",
@@ -88,22 +88,13 @@ class PerformancesPMSM(om.Group):
                 "ac_voltage_peak_in",
                 "rpm",
                 "shaft_power_out",
+                "torque_out",
             ],
-        )
-
-        self.connect(
-            "torque.torque_out",
-            ["losses.torque_out", "current_rms.torque_out", "maximum.torque_out"],
         )
 
         self.connect(
             "losses.power_losses",
             ["efficiency.power_losses", "maximum.power_losses"],
-        )
-
-        self.connect(
-            "efficiency.efficiency",
-            "active_power.efficiency",
         )
 
         self.connect(
