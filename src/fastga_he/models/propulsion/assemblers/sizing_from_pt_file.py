@@ -5,6 +5,8 @@
 import openmdao.api as om
 import fastoad.api as oad
 
+from fastoad.module_management.constants import ModelDomain
+
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 # noinspection PyUnresolvedReferences
@@ -18,12 +20,10 @@ from fastga_he.models.propulsion.components import (
     SizingBatteryPack,
 )
 
-from .constants import SUBMODEL_POWER_TRAIN_SIZING, SUBMODEL_POWER_TRAIN_MASS
+from .constants import SUBMODEL_POWER_TRAIN_MASS
 
 
-@oad.RegisterSubmodel(
-    SUBMODEL_POWER_TRAIN_SIZING, "fastga_he.submodel.propulsion.sizing.from_pt_file"
-)
+@oad.RegisterOpenMDAOSystem("fastga_he.power_train.sizing", domain=ModelDomain.OTHER)
 class PowerTrainSizingFromFile(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
