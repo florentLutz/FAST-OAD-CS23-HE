@@ -2,7 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import time
+import os.path as pth
 
 import numpy as np
 import openmdao.api as om
@@ -25,6 +25,8 @@ from ..components.source.battery import PerformancesBatteryPack
 
 from ..assemblers.thrust_distributor import ThrustDistributor
 from ..assemblers.power_rate import PowerRate
+
+DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 
 XML_FILE = "quad_assembly.xml"
 NB_POINTS_TEST = 50
@@ -536,7 +538,7 @@ def test_assembly():
 
 def test_assembly_from_pt_file():
 
-    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/quad_assembly.yml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -633,7 +635,7 @@ def test_assembly_from_pt_file():
 
 def test_thrust_distributor():
 
-    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/quad_assembly.yml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -667,7 +669,8 @@ def test_thrust_distributor():
 
 
 def test_power_rate():
-    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/quad_assembly.yml"
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(PowerRate(power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST)),

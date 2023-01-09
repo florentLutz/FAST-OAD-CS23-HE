@@ -23,6 +23,8 @@ from ..assemblers.mass_from_pt_file import PowerTrainMassFromFile
 
 from . import outputs
 
+DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
+
 XML_FILE = "simple_assembly.xml"
 NB_POINTS_TEST = 10
 
@@ -291,7 +293,7 @@ def test_assembly_sizing_from_pt_file():
         "submodel.propulsion.constraints.pmsm.rpm"
     ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
 
-    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/simple_assembly.yml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(PowerTrainSizingFromFile(power_train_file_path=pt_file_path)),
@@ -339,8 +341,7 @@ def test_assembly_sizing_from_pt_file():
 
 
 def test_performances_from_pt_file():
-
-    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/simple_assembly.yml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -402,8 +403,7 @@ def test_performances_from_pt_file():
 
 
 def test_mass_from_pt_file():
-
-    pt_file_path = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models/propulsion/assemblies/data/simple_assembly.yml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(PowerTrainMassFromFile(power_train_file_path=pt_file_path)),
