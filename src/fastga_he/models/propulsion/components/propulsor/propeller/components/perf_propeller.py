@@ -82,12 +82,12 @@ class PerformancesPropeller(om.Group):
         self.add_subsystem(
             "torque",
             PerformancesTorque(number_of_points=number_of_points),
-            promotes=["shaft_power_in", "rpm"],
+            promotes=["shaft_power_in", "rpm", "torque_in"],
         )
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(propeller_id=propeller_id, number_of_points=number_of_points),
-            promotes=["data:*", "rpm"],
+            promotes=["data:*", "rpm", "torque_in"],
         )
 
         self.connect(
@@ -108,4 +108,3 @@ class PerformancesPropeller(om.Group):
             "power_coefficient.power_coefficient",
             ["shaft_power.power_coefficient", "efficiency.power_coefficient"],
         )
-        self.connect("torque.torque_in", "maximum.torque_in")

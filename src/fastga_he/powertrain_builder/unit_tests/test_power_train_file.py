@@ -47,3 +47,14 @@ def test_power_train_file_connections():
     ):
 
         print("[" + om_output + ", " + om_input + "]")
+
+
+def test_power_train_watcher_path():
+
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    print("\n")
+    print(power_train_configurator.get_watcher_file_path())

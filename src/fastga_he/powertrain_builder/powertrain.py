@@ -31,6 +31,7 @@ JSON_SCHEMA_NAME = "power_train.json"
 KEY_TITLE = "title"
 KEY_PT_COMPONENTS = "power_train_components"
 KEY_PT_CONNECTIONS = "connections"
+KEY_PT_WATCHER = "watcher_file_path"
 
 PT_DATA_PREFIX = "data:propulsion:he_power_train:"
 
@@ -86,6 +87,10 @@ class FASTGAHEPowerTrainConfigurator:
         # connections between components
         self._components_connection_inputs = None
 
+        # Contains a list, for each component, of all the variables that will be monitored in the
+        # performances watcher of the power train, meaning this should be a list of list
+        self._components_perf_watchers = None
+
         if power_train_file_path:
             self.load(power_train_file_path)
 
@@ -110,6 +115,21 @@ class FASTGAHEPowerTrainConfigurator:
             if key not in json_schema["properties"].keys():
                 _LOGGER.warning('Power train file: "%s" is not a FAST-OAD-GA-HE key.', key)
 
+    def get_watcher_file_path(self):
+        """
+        Returns the path to where the performance watch file will be. If name is not absolute
+        we complete it.
+        """
+
+        watcher_file_path = self._serializer.data.get(KEY_PT_WATCHER)
+        if watcher_file_path:
+            if not pth.isabs(watcher_file_path):
+                return pth.join(self._power_train_file, watcher_file_path)
+            else:
+                return watcher_file_path
+        else:
+            return None
+
     def _get_components(self):
 
         components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
@@ -122,6 +142,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_options_list = []
         components_promote_list = []
         components_type_class_list = []
+        components_perf_watchers_list = []
 
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
@@ -138,6 +159,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_om_type_list.append(resources.DICTIONARY_CN[component_id])
             components_promote_list.append(resources.DICTIONARY_PT[component_id])
             components_type_class_list.append(resources.DICTIONARY_CTC[component_id])
+            components_perf_watchers_list.append(resources.DICTIONARY_MP[component_id])
 
             if "options" in component.keys():
                 components_options_list.append(component["options"])
@@ -163,6 +185,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_options = components_options_list
         self._components_promotes = components_promote_list
         self._components_type_class = components_type_class_list
+        self._components_perf_watchers = components_perf_watchers_list
 
     def _get_connections(self):
         """
@@ -347,6 +370,32 @@ class FASTGAHEPowerTrainConfigurator:
                 components_names.append(component_name)
 
         return components_names
+
+    def get_performance_watcher_elements_list(self) -> tuple:
+        """
+        Returns the list of OpenMDAO variables that are to be registered by the performances
+        watcher.
+        """
+
+        self._get_components()
+        components_perf_watchers_name_organised_list = []
+        components_perf_watchers_unit_organised_list = []
+        components_name_organised_list = []
+
+        for component_name, components_perf_watchers in zip(
+            self._components_name, self._components_perf_watchers
+        ):
+            for components_perf_watcher in components_perf_watchers:
+                key, value = list(components_perf_watcher.items())[0]
+                components_name_organised_list.append(component_name)
+                components_perf_watchers_name_organised_list.append(key)
+                components_perf_watchers_unit_organised_list.append(value)
+
+        return (
+            components_name_organised_list,
+            components_perf_watchers_name_organised_list,
+            components_perf_watchers_unit_organised_list,
+        )
 
 
 class _YAMLSerializer(ABC):

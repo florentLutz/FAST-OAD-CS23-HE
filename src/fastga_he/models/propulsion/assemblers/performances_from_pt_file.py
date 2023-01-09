@@ -9,6 +9,9 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 from fastga_he.models.propulsion.assemblers.energy_consumption_from_pt_file import (
     EnergyConsumptionFromPTFile,
 )
+from fastga_he.models.propulsion.assemblers.performances_watcher import (
+    PowerTrainPerformancesWatcher,
+)
 
 # noinspection PyUnresolvedReferences
 from fastga_he.models.propulsion.components import (
@@ -146,3 +149,34 @@ class PowerTrainPerformancesFromFile(om.Group):
             self.nonlinear_solver.options["maxiter"] = 200
             self.nonlinear_solver.options["rtol"] = 1e-4
             self.linear_solver = om.DirectSolver()
+
+        if self.configurator.get_watcher_file_path():
+
+            self.add_subsystem(
+                "performances_watcher",
+                PowerTrainPerformancesWatcher(
+                    power_train_file_path=self.options["power_train_file_path"],
+                    number_of_points=number_of_points,
+                ),
+                promotes=[],
+            )
+
+            (
+                components_name,
+                components_performances_watchers_names,
+                components_performances_watchers_units,
+            ) = self.configurator.get_performance_watcher_elements_list()
+
+            for (component_name, component_performances_watcher_name,) in zip(
+                components_name,
+                components_performances_watchers_names,
+            ):
+
+                self.connect(
+                    component_name + "." + component_performances_watcher_name,
+                    "performances_watcher"
+                    + "."
+                    + component_name
+                    + "_"
+                    + component_performances_watcher_name,
+                )

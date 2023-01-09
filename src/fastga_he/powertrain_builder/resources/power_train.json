@@ -70,6 +70,12 @@
     },
     "component_connections": {
       "$ref": "#/definitions/connections"
+    },
+    "watcher_file_path": {
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [

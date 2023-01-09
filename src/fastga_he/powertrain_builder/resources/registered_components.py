@@ -22,6 +22,9 @@ OUT = "outputs"
 # The PT field contains the variables that must be promoted from aircraft level for the component
 # to work
 PT = "promoted_variables"
+# The MP field will contain the variables that will be of interest for the analysis of the
+# mission performances and that will be registered in the power train performances CSV file
+MP = "mission_performances_watcher"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -33,6 +36,7 @@ PROPELLER = {
     IN: [(None, "rpm"), (None, "shaft_power_in")],
     OUT: None,
     CTC: "propulsor",
+    MP: [{"rpm": "1/min"}, {"shaft_power_in": "kW"}, {"torque_in": "N*m"}],
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -48,6 +52,7 @@ PMSM = {
     ],
     OUT: [("rpm", None), ("shaft_power_out", None)],
     CTC: "propulsive_load",
+    MP: [],
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -63,6 +68,7 @@ INVERTER = {
         ("ac_voltage_rms_out", None),
     ],
     CTC: "connector",
+    MP: [],
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -74,6 +80,7 @@ DC_BUS = {
     IN: [(None, "dc_voltage"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out_", None)],
     CTC: "connector",
+    MP: [],
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -85,6 +92,7 @@ DC_LINE = {
     IN: [("dc_voltage_in", None), (None, "dc_current")],
     OUT: [("dc_voltage_out", None), (None, "dc_current")],
     CTC: "connector",
+    MP: [],
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -96,6 +104,7 @@ DC_DC_CONVERTER = {
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [("dc_voltage_out", None), (None, "dc_current_out")],
     CTC: "connector",
+    MP: [],
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -107,6 +116,7 @@ BATTERY_PACK = {
     IN: None,
     OUT: [(None, "voltage_out"), ("dc_current_out", None)],
     CTC: "source",
+    MP: [],
 }
 
 KNOWN_COMPONENTS = [PROPELLER, PMSM, INVERTER, DC_BUS, DC_LINE, DC_DC_CONVERTER, BATTERY_PACK]
@@ -121,6 +131,7 @@ DICTIONARY_PT = {}
 DICTIONARY_IN = {}
 DICTIONARY_OUT = {}
 DICTIONARY_CTC = {}
+DICTIONARY_MP = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -132,3 +143,4 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_IN[known_component[ID]] = known_component[IN]
     DICTIONARY_OUT[known_component[ID]] = known_component[OUT]
     DICTIONARY_CTC[known_component[ID]] = known_component[CTC]
+    DICTIONARY_MP[known_component[ID]] = known_component[MP]

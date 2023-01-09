@@ -13,4 +13,5 @@ from .registered_components import (
     DICTIONARY_IN,
     DICTIONARY_OUT,
     DICTIONARY_CTC,
+    DICTIONARY_MP,
 )
