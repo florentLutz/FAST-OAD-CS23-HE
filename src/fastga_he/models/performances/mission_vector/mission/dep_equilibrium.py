@@ -164,8 +164,7 @@ class DEPEquilibrium(om.Group):
                 oad.RegisterSubmodel.get_submodel(
                     HE_SUBMODEL_ENERGY_CONSUMPTION, options=options_propulsion
                 ),
-                promotes_inputs=["data:*"],
-                promotes_outputs=[],
+                promotes=["data:*"],
             )
 
             self.connect("compute_dep_effect.delta_Cl", "compute_equilibrium.delta_Cl")
@@ -192,6 +191,10 @@ class DEPEquilibrium(om.Group):
             self.connect(
                 "preparation_for_energy_consumption.altitude_econ",
                 "compute_energy_consumed.altitude_econ",
+            )
+            self.connect(
+                "preparation_for_energy_consumption.exterior_temperature_econ",
+                "compute_energy_consumed.exterior_temperature_econ",
             )
             self.connect(
                 "preparation_for_energy_consumption.time_step_econ",

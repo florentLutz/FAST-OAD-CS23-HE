@@ -8,7 +8,6 @@ import fastoad.api as oad
 from ..constants import HE_SUBMODEL_EQUILIBRIUM
 from ..mission.compute_time_step import ComputeTimeStep
 from ..mission.performance_per_phase import PerformancePerPhase
-from ..mission.reserve_energy import ReserveEnergy
 from ..mission.sizing_energy import SizingEnergy
 from ..mission.thrust_taxi import ThrustTaxi
 from ..mission.update_mass import UpdateMass
@@ -81,8 +80,7 @@ class MissionCore(om.Group):
         self.add_subsystem(
             "compute_dep_equilibrium",
             oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_EQUILIBRIUM, options=options_equilibrium),
-            promotes_inputs=["data:*"],
-            promotes_outputs=[],
+            promotes=["data:*"],
         )
         self.add_subsystem(
             "performance_per_phase",

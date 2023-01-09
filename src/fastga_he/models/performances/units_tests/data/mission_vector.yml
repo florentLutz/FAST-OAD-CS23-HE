@@ -13,10 +13,10 @@ driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
 model:
   sample_discipline:
     id: fastga_he.performances.mission_vector
-    number_of_points_climb: 50
-    number_of_points_cruise: 50
-    number_of_points_descent: 25
-    number_of_points_reserve: 25
+    number_of_points_climb: 30
+    number_of_points_cruise: 30
+    number_of_points_descent: 20
+    number_of_points_reserve: 10
     power_train_file_path: simple_assembly.yml
 
 submodels:

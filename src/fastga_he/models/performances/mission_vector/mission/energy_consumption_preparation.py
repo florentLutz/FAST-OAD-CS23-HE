@@ -4,6 +4,7 @@
 
 import numpy as np
 import openmdao.api as om
+from stdatm import Atmosphere
 
 
 class PrepareForEnergyConsumption(om.ExplicitComponent):
@@ -62,6 +63,12 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
             "altitude", shape=number_of_points, val=np.full(number_of_points, np.nan), units="m"
         )
         self.add_input(
+            "exterior_temperature",
+            shape=number_of_points,
+            val=np.full(number_of_points, np.nan),
+            units="degK",
+        )
+        self.add_input(
             "time_step", shape=number_of_points, val=np.full(number_of_points, np.nan), units="s"
         )
         self.add_input(
@@ -79,6 +86,7 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         # consumption
         self.add_output("thrust_econ", shape=number_of_points + 2, units="N")
         self.add_output("altitude_econ", shape=number_of_points + 2, units="m")
+        self.add_output("exterior_temperature_econ", shape=number_of_points + 2, units="degK")
         self.add_output("time_step_econ", shape=number_of_points + 2, units="s")
         self.add_output("true_airspeed_econ", shape=number_of_points + 2, units="m/s")
         self.add_output("engine_setting_econ", shape=number_of_points + 2)
@@ -99,6 +107,14 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
             of="altitude_econ",
             wrt=[
                 "altitude",
+            ],
+            method="exact",
+        )
+
+        self.declare_partials(
+            of="exterior_temperature_econ",
+            wrt=[
+                "exterior_temperature",
             ],
             method="exact",
         )
@@ -144,6 +160,11 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         )
 
         outputs["altitude_econ"] = np.concatenate((np.zeros(1), inputs["altitude"], np.zeros(1)))
+
+        temp_sl = Atmosphere(np.array([0]), altitude_in_feet=True).temperature
+        outputs["exterior_temperature_econ"] = np.concatenate(
+            (temp_sl, inputs["exterior_temperature"], temp_sl)
+        )
 
         time_step_taxi_out = float(inputs["data:mission:sizing:taxi_out:duration"])
         time_step_taxi_in = float(inputs["data:mission:sizing:taxi_in:duration"])
@@ -209,6 +230,10 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         d_altitude_econ_d_altitude = np.zeros((number_of_points + 2, number_of_points))
         d_altitude_econ_d_altitude[1 : number_of_points + 1, :] = np.eye(number_of_points)
         partials["altitude_econ", "altitude"] = d_altitude_econ_d_altitude
+
+        d_temp_econ_d_temp = np.zeros((number_of_points + 2, number_of_points))
+        d_temp_econ_d_temp[1 : number_of_points + 1, :] = np.eye(number_of_points)
+        partials["exterior_temperature_econ", "exterior_temperature"] = d_temp_econ_d_temp
 
         d_ts_econ_d_ts = np.zeros((number_of_points + 2, number_of_points))
         d_ts_econ_d_ts[1 : number_of_points + 1, :] = np.eye(number_of_points)

@@ -59,7 +59,7 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
         }
 
         # For some reasons that I only knew when I coded the mission vector, all flight
-        # parameters have "econ" in them. Additionnaly for some reason that I only knew when
+        # parameters have "econ" in them. Additionally for some reason that I only knew when
         # coding the power train builder components, I didn't think of re-using the
         # aforementioned naming convention. Consequently, we will have to use the OpenMDAO trick
         # which consists in renaming variable during promotion. Thanks @christophe-david for
@@ -76,7 +76,7 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
                 ("altitude", "altitude_econ"),
                 ("time_step", "time_step_econ"),
                 ("true_airspeed", "true_airspeed_econ"),
-                "exterior_temperature",
+                ("exterior_temperature", "exterior_temperature_econ"),
             ],
         )
         self.add_subsystem(

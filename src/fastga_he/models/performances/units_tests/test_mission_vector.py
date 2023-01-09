@@ -51,6 +51,7 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_cg i
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
+from utils.write_outputs import write_outputs
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
@@ -1084,7 +1085,7 @@ def test_mission_vector():
         ivc,
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(62.48, abs=1e-2)
+    assert sizing_fuel == pytest.approx(61.97, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1105,6 +1106,9 @@ def test_mission_vector_from_yml():
     # Create problems with inputs
     problem = configurator.get_problem(read_inputs=True)
     problem.setup()
+
+    # om.n2(problem)
+
     problem.run_model()
     problem.write_outputs()
 
@@ -1116,4 +1120,8 @@ def test_mission_vector_from_yml():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(0.0, abs=1e-2)
+    assert sizing_energy == pytest.approx(224.67, abs=1e-2)
+    mission_end_soc = problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
+    )
+    assert mission_end_soc == pytest.approx(40.57, abs=1e-2)

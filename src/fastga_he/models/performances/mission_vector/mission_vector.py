@@ -86,8 +86,7 @@ class MissionVector(om.Group):
                 propulsion_id=self.options["propulsion_id"],
                 power_train_file_path=self.options["power_train_file_path"],
             ),
-            promotes_inputs=["data:*"],
-            promotes_outputs=["data:*"],
+            promotes=["data:*"],
         )
         self.add_subsystem(
             "to_csv",
@@ -108,6 +107,15 @@ class MissionVector(om.Group):
                 "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption"
                 + ".engine_setting",
                 "to_csv.engine_setting",
+            ],
+        )
+
+        self.connect(
+            "initialization.initialize_temperature.exterior_temperature",
+            [
+                "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption"
+                + ".exterior_temperature",
+                "to_csv.exterior_temperature",
             ],
         )
 

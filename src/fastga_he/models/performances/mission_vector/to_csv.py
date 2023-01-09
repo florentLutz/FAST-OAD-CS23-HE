@@ -20,6 +20,7 @@ CSV_DATA_LABELS = [
     "mach",
     "d_vx_dt",
     "density",
+    "exterior_temperature",
     "gamma",
     "alpha",
     "delta_m",
@@ -89,6 +90,12 @@ class ToCSV(om.ExplicitComponent):
         )
         self.add_input(
             "altitude", shape=number_of_points, val=np.full(number_of_points, np.nan), units="m"
+        )
+        self.add_input(
+            "exterior_temperature",
+            shape=number_of_points,
+            val=np.full(number_of_points, np.nan),
+            units="degK",
         )
         self.add_input(
             "position", shape=number_of_points, val=np.full(number_of_points, np.nan), units="m"
@@ -167,6 +174,7 @@ class ToCSV(om.ExplicitComponent):
 
         time = inputs["time"]
         altitude = inputs["altitude"]
+        exterior_temperature = inputs["exterior_temperature"]
         distance = inputs["position"]
         mass = inputs["mass"]
         x_cg = inputs["x_cg"]
@@ -245,6 +253,7 @@ class ToCSV(om.ExplicitComponent):
             results_df["mach"] = atm.mach
             results_df["d_vx_dt"] = d_vx_dt
             results_df["density"] = atm.density
+            results_df["exterior_temperature"] = exterior_temperature
             results_df["gamma"] = gamma
             results_df["alpha"] = alpha * 180.0 / np.pi
             results_df["delta_m"] = delta_m * 180.0 / np.pi
