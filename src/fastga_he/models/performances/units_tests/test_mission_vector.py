@@ -51,7 +51,6 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_cg i
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
-from utils.write_outputs import write_outputs
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")

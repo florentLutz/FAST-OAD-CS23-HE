@@ -21,6 +21,16 @@ from fastga_he.models.propulsion.assemblers.constants import (
     "fastga_he.submodel.performances.energy_consumption.from_pt_file",
 )
 class PowerTrainPerformancesFromFileWithInterface(om.Group):
+    """
+    This group is solely meant to be used as an interface with the vector mission, if the user
+    wish to run a standalone analysis of a power train, use the SUBMODEL_POWER_TRAIN_PERF
+    service.
+
+    This is the reason why the add_solver options will be set to False without access to it on
+    mission level. This also allows to not have to set up another dummy option in the
+    propulsion_basic.py file.
+    """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -52,10 +62,10 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
             propulsive_load_types,
         ) = self.configurator.get_propulsive_element_list()
 
-        # TODO: Finish the mock-up interface
         options_pt_perf = {
             "power_train_file_path": power_train_file_path,
             "number_of_points": number_of_points,
+            "add_solver": False,
         }
 
         # For some reasons that I only knew when I coded the mission vector, all flight
@@ -79,9 +89,15 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
                 ("exterior_temperature", "exterior_temperature_econ"),
             ],
         )
+
+        options_power_rate = {
+            "power_train_file_path": power_train_file_path,
+            "number_of_points": number_of_points,
+        }
+
         self.add_subsystem(
             "mock_up_interface",
-            oad.RegisterSubmodel.get_submodel(SUBMODEL_POWER_RATE, options=options_pt_perf),
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_POWER_RATE, options=options_power_rate),
             promotes=["data:*", "thrust_rate_t_econ", "engine_setting_econ"],
         )
 

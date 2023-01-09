@@ -33,14 +33,6 @@ class PowerTrainPerformancesFromFile(om.Group):
 
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
-        # Solvers setup
-        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
-        self.nonlinear_solver.options["iprint"] = 2
-        self.nonlinear_solver.options["maxiter"] = 200
-        self.nonlinear_solver.options["rtol"] = 1e-4
-        self.linear_solver = om.DirectSolver()
-
     def initialize(self):
 
         self.options.declare(
@@ -51,6 +43,13 @@ class PowerTrainPerformancesFromFile(om.Group):
         )
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            name="add_solver",
+            default=True,
+            desc="Boolean to add solvers to the power train performance group. Default is true "
+            "but can be turned off when used jointly with the mission to save computation time",
+            allow_none=False,
         )
 
     def setup(self):
@@ -138,3 +137,12 @@ class PowerTrainPerformancesFromFile(om.Group):
                 source_name + ".fuel_consumed_t",
                 "energy_consumption." + source_name + "_fuel_consumed_t",
             )
+
+        if self.options["add_solver"]:
+            # Solvers setup
+            self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+            self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
+            self.nonlinear_solver.options["iprint"] = 2
+            self.nonlinear_solver.options["maxiter"] = 200
+            self.nonlinear_solver.options["rtol"] = 1e-4
+            self.linear_solver = om.DirectSolver()
