@@ -6,12 +6,6 @@ on:
       - '**'
     tags-ignore:
       - '**'
-    paths:
-      - 'src/**'
-      - 'tests/**'
-      - 'poetry.lock'
-      - '.github/workflows/**'
-      - 'CHANGELOG.rst'  # To ensure CI runs when merging release branch
 
 
 jobs:
