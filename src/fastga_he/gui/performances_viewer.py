@@ -85,77 +85,65 @@ class PerformancesViewer:
         key = list(self.data)
         keys = self.data[key].keys()
 
+        output = widgets.Output()
+
+        def show_plots(change=None):
+
+            with output:
+
+                clear_output(wait=True)
+
+                x_name = self._x_widget.value
+                y_name = self._y_widget.value
+
+                fig = go.Figure()
+
+                # If both mission and pt data are present, we change the color according to the
+                # phase to make it more readable
+                if "name" in self.data.columns:
+                    for name in list(set(self.data["name"].to_list())):
+                        # pylint: disable=invalid-name # that's a common naming
+                        x = self.data.loc[self.data["name"] == name, x_name]
+                        # pylint: disable=invalid-name # that's a common naming
+                        y = self.data.loc[self.data["name"] == name, y_name]
+
+                        scatter = go.Scatter(
+                            x=x,
+                            y=y,
+                            mode="markers",
+                            marker={"color": COLOR_DICTIONARY[name]},
+                            name=name,
+                        )
+                        fig.add_trace(scatter)
+                else:
+
+                    # pylint: disable=invalid-name # that's a common naming
+                    x = self.data[x_name]
+                    # pylint: disable=invalid-name # that's a common naming
+                    y = self.data[y_name]
+
+                    scatter = go.Scatter(x=x, y=y, mode="markers")
+                    fig.add_trace(scatter)
+
+                fig.update_layout(
+                    title_text="Power train performances on the mission",
+                    title_x=0.5,
+                    xaxis_title=x_name,
+                    yaxis_title=y_name,
+                    showlegend=True,
+                )
+
+                fig.show()
+
         # By default ground distance
         self._x_widget = widgets.Dropdown(value=keys[2], options=keys)
-        self._x_widget.observe(self.display, "value")
+        self._x_widget.observe(show_plots, "value")
         # By default altitude
         self._y_widget = widgets.Dropdown(value=keys[1], options=keys)
-        self._y_widget.observe(self.display, "value")
+        self._y_widget.observe(show_plots, "value")
 
-    # pylint: disable=unused-argument  # args has to be there for observe() to work
-    def display(self, change=None) -> display:
-        """
-        Display the user interface
-        :return the display object
-        """
-        clear_output(wait=True)
-        self._update_plots()
         toolbar = widgets.HBox(
             [widgets.Label(value="x:"), self._x_widget, widgets.Label(value="y:"), self._y_widget]
         )
-        # pylint: disable=invalid-name # that's a common naming
-        ui = widgets.VBox([toolbar, self._fig])
-        return display(ui)
 
-    def _update_plots(self):
-        """
-        Update the plots
-        """
-        self._fig = None
-        self._build_plots()
-
-    def _build_plots(self):
-        """
-        Add a plot of the mission
-        """
-
-        x_name = self._x_widget.value
-        y_name = self._y_widget.value
-
-        if self._fig is None:
-            self._fig = go.Figure()
-
-        # If both mission and pt data are present, we change the color according to the phase to
-        # make it more readable
-        if "name" in self.data.columns:
-            for name in list(set(self.data["name"].to_list())):
-
-                # pylint: disable=invalid-name # that's a common naming
-                x = self.data.loc[self.data["name"] == name, x_name]
-                # pylint: disable=invalid-name # that's a common naming
-                y = self.data.loc[self.data["name"] == name, y_name]
-
-                scatter = go.Scatter(
-                    x=x, y=y, mode="markers", marker={"color": COLOR_DICTIONARY[name]}, name=name
-                )
-                self._fig.add_trace(scatter)
-        else:
-
-            # pylint: disable=invalid-name # that's a common naming
-            x = self.data[x_name]
-            # pylint: disable=invalid-name # that's a common naming
-            y = self.data[y_name]
-
-            scatter = go.Scatter(x=x, y=y, mode="markers")
-            self._fig.add_trace(scatter)
-
-        layout = go.Layout(showlegend=True)
-
-        self._fig = go.FigureWidget(self._fig, layout=layout)
-
-        self._fig.update_layout(
-            title_text="Power train performances on the mission",
-            title_x=0.5,
-            xaxis_title=x_name,
-            yaxis_title=y_name,
-        )
+        display(toolbar, output)
