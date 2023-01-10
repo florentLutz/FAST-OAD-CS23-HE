@@ -6,13 +6,14 @@ import ipywidgets as widgets
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.express as px
 from IPython.display import clear_output, display
 
 COLOR_DICTIONARY = {
-    "sizing:main_route:climb": "crimson",
-    "sizing:main_route:cruise": "darkblue",
-    "sizing:main_route:descent": "lightskyblue",
-    "sizing:main_route:reserve": "darkgreen",
+    "sizing:main_route:climb": px.colors.qualitative.Prism[3],
+    "sizing:main_route:cruise": px.colors.qualitative.Prism[4],
+    "sizing:main_route:descent": px.colors.qualitative.Prism[5],
+    "sizing:main_route:reserve": px.colors.qualitative.Prism[6],
 }
 
 
@@ -22,7 +23,13 @@ class PerformancesViewer:
     performances at aircraft level. Vastly inspired by the MissionViewer from fast-oad-core.
     """
 
-    def __init__(self, power_train_data_file_path: str, mission_data_file_path: str):
+    def __init__(
+        self,
+        power_train_data_file_path: str,
+        mission_data_file_path: str,
+        plot_height: int = None,
+        plot_width: int = None,
+    ):
 
         if power_train_data_file_path.endswith(".csv") and not mission_data_file_path.endswith(
             ".csv"
@@ -72,6 +79,9 @@ class PerformancesViewer:
 
         # The y selector
         self._y_widget = None
+
+        self.plot_height = plot_height
+        self.plot_width = plot_width
 
         self.data = all_data
 
@@ -132,6 +142,11 @@ class PerformancesViewer:
                     yaxis_title=y_name,
                     showlegend=True,
                 )
+                if self.plot_height:
+                    fig.update_layout(height=self.plot_height)
+
+                if self.plot_width:
+                    fig.update_layout(width=self.plot_width)
 
                 fig.show()
 
