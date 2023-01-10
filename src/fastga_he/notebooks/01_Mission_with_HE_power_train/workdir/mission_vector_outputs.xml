@@ -363,7 +363,7 @@
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <mass units="kg" is_input="False">3953.8317156827666<!--Mass of the battery pack--></mass>
-            <min_safe_SOC is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_cells is_input="False">3985.7174553253694<!--Total number of cells in the battery pack--></number_cells>
             <number_modules is_input="False">19.928587276626846<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
@@ -507,9 +507,9 @@
             <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
             <mass units="kg" is_input="False">37.51910533905961</mass>
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
-            <number_blades is_input="True">3.0<!--Diameter of the propeller--></number_blades>
+            <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the propeller rpm--></rpm_max>
-            <rpm_mission is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
             <tip_mach_max is_input="False">0.45525598042395493<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
             <torque_max units="N*m" is_input="False">1179.758678101042<!--Maximum value of the propeller torque--></torque_max>

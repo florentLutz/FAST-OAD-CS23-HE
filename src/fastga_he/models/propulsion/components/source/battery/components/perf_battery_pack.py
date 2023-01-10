@@ -153,10 +153,7 @@ class PerformancesBatteryPack(om.Group):
         )
 
         fuel_consumed = om.IndepVarComp()
-        fuel_consumed.add_output(
-            "fuel_consumed_t",
-            np.full(number_of_points, 0.0),
-        )
+        fuel_consumed.add_output("fuel_consumed_t", np.full(number_of_points, 0.0), units="kg")
         self.add_subsystem(
             "fuel_consumed",
             fuel_consumed,

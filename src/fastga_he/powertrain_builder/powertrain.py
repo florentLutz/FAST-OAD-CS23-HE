@@ -30,7 +30,7 @@ JSON_SCHEMA_NAME = "power_train.json"
 
 KEY_TITLE = "title"
 KEY_PT_COMPONENTS = "power_train_components"
-KEY_PT_CONNECTIONS = "connections"
+KEY_PT_CONNECTIONS = "component_connections"
 KEY_PT_WATCHER = "watcher_file_path"
 
 PT_DATA_PREFIX = "data:propulsion:he_power_train:"

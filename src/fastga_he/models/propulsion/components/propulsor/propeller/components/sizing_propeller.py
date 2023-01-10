@@ -35,7 +35,7 @@ class SizingPropeller(om.Group):
         )
 
         self.add_subsystem(
-            "propeller_wright",
+            "propeller_wright",  # Like Orville and Wilbur
             SizingPropellerWeight(propeller_id=propeller_id),
             promotes=["data:*"],
         )

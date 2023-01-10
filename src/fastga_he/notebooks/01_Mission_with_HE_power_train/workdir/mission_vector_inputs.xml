@@ -143,7 +143,7 @@
           <battery_pack_1>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <min_safe_SOC is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <cell>
               <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
               <mass units="g" is_input="True">496.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
@@ -209,8 +209,8 @@
             <blade_twist units="deg" is_input="True">22.6<!--Twist between the propeller blade root and tip--></blade_twist>
             <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
-            <number_blades is_input="True">3.0<!--Diameter of the propeller--></number_blades>
-            <rpm_mission is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
+            <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>

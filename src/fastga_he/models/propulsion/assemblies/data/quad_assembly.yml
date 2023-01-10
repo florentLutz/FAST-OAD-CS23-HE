@@ -75,7 +75,7 @@ power_train_components:
   battery_pack_1:
     id: fastga_he.pt_component.battery_pack
 
-connections:
+component_connections:
   - source: propeller_1
     target: motor_1
   - source: propeller_2

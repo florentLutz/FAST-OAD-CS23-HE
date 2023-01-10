@@ -41,8 +41,7 @@ class SizingPropellerWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:propeller:" + propeller_id + ":number_blades",
             val=np.nan,
-            units="m",
-            desc="Diameter of the propeller",
+            desc="Number of blades on the propeller",
         )
         self.add_input(
             name="data:propulsion:he_power_train:propeller:" + propeller_id + ":material",
