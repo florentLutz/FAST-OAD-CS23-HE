@@ -359,7 +359,7 @@
             <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
             <mass units="kg" is_input="False">36.325959926133095</mass>
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
-            <number_blades is_input="True">3.0<!--Diameter of the propeller--></number_blades>
+            <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>

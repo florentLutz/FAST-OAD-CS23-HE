@@ -35,6 +35,14 @@ KEY_PT_WATCHER = "watcher_file_path"
 
 PT_DATA_PREFIX = "data:propulsion:he_power_train:"
 
+PROMOTION_FROM_MISSION = {
+    "thrust": "N",
+    "altitude": "m",
+    "time_step": "s",
+    "true_airspeed": "m/s",
+    "exterior_temperature": "degK",
+}
+
 
 class FASTGAHEPowerTrainConfigurator:
     """

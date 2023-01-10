@@ -8,9 +8,11 @@ import numpy as np
 import pandas as pd
 
 import openmdao.api as om
-import fastoad.api as oad
 
-from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
+from fastga_he.powertrain_builder.powertrain import (
+    FASTGAHEPowerTrainConfigurator,
+    PROMOTION_FROM_MISSION,
+)
 
 
 class PowerTrainPerformancesWatcher(om.ExplicitComponent):
@@ -79,6 +81,18 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
                 + "]"
             )
 
+        for mission_variable_name in list(PROMOTION_FROM_MISSION.keys()):
+            self.add_input(
+                mission_variable_name,
+                units=PROMOTION_FROM_MISSION[mission_variable_name],
+                val=np.nan,
+                shape=number_of_points,
+            )
+
+            self.header_name.append(
+                mission_variable_name + " [" + PROMOTION_FROM_MISSION[mission_variable_name] + "]"
+            )
+
         self.add_output("dummy_output", val=1337.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -97,13 +111,21 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
             _,
         ) = self.configurator.get_performance_watcher_elements_list()
 
+        mission_variable_names = list(PROMOTION_FROM_MISSION.keys())
+
         results_df = pd.DataFrame(columns=self.header_name)
 
-        for (component_name, component_performances_watcher_name, corresponding_header) in zip(
-            components_name, components_performances_watchers_names, self.header_name
-        ):
-            results_df[corresponding_header] = inputs[
-                component_name + "_" + component_performances_watcher_name
-            ]
+        components_name_with_mission = components_name + [None] * len(mission_variable_names)
+        inputs_names = components_performances_watchers_names + mission_variable_names
 
-            results_df.to_csv(file_path)
+        for (component_name, component_performances_watcher_name, corresponding_header) in zip(
+            components_name_with_mission, inputs_names, self.header_name
+        ):
+            if component_name:
+                results_df[corresponding_header] = inputs[
+                    component_name + "_" + component_performances_watcher_name
+                ]
+            else:
+                results_df[corresponding_header] = inputs[component_performances_watcher_name]
+
+        results_df.to_csv(file_path)

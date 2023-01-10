@@ -5,7 +5,10 @@
 import openmdao.api as om
 import fastoad.api as oad
 
-from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
+from fastga_he.powertrain_builder.powertrain import (
+    FASTGAHEPowerTrainConfigurator,
+    PROMOTION_FROM_MISSION,
+)
 from fastga_he.models.propulsion.assemblers.energy_consumption_from_pt_file import (
     EnergyConsumptionFromPTFile,
 )
@@ -158,7 +161,7 @@ class PowerTrainPerformancesFromFile(om.Group):
                     power_train_file_path=self.options["power_train_file_path"],
                     number_of_points=number_of_points,
                 ),
-                promotes=[],
+                promotes=list(PROMOTION_FROM_MISSION.keys()),
             )
 
             (
