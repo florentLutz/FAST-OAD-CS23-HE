@@ -124,7 +124,7 @@ class FASTGAHEPowerTrainConfigurator:
         watcher_file_path = self._serializer.data.get(KEY_PT_WATCHER)
         if watcher_file_path:
             if not pth.isabs(watcher_file_path):
-                return pth.join(self._power_train_file, watcher_file_path)
+                return pth.join(pth.dirname(self._power_train_file), watcher_file_path)
             else:
                 return watcher_file_path
         else:
