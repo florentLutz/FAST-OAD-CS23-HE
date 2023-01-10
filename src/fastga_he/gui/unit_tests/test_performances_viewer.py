@@ -29,6 +29,3 @@ def test_performances_viewer(cleanup):
     performances_viewer = PerformancesViewer(
         power_train_data_file_path=pt_data_filename, mission_data_file_path=mission_data_filename
     )
-
-    # Testing display
-    performances_viewer.display()

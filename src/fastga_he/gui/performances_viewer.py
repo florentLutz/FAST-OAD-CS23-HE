@@ -9,6 +9,8 @@ import plotly.graph_objects as go
 import plotly.express as px
 from IPython.display import clear_output, display
 
+from fastga_he.powertrain_builder.powertrain import PROMOTION_FROM_MISSION
+
 COLOR_DICTIONARY = {
     "sizing:main_route:climb": px.colors.qualitative.Prism[3],
     "sizing:main_route:cruise": px.colors.qualitative.Prism[4],
@@ -26,7 +28,7 @@ class PerformancesViewer:
     def __init__(
         self,
         power_train_data_file_path: str,
-        mission_data_file_path: str,
+        mission_data_file_path: str = "NeFinisPasPar.csv!",
         plot_height: int = None,
         plot_width: int = None,
     ):
@@ -44,17 +46,18 @@ class PerformancesViewer:
 
             all_data = power_train_data
 
-        elif not power_train_data_file_path.endswith(".csv") and mission_data_file_path.endswith(
-            ".csv"
-        ):
-
-            mission_data = pd.read_csv(mission_data_file_path, index_col=0)
-
-            all_data = mission_data
-
         elif power_train_data_file_path.endswith(".csv") and mission_data_file_path.endswith(
             ".csv"
         ):
+
+            columns_to_drop = []
+            for mission_variable_name in list(PROMOTION_FROM_MISSION.keys()):
+                columns_to_drop.append(
+                    mission_variable_name
+                    + " ["
+                    + PROMOTION_FROM_MISSION[mission_variable_name]
+                    + "]"
+                )
 
             # Read the two CSV and concatenate them so that all data can be displayed against all
             # data
@@ -64,6 +67,7 @@ class PerformancesViewer:
             power_train_data = power_train_data.drop([0]).iloc[:-1]
             # We readjust the index
             power_train_data = power_train_data.set_index(np.arange(len(power_train_data.index)))
+            power_train_data = power_train_data.drop(columns_to_drop, axis=1)
 
             mission_data = pd.read_csv(mission_data_file_path, index_col=0)
             all_data = pd.concat([power_train_data, mission_data], axis=1)
