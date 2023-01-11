@@ -23,7 +23,7 @@ class MissionVector(om.Group):
         # Solvers setup
         self.nonlinear_solver = om.NonlinearBlockGS()
         self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 50
+        self.nonlinear_solver.options["maxiter"] = 100
         self.nonlinear_solver.options["rtol"] = 1e-5
         self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
         self.linear_solver = om.LinearBlockGS()

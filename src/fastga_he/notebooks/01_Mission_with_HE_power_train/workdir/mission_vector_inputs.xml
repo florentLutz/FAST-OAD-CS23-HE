@@ -107,7 +107,7 @@
             <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <power_density units="W/kg" is_input="True">4000.0<!--Power density of the converter--></power_density>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
-            <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
+            <voltage_out_target_mission units="V" is_input="True">500.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
             <capacitor>
               <resistance units="ohm" is_input="True">0.0014</resistance>
@@ -135,21 +135,21 @@
         </DC_cable_harness>
         <PMSM>
           <motor_1>
-            <rpm_rating units="min**-1" is_input="True">5000.0<!--Max continuous rpm of the motor--></rpm_rating>
-            <voltage_caliber units="V" is_input="True">700.0<!--Max voltage of the motor--></voltage_caliber>
+            <voltage_caliber units="V" is_input="True">450.0<!--Max voltage of the motor--></voltage_caliber>
           </motor_1>
         </PMSM>
         <battery_pack>
           <battery_pack_1>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
-            <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
+            <cell_weight_fraction is_input="True">0.75<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <number_modules is_input="True">30.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <mass units="g" is_input="True">496.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
+              <mass units="g" is_input="True">160.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
             </cell>
             <module>
-              <number_cells is_input="True">200.0<!--Number of cells in series inside one battery module--></number_cells>
+              <number_cells is_input="True">120.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
           </battery_pack_1>
         </battery_pack>
@@ -205,12 +205,12 @@
         </inverter>
         <propeller>
           <propeller_1>
-            <activity_factor is_input="True">150.0<!--Activity factor of the propeller--></activity_factor>
-            <blade_twist units="deg" is_input="True">22.6<!--Twist between the propeller blade root and tip--></blade_twist>
-            <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
+            <activity_factor is_input="True">200.0<!--Activity factor of the propeller--></activity_factor>
+            <blade_twist units="deg" is_input="True">22.15<!--Twist between the propeller blade root and tip--></blade_twist>
+            <diameter units="inch" is_input="True">55.0<!--Diameter of the propeller--></diameter>
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
-            <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
-            <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <number_blades is_input="True">4.0<!--Number of blades on the propeller--></number_blades>
+            <rpm_mission units="1/min" is_input="True">4000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>
@@ -234,7 +234,7 @@
     </propulsion>
     <weight>
       <aircraft>
-        <MTOW units="kg" is_input="True">1747.3649929730034<!--maximum takeoff weight--></MTOW>
+        <MTOW units="kg" is_input="True">1630.0<!--maximum takeoff weight--></MTOW>
         <payload units="kg" is_input="True">390.0<!--design payload weight--></payload>
       </aircraft>
       <aircraft_empty>
@@ -287,12 +287,12 @@
           </descent>
           <reserve>
             <altitude units="m" is_input="True">1000.0<!--altitude of the reserve segment--></altitude>
-            <duration units="min" is_input="True">45.0<!--duration of the reserve segment--></duration>
+            <duration units="min" is_input="True">30.0<!--duration of the reserve segment--></duration>
           </reserve>
           <climb>
             <climb_rate>
-              <cruise_level units="ft/min" is_input="True">700.0<!--target climb rate at the end of climb--></cruise_level>
-              <sea_level units="ft/min" is_input="True">1200.0<!--target climb rate at sea level--></sea_level>
+              <cruise_level units="ft/min" is_input="True">300.0<!--target climb rate at the end of climb--></cruise_level>
+              <sea_level units="ft/min" is_input="True">700.0<!--target climb rate at sea level--></sea_level>
             </climb_rate>
           </climb>
         </main_route>

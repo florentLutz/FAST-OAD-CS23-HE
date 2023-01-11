@@ -154,8 +154,14 @@ class PerformancesViewer:
 
                 fig.show()
 
+        # Check if time is in column name to put it as the x axis by default
+        if "time" in keys:
+            index_x = self.data.columns.get_loc("time")
+        else:
+            index_x = 2
+
         # By default ground distance
-        self._x_widget = widgets.Dropdown(value=keys[2], options=keys)
+        self._x_widget = widgets.Dropdown(value=keys[index_x], options=keys)
         self._x_widget.observe(show_plots, "value")
         # By default altitude
         self._y_widget = widgets.Dropdown(value=keys[1], options=keys)

@@ -36,7 +36,13 @@ PROPELLER = {
     IN: [(None, "rpm"), (None, "shaft_power_in")],
     OUT: None,
     CTC: "propulsor",
-    MP: [{"rpm": "1/min"}, {"shaft_power_in": "kW"}, {"torque_in": "N*m"}],
+    MP: [
+        {"rpm": "1/min"},
+        {"shaft_power_in": "kW"},
+        {"torque_in": "N*m"},
+        {"efficiency": None},
+        {"advance_ratio": None},
+    ],
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
