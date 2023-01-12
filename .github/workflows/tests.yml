@@ -53,3 +53,8 @@ jobs:
         run: |
           poetry run pytest src/fastga_he/models/performances
         shell: bash
+
+      - name: GUI unit tests
+        run: |
+          poetry run pytest src/fastga_he/gui
+        shell: bash

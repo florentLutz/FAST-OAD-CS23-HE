@@ -314,7 +314,7 @@
                         <voltage_caliber units="V">1000.0</voltage_caliber>
                         <voltage_max units="V">800.0</voltage_max>
                         <number_cables>1.0</number_cables>
-                        <length units="m">7.0</length>
+                        <length units="m">3.0</length>
                         <conductor>
                             <radius units="m">3.71e-3</radius>
                             <section units="mm*mm">43.44</section>

@@ -92,7 +92,7 @@ def test_compute_current_per_cable():
     problem = run_system(SizingCurrentPerCable(harness_id="harness_1"), ivc)
     assert problem[
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:current_caliber"
-    ] == pytest.approx(800.0, rel=1e-2)
+    ] == pytest.approx(700.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -109,10 +109,10 @@ def test_compute_diameter():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:section", units="mm*mm"
-    ) == pytest.approx(43.44, rel=1e-2)
+    ) == pytest.approx(716.37, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius", units="m"
-    ) == pytest.approx(3.71e-3, rel=1e-2)
+    ) == pytest.approx(0.0151, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -206,7 +206,7 @@ def test_contactor_mass():
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:contactor:mass",
             units="kg",
         )
-        == pytest.approx(4.95, rel=1e-2)
+        == pytest.approx(4.51, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -652,7 +652,7 @@ def test_constraints_enforce():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:current_caliber", units="A"
-    ) == pytest.approx(750.0, rel=1e-2)
+    ) == pytest.approx(650.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_caliber", units="V"
     ) == pytest.approx(800.0, rel=1e-2)
@@ -746,7 +746,7 @@ def test_sizing_harness():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:mass", units="kg"
-    ) == pytest.approx(8.86, rel=1e-2)
+    ) == pytest.approx(51.85, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -781,26 +781,26 @@ def test_sizing_cable():
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:mass_per_length",
             units="kg/m",
         )
-        == pytest.approx(0.540, rel=1e-2)
+        == pytest.approx(9.922, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:resistance",
             units="ohm",
         )
-        == pytest.approx(0.00334, rel=1e-2)
+        == pytest.approx(0.00014129, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:heat_capacity",
             units="J/degK",
         )
-        == pytest.approx(3169.777, rel=1e-2)
+        == pytest.approx(39157.028, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:radius",
             units="mm",
         )
-        == pytest.approx(6.478, rel=1e-2)
+        == pytest.approx(21.848, rel=1e-2)
     )

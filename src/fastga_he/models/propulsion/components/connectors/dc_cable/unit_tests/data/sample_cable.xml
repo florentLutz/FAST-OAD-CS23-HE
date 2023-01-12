@@ -5,8 +5,8 @@
                 <DC_cable_harness>
                     <harness_1>
                         <material>1.0</material>
-                        <current_caliber units="A">800.0</current_caliber>
-                        <current_max units="A">750.0</current_max>
+                        <current_caliber units="A">700.0</current_caliber>
+                        <current_max units="A">650.0</current_max>
                         <voltage_caliber units="V">1000.0</voltage_caliber>
                         <voltage_max units="V">800.0</voltage_max>
                         <number_cables>1.0</number_cables>
@@ -29,7 +29,7 @@
                             <initial_temperature units="degK">288.15</initial_temperature>
                             <resistance_per_length units="ohm/km">0.397</resistance_per_length>
                             <mass_per_length units="kg/m">0.537</mass_per_length>
-                            <current_caliber units="A">800.0</current_caliber>
+                            <current_caliber units="A">700.0</current_caliber>
                             <radius units="mm">6.47</radius>
                             <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
                             <heat_capacity units="J/degK">3169.777</heat_capacity>

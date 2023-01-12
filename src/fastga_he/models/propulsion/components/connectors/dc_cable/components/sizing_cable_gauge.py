@@ -2,16 +2,29 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import logging
+
 import numpy as np
 import openmdao.api as om
 
-C0_COPPER = 52.13
-C1_COPPER = -85.71
-C2_COPPER = 75.30
+C0_COPPER = 1.23553482e-01
+C1_COPPER = 4.44191525e-02
+C2_COPPER = -1.88835315e-04
+C3_COPPER = 4.48406500e-07
+C4_COPPER = -5.24550340e-10
+C5_COPPER = 2.38160582e-13
 
-C0_ALU = 42.62
-C1_ALU = -70.68
-C2_ALU = 60.33
+C0_ALU = -2.75147916e-02
+C1_ALU = 5.87923841e-02
+C2_ALU = -3.08804274e-04
+C3_ALU = 8.75318539e-07
+C4_ALU = -1.20500903e-09
+C5_ALU = 6.39275239e-13
+
+LIMIT_CU = 750
+LIMIT_ALU = 630
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class SizingCableGauge(om.Group):
@@ -30,26 +43,18 @@ class SizingCableGauge(om.Group):
 
         harness_id = self.options["harness_id"]
 
-        self.add_subsystem(
-            "discriminant", _Discriminant(harness_id=harness_id), promotes=["data:*"]
-        )
-        self.add_subsystem("log_solution", _LogSolution(), promotes=[])
+        self.add_subsystem("log_solution", _LogSolution(harness_id=harness_id), promotes=["data:*"])
         self.add_subsystem(
             "actual_solution", _SolutionGauge(harness_id=harness_id), promotes=["data:*"]
         )
 
-        self.connect("discriminant.discriminant", "log_solution.discriminant")
-        self.connect("discriminant.c_1", "log_solution.c_1")
-        self.connect("discriminant.c_2", "log_solution.c_2")
-
         self.connect("log_solution.log_solution", "actual_solution.log_solution")
 
 
-class _Discriminant(om.ExplicitComponent):
-    """Computation the discriminant to find the proper cable gauge."""
+class _LogSolution(om.ExplicitComponent):
+    """Computation the log of the solution to find the cable gauge."""
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -74,115 +79,90 @@ class _Discriminant(om.ExplicitComponent):
             desc="1.0 for copper, 0.0 for aluminium",
         )
 
-        self.add_output(name="discriminant")
-        self.add_output(name="c_1")
-        self.add_output(name="c_2")
-
-        self.declare_partials(of="discriminant", wrt="*")
-        self.declare_partials(
-            of="c_1",
-            wrt="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material",
-        )
-        self.declare_partials(
-            of="c_2",
-            wrt="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material",
-        )
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
-        harness_id = self.options["harness_id"]
-
-        current = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":cable:current_caliber"
-        ]
-        material = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material"
-        ]
-
-        c_0 = C0_ALU + (C0_COPPER - C0_ALU) * material - current
-        c_1 = C1_ALU + (C1_COPPER - C1_ALU) * material
-        c_2 = C2_ALU + (C2_COPPER - C2_ALU) * material
-
-        delta = c_1 ** 2.0 - 4.0 * c_0 * c_2
-
-        outputs["discriminant"] = delta
-        outputs["c_1"] = c_1
-        outputs["c_2"] = c_2
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        harness_id = self.options["harness_id"]
-
-        current = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":cable:current_caliber"
-        ]
-        material = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material"
-        ]
-
-        c_0 = C0_ALU + (C0_COPPER - C0_ALU) * material - current
-        c_1 = C1_ALU + (C1_COPPER - C1_ALU) * material
-        c_2 = C2_ALU + (C2_COPPER - C2_ALU) * material
-
-        d_c_0_d_mat = C0_COPPER - C0_ALU
-        d_c_0_d_current = -1.0
-        d_c_1_d_mat = C1_COPPER - C1_ALU
-        d_c_2_d_mat = C2_COPPER - C2_ALU
-
-        partials[
-            "discriminant",
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":cable:current_caliber",
-        ] = (
-            -4.0 * c_2 * d_c_0_d_current
-        )
-
-        partials[
-            "discriminant",
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material",
-        ] = 2.0 * c_1 * d_c_1_d_mat - 4.0 * (c_0 * d_c_2_d_mat + c_2 * d_c_0_d_mat)
-
-        partials[
-            "c_1",
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material",
-        ] = d_c_1_d_mat
-        partials[
-            "c_2",
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material",
-        ] = d_c_2_d_mat
-
-
-class _LogSolution(om.ExplicitComponent):
-    """Computation the log of the solution to find the cable gauge."""
-
-    def setup(self):
-
-        self.add_input(name="discriminant", val=np.nan)
-        self.add_input(name="c_1", val=np.nan)
-        self.add_input(name="c_2", val=np.nan)
-
         self.add_output("log_solution")
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        log_solution = (-inputs["c_1"] + np.sqrt(inputs["discriminant"])) / (2.0 * inputs["c_2"])
+        harness_id = self.options["harness_id"]
+
+        current = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber"
+        ]
+        material = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material"
+        ]
+
+        limit_current = LIMIT_ALU + (LIMIT_CU - LIMIT_ALU) * material
+        if current > limit_current:
+            _LOGGER.warning(
+                "Current in the cable greater than what the NEC table allow, "
+                "consider using multiple cables in the harness"
+            )
+            current = limit_current
+
+        c_0 = C0_ALU + (C0_COPPER - C0_ALU) * material
+        c_1 = C1_ALU + (C1_COPPER - C1_ALU) * material
+        c_2 = C2_ALU + (C2_COPPER - C2_ALU) * material
+        c_3 = C3_ALU + (C3_COPPER - C3_ALU) * material
+        c_4 = C4_ALU + (C4_COPPER - C4_ALU) * material
+        c_5 = C5_ALU + (C5_COPPER - C5_ALU) * material
+
+        log_solution = (
+            c_5 * current ** 5.0
+            + c_4 * current ** 4.0
+            + c_3 * current ** 3.0
+            + c_2 * current ** 2.0
+            + c_1 * current
+            + c_0
+        )
 
         outputs["log_solution"] = log_solution
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["log_solution", "discriminant"] = 0.5 / (
-            2.0 * inputs["c_2"] * np.sqrt(inputs["discriminant"])
+        harness_id = self.options["harness_id"]
+
+        current = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber"
+        ]
+        material = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material"
+        ]
+
+        c_1 = C1_ALU + (C1_COPPER - C1_ALU) * material
+        c_2 = C2_ALU + (C2_COPPER - C2_ALU) * material
+        c_3 = C3_ALU + (C3_COPPER - C3_ALU) * material
+        c_4 = C4_ALU + (C4_COPPER - C4_ALU) * material
+        c_5 = C5_ALU + (C5_COPPER - C5_ALU) * material
+
+        partials[
+            "log_solution",
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber",
+        ] = (
+            5.0 * c_5 * current ** 4.0
+            + 4.0 * c_4 * current ** 3.0
+            + 3.0 * c_3 * current ** 2.0
+            + 2.0 * c_2 * current
+            + c_1
         )
-        partials["log_solution", "c_1"] = -1.0 / (2.0 * inputs["c_2"])
-        partials["log_solution", "c_2"] = -(-inputs["c_1"] + np.sqrt(inputs["discriminant"])) / (
-            2.0 * inputs["c_2"] ** 2.0
+        partials[
+            "log_solution",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material",
+        ] = (
+            (C5_COPPER - C5_ALU) * current ** 5.0
+            + (C4_COPPER - C4_ALU) * current ** 4.0
+            + (C3_COPPER - C3_ALU) * current ** 3.0
+            + (C2_COPPER - C2_ALU) * current ** 2.0
+            + (C1_COPPER - C1_ALU) * current
+            + (C0_COPPER - C0_ALU)
         )
 
 

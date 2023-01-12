@@ -2,7 +2,7 @@
   <data>
     <propulsion>
       <he_power_train>
-        <mass units="kg" is_input="False">5150.03480805918</mass>
+        <mass units="kg" is_input="False">5229.180224358104</mass>
         <DC_DC_converter>
           <dc_dc_converter_1>
             <current_in_caliber units="A" is_input="False">400.0<!--Current caliber of the DC/DC converter--></current_in_caliber>
@@ -117,31 +117,31 @@
             <current_caliber units="A" is_input="False">750.0</current_caliber>
             <current_max units="A" is_input="True">750.0</current_max>
             <length units="m" is_input="True">7.0</length>
-            <mass units="kg" is_input="False">8.869570670474378</mass>
+            <mass units="kg" is_input="False">88.01498696939814</mass>
             <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
             <number_cables is_input="True">1.0</number_cables>
             <voltage_caliber units="V" is_input="False">800.0</voltage_caliber>
             <voltage_max units="V" is_input="True">800.0</voltage_max>
             <cable>
               <current_caliber units="A" is_input="False">750.0<!--Maximum current flowing in one cable of the harness--></current_caliber>
-              <heat_capacity units="J/degK" is_input="False">2912.230921548136</heat_capacity>
-              <heat_capacity_per_length units="J/degK/m" is_input="False">346.6941573271591</heat_capacity_per_length>
-              <mass_per_length units="kg/m" is_input="False">0.4922426677287979</mass_per_length>
-              <radius units="m" is_input="False">0.006230568843427464</radius>
-              <resistance units="ohm" is_input="False">0.003713782784153666</resistance>
-              <resistance_per_length units="ohm/km" is_input="False">0.4421169981135317</resistance_per_length>
+              <heat_capacity units="J/degK" is_input="False">38980.136207414806</heat_capacity>
+              <heat_capacity_per_length units="J/degK/m" is_input="False">4640.49240564462</heat_capacity_per_length>
+              <mass_per_length units="kg/m" is_input="False">9.914316036648293</mass_per_length>
+              <radius units="m" is_input="False">0.021806098943972216</radius>
+              <resistance units="ohm" is_input="False">0.00014129150352442041</resistance>
+              <resistance_per_length units="ohm/km" is_input="False">0.016820417086240526</resistance_per_length>
             </cable>
             <conductor>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the conducting core--></k_factor_radius>
-              <radius units="mm" is_input="False">3.527979834325239</radius>
-              <section units="mm**2" is_input="False">39.102278162415935</section>
+              <radius units="mm" is_input="False">18.08740737359369</radius>
+              <section units="mm**2" is_input="False">1027.7855627438291</section>
             </conductor>
             <contactor>
               <mass units="kg" is_input="False">4.734732261552477<!--Mass of all the contactors in the harness--></mass>
             </contactor>
             <insulation>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the insulation--></k_factor_radius>
-              <thickness units="m" is_input="False">0.0011604022623359427</thickness>
+              <thickness units="m" is_input="False">0.001157544910492495</thickness>
             </insulation>
             <properties>
               <density units="g/cm**3" is_input="False">8.96<!--1.0 for copper, 0.0 for aluminium--></density>
@@ -149,7 +149,7 @@
               <specific_heat units="J/degK/kg" is_input="False">386.0<!--1.0 for copper, 0.0 for aluminium--></specific_heat>
             </properties>
             <sheath>
-              <thickness units="m" is_input="False">0.0013421867467662827</thickness>
+              <thickness units="m" is_input="False">0.0023611466598860327</thickness>
             </sheath>
           </harness_1>
         </DC_cable_harness>

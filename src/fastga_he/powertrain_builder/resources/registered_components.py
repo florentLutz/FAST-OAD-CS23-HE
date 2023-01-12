@@ -109,7 +109,7 @@ DC_LINE = {
     IN: [("dc_voltage_in", None), (None, "dc_current")],
     OUT: [("dc_voltage_out", None), (None, "dc_current")],
     CTC: "connector",
-    MP: [{"dc_current": "A"}, {"cable_temperature": "degK"}],
+    MP: [{"dc_current": "A"}, {"cable_temperature": "degK"}, {"conduction_losses": "W"}],
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
