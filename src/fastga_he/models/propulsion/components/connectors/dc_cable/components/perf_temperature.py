@@ -4,8 +4,19 @@
 
 import numpy as np
 import openmdao.api as om
+import fastoad.api as oad
+
+from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
+
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
+] = "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
 
 
+@oad.RegisterSubmodel(
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
+    "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state",
+)
 class PerformancesTemperature(om.ExplicitComponent):
     def initialize(self):
 
@@ -54,6 +65,7 @@ class PerformancesTemperature(om.ExplicitComponent):
             val=np.nan,
             units="m",
         )
+        self.add_input("time_step", shape=number_of_points, units="s", val=np.nan)
 
         self.add_output(
             "cable_temperature",
@@ -63,7 +75,17 @@ class PerformancesTemperature(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt=[
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
+                "exterior_temperature",
+                "heat_transfer_coefficient",
+                "conduction_losses",
+            ],
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

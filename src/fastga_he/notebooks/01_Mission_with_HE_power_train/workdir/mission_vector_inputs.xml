@@ -125,6 +125,9 @@
             <length units="m" is_input="True">3.0</length>
             <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
             <number_cables is_input="True">1.0</number_cables>
+            <cable>
+              <initial_temperature units="degK" is_input="True">288.15</initial_temperature>
+            </cable>
             <conductor>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the conducting core--></k_factor_radius>
             </conductor>

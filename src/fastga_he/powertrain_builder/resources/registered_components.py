@@ -105,7 +105,7 @@ DC_LINE = {
     CN_ID: "harness_id",
     CT: "DC_cable_harness",
     ATT: None,
-    PT: ["exterior_temperature", "settings:*"],
+    PT: ["exterior_temperature", "settings:*", "time_step"],
     IN: [("dc_voltage_in", None), (None, "dc_current")],
     OUT: [("dc_voltage_out", None), (None, "dc_current")],
     CTC: "connector",

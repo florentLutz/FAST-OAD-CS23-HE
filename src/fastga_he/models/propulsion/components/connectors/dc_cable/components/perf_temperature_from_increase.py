@@ -59,8 +59,8 @@ class PerformancesTemperatureFromIncrease(om.ExplicitComponent):
             + ":cable:initial_temperature"
         ]
 
-        temperature_profile = (
-            np.full(number_of_points, initial_temperature) + np.cumsum(d_temp) - d_temp[0]
+        temperature_profile = np.full(number_of_points, initial_temperature) + np.cumsum(
+            np.concatenate((np.zeros(1), d_temp[:-1]))
         )
 
         outputs["cable_temperature"] = temperature_profile

@@ -23,13 +23,13 @@ from ..components.sizing_heat_capacity import SizingHeatCapacityCable
 from ..components.sizing_cable_radius import SizingCableRadius
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from ..components.perf_losses_one_cable import PerformancesLossesOneCable
-from fastga_he.models.propulsion.components.connectors.dc_cable.components.stale.perf_temperature_derivative import (
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_temperature_derivative import (
     PerformancesTemperatureDerivative,
 )
-from fastga_he.models.propulsion.components.connectors.dc_cable.components.stale.perf_temperature_increase import (
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_temperature_increase import (
     PerformancesTemperatureIncrease,
 )
-from fastga_he.models.propulsion.components.connectors.dc_cable.components.stale.perf_temperature_from_increase import (
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_temperature_from_increase import (
     PerformancesTemperatureFromIncrease,
 )
 from ..components.perf_temperature import PerformancesTemperature
@@ -501,7 +501,7 @@ def test_perf_temperature_profile():
     )
 
     expected_temperature = np.array(
-        [288.15, 316.119, 341.832, 365.298, 386.526, 405.519, 422.283, 436.824, 449.148, 459.264]
+        [288.15, 318.378, 346.347, 372.06, 395.526, 416.754, 435.747, 452.511, 467.052, 479.376]
     )
     assert (
         problem.get_val(
@@ -514,7 +514,7 @@ def test_perf_temperature_profile():
     problem.check_partials(compact_print=True)
 
 
-def test_perf_temperature_profile_v2():
+def test_perf_temperature_profile_steady_state():
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -523,6 +523,7 @@ def test_perf_temperature_profile_v2():
         __file__,
         XML_FILE,
     )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 300.0))
     ivc.add_output(
         "conduction_losses",
         units="W",

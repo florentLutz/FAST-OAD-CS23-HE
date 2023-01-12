@@ -3,12 +3,15 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
+import fastoad.api as oad
 
 from .perf_resistance import PerformancesResistance
 from .perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from .perf_losses_one_cable import PerformancesLossesOneCable
 from .perf_temperature import PerformancesTemperature
 from .perf_maximum import PerformancesMaximum
+
+from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
 
 
 class PerformancesHarness(om.Group):
@@ -54,10 +57,21 @@ class PerformancesHarness(om.Group):
             PerformancesLossesOneCable(number_of_points=number_of_points),
             promotes=["conduction_losses"],
         )
+
+        options_dict = {"harness_id": harness_id, "number_of_points": number_of_points}
+
         self.add_subsystem(
             "temperature",
-            PerformancesTemperature(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "exterior_temperature", "cable_temperature", "conduction_losses"],
+            oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE, options=options_dict
+            ),
+            promotes=[
+                "data:*",
+                "exterior_temperature",
+                "cable_temperature",
+                "conduction_losses",
+                "time_step",
+            ],
         )
         # Though harness current depend on a variable stuck in the loop its output is not used in
         # the loop so we can take it out

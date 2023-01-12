@@ -173,20 +173,15 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         # of cruise which means, since the cruise time step is very wide, that it will be very
         # wide and lead to an overestimation of climb fuel. For this reason we will replace the
         # last time step of climb with the precedent to get a good estimate. This will only serve
-        # for the energy consumption calculation. Since this module might be used for something
-        # else than performances computation, the array might not be long enough for the index
-        # number_of_points_climb - 1 to be reachable. Though it is a clumsy way to do it,
-        # we will check that n = number_of_points_climb + number_of_points_cruise +
-        # number_of_points_descent and only perform the change above if it is the case.
+        # for the energy consumption calculation. Same remark holds for the end of descent and
+        # start of reserve.
         time_step = inputs["time_step"]
-        if (
-            number_of_points
-            == number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-            + number_of_points_reserve
-        ):
-            time_step[number_of_points_climb - 1] = time_step[number_of_points_climb - 2]
+        time_step[number_of_points_climb - 1] = time_step[number_of_points_climb - 2]
+        time_step[
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent - 1
+        ] = time_step[
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent - 2
+        ]
         outputs["time_step_econ"] = np.concatenate(
             (np.array([time_step_taxi_out]), time_step, np.array([time_step_taxi_in]))
         )

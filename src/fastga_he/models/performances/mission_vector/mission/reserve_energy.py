@@ -2,10 +2,17 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO.
 
+from deprecated import deprecated
+
 import numpy as np
 import openmdao.api as om
 
 
+@deprecated(
+    version="0.0.1",
+    reason="This method is no more the way we compute reserve, it is now computed as a proper "
+    "flight phase",
+)
 class ReserveEnergy(om.ExplicitComponent):
     """Computes the fuel consumed during the reserve phase."""
 
