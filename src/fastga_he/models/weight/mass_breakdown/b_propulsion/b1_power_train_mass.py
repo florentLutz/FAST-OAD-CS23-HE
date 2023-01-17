@@ -13,6 +13,10 @@ from fastga.models.weight.mass_breakdown.constants import SUBMODEL_PROPULSION_MA
     SUBMODEL_PROPULSION_MASS, "fastga_he.submodel.weight.mass.propulsion.power_train"
 )
 class PowerTrainMass(om.ExplicitComponent):
+    def initialize(self):
+        # Needed even if it isn't used because the original one has that option ...
+        self.options.declare("propulsion_id", default="", types=str)
+
     def setup(self):
 
         self.add_input("data:propulsion:he_power_train:mass", val=np.nan, units="kg")

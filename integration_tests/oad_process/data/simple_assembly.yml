@@ -1,0 +1,49 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  harness_1:
+    id: fastga_he.pt_component.dc_line
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+  battery_pack_1:
+    id: fastga_he.pt_component.battery_pack
+
+component_connections:
+  - source: propeller_1
+    target: motor_1
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: inverter_1
+    target: [dc_bus_1, 1]
+
+  - source: [dc_bus_1, 1]
+    target: harness_1
+
+  - source: harness_1
+    target: [dc_bus_2, 1]
+
+  - source: [dc_bus_2, 1]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: battery_pack_1
+
+watcher_file_path: ../results/power_train_data.csv

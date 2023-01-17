@@ -1,12 +1,12 @@
 <FASTOAD_model>
   <data>
     <TLAR>
-      <NPAX_design is_input="True">0.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>
+      <NPAX_design is_input="True">2.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">70.0<!--luggage design mass--></luggage_mass_design>
       <range units="km" is_input="True">250.0<!--top-level requirement: design range--></range>
       <v_approach units="knot" is_input="True">78.0<!--approach speed--></v_approach>
-      <v_cruise units="knot" is_input="True">150.0<!--cruise speed--></v_cruise>
-      <v_max_sl units="knot" is_input="True">160.0<!--maximum speed at sea level--></v_max_sl>
+      <v_cruise units="knot" is_input="True">160.0<!--cruise speed--></v_cruise>
+      <v_max_sl units="knot" is_input="True">171.0<!--maximum speed at sea level--></v_max_sl>
     </TLAR>
     <geometry>
       <flap_type is_input="True">1.0<!--flap type (0.0 - plain flap, 2.0 - single slotted flap, 3.0 - split flap)--></flap_type>

@@ -35,7 +35,7 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
         self.add_input("altitude", units="m", val=0.0, shape=number_of_points)
         self.add_input("thrust", units="N", val=1500, shape=number_of_points)
 
-        self.add_output("thrust_coefficient", val=0.05, shape=number_of_points)
+        self.add_output("thrust_coefficient", val=0.05, shape=number_of_points, lower=0.0)
 
         self.declare_partials(
             of="thrust_coefficient",
@@ -65,7 +65,11 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
         rho = Atmosphere(inputs["altitude"], altitude_in_feet=False).density
         rps = inputs["rpm"] / 60.0
 
-        outputs["thrust_coefficient"] = inputs["thrust"] / (rho * rps ** 2.0 * diameter ** 4.0)
+        # Ensuring we take the absolute value for the computation of thrust in case we eventually
+        # want to do some energy recovery
+        outputs["thrust_coefficient"] = np.abs(inputs["thrust"]) / (
+            rho * rps ** 2.0 * diameter ** 4.0
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]

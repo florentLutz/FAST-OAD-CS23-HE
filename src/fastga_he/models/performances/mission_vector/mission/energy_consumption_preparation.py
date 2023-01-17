@@ -2,9 +2,13 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO.
 
+import logging
+
 import numpy as np
 import openmdao.api as om
 from stdatm import Atmosphere
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class PrepareForEnergyConsumption(om.ExplicitComponent):
@@ -144,20 +148,23 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
-        number_of_points_reserve = self.options["number_of_points_reserve"]
-
-        number_of_points = (
-            number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-            + number_of_points_reserve
-        )
 
         thrust_taxi_out = float(inputs["data:mission:sizing:taxi_out:thrust"])
         thrust_taxi_in = float(inputs["data:mission:sizing:taxi_in:thrust"])
-        outputs["thrust_econ"] = np.concatenate(
+
+        thrust_econ = np.concatenate(
             (np.array([thrust_taxi_out]), inputs["thrust"], np.array([thrust_taxi_in]))
         )
+        if np.any(thrust_econ) < 50.0:
+            # _LOGGER.warning(
+            #     "Value of thrust required at some point of the flight too small, clipping"
+            # )
+            thrust_econ = np.abs(
+                thrust_econ,
+                np.full_like(thrust_econ, 50.0),
+            )
+
+        outputs["thrust_econ"] = thrust_econ
 
         outputs["altitude_econ"] = np.concatenate((np.zeros(1), inputs["altitude"], np.zeros(1)))
 
@@ -211,7 +218,12 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         )
 
         d_thrust_econ_d_thrust = np.zeros((number_of_points + 2, number_of_points))
-        d_thrust_econ_d_thrust[1 : number_of_points + 1, :] = np.eye(number_of_points)
+        d_thrust_econ_d_thrust_diagonal = np.where(
+            inputs["thrust"] > 0, np.ones_like(inputs["thrust"]), np.zeros_like(inputs["thrust"])
+        )
+        d_thrust_econ_d_thrust[1 : number_of_points + 1, :] = np.diag(
+            d_thrust_econ_d_thrust_diagonal
+        )
         partials["thrust_econ", "thrust"] = d_thrust_econ_d_thrust
 
         d_thrust_econ_d_thrust_to = np.zeros(number_of_points + 2)

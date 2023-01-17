@@ -21,8 +21,7 @@
         <max_differential_pressure units="Pa">0.0<!--0 = unpressurized / !=0 = pressurized and value of the maximum supported differential of pressure--></max_differential_pressure>
         <luggage>
           <front_compartment_first>0.0<!--1 front luggage compartment filled at max capacity first then the rear one / 0 = rear luggage compartment filled at max capacity first then the front one--></front_compartment_first>
-          <mass_max_front units="kg">0.0<!--maximum luggage weight in the unpressurized front luggage compartment--></mass_max_front>
-          <mass_max_rear units="kg">90.0<!--maximum luggage weight in the permanent rear luggage compartment--></mass_max_rear>
+          <mass_max units="kg">10.0<!--maximum luggage weight in the luggage compartment--></mass_max>
         </luggage>
         <seats>
           <passenger>
@@ -836,7 +835,8 @@
             <fuel units="kg" is_input="False">189.72706626359863<!--mass of consumed fuel during cruise phase in sizing mission--></fuel>
           </cruise>
           <descent>
-            <descent_rate units="ft/min" is_input="True">-300.0<!--target descent rate for the aircraft--></descent_rate>
+            <descent_rate units="ft/min" is_input="True">-300.0<!--target descent rate for the
+            aircraft--></descent_rate>
             <distance units="m" is_input="False">78932.47788602494<!--covered ground distance during descent phase--></distance>
             <duration units="s" is_input="False">1507.0131880557774<!--duration of descent phase in sizing mission--></duration>
             <fuel units="kg" is_input="False">7.660470157501762<!--mass of consumed fuel during descent phase in sizing mission--></fuel>

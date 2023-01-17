@@ -40,6 +40,7 @@ class PerformancesDutyCycle(om.ExplicitComponent):
             "duty_cycle",
             val=np.full(number_of_points, 0.5),
             desc="Duty cycle of the converter",
+            lower=np.full(number_of_points, 0.0),
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

@@ -85,6 +85,12 @@ INVERTER = {
         {"dc_current_in": "A"},
         {"diode_temperature": "degK"},
         {"IGBT_temperature": "degK"},
+        {"casing_temperature": "degK"},
+        {"losses_inverter": "W"},
+        {"switching_losses_IGBT": "W"},
+        {"switching_losses_diode": "W"},
+        {"conduction_losses_IGBT": "W"},
+        {"conduction_losses_diode": "W"},
     ],
 }
 DC_BUS = {

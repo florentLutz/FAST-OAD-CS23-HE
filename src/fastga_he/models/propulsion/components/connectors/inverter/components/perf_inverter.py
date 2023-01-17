@@ -28,6 +28,7 @@ class PerformancesInverter(om.Group):
         self.nonlinear_solver.options["iprint"] = 0
         self.nonlinear_solver.options["maxiter"] = 200
         self.nonlinear_solver.options["rtol"] = 1e-5
+        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):
@@ -71,7 +72,13 @@ class PerformancesInverter(om.Group):
         self.add_subsystem(
             "switching_losses",
             PerformancesSwitchingLosses(inverter_id=inverter_id, number_of_points=number_of_points),
-            promotes=["data:*", "ac_current_rms_out_one_phase", "switching_frequency"],
+            promotes=[
+                "data:*",
+                "ac_current_rms_out_one_phase",
+                "switching_frequency",
+                "switching_losses_IGBT",
+                "switching_losses_diode",
+            ],
         )
         self.add_subsystem(
             "resistance",
@@ -88,31 +95,62 @@ class PerformancesInverter(om.Group):
             PerformancesConductionLosses(
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
-            promotes=["data:*", "ac_current_rms_out_one_phase", "modulation_index"],
+            promotes=[
+                "data:*",
+                "ac_current_rms_out_one_phase",
+                "modulation_index",
+                "conduction_losses_IGBT",
+                "conduction_losses_diode",
+            ],
         )
         self.add_subsystem(
             "total_losses",
             PerformancesLosses(number_of_points=number_of_points),
-            promotes=[],
+            promotes=[
+                "losses_inverter",
+                "switching_losses_IGBT",
+                "switching_losses_diode",
+                "conduction_losses_IGBT",
+                "conduction_losses_diode",
+            ],
         )
         self.add_subsystem(
             "temperature_casing",
             PerformancesCasingTemperature(
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
-            promotes=["data:*", "heat_sink_temperature"],
+            promotes=[
+                "data:*",
+                "heat_sink_temperature",
+                "casing_temperature",
+                "losses_inverter",
+            ],
         )
         self.add_subsystem(
             "temperature_junction",
             PerformancesJunctionTemperature(
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
-            promotes=["data:*", "diode_temperature", "IGBT_temperature"],
+            promotes=[
+                "data:*",
+                "diode_temperature",
+                "IGBT_temperature",
+                "casing_temperature",
+                "switching_losses_IGBT",
+                "switching_losses_diode",
+                "conduction_losses_IGBT",
+                "conduction_losses_diode",
+            ],
         )
         self.add_subsystem(
             "efficiency",
             PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=["ac_current_rms_out_one_phase", "ac_voltage_rms_out", "efficiency"],
+            promotes=[
+                "ac_current_rms_out_one_phase",
+                "ac_voltage_rms_out",
+                "efficiency",
+                "losses_inverter",
+            ],
         )
         self.add_subsystem(
             "dc_side_current",
@@ -138,6 +176,8 @@ class PerformancesInverter(om.Group):
                 "modulation_index",
                 "diode_temperature",
                 "IGBT_temperature",
+                "casing_temperature",
+                "losses_inverter",
             ],
         )
 
@@ -145,34 +185,3 @@ class PerformancesInverter(om.Group):
         self.connect("gate_voltage.gate_voltage_igbt", "conduction_losses.gate_voltage_igbt")
         self.connect("resistance.resistance_diode", "conduction_losses.resistance_diode")
         self.connect("gate_voltage.gate_voltage_diode", "conduction_losses.gate_voltage_diode")
-        self.connect(
-            "conduction_losses.conduction_losses_diode",
-            [
-                "total_losses.conduction_losses_diode",
-                "temperature_junction.conduction_losses_diode",
-            ],
-        )
-        self.connect(
-            "conduction_losses.conduction_losses_IGBT",
-            ["total_losses.conduction_losses_IGBT", "temperature_junction.conduction_losses_IGBT"],
-        )
-        self.connect(
-            "switching_losses.switching_losses_diode",
-            ["total_losses.switching_losses_diode", "temperature_junction.switching_losses_diode"],
-        )
-        self.connect(
-            "switching_losses.switching_losses_IGBT",
-            ["total_losses.switching_losses_IGBT", "temperature_junction.switching_losses_IGBT"],
-        )
-        self.connect(
-            "total_losses.losses_inverter",
-            [
-                "temperature_casing.losses_inverter",
-                "efficiency.losses_inverter",
-                "maximum.losses_inverter",
-            ],
-        )
-        self.connect(
-            "temperature_casing.casing_temperature",
-            ["temperature_junction.casing_temperature", "maximum.casing_temperature"],
-        )
