@@ -2,7 +2,12 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-from ..constants import SUBMODEL_CONSTRAINTS_INVERTER
+from ..constants import (
+    SUBMODEL_CONSTRAINTS_INVERTER_CURRENT,
+    SUBMODEL_CONSTRAINTS_INVERTER_VOLTAGE,
+    SUBMODEL_CONSTRAINTS_INVERTER_LOSSES,
+    SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY,
+)
 
 import openmdao.api as om
 import numpy as np
@@ -10,17 +15,27 @@ import numpy as np
 import fastoad.api as oad
 
 oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_INVERTER
-] = "fastga_he.submodel.propulsion.constraints.inverter.enforce"
+    SUBMODEL_CONSTRAINTS_INVERTER_CURRENT
+] = "fastga_he.submodel.propulsion.constraints.inverter.current.enforce"
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_CONSTRAINTS_INVERTER_VOLTAGE
+] = "fastga_he.submodel.propulsion.constraints.inverter.voltage.enforce"
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_CONSTRAINTS_INVERTER_LOSSES
+] = "fastga_he.submodel.propulsion.constraints.inverter.losses.enforce"
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY
+] = "fastga_he.submodel.propulsion.constraints.inverter.frequency.enforce"
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_INVERTER, "fastga_he.submodel.propulsion.constraints.inverter.enforce"
+    SUBMODEL_CONSTRAINTS_INVERTER_CURRENT,
+    "fastga_he.submodel.propulsion.constraints.inverter.current.enforce",
 )
-class ConstraintsEnforce(om.ExplicitComponent):
+class ConstraintsCurrentEnforce(om.ExplicitComponent):
     """
-    Class that enforces that the maxima seen by the inverter during the mission are used for the
-    sizing, ensuring a fitted design of each component.
+    Class that enforces that the maximum current seen by the inverter during the mission is used
+    for the sizing, ensuring a fitted design of each component.
     """
 
     def initialize(self):
@@ -52,6 +67,38 @@ class ConstraintsEnforce(om.ExplicitComponent):
             val=1.0,
         )
 
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        inverter_id = self.options["inverter_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"
+        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max"]
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_INVERTER_VOLTAGE,
+    "fastga_he.submodel.propulsion.constraints.inverter.voltage.enforce",
+)
+class ConstraintsVoltageEnforce(om.ExplicitComponent):
+    """
+    Class that enforces that the maximum voltage seen by the inverter during the mission is used
+    for the sizing, ensuring a fitted design of each component.
+    """
+
+    def initialize(self):
+
+        self.options.declare(
+            name="inverter_id",
+            default=None,
+            desc="Identifier of the inverter",
+            allow_none=False,
+        )
+
+    def setup(self):
+
+        inverter_id = self.options["inverter_id"]
+
         self.add_input(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max",
             val=np.nan,
@@ -68,6 +115,38 @@ class ConstraintsEnforce(om.ExplicitComponent):
             val=1.0,
         )
 
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        inverter_id = self.options["inverter_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber"
+        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max"]
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_INVERTER_LOSSES,
+    "fastga_he.submodel.propulsion.constraints.inverter.losses.enforce",
+)
+class ConstraintsLossesEnforce(om.ExplicitComponent):
+    """
+    Class that enforces that the maximum losses seen by the inverter during the mission are used
+    for the sizing, ensuring a fitted design of each component.
+    """
+
+    def initialize(self):
+
+        self.options.declare(
+            name="inverter_id",
+            default=None,
+            desc="Identifier of the inverter",
+            allow_none=False,
+        )
+
+    def setup(self):
+
+        inverter_id = self.options["inverter_id"]
+
         self.add_input(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max",
             val=np.nan,
@@ -83,6 +162,38 @@ class ConstraintsEnforce(om.ExplicitComponent):
             wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max",
             val=1.0,
         )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        inverter_id = self.options["inverter_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat"
+        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max"]
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY,
+    "fastga_he.submodel.propulsion.constraints.inverter.frequency.enforce",
+)
+class ConstraintsFrequencyEnforce(om.ExplicitComponent):
+    """
+    Class that enforces that the maximum frequency seen by the inverter during the mission is used
+    for the sizing, ensuring a fitted design of each component.
+    """
+
+    def initialize(self):
+
+        self.options.declare(
+            name="inverter_id",
+            default=None,
+            desc="Identifier of the inverter",
+            allow_none=False,
+        )
+
+    def setup(self):
+
+        inverter_id = self.options["inverter_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:inverter:"
@@ -111,15 +222,6 @@ class ConstraintsEnforce(om.ExplicitComponent):
 
         inverter_id = self.options["inverter_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"
-        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max"]
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber"
-        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max"]
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat"
-        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max"]
         outputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency"
         ] = inputs[

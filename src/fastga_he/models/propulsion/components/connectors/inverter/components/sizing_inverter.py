@@ -5,7 +5,7 @@
 import openmdao.api as om
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_CONSTRAINTS_INVERTER
+from .cstr_inverter import ConstraintsInverter
 
 from .sizing_energy_coefficient_scaling import SizingInverterEnergyCoefficientScaling
 from .sizing_energy_coefficients import SizingInverterEnergyCoefficients
@@ -44,16 +44,9 @@ class SizingInverter(om.Group):
 
         inverter_id = self.options["inverter_id"]
 
-        # It was decided to add the constraints computation at the beginning of the sizing to
-        # ensure that both are ran along and to avoid having an additional id to add in the
-        # configuration file.
-        option_inverter_id = {"inverter_id": inverter_id}
-
         self.add_subsystem(
             name="constraints_inverter",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_INVERTER, options=option_inverter_id
-            ),
+            subsys=ConstraintsInverter(inverter_id=inverter_id),
             promotes=["*"],
         )
 

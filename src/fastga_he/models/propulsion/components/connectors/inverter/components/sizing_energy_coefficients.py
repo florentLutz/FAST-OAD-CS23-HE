@@ -27,13 +27,13 @@ class SizingInverterEnergyCoefficients(om.ExplicitComponent):
         self.options.declare(
             name="a_off_ref",
             types=float,
-            default=0.01507362815506554,
+            default=0.004248159711027629,
             desc="Reference constant coefficient for OFF commutation energy",
         )
         self.options.declare(
             name="a_rr_ref",
             types=float,
-            default=0.004248159711027629,
+            default=0.01507362815506554,
             desc="Reference constant coefficient for RR commutation energy",
         )
 
@@ -46,13 +46,13 @@ class SizingInverterEnergyCoefficients(om.ExplicitComponent):
         self.options.declare(
             name="b_off_ref",
             types=float,
-            default=0.0002539092853205021,
+            default=0.00034030311012866587,
             desc="Reference coefficient in front of current for OFF commutation energy",
         )
         self.options.declare(
             name="b_rr_ref",
             types=float,
-            default=0.00034030311012866587,
+            default=0.0002539092853205021,
             desc="Reference coefficient in front of current for RR commutation energy",
         )
 
@@ -65,13 +65,13 @@ class SizingInverterEnergyCoefficients(om.ExplicitComponent):
         self.options.declare(
             name="c_off_ref",
             types=float,
-            default=-1.739057882676467e-07,
+            default=-4.5116538387667774e-08,
             desc="Reference coefficient in front of current square for OFF commutation energy",
         )
         self.options.declare(
             name="c_rr_ref",
             types=float,
-            default=-4.5116538387667774e-08,
+            default=-1.739057882676467e-07,
             desc="Reference coefficient in front of current square for RR commutation energy",
         )
 

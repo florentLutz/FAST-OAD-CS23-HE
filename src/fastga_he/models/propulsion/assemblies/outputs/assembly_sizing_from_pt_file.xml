@@ -234,19 +234,19 @@
               <thermal_resistance units="degK/W" is_input="False">0.120375</thermal_resistance>
             </diode>
             <energy_off>
-              <a is_input="False">0.016957831674448733</a>
-              <b is_input="False">0.0002539092853205021</b>
-              <c is_input="False">-1.5458292290457484e-07</c>
+              <a is_input="False">0.003776141965357892</a>
+              <b is_input="False">0.00034030311012866587</b>
+              <c is_input="False">-5.0756105686126246e-08</c>
             </energy_off>
             <energy_on>
-              <a is_input="False">0.017845713952637392</a>
+              <a is_input="False">0.014100317197145593</a>
               <b is_input="False">3.3256504177779456e-05</b>
-              <c is_input="False">4.564158182753622e-07</c>
+              <c is_input="False">5.776512700047553e-07</c>
             </energy_on>
             <energy_rr>
-              <a is_input="False">0.004779179674906082</a>
-              <b is_input="False">0.00034030311012866587</b>
-              <c is_input="False">-4.0103589677926907e-08</c>
+              <a is_input="False">0.01339878058228048</a>
+              <b is_input="False">0.0002539092853205021</b>
+              <c is_input="False">-1.9564401180110255e-07</c>
             </energy_rr>
             <heat_sink>
               <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
@@ -289,8 +289,8 @@
               <width units="m" is_input="False">0.065<!--Width of one module--></width>
             </module>
             <scaling>
-              <a is_input="False">1.125</a>
-              <c is_input="False">0.8888888888888888</c>
+              <a is_input="False">0.8888888888888888</a>
+              <c is_input="False">1.125</c>
               <resistance is_input="False">1.125</resistance>
             </scaling>
             <tube>

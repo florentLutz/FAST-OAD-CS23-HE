@@ -58,12 +58,12 @@ class SizingInverterEnergyCoefficientScaling(om.ExplicitComponent):
 
         current_caliber_star = current_caliber / current_caliber_ref
 
-        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a"] = (
+        outputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a"
+        ] = current_caliber_star
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c"] = (
             current_caliber_star ** -1
         )
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c"
-        ] = current_caliber_star
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         inverter_id = self.options["inverter_id"]
@@ -76,11 +76,11 @@ class SizingInverterEnergyCoefficientScaling(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
         ] = (
-            -current_caliber_ref / current_caliber ** 2.0
+            1.0 / current_caliber_ref
         )
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:c",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
         ] = (
-            1.0 / current_caliber_ref
+            -current_caliber_ref / current_caliber ** 2.0
         )

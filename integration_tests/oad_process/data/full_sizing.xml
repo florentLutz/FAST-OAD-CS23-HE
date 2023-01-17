@@ -145,7 +145,7 @@
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_weight_fraction is_input="True">0.75<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_modules is_input="True">9.0<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <number_modules is_input="True">10.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
               <mass units="g" is_input="True">145.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
@@ -157,8 +157,8 @@
         </battery_pack>
         <inverter>
           <inverter_1>
-            <current_caliber units="A">225.0</current_caliber>
-            <current_ripple is_input="True">0.2<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
+            <current_caliber units="A">600.0</current_caliber>
+            <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>

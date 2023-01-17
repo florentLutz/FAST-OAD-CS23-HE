@@ -59,8 +59,18 @@ from ..components.perf_dc_current import PerformancesDCCurrent
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_inverter import PerformancesInverter
 
-from ..components.cstr_enforce import ConstraintsEnforce
-from ..components.cstr_ensure import ConstraintsEnsure
+from ..components.cstr_enforce import (
+    ConstraintsCurrentEnforce,
+    ConstraintsVoltageEnforce,
+    ConstraintsLossesEnforce,
+    ConstraintsFrequencyEnforce,
+)
+from ..components.cstr_ensure import (
+    ConstraintsCurrentEnsure,
+    ConstraintsVoltageEnsure,
+    ConstraintsLossesEnsure,
+    ConstraintsFrequencyEnsure,
+)
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -81,10 +91,10 @@ def test_scaling_ratio():
     problem = run_system(SizingInverterEnergyCoefficientScaling(inverter_id="inverter_1"), ivc)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:a"
-    ) == pytest.approx(1.039, rel=1e-2)
+    ) == pytest.approx(0.962, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:scaling:c"
-    ) == pytest.approx(0.962, rel=1e-2)
+    ) == pytest.approx(1.039, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -102,30 +112,30 @@ def test_energy_coefficient():
     ) == pytest.approx(0.02197006, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_rr:a"
-    ) == pytest.approx(0.0058837, rel=1e-2)
+    ) == pytest.approx(0.02087697, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_off:a"
-    ) == pytest.approx(0.02087697, rel=1e-2)
+    ) == pytest.approx(0.0058837, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_on:b"
     ) == pytest.approx(3.326e-05, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_rr:b"
-    ) == pytest.approx(0.000340, rel=1e-2)
+    ) == pytest.approx(0.000254, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_off:b"
-    ) == pytest.approx(0.000254, rel=1e-2)
+    ) == pytest.approx(0.000340, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_on:c"
     ) == pytest.approx(3.707e-7, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_rr:c"
-    ) == pytest.approx(-3.257e-8, rel=1e-2)
+    ) == pytest.approx(-1.256e-7, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:energy_off:c"
-    ) == pytest.approx(-1.256e-7, rel=1e-2)
+    ) == pytest.approx(-3.257e-8, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -678,16 +688,16 @@ def test_inverter_sizing():
     )
 
 
-def test_constraints_enforce():
+def test_constraints_enforce_current():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ConstraintsEnforce(inverter_id="inverter_1")),
+        list_inputs(ConstraintsCurrentEnforce(inverter_id="inverter_1")),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(ConstraintsEnforce(inverter_id="inverter_1"), ivc)
+    problem = run_system(ConstraintsCurrentEnforce(inverter_id="inverter_1"), ivc)
 
     assert (
         problem.get_val(
@@ -696,6 +706,21 @@ def test_constraints_enforce():
         )
         == pytest.approx(400.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_enforce_voltage():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnforce(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsVoltageEnforce(inverter_id="inverter_1"), ivc)
+
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:voltage_caliber",
@@ -703,6 +728,21 @@ def test_constraints_enforce():
         )
         == pytest.approx(500.00, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_enforce_losses():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsLossesEnforce(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsLossesEnforce(inverter_id="inverter_1"), ivc)
+
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:dissipable_heat",
@@ -710,6 +750,21 @@ def test_constraints_enforce():
         )
         == pytest.approx(11000.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_enforce_frequency():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsFrequencyEnforce(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsFrequencyEnforce(inverter_id="inverter_1"), ivc)
+
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:switching_frequency",
@@ -721,16 +776,16 @@ def test_constraints_enforce():
     problem.check_partials(compact_print=True)
 
 
-def test_constraints_ensure():
+def test_constraints_ensure_current():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ConstraintsEnsure(inverter_id="inverter_1")),
+        list_inputs(ConstraintsCurrentEnsure(inverter_id="inverter_1")),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(ConstraintsEnsure(inverter_id="inverter_1"), ivc)
+    problem = run_system(ConstraintsCurrentEnsure(inverter_id="inverter_1"), ivc)
 
     assert (
         problem.get_val(
@@ -739,6 +794,21 @@ def test_constraints_ensure():
         )
         == pytest.approx(-33.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure_voltage():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnsure(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsVoltageEnsure(inverter_id="inverter_1"), ivc)
+
     assert (
         problem.get_val(
             "constraints:propulsion:he_power_train:inverter:inverter_1:voltage_caliber",
@@ -746,6 +816,21 @@ def test_constraints_ensure():
         )
         == pytest.approx(0.00, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure_losses():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsLossesEnsure(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsLossesEnsure(inverter_id="inverter_1"), ivc)
+
     assert (
         problem.get_val(
             "constraints:propulsion:he_power_train:inverter:inverter_1:dissipable_heat",
@@ -753,6 +838,21 @@ def test_constraints_ensure():
         )
         == pytest.approx(-808.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure_frequency():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsFrequencyEnsure(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsFrequencyEnsure(inverter_id="inverter_1"), ivc)
+
     assert (
         problem.get_val(
             "constraints:propulsion:he_power_train:inverter:inverter_1:switching_frequency",

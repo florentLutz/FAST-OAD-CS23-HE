@@ -2,4 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-SUBMODEL_CONSTRAINTS_INVERTER = "submodel.propulsion.constraints.inverter"
+SUBMODEL_CONSTRAINTS_INVERTER_CURRENT = "submodel.propulsion.constraints.inverter.current"
+SUBMODEL_CONSTRAINTS_INVERTER_VOLTAGE = "submodel.propulsion.constraints.inverter.voltage"
+SUBMODEL_CONSTRAINTS_INVERTER_LOSSES = "submodel.propulsion.constraints.inverter.losses"
+SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY = "submodel.propulsion.constraints.inverter.frequency"

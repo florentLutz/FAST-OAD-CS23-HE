@@ -14,7 +14,7 @@ def test_dummy():
     logging.basicConfig(level=logging.WARNING)
 
     # Define used files depending on options
-    xml_file_name = "input_for_sizing.xml"
+    xml_file_name = "full_sizing.xml"
     process_file_name = "full_sizing.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))

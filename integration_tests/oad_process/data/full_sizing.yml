@@ -4,8 +4,8 @@ title: Sample OAD Process
 module_folders:
 
 # Input and output files
-input_file: ../results/mission_vector_inputs.xml
-output_file: ../results/mission_vector_outputs.xml
+input_file: ./full_sizing_in.xml
+output_file: ./full_sizing_out.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA', debug_print=["objs"])
@@ -42,7 +42,7 @@ model:
     number_of_points_descent: 20
     number_of_points_reserve: 10
     power_train_file_path: ./simple_assembly.yml
-    out_file: ../results/mission_data.csv
+    out_file: ./mission_data.csv
   hq:
     tail_sizing:
       id: fastga.handling_qualities.tail_sizing
@@ -58,11 +58,20 @@ model:
 
 submodels:
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
-  submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce
+  submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
+  submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.ensure
+  submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.ensure
   submodel.propulsion.constraints.battery: fastga_he.submodel.propulsion.constraints.battery.ensure
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
   submodel.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
   submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
+  submodel.performances.mission_vector.climb_speed: null 
+  submodel.performances.mission_vector.descent_speed: null
+  submodel.weight.mass.system.power_system: null
+  submodel.weight.mass.system.avionics_system: null
+  submodel.weight.mass.system.life_support_system: null
+  submodel.weight.mass.system.recording_system: null
+  submodel.geometry.nacelle.dimension: null
 
 optimization: # This section is needed only if optimization process is run
   design_variables:
