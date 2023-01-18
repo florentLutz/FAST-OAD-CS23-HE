@@ -150,7 +150,7 @@
               <mass units="g" is_input="True">145.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
             </cell>
             <module>
-              <number_cells is_input="True">100.0<!--Number of cells in series inside one battery module--></number_cells>
+              <number_cells is_input="True">95.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
           </battery_pack_1>
         </battery_pack>

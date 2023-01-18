@@ -41,14 +41,17 @@ class PerformancesDutyCycle(om.ExplicitComponent):
             val=np.full(number_of_points, 0.5),
             desc="Duty cycle of the converter",
             lower=np.full(number_of_points, 0.0),
+            upper=np.full(number_of_points, 1.0),
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["duty_cycle"] = inputs["dc_voltage_out"] / (
-            inputs["dc_voltage_out"] + inputs["dc_voltage_in"]
+        duty_cycle = inputs["dc_voltage_out"] / (inputs["dc_voltage_out"] + inputs["dc_voltage_in"])
+
+        outputs["duty_cycle"] = np.clip(
+            duty_cycle, np.full_like(duty_cycle, 1e-2), np.full_like(duty_cycle, 1 - 1e-2)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
