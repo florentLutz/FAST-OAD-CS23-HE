@@ -2,4 +2,5 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-SUBMODEL_CONSTRAINTS_DC_BUS = "submodel.propulsion.constraints.dc_bus"
+SUBMODEL_CONSTRAINTS_CURRENT_DC_BUS = "submodel.propulsion.constraints.dc_bus.current"
+SUBMODEL_CONSTRAINTS_VOLTAGE_DC_BUS = "submodel.propulsion.constraints.dc_bus.voltage"
