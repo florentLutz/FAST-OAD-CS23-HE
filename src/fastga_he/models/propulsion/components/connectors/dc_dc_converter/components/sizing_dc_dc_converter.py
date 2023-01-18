@@ -5,17 +5,17 @@
 import openmdao.api as om
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER
-
-from ..components.sizing_energy_coefficient_scaling import (
+from .sizing_energy_coefficient_scaling import (
     SizingDCDCConverterEnergyCoefficientScaling,
 )
-from ..components.sizing_energy_coefficients import SizingDCDCConverterEnergyCoefficients
-from ..components.sizing_resistance_scaling import SizingDCDCConverterResistanceScaling
-from ..components.sizing_reference_resistance import SizingDCDCConverterResistances
-from ..components.sizing_inductor_inductance import SizingDCDCConverterInductorInductance
-from ..components.sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
-from ..components.sizing_weight import SizingDCDCConverterWeight
+from .sizing_energy_coefficients import SizingDCDCConverterEnergyCoefficients
+from .sizing_resistance_scaling import SizingDCDCConverterResistanceScaling
+from .sizing_reference_resistance import SizingDCDCConverterResistances
+from .sizing_inductor_inductance import SizingDCDCConverterInductorInductance
+from .sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
+from .sizing_weight import SizingDCDCConverterWeight
+
+from .cstr_dc_dc_converter import ConstraintsDCDCConverter
 
 
 class SizingDCDCConverter(om.Group):
@@ -38,13 +38,9 @@ class SizingDCDCConverter(om.Group):
         # It was decided to add the constraints computation at the beginning of the sizing to
         # ensure that both are ran along and to avoid having an additional id to add in the
         # configuration file.
-        option_dc_dc_converter_id = {"dc_dc_converter_id": dc_dc_converter_id}
-
         self.add_subsystem(
             name="constraints_dc_dc_converter",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER, options=option_dc_dc_converter_id
-            ),
+            subsys=ConstraintsDCDCConverter(dc_dc_converter_id=dc_dc_converter_id),
             promotes=["*"],
         )
 

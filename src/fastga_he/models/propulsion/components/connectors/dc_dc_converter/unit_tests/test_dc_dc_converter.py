@@ -26,8 +26,24 @@ from ..components.perf_total_losses import PerformancesLosses
 from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_maximum import PerformancesMaximum
 
-from ..components.cstr_enforce import ConstraintsEnforce
-from ..components.cstr_ensure import ConstraintsEnsure
+from ..components.cstr_enforce import (
+    ConstraintsCurrentCapacitorEnforce,
+    ConstraintsCurrentInductorEnforce,
+    ConstraintsCurrentModuleEnforce,
+    ConstraintsCurrentInputEnforce,
+    ConstraintsVoltageEnforce,
+    ConstraintsVoltageInputEnforce,
+    ConstraintsFrequencyEnforce,
+)
+from ..components.cstr_ensure import (
+    ConstraintsCurrentCapacitorEnsure,
+    ConstraintsCurrentInductorEnsure,
+    ConstraintsCurrentModuleEnsure,
+    ConstraintsCurrentInputEnsure,
+    ConstraintsVoltageEnsure,
+    ConstraintsVoltageInputEnsure,
+    ConstraintsFrequencyEnsure,
+)
 
 from ..components.sizing_dc_dc_converter import SizingDCDCConverter
 
@@ -233,16 +249,18 @@ def test_converter_weight():
     problem.check_partials(compact_print=True)
 
 
-def test_constraints_enforce():
+def test_constraints_current_capacitor_enforce():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ConstraintsEnforce(dc_dc_converter_id="dc_dc_converter_1")),
+        list_inputs(ConstraintsCurrentCapacitorEnforce(dc_dc_converter_id="dc_dc_converter_1")),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(ConstraintsEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+    problem = run_system(
+        ConstraintsCurrentCapacitorEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
 
     assert (
         problem.get_val(
@@ -252,6 +270,23 @@ def test_constraints_enforce():
         )
         == pytest.approx(380.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_current_inductor_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentInductorEnforce(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsCurrentInductorEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor"
@@ -260,6 +295,23 @@ def test_constraints_enforce():
         )
         == pytest.approx(380.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_current_module_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentModuleEnforce(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsCurrentModuleEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:module"
@@ -268,6 +320,23 @@ def test_constraints_enforce():
         )
         == pytest.approx(390.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_current_input_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentInputEnforce(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsCurrentInputEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:current_in_caliber",
@@ -275,13 +344,21 @@ def test_constraints_enforce():
         )
         == pytest.approx(400.0, rel=1e-2)
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_in_caliber",
-            units="V",
-        )
-        == pytest.approx(860.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_voltage_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnforce(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
     )
+
+    problem = run_system(ConstraintsVoltageEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_caliber",
@@ -289,6 +366,45 @@ def test_constraints_enforce():
         )
         == pytest.approx(860.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_voltage_input_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageInputEnforce(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsVoltageInputEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_in_caliber",
+            units="V",
+        )
+        == pytest.approx(860.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_frequency_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsFrequencyEnforce(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsFrequencyEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency",
@@ -300,16 +416,18 @@ def test_constraints_enforce():
     problem.check_partials(compact_print=True)
 
 
-def test_constraints_ensure():
+def test_constraints_current_capacitor_ensure():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ConstraintsEnsure(dc_dc_converter_id="dc_dc_converter_1")),
+        list_inputs(ConstraintsCurrentCapacitorEnsure(dc_dc_converter_id="dc_dc_converter_1")),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(ConstraintsEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+    problem = run_system(
+        ConstraintsCurrentCapacitorEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
 
     assert (
         problem.get_val(
@@ -319,6 +437,23 @@ def test_constraints_ensure():
         )
         == pytest.approx(-20.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_current_inductor_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentInductorEnsure(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsCurrentInductorEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
     assert (
         problem.get_val(
             "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor"
@@ -327,6 +462,23 @@ def test_constraints_ensure():
         )
         == pytest.approx(-20.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_current_module_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentModuleEnsure(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsCurrentModuleEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
     assert (
         problem.get_val(
             "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:module"
@@ -335,6 +487,21 @@ def test_constraints_ensure():
         )
         == pytest.approx(-10.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_current_input_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentInputEnsure(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsCurrentInputEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
     assert (
         problem.get_val(
             "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:current_in_caliber",
@@ -342,13 +509,21 @@ def test_constraints_ensure():
         )
         == pytest.approx(0.0, rel=1e-2)
     )
-    assert (
-        problem.get_val(
-            "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_in_caliber",
-            units="V",
-        )
-        == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_voltage_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnsure(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
     )
+
+    problem = run_system(ConstraintsVoltageEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
     assert (
         problem.get_val(
             "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_caliber",
@@ -356,6 +531,43 @@ def test_constraints_ensure():
         )
         == pytest.approx(0.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_voltage_input_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageInputEnsure(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsVoltageInputEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_in_caliber",
+            units="V",
+        )
+        == pytest.approx(0.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_frequency_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsFrequencyEnsure(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsFrequencyEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
     assert (
         problem.get_val(
             "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency",
