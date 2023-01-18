@@ -2,7 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-from ..constants import SUBMODEL_CONSTRAINTS_BATTERY
+from ..constants import SUBMODEL_CONSTRAINTS_BATTERY_SOC
 
 import openmdao.api as om
 import numpy as np
@@ -11,11 +11,12 @@ import fastoad.api as oad
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_BATTERY, "fastga_he.submodel.propulsion.constraints.battery.enforce"
+    SUBMODEL_CONSTRAINTS_BATTERY_SOC,
+    "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce",
 )
-class ConstraintsEnforce(om.ExplicitComponent):
+class ConstraintsSOCEnforce(om.ExplicitComponent):
     """
-    Class that enforces that the maxima seen by the battery during the mission are used for the
+    Class that enforces that the minimum SOC seen by the battery during the mission is used for the
     sizing, ensuring a fitted design of each component. For now only enforces that the number of
     module is readjusted to match the minimum SOC level required.
     """

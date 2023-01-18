@@ -2,7 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-from ..constants import SUBMODEL_CONSTRAINTS_BATTERY
+from ..constants import SUBMODEL_CONSTRAINTS_BATTERY_SOC
 
 import openmdao.api as om
 import numpy as np
@@ -11,16 +11,17 @@ import fastoad.api as oad
 
 
 oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_BATTERY
-] = "fastga_he.submodel.propulsion.constraints.battery.ensure"
+    SUBMODEL_CONSTRAINTS_BATTERY_SOC
+] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure"
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_BATTERY, "fastga_he.submodel.propulsion.constraints.battery.ensure"
+    SUBMODEL_CONSTRAINTS_BATTERY_SOC,
+    "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure",
 )
-class ConstraintsEnsure(om.ExplicitComponent):
+class ConstraintsSOCEnsure(om.ExplicitComponent):
     """
-    Class that computes the difference between the maximum seen by the battery during the
+    Class that computes the difference between the minimum SOC seen by the battery during the
     mission and the value used for sizing, ensuring each component works below its maxima.
     """
 

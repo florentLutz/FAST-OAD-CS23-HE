@@ -9,7 +9,7 @@ from .sizing_module_weight import SizingBatteryModuleWeight
 from .sizing_battery_weight import SizingBatteryWeight
 from .sizing_number_cells import SizingBatteryNumberCells
 
-from ..constants import SUBMODEL_CONSTRAINTS_BATTERY
+from .cstr_battery_pack import ConstraintsBattery
 
 
 class SizingBatteryPack(om.Group):
@@ -31,13 +31,9 @@ class SizingBatteryPack(om.Group):
         # It was decided to add the constraints computation at the beginning of the sizing to
         # ensure that both are ran along and to avoid having an additional id to add in the
         # configuration file.
-        option_battery_pack_id = {"battery_pack_id": battery_pack_id}
-
         self.add_subsystem(
             name="constraints_battery",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_BATTERY, options=option_battery_pack_id
-            ),
+            subsys=ConstraintsBattery(battery_pack_id=battery_pack_id),
             promotes=["*"],
         )
 

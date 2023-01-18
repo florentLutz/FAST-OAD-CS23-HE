@@ -2,4 +2,4 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-SUBMODEL_CONSTRAINTS_BATTERY = "submodel.propulsion.constraints.battery"
+SUBMODEL_CONSTRAINTS_BATTERY_SOC = "submodel.propulsion.constraints.battery.state_of_charge"

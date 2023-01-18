@@ -26,8 +26,8 @@ from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
-from ..components.cstr_ensure import ConstraintsEnsure
-from ..components.cstr_enforce import ConstraintsEnforce
+from ..components.cstr_ensure import ConstraintsSOCEnsure
+from ..components.cstr_enforce import ConstraintsSOCEnforce
 
 from ..components.sizing_battery_pack import SizingBatteryPack
 from ..components.perf_battery_pack import PerformancesBatteryPack
@@ -101,18 +101,18 @@ def test_battery_cell_number():
     problem.check_partials(compact_print=True)
 
 
-def test_constraints_enforce():
+def test_constraints_enforce_soc():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ConstraintsEnforce(battery_pack_id="battery_pack_1")),
+        list_inputs(ConstraintsSOCEnforce(battery_pack_id="battery_pack_1")),
         __file__,
         XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        ConstraintsEnforce(battery_pack_id="battery_pack_1"),
+        ConstraintsSOCEnforce(battery_pack_id="battery_pack_1"),
         ivc,
     )
     assert (
@@ -126,18 +126,18 @@ def test_constraints_enforce():
     problem.check_partials(compact_print=True)
 
 
-def test_constraints_ensure():
+def test_constraints_ensure_soc():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ConstraintsEnsure(battery_pack_id="battery_pack_1")),
+        list_inputs(ConstraintsSOCEnsure(battery_pack_id="battery_pack_1")),
         __file__,
         XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        ConstraintsEnsure(battery_pack_id="battery_pack_1"),
+        ConstraintsSOCEnsure(battery_pack_id="battery_pack_1"),
         ivc,
     )
     assert (

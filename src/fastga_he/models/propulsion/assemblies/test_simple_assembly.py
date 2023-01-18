@@ -189,8 +189,8 @@ def test_performances_sizing_assembly_battery_enforce():
         "submodel.propulsion.constraints.pmsm.rpm"
     ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.battery"
-    ] = "fastga_he.submodel.propulsion.constraints.battery.enforce"
+        "submodel.propulsion.constraints.battery.state_of_charge"
+    ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce"
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
