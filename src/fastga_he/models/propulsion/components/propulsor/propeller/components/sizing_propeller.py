@@ -7,7 +7,7 @@ import fastoad.api as oad
 
 from .sizing_weight import SizingPropellerWeight
 
-from ..constants import SUBMODEL_CONSTRAINTS_PROPELLER
+from .cstr_propeller import ConstraintsPropeller
 
 
 class SizingPropeller(om.Group):
@@ -24,13 +24,9 @@ class SizingPropeller(om.Group):
         # It was decided to add the constraints computation at the beginning of the sizing to
         # ensure that both are ran along and to avoid having an additional id to add in the
         # configuration file.
-        option_propeller_id = {"propeller_id": propeller_id}
-
         self.add_subsystem(
             name="constraints_propeller",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_PROPELLER, options=option_propeller_id
-            ),
+            subsys=ConstraintsPropeller(propeller_id=propeller_id),
             promotes=["*"],
         )
 

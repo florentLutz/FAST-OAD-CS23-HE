@@ -2,7 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-from ..constants import SUBMODEL_CONSTRAINTS_PROPELLER
+from ..constants import SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE
 
 import openmdao.api as om
 import numpy as np
@@ -10,17 +10,18 @@ import numpy as np
 import fastoad.api as oad
 
 oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_PROPELLER
-] = "fastga_he.submodel.propulsion.constraints.propeller.enforce"
+    SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE
+] = "fastga_he.submodel.propulsion.constraints.propeller.torque.enforce"
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_PROPELLER, "fastga_he.submodel.propulsion.constraints.propeller.enforce"
+    SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE,
+    "fastga_he.submodel.propulsion.constraints.propeller.torque.enforce",
 )
-class ConstraintsEnforce(om.ExplicitComponent):
+class ConstraintsTorqueEnforce(om.ExplicitComponent):
     """
-    Class that enforces that the maxima seen by the propeller during the mission are used for the
-    sizing, ensuring a fitted design of each component.
+    Class that enforces that the maximum torque seen by the propeller during the mission is used
+    for the sizing, ensuring a fitted design of each component.
     """
 
     def initialize(self):

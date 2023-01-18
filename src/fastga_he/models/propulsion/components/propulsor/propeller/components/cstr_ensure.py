@@ -2,7 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-from ..constants import SUBMODEL_CONSTRAINTS_PROPELLER
+from ..constants import SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE
 
 import openmdao.api as om
 import numpy as np
@@ -11,11 +11,12 @@ import fastoad.api as oad
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_PROPELLER, "fastga_he.submodel.propulsion.constraints.propeller.ensure"
+    SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE,
+    "fastga_he.submodel.propulsion.constraints.propeller.torque.ensure",
 )
-class ConstraintsEnsure(om.ExplicitComponent):
+class ConstraintsTorqueEnsure(om.ExplicitComponent):
     """
-    Class that computes the difference between the maximum seen by the propeller during the
+    Class that computes the difference between the maximum torque seen by the propeller during the
     mission and the value used for sizing, ensuring each component works below its maxima.
     """
 

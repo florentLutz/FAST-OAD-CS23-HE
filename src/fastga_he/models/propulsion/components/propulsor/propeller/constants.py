@@ -2,4 +2,4 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-SUBMODEL_CONSTRAINTS_PROPELLER = "submodel.propulsion.constraints.propeller"
+SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE = "submodel.propulsion.constraints.propeller.torque"
