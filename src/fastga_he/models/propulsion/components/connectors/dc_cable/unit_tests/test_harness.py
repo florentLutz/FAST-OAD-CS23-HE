@@ -35,8 +35,8 @@ from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_
 from ..components.perf_temperature import PerformancesTemperature
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_maximum import PerformancesMaximum
-from ..components.cstr_enforce import ConstraintsEnforce
-from ..components.cstr_ensure import ConstraintsEnsure
+from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
+from ..components.cstr_ensure import ConstraintsCurrentEnsure, ConstraintsVoltageEnsure
 
 from ..components.perf_harness import PerformancesHarness
 from ..components.sizing_harness import SizingHarness
@@ -642,18 +642,31 @@ def test_maximum():
     problem.check_partials(compact_print=True)
 
 
-def test_constraints_enforce():
+def test_constraints_current_enforce():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ConstraintsEnforce(harness_id="harness_1")), __file__, XML_FILE
+        list_inputs(ConstraintsCurrentEnforce(harness_id="harness_1")), __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(ConstraintsEnforce(harness_id="harness_1"), ivc)
+    problem = run_system(ConstraintsCurrentEnforce(harness_id="harness_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:current_caliber", units="A"
     ) == pytest.approx(650.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_voltage_enforce():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnforce(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsVoltageEnforce(harness_id="harness_1"), ivc)
+
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_caliber", units="V"
     ) == pytest.approx(800.0, rel=1e-2)
@@ -661,14 +674,14 @@ def test_constraints_enforce():
     problem.check_partials(compact_print=True)
 
 
-def test_constraints_ensure():
+def test_constraints_current_ensure():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ConstraintsEnsure(harness_id="harness_1")), __file__, XML_FILE
+        list_inputs(ConstraintsCurrentEnsure(harness_id="harness_1")), __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(ConstraintsEnsure(harness_id="harness_1"), ivc)
+    problem = run_system(ConstraintsCurrentEnsure(harness_id="harness_1"), ivc)
 
     assert (
         problem.get_val(
@@ -677,6 +690,19 @@ def test_constraints_ensure():
         )
         == pytest.approx(-50.0, rel=1e-2)
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_voltage_ensure():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnsure(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsVoltageEnsure(harness_id="harness_1"), ivc)
+
     assert (
         problem.get_val(
             "constraints:propulsion:he_power_train:DC_cable_harness:harness_1:voltage_caliber",

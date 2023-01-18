@@ -5,8 +5,6 @@
 import openmdao.api as om
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_CONSTRAINTS_DC_LINE
-
 from .sizing_material_core import SizingMaterialCore
 from .sizing_current_per_cable import SizingCurrentPerCable
 from .sizing_cable_gauge import SizingCableGauge
@@ -20,6 +18,8 @@ from .sizing_reference_resistance import SizingReferenceResistance
 from .sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
 from .sizing_heat_capacity import SizingHeatCapacityCable
 from .sizing_cable_radius import SizingCableRadius
+
+from .cstr_harness import ConstraintsHarness
 
 
 class SizingHarness(om.Group):
@@ -38,13 +38,10 @@ class SizingHarness(om.Group):
         # It was decided to add the constraints computation at the beginning of the sizing to
         # ensure that both are ran along and to avoid having an additional id to add in the
         # configuration file.
-        option_harness_id = {"harness_id": harness_id}
 
         self.add_subsystem(
             name="constraints_dc_line",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_DC_LINE, options=option_harness_id
-            ),
+            subsys=ConstraintsHarness(harness_id=harness_id),
             promotes=["*"],
         )
 
