@@ -48,12 +48,12 @@ class SizingInverterWeight(om.ExplicitComponent):
             units="kg",
             desc="Weight of the control card, is generally constant, taken at 1 kg",
         )
-        self.add_input(
-            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:mass",
-            units="kg",
-            val=np.nan,
-            desc="Mass of the 3 single phase inductor",
-        )
+        # self.add_input(
+        #     name="data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:mass",
+        #     units="kg",
+        #     val=np.nan,
+        #     desc="Mass of the 3 single phase inductor",
+        # )
         self.add_input(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":contactor:mass",
             units="kg",
@@ -81,7 +81,7 @@ class SizingInverterWeight(om.ExplicitComponent):
             + inputs[
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":control_card:mass"
             ]
-            + inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:mass"]
+            # + inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:mass"]
             + inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":contactor:mass"]
         )
 
@@ -105,10 +105,10 @@ class SizingInverterWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":mass",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":control_card:mass",
         ] = 1.0
-        partials[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":mass",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:mass",
-        ] = 1.0
+        # partials[
+        #     "data:propulsion:he_power_train:inverter:" + inverter_id + ":mass",
+        #     "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:mass",
+        # ] = 1.0
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":mass",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":contactor:mass",

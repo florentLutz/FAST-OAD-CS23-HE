@@ -633,7 +633,7 @@ def test_inverter_weight():
             "data:propulsion:he_power_train:inverter:inverter_1:mass",
             units="kg",
         )
-        == pytest.approx(42.41, rel=1e-2)
+        == pytest.approx(11.3456, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -677,7 +677,7 @@ def test_inverter_sizing():
             "data:propulsion:he_power_train:inverter:inverter_1:mass",
             units="kg",
         )
-        == pytest.approx(40.69, rel=1e-2)
+        == pytest.approx(52.156, rel=1e-2)
     )
     assert (
         problem.get_val(

@@ -245,9 +245,9 @@
             <dissipable_heat units="W" is_input="False">16597.81737523753<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <losses_max units="W" is_input="False">16597.817381288016</losses_max>
-            <mass units="kg" is_input="False">46.250023294104416<!--Mass of the inverter--></mass>
+            <mass units="kg" is_input="False">34.36622274636325<!--Mass of the inverter--></mass>
             <modulation_idx_max is_input="False">0.11432009091831861<!--Maximum modulation index during the mission--></modulation_idx_max>
-            <power_density units="kW/kg" is_input="False">4.570984911992366<!--Power density of the inverter--></power_density>
+            <power_density units="kW/kg" is_input="False">6.151626270274893<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>

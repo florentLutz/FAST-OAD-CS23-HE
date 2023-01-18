@@ -215,8 +215,8 @@
             <current_ripple is_input="True">0.2<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <dissipable_heat units="W" is_input="False">11000.0<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <losses_max units="W" is_input="True">11000.0</losses_max>
-            <mass units="kg" is_input="False">40.69162227488438<!--Mass of the inverter--></mass>
-            <power_density units="kW/kg" is_input="False">14.745049876527805<!--Power density of the inverter--></power_density>
+            <mass units="kg" is_input="False">11.503759301821503<!--Mass of the inverter--></mass>
+            <power_density units="kW/kg" is_input="False">52.15686318341137<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="True">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
