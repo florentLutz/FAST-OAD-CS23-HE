@@ -18,7 +18,7 @@ class ComputValveMass(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         m_flow = inputs["data:thermal:coolant:mass_flow"]
-
+ù
         M_valve = 0.568 * (m_flow**0.55410)
 
         outputs["data:thermal:valve:mass"] = M_valve
