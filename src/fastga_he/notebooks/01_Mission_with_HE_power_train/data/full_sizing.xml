@@ -78,7 +78,7 @@
       </wing>
       <propulsion>
         <engine>
-          <count is_input="True">2.0<!--number of engines--></count>
+          <count is_input="True">1.0<!--number of engines--></count>
           <layout is_input="True">3.0<!--position of engines (1=under the wing / 2=rear fuselage)--></layout>
           <y_ratio is_input="True">0.34<!--engine position with respect to total span--></y_ratio>
         </engine>
@@ -147,6 +147,7 @@
             <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_modules is_input="True">9.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
+              <volume units="mL">155.0</volume>
               <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
               <mass units="g" is_input="True">145.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
             </cell>

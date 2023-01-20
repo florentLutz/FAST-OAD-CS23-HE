@@ -3,3 +3,5 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 SUBMODEL_CONSTRAINTS_BATTERY_SOC = "submodel.propulsion.constraints.battery.state_of_charge"
+
+POSSIBLE_POSITION = ["inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"]
