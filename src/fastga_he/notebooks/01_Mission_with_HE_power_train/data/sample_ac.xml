@@ -243,6 +243,7 @@
                             <mass units="kg">198.4</mass>
                         </module>
                         <cell>
+                            <volume units="mL">155.0</volume>
                             <capacity units="A*h">20.0</capacity>
                             <mass units="g">160.0</mass>
                         </cell>

@@ -4,18 +4,24 @@
   <thrust units="N" is_input="True">[1550.0, 1538.888888888889, 1527.7777777777778, 1516.6666666666667, 1505.5555555555557, 1494.4444444444443, 1483.3333333333333, 1472.2222222222222, 1461.111111111111, 1450.0]</thrust>
   <time_step units="s" is_input="True">[500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0]</time_step>
   <true_airspeed units="m/s" is_input="True">[81.8, 82.76666666666667, 83.73333333333333, 84.7, 85.66666666666667, 86.63333333333333, 87.6, 88.56666666666666, 89.53333333333333, 90.5]</true_airspeed>
-  <constraints>
-    <propulsion>
-      <he_power_train>
-        <PMSM>
-          <motor_1>
-            <rpm_rating units="1/min" is_input="False">-3000.0<!--Respected if <0--></rpm_rating>
-          </motor_1>
-        </PMSM>
-      </he_power_train>
-    </propulsion>
-  </constraints>
   <data>
+    <geometry>
+      <wing>
+        <span units="m" is_input="True">9.237463382822208<!--wing span--></span>
+        <MAC>
+          <length units="m" is_input="True">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+          <at25percent>
+            <x units="m" is_input="True">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+          </at25percent>
+        </MAC>
+        <root>
+          <chord units="m" is_input="True">0.7672311779752663<!--chord length at wing root--></chord>
+        </root>
+        <tip>
+          <chord units="m" is_input="True">0.7672311779752663<!--chord length at wing tip--></chord>
+        </tip>
+      </wing>
+    </geometry>
     <propulsion>
       <he_power_train>
         <DC_DC_converter>
@@ -213,21 +219,39 @@
             <SOC_min units="percent" is_input="False">20.096797915396024<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">0.71003822830502<!--Minimum state-of-charge of the battery during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <mass units="kg" is_input="False">3927.311636849219<!--Mass of the battery pack--></mass>
             <min_safe_SOC is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_cells is_input="False">3958.983504888326<!--Total number of cells in the battery pack--></number_cells>
             <number_modules is_input="False">19.79491752444163<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <volume units="L" is_input="False">767.0530540721131<!--Volume of the battery pack--></volume>
+            <CG>
+              <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
+            </CG>
             <cell>
               <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
               <losses_max units="W" is_input="False">1.7522478310005984<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <mass units="g" is_input="True">496.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
               <voltage_max units="V" is_input="False">4.002463287968649<!--Maximum voltage needed by the cells during the mission--></voltage_max>
               <voltage_min units="V" is_input="False">3.41032960841407<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <volume units="mL" is_input="True">155.0<!--Volume of the cell used for the assembly of the battery pack--></volume>
             </cell>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <dimension>
+              <height units="m" is_input="False">0.4058613525658901<!--Height of the battery, as in the size of the battery along the Z-axis--></height>
+              <length units="m" is_input="False">0.5114874519835109<!--Length of the battery, as in the size of the battery along the X-axis--></length>
+              <width units="m" is_input="False">3.6949853531288834<!--Width of the battery, as in the size of the battery along the Y-axis--></width>
+            </dimension>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
             <module>
               <mass units="kg" is_input="False">198.4<!--Mass of one module of the battery--></mass>
               <number_cells is_input="True">200.0<!--Number of cells in series inside one battery module--></number_cells>
+              <volume units="L" is_input="False">38.75<!--Volume of one module of the battery--></volume>
             </module>
           </battery_pack_1>
         </battery_pack>
@@ -371,6 +395,17 @@
       </he_power_train>
     </propulsion>
   </data>
+  <constraints>
+    <propulsion>
+      <he_power_train>
+        <PMSM>
+          <motor_1>
+            <rpm_rating units="1/min" is_input="False">-3000.0<!--Respected if <0--></rpm_rating>
+          </motor_1>
+        </PMSM>
+      </he_power_train>
+    </propulsion>
+  </constraints>
   <settings>
     <propulsion>
       <he_power_train>

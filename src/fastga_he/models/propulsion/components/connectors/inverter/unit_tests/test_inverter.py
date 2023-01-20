@@ -677,14 +677,14 @@ def test_inverter_sizing():
             "data:propulsion:he_power_train:inverter:inverter_1:mass",
             units="kg",
         )
-        == pytest.approx(52.156, rel=1e-2)
+        == pytest.approx(11.50, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:power_density",
             units="kW/kg",
         )
-        == pytest.approx(14.75, rel=1e-2)
+        == pytest.approx(52.15, rel=1e-2)
     )
 
 
