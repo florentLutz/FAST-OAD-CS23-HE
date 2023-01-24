@@ -8,6 +8,8 @@ import pytest
 import openmdao.api as om
 
 from ..components.sizing_weight import SizingPropellerWeight
+from ..components.sizing_propeller_depth import SizingPropellerDepth
+from ..components.sizing_propeller_cg import SizingPropellerCG
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_advance_ratio import PerformancesAdvanceRatio
 from ..components.perf_tip_mach import PerformancesTipMach
@@ -23,6 +25,8 @@ from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
 from ..components.perf_propeller import PerformancesPropeller
 from ..components.sizing_propeller import SizingPropeller
+
+from ..constants import POSSIBLE_POSITION
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -45,6 +49,42 @@ def test_weight():
     )  # Real value for Cirrus SR22 prop is 75 lbs
 
     problem.check_partials(compact_print=True)
+
+
+def test_depth():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingPropellerDepth(propeller_id="propeller_1")), __file__, XML_FILE
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingPropellerDepth(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:depth", units="m"
+    ) == pytest.approx(0.30, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_propeller_cg():
+
+    expected_cg = [2.2, 0.15]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(SizingPropellerCG(propeller_id="propeller_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(SizingPropellerCG(propeller_id="propeller_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:propeller:propeller_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
 
 
 def test_constraints_torque_enforce():
@@ -444,6 +484,15 @@ def test_sizing_propeller():
     ) == pytest.approx(
         80.1, rel=1e-2
     )  # Real value for Cirrus SR22 prop is 75 lbs
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:depth", units="m"
+    ) == pytest.approx(0.30, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:CG:x", units="m"
+    ) == pytest.approx(2.2, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:low_speed:CD0"
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

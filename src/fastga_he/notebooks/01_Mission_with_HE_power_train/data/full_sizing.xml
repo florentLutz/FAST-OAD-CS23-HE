@@ -209,6 +209,7 @@
         </inverter>
         <propeller>
           <propeller_1>
+            <from_LE units="m">0.15</from_LE>
             <activity_factor is_input="True">125.0<!--Activity factor of the propeller--></activity_factor>
             <blade_twist units="deg" is_input="True">20.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <diameter units="inch" is_input="True">65.0<!--Diameter of the propeller--></diameter>

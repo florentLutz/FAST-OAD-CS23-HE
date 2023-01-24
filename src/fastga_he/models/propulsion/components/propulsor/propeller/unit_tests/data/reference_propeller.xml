@@ -1,9 +1,21 @@
 <FASTOAD_model>
     <data>
+        <geometry>
+            <wing>
+                <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
         <propulsion>
             <he_power_train>
                 <propeller>
                     <propeller_1>
+                        <depth units="m">0.3</depth>
+                        <from_LE units="m">0.15</from_LE>
                         <rpm_mission>2500.0</rpm_mission>
                         <solidity>0.2</solidity>
                         <activity_factor>150</activity_factor>

@@ -380,7 +380,10 @@
             <activity_factor is_input="True">150.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">1.37038158691702<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">22.6<!--Twist between the propeller blade root and tip--></blade_twist>
+            <depth units="cm" is_input="False">29.718<!--Depth of the propeller--></depth>
+            <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
+            <from_LE units="m" is_input="True">0.15<!--Distance between the propeller and the leading edge--></from_LE>
             <mass units="kg" is_input="False">36.325959926133095</mass>
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
@@ -390,6 +393,15 @@
             <tip_mach_max is_input="False">0.44243515198268096<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
             <torque_max units="N*m" is_input="False">809.4466318792784<!--Maximum value of the propeller torque--></torque_max>
             <torque_rating units="N*m" is_input="False">809.4466318792784<!--Maximum value of the propeller torque used for the sizing--></torque_rating>
+            <CG>
+              <x units="m" is_input="False">2.202458712937498<!--X position of the propeller center of gravity--></x>
+            </CG>
+            <cruise>
+              <CD0 is_input="True">0.0</CD0>
+            </cruise>
+            <low_speed>
+              <CD0 is_input="True">0.0</CD0>
+            </low_speed>
           </propeller_1>
         </propeller>
       </he_power_train>

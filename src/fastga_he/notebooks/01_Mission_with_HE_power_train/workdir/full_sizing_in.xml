@@ -210,11 +210,19 @@
           <propeller_1>
             <activity_factor is_input="True">125.0<!--Activity factor of the propeller--></activity_factor>
             <blade_twist units="deg" is_input="True">20.5<!--Twist between the propeller blade root and tip--></blade_twist>
+            <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="inch" is_input="True">65.0<!--Diameter of the propeller--></diameter>
+            <from_LE units="m" is_input="True">0.15<!--Distance between the propeller and the leading edge--></from_LE>
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.1<!--Solidity of the propeller--></solidity>
+            <cruise>
+              <CD0 is_input="True">0.0</CD0>
+            </cruise>
+            <low_speed>
+              <CD0 is_input="True">0.0</CD0>
+            </low_speed>
           </propeller_1>
         </propeller>
         <DC_bus>

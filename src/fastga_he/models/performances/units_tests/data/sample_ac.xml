@@ -459,6 +459,7 @@
                 </PMSM>
                 <propeller>
                     <propeller_1>
+                        <from_LE units="m">0.15</from_LE>
                         <mass units="kg">36.35</mass>
                         <rpm_mission>2000.0</rpm_mission>
                         <solidity>0.2</solidity>

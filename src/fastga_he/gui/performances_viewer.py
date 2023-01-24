@@ -103,6 +103,10 @@ class PerformancesViewer:
 
         self.data = all_data
 
+        # Used to store the minimum values display in the graph so that we can readjust the axis
+        self.y_min = np.inf
+        self.y_max = -np.inf
+
         self._initialize_widgets()
 
     def _initialize_widgets(self):
@@ -120,6 +124,10 @@ class PerformancesViewer:
             with output:
 
                 clear_output(wait=True)
+
+                # Reset axis_range
+                self.y_min = np.inf
+                self.y_max = -np.inf
 
                 x_name = self._x_widget.value
                 y_name = self._y_widget.value
@@ -148,6 +156,7 @@ class PerformancesViewer:
                             legendgroup="Primary axis",
                             legendgrouptitle_text="primary_axis",
                         )
+                        self.readjust_axis(y)
 
                         if y2_name != "None":
                             y_2 = self.data.loc[self.data["name"] == name, y2_name]
@@ -160,6 +169,7 @@ class PerformancesViewer:
                                 legendgroup="Secondary axis",
                                 legendgrouptitle_text="secondary_axis",
                             )
+                            self.readjust_axis(y_2)
 
                             fig.add_trace(scatter, secondary_y=False)
                             fig.add_trace(scatter_2, secondary_y=True)
@@ -180,6 +190,7 @@ class PerformancesViewer:
                         legendgroup="Primary axis",
                         legendgrouptitle_text="primary_axis",
                     )
+                    self.readjust_axis(y)
 
                     if y2_name != "None":
                         y_2 = self.data[y2_name]
@@ -190,6 +201,7 @@ class PerformancesViewer:
                             legendgroup="Secondary axis",
                             legendgrouptitle_text="secondary_axis",
                         )
+                        self.readjust_axis(y_2)
 
                         fig.add_trace(scatter, secondary_y=False)
                         fig.add_trace(scatter_2, secondary_y=True)
@@ -207,11 +219,13 @@ class PerformancesViewer:
                     fig.update_yaxes(title_text=y2_name, secondary_y=True)
 
                     if self._axis_ensurer.value:
-                        y_min = min(y.min(), y_2.min())
-                        y_max = max(y.max(), y_2.max())
 
-                        fig.update_yaxes(range=[0.95 * y_min, 1.05 * y_max], secondary_y=False)
-                        fig.update_yaxes(range=[0.95 * y_min, 1.05 * y_max], secondary_y=True)
+                        fig.update_yaxes(
+                            range=[0.95 * self.y_min, 1.05 * self.y_max], secondary_y=False
+                        )
+                        fig.update_yaxes(
+                            range=[0.95 * self.y_min, 1.05 * self.y_max], secondary_y=True
+                        )
 
                 else:
                     fig.update_layout(
@@ -271,3 +285,8 @@ class PerformancesViewer:
         )
 
         display(toolbar, output)
+
+    def readjust_axis(self, y: pd.Series):
+        """Readjusts the range of data plotted when adding a new scatter to the graph."""
+        self.y_min = min(self.y_min, y.min())
+        self.y_max = max(self.y_max, y.max())

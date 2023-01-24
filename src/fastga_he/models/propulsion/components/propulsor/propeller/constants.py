@@ -3,3 +3,5 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE = "submodel.propulsion.constraints.propeller.torque"
+
+POSSIBLE_POSITION = ["on_the_wing", "in_the_nose"]

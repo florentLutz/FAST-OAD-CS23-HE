@@ -705,6 +705,7 @@
                 </PMSM>
                 <propeller>
                     <propeller_1>
+                        <from_LE units="m">0.15</from_LE>
                         <rpm_mission>2000.0</rpm_mission>
                         <solidity>0.2</solidity>
                         <activity_factor>150</activity_factor>
@@ -717,6 +718,7 @@
                         </torque>
                     </propeller_1>
                     <propeller_2>
+                        <from_LE units="m">0.15</from_LE>
                         <rpm_mission>2000.0</rpm_mission>
                         <solidity>0.2</solidity>
                         <activity_factor>150</activity_factor>
@@ -729,6 +731,7 @@
                         </torque>
                     </propeller_2>
                     <propeller_3>
+                        <from_LE units="m">0.15</from_LE>
                         <rpm_mission>2000.0</rpm_mission>
                         <solidity>0.2</solidity>
                         <activity_factor>150</activity_factor>
@@ -741,6 +744,7 @@
                         </torque>
                     </propeller_3>
                     <propeller_4>
+                        <from_LE units="m">0.15</from_LE>
                         <rpm_mission>2000.0</rpm_mission>
                         <solidity>0.2</solidity>
                         <activity_factor>150</activity_factor>
