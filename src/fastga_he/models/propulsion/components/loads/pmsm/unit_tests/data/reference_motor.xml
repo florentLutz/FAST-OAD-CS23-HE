@@ -1,9 +1,37 @@
 <FASTOAD_model>
     <data>
+        <aerodynamics>
+            <cruise>
+                  <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
+                  <unit_reynolds units="1/m" is_input="False">2948053.940803294<!--unitary reynolds number representative of high speed aerodynamics--></unit_reynolds>
+            </cruise>
+            <low_speed>
+                <mach is_input="False">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
+                <unit_reynolds units="1/m" is_input="False">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
+            </low_speed>
+        </aerodynamics>
+        <geometry>
+            <fuselage>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+            </fuselage>
+            <wing>
+                <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
+                <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
         <propulsion>
             <he_power_train>
                 <PMSM>
                     <motor_1>
+                        <from_LE units="m">0.15</from_LE>
+                        <length units="m">0.088</length>
+                        <diameter units="m">0.268</diameter>
+                        <front_length_ratio units="m">0.5</front_length_ratio>
                         <torque_constant units="N*m/A">1.46</torque_constant>
                         <torque_max units="N*m">150.0</torque_max>
                         <torque_rating units="N*m">150.0</torque_rating>

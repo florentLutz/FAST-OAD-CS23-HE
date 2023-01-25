@@ -18,6 +18,8 @@ from ..components.sizing_torque_constant_scaling import SizingMotorTorqueConstan
 from ..components.sizing_torque_constant import SizingMotorTorqueConstant
 from ..components.sizing_loss_coefficient_scaling import SizingMotorLossCoefficientScaling
 from ..components.sizing_loss_coefficient import SizingMotorLossCoefficient
+from ..components.sizing_pmsm_cg import SizingPMSMCG
+from ..components.sizing_pmsm_drag import SizingPMSMDrag
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_losses import PerformancesLosses
 from ..components.perf_efficiency import PerformancesEfficiency
@@ -33,6 +35,8 @@ from ..components.cstr_ensure import ConstraintsTorqueEnsure, ConstraintsRPMEnsu
 
 from ..components.sizing_pmsm import SizingPMSM
 from ..components.perf_pmsm import PerformancesPMSM
+
+from ..constants import POSSIBLE_POSITION
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -211,6 +215,69 @@ def test_loss_coefficient():
     ) == pytest.approx(0.00825, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_motor_cg():
+
+    expected_cg = [2.39, 0.25]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(SizingPMSMCG(motor_id="motor_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(SizingPMSMCG(motor_id="motor_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:PMSM:motor_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_motor_drag():
+
+    expected_drag_ls = [0.357, 0.0]
+    expected_drag_cruise = [0.352, 0.0]
+
+    for option, ls_drag, cruise_drag in zip(
+        POSSIBLE_POSITION, expected_drag_ls, expected_drag_cruise
+    ):
+        for ls_option in [True, False]:
+            ivc = get_indep_var_comp(
+                list_inputs(
+                    SizingPMSMDrag(motor_id="motor_1", position=option, low_speed_aero=ls_option)
+                ),
+                __file__,
+                XML_FILE,
+            )
+            # Run problem and check obtained value(s) is/(are) correct
+            problem = run_system(
+                SizingPMSMDrag(motor_id="motor_1", position=option, low_speed_aero=ls_option), ivc
+            )
+
+            if ls_option:
+                assert (
+                    problem.get_val(
+                        "data:propulsion:he_power_train:PMSM:motor_1:low_speed:CD0",
+                    )
+                    * 1e3
+                    == pytest.approx(ls_drag, rel=1e-2)
+                )
+            else:
+                assert (
+                    problem.get_val(
+                        "data:propulsion:he_power_train:PMSM:motor_1:cruise:CD0",
+                    )
+                    * 1e3
+                    == pytest.approx(cruise_drag, rel=1e-2)
+                )
+
+            # Slight error on reynolds is due to step
+            problem.check_partials(compact_print=True)
 
 
 def test_constraints_torque_enforce():
@@ -568,6 +635,16 @@ def test_sizing_pmsm():
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:loss_coefficient:gamma", units="W*s**2/rad**2"
     ) == pytest.approx(0.0237, rel=1e-2)
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:PMSM:motor_1:low_speed:CD0",
+        )
+        * 1e3
+        == pytest.approx(0.357, rel=1e-2)
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:CG:x", units="m"
+    ) == pytest.approx(2.39, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

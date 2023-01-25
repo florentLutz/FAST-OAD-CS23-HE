@@ -595,6 +595,7 @@
                 </inverter>
                 <PMSM>
                     <motor_1>
+                        <from_LE units="m">0.15</from_LE>
                         <shaft_power_max units="kW">65.0</shaft_power_max>
                         <torque_constant units="N*m/A">1.46</torque_constant>
                         <voltage>
@@ -622,6 +623,7 @@
                         </scaling>
                     </motor_1>
                     <motor_2>
+                        <from_LE units="m">0.15</from_LE>
                         <shaft_power_max units="kW">70.0</shaft_power_max>
                         <torque_constant units="N*m/A">1.46</torque_constant>
                         <voltage>
@@ -649,6 +651,7 @@
                         </scaling>
                     </motor_2>
                     <motor_3>
+                        <from_LE units="m">0.15</from_LE>
                         <shaft_power_max units="kW">75.</shaft_power_max>
                         <torque_constant units="N*m/A">1.46</torque_constant>
                         <voltage>
@@ -676,6 +679,7 @@
                         </scaling>
                     </motor_3>
                     <motor_4>
+                        <from_LE units="m">0.15</from_LE>
                         <shaft_power_max units="kW">80</shaft_power_max>
                         <torque_constant units="N*m/A">1.46</torque_constant>
                         <voltage>

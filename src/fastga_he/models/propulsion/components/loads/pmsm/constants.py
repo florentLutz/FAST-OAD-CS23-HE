@@ -4,3 +4,5 @@
 
 SUBMODEL_CONSTRAINTS_PMSM_TORQUE = "submodel.propulsion.constraints.pmsm.torque"
 SUBMODEL_CONSTRAINTS_PMSM_RPM = "submodel.propulsion.constraints.pmsm.rpm"
+
+POSSIBLE_POSITION = ["on_the_wing", "in_the_nose"]

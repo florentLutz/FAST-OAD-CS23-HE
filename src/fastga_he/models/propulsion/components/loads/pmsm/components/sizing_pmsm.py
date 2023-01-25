@@ -16,7 +16,11 @@ from .sizing_torque_constant_scaling import SizingMotorTorqueConstantScaling
 from .sizing_torque_constant import SizingMotorTorqueConstant
 from .sizing_loss_coefficient_scaling import SizingMotorLossCoefficientScaling
 from .sizing_loss_coefficient import SizingMotorLossCoefficient
+from .sizing_pmsm_cg import SizingPMSMCG
+from .sizing_pmsm_drag import SizingPMSMDrag
 from .cstr_pmsm import ConstraintsPMSM
+
+from ..constants import POSSIBLE_POSITION
 
 
 class SizingPMSM(om.Group):
@@ -25,9 +29,19 @@ class SizingPMSM(om.Group):
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
+        self.options.declare(
+            name="position",
+            default="on_the_wing",
+            values=POSSIBLE_POSITION,
+            desc="Option to give the position of the pmsm, possible position include "
+            + ", ".join(POSSIBLE_POSITION),
+            allow_none=False,
+        )
+
     def setup(self):
 
         motor_id = self.options["motor_id"]
+        position = self.options["position"]
 
         self.add_subsystem(
             name="constraints_pmsm",
@@ -73,3 +87,17 @@ class SizingPMSM(om.Group):
         self.add_subsystem(
             "loss_coefficients", SizingMotorLossCoefficient(motor_id=motor_id), promotes=["data:*"]
         )
+        self.add_subsystem(
+            "pmsm_cg", SizingPMSMCG(motor_id=motor_id, position=position), promotes=["data:*"]
+        )
+        for low_speed_aero in [True, False]:
+            system_name = "pmsm_drag_ls" if low_speed_aero else "pmsm_drag_cruise"
+            self.add_subsystem(
+                name=system_name,
+                subsys=SizingPMSMDrag(
+                    motor_id=motor_id,
+                    position=position,
+                    low_speed_aero=low_speed_aero,
+                ),
+                promotes=["*"],
+            )

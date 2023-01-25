@@ -435,6 +435,7 @@
                 </inverter>
                 <PMSM>
                     <motor_1>
+                        <from_LE units="m">0.15</from_LE>
                         <mass units="kg">16.19</mass>
                         <torque_constant units="N*m/A">1.46</torque_constant>
                         <torque_max units="N*m">150.0</torque_max>

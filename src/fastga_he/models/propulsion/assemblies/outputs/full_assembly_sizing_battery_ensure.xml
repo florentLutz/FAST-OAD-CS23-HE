@@ -5,8 +5,19 @@
   <time_step units="s" is_input="True">[500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0]</time_step>
   <true_airspeed units="m/s" is_input="True">[81.8, 82.76666666666667, 83.73333333333333, 84.7, 85.66666666666667, 86.63333333333333, 87.6, 88.56666666666666, 89.53333333333333, 90.5]</true_airspeed>
   <data>
+    <aerodynamics>
+      <cruise>
+        <mach is_input="True">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
+        <unit_reynolds units="1/m" is_input="True">2948053.940803294<!--unitary reynolds number representative of high speed aerodynamics--></unit_reynolds>
+      </cruise>
+      <low_speed>
+        <mach is_input="True">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
+        <unit_reynolds units="1/m" is_input="True">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
+      </low_speed>
+    </aerodynamics>
     <geometry>
       <wing>
+        <area units="m**2" is_input="True">7.105673586278243<!--wing area--></area>
         <span units="m" is_input="True">9.237463382822208<!--wing span--></span>
         <MAC>
           <length units="m" is_input="True">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
@@ -186,6 +197,7 @@
           <motor_1>
             <current_ac_max units="A" is_input="False">725.5263305926642<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.2412</diameter>
+            <from_LE units="m" is_input="True">0.15<!--Distance between the PMSM front face and the leading edge--></from_LE>
             <length units="m" is_input="False">0.47928445493667615</length>
             <losses_max units="W" is_input="False">3083.9325777155054</losses_max>
             <mass units="kg" is_input="False">61.27409204699613</mass>
@@ -198,11 +210,23 @@
             <torque_rating units="N*m" is_input="False">809.4466318792784<!--Max continuous torque of the motor--></torque_rating>
             <voltage_ac_max units="V" is_input="False">97.12864061228156<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
             <voltage_caliber units="V" is_input="True">700.0<!--Max voltage of the motor--></voltage_caliber>
+            <CG>
+              <x units="m" is_input="False">2.5906909404058363<!--X position of the PMSM center of gravity--></x>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0002910208570704217</CD0>
+            </cruise>
+            <fairing>
+              <fineness is_input="True">1.75<!--Ratio between the fairing length and the motor diameter--></fineness>
+            </fairing>
             <loss_coefficient>
               <alpha units="W/N**2/m**2" is_input="False">0.004630181270347912</alpha>
               <beta units="W*s/rad" is_input="False">0.12378190020782222</beta>
               <gamma units="W*s**2/rad**2" is_input="False">0.0005538633074472235</gamma>
             </loss_coefficient>
+            <low_speed>
+              <CD0 is_input="False">0.00029497185792681384</CD0>
+            </low_speed>
             <scaling>
               <alpha is_input="False">0.2893863293967445</alpha>
               <beta is_input="False">0.018641852440937082</beta>

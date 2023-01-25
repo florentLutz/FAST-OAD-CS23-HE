@@ -1,7 +1,18 @@
 <FASTOAD_model>
   <data>
+    <aerodynamics>
+      <cruise>
+        <mach is_input="True">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
+        <unit_reynolds units="1/m" is_input="True">2948053.940803294<!--unitary reynolds number representative of high speed aerodynamics--></unit_reynolds>
+      </cruise>
+      <low_speed>
+        <mach is_input="True">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
+        <unit_reynolds units="1/m" is_input="True">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
+      </low_speed>
+    </aerodynamics>
     <geometry>
       <wing>
+        <area units="m**2" is_input="True">7.105673586278243<!--wing area--></area>
         <span units="m" is_input="True">9.237463382822208<!--wing span--></span>
         <MAC>
           <length units="m" is_input="True">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
@@ -172,6 +183,7 @@
         <PMSM>
           <motor_1>
             <diameter units="m" is_input="False">0.268</diameter>
+            <from_LE units="m" is_input="True">0.15<!--Distance between the PMSM front face and the leading edge--></from_LE>
             <length units="m" is_input="False">0.06825</length>
             <mass units="kg" is_input="False">16.196786057760463</mass>
             <phase_resistance units="ohm" is_input="False">37.25555849870176</phase_resistance>
@@ -181,11 +193,23 @@
             <torque_max units="N*m" is_input="True">150.0<!--Maximum value of the torque the motor has to provide--></torque_max>
             <torque_rating units="N*m" is_input="False">150.0<!--Max continuous torque of the motor--></torque_rating>
             <voltage_caliber units="V" is_input="True">700.0<!--Max voltage of the motor--></voltage_caliber>
+            <CG>
+              <x units="m" is_input="False">2.385173712937498<!--X position of the PMSM center of gravity--></x>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0003524184026434314</CD0>
+            </cruise>
+            <fairing>
+              <fineness is_input="True">1.75<!--Ratio between the fairing length and the motor diameter--></fineness>
+            </fairing>
             <loss_coefficient>
               <alpha units="W/N**2/m**2" is_input="False">0.021333333333333333</alpha>
               <beta units="W*s/rad" is_input="False">11.669385931366483</beta>
               <gamma units="W*s**2/rad**2" is_input="False">0.023768032772880046</gamma>
             </loss_coefficient>
+            <low_speed>
+              <CD0 is_input="False">0.00035716822183019494</CD0>
+            </low_speed>
             <scaling>
               <alpha is_input="False">1.3333333333333333</alpha>
               <beta is_input="False">1.7574376402660368</beta>

@@ -135,6 +135,7 @@
         </DC_cable_harness>
         <PMSM>
           <motor_1>
+            <from_LE units="m">0.15</from_LE>
             <rpm_rating units="1/min" is_input="True">4500.0<!--Max voltage of the motor--></rpm_rating>
             <torque_rating units="N*m" is_input="True">200.0<!--Max voltage of the motor--></torque_rating>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
