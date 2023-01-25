@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import fastoad.api as oad
 
 from .cstr_inverter import ConstraintsInverter
 
@@ -25,6 +24,10 @@ from .sizing_inductor_weight import SizingInverterInductorWeight
 from .sizing_contactor_weight import SizingInverterContactorWeight
 from .sizing_inverter_weight import SizingInverterWeight
 from .sizing_inverter_power_density import SizingInverterPowerDensity
+from .sizing_inverter_cg import SizingInverterCG
+from .sizing_inverter_drag import SizingInverterDrag
+
+from ..constants import POSSIBLE_POSITION
 
 
 class SizingInverter(om.Group):
@@ -39,10 +42,19 @@ class SizingInverter(om.Group):
             desc="Identifier of the inverter",
             allow_none=False,
         )
+        self.options.declare(
+            name="position",
+            default="inside_the_wing",
+            values=POSSIBLE_POSITION,
+            desc="Option to give the position of the inverter, possible position include "
+            + ", ".join(POSSIBLE_POSITION),
+            allow_none=False,
+        )
 
     def setup(self):
 
         inverter_id = self.options["inverter_id"]
+        position = self.options["position"]
 
         self.add_subsystem(
             name="constraints_inverter",
@@ -140,3 +152,19 @@ class SizingInverter(om.Group):
             subsys=SizingInverterPowerDensity(inverter_id=inverter_id),
             promotes=["*"],
         )
+        self.add_subsystem(
+            name="inverter_CG",
+            subsys=SizingInverterCG(inverter_id=inverter_id, position=position),
+            promotes=["*"],
+        )
+        for low_speed_aero in [True, False]:
+            system_name = "inverter_drag_ls" if low_speed_aero else "inverter_drag_cruise"
+            self.add_subsystem(
+                name=system_name,
+                subsys=SizingInverterDrag(
+                    inverter_id=inverter_id,
+                    position=position,
+                    low_speed_aero=low_speed_aero,
+                ),
+                promotes=["*"],
+            )

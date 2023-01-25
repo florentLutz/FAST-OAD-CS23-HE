@@ -272,6 +272,9 @@
             <voltage_ac_max units="V" is_input="True">500.0</voltage_ac_max>
             <voltage_caliber units="V" is_input="False">500.0<!--Voltage caliber of the inverter--></voltage_caliber>
             <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
+            <CG>
+              <x units="m" is_input="False">2.692856507431314<!--X position of the inverter center of gravity--></x>
+            </CG>
             <capacitor>
               <capacity units="F" is_input="False">0.0023373333333333336<!--Capacity required to dampen the design voltage ripple--></capacity>
               <current_caliber units="A" is_input="False">183.7762984739307<!--Current caliber of the capacitor of the inverter--></current_caliber>
@@ -288,6 +291,9 @@
             <control_card>
               <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
             </control_card>
+            <cruise>
+              <CD0 is_input="True">0.0</CD0>
+            </cruise>
             <diode>
               <resistance units="ohm" is_input="False">0.0021037499999999997</resistance>
               <thermal_resistance units="degK/W" is_input="False">0.120375</thermal_resistance>
@@ -342,6 +348,9 @@
               <mass units="kg" is_input="False">29.18786297306288<!--Mass of the 3 single phase inductor--></mass>
               <short_circuit_time units="s" is_input="True">2e-06<!--Duration of the short circuit--></short_circuit_time>
             </inductor>
+            <low_speed>
+              <CD0 is_input="True">0.0</CD0>
+            </low_speed>
             <module>
               <height units="m" is_input="False">0.021<!--Height of one module--></height>
               <length units="m" is_input="False">0.1502<!--Length of one module--></length>
