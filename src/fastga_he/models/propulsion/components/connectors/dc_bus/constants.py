@@ -4,3 +4,5 @@
 
 SUBMODEL_CONSTRAINTS_CURRENT_DC_BUS = "submodel.propulsion.constraints.dc_bus.current"
 SUBMODEL_CONSTRAINTS_VOLTAGE_DC_BUS = "submodel.propulsion.constraints.dc_bus.voltage"
+
+POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]

@@ -11,8 +11,12 @@ from .sizing_bus_dimensions import SizingBusBarDimensions
 from .sizing_bus_bar_weight import SizingBusBarWeight
 from .sizing_conductor_self_inductance import SizingBusBarSelfInductance
 from .sizing_conductor_mutual_inductance import SizingBusBarMutualInductance
+from .sizing_dc_bus_cg import SizingDCBusCG
+from .sizing_dc_bus_drag import SizingDCBusDrag
 
 from .cstr_dc_bus import ConstraintsDCBus
+
+from ..constants import POSSIBLE_POSITION
 
 
 class SizingDCBus(om.Group):
@@ -29,9 +33,18 @@ class SizingDCBus(om.Group):
             types=str,
             allow_none=False,
         )
+        self.options.declare(
+            name="position",
+            default="inside_the_wing",
+            values=POSSIBLE_POSITION,
+            desc="Option to give the position of the DC bus, possible position include "
+            + ", ".join(POSSIBLE_POSITION),
+            allow_none=False,
+        )
 
     def setup(self):
         dc_bus_id = self.options["dc_bus_id"]
+        position = self.options["position"]
 
         self.add_subsystem(
             name="constraints_dc_bus",
@@ -74,3 +87,19 @@ class SizingDCBus(om.Group):
             subsys=SizingBusBarMutualInductance(dc_bus_id=dc_bus_id),
             promotes=["*"],
         )
+        self.add_subsystem(
+            name="converter_CG",
+            subsys=SizingDCBusCG(dc_bus_id=dc_bus_id, position=position),
+            promotes=["*"],
+        )
+        for low_speed_aero in [True, False]:
+            system_name = "dc_bus_drag_ls" if low_speed_aero else "dc_bus_drag_cruise"
+            self.add_subsystem(
+                name=system_name,
+                subsys=SizingDCBusDrag(
+                    dc_bus_id=dc_bus_id,
+                    position=position,
+                    low_speed_aero=low_speed_aero,
+                ),
+                promotes=["*"],
+            )

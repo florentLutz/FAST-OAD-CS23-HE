@@ -117,6 +117,9 @@
             <voltage_caliber units="V" is_input="False">849.6346127854488</voltage_caliber>
             <voltage_max units="V" is_input="False">849.6349002877731</voltage_max>
             <width units="m" is_input="False">0.03239070604458613</width>
+            <CG>
+              <x units="m" is_input="False">2.692856507431314<!--X position of the DC bus center of gravity--></x>
+            </CG>
             <conductor>
               <mutual_inductance units="H" is_input="False">1.2572566996054443e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
               <self_inductance units="H" is_input="False">2.081816030211905e-07<!--Self inductance of the bus bar conductor--></self_inductance>
@@ -129,9 +132,15 @@
               <w_t_ratio is_input="True">20.0</w_t_ratio>
               <width units="cm" is_input="False">3.0038334397685884</width>
             </cross_section>
+            <cruise>
+              <CD0 is_input="True">0.0</CD0>
+            </cruise>
             <insulation>
               <thickness units="m" is_input="False">0.0011761858234501244</thickness>
             </insulation>
+            <low_speed>
+              <CD0 is_input="True">0.0</CD0>
+            </low_speed>
           </dc_bus_1>
           <dc_bus_2>
             <current_caliber units="A" is_input="False">222.70181158442008</current_caliber>
@@ -142,6 +151,9 @@
             <voltage_caliber units="V" is_input="False">850.0</voltage_caliber>
             <voltage_max units="V" is_input="False">850.0</voltage_max>
             <width units="m" is_input="False">0.03239086614636901</width>
+            <CG>
+              <x units="m" is_input="False">2.692856507431314<!--X position of the DC bus center of gravity--></x>
+            </CG>
             <conductor>
               <mutual_inductance units="H" is_input="False">1.2572404297408633e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
               <self_inductance units="H" is_input="False">2.081816030211905e-07<!--Self inductance of the bus bar conductor--></self_inductance>
@@ -154,9 +166,15 @@
               <w_t_ratio is_input="True">20.0</w_t_ratio>
               <width units="cm" is_input="False">3.0038334397685884</width>
             </cross_section>
+            <cruise>
+              <CD0 is_input="True">0.0</CD0>
+            </cruise>
             <insulation>
               <thickness units="m" is_input="False">0.001176265874341565</thickness>
             </insulation>
+            <low_speed>
+              <CD0 is_input="True">0.0</CD0>
+            </low_speed>
           </dc_bus_2>
         </DC_bus>
         <DC_cable_harness>
