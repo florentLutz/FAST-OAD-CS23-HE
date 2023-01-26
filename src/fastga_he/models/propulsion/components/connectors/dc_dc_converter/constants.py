@@ -23,3 +23,5 @@ SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE = (
 SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY = (
     "submodel.propulsion.constraints.dc_dc_converter.frequency"
 )
+
+POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]

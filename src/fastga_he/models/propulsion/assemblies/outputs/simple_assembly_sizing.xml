@@ -44,11 +44,17 @@
             <voltage_in_max units="V" is_input="True">860.0</voltage_in_max>
             <voltage_out_max units="V" is_input="True">850.0</voltage_out_max>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
+            <CG>
+              <x units="m" is_input="False">2.692856507431314<!--X position of the DC/DC converter center of gravity--></x>
+            </CG>
             <capacitor>
               <capacity units="F" is_input="False">0.00046027131782945736<!--Capacity of the capacitor--></capacity>
               <current_caliber units="A" is_input="False">380.0<!--Current caliber of the DC/DC converter--></current_caliber>
               <current_max units="A" is_input="True">380.0</current_max>
             </capacitor>
+            <cruise>
+              <CD0 is_input="True">0.0</CD0>
+            </cruise>
             <diode>
               <current_max units="A" is_input="True">380.0</current_max>
               <resistance units="ohm" is_input="False">0.0021576923076923075</resistance>
@@ -77,6 +83,9 @@
               <current_max units="A" is_input="True">380.0</current_max>
               <inductance units="H" is_input="False">0.0004714912280701754<!--Inductance of the inductor--></inductance>
             </inductor>
+            <low_speed>
+              <CD0 is_input="True">0.0</CD0>
+            </low_speed>
             <module>
               <current_caliber units="A" is_input="False">390.0<!--Current caliber of the DC/DC converter--></current_caliber>
             </module>

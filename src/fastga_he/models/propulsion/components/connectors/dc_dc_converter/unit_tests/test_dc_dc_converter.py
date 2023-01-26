@@ -15,6 +15,7 @@ from ..components.sizing_reference_resistance import SizingDCDCConverterResistan
 from ..components.sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from ..components.sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
 from ..components.sizing_weight import SizingDCDCConverterWeight
+from ..components.sizing_dc_dc_converter_cg import SizingDCDCConverterCG
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_load_side import PerformancesConverterLoadSide
@@ -48,6 +49,8 @@ from ..components.cstr_ensure import (
 from ..components.sizing_dc_dc_converter import SizingDCDCConverter
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
+
+from ..constants import POSSIBLE_POSITION
 
 XML_FILE = "sample_dc_dc_converter.xml"
 NB_POINTS_TEST = 10
@@ -247,6 +250,35 @@ def test_converter_weight():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_converter_cg():
+
+    expected_cg = [2.69, 0.45, 2.54]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingDCDCConverterCG(dc_dc_converter_id="dc_dc_converter_1", position=option)
+            ),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(
+            SizingDCDCConverterCG(dc_dc_converter_id="dc_dc_converter_1", position=option), ivc
+        )
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:x",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
 
 
 def test_constraints_current_capacitor_enforce():
@@ -610,6 +642,25 @@ def test_dc_dc_converter_sizing():
             units="ohm",
         )
         == pytest.approx(0.002157, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:x",
+            units="m",
+        )
+        == pytest.approx(2.69, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:low_speed:CD0",
+        )
+        == pytest.approx(0.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:cruise:CD0",
+        )
+        == pytest.approx(0.0, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
