@@ -13,22 +13,20 @@ from fastga.models.weight.cg.cg_components.constants import SUBMODEL_PROPULSION_
 @oad.RegisterSubmodel(SUBMODEL_PROPULSION_CG, "fastga_he.submodel.weight.cg.propulsion.power_train")
 class PowerTrainCG(om.ExplicitComponent):
     """
-    For now, the propulsion CG will be simplified a lot so that we can test the process on
-    aircraft level. It will be changed in the future to be done in the sizing.
+    The propulsion CG is computed during the sizing, this is just the interfacing with the OAD
+    process.
     """
 
     def setup(self):
 
-        self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
+        self.add_input("data:propulsion:he_power_train:CG:x", val=np.nan, units="m")
 
-        self.add_output("data:weight:propulsion:CG:x", units="m", val=3.0)
+        self.add_output("data:weight:propulsion:CG:x", units="m", val=2.5)
 
         self.declare_partials(
-            of="data:weight:propulsion:CG:x", wrt="data:geometry:wing:MAC:at25percent:x", val=0.5
+            of="data:weight:propulsion:CG:x", wrt="data:propulsion:he_power_train:CG:x", val=1.0
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["data:weight:propulsion:CG:x"] = (
-            0.5 * inputs["data:geometry:wing:MAC:at25percent:x"]
-        )
+        outputs["data:weight:propulsion:CG:x"] = inputs["data:propulsion:he_power_train:CG:x"]
