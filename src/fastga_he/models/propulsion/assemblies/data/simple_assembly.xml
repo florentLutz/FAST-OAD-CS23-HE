@@ -49,6 +49,9 @@
             <he_power_train>
                 <battery_pack>
                     <battery_pack_1>
+                        <CG>
+                            <x units="m">2.88</x>
+                        </CG>
                         <mass units="kg">4960.0</mass>
                         <cell_temperature_mission units="degK">288.15</cell_temperature_mission>
                         <SOC_min>40.0</SOC_min>
@@ -68,6 +71,9 @@
                 </battery_pack>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
+                        <CG>
+                            <x units="m">2.69</x>
+                        </CG>
                         <mass units="kg">86.0</mass>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
@@ -125,6 +131,9 @@
                 </DC_DC_converter>
                 <DC_cable_harness>
                     <harness_1>
+                        <CG>
+                            <x units="m">2.69</x>
+                        </CG>
                         <mass units="kg">8.86</mass>
                         <material>1.0</material>
                         <current_caliber units="A">800.0</current_caliber>
@@ -166,6 +175,9 @@
                 </DC_cable_harness>
                 <inverter>
                     <inverter_1>
+                        <CG>
+                            <x units="m">2.69</x>
+                        </CG>
                         <mass units="kg">40.69</mass>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
@@ -253,6 +265,9 @@
                 </inverter>
                 <PMSM>
                     <motor_1>
+                        <CG>
+                            <x units="m">2.39</x>
+                        </CG>
                         <from_LE units="m">0.15</from_LE>
                         <mass units="kg">16.19</mass>
                         <torque_constant units="N*m/A">1.46</torque_constant>
@@ -279,6 +294,9 @@
                 </PMSM>
                 <propeller>
                     <propeller_1>
+                        <CG>
+                            <x units="m">2.2</x>
+                        </CG>
                         <from_LE units="m">0.15</from_LE>
                         <mass units="kg">36.35</mass>
                         <rpm_mission>2000.0</rpm_mission>
@@ -294,6 +312,9 @@
                 </propeller>
                 <DC_bus>
                     <dc_bus_2>
+                        <CG>
+                            <x units="m">2.69</x>
+                        </CG>
                         <mass units="kg">0.96</mass>
                         <current_caliber units="A">941.2</current_caliber>
                         <current_max units="A">800.</current_max>
@@ -312,6 +333,9 @@
                         </insulation>
                     </dc_bus_2>
                     <dc_bus_1>
+                        <CG>
+                            <x units="m">2.39</x>
+                        </CG>
                         <mass units="kg">0.96</mass>
                         <current_caliber units="A">941.2</current_caliber>
                         <current_max units="A">800.</current_max>

@@ -20,7 +20,7 @@ from fastga_he.models.propulsion.components import (
     SizingBatteryPack,
 )
 
-from .constants import SUBMODEL_POWER_TRAIN_MASS
+from .constants import SUBMODEL_POWER_TRAIN_MASS, SUBMODEL_POWER_TRAIN_CG
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.power_train.sizing", domain=ModelDomain.OTHER)
@@ -65,6 +65,13 @@ class PowerTrainSizingFromFile(om.Group):
             name="power_train_mass",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_POWER_TRAIN_MASS, options=option_pt_file
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="power_train_CG",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_POWER_TRAIN_CG, options=option_pt_file
             ),
             promotes=["*"],
         )

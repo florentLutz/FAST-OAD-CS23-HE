@@ -37,6 +37,9 @@
     <propulsion>
       <he_power_train>
         <mass units="kg" is_input="False">5134.28920373031</mass>
+        <CG>
+          <x units="m" is_input="False">2.8673913548516072</x>
+        </CG>
         <DC_DC_converter>
           <dc_dc_converter_1>
             <current_in_caliber units="A" is_input="False">400.0<!--Current caliber of the DC/DC converter--></current_in_caliber>

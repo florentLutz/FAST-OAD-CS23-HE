@@ -326,6 +326,23 @@ class FASTGAHEPowerTrainConfigurator:
 
         return variable_names
 
+    def get_cg_element_lists(self) -> list:
+        """
+        Returns the list of OpenMDAO variables necessary to create the component which computes
+        the center of gravity of the power train.
+        """
+
+        self._get_components()
+
+        variable_names_cg = []
+
+        for component_type, component_name in zip(self._components_type, self._components_name):
+            variable_names_cg.append(
+                PT_DATA_PREFIX + component_type + ":" + component_name + ":CG:x"
+            )
+
+        return variable_names_cg
+
     def get_thrust_element_list(self) -> list:
         """
         Returns the list of OpenMDAO variables necessary to create the component which computes
