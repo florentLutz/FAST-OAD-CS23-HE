@@ -7,7 +7,7 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingPropellerDrag(om.IndepVarComp):
+class SizingPropellerDrag(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(

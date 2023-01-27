@@ -4,6 +4,7 @@
 
 SUBMODEL_POWER_TRAIN_MASS = "submodel.propulsion.mass"
 SUBMODEL_POWER_TRAIN_CG = "submodel.propulsion.cg"
+SUBMODEL_POWER_TRAIN_DRAG = "submodel.propulsion.drag"
 SUBMODEL_POWER_TRAIN_PERF = "submodel.propulsion.performances"
 SUBMODEL_POWER_TRAIN_FULL_PERF = "submodel.propulsion.full_performances"
 

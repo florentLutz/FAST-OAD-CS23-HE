@@ -7,7 +7,7 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingDCBusDrag(om.IndepVarComp):
+class SizingDCBusDrag(om.ExplicitComponent):
     """
     Class that computes the drag coefficient of the DC bus based on its position. Will be 0.0
     all the time as we wil make the assumption that the DC bus is "inside" the fuselage or in

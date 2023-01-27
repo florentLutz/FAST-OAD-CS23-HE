@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 import fastoad.api as oad
+import openmdao.api as om
 from stdatm import Atmosphere
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
@@ -21,6 +22,7 @@ from ..assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 from ..assemblers.mass_from_pt_file import PowerTrainMassFromFile
 from ..assemblers.cg_from_pt_file import PowerTrainCGFromFile
+from ..assemblers.drag_from_pt_file import PowerTrainDragFromFile
 
 from . import outputs
 
@@ -337,6 +339,12 @@ def test_assembly_sizing_from_pt_file():
     assert problem.get_val("data:propulsion:he_power_train:CG:x", units="m") == pytest.approx(
         2.867, rel=1e-2
     )
+    assert problem.get_val("data:propulsion:he_power_train:low_speed:CD0") == pytest.approx(
+        0.000357, rel=1e-2
+    )
+    assert problem.get_val("data:propulsion:he_power_train:cruise:CD0") == pytest.approx(
+        0.000352, rel=1e-2
+    )
 
     write_outputs(
         pth.join(outputs.__path__[0], "assembly_sizing_from_pt_file.xml"),
@@ -442,5 +450,28 @@ def test_cg_from_pt_file():
 
     assert problem.get_val("data:propulsion:he_power_train:CG:x", units="m") == pytest.approx(
         2.868, rel=1e-2
+    )
+    problem.check_partials(compact_print=True)
+
+
+def test_drag_from_pt_file():
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    ivc = get_indep_var_comp(
+        list_inputs(PowerTrainDragFromFile(power_train_file_path=pt_file_path)),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        PowerTrainDragFromFile(power_train_file_path=pt_file_path),
+        ivc,
+    )
+
+    assert problem.get_val("data:propulsion:he_power_train:low_speed:CD0") == pytest.approx(
+        0.000357, rel=1e-2
+    )
+    assert problem.get_val("data:propulsion:he_power_train:cruise:CD0") == pytest.approx(
+        0.000352, rel=1e-2
     )
     problem.check_partials(compact_print=True)

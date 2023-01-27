@@ -7,7 +7,7 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingDCDCConverterDrag(om.IndepVarComp):
+class SizingDCDCConverterDrag(om.ExplicitComponent):
     """
     Class that computes the drag coefficient of the DC/DC converter based on its position. Will be 0.0
     all the time as we wil make the assumption that the DC/DC converter is "inside" the fuselage or in

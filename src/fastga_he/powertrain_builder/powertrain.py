@@ -5,6 +5,7 @@ power train module with the aircraft sizing modules from FAST-OAD-GA based on th
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
+
 import copy
 import json
 import logging
@@ -12,6 +13,7 @@ import os.path as pth
 
 from abc import ABC
 from importlib.resources import open_text
+from typing import Tuple
 
 from jsonschema import validate
 from ruamel.yaml import YAML
@@ -342,6 +344,28 @@ class FASTGAHEPowerTrainConfigurator:
             )
 
         return variable_names_cg
+
+    def get_drag_element_lists(self) -> Tuple[list, list]:
+        """
+        Returns the list of OpenMDAO variables necessary to create the component which computes
+        the drag of the power train. Will return both the name of high speed and low speed drag
+        as they are meant to be used once in the same component
+        """
+
+        self._get_components()
+
+        variable_names_drag_ls = []
+        variable_names_drag_cruise = []
+
+        for component_type, component_name in zip(self._components_type, self._components_name):
+            variable_names_drag_ls.append(
+                PT_DATA_PREFIX + component_type + ":" + component_name + ":low_speed:CD0"
+            )
+            variable_names_drag_cruise.append(
+                PT_DATA_PREFIX + component_type + ":" + component_name + ":cruise:CD0"
+            )
+
+        return variable_names_drag_ls, variable_names_drag_cruise
 
     def get_thrust_element_list(self) -> list:
         """

@@ -7,7 +7,7 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingInverterDrag(om.IndepVarComp):
+class SizingInverterDrag(om.ExplicitComponent):
     """
     Class that computes the drag coefficient of the inverter based on its position. Will be 0.0
     all the time as we wil make the assumption that the inverter is "inside" the fuselage or in

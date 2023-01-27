@@ -52,6 +52,12 @@
                         <CG>
                             <x units="m">2.88</x>
                         </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
                         <mass units="kg">4960.0</mass>
                         <cell_temperature_mission units="degK">288.15</cell_temperature_mission>
                         <SOC_min>40.0</SOC_min>
@@ -74,6 +80,12 @@
                         <CG>
                             <x units="m">2.69</x>
                         </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
                         <mass units="kg">86.0</mass>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
@@ -134,6 +146,12 @@
                         <CG>
                             <x units="m">2.69</x>
                         </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
                         <mass units="kg">8.86</mass>
                         <material>1.0</material>
                         <current_caliber units="A">800.0</current_caliber>
@@ -178,6 +196,12 @@
                         <CG>
                             <x units="m">2.69</x>
                         </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
                         <mass units="kg">40.69</mass>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
@@ -268,6 +292,12 @@
                         <CG>
                             <x units="m">2.39</x>
                         </CG>
+                        <low_speed>
+                            <CD0>0.000357</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.000352</CD0>
+                        </cruise>
                         <from_LE units="m">0.15</from_LE>
                         <mass units="kg">16.19</mass>
                         <torque_constant units="N*m/A">1.46</torque_constant>
@@ -297,6 +327,12 @@
                         <CG>
                             <x units="m">2.2</x>
                         </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
                         <from_LE units="m">0.15</from_LE>
                         <mass units="kg">36.35</mass>
                         <rpm_mission>2000.0</rpm_mission>
@@ -315,6 +351,12 @@
                         <CG>
                             <x units="m">2.69</x>
                         </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
                         <mass units="kg">0.96</mass>
                         <current_caliber units="A">941.2</current_caliber>
                         <current_max units="A">800.</current_max>
@@ -336,6 +378,12 @@
                         <CG>
                             <x units="m">2.39</x>
                         </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
                         <mass units="kg">0.96</mass>
                         <current_caliber units="A">941.2</current_caliber>
                         <current_max units="A">800.</current_max>

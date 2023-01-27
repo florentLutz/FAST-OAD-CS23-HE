@@ -7,7 +7,7 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingHarnessDrag(om.IndepVarComp):
+class SizingHarnessDrag(om.ExplicitComponent):
     """
     Class that computes the drag coefficient of the cable harness based on its position. Will be 0.0
     all the time as we wil make the assumption that the cable harness is "inside" the fuselage or in

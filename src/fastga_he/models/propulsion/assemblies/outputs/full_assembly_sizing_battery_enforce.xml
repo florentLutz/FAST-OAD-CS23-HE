@@ -68,7 +68,7 @@
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </capacitor>
             <cruise>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </cruise>
             <diode>
               <current_max units="A" is_input="False">333.653487920515</current_max>
@@ -101,7 +101,7 @@
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
             <low_speed>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <module>
               <current_caliber units="A" is_input="False">371.90570857474677<!--Current caliber of the DC/DC converter--></current_caliber>
@@ -139,13 +139,13 @@
               <width units="cm" is_input="False">3.003303326494629</width>
             </cross_section>
             <cruise>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </cruise>
             <insulation>
               <thickness units="m" is_input="False">0.001176250733426229</thickness>
             </insulation>
             <low_speed>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </low_speed>
           </dc_bus_1>
           <dc_bus_2>
@@ -173,13 +173,13 @@
               <width units="cm" is_input="False">3.003303326494629</width>
             </cross_section>
             <cruise>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </cruise>
             <insulation>
               <thickness units="m" is_input="False">0.001176267632551458</thickness>
             </insulation>
             <low_speed>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </low_speed>
           </dc_bus_2>
         </DC_bus>
@@ -216,14 +216,14 @@
               <mass units="kg" is_input="False">2.0375619201372484<!--Mass of all the contactors in the harness--></mass>
             </contactor>
             <cruise>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </cruise>
             <insulation>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the insulation--></k_factor_radius>
               <thickness units="m" is_input="False">0.0011693655495630003</thickness>
             </insulation>
             <low_speed>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <properties>
               <density units="g/cm**3" is_input="False">8.96<!--1.0 for copper, 0.0 for aluminium--></density>
@@ -362,7 +362,7 @@
               <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
             </control_card>
             <cruise>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </cruise>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
@@ -423,7 +423,7 @@
               <short_circuit_time units="s" is_input="True">2e-06<!--Duration of the short circuit--></short_circuit_time>
             </inductor>
             <low_speed>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <module>
               <height units="m" is_input="False">0.021<!--Height of one module--></height>
@@ -472,10 +472,10 @@
               <x units="m" is_input="False">2.202458712937498<!--X position of the propeller center of gravity--></x>
             </CG>
             <cruise>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </cruise>
             <low_speed>
-              <CD0 is_input="True">0.0</CD0>
+              <CD0 is_input="False">0.0</CD0>
             </low_speed>
           </propeller_1>
         </propeller>
