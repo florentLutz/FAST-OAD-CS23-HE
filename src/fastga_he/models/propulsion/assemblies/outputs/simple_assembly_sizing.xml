@@ -11,6 +11,12 @@
       </low_speed>
     </aerodynamics>
     <geometry>
+      <cabin>
+        <length units="m" is_input="True">1.477417183742213<!--cabin length--></length>
+      </cabin>
+      <fuselage>
+        <front_length units="m" is_input="True">0.5<!--length of the front cone of the aircraft--></front_length>
+      </fuselage>
       <wing>
         <area units="m**2" is_input="True">7.105673586278243<!--wing area--></area>
         <span units="m" is_input="True">9.237463382822208<!--wing span--></span>
@@ -170,19 +176,22 @@
           <harness_1>
             <current_caliber units="A" is_input="False">750.0</current_caliber>
             <current_max units="A" is_input="True">750.0</current_max>
-            <length units="m" is_input="True">7.0</length>
-            <mass units="kg" is_input="False">88.01498696939814</mass>
+            <length units="m" is_input="False">1.477417183742213<!--Length of the harness--></length>
+            <mass units="kg" is_input="False">22.311829314666692</mass>
             <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
             <number_cables is_input="True">1.0</number_cables>
             <voltage_caliber units="V" is_input="False">800.0</voltage_caliber>
             <voltage_max units="V" is_input="True">800.0</voltage_max>
+            <CG>
+              <x units="m" is_input="False">1.2387085918711065<!--X position of the DC cable center of gravity--></x>
+            </CG>
             <cable>
               <current_caliber units="A" is_input="False">750.0<!--Maximum current flowing in one cable of the harness--></current_caliber>
-              <heat_capacity units="J/degK" is_input="False">38980.136207414806</heat_capacity>
+              <heat_capacity units="J/degK" is_input="False">8227.131865349522</heat_capacity>
               <heat_capacity_per_length units="J/degK/m" is_input="False">4640.49240564462</heat_capacity_per_length>
               <mass_per_length units="kg/m" is_input="False">9.914316036648293</mass_per_length>
               <radius units="m" is_input="False">0.021806098943972216</radius>
-              <resistance units="ohm" is_input="False">0.00014129150352442041</resistance>
+              <resistance units="ohm" is_input="False">2.982092788910745e-05</resistance>
               <resistance_per_length units="ohm/km" is_input="False">0.016820417086240526</resistance_per_length>
             </cable>
             <conductor>
@@ -193,10 +202,16 @@
             <contactor>
               <mass units="kg" is_input="False">4.734732261552477<!--Mass of all the contactors in the harness--></mass>
             </contactor>
+            <cruise>
+              <CD0 is_input="True">0.0</CD0>
+            </cruise>
             <insulation>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the insulation--></k_factor_radius>
               <thickness units="m" is_input="False">0.001157544910492495</thickness>
             </insulation>
+            <low_speed>
+              <CD0 is_input="True">0.0</CD0>
+            </low_speed>
             <properties>
               <density units="g/cm**3" is_input="False">8.96<!--1.0 for copper, 0.0 for aluminium--></density>
               <resistance_temperature_scale_factor units="1/degK" is_input="False">0.00393</resistance_temperature_scale_factor>

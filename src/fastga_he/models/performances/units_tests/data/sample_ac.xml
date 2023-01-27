@@ -315,6 +315,7 @@
                         <voltage_max units="V">800.0</voltage_max>
                         <number_cables>1.0</number_cables>
                         <length units="m">7.0</length>
+                        <length_span_ratio>0.17</length_span_ratio>
                         <conductor>
                             <radius units="m">3.71e-3</radius>
                             <section units="mm*mm">43.44</section>

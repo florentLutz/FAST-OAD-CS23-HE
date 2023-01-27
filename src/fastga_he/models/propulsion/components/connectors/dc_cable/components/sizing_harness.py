@@ -18,8 +18,12 @@ from .sizing_reference_resistance import SizingReferenceResistance
 from .sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
 from .sizing_heat_capacity import SizingHeatCapacityCable
 from .sizing_cable_radius import SizingCableRadius
+from .sizing_harness_cg import SizingHarnessCG
+from .sizing_harness_drag import SizingHarnessDrag
 
 from .cstr_harness import ConstraintsHarness
+
+from ..constants import POSSIBLE_POSITION, SUBMODEL_DC_LINE_SIZING_LENGTH
 
 
 class SizingHarness(om.Group):
@@ -30,10 +34,19 @@ class SizingHarness(om.Group):
             desc="Identifier of the cable harness",
             allow_none=False,
         )
+        self.options.declare(
+            name="position",
+            default="from_rear_to_front",
+            values=POSSIBLE_POSITION,
+            desc="Option to give the position of the cable harness, possible position include "
+            + ", ".join(POSSIBLE_POSITION),
+            allow_none=False,
+        )
 
     def setup(self):
 
         harness_id = self.options["harness_id"]
+        position = self.options["position"]
 
         # It was decided to add the constraints computation at the beginning of the sizing to
         # ensure that both are ran along and to avoid having an additional id to add in the
@@ -45,6 +58,13 @@ class SizingHarness(om.Group):
             promotes=["*"],
         )
 
+        options = {"harness_id": harness_id, "position": position}
+
+        self.add_subsystem(
+            "harness_length",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_DC_LINE_SIZING_LENGTH, options=options),
+            promotes=["data:*"],
+        )
         self.add_subsystem(
             "core_material", SizingMaterialCore(harness_id=harness_id), promotes=["data:*"]
         )
@@ -99,3 +119,19 @@ class SizingHarness(om.Group):
         self.add_subsystem(
             "heat_capacity", SizingHeatCapacityCable(harness_id=harness_id), promotes=["data:*"]
         )
+        self.add_subsystem(
+            name="harness_CG",
+            subsys=SizingHarnessCG(harness_id=harness_id, position=position),
+            promotes=["*"],
+        )
+        for low_speed_aero in [True, False]:
+            system_name = "harness_drag_ls" if low_speed_aero else "harness_drag_cruise"
+            self.add_subsystem(
+                name=system_name,
+                subsys=SizingHarnessDrag(
+                    harness_id=harness_id,
+                    position=position,
+                    low_speed_aero=low_speed_aero,
+                ),
+                promotes=["*"],
+            )

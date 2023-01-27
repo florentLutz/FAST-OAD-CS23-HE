@@ -8,6 +8,7 @@ import openmdao.api as om
 
 from stdatm import Atmosphere
 
+from ..components.sizing_harness_length import SizingHarnessLength
 from ..components.sizing_material_core import SizingMaterialCore
 from ..components.sizing_current_per_cable import SizingCurrentPerCable
 from ..components.sizing_cable_gauge import SizingCableGauge
@@ -21,6 +22,7 @@ from ..components.sizing_reference_resistance import SizingReferenceResistance
 from ..components.sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
 from ..components.sizing_heat_capacity import SizingHeatCapacityCable
 from ..components.sizing_cable_radius import SizingCableRadius
+from ..components.sizing_harness_cg import SizingHarnessCG
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from ..components.perf_losses_one_cable import PerformancesLossesOneCable
 from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_temperature_derivative import (
@@ -43,8 +45,35 @@ from ..components.sizing_harness import SizingHarness
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
+from ..constants import POSSIBLE_POSITION
+
 XML_FILE = "sample_cable.xml"
 NB_POINTS_TEST = 10
+
+
+def test_harness_length():
+
+    expected_length = [1.57, 1.47, 2.28, 3.76, 1.97, 0.5, 2.69]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_length):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(SizingHarnessLength(harness_id="harness_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(SizingHarnessLength(harness_id="harness_1", position=option), ivc)
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:DC_cable_harness:harness_1:length",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
 
 
 def test_material_core():
@@ -306,6 +335,31 @@ def test_cable_mass():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_harness_cg():
+
+    expected_cg = [2.69, 1.24, 2.45, 1.96, 0.98, 0.25, 1.345]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(SizingHarnessCG(harness_id="harness_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(SizingHarnessCG(harness_id="harness_1", position=option), ivc)
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:DC_cable_harness:harness_1:CG:x",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
 
 
 def test_perf_current():
@@ -773,7 +827,26 @@ def test_sizing_harness():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:mass", units="kg"
-    ) == pytest.approx(51.85, rel=1e-2)
+    ) == pytest.approx(14.32, rel=1e-2)
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_cable_harness:harness_1:CG:x",
+            units="m",
+        )
+        == pytest.approx(1.24, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_cable_harness:harness_1:cruise:CD0",
+        )
+        == pytest.approx(0.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_cable_harness:harness_1:cruise:CD0",
+        )
+        == pytest.approx(0.0, rel=1e-2)
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -796,9 +869,8 @@ def test_sizing_cable():
     ivc.add_output(
         name="data:propulsion:he_power_train:DC_cable_harness:harness_1:number_cables", val=1
     )
-    ivc.add_output(
-        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:length", val=7.0, units="m"
-    )
+    ivc.add_output(name="data:geometry:fuselage:front_length", val=0.5, units="m")
+    ivc.add_output(name="data:geometry:cabin:length", val=1.47, units="m")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingHarness(harness_id="harness_1"), ivc)
@@ -815,14 +887,14 @@ def test_sizing_cable():
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:resistance",
             units="ohm",
         )
-        == pytest.approx(0.00014129, rel=1e-2)
+        == pytest.approx(2.967e-5, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:heat_capacity",
             units="J/degK",
         )
-        == pytest.approx(39157.028, rel=1e-2)
+        == pytest.approx(8222.0, rel=1e-2)
     )
     assert (
         problem.get_val(

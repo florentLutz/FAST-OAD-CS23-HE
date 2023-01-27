@@ -119,6 +119,7 @@
         </DC_DC_converter>
         <DC_cable_harness>
           <harness_1>
+            <length_span_ratio>0.17</length_span_ratio>
             <length units="m" is_input="True">3.0</length>
             <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
             <number_cables is_input="True">1.0</number_cables>
