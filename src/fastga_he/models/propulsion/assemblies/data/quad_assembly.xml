@@ -1,0 +1,773 @@
+<FASTOAD_model>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <thrust_distribution>[1.0, 1.0, 1.0, 1.0]</thrust_distribution>
+                <battery_pack>
+                    <battery_pack_1>
+                        <cell_temperature_mission units="degK">288.15</cell_temperature_mission>
+                        <SOC_min>40.0</SOC_min>
+                        <min_safe_SOC>20.0</min_safe_SOC>
+                        <number_modules>25.0</number_modules>
+                        <number_cells>8000.0</number_cells>
+                        <module>
+                            <number_cells>200.0</number_cells>
+                            <mass units="kg">198.4</mass>
+                        </module>
+                        <cell>
+                            <capacity units="A*h">20.0</capacity>
+                            <mass units="g">496.0</mass>
+                        </cell>
+                    </battery_pack_1>
+                </battery_pack>
+                <DC_DC_converter>
+                    <dc_dc_converter_1>
+                        <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
+                        <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
+                        <igbt>
+                            <resistance units="ohm">0.002265</resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.002805</resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                        </diode>
+                        <current_caliber units="A">400.0</current_caliber>
+                        <scaling>
+                            <a>1.5</a>
+                            <resistance>1.5</resistance>
+                            <c>0.666</c>
+                        </scaling>
+                        <energy_on>
+                            <a>0.02379429</a>
+                            <b>3.326e-05</b>
+                            <c>3.420e-7</c>
+                        </energy_on>
+                        <energy_rr>
+                            <a>0.00637224</a>
+                            <b>0.000340</b>
+                            <c>-3.005e-8</c>
+                        </energy_rr>
+                        <energy_off>
+                            <a>0.02261044</a>
+                            <b>0.000254</b>
+                            <c>-1.158e-7</c>
+                        </energy_off>
+                    </dc_dc_converter_1>
+                </DC_DC_converter>
+                <DC_cable_harness>
+                    <harness_1>
+                        <material>1.0</material>
+                        <current_max units="A">800.0</current_max>
+                        <voltage_max units="V">1000.0</voltage_max>
+                        <number_cables>1.0</number_cables>
+                        <length units="m">7.0</length>
+                        <length_span_ratio>0.17</length_span_ratio>
+                        <conductor>
+                            <radius units="m">3.71e-3</radius>
+                            <section units="mm*mm">43.44</section>
+                        </conductor>
+                        <insulation>
+                            <thickness units="m">0.0012</thickness>
+                        </insulation>
+                        <sheath>
+                            <thickness units="mm">1.36</thickness>
+                        </sheath>
+                        <contactor>
+                            <mass units="kg">4.95</mass>
+                        </contactor>
+                        <cable>
+                            <resistance units="ohm">0.00475</resistance>
+                            <initial_temperature units="degK">288.15</initial_temperature>
+                            <resistance_per_length units="ohm/km">0.397</resistance_per_length>
+                            <mass_per_length units="kg/m">0.537</mass_per_length>
+                            <current units="A">800.0</current>
+                            <radius units="mm">6.47</radius>
+                            <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
+                            <heat_capacity units="J/degK">7000.</heat_capacity>
+                        </cable>
+                        <properties>
+                            <resistance_temperature_scale_factor units="degK**-1">0.00393</resistance_temperature_scale_factor>
+                            <density units="kg/m**3">8960.0</density>
+                            <specific_heat units="J/kg/degK">386.0</specific_heat>
+                        </properties>
+                    </harness_1>
+                    <harness_2>
+                        <material>1.0</material>
+                        <current_max units="A">800.0</current_max>
+                        <voltage_max units="V">1000.0</voltage_max>
+                        <number_cables>1.0</number_cables>
+                        <length units="m">7.0</length>
+                        <length_span_ratio>0.17</length_span_ratio>
+                        <conductor>
+                            <radius units="m">3.71e-3</radius>
+                            <section units="mm*mm">43.44</section>
+                        </conductor>
+                        <insulation>
+                            <thickness units="m">0.0012</thickness>
+                        </insulation>
+                        <sheath>
+                            <thickness units="mm">1.36</thickness>
+                        </sheath>
+                        <contactor>
+                            <mass units="kg">4.95</mass>
+                        </contactor>
+                        <cable>
+                            <resistance units="ohm">0.00333</resistance>
+                            <initial_temperature units="degK">288.15</initial_temperature>
+                            <resistance_per_length units="ohm/km">0.397</resistance_per_length>
+                            <mass_per_length units="kg/m">0.537</mass_per_length>
+                            <current units="A">800.0</current>
+                            <radius units="mm">6.47</radius>
+                            <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
+                            <heat_capacity units="J/degK">7000.</heat_capacity>
+                        </cable>
+                        <properties>
+                            <resistance_temperature_scale_factor units="degK**-1">0.00393</resistance_temperature_scale_factor>
+                            <density units="kg/m**3">8960.0</density>
+                            <specific_heat units="J/kg/degK">386.0</specific_heat>
+                        </properties>
+                    </harness_2>
+                    <harness_3>
+                        <material>1.0</material>
+                        <current_max units="A">800.0</current_max>
+                        <voltage_max units="V">1000.0</voltage_max>
+                        <number_cables>1.0</number_cables>
+                        <length units="m">7.0</length>
+                        <length_span_ratio>0.17</length_span_ratio>
+                        <conductor>
+                            <radius units="m">3.71e-3</radius>
+                            <section units="mm*mm">43.44</section>
+                        </conductor>
+                        <insulation>
+                            <thickness units="m">0.0012</thickness>
+                        </insulation>
+                        <sheath>
+                            <thickness units="mm">1.36</thickness>
+                        </sheath>
+                        <contactor>
+                            <mass units="kg">4.95</mass>
+                        </contactor>
+                        <cable>
+                            <resistance units="ohm">0.00333</resistance>
+                            <initial_temperature units="degK">288.15</initial_temperature>
+                            <resistance_per_length units="ohm/km">0.397</resistance_per_length>
+                            <mass_per_length units="kg/m">0.537</mass_per_length>
+                            <current units="A">800.0</current>
+                            <radius units="mm">6.47</radius>
+                            <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
+                            <heat_capacity units="J/degK">7000.</heat_capacity>
+                        </cable>
+                        <properties>
+                            <resistance_temperature_scale_factor units="degK**-1">0.00393</resistance_temperature_scale_factor>
+                            <density units="kg/m**3">8960.0</density>
+                            <specific_heat units="J/kg/degK">386.0</specific_heat>
+                        </properties>
+                    </harness_3>
+                    <harness_4>
+                        <material>1.0</material>
+                        <current_max units="A">800.0</current_max>
+                        <voltage_max units="V">1000.0</voltage_max>
+                        <number_cables>1.0</number_cables>
+                        <length units="m">7.0</length>
+                        <length_span_ratio>0.17</length_span_ratio>
+                        <conductor>
+                            <radius units="m">3.71e-3</radius>
+                            <section units="mm*mm">43.44</section>
+                        </conductor>
+                        <insulation>
+                            <thickness units="m">0.0012</thickness>
+                        </insulation>
+                        <sheath>
+                            <thickness units="mm">1.36</thickness>
+                        </sheath>
+                        <contactor>
+                            <mass units="kg">4.95</mass>
+                        </contactor>
+                        <cable>
+                            <resistance units="ohm">0.00475</resistance>
+                            <initial_temperature units="degK">288.15</initial_temperature>
+                            <resistance_per_length units="ohm/km">0.397</resistance_per_length>
+                            <mass_per_length units="kg/m">0.537</mass_per_length>
+                            <current units="A">800.0</current>
+                            <radius units="mm">6.47</radius>
+                            <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
+                            <heat_capacity units="J/degK">7000.</heat_capacity>
+                        </cable>
+                        <properties>
+                            <resistance_temperature_scale_factor units="degK**-1">0.00393</resistance_temperature_scale_factor>
+                            <density units="kg/m**3">8960.0</density>
+                            <specific_heat units="J/kg/degK">386.0</specific_heat>
+                        </properties>
+                    </harness_4>
+                    <harness_5>
+                        <material>1.0</material>
+                        <current_max units="A">800.0</current_max>
+                        <voltage_max units="V">1000.0</voltage_max>
+                        <number_cables>1.0</number_cables>
+                        <length units="m">7.0</length>
+                        <length_span_ratio>0.17</length_span_ratio>
+                        <conductor>
+                            <radius units="m">3.71e-3</radius>
+                            <section units="mm*mm">43.44</section>
+                        </conductor>
+                        <insulation>
+                            <thickness units="m">0.0012</thickness>
+                        </insulation>
+                        <sheath>
+                            <thickness units="mm">1.36</thickness>
+                        </sheath>
+                        <contactor>
+                            <mass units="kg">4.95</mass>
+                        </contactor>
+                        <cable>
+                            <resistance units="ohm">0.00142</resistance>
+                            <initial_temperature units="degK">288.15</initial_temperature>
+                            <resistance_per_length units="ohm/km">0.397</resistance_per_length>
+                            <mass_per_length units="kg/m">0.537</mass_per_length>
+                            <current units="A">800.0</current>
+                            <radius units="mm">6.47</radius>
+                            <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
+                            <heat_capacity units="J/degK">7000.</heat_capacity>
+                        </cable>
+                        <properties>
+                            <resistance_temperature_scale_factor units="degK**-1">0.00393</resistance_temperature_scale_factor>
+                            <density units="kg/m**3">8960.0</density>
+                            <specific_heat units="J/kg/degK">386.0</specific_heat>
+                        </properties>
+                    </harness_5>
+                    <harness_6>
+                        <material>1.0</material>
+                        <current_max units="A">800.0</current_max>
+                        <voltage_max units="V">1000.0</voltage_max>
+                        <number_cables>1.0</number_cables>
+                        <length units="m">7.0</length>
+                        <length_span_ratio>0.17</length_span_ratio>
+                        <conductor>
+                            <radius units="m">3.71e-3</radius>
+                            <section units="mm*mm">43.44</section>
+                        </conductor>
+                        <insulation>
+                            <thickness units="m">0.0012</thickness>
+                        </insulation>
+                        <sheath>
+                            <thickness units="mm">1.36</thickness>
+                        </sheath>
+                        <contactor>
+                            <mass units="kg">4.95</mass>
+                        </contactor>
+                        <cable>
+                            <resistance units="ohm">0.00142</resistance>
+                            <initial_temperature units="degK">288.15</initial_temperature>
+                            <resistance_per_length units="ohm/km">0.397</resistance_per_length>
+                            <mass_per_length units="kg/m">0.537</mass_per_length>
+                            <current units="A">800.0</current>
+                            <radius units="mm">6.47</radius>
+                            <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
+                            <heat_capacity units="J/degK">7000.</heat_capacity>
+                        </cable>
+                        <properties>
+                            <resistance_temperature_scale_factor units="degK**-1">0.00393</resistance_temperature_scale_factor>
+                            <density units="kg/m**3">8960.0</density>
+                            <specific_heat units="J/kg/degK">386.0</specific_heat>
+                        </properties>
+                    </harness_6>
+                </DC_cable_harness>
+                <inverter>
+                    <inverter_1>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <casing>
+                            <mass units="kg">1.0446</mass>
+                            <heat_capacity units="J/degK">208.92</heat_capacity>
+                            <thermal_resistance units="K/W">0.021</thermal_resistance>
+                        </casing>
+                        <module>
+                            <length units="m">0.156</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
+                        <heat_sink>
+                            <length units="m">0.2145</length>
+                            <width units="m">0.1716</width>
+                            <height units="m">0.005655</height>
+                            <max_temperature units="degK">373.15</max_temperature>
+                            <mass units="kg">0.619</mass>
+                            <coolant>
+                                <max_input_temperature units="degK">323.15</max_input_temperature>
+                                <max_output_temperature units="degK">353.15</max_output_temperature>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                            <tube>
+                                <inner_diameter units="m">1.27e-3</inner_diameter>
+                                <outer_diameter units="m">3.77e-3</outer_diameter>
+                                <length units="m">0.858</length>
+                                <mass units="kg">0.083</mass>
+                            </tube>
+                        </heat_sink>
+                        <maximum_losses units="W">11808.0</maximum_losses>
+                        <current_caliber units="A">433.0</current_caliber>
+                        <voltage_caliber units="V">500.0</voltage_caliber>
+                        <switching_frequency units="Hz">15.0e3</switching_frequency>
+                        <power_factor>1.0</power_factor>
+                        <mass units="kg">42.82</mass>
+                        <capacitor>
+                            <capacity units="F">2.02e-3</capacity>
+                            <current_caliber units="A">199.18</current_caliber>
+                            <mass units="kg">3.832</mass>
+                        </capacitor>
+                        <inductor>
+                            <inductance units="H">11.5e-6</inductance>
+                            <mass units="kg">31.064</mass>
+                        </inductor>
+                        <contactor>
+                            <mass units="kg">4.85</mass>
+                        </contactor>
+                        <scaling>
+                            <a>1.385</a>
+                            <c>0.722</c>
+                            <resistance>1.385</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00209135</resistance>
+                            <thermal_resistance units="K/W">0.114955</thermal_resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00258995</resistance>
+                            <thermal_resistance units="K/W">0.148195</thermal_resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                        </diode>
+                        <energy_on>
+                            <a>0.02197006</a>
+                            <b>3.326e-05</b>
+                            <c>3.707e-7</c>
+                        </energy_on>
+                        <energy_off>
+                            <a>0.02087697</a>
+                            <b>0.000254</b>
+                            <c>-1.256e-7</c>
+                        </energy_off>
+                        <energy_rr>
+                            <a>0.0058837</a>
+                            <b>0.000340</b>
+                            <c>-3.257e-8</c>
+                        </energy_rr>
+                    </inverter_1>
+                    <inverter_2>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <casing>
+                            <mass units="kg">1.0446</mass>
+                            <heat_capacity units="J/degK">208.92</heat_capacity>
+                            <thermal_resistance units="K/W">0.021</thermal_resistance>
+                        </casing>
+                        <module>
+                            <length units="m">0.156</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
+                        <heat_sink>
+                            <length units="m">0.2145</length>
+                            <width units="m">0.1716</width>
+                            <height units="m">0.005655</height>
+                            <max_temperature units="degK">373.15</max_temperature>
+                            <mass units="kg">0.619</mass>
+                            <coolant>
+                                <max_input_temperature units="degK">323.15</max_input_temperature>
+                                <max_output_temperature units="degK">353.15</max_output_temperature>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                            <tube>
+                                <inner_diameter units="m">1.27e-3</inner_diameter>
+                                <outer_diameter units="m">3.77e-3</outer_diameter>
+                                <length units="m">0.858</length>
+                                <mass units="kg">0.083</mass>
+                            </tube>
+                        </heat_sink>
+                        <maximum_losses units="W">11808.0</maximum_losses>
+                        <current_caliber units="A">433.0</current_caliber>
+                        <voltage_caliber units="V">500.0</voltage_caliber>
+                        <switching_frequency units="Hz">15.0e3</switching_frequency>
+                        <power_factor>1.0</power_factor>
+                        <mass units="kg">42.82</mass>
+                        <capacitor>
+                            <capacity units="F">2.02e-3</capacity>
+                            <current_caliber units="A">199.18</current_caliber>
+                            <mass units="kg">3.832</mass>
+                        </capacitor>
+                        <inductor>
+                            <inductance units="H">11.5e-6</inductance>
+                            <mass units="kg">31.064</mass>
+                        </inductor>
+                        <contactor>
+                            <mass units="kg">4.85</mass>
+                        </contactor>
+                        <scaling>
+                            <a>1.385</a>
+                            <c>0.722</c>
+                            <resistance>1.385</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00209135</resistance>
+                            <thermal_resistance units="K/W">0.114955</thermal_resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00258995</resistance>
+                            <thermal_resistance units="K/W">0.148195</thermal_resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                        </diode>
+                        <energy_on>
+                            <a>0.02197006</a>
+                            <b>3.326e-05</b>
+                            <c>3.707e-7</c>
+                        </energy_on>
+                        <energy_off>
+                            <a>0.02087697</a>
+                            <b>0.000254</b>
+                            <c>-1.256e-7</c>
+                        </energy_off>
+                        <energy_rr>
+                            <a>0.0058837</a>
+                            <b>0.000340</b>
+                            <c>-3.257e-8</c>
+                        </energy_rr>
+                    </inverter_2>
+                    <inverter_3>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <casing>
+                            <mass units="kg">1.0446</mass>
+                            <heat_capacity units="J/degK">208.92</heat_capacity>
+                            <thermal_resistance units="K/W">0.021</thermal_resistance>
+                        </casing>
+                        <module>
+                            <length units="m">0.156</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
+                        <heat_sink>
+                            <length units="m">0.2145</length>
+                            <width units="m">0.1716</width>
+                            <height units="m">0.005655</height>
+                            <max_temperature units="degK">373.15</max_temperature>
+                            <mass units="kg">0.619</mass>
+                            <coolant>
+                                <max_input_temperature units="degK">323.15</max_input_temperature>
+                                <max_output_temperature units="degK">353.15</max_output_temperature>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                            <tube>
+                                <inner_diameter units="m">1.27e-3</inner_diameter>
+                                <outer_diameter units="m">3.77e-3</outer_diameter>
+                                <length units="m">0.858</length>
+                                <mass units="kg">0.083</mass>
+                            </tube>
+                        </heat_sink>
+                        <maximum_losses units="W">11808.0</maximum_losses>
+                        <current_caliber units="A">433.0</current_caliber>
+                        <voltage_caliber units="V">500.0</voltage_caliber>
+                        <switching_frequency units="Hz">15.0e3</switching_frequency>
+                        <power_factor>1.0</power_factor>
+                        <mass units="kg">42.82</mass>
+                        <capacitor>
+                            <capacity units="F">2.02e-3</capacity>
+                            <current_caliber units="A">199.18</current_caliber>
+                            <mass units="kg">3.832</mass>
+                        </capacitor>
+                        <inductor>
+                            <inductance units="H">11.5e-6</inductance>
+                            <mass units="kg">31.064</mass>
+                        </inductor>
+                        <contactor>
+                            <mass units="kg">4.85</mass>
+                        </contactor>
+                        <scaling>
+                            <a>1.385</a>
+                            <c>0.722</c>
+                            <resistance>1.385</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00209135</resistance>
+                            <thermal_resistance units="K/W">0.114955</thermal_resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00258995</resistance>
+                            <thermal_resistance units="K/W">0.148195</thermal_resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                        </diode>
+                        <energy_on>
+                            <a>0.02197006</a>
+                            <b>3.326e-05</b>
+                            <c>3.707e-7</c>
+                        </energy_on>
+                        <energy_off>
+                            <a>0.02087697</a>
+                            <b>0.000254</b>
+                            <c>-1.256e-7</c>
+                        </energy_off>
+                        <energy_rr>
+                            <a>0.0058837</a>
+                            <b>0.000340</b>
+                            <c>-3.257e-8</c>
+                        </energy_rr>
+                    </inverter_3>
+                    <inverter_4>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <casing>
+                            <mass units="kg">1.0446</mass>
+                            <heat_capacity units="J/degK">208.92</heat_capacity>
+                            <thermal_resistance units="K/W">0.021</thermal_resistance>
+                        </casing>
+                        <module>
+                            <length units="m">0.156</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
+                        <heat_sink>
+                            <length units="m">0.2145</length>
+                            <width units="m">0.1716</width>
+                            <height units="m">0.005655</height>
+                            <max_temperature units="degK">373.15</max_temperature>
+                            <mass units="kg">0.619</mass>
+                            <coolant>
+                                <max_input_temperature units="degK">323.15</max_input_temperature>
+                                <max_output_temperature units="degK">353.15</max_output_temperature>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                            <tube>
+                                <inner_diameter units="m">1.27e-3</inner_diameter>
+                                <outer_diameter units="m">3.77e-3</outer_diameter>
+                                <length units="m">0.858</length>
+                                <mass units="kg">0.083</mass>
+                            </tube>
+                        </heat_sink>
+                        <maximum_losses units="W">11808.0</maximum_losses>
+                        <current_caliber units="A">433.0</current_caliber>
+                        <voltage_caliber units="V">500.0</voltage_caliber>
+                        <switching_frequency units="Hz">15.0e3</switching_frequency>
+                        <power_factor>1.0</power_factor>
+                        <mass units="kg">42.82</mass>
+                        <capacitor>
+                            <capacity units="F">2.02e-3</capacity>
+                            <current_caliber units="A">199.18</current_caliber>
+                            <mass units="kg">3.832</mass>
+                        </capacitor>
+                        <inductor>
+                            <inductance units="H">11.5e-6</inductance>
+                            <mass units="kg">31.064</mass>
+                        </inductor>
+                        <contactor>
+                            <mass units="kg">4.85</mass>
+                        </contactor>
+                        <scaling>
+                            <a>1.385</a>
+                            <c>0.722</c>
+                            <resistance>1.385</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00209135</resistance>
+                            <thermal_resistance units="K/W">0.114955</thermal_resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00258995</resistance>
+                            <thermal_resistance units="K/W">0.148195</thermal_resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                        </diode>
+                        <energy_on>
+                            <a>0.02197006</a>
+                            <b>3.326e-05</b>
+                            <c>3.707e-7</c>
+                        </energy_on>
+                        <energy_off>
+                            <a>0.02087697</a>
+                            <b>0.000254</b>
+                            <c>-1.256e-7</c>
+                        </energy_off>
+                        <energy_rr>
+                            <a>0.0058837</a>
+                            <b>0.000340</b>
+                            <c>-3.257e-8</c>
+                        </energy_rr>
+                    </inverter_4>
+                </inverter>
+                <PMSM>
+                    <motor_1>
+                        <from_LE units="m">0.15</from_LE>
+                        <shaft_power_max units="kW">65.0</shaft_power_max>
+                        <torque_constant units="N*m/A">1.46</torque_constant>
+                        <voltage>
+                            <peak units="V">700.0</peak>
+                        </voltage>
+                        <torque>
+                            <cont units="N*m">150.0</cont>
+                        </torque>
+                        <omega>
+                            <peak units="rad/s">523.59</peak>
+                        </omega>
+                        <loss_coefficient>
+                            <alpha units="W/N**2/m**2">0.025</alpha>
+                            <beta units="W*s/rad">3.38</beta>
+                            <gamma units="W*s**2/rad**2">0.00825</gamma>
+                        </loss_coefficient>
+                        <scaling>
+                            <diameter>0.9</diameter>
+                            <length>0.97</length>
+                            <phase_resistance>0.93308789</phase_resistance>
+                            <torque_constant>0.77</torque_constant>
+                            <alpha>1.57</alpha>
+                            <beta>0.51</beta>
+                            <gamma>0.55</gamma>
+                        </scaling>
+                    </motor_1>
+                    <motor_2>
+                        <from_LE units="m">0.15</from_LE>
+                        <shaft_power_max units="kW">70.0</shaft_power_max>
+                        <torque_constant units="N*m/A">1.46</torque_constant>
+                        <voltage>
+                            <peak units="V">700.0</peak>
+                        </voltage>
+                        <torque>
+                            <cont units="N*m">150.0</cont>
+                        </torque>
+                        <omega>
+                            <peak units="rad/s">523.59</peak>
+                        </omega>
+                        <loss_coefficient>
+                            <alpha units="W/N**2/m**2">0.025</alpha>
+                            <beta units="W*s/rad">3.38</beta>
+                            <gamma units="W*s**2/rad**2">0.00825</gamma>
+                        </loss_coefficient>
+                        <scaling>
+                            <diameter>0.9</diameter>
+                            <length>0.97</length>
+                            <phase_resistance>0.93308789</phase_resistance>
+                            <torque_constant>0.77</torque_constant>
+                            <alpha>1.57</alpha>
+                            <beta>0.51</beta>
+                            <gamma>0.55</gamma>
+                        </scaling>
+                    </motor_2>
+                    <motor_3>
+                        <from_LE units="m">0.15</from_LE>
+                        <shaft_power_max units="kW">75.</shaft_power_max>
+                        <torque_constant units="N*m/A">1.46</torque_constant>
+                        <voltage>
+                            <peak units="V">700.0</peak>
+                        </voltage>
+                        <torque>
+                            <cont units="N*m">150.0</cont>
+                        </torque>
+                        <omega>
+                            <peak units="rad/s">523.59</peak>
+                        </omega>
+                        <loss_coefficient>
+                            <alpha units="W/N**2/m**2">0.025</alpha>
+                            <beta units="W*s/rad">3.38</beta>
+                            <gamma units="W*s**2/rad**2">0.00825</gamma>
+                        </loss_coefficient>
+                        <scaling>
+                            <diameter>0.9</diameter>
+                            <length>0.97</length>
+                            <phase_resistance>0.93308789</phase_resistance>
+                            <torque_constant>0.77</torque_constant>
+                            <alpha>1.57</alpha>
+                            <beta>0.51</beta>
+                            <gamma>0.55</gamma>
+                        </scaling>
+                    </motor_3>
+                    <motor_4>
+                        <from_LE units="m">0.15</from_LE>
+                        <shaft_power_max units="kW">80</shaft_power_max>
+                        <torque_constant units="N*m/A">1.46</torque_constant>
+                        <voltage>
+                            <peak units="V">700.0</peak>
+                        </voltage>
+                        <torque>
+                            <cont units="N*m">150.0</cont>
+                        </torque>
+                        <omega>
+                            <peak units="rad/s">523.59</peak>
+                        </omega>
+                        <loss_coefficient>
+                            <alpha units="W/N**2/m**2">0.025</alpha>
+                            <beta units="W*s/rad">3.38</beta>
+                            <gamma units="W*s**2/rad**2">0.00825</gamma>
+                        </loss_coefficient>
+                        <scaling>
+                            <diameter>0.9</diameter>
+                            <length>0.97</length>
+                            <phase_resistance>0.93308789</phase_resistance>
+                            <torque_constant>0.77</torque_constant>
+                            <alpha>1.57</alpha>
+                            <beta>0.51</beta>
+                            <gamma>0.55</gamma>
+                        </scaling>
+                    </motor_4>
+                </PMSM>
+                <propeller>
+                    <propeller_1>
+                        <from_LE units="m">0.15</from_LE>
+                        <rpm_mission>2000.0</rpm_mission>
+                        <solidity>0.2</solidity>
+                        <activity_factor>150</activity_factor>
+                        <blade_twist units="deg">22.6</blade_twist>
+                        <diameter units="inch">78.0</diameter>
+                        <number_blades>3</number_blades>
+                        <material>0.0</material>
+                        <torque>
+                            <cont units="N*m">817.0</cont>
+                        </torque>
+                    </propeller_1>
+                    <propeller_2>
+                        <from_LE units="m">0.15</from_LE>
+                        <rpm_mission>2000.0</rpm_mission>
+                        <solidity>0.2</solidity>
+                        <activity_factor>150</activity_factor>
+                        <blade_twist units="deg">22.6</blade_twist>
+                        <diameter units="inch">78.0</diameter>
+                        <number_blades>3</number_blades>
+                        <material>0.0</material>
+                        <torque>
+                            <cont units="N*m">817.0</cont>
+                        </torque>
+                    </propeller_2>
+                    <propeller_3>
+                        <from_LE units="m">0.15</from_LE>
+                        <rpm_mission>2000.0</rpm_mission>
+                        <solidity>0.2</solidity>
+                        <activity_factor>150</activity_factor>
+                        <blade_twist units="deg">22.6</blade_twist>
+                        <diameter units="inch">78.0</diameter>
+                        <number_blades>3</number_blades>
+                        <material>0.0</material>
+                        <torque>
+                            <cont units="N*m">817.0</cont>
+                        </torque>
+                    </propeller_3>
+                    <propeller_4>
+                        <from_LE units="m">0.15</from_LE>
+                        <rpm_mission>2000.0</rpm_mission>
+                        <solidity>0.2</solidity>
+                        <activity_factor>150</activity_factor>
+                        <blade_twist units="deg">22.6</blade_twist>
+                        <diameter units="inch">78.0</diameter>
+                        <number_blades>3</number_blades>
+                        <material>0.0</material>
+                        <torque>
+                            <cont units="N*m">817.0</cont>
+                        </torque>
+                    </propeller_4>
+                </propeller>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>

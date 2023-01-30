@@ -25,24 +25,28 @@ class PerformancesMaximum(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "voltage_a",
+            "dc_voltage_out",
             val=np.full(number_of_points, np.nan),
             units="V",
-            desc="real voltage at side a",
+            desc="Voltage at the expected output (current flows from source/input to load/output)",
             shape=number_of_points,
         )
         self.add_input(
-            "voltage_b",
+            "dc_voltage_in",
             val=np.full(number_of_points, np.nan),
             units="V",
-            desc="real voltage at side b",
+            desc="Voltage at the expected input (current flows from source/input to load/output)",
             shape=number_of_points,
         )
         self.add_input(
-            "total_current",
+            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
+            val=1.0,
+        )
+        self.add_input(
+            "dc_current_one_cable",
             val=np.full(number_of_points, np.nan),
             units="A",
-            desc="current of the harness",
+            desc="current of one cable of the harness",
             shape=number_of_points,
         )
         self.add_input(
@@ -52,11 +56,18 @@ class PerformancesMaximum(om.ExplicitComponent):
             desc="temperature inside of the cable",
             shape=number_of_points,
         )
+        self.add_input(
+            "conduction_losses",
+            units="W",
+            desc="Joule losses in one cable of the harness",
+            val=np.full(number_of_points, np.nan),
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
             val=1000.0,
             units="A",
+            desc="Maximum current flowing through the harness, all cables included",
         )
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max",
@@ -67,23 +78,37 @@ class PerformancesMaximum(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":temperature_max",
-            val=288.15,
+            val=388.15,
             units="degK",
+        )
+        self.add_output(
+            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":losses_max",
+            val=2.0e3,
+            units="W",
+            desc="Maximum losses in one cable of the harness",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
-            wrt="total_current",
+            wrt=[
+                "dc_current_one_cable",
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
+            ],
             method="exact",
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max",
-            wrt=["voltage_a", "voltage_b"],
+            wrt=["dc_voltage_out", "dc_voltage_in"],
             method="exact",
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":temperature_max",
             wrt=["cable_temperature"],
+            method="exact",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":losses_max",
+            wrt=["conduction_losses"],
             method="exact",
         )
 
@@ -93,9 +118,14 @@ class PerformancesMaximum(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max"
-        ] = np.amax(inputs["total_current"])
+        ] = (
+            np.amax(inputs["dc_current_one_cable"])
+            * inputs[
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
+            ]
+        )
 
-        voltage_max = np.maximum(inputs["voltage_a"], inputs["voltage_b"])
+        voltage_max = np.maximum(inputs["dc_voltage_out"], inputs["dc_voltage_in"])
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max"
@@ -105,39 +135,58 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":temperature_max"
         ] = np.amax(inputs["cable_temperature"])
 
+        outputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":losses_max"
+        ] = np.amax(inputs["conduction_losses"])
+
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         harness_id = self.options["harness_id"]
 
-        current = inputs["total_current"]
+        current = inputs["dc_current_one_cable"]
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
-            "total_current",
-        ] = np.where(current == np.amax(current), 1.0, 0.0)
+            "dc_current_one_cable",
+        ] = (
+            np.where(current == np.amax(current), 1.0, 0.0)
+            * inputs[
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
+            ]
+        )
+        partials[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
+        ] = np.amax(inputs["dc_current_one_cable"])
 
-        voltage_a = inputs["voltage_a"]
-        voltage_b = inputs["voltage_b"]
-        if np.amax(voltage_b) > np.amax(voltage_a):
+        voltage_out = inputs["dc_voltage_out"]
+        voltage_in = inputs["dc_voltage_in"]
+        if np.amax(voltage_in) > np.amax(voltage_out):
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max",
-                "voltage_a",
-            ] = np.zeros_like(voltage_a)
+                "dc_voltage_out",
+            ] = np.zeros_like(voltage_out)
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max",
-                "voltage_b",
-            ] = np.where(voltage_b == np.amax(voltage_b), 1.0, 0.0)
+                "dc_voltage_in",
+            ] = np.where(voltage_in == np.amax(voltage_in), 1.0, 0.0)
         else:
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max",
-                "voltage_b",
-            ] = np.zeros_like(voltage_a)
+                "dc_voltage_in",
+            ] = np.zeros_like(voltage_out)
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max",
-                "voltage_a",
-            ] = np.where(voltage_a == np.amax(voltage_a), 1.0, 0.0)
+                "dc_voltage_out",
+            ] = np.where(voltage_out == np.amax(voltage_out), 1.0, 0.0)
 
         cable_temperature = inputs["cable_temperature"]
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":temperature_max",
             "cable_temperature",
         ] = np.where(cable_temperature == np.amax(cable_temperature), 1.0, 0.0)
+
+        losses = inputs["conduction_losses"]
+        partials[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":losses_max",
+            "conduction_losses",
+        ] = np.where(losses == np.amax(losses), 1.0, 0.0)

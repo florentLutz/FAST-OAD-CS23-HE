@@ -9,7 +9,7 @@ LENGTH_FACTOR = 1.2  # For the mass and resistance computation we will consider 
 # longer than it actually is to account for the fact that he is stranded to shield EMI
 
 
-class HarnessMass(om.ExplicitComponent):
+class SizingHarnessMass(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
             name="harness_id",
@@ -38,10 +38,18 @@ class HarnessMass(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
             val=1,
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":contactor:mass",
+            units="kg",
+            val=np.nan,
+            desc="Mass of all the contactors in the harness",
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":mass",
-            val=1,
+            val=10,
             units="kg",
         )
 
@@ -62,6 +70,9 @@ class HarnessMass(om.ExplicitComponent):
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
             ]
             * LENGTH_FACTOR
+            + inputs[
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":contactor:mass"
+            ]
         )
 
         outputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":mass"] = mass
@@ -108,3 +119,7 @@ class HarnessMass(om.ExplicitComponent):
             ]
             * LENGTH_FACTOR
         )
+        partials[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":mass",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":contactor:mass",
+        ] = 1.0

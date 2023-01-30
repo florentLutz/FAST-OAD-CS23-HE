@@ -1,38 +1,109 @@
 <FASTOAD_model>
     <data>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <MAC>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
         <propulsion>
             <he_power_train>
                 <inverter>
                     <inverter_1>
-                        <current_caliber units="A">500.0</current_caliber>
-                        <power_factor>0.9</power_factor>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <casing>
+                            <mass units="kg">1.0446</mass>
+                            <heat_capacity units="J/degK">208.92</heat_capacity>
+                            <thermal_resistance units="K/W">0.010</thermal_resistance>
+                        </casing>
+                        <module>
+                            <length units="m">0.156</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
+                        <heat_sink>
+                            <length units="m">0.2145</length>
+                            <width units="m">0.1716</width>
+                            <height units="m">0.005655</height>
+                            <temperature_rating units="degK">373.15</temperature_rating>
+                            <mass units="kg">0.619</mass>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                            <tube>
+                                <inner_diameter units="m">1.27e-3</inner_diameter>
+                                <outer_diameter units="m">3.77e-3</outer_diameter>
+                                <length units="m">0.858</length>
+                                <mass units="kg">0.083</mass>
+                            </tube>
+                        </heat_sink>
+                        <dissipable_heat units="W">11808.0</dissipable_heat>
+                        <losses_max units="W">11000.0</losses_max>
+                        <current_caliber units="A">433.0</current_caliber>
+                        <current_ac_max units="A">400.0</current_ac_max>
+                        <voltage_caliber units="V">500.0</voltage_caliber>
+                        <voltage_ac_max units="V">500.0</voltage_ac_max>
+                        <switching_frequency units="Hz">15.0e3</switching_frequency>
+                        <switching_frequency_max units="Hz">12.0e3</switching_frequency_max>
+                        <power_factor>1.0</power_factor>
+                        <mass units="kg">42.82</mass>
+                        <capacitor>
+                            <capacity units="F">2.02e-3</capacity>
+                            <current_caliber units="A">199.18</current_caliber>
+                            <mass units="kg">3.832</mass>
+                        </capacitor>
+                        <inductor>
+                            <inductance units="H">11.5e-6</inductance>
+                            <mass units="kg">31.064</mass>
+                        </inductor>
+                        <contactor>
+                            <mass units="kg">4.85</mass>
+                        </contactor>
                         <scaling>
-                            <a>1.111</a>
-                            <c>0.9</c>
-                            <resistance>0.9</resistance>
+                            <a>1.385</a>
+                            <c>0.722</c>
+                            <resistance>1.385</resistance>
                         </scaling>
                         <igbt>
-                            <resistance units="ohm">1.8e-3</resistance>
-                            <gate_voltage units="V">1.2</gate_voltage>
+                            <resistance units="ohm">0.00209135</resistance>
+                            <thermal_resistance units="K/W">0.114955</thermal_resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
                         </igbt>
                         <diode>
-                            <resistance units="ohm">1.44e-3</resistance>
-                            <gate_voltage units="V">1.1</gate_voltage>
+                            <resistance units="ohm">0.00258995</resistance>
+                            <thermal_resistance units="K/W">0.148195</thermal_resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
                         </diode>
                         <energy_on>
-                            <a>1.5106e-9</a>
-                            <b>3.986e-6</b>
-                            <c>0.0010926</c>
+                            <a>0.02197006</a>
+                            <b>3.326e-05</b>
+                            <c>3.707e-7</c>
                         </energy_on>
                         <energy_off>
-                            <a>-1.07e-10</a>
-                            <b>1.33e-05</b>
-                            <c>0.00081576</c>
+                            <a>0.02087697</a>
+                            <b>0.000254</b>
+                            <c>-1.256e-7</c>
                         </energy_off>
                         <energy_rr>
-                            <a>-9.204e-10</a>
-                            <b>1.116e-05</b>
-                            <c>0.0011241</c>
+                            <a>0.0058837</a>
+                            <b>0.000340</b>
+                            <c>-3.257e-8</c>
                         </energy_rr>
                     </inverter_1>
                 </inverter>

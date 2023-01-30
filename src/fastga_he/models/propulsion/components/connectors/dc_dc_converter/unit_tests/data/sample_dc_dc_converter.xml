@@ -1,0 +1,82 @@
+<FASTOAD_model>
+    <data>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <MAC>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <DC_DC_converter>
+                    <dc_dc_converter_1>
+                        <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
+                        <switching_frequency_mission units="Hz">[3000., 4000., 5000., 6000., 7000., 8000., 9000., 10000., 11000., 12000.]</switching_frequency_mission>
+                        <capacitor>
+                            <current_caliber units="A">400.0</current_caliber>
+                            <current_max units="A">380.0</current_max>
+                        </capacitor>
+                        <inductor>
+                            <current_caliber units="A">400.0</current_caliber>
+                            <current_max units="A">380.0</current_max>
+                        </inductor>
+                        <module>
+                            <current_caliber units="A">400.0</current_caliber>
+                        </module>
+                        <igbt>
+                            <current_max units="A">390.0</current_max>
+                            <resistance units="ohm">0.002265</resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                        </igbt>
+                        <diode>
+                            <current_max units="A">380.0</current_max>
+                            <resistance units="ohm">0.002805</resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                        </diode>
+                        <current_in_caliber units="A">400.0</current_in_caliber>
+                        <current_in_max units="A">400.0</current_in_max>
+                        <voltage_caliber units="V">860.0</voltage_caliber>
+                        <voltage_in_caliber units="V">860.0</voltage_in_caliber>
+                        <voltage_in_max units="V">860.0</voltage_in_max>
+                        <voltage_out_max units="V">850.0</voltage_out_max>
+                        <current_ripple>0.1</current_ripple>
+                        <switching_frequency units="Hz">12000.0</switching_frequency>
+                        <switching_frequency_max units="Hz">12000.0</switching_frequency_max>
+                        <scaling>
+                            <a>1.5</a>
+                            <resistance>1.5</resistance>
+                            <c>0.666</c>
+                        </scaling>
+                        <energy_on>
+                            <a>0.02379429</a>
+                            <b>3.326e-05</b>
+                            <c>3.420e-7</c>
+                        </energy_on>
+                        <energy_rr>
+                            <a>0.00637224</a>
+                            <b>0.000340</b>
+                            <c>-3.005e-8</c>
+                        </energy_rr>
+                        <energy_off>
+                            <a>0.02261044</a>
+                            <b>0.000254</b>
+                            <c>-1.158e-7</c>
+                        </energy_off>
+                    </dc_dc_converter_1>
+                </DC_DC_converter>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>

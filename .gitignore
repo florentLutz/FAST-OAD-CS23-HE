@@ -50,6 +50,7 @@ coverage.xml
 
 # test results
 results/
+n2.html
 
 # Build and docs folder/files
 build/*
@@ -69,5 +70,6 @@ venv*/
 # External tools
 /XFOIL
 
-# Private files
+# Private files and workdir
 **/private/**
+**/workdir/**

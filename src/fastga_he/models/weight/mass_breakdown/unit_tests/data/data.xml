@@ -1,0 +1,9 @@
+<FAST_OAD>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <mass units="kg">320.0</mass>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FAST_OAD>

@@ -1,0 +1,60 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    if: ${{ !contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[skip ci]') }}
+    strategy:
+      matrix:
+        python-version: [ 3.8, 3.9 ]
+        os: [ windows-latest, ubuntu-latest ]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Poetry
+        run: pipx install poetry==1.1.15
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
+
+      - name: Activate environment and install dependencies
+        run: poetry install
+        shell: bash
+
+      - name: Check with Black
+        run: |
+          # Fails if Black format is not respected
+          poetry run black --check .
+        shell: bash
+
+      - name: Component unit tests
+        run: |
+          poetry run pytest src/fastga_he/models/propulsion/components
+        shell: bash
+
+      - name: Assembly unit tests
+        run: |
+          poetry run pytest src/fastga_he/models/propulsion/assemblies
+        shell: bash
+
+      - name: Mission unit tests
+        run: |
+          poetry run pytest src/fastga_he/models/performances
+        shell: bash
+
+      - name: GUI unit tests
+        run: |
+          poetry run pytest src/fastga_he/gui
+        shell: bash

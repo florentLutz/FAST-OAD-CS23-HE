@@ -8,7 +8,7 @@ import openmdao.api as om
 from .sizing_harness_mass import LENGTH_FACTOR
 
 
-class ReferenceResistance(om.ExplicitComponent):
+class SizingReferenceResistance(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
             name="harness_id",
@@ -38,7 +38,7 @@ class ReferenceResistance(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":cable:resistance",
-            val=1,
+            val=1e-3,
             units="ohm",
         )
 

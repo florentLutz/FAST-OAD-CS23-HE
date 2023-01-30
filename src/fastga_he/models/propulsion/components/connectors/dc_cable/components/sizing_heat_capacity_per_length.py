@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class HeatCapacityPerLength(om.ExplicitComponent):
+class SizingHeatCapacityPerLength(om.ExplicitComponent):
     """Computation of mass per length of cable."""
 
     def initialize(self):
@@ -83,7 +83,7 @@ class HeatCapacityPerLength(om.ExplicitComponent):
         )
 
         self.add_input(
-            "settings:propulsion:he_power_train:DC_cable_harness:sheath:thickness",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
             units="m",
             val=0.2e-2,
         )
@@ -105,6 +105,7 @@ class HeatCapacityPerLength(om.ExplicitComponent):
             + harness_id
             + ":cable:heat_capacity_per_length",
             units="J/degK/m",
+            val=7000.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -124,7 +125,9 @@ class HeatCapacityPerLength(om.ExplicitComponent):
         t_shield = inputs[
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness"
         ]
-        t_sheath = inputs["settings:propulsion:he_power_train:DC_cable_harness:sheath:thickness"]
+        t_sheath = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
+        ]
 
         cp_c = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:"
@@ -185,7 +188,9 @@ class HeatCapacityPerLength(om.ExplicitComponent):
         t_shield = inputs[
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness"
         ]
-        t_sheath = inputs["settings:propulsion:he_power_train:DC_cable_harness:sheath:thickness"]
+        t_sheath = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
+        ]
 
         cp_c = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:"
@@ -300,7 +305,7 @@ class HeatCapacityPerLength(om.ExplicitComponent):
         )
         partials[
             output_str,
-            "settings:propulsion:he_power_train:DC_cable_harness:sheath:thickness",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
         ] = (
             2.0 * np.pi * cp_sheath * rho_sheath * (r_c + t_in + t_shield + t_sheath)
         )

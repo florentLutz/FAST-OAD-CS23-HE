@@ -1,0 +1,45 @@
+<FASTOAD_model>
+    <data>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <MAC>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <DC_bus>
+                    <dc_bus_1>
+                        <current_caliber units="A">941.2</current_caliber>
+                        <current_max units="A">800.</current_max>
+                        <voltage_caliber units="V">588.2</voltage_caliber>
+                        <voltage_max units="V">500.</voltage_max>
+                        <width units="cm">6.382</width>
+                        <height units="cm">0.953</height>
+                        <length units="cm">30.222</length>
+                        <cross_section>
+                            <area units="cm**2">1.90</area>
+                            <thickness units="cm">0.31</thickness>
+                            <width units="cm">6.16</width>
+                        </cross_section>
+                        <insulation>
+                            <thickness units="cm">0.111</thickness>
+                        </insulation>
+                    </dc_bus_1>
+                </DC_bus>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>

@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class CurrentPerCable(om.ExplicitComponent):
+class SizingCurrentPerCable(om.ExplicitComponent):
     """Computation of max current per cable ."""
 
     def initialize(self):
@@ -27,14 +27,19 @@ class CurrentPerCable(om.ExplicitComponent):
             val=1.0,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":current_caliber",
             val=np.nan,
             units="A",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current",
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber",
             units="A",
+            val=250.0,
         )
 
         self.declare_partials(of="*", wrt="*")
@@ -44,9 +49,13 @@ class CurrentPerCable(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         outputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current"
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber"
         ] = (
-            inputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max"]
+            inputs[
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_caliber"
+            ]
             / inputs[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
             ]
@@ -57,8 +66,10 @@ class CurrentPerCable(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         partials[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current",
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_caliber",
         ] = (
             1.0
             / inputs[
@@ -67,10 +78,14 @@ class CurrentPerCable(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:current",
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:current_caliber",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
         ] = -(
-            inputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max"]
+            inputs[
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_caliber"
+            ]
             / inputs[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
             ]

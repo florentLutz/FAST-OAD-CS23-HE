@@ -8,7 +8,7 @@ import openmdao.api as om
 from .sizing_harness_mass import LENGTH_FACTOR
 
 
-class HeatCapacityCable(om.ExplicitComponent):
+class SizingHeatCapacityCable(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
             name="harness_id",
@@ -38,7 +38,7 @@ class HeatCapacityCable(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":cable:heat_capacity",
-            val=1,
+            val=7000.0,
             units="J/degK",
         )
 

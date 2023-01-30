@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class CableRadius(om.ExplicitComponent):
+class SizingCableRadius(om.ExplicitComponent):
     """Computation of mass per length of cable."""
 
     def initialize(self):
@@ -42,7 +42,7 @@ class CableRadius(om.ExplicitComponent):
             val=0.2e-3,
         )
         self.add_input(
-            "settings:propulsion:he_power_train:DC_cable_harness:sheath:thickness",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
             units="m",
             val=0.2e-2,
         )
@@ -50,6 +50,7 @@ class CableRadius(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
             units="m",
+            val=5e-2,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -69,7 +70,9 @@ class CableRadius(om.ExplicitComponent):
         t_shield = inputs[
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness"
         ]
-        t_sheath = inputs["settings:propulsion:he_power_train:DC_cable_harness:sheath:thickness"]
+        t_sheath = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
+        ]
 
         r_cable = r_c + t_in + t_shield + t_sheath
 
@@ -100,5 +103,5 @@ class CableRadius(om.ExplicitComponent):
         ] = 1.0
         partials[
             output_str,
-            "settings:propulsion:he_power_train:DC_cable_harness:sheath:thickness",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
         ] = 1.0

@@ -1,30 +1,58 @@
 <FASTOAD_model>
     <data>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <span units="m" is_input="False">9.237463382822208<!--wing span--></span>
+                <MAC>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
         <propulsion>
             <he_power_train>
                 <DC_cable_harness>
                     <harness_1>
                         <material>1.0</material>
-                        <current_max units="A">47.0</current_max>
-                        <voltage_max units="V">10000</voltage_max>
+                        <current_caliber units="A">700.0</current_caliber>
+                        <current_max units="A">650.0</current_max>
+                        <voltage_caliber units="V">1000.0</voltage_caliber>
+                        <voltage_max units="V">800.0</voltage_max>
                         <number_cables>1.0</number_cables>
                         <length units="m">7.0</length>
+                        <length_span_ratio>0.17</length_span_ratio>
                         <conductor>
-                            <radius units="cm">0.24</radius><!--Not coherent with section but here to check paper values-->
-                            <section units="mm*mm">5.02</section>
+                            <radius units="m">3.71e-3</radius>
+                            <section units="mm*mm">43.44</section>
                         </conductor>
                         <insulation>
-                            <thickness units="m">0.327e-2</thickness>
+                            <thickness units="m">0.0012</thickness>
                         </insulation>
+                        <sheath>
+                            <thickness units="mm">1.36</thickness>
+                        </sheath>
+                        <contactor>
+                            <mass units="kg">4.95</mass>
+                        </contactor>
                         <cable>
-                            <resistance units="ohm">0.0263</resistance>
+                            <resistance units="ohm">0.00333</resistance>
                             <initial_temperature units="degK">288.15</initial_temperature>
-                            <resistance_per_length units="ohm/km">3.14</resistance_per_length>
-                            <mass_per_length units="kg/m">1.08</mass_per_length>
-                            <current units="A">110.0</current>
-                            <radius units="mm">8.67</radius>
-                            <heat_capacity_per_length units="J/degK/m">764.64</heat_capacity_per_length>
-                            <heat_capacity units="J/degK">6422.976</heat_capacity>
+                            <resistance_per_length units="ohm/km">0.397</resistance_per_length>
+                            <mass_per_length units="kg/m">0.537</mass_per_length>
+                            <current_caliber units="A">700.0</current_caliber>
+                            <radius units="mm">6.47</radius>
+                            <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
+                            <heat_capacity units="J/degK">3169.777</heat_capacity>
                         </cable>
                         <properties>
                             <resistance_temperature_scale_factor units="degK**-1">0.00393</resistance_temperature_scale_factor>

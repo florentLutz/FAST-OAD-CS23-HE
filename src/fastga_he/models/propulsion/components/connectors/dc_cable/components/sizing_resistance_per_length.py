@@ -9,7 +9,7 @@ POWER_COPPER = 2.85
 POWER_ALU = 3.28
 
 
-class ResistancePerLength(om.ExplicitComponent):
+class SizingResistancePerLength(om.ExplicitComponent):
     """Computation of max current per cable ."""
 
     def initialize(self):
@@ -43,6 +43,7 @@ class ResistancePerLength(om.ExplicitComponent):
             + harness_id
             + ":cable:resistance_per_length",
             units="ohm/km",
+            val=1.21,
         )
 
         self.declare_partials(of="*", wrt="*")

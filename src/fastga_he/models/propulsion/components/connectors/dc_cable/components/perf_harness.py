@@ -3,25 +3,27 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
+import fastoad.api as oad
 
 from .perf_resistance import PerformancesResistance
 from .perf_current import PerformancesCurrent, PerformancesHarnessCurrent
-from .perf_temperature_derivative import PerformancesTemperatureDerivative
-from .perf_temperature_increase import PerformancesTemperatureIncrease
+from .perf_losses_one_cable import PerformancesLossesOneCable
 from .perf_temperature import PerformancesTemperature
 from .perf_maximum import PerformancesMaximum
 
+from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
 
-class PerformanceHarness(om.Group):
+
+class PerformancesHarness(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         # Solvers setup
-        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+        self.nonlinear_solver = om.NonlinearBlockGS()
         self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 50
+        self.nonlinear_solver.options["maxiter"] = 200
         self.nonlinear_solver.options["rtol"] = 1e-5
-        self.linear_solver = om.DirectSolver()
+        self.linear_solver = om.LinearBlockGS()
 
     def initialize(self):
 
@@ -43,65 +45,63 @@ class PerformanceHarness(om.Group):
         self.add_subsystem(
             "resistance",
             PerformancesResistance(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "settings:*"],
+            promotes=["data:*", "settings:*", "cable_temperature"],
         )
         self.add_subsystem(
             "cable_current",
             PerformancesCurrent(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "voltage_a", "voltage_b"],
+            promotes=["data:*", "dc_voltage_out", "dc_voltage_in"],
         )
+        self.add_subsystem(
+            "losses_one_cable",
+            PerformancesLossesOneCable(number_of_points=number_of_points),
+            promotes=["conduction_losses"],
+        )
+
+        options_dict = {"harness_id": harness_id, "number_of_points": number_of_points}
+
+        self.add_subsystem(
+            "temperature",
+            oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE, options=options_dict
+            ),
+            promotes=[
+                "data:*",
+                "exterior_temperature",
+                "cable_temperature",
+                "conduction_losses",
+                "time_step",
+            ],
+        )
+        # Though harness current depend on a variable stuck in the loop its output is not used in
+        # the loop so we can take it out
         self.add_subsystem(
             "harness_current",
             PerformancesHarnessCurrent(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "total_current"],
+            promotes=["data:*", "dc_current"],
         )
         self.add_subsystem(
-            "temperature_derivative",
-            PerformancesTemperatureDerivative(
-                harness_id=harness_id, number_of_points=number_of_points
-            ),
-            promotes=["data:*", "exterior_temperature"],
-        )
-        self.add_subsystem(
-            "temperature_increase",
-            PerformancesTemperatureIncrease(number_of_points=number_of_points),
-            promotes=["time_step"],
-        )
-        self.add_subsystem(
-            "temperature",
-            PerformancesTemperature(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*"],
-        )
-        self.add_subsystem(
-            "maxima",
+            "maximum",
             PerformancesMaximum(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "total_current", "voltage_a", "voltage_b"],
+            promotes=[
+                "data:*",
+                "dc_voltage_out",
+                "dc_voltage_in",
+                "cable_temperature",
+                "conduction_losses",
+            ],
         )
 
         self.connect(
             "resistance.resistance_per_cable",
-            ["cable_current.resistance_per_cable", "temperature_derivative.resistance_per_cable"],
+            ["cable_current.resistance_per_cable", "losses_one_cable.resistance_per_cable"],
         )
 
         self.connect(
-            "cable_current.current", ["harness_current.current", "temperature_derivative.current"]
-        )
-
-        self.connect(
-            "temperature_derivative.cable_temperature_time_derivative",
-            "temperature_increase.cable_temperature_time_derivative",
-        )
-
-        self.connect(
-            "temperature_increase.cable_temperature_increase",
-            "temperature.cable_temperature_increase",
-        )
-
-        self.connect(
-            "temperature.cable_temperature",
+            "cable_current.dc_current_one_cable",
             [
-                "resistance.cable_temperature",
-                "temperature_derivative.cable_temperature",
-                "maxima.cable_temperature",
+                "harness_current.dc_current_one_cable",
+                "losses_one_cable.dc_current_one_cable",
+                "maximum.dc_current_one_cable",
             ],
         )

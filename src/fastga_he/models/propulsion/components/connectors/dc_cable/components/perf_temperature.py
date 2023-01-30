@@ -4,8 +4,19 @@
 
 import numpy as np
 import openmdao.api as om
+import fastoad.api as oad
+
+from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
+
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
+] = "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
 
 
+@oad.RegisterSubmodel(
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
+    "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state",
+)
 class PerformancesTemperature(om.ExplicitComponent):
     def initialize(self):
 
@@ -25,18 +36,36 @@ class PerformancesTemperature(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "cable_temperature_increase",
+            "conduction_losses",
+            units="W",
+            desc="Joule losses in one cable of the harness",
             val=np.full(number_of_points, np.nan),
-            units="degK",
+        )
+        self.add_input(
+            "heat_transfer_coefficient",
+            val=np.full(number_of_points, 50.0),
+            units="W/m**2/degK",
+            desc="Heat transfer coefficient between cable and outside medium",
             shape=number_of_points,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":cable:initial_temperature",
+            "exterior_temperature",
+            val=np.full(number_of_points, np.nan),
             units="degK",
+            desc="temperature outside of the cable",
+            shape=number_of_points,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
+            units="m",
             val=np.nan,
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
+            val=np.nan,
+            units="m",
+        )
+        self.add_input("time_step", shape=number_of_points, units="s", val=np.nan)
 
         self.add_output(
             "cable_temperature",
@@ -46,22 +75,36 @@ class PerformancesTemperature(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt=[
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
+                "exterior_temperature",
+                "heat_transfer_coefficient",
+                "conduction_losses",
+            ],
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        harness_id = self.options["harness_id"]
-        number_of_points = self.options["number_of_points"]
 
-        d_temp = inputs["cable_temperature_increase"]
-        initial_temperature = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":cable:initial_temperature"
+        harness_id = self.options["harness_id"]
+
+        cable_radius = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius"
+        ]
+        cable_length = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length"
         ]
 
-        temperature_profile = (
-            np.full(number_of_points, initial_temperature) + np.cumsum(d_temp) - d_temp[0]
-        )
+        h = inputs["heat_transfer_coefficient"]
+
+        temp_ext = inputs["exterior_temperature"]
+
+        q_c = inputs["conduction_losses"]
+
+        temperature_profile = temp_ext + q_c / (2.0 * np.pi * cable_radius * cable_length * h)
 
         outputs["cable_temperature"] = temperature_profile
 
@@ -70,12 +113,29 @@ class PerformancesTemperature(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
+        cable_radius = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius"
+        ]
+        cable_length = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length"
+        ]
+
+        h = inputs["heat_transfer_coefficient"]
+
+        q_c = inputs["conduction_losses"]
+
         partials[
             "cable_temperature",
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":cable:initial_temperature",
-        ] = np.ones(number_of_points)
-        partials["cable_temperature", "cable_temperature_increase"] = np.tri(
-            number_of_points, number_of_points
-        ) - np.eye(number_of_points)
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
+        ] = -q_c / (2.0 * np.pi * cable_radius ** 2.0 * cable_length * h)
+        partials[
+            "cable_temperature",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
+        ] = -q_c / (2.0 * np.pi * cable_radius * cable_length ** 2.0 * h)
+        partials["cable_temperature", "heat_transfer_coefficient"] = np.diag(
+            -q_c / (2.0 * np.pi * cable_radius * cable_length * h ** 2.0)
+        )
+        partials["cable_temperature", "conduction_losses"] = np.diag(
+            1.0 / (2.0 * np.pi * cable_radius * cable_length * h ** 2.0)
+        )
+        partials["cable_temperature", "exterior_temperature"] = np.eye(number_of_points)

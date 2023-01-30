@@ -29,17 +29,17 @@ class PerformancesCurrent(om.ExplicitComponent):
             val=1.0,
         )
         self.add_input(
-            "voltage_a",
+            "dc_voltage_out",
             val=np.full(number_of_points, np.nan),
             units="V",
-            desc="real voltage at side a",
+            desc="Voltage at the expected output (current flows from source/input to load/output)",
             shape=number_of_points,
         )
         self.add_input(
-            "voltage_b",
+            "dc_voltage_in",
             val=np.full(number_of_points, np.nan),
             units="V",
-            desc="real voltage at side b",
+            desc="Voltage at the expected input (current flows from source/input to load/output)",
             shape=number_of_points,
         )
         self.add_input(
@@ -51,10 +51,11 @@ class PerformancesCurrent(om.ExplicitComponent):
         )
 
         self.add_output(
-            "current",
+            "dc_current_one_cable",
             units="A",
             desc="current of line",
             shape=number_of_points,
+            val=250.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -65,34 +66,34 @@ class PerformancesCurrent(om.ExplicitComponent):
         number_cables = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
         ]
-        voltage_a = inputs["voltage_a"]
-        voltage_b = inputs["voltage_b"]
+        voltage_out = inputs["dc_voltage_out"]
+        voltage_in = inputs["dc_voltage_in"]
         resistance_per_cable = inputs["resistance_per_cable"]
 
         equivalent_resistance = resistance_per_cable / number_cables
-        total_current = (voltage_b - voltage_a) / equivalent_resistance
+        total_current = (voltage_in - voltage_out) / equivalent_resistance
         current = total_current / number_cables
 
         # Equivalent to :
-        # current = (voltage_b - voltage_a) / resistance_per_cable ?
+        # current = (voltage_in - voltage_out) / resistance_per_cable ?
 
-        outputs["current"] = current
+        outputs["dc_current_one_cable"] = current
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         harness_id = self.options["harness_id"]
 
-        voltage_a = inputs["voltage_a"]
-        voltage_b = inputs["voltage_b"]
+        voltage_out = inputs["dc_voltage_out"]
+        voltage_in = inputs["dc_voltage_in"]
         resistance_per_cable = inputs["resistance_per_cable"]
 
-        partials["current", "voltage_b"] = np.diag(1.0 / resistance_per_cable)
-        partials["current", "voltage_a"] = np.diag(-1.0 / resistance_per_cable)
-        partials["current", "resistance_per_cable"] = np.diag(
-            -(voltage_b - voltage_a) / resistance_per_cable ** 2.0
+        partials["dc_current_one_cable", "dc_voltage_in"] = np.diag(1.0 / resistance_per_cable)
+        partials["dc_current_one_cable", "dc_voltage_out"] = np.diag(-1.0 / resistance_per_cable)
+        partials["dc_current_one_cable", "resistance_per_cable"] = np.diag(
+            -(voltage_in - voltage_out) / resistance_per_cable ** 2.0
         )
         partials[
-            "current",
+            "dc_current_one_cable",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
         ] = 0.0
 
@@ -119,7 +120,7 @@ class PerformancesHarnessCurrent(om.ExplicitComponent):
             val=1.0,
         )
         self.add_input(
-            "current",
+            "dc_current_one_cable",
             val=np.full(number_of_points, np.nan),
             units="A",
             desc="current of line",
@@ -127,10 +128,11 @@ class PerformancesHarnessCurrent(om.ExplicitComponent):
         )
 
         self.add_output(
-            "total_current",
+            "dc_current",
             units="A",
             desc="current of the harness",
             shape=number_of_points,
+            val=400.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -138,8 +140,8 @@ class PerformancesHarnessCurrent(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         harness_id = self.options["harness_id"]
 
-        outputs["total_current"] = (
-            inputs["current"]
+        outputs["dc_current"] = (
+            inputs["dc_current_one_cable"]
             * inputs[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
             ]
@@ -148,9 +150,9 @@ class PerformancesHarnessCurrent(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         harness_id = self.options["harness_id"]
 
-        partials["total_current", "current"] = np.diag(
+        partials["dc_current", "dc_current_one_cable"] = np.diag(
             np.full_like(
-                inputs["current"],
+                inputs["dc_current_one_cable"],
                 inputs[
                     "data:propulsion:he_power_train:DC_cable_harness:"
                     + harness_id
@@ -160,6 +162,6 @@ class PerformancesHarnessCurrent(om.ExplicitComponent):
         )
 
         partials[
-            "total_current",
+            "dc_current",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
-        ] = inputs["current"]
+        ] = inputs["dc_current_one_cable"]
