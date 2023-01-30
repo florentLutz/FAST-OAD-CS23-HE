@@ -48,15 +48,28 @@ class PowerTrainSizingFromFile(om.Group):
             components_name_id,
             components_type,
             components_om_type,
+            components_position,
         ) = self.configurator.get_sizing_element_lists()
 
-        for component_name, component_name_id, component_type, component_om_type in zip(
-            components_name, components_name_id, components_type, components_om_type
+        for (
+            component_name,
+            component_name_id,
+            component_type,
+            component_om_type,
+            component_position,
+        ) in zip(
+            components_name,
+            components_name_id,
+            components_type,
+            components_om_type,
+            components_position,
         ):
 
             klass = globals()["Sizing" + component_om_type]
             local_sub_sys = klass()
             local_sub_sys.options[component_name_id] = component_name
+            if component_position:
+                local_sub_sys.options["position"] = component_position
 
             self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
 

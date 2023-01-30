@@ -72,6 +72,8 @@ submodels:
   submodel.weight.mass.system.avionics_system: null
   submodel.weight.mass.system.life_support_system: null
   submodel.weight.mass.system.recording_system: null
+  submodel.weight.mass.systems: fastga_he.submodel.weight.mass.systems.weight_nan
+  submodel.weight.mass.payload: null
   submodel.geometry.nacelle.dimension: null
   submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
 

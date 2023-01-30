@@ -137,6 +137,7 @@
         <PMSM>
           <motor_1>
             <from_LE units="m">0.15</from_LE>
+            <front_length_ratio>0.25</front_length_ratio>
             <rpm_rating units="1/min" is_input="True">4500.0<!--Max voltage of the motor--></rpm_rating>
             <torque_rating units="N*m" is_input="True">200.0<!--Max voltage of the motor--></torque_rating>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
@@ -329,6 +330,10 @@
       </sizing>
     </mission>
     <weight>
+      <aircraft>
+        <payload units="kg">172.0</payload>
+        <max_payload units="kg">172.0</max_payload>
+      </aircraft>
       <airframe>
         <fuselage>
           <k_factor is_input="True">0.85<!--proportional corrective factor for fuselage mass--></k_factor>
@@ -380,8 +385,26 @@
         </recording>
         <life_support>
           <air_conditioning>
-            <mass units="kg">0</mass>
+            <mass units="kg">0.0</mass>
           </air_conditioning>
+          <de_icing>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:de_icing:mass--></mass>
+          </de_icing>
+          <fixed_oxygen>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:fixed_oxygen:mass--></mass>
+          </fixed_oxygen>
+          <insulation>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:insulation:mass--></mass>
+          </insulation>
+          <internal_lighting>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:internal_lighting:mass--></mass>
+          </internal_lighting>
+          <seat_installation>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:seat_installation:mass--></mass>
+          </seat_installation>
+          <security_kits>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:security_kits:mass--></mass>
+          </security_kits>
         </life_support>
         <fixed_oxygen>
           <mass units="kg">0</mass>

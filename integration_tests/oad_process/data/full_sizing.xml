@@ -78,7 +78,7 @@
       </wing>
       <propulsion>
         <engine>
-          <count is_input="True">2.0<!--number of engines--></count>
+          <count is_input="True">1.0<!--number of engines--></count>
           <layout is_input="True">3.0<!--position of engines (1=under the wing / 2=rear fuselage)--></layout>
           <y_ratio is_input="True">0.34<!--engine position with respect to total span--></y_ratio>
         </engine>
@@ -119,6 +119,7 @@
         </DC_DC_converter>
         <DC_cable_harness>
           <harness_1>
+            <length_span_ratio>0.17</length_span_ratio>
             <length units="m" is_input="True">3.0</length>
             <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
             <number_cables is_input="True">1.0</number_cables>
@@ -135,6 +136,7 @@
         </DC_cable_harness>
         <PMSM>
           <motor_1>
+            <from_LE units="m">0.15</from_LE>
             <rpm_rating units="1/min" is_input="True">4500.0<!--Max voltage of the motor--></rpm_rating>
             <torque_rating units="N*m" is_input="True">200.0<!--Max voltage of the motor--></torque_rating>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
@@ -145,20 +147,21 @@
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_weight_fraction is_input="True">0.75<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_modules is_input="True">10.0<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <number_modules is_input="True">9.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
+              <volume units="mL">155.0</volume>
               <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
               <mass units="g" is_input="True">145.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
             </cell>
             <module>
-              <number_cells is_input="True">100.0<!--Number of cells in series inside one battery module--></number_cells>
+              <number_cells is_input="True">95.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
           </battery_pack_1>
         </battery_pack>
         <inverter>
           <inverter_1>
-            <current_caliber units="A">600.0</current_caliber>
-            <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
+            <current_caliber units="A">225.0</current_caliber>
+            <current_ripple is_input="True">0.2<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -208,6 +211,7 @@
         </inverter>
         <propeller>
           <propeller_1>
+            <from_LE units="m">0.15</from_LE>
             <activity_factor is_input="True">125.0<!--Activity factor of the propeller--></activity_factor>
             <blade_twist units="deg" is_input="True">20.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <diameter units="inch" is_input="True">65.0<!--Diameter of the propeller--></diameter>
@@ -325,6 +329,10 @@
       </sizing>
     </mission>
     <weight>
+      <aircraft>
+        <payload units="kg">172.0</payload>
+        <max_payload units="kg">172.0</max_payload>
+      </aircraft>
       <airframe>
         <fuselage>
           <k_factor is_input="True">0.85<!--proportional corrective factor for fuselage mass--></k_factor>
@@ -376,8 +384,26 @@
         </recording>
         <life_support>
           <air_conditioning>
-            <mass units="kg">0</mass>
+            <mass units="kg">0.0</mass>
           </air_conditioning>
+          <de_icing>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:de_icing:mass--></mass>
+          </de_icing>
+          <fixed_oxygen>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:fixed_oxygen:mass--></mass>
+          </fixed_oxygen>
+          <insulation>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:insulation:mass--></mass>
+          </insulation>
+          <internal_lighting>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:internal_lighting:mass--></mass>
+          </internal_lighting>
+          <seat_installation>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:seat_installation:mass--></mass>
+          </seat_installation>
+          <security_kits>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:security_kits:mass--></mass>
+          </security_kits>
         </life_support>
         <fixed_oxygen>
           <mass units="kg">0</mass>

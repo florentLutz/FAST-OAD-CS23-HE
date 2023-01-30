@@ -24,6 +24,9 @@
       "properties": {
         "id": {
           "type": "string"
+        },
+        "position": {
+          "type": "string"
         }
       },
       "additionalProperties": true

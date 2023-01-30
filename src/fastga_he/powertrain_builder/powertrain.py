@@ -63,6 +63,9 @@ class FASTGAHEPowerTrainConfigurator:
         # Contains the id of the components
         self._components_id = None
 
+        # Contains the position of the components
+        self._components_position = None
+
         # Contains the name of the component as it will be found in the input/output file to
         # contain the data. Will also be used as subsystem name
         self._components_name = None
@@ -145,6 +148,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
 
         components_id = []
+        components_position = []
         components_name_list = []
         components_name_id_list = []
         components_type_list = []
@@ -162,6 +166,11 @@ class FASTGAHEPowerTrainConfigurator:
                 raise FASTGAHEUnknownComponentID(
                     component_id + " is not a known ID of a power train component"
                 )
+            if "position" in component:
+                component_position = component["position"]
+                components_position.append(component_position)
+            else:
+                components_position.append("")
 
             components_name_list.append(component_name)
             components_name_id_list.append(resources.DICTIONARY_CN_ID[component_id])
@@ -188,6 +197,7 @@ class FASTGAHEPowerTrainConfigurator:
                 components_options_list.append(None)
 
         self._components_id = components_id
+        self._components_position = components_position
         self._components_name = components_name_list
         self._components_name_id = components_name_id_list
         self._components_type = components_type_list
@@ -291,6 +301,7 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_name_id,
             self._components_type,
             self._components_om_type,
+            self._components_position,
         )
 
     def get_performances_element_lists(self) -> tuple:
