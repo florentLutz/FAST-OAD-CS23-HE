@@ -6,7 +6,7 @@ power_train_components:
     position: in_the_nose  # "on_the_wing", "in_the_nose"
   motor_1:
     id: fastga_he.pt_component.pmsm
-    position: on_the_wing  # "on_the_wing", "in_the_nose"
+    position: in_the_nose  # "on_the_wing", "in_the_nose"
   inverter_1:
     id: fastga_he.pt_component.inverter
     position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
