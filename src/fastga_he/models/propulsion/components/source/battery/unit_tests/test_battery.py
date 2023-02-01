@@ -62,7 +62,7 @@ def test_module_weight():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:module:mass", units="kg"
-    ) == pytest.approx(198.4, rel=1e-2)
+    ) == pytest.approx(15.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -83,7 +83,7 @@ def test_battery_weight():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(7936.0, rel=1e-2)
+    ) == pytest.approx(3000.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -104,7 +104,7 @@ def test_battery_cell_number():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_cells"
-    ) == pytest.approx(8000.0, rel=1e-2)
+    ) == pytest.approx(30000.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -125,7 +125,7 @@ def test_module_volume():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:module:volume", units="L"
-    ) == pytest.approx(38.75, rel=1e-2)
+    ) == pytest.approx(3.30, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -146,7 +146,7 @@ def test_battery_volume():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:volume", units="L"
-    ) == pytest.approx(1550.0, rel=1e-2)
+    ) == pytest.approx(660.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -273,7 +273,7 @@ def test_constraints_enforce_soc():
         problem.get_val(
             "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
         )
-        == pytest.approx(32.0, rel=1e-2)
+        == pytest.approx(42.66, rel=1e-2)
     )
 
     # Partials will be hard to justify here since there is a rounding inside the module
@@ -321,7 +321,7 @@ def test_battery_pack_sizing():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(7936.0, rel=1e-2)
+    ) == pytest.approx(3000.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:CG:x", units="m"
     ) == pytest.approx(2.88, rel=1e-2)
@@ -408,7 +408,7 @@ def test_current_module():
         ivc,
     )
     assert problem.get_val("current_one_module", units="A") == pytest.approx(
-        [10.0, 10.03, 10.06, 10.08, 10.11, 10.14, 10.17, 10.19, 10.22, 10.25], rel=1e-2
+        [2.0, 2.01, 2.01, 2.02, 2.02, 2.03, 2.03, 2.04, 2.04, 2.05], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -512,7 +512,7 @@ def test_module_voltage():
         ivc,
     )
     assert problem.get_val("module_voltage", units="V") == pytest.approx(
-        [802.0, 786.0, 770.0, 760.0, 750.0, 740.0, 734.0, 726.0, 720.0, 714.0], rel=1e-2
+        [601.5, 589.5, 577.5, 570.0, 562.5, 555.0, 550.5, 544.5, 540.0, 535.5], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -561,7 +561,7 @@ def test_module_c_rate():
         ivc,
     )
     assert problem.get_val("c_rate", units="h**-1") == pytest.approx(
-        [0.5, 0.5015, 0.503, 0.504, 0.5055, 0.507, 0.5085, 0.5095, 0.511, 0.5125], rel=1e-2
+        [2.857, 2.866, 2.874, 2.88, 2.889, 2.897, 2.906, 2.911, 2.92, 2.929], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -743,7 +743,7 @@ def test_battery_losses():
         ivc,
     )
     assert problem.get_val("losses_battery", units="W") == pytest.approx(
-        [2596.24, 2063.36, 3824.4, 5434.4, 5789.6, 4770.96, 2929.52, 1169.84, 448.88, 1380.88],
+        [9735.9, 7737.6, 14341.5, 20379.0, 21711.0, 17891.1, 10985.7, 4386.9, 1683.3, 5178.3],
         rel=1e-2,
     )
 
@@ -885,17 +885,18 @@ def test_performances_battery_pack():
         ivc,
     )
     assert problem.get_val("voltage_out", units="V") == pytest.approx(
-        [730.8, 695.4, 676.7, 666.0, 657.5, 647.6, 635.2, 620.4, 604.5, 589.7], rel=1e-2
+        [604.0, 591.2, 581.8, 572.7, 562.3, 550.8, 538.9, 527.5, 517.2, 507.5],
+        rel=1e-2,
     )
     assert problem.get_val("state_of_charge", units="percent") == pytest.approx(
-        [100.0, 93.06, 86.09, 79.1, 72.1, 65.08, 58.04, 50.98, 43.9, 36.8], rel=1e-2
+        [100.0, 92.1, 84.1, 76.1, 68.1, 60.1, 52.1, 44.0, 35.9, 27.8], rel=1e-2
     )
     assert problem.get_val("losses_battery", units="kW") == pytest.approx(
-        [38.2, 47.6, 50.6, 50.1, 48.1, 46.2, 45.3, 45.8, 47.4, 49.6],
+        [6.32, 7.26, 7.06, 6.32, 5.54, 5.01, 4.93, 5.31, 6.07, 6.97],
         rel=1e-2,
     )
     assert problem.get_val("efficiency") == pytest.approx(
-        [0.87, 0.83, 0.81, 0.81, 0.82, 0.82, 0.82, 0.82, 0.81, 0.79],
+        [0.974, 0.969, 0.97, 0.973, 0.976, 0.978, 0.978, 0.975, 0.971, 0.966],
         rel=1e-2,
     )
 

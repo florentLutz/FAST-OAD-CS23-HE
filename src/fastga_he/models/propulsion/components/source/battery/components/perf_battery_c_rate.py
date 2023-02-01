@@ -23,6 +23,12 @@ class PerformancesModuleCRate(om.ExplicitComponent):
             desc="Identifier of the battery pack",
             allow_none=False,
         )
+        self.options.declare(
+            name="cell_capacity_ref",
+            types=float,
+            default=3.5,
+            desc="Capacity of the reference cell for the battery construction [A*h]",
+        )
 
     def setup(self):
 
@@ -30,46 +36,37 @@ class PerformancesModuleCRate(om.ExplicitComponent):
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_input("current_one_module", units="A", val=np.full(number_of_points, np.nan))
-        self.add_input(
+
+        # Weirdly enough, this will be a output of a performance module, it does not really make
+        # sense to create a component in sizing that just outputs this value based on an option
+        self.add_output(
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:capacity",
-            val=np.nan,
+            val=self.options["cell_capacity_ref"],
             units="A*h",
             desc="Capacity of the cell used for the assembly of the battery pack",
         )
-
         self.add_output("c_rate", units="h**-1", val=np.full(number_of_points, 1.0))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(of="c_rate", wrt="current_one_module", method="exact")
+        self.declare_partials(
+            of="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:capacity",
+            wrt=[],
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         battery_pack_id = self.options["battery_pack_id"]
 
-        outputs["c_rate"] = (
-            inputs["current_one_module"]
-            / inputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:capacity"
-            ]
-        )
+        outputs["c_rate"] = inputs["current_one_module"] / self.options["cell_capacity_ref"]
+        outputs[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:capacity"
+        ] = self.options["cell_capacity_ref"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         number_of_points = self.options["number_of_points"]
-        battery_pack_id = self.options["battery_pack_id"]
 
         partials["c_rate", "current_one_module"] = (
-            np.eye(number_of_points)
-            / inputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:capacity"
-            ]
-        )
-        partials[
-            "c_rate",
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:capacity",
-        ] = (
-            -inputs["current_one_module"]
-            / inputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:capacity"
-            ]
-            ** 2.0
+            np.eye(number_of_points) / self.options["cell_capacity_ref"]
         )

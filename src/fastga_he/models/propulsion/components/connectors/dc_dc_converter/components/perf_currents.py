@@ -58,7 +58,12 @@ class PerformancesCurrents(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        duty_cycle = inputs["duty_cycle"]
+        # We will clip the duty cycle to avoid any problems in the first loop of converging
+        duty_cycle = np.clip(
+            inputs["duty_cycle"],
+            np.full_like(inputs["duty_cycle"], 1e-3),
+            np.full_like(inputs["duty_cycle"], 1.0 - 1e-3),
+        )
         current_out = inputs["dc_current_out"]
 
         outputs["current_IGBT"] = np.sqrt(duty_cycle) / (1.0 - duty_cycle) * current_out

@@ -21,6 +21,12 @@ class SizingBatteryModuleVolume(om.ExplicitComponent):
             desc="Identifier of the battery pack",
             allow_none=False,
         )
+        self.options.declare(
+            name="cell_volume_ref",
+            types=float,
+            default=17.63e-3,
+            desc="Volume of the reference cell for the battery construction [L]",
+        )
 
     def setup(self):
 
@@ -32,12 +38,6 @@ class SizingBatteryModuleVolume(om.ExplicitComponent):
             + ":module:number_cells",
             val=np.nan,
             desc="Number of cells in series inside one battery module",
-        )
-        self.add_input(
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:volume",
-            val=np.nan,
-            units="L",
-            desc="Volume of the cell used for the assembly of the battery pack",
         )
         self.add_input(
             "data:propulsion:he_power_train:battery_pack:"
@@ -54,8 +54,23 @@ class SizingBatteryModuleVolume(om.ExplicitComponent):
             val=50.0,
             desc="Volume of one module of the battery",
         )
+        self.add_output(
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:volume",
+            val=self.options["cell_volume_ref"],
+            units="L",
+            desc="Volume of the cell used for the assembly of the battery pack",
+        )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":module:volume",
+            wrt="*",
+            method="exact",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:volume",
+            wrt=[],
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -69,15 +84,17 @@ class SizingBatteryModuleVolume(om.ExplicitComponent):
                 + battery_pack_id
                 + ":module:number_cells"
             ]
-            * inputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:volume"
-            ]
+            * self.options["cell_volume_ref"]
             / inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":cell_volume_fraction"
             ]
         )
+
+        outputs[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:volume"
+        ] = self.options["cell_volume_ref"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -89,24 +106,7 @@ class SizingBatteryModuleVolume(om.ExplicitComponent):
             + battery_pack_id
             + ":module:number_cells",
         ] = (
-            inputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:volume"
-            ]
-            / inputs[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":cell_volume_fraction"
-            ]
-        )
-        partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":module:volume",
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:volume",
-        ] = (
-            inputs[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":module:number_cells"
-            ]
+            self.options["cell_volume_ref"]
             / inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -124,9 +124,7 @@ class SizingBatteryModuleVolume(om.ExplicitComponent):
                 + battery_pack_id
                 + ":module:number_cells"
             ]
-            * inputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:volume"
-            ]
+            * self.options["cell_volume_ref"]
             / inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id

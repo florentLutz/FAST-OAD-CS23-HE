@@ -36,9 +36,9 @@
     </geometry>
     <propulsion>
       <he_power_train>
-        <mass units="kg" is_input="False">5134.28920373031</mass>
+        <mass units="kg" is_input="False">3174.28920373031</mass>
         <CG>
-          <x units="m" is_input="False">2.8673913548516072</x>
+          <x units="m" is_input="False">2.8567259825142917</x>
         </CG>
         <cruise>
           <CD0 is_input="False">0.0003524184026434314</CD0>
@@ -278,23 +278,23 @@
             <SOC_min is_input="True">40.0<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <mass units="kg" is_input="False">4960.0<!--Mass of the battery pack--></mass>
+            <mass units="kg" is_input="False">3000.0<!--Mass of the battery pack--></mass>
             <min_safe_SOC is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_cells is_input="False">5000.0<!--Total number of cells in the battery pack--></number_cells>
-            <number_modules is_input="True">25.0<!--Number of modules in parallel inside the battery pack--></number_modules>
-            <volume units="L" is_input="False">968.75<!--Volume of the battery pack--></volume>
+            <number_cells is_input="False">30000.0<!--Total number of cells in the battery pack--></number_cells>
+            <number_modules is_input="True">200.0<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <volume units="L" is_input="False">661.1249999999999<!--Volume of the battery pack--></volume>
             <CG>
               <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
             </CG>
             <cell>
-              <mass units="g" is_input="True">496.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
-              <volume units="mL" is_input="True">155.0<!--Volume of the cell used for the assembly of the battery pack--></volume>
+              <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
+              <volume units="L" is_input="False">0.01763<!--Volume of the cell used for the assembly of the battery pack--></volume>
             </cell>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <dimension>
-              <height units="m" is_input="False">0.5125827779589834<!--Height of the battery, as in the size of the battery along the Z-axis--></height>
+              <height units="m" is_input="False">0.34981294356452425<!--Height of the battery, as in the size of the battery along the Z-axis--></height>
               <length units="m" is_input="False">0.5114874519835109<!--Length of the battery, as in the size of the battery along the X-axis--></length>
               <width units="m" is_input="False">3.6949853531288834<!--Width of the battery, as in the size of the battery along the Y-axis--></width>
             </dimension>
@@ -302,9 +302,9 @@
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <module>
-              <mass units="kg" is_input="False">198.4<!--Mass of one module of the battery--></mass>
-              <number_cells is_input="True">200.0<!--Number of cells in series inside one battery module--></number_cells>
-              <volume units="L" is_input="False">38.75<!--Volume of one module of the battery--></volume>
+              <mass units="kg" is_input="False">15.0<!--Mass of one module of the battery--></mass>
+              <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
+              <volume units="L" is_input="False">3.3056249999999996<!--Volume of one module of the battery--></volume>
             </module>
           </battery_pack_1>
         </battery_pack>

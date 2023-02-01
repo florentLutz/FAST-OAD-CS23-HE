@@ -65,7 +65,10 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         tip_mach = inputs["tip_mach"]
         re_d = inputs["reynolds_D"]
         solidity = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":solidity"]
-        ct = inputs["thrust_coefficient"]
+        # To avoid warning coming from negative thrust
+        ct = np.maximum(
+            inputs["thrust_coefficient"], np.full_like(inputs["thrust_coefficient"], 1e-4)
+        )
         activity_factor = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":activity_factor"
         ]
