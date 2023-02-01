@@ -93,8 +93,10 @@ class PerformancesBatteryPack(om.Group):
         )
         self.add_subsystem(
             "internal_resistance",
-            PerformancesInternalResistance(number_of_points=number_of_points),
-            promotes=["state_of_charge", "internal_resistance"],
+            PerformancesInternalResistance(
+                number_of_points=number_of_points, battery_pack_id=battery_pack_id
+            ),
+            promotes=["state_of_charge", "internal_resistance", "settings:*", "cell_temperature"],
         )
         self.add_subsystem(
             "cell_voltage",

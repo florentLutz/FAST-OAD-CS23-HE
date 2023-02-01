@@ -11,7 +11,7 @@
                         <number_modules>25.0</number_modules>
                         <number_cells>8000.0</number_cells>
                         <module>
-                            <number_cells>200.0</number_cells>
+                            <number_cells>300.0</number_cells>
                             <mass units="kg">198.4</mass>
                         </module>
                         <cell>

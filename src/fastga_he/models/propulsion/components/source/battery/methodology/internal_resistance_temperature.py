@@ -2,7 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 """This module is to study the effect of temperature on battery internal resistance. One of the
-reference in :cite:`vratny:2013` suggests that internal resistance is a product of a function of
+reference in :cite:`chen:2021` suggests that internal resistance is a product of a function of
 SOC and a function of temperature under the form of an exponential (R_int(SOC, T) = f(SOC) * g(
 T)). :cite:`lai:2019` gives the evolution of internal resistance for the temperature for a 18650
 cell (NCR 18650-type cylindrical Li-ion). We will make the assumption that the coefficient in the
@@ -31,6 +31,14 @@ def ratio(temperature_value, scaling_factor, ref_temperature):
         293.0,
         scaling_factor,
         ref_temperature,
+    )
+
+
+def ratio_expanded(temperature_value):
+
+    return np.exp(
+        (46.386005 * (293.0 - temperature_value))
+        / ((temperature_value - 254.33423266) * (293.0 - 254.33423266))
     )
 
 
@@ -166,6 +174,7 @@ if __name__ == "__main__":
     for temperature, y_to_plot in zip(temperatures, y_list):
         x = x_293
         y_interpolated = y_293 * ratio(temperature, 46.386005, -254.33423266)
+        y_interpolated_v_2 = y_293 * ratio_expanded(temperature)
         y_real = y_to_plot
 
         scatter = go.Scatter(
@@ -185,8 +194,15 @@ if __name__ == "__main__":
             legendgroup=str(temperature),
         )
         fig3.add_trace(scatter_real)
+        scatter = go.Scatter(
+            x=x[proper_index],
+            y=y_interpolated_v_2[proper_index],
+            name="Interpolated v2 internal resistance " + str(temperature),
+            mode="lines+markers",
+        )
+        fig3.add_trace(scatter)
 
-    # fig3.show()
+    fig3.show()
 
     # Just to confirm we will study the tendency of the function (should have an asymptotic curve
     # when reaching very high temperatures and should be decreasing)
@@ -194,9 +210,9 @@ if __name__ == "__main__":
     x = np.linspace(273.15, 473.15, 300)
     scatter = go.Scatter(
         x=x,
-        y=temperature_function(x, 46.386005, -254.33423266),
+        y=ratio(x, 46.386005, -254.33423266),
         name="Temperature contribution",
         mode="lines+markers",
     )
     fig4.add_trace(scatter)
-    fig4.show()
+    # fig4.show()

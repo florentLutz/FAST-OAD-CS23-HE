@@ -424,7 +424,7 @@ def test_open_circuit_voltage():
         ivc,
     )
     assert problem.get_val("open_circuit_voltage", units="V") == pytest.approx(
-        [4.04, 3.96, 3.89, 3.84, 3.79, 3.75, 3.72, 3.68, 3.65, 3.62], rel=1e-2
+        [4.12, 4.07, 4.03, 3.98, 3.92, 3.86, 3.79, 3.72, 3.66, 3.61], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -434,14 +434,21 @@ def test_internal_resistance():
 
     ivc = om.IndepVarComp()
     ivc.add_output("state_of_charge", val=np.linspace(100, 40, NB_POINTS_TEST), units="percent")
+    ivc.add_output(
+        "cell_temperature",
+        units="degK",
+        val=np.linspace(288.15, 298.15, NB_POINTS_TEST),
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesInternalResistance(number_of_points=NB_POINTS_TEST),
+        PerformancesInternalResistance(
+            number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"
+        ),
         ivc,
     )
     assert problem.get_val("internal_resistance", units="ohm") * 1e3 == pytest.approx(
-        [2.96, 3.44, 3.83, 4.13, 4.35, 4.51, 4.62, 4.68, 4.71, 4.71], rel=1e-2
+        [46.59, 56.13, 58.11, 56.15, 52.7, 49.3, 46.76, 45.32, 44.82, 44.73], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -846,13 +853,13 @@ def test_performances_battery_pack():
         ivc,
     )
     assert problem.get_val("voltage_out", units="V") == pytest.approx(
-        [802.0, 786.0, 770.0, 760.0, 750.0, 740.0, 734.0, 726.0, 720.0, 714.0], rel=1e-2
+        [730.8, 695.4, 676.7, 666.0, 657.5, 647.6, 635.2, 620.4, 604.5, 589.7], rel=1e-2
     )
     assert problem.get_val("state_of_charge", units="percent") == pytest.approx(
         [100.0, 93.06, 86.09, 79.1, 72.1, 65.08, 58.04, 50.98, 43.9, 36.8], rel=1e-2
     )
-    assert problem.get_val("component.battery_losses.losses_battery", units="W") == pytest.approx(
-        [2601.02, 2114.19, 3986.52, 5563.48, 5693.91, 4371.49, 2352.99, 752.6, 611.58, 2442.75],
+    assert problem.get_val("component.battery_losses.losses_battery", units="kW") == pytest.approx(
+        [37.5, 46.8, 52.1, 53.7, 52.3, 49.5, 46.9, 45.8, 47.0, 50.4],
         rel=1e-2,
     )
 
