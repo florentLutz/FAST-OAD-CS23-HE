@@ -150,6 +150,7 @@ BATTERY_PACK = {
         {"open_circuit_voltage": "V"},
         {"internal_resistance": "ohm"},
         {"voltage_out": "V"},
+        {"efficiency": None},
     ],
 }
 

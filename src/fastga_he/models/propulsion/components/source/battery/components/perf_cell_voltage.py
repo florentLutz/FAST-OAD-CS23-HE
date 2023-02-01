@@ -18,6 +18,9 @@ class PerformancesCellVoltage(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            "cut_off_voltage", default=2.6, desc="Cut-off voltage of the battery cells"
+        )
 
     def setup(self):
 
@@ -38,7 +41,7 @@ class PerformancesCellVoltage(om.ExplicitComponent):
                 inputs["open_circuit_voltage"]
                 - inputs["internal_resistance"] * inputs["current_one_module"]
             ),
-            np.full_like(inputs["open_circuit_voltage"], 1.0),
+            np.full_like(inputs["open_circuit_voltage"], self.options["cut_off_voltage"]),
             np.full_like(inputs["open_circuit_voltage"], 5.0),
         )
 

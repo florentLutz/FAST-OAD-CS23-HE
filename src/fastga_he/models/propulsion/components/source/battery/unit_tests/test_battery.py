@@ -30,6 +30,7 @@ from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
 from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 from ..components.cstr_ensure import ConstraintsSOCEnsure
 from ..components.cstr_enforce import ConstraintsSOCEnforce
@@ -647,7 +648,7 @@ def test_cell_entropic_heat_coefficient():
         ivc,
     )
     assert problem.get_val("entropic_heat_coefficient", units="mV/degK") == pytest.approx(
-        [-0.0099, 0.0305, -0.0312, -0.0894, -0.0958, -0.0454, 0.0381, 0.1157, 0.148, 0.1091],
+        [-0.042, -0.008, 0.0261, 0.0584, 0.0871, 0.1105, 0.1266, 0.1337, 0.1299, 0.1134],
         rel=1e-2,
     )
 
@@ -809,6 +810,37 @@ def test_maximum():
     problem.check_partials(compact_print=True)
 
 
+def test_battery_efficiency():
+
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "voltage_out",
+        units="V",
+        val=np.array([802.0, 786.0, 770.0, 760.0, 750.0, 740.0, 734.0, 726.0, 720.0, 714.0]),
+    )
+    ivc.add_output("dc_current_out", np.linspace(400, 410, NB_POINTS_TEST), units="A")
+    ivc.add_output(
+        "losses_battery",
+        np.array(
+            [2596.24, 2063.36, 3824.4, 5434.4, 5789.6, 4770.96, 2929.52, 1169.84, 448.88, 1380.88]
+        ),
+        units="W",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesBatteryEfficiency(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    # Not computed with proper losses, to test only
+    assert problem.get_val("efficiency") == pytest.approx(
+        [0.992, 0.993, 0.988, 0.982, 0.981, 0.984, 0.99, 0.996, 0.998, 0.995], rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_energy_consumption():
 
     ivc = om.IndepVarComp()
@@ -858,8 +890,12 @@ def test_performances_battery_pack():
     assert problem.get_val("state_of_charge", units="percent") == pytest.approx(
         [100.0, 93.06, 86.09, 79.1, 72.1, 65.08, 58.04, 50.98, 43.9, 36.8], rel=1e-2
     )
-    assert problem.get_val("component.battery_losses.losses_battery", units="kW") == pytest.approx(
-        [37.5, 46.8, 52.1, 53.7, 52.3, 49.5, 46.9, 45.8, 47.0, 50.4],
+    assert problem.get_val("losses_battery", units="kW") == pytest.approx(
+        [38.2, 47.6, 50.6, 50.1, 48.1, 46.2, 45.3, 45.8, 47.4, 49.6],
+        rel=1e-2,
+    )
+    assert problem.get_val("efficiency") == pytest.approx(
+        [0.87, 0.83, 0.81, 0.81, 0.82, 0.82, 0.82, 0.82, 0.81, 0.79],
         rel=1e-2,
     )
 

@@ -21,6 +21,7 @@ from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
 from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 
 
@@ -141,12 +142,17 @@ class PerformancesBatteryPack(om.Group):
             PerformancesBatteryLosses(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "losses_battery"],
         )
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(number_of_points=number_of_points, battery_pack_id=battery_pack_id),
             promotes=["data:*", "state_of_charge", "c_rate"],
+        )
+        self.add_subsystem(
+            "efficiency",
+            PerformancesBatteryEfficiency(number_of_points=number_of_points),
+            promotes=["dc_current_out", "voltage_out", "losses_battery", "efficiency"],
         )
         self.add_subsystem(
             "energy_consumption",
