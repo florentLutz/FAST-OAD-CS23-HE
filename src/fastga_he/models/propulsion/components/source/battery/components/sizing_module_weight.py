@@ -22,6 +22,12 @@ class SizingBatteryModuleWeight(om.ExplicitComponent):
             desc="Identifier of the battery pack",
             allow_none=False,
         )
+        self.options.declare(
+            name="cell_weight_ref",
+            types=float,
+            default=50.0e-3,
+            desc="Weight of the reference cell for the battery construction [kg]",
+        )
 
     def setup(self):
 
@@ -33,12 +39,6 @@ class SizingBatteryModuleWeight(om.ExplicitComponent):
             + ":module:number_cells",
             val=np.nan,
             desc="Number of cells in series inside one battery module",
-        )
-        self.add_input(
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:mass",
-            val=np.nan,
-            units="kg",
-            desc="Mass of the cell used for the assembly of the battery pack",
         )
         self.add_input(
             "data:propulsion:he_power_train:battery_pack:"
@@ -55,8 +55,23 @@ class SizingBatteryModuleWeight(om.ExplicitComponent):
             val=100.0,
             desc="Mass of one module of the battery",
         )
+        self.add_output(
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:mass",
+            val=self.options["cell_weight_ref"],
+            units="g",
+            desc="Mass of the cell used for the assembly of the battery pack",
+        )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":module:mass",
+            wrt="*",
+            method="exact",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:mass",
+            wrt=[],
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -70,15 +85,17 @@ class SizingBatteryModuleWeight(om.ExplicitComponent):
                 + battery_pack_id
                 + ":module:number_cells"
             ]
-            * inputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:mass"
-            ]
+            * self.options["cell_weight_ref"]
             / inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":cell_weight_fraction"
             ]
         )
+
+        outputs[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:mass"
+        ] = self.options["cell_weight_ref"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -90,22 +107,7 @@ class SizingBatteryModuleWeight(om.ExplicitComponent):
             + battery_pack_id
             + ":module:number_cells",
         ] = (
-            inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:mass"]
-            / inputs[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":cell_weight_fraction"
-            ]
-        )
-        partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":module:mass",
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:mass",
-        ] = (
-            inputs[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":module:number_cells"
-            ]
+            self.options["cell_weight_ref"]
             / inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -123,9 +125,7 @@ class SizingBatteryModuleWeight(om.ExplicitComponent):
                 + battery_pack_id
                 + ":module:number_cells"
             ]
-            * inputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:mass"
-            ]
+            * self.options["cell_weight_ref"]
             / inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id

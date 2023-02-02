@@ -8,9 +8,8 @@ import numpy as np
 
 class PerformancesEntropicHeatCoefficient(om.ExplicitComponent):
     """
-    Computation of the entropic heat coefficient, used for the estimation losses. Based on a
-    regression that can be found in ..methodology.entropic_heat_coefficient.py on data from
-    :cite:`geng:2020`
+    Computation of the entropic heat coefficient, used for the estimation losses. Based on
+    :cite:`lai:2019`
     """
 
     def initialize(self):
@@ -35,12 +34,7 @@ class PerformancesEntropicHeatCoefficient(om.ExplicitComponent):
         soc = inputs["state_of_charge"]
 
         outputs["entropic_heat_coefficient"] = (
-            -8.95880680e-09 * soc ** 5.0
-            + 2.67279229e-06 * soc ** 4.0
-            - 2.94955067e-04 * soc ** 3.0
-            + 1.46460304e-02 * soc ** 2.0
-            - 3.13899180e-01 * soc
-            + 2.18357694e00
+            -0.355 + 2.154e-2 * soc - 2.869e-4 * soc ** 2.0 + 1.028e-6 * soc ** 3.0
         ) * 1e-3
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -48,12 +42,5 @@ class PerformancesEntropicHeatCoefficient(om.ExplicitComponent):
         soc = inputs["state_of_charge"]
 
         partials["entropic_heat_coefficient", "state_of_charge"] = (
-            np.diag(
-                -5.0 * 8.95880680e-09 * soc ** 4.0
-                + 4.0 * 2.67279229e-06 * soc ** 3.0
-                - 3.0 * 2.94955067e-04 * soc ** 2.0
-                + 2.0 * 1.46460304e-02 * soc
-                - 3.13899180e-01
-            )
-            * 1e-3
+            np.diag(2.154e-2 - 2.0 * 2.869e-4 * soc + 3.0 * 1.028e-6 * soc ** 2.0) * 1e-3
         )

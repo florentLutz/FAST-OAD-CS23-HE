@@ -236,10 +236,10 @@
                         <cell_temperature_mission units="degK">288.15</cell_temperature_mission>
                         <SOC_min>20.0</SOC_min>
                         <min_safe_SOC units="percent">20.0</min_safe_SOC>
-                        <number_modules>30.0</number_modules>
+                        <number_modules>200.0</number_modules>
                         <number_cells>8000.0</number_cells>
                         <module>
-                            <number_cells>120.0</number_cells>
+                            <number_cells>150.0</number_cells>
                             <mass units="kg">198.4</mass>
                         </module>
                         <cell>
@@ -436,6 +436,7 @@
                 </inverter>
                 <PMSM>
                     <motor_1>
+                        <front_length_ratio>0.25</front_length_ratio>
                         <from_LE units="m">0.15</from_LE>
                         <mass units="kg">16.19</mass>
                         <torque_constant units="N*m/A">1.46</torque_constant>

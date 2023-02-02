@@ -57,13 +57,13 @@
                         <cell_temperature_mission units="degK">288.15</cell_temperature_mission>
                         <SOC_min>40.0</SOC_min>
                         <min_safe_SOC>20.0</min_safe_SOC>
-                        <number_modules>40.0</number_modules>
+                        <number_modules>200.0</number_modules>
                         <number_cells>8000.0</number_cells>
                         <volume units="L">1550.0</volume>
                         <module>
-                            <number_cells>200.0</number_cells>
-                            <mass units="kg">198.4</mass>
-                            <volume units="L">38.75</volume>
+                            <number_cells>150.0</number_cells>
+                            <mass units="kg">15.0</mass>
+                            <volume units="L">3.30</volume>
                         </module>
                         <cell>
                             <capacity units="A*h">20.0</capacity>

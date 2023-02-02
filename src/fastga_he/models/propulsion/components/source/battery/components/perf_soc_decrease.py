@@ -25,6 +25,7 @@ class PerformancesSOCDecrease(om.ExplicitComponent):
 
         self.add_input("c_rate", units="h**-1", val=np.full(number_of_points, np.nan))
         self.add_input("time_step", units="h", val=np.full(number_of_points, np.nan))
+        self.add_input("relative_capacity", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             "state_of_charge_decrease", units="percent", val=np.full(number_of_points, 1.0)
@@ -34,9 +35,18 @@ class PerformancesSOCDecrease(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["state_of_charge_decrease"] = inputs["c_rate"] * inputs["time_step"] * 100.0
+        outputs["state_of_charge_decrease"] = (
+            inputs["c_rate"] * inputs["time_step"] * 100.0 / inputs["relative_capacity"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["state_of_charge_decrease", "c_rate"] = 100.0 * np.diag(inputs["time_step"])
-        partials["state_of_charge_decrease", "time_step"] = 100.0 * np.diag(inputs["c_rate"])
+        partials["state_of_charge_decrease", "c_rate"] = 100.0 * np.diag(
+            inputs["time_step"] / inputs["relative_capacity"]
+        )
+        partials["state_of_charge_decrease", "time_step"] = 100.0 * np.diag(
+            inputs["c_rate"] / inputs["relative_capacity"]
+        )
+        partials["state_of_charge_decrease", "relative_capacity"] = -100.0 * np.diag(
+            inputs["c_rate"] * inputs["time_step"] / inputs["relative_capacity"] ** 2.0
+        )

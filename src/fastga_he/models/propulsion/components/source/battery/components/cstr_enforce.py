@@ -61,7 +61,7 @@ class ConstraintsSOCEnforce(om.ExplicitComponent):
 
         self.add_output(
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
-            val=20.0,
+            val=200.0,
             desc="Number of modules in parallel inside the battery pack",
             lower=5.0,
         )

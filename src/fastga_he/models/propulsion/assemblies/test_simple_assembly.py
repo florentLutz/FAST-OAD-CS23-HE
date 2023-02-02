@@ -119,16 +119,16 @@ def test_assembly_performances():
     ) * problem.get_val("performances.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                186831.0,
-                187780.0,
-                188711.0,
-                189625.0,
-                190520.0,
-                191398.0,
-                192257.0,
-                193100.0,
-                193926.0,
-                194739.0,
+                187277.0,
+                188236.0,
+                189173.0,
+                190095.0,
+                191006.0,
+                191907.0,
+                192800.0,
+                193680.0,
+                194546.0,
+                195395.0,
             ]
         ),
         abs=1,
@@ -178,7 +178,7 @@ def test_assembly_sizing():
     ) == pytest.approx(86.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(4960.0, rel=1e-2)
+    ) == pytest.approx(3000.0, rel=1e-2)
 
     write_outputs(
         pth.join(outputs.__path__[0], "simple_assembly_sizing.xml"),
@@ -235,7 +235,7 @@ def test_performances_sizing_assembly_battery_enforce():
     ) == pytest.approx(20.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(3927.44, rel=1e-2)
+    ) == pytest.approx(2424.4, rel=1e-2)
 
 
 def test_performances_sizing_assembly_battery_ensure():
@@ -284,10 +284,10 @@ def test_performances_sizing_assembly_battery_ensure():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
-    ) == pytest.approx(37.69, rel=1e-2)
+    ) == pytest.approx(37.29, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(4960.0, rel=1e-2)
+    ) == pytest.approx(3000.0, rel=1e-2)
 
 
 def test_assembly_sizing_from_pt_file():
@@ -331,10 +331,10 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(86.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(4960.0, rel=1e-2)
+    ) == pytest.approx(3000.0, rel=1e-2)
 
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        5134.28, rel=1e-2
+        3174.28, rel=1e-2
     )
     assert problem.get_val("data:propulsion:he_power_train:CG:x", units="m") == pytest.approx(
         2.867, rel=1e-2
@@ -393,16 +393,16 @@ def test_performances_from_pt_file():
     assert current_in * voltage_in == pytest.approx(
         np.array(
             [
-                186831.8,
-                187780.4,
-                188711.8,
-                189625.3,
-                190520.8,
-                191398.1,
-                192257.3,
-                193098.2,
-                193918.7,
-                194700.2,
+                187277.0,
+                188236.0,
+                189173.0,
+                190095.0,
+                191006.0,
+                191907.0,
+                192800.0,
+                193680.0,
+                194546.0,
+                195395.0,
             ]
         ),
         abs=1,

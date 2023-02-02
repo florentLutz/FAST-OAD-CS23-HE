@@ -13,6 +13,7 @@ from ..components.perf_cell_voltage import PerformancesCellVoltage
 from ..components.perf_module_voltage import PerformancesModuleVoltage
 from ..components.perf_battery_voltage import PerformancesBatteryVoltage
 from ..components.perf_battery_c_rate import PerformancesModuleCRate
+from ..components.perf_battery_relative_capacity import PerformancesRelativeCapacity
 from ..components.perf_soc_decrease import PerformancesSOCDecrease
 from ..components.perf_update_soc import PerformancesUpdateSOC
 from ..components.perf_joule_losses import PerformancesCellJouleLosses
@@ -21,6 +22,7 @@ from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
 from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 
 
@@ -75,9 +77,14 @@ class PerformancesBatteryPack(om.Group):
             promotes=["data:*", "c_rate"],
         )
         self.add_subsystem(
+            "battery_relative_capacity",
+            PerformancesRelativeCapacity(number_of_points=number_of_points),
+            promotes=["relative_capacity"],
+        )
+        self.add_subsystem(
             "battery_soc_decrease",
             PerformancesSOCDecrease(number_of_points=number_of_points),
-            promotes=["time_step", "c_rate"],
+            promotes=["time_step", "c_rate", "relative_capacity"],
         )
         self.add_subsystem(
             "update_soc",
@@ -93,8 +100,10 @@ class PerformancesBatteryPack(om.Group):
         )
         self.add_subsystem(
             "internal_resistance",
-            PerformancesInternalResistance(number_of_points=number_of_points),
-            promotes=["state_of_charge", "internal_resistance"],
+            PerformancesInternalResistance(
+                number_of_points=number_of_points, battery_pack_id=battery_pack_id
+            ),
+            promotes=["state_of_charge", "internal_resistance", "settings:*", "cell_temperature"],
         )
         self.add_subsystem(
             "cell_voltage",
@@ -139,12 +148,17 @@ class PerformancesBatteryPack(om.Group):
             PerformancesBatteryLosses(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "losses_battery"],
         )
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(number_of_points=number_of_points, battery_pack_id=battery_pack_id),
             promotes=["data:*", "state_of_charge", "c_rate"],
+        )
+        self.add_subsystem(
+            "efficiency",
+            PerformancesBatteryEfficiency(number_of_points=number_of_points),
+            promotes=["dc_current_out", "voltage_out", "losses_battery", "efficiency"],
         )
         self.add_subsystem(
             "energy_consumption",
@@ -165,6 +179,7 @@ class PerformancesBatteryPack(om.Group):
             [
                 "cell_voltage.current_one_module",
                 "battery_c_rate.current_one_module",
+                "battery_relative_capacity.current_one_module",
                 "joule_losses_cell.current_one_module",
                 "entropic_losses_cell.current_one_module",
             ],

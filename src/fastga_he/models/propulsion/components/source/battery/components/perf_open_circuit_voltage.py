@@ -9,9 +9,11 @@ import numpy as np
 class PerformancesOpenCircuitVoltage(om.ExplicitComponent):
     """
     Computation of the open circuit voltage of one module cell, takes into account the impact of
-    the SOC on the performances. Does not account for temperature just yet. As a matter of fact,
-    this component, an implementation of the model from :cite:`baccouche:2017`, will use only the
-    coefficient at 25 degC.
+    the SOC on the performances. Does not account for temperature just yet, it seems however that
+    the dependency on temperature is only visible at very low SOC :cite:`chin:2019`. The model
+    put forward by :cite:`baccouche:2017` does not provide satisfactory results but the article
+    suggest a simple polynomial fit could provide adequate results, which is what we took. See
+    internal_resistance_new.py for how we obtain those values.
     """
 
     def initialize(self):
@@ -34,24 +36,34 @@ class PerformancesOpenCircuitVoltage(om.ExplicitComponent):
 
         soc = np.clip(
             inputs["state_of_charge"],
-            np.full_like(inputs["state_of_charge"], 10),
-            np.full_like(inputs["state_of_charge"], 100),
+            np.full_like(inputs["state_of_charge"], 10 - 1e-3),
+            np.full_like(inputs["state_of_charge"], 100 + 1e-3),
         )
+        dod = 100.0 - soc
 
         ocv = (
-            94.501 * np.exp(-0.01292712 * soc)
-            - 91.349 * np.exp(-0.01362893 * soc)
-            + 1.472e-4 * soc ** 2
+            -9.65121262e-10 * dod ** 5.0
+            + 1.81419058e-07 * dod ** 4.0
+            - 1.11814100e-05 * dod ** 3.0
+            + 2.26114438e-04 * dod ** 2.0
+            - 8.54619953e-03 * dod
+            + 4.12
         )
-
         outputs["open_circuit_voltage"] = ocv
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        soc = inputs["state_of_charge"]
+        soc = np.clip(
+            inputs["state_of_charge"],
+            np.full_like(inputs["state_of_charge"], 10 - 1e-3),
+            np.full_like(inputs["state_of_charge"], 100 + 1e-3),
+        )
+        dod = 100.0 - soc
 
-        partials["open_circuit_voltage", "state_of_charge"] = np.diag(
-            -94.50 * 0.01292712 * np.exp(-0.01292712 * soc)
-            + 91.349 * 0.01362893 * np.exp(-0.01362893 * soc)
-            + 2.0 * 1.472e-4 * soc
+        partials["open_circuit_voltage", "state_of_charge"] = -np.diag(
+            -5.0 * 9.65121262e-10 * dod ** 4.0
+            + 4.0 * 1.81419058e-07 * dod ** 3.0
+            - 3.0 * 1.11814100e-05 * dod ** 2.0
+            + 2.0 * 2.26114438e-04 * dod
+            - 8.54619953e-03
         )
