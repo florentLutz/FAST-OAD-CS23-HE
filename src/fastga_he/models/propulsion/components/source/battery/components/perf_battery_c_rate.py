@@ -26,7 +26,7 @@ class PerformancesModuleCRate(om.ExplicitComponent):
         self.options.declare(
             name="cell_capacity_ref",
             types=float,
-            default=3.5,
+            default=3.35,
             desc="Capacity of the reference cell for the battery construction [A*h]",
         )
 

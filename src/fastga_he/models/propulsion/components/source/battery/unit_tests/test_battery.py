@@ -22,6 +22,7 @@ from ..components.perf_cell_voltage import PerformancesCellVoltage
 from ..components.perf_module_voltage import PerformancesModuleVoltage
 from ..components.perf_battery_voltage import PerformancesBatteryVoltage
 from ..components.perf_battery_c_rate import PerformancesModuleCRate
+from ..components.perf_battery_relative_capacity import PerformancesRelativeCapacity
 from ..components.perf_soc_decrease import PerformancesSOCDecrease
 from ..components.perf_update_soc import PerformancesUpdateSOC
 from ..components.perf_joule_losses import PerformancesCellJouleLosses
@@ -561,7 +562,28 @@ def test_module_c_rate():
         ivc,
     )
     assert problem.get_val("c_rate", units="h**-1") == pytest.approx(
-        [2.857, 2.866, 2.874, 2.88, 2.889, 2.897, 2.906, 2.911, 2.92, 2.929], rel=1e-2
+        [2.985, 2.994, 3.003, 3.009, 3.018, 3.027, 3.036, 3.042, 3.051, 3.06], rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_module_relative_capacity():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "current_one_module",
+        units="A",
+        val=np.linspace(0.5, 5.0, NB_POINTS_TEST),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesRelativeCapacity(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    assert problem.get_val("relative_capacity") == pytest.approx(
+        [1.0, 0.993, 0.984, 0.978, 0.974, 0.971, 0.97, 0.969, 0.968, 0.967], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -575,6 +597,10 @@ def test_module_soc_decrease():
         val=np.array([0.5, 0.5015, 0.503, 0.504, 0.5055, 0.507, 0.5085, 0.5095, 0.511, 0.5125]),
     )
     ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+    ivc.add_output(
+        "relative_capacity",
+        val=np.array([1.0, 0.993, 0.984, 0.978, 0.974, 0.971, 0.97, 0.969, 0.968, 0.967]),
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -582,7 +608,7 @@ def test_module_soc_decrease():
         ivc,
     )
     assert problem.get_val("state_of_charge_decrease", units="percent") == pytest.approx(
-        [6.94, 6.97, 6.99, 7.0, 7.02, 7.04, 7.06, 7.08, 7.1, 7.12],
+        [6.94, 7.01, 7.1, 7.16, 7.21, 7.25, 7.28, 7.3, 7.33, 7.36],
         rel=1e-2,
     )
 
@@ -885,14 +911,14 @@ def test_performances_battery_pack():
         ivc,
     )
     assert problem.get_val("voltage_out", units="V") == pytest.approx(
-        [604.0, 591.2, 581.8, 572.7, 562.3, 550.8, 538.9, 527.5, 517.2, 507.5],
+        [604.0, 590.5, 580.6, 570.7, 559.3, 546.8, 534.1, 522.5, 512.0, 501.0],
         rel=1e-2,
     )
     assert problem.get_val("state_of_charge", units="percent") == pytest.approx(
-        [100.0, 92.1, 84.1, 76.1, 68.1, 60.1, 52.1, 44.0, 35.9, 27.8], rel=1e-2
+        [100.0, 91.5, 83.0, 74.5, 65.9, 57.4, 48.8, 40.1, 31.5, 22.8], rel=1e-2
     )
     assert problem.get_val("losses_battery", units="kW") == pytest.approx(
-        [6.32, 7.26, 7.06, 6.32, 5.54, 5.01, 4.93, 5.31, 6.07, 6.97],
+        [6.32, 7.28, 6.97, 6.15, 5.35, 4.92, 5.02, 5.62, 6.54, 7.44],
         rel=1e-2,
     )
     assert problem.get_val("efficiency") == pytest.approx(

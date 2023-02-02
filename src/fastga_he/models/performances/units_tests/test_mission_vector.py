@@ -1123,4 +1123,4 @@ def test_mission_vector_from_yml():
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(22.99, abs=1e-2)
+    assert mission_end_soc == pytest.approx(21.67, abs=1e-2)

@@ -151,6 +151,7 @@ BATTERY_PACK = {
         {"internal_resistance": "ohm"},
         {"voltage_out": "V"},
         {"efficiency": None},
+        {"relative_capacity": None},
     ],
 }
 

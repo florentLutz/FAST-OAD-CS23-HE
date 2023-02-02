@@ -13,6 +13,7 @@ from ..components.perf_cell_voltage import PerformancesCellVoltage
 from ..components.perf_module_voltage import PerformancesModuleVoltage
 from ..components.perf_battery_voltage import PerformancesBatteryVoltage
 from ..components.perf_battery_c_rate import PerformancesModuleCRate
+from ..components.perf_battery_relative_capacity import PerformancesRelativeCapacity
 from ..components.perf_soc_decrease import PerformancesSOCDecrease
 from ..components.perf_update_soc import PerformancesUpdateSOC
 from ..components.perf_joule_losses import PerformancesCellJouleLosses
@@ -76,9 +77,14 @@ class PerformancesBatteryPack(om.Group):
             promotes=["data:*", "c_rate"],
         )
         self.add_subsystem(
+            "battery_relative_capacity",
+            PerformancesRelativeCapacity(number_of_points=number_of_points),
+            promotes=["relative_capacity"],
+        )
+        self.add_subsystem(
             "battery_soc_decrease",
             PerformancesSOCDecrease(number_of_points=number_of_points),
-            promotes=["time_step", "c_rate"],
+            promotes=["time_step", "c_rate", "relative_capacity"],
         )
         self.add_subsystem(
             "update_soc",
@@ -173,6 +179,7 @@ class PerformancesBatteryPack(om.Group):
             [
                 "cell_voltage.current_one_module",
                 "battery_c_rate.current_one_module",
+                "battery_relative_capacity.current_one_module",
                 "joule_losses_cell.current_one_module",
                 "entropic_losses_cell.current_one_module",
             ],

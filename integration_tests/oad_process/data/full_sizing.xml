@@ -3,9 +3,9 @@
     <TLAR>
       <NPAX_design is_input="True">0.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">10.0<!--luggage design mass--></luggage_mass_design>
-      <range units="km" is_input="True">140.0<!--top-level requirement: design range--></range>
-      <v_approach units="knot" is_input="True">78.0<!--approach speed--></v_approach>
-      <v_cruise units="knot" is_input="True">90.0<!--cruise speed--></v_cruise>
+      <range units="km" is_input="True">55.0<!--top-level requirement: design range--></range>
+      <v_approach units="knot" is_input="True">58.5<!--approach speed--></v_approach>
+      <v_cruise units="knot" is_input="True">93.0<!--cruise speed--></v_cruise>
       <v_max_sl units="knot" is_input="True">110.0<!--maximum speed at sea level--></v_max_sl>
     </TLAR>
     <geometry>
@@ -137,6 +137,7 @@
         <PMSM>
           <motor_1>
             <from_LE units="m">0.15</from_LE>
+            <front_length_ratio>0.25</front_length_ratio>
             <rpm_rating units="1/min" is_input="True">4500.0<!--Max voltage of the motor--></rpm_rating>
             <torque_rating units="N*m" is_input="True">200.0<!--Max voltage of the motor--></torque_rating>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
@@ -144,17 +145,12 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
-            <cell_weight_fraction is_input="True">0.75<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_modules is_input="True">200.0<!--Number of modules in parallel inside the battery pack--></number_modules>
-            <cell>
-              <volume units="mL">155.0</volume>
-              <capacity units="A*h" is_input="True">20.0<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <mass units="g" is_input="True">145.0<!--Mass of the cell used for the assembly of the battery pack--></mass>
-            </cell>
+            <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
+            <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <number_modules is_input="True">24.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <module>
-              <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
+              <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
           </battery_pack_1>
         </battery_pack>
@@ -307,11 +303,11 @@
         </cs23>
         <main_route>
           <cruise>
-            <altitude units="ft" is_input="True">3000.0<!--altitude during cruise phase in sizing mission--></altitude>
+            <altitude units="ft" is_input="True">2000.0<!--altitude during cruise phase in sizing mission--></altitude>
           </cruise>
           <descent>
-            <v_eas units="m/s">50.0</v_eas>
-            <descent_rate units="ft/min" is_input="True">-300.0<!--target descent rate for the
+            <v_eas units="m/s">36.0</v_eas>
+            <descent_rate units="ft/min" is_input="True">-350.0<!--target descent rate for the
             aircraft--></descent_rate>
           </descent>
           <reserve>
@@ -319,9 +315,9 @@
             <duration units="min" is_input="True">30.0<!--duration of the reserve segment--></duration>
           </reserve>
           <climb>
-            <v_eas units="m/s">38.0</v_eas>
+            <v_eas units="m/s">40.0</v_eas>
             <climb_rate>
-              <cruise_level units="ft/min" is_input="True">300.0<!--target climb rate at the end of climb--></cruise_level>
+              <cruise_level units="ft/min" is_input="True">450.0<!--target climb rate at the end of climb--></cruise_level>
               <sea_level units="ft/min" is_input="True">600.0<!--target climb rate at sea level--></sea_level>
             </climb_rate>
           </climb>
@@ -370,17 +366,17 @@
       <systems>
         <power>
           <electric_systems>
-            <mass units="kg">20</mass>
+            <mass units="kg">5</mass>
           </electric_systems>
           <hydraulic_systems>
-            <mass units="kg">10</mass>
+            <mass units="kg">0</mass>
           </hydraulic_systems>
         </power>
         <avionics>
           <mass units="kg">10</mass>
         </avionics>
         <recording>
-          <mass units="kg">10</mass>
+          <mass units="kg">0</mass>
         </recording>
         <life_support>
           <air_conditioning>
