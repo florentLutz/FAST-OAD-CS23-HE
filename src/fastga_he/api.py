@@ -6,3 +6,4 @@
 # flake8: noqa
 
 from fastga_he.gui.performances_viewer import PerformancesViewer
+from fastga_he.gui.power_train_weight_breakdown import power_train_mass_breakdown

@@ -74,8 +74,11 @@ def power_train_mass_breakdown(
         power_train_weight_check += component_weight
 
     if power_train_weight != round(power_train_weight_check, 6):
+        print(
+            "Difference found between power train weight and the sum of the components, "
+            "" + str(power_train_weight) + " vs " + str(round(power_train_weight_check, 6))
+        )
         power_train_weight = round(power_train_weight_check, 6)
-        print("Difference found between power train weight and the sum of the components")
 
     # Create lists for the sunburst and start filling them with the power train mass value
     pt_weight_label = "Power train weight" + "<br> " + str(power_train_weight) + " [kg]"
