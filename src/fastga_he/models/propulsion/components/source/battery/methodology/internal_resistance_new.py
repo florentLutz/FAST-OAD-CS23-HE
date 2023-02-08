@@ -158,7 +158,14 @@ if __name__ == "__main__":
     names = ["0.2A", "0.5A", "1.0A", "2.0A", "3.0A", "5.0A"]
 
     for x, y, name in zip(x_list, y_list, names):
-        scatter = go.Scatter(x=x, y=y, name=name, mode="lines+markers")
+        scatter = go.Scatter(
+            x=x,
+            y=y,
+            name=name + " data",
+            mode="lines+markers",
+            legendgroup=name,
+            legendgrouptitle_text=name,
+        )
         fig.add_trace(scatter)
 
     # fig.show()
@@ -220,7 +227,7 @@ if __name__ == "__main__":
     )
 
     scatter = go.Scatter(x=depth_of_discharge_ref, y=ocv, name="Average OCV", mode="lines+markers")
-    fig.add_trace(scatter)
+    # fig.add_trace(scatter)
 
     # fig.show()
     # Let's try to fit with the shape we want
@@ -353,11 +360,13 @@ if __name__ == "__main__":
     fig7 = go.Figure()
 
     for current_plot in [0.2, 0.5, 1.0, 2.0, 3.0, 5.0]:
+        string = str(current_plot) + "A"
         scatter = go.Scatter(
             x=depth_of_discharge_ref[where_valid],
             y=discharge_curve_func(depth_of_discharge_ref[where_valid], current_plot),
-            name=str(current_plot) + " A",
+            name=string + " interpolated",
             mode="lines+markers",
+            legendgroup=string,
         )
         fig.add_trace(scatter)
 

@@ -202,7 +202,7 @@ if __name__ == "__main__":
         )
         fig3.add_trace(scatter)
 
-    fig3.show()
+    # fig3.show()
 
     # Just to confirm we will study the tendency of the function (should have an asymptotic curve
     # when reaching very high temperatures and should be decreasing)
@@ -215,4 +215,4 @@ if __name__ == "__main__":
         mode="lines+markers",
     )
     fig4.add_trace(scatter)
-    # fig4.show()
+    fig4.show()
