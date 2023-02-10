@@ -115,7 +115,9 @@ class SizingDCDCConverterInductorReluctance(om.ExplicitComponent):
             "settings:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":inductor:iron_permeability",
-        ] = (-2.0 * air_gap / (mu ** 2.0 * iron_area))
+        ] = (
+            -2.0 * air_gap / (mu ** 2.0 * iron_area)
+        )
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -131,4 +133,6 @@ class SizingDCDCConverterInductorReluctance(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":inductor:iron_surface",
-        ] = (-2.0 * air_gap / (mu * iron_area ** 2.0))
+        ] = (
+            -2.0 * air_gap / (mu * iron_area ** 2.0)
+        )
