@@ -46,6 +46,8 @@ fast-oad-core = "~1.3.3"
 fast-oad-cs23 = { git = "https://github.com/supaero-aircraft-design/FAST-GA.git", branch = "main" }
 pybamm = "*"
 casadi = "3.5.5"
+networkx = "*"
+pyvis = "*"
 
 [tool.poetry.dev-dependencies]
 pyvplm = { git = "https://github.com/SizingLab/pyvplm.git", branch = "master" }
