@@ -13,8 +13,22 @@ from ..components.sizing_energy_coefficients import SizingDCDCConverterEnergyCoe
 from ..components.sizing_resistance_scaling import SizingDCDCConverterResistanceScaling
 from ..components.sizing_reference_resistance import SizingDCDCConverterResistances
 from ..components.sizing_inductor_inductance import SizingDCDCConverterInductorInductance
+from ..components.sizing_inductor_energy import SizingDCDCConverterInductorEnergy
+from ..components.sizing_inductor_iron_surface import SizingDCDCConverterInductorIronSurface
+from ..components.sizing_inductor_reluctance import SizingDCDCConverterInductorReluctance
+from ..components.sizing_inductor_turn_number import SizingDCDCConverterInductorTurnNumber
+from ..components.sizing_inductor_copper_wire_area import SizingDCDCConverterInductorCopperWireArea
+from ..components.sizing_inductor_core_scaling import SizingDCDCConverterInductorCoreScaling
+from ..components.sizing_inductor_core_mass import SizingDCDCConverterInductorCoreMass
+from ..components.sizing_inductor_core_dimensions import SizingDCDCConverterInductorCoreDimensions
+from ..components.sizing_inductor_copper_mass import SizingDCDCConverterInductorCopperMass
+from ..components.sizing_inductor_mass import SizingDCDCConverterInductorMass
+from ..components.sizing_inductor_resistance import SizingDCDCConverterInductorResistance
+from ..components.sizing_inductor import SizingDCDCConverterInductor
 from ..components.sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
-from ..components.sizing_weight import SizingDCDCConverterWeight
+from ..components.sizing_capacitor_weight import SizingDCDCConverterCapacitorWeight
+from ..components.sizing_module_mass import SizingDCDCConverterCasingWeight
+from ..components.sizing_weight import SizingDCDCConverterWeight, SizingDCDCConverterWeightBySum
 from ..components.sizing_dc_dc_converter_cg import SizingDCDCConverterCG
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
@@ -35,6 +49,7 @@ from ..components.cstr_enforce import (
     ConstraintsVoltageEnforce,
     ConstraintsVoltageInputEnforce,
     ConstraintsFrequencyEnforce,
+    ConstraintsInductorAirGapEnforce,
 )
 from ..components.cstr_ensure import (
     ConstraintsCurrentCapacitorEnsure,
@@ -44,6 +59,7 @@ from ..components.cstr_ensure import (
     ConstraintsVoltageEnsure,
     ConstraintsVoltageInputEnsure,
     ConstraintsFrequencyEnsure,
+    ConstraintsInductorAirGapEnsure,
 )
 
 from ..components.sizing_dc_dc_converter import SizingDCDCConverter
@@ -206,6 +222,317 @@ def test_inductor_inductance():
     problem.check_partials(compact_print=True)
 
 
+def test_inductor_mag_energy():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductorEnergy(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorEnergy(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:magnetic_energy_rating",
+            units="J",
+        )
+        == pytest.approx(35.76, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_iron_surface():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductorIronSurface(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorIronSurface(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:iron_surface",
+            units="mm**2",
+        )
+        == pytest.approx(15720.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_reluctance():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductorReluctance(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorReluctance(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:reluctance",
+            units="H**-1",
+        )
+        / 1e6
+        == pytest.approx(0.289, rel=1e-2)
+    )
+
+    # Partials are OK, it is just a question of step
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_turn_number():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductorTurnNumber(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorTurnNumber(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:turn_number",
+        )
+        == pytest.approx(11.36, rel=1e-2)
+    )
+
+    # Partials are OK, it is just a question of step
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_copper_wire_area():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SizingDCDCConverterInductorCopperWireArea(dc_dc_converter_id="dc_dc_converter_1")
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorCopperWireArea(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:wire_section_area",
+        )
+        == pytest.approx(8.0e-05, rel=1e-2)
+    )
+
+    # Partials are OK, it is just a question of step
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_core_scaling():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductorCoreScaling(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorCoreScaling(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:scaling:core_mass",
+        )
+        == pytest.approx(98.30, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:scaling:core_dimension",
+        )
+        == pytest.approx(4.61, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_core_mass():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductorCoreMass(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorCoreMass(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:core_mass",
+            units="kg",
+        )
+        == pytest.approx(48.46, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_core_dimensions():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SizingDCDCConverterInductorCoreDimensions(dc_dc_converter_id="dc_dc_converter_1")
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorCoreDimensions(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:core_dimension:B",
+            units="m",
+        )
+        == pytest.approx(0.3372215, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:core_dimension:C",
+            units="m",
+        )
+        == pytest.approx(0.126775, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_copper_mass():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductorCopperMass(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorCopperMass(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:copper_mass",
+            units="kg",
+        )
+        == pytest.approx(5.16, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_mass():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductorMass(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorMass(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:mass",
+            units="kg",
+        )
+        == pytest.approx(201.76, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_resistance():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductorResistance(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterInductorResistance(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:resistance",
+            units="ohm",
+        )
+        == pytest.approx(0.00183188, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_sizing():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterInductor(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingDCDCConverterInductor(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:resistance",
+            units="ohm",
+        )
+        == pytest.approx(0.00183188, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:mass",
+            units="kg",
+        )
+        == pytest.approx(102.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_capacitor_capacity():
 
     # Research independent input value in .xml file
@@ -230,6 +557,54 @@ def test_capacitor_capacity():
     problem.check_partials(compact_print=True)
 
 
+def test_capacitor_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterCapacitorWeight(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterCapacitorWeight(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:capacitor:mass",
+            units="kg",
+        )
+        == pytest.approx(1.21, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_module_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterCasingWeight(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterCasingWeight(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:module:mass",
+            units="kg",
+        )
+        == pytest.approx(0.335, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_converter_weight():
 
     # Research independent input value in .xml file
@@ -247,6 +622,30 @@ def test_converter_weight():
             units="kg",
         )
         == pytest.approx(86.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_converter_weight_by_sum():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterWeightBySum(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterWeightBySum(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass",
+            units="kg",
+        )
+        == pytest.approx(103.545, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -448,6 +847,30 @@ def test_constraints_frequency_enforce():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_air_gap_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsInductorAirGapEnforce(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsInductorAirGapEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:air_gap",
+            units="m",
+        )
+        == pytest.approx(0.0126775, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraints_current_capacitor_ensure():
 
     # Research independent input value in .xml file
@@ -611,6 +1034,31 @@ def test_constraints_frequency_ensure():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_air_gap_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsInductorAirGapEnsure(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsInductorAirGapEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor"
+            ":air_gap",
+            units="m",
+        )
+        == pytest.approx(-0.0026775, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_dc_dc_converter_sizing():
 
     # Research independent input value in .xml file
@@ -627,7 +1075,7 @@ def test_dc_dc_converter_sizing():
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass",
             units="kg",
         )
-        == pytest.approx(86.0, rel=1e-2)
+        == pytest.approx(96.63, rel=1e-2)
     )
     assert (
         problem.get_val(

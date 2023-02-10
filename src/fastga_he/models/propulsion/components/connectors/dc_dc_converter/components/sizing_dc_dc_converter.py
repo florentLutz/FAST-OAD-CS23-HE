@@ -11,15 +11,16 @@ from .sizing_energy_coefficient_scaling import (
 from .sizing_energy_coefficients import SizingDCDCConverterEnergyCoefficients
 from .sizing_resistance_scaling import SizingDCDCConverterResistanceScaling
 from .sizing_reference_resistance import SizingDCDCConverterResistances
-from .sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from .sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
-from .sizing_weight import SizingDCDCConverterWeight
+from .sizing_capacitor_weight import SizingDCDCConverterCapacitorWeight
+from .sizing_inductor import SizingDCDCConverterInductor
+from .sizing_module_mass import SizingDCDCConverterCasingWeight
 from .sizing_dc_dc_converter_cg import SizingDCDCConverterCG
 from .sizing_dc_dc_converter_drag import SizingDCDCConverterDrag
 
 from .cstr_dc_dc_converter import ConstraintsDCDCConverter
 
-from ..constants import POSSIBLE_POSITION
+from ..constants import POSSIBLE_POSITION, SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT
 
 
 class SizingDCDCConverter(om.Group):
@@ -84,16 +85,31 @@ class SizingDCDCConverter(om.Group):
             SizingDCDCConverterCapacitorCapacity(dc_dc_converter_id=dc_dc_converter_id),
             promotes=["*"],
         )
-
         self.add_subsystem(
-            "inductor_inductance",
-            SizingDCDCConverterInductorInductance(dc_dc_converter_id=dc_dc_converter_id),
+            "capacitor_weight",
+            SizingDCDCConverterCapacitorWeight(dc_dc_converter_id=dc_dc_converter_id),
             promotes=["*"],
         )
 
         self.add_subsystem(
+            "inductor_sizing",
+            SizingDCDCConverterInductor(dc_dc_converter_id=dc_dc_converter_id),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "module_weight",
+            SizingDCDCConverterCasingWeight(dc_dc_converter_id=dc_dc_converter_id),
+            promotes=["*"],
+        )
+
+        option = {"dc_dc_converter_id": dc_dc_converter_id}
+
+        self.add_subsystem(
             "converter_weight",
-            SizingDCDCConverterWeight(dc_dc_converter_id=dc_dc_converter_id),
+            oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT, options=option
+            ),
             promotes=["*"],
         )
         self.add_subsystem(

@@ -79,7 +79,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":inductor:resistance",
             units="ohm",
-            val=1.4e-3,
+            val=np.nan,
         )
         self.add_input(
             "data:propulsion:he_power_train:DC_DC_converter:"
