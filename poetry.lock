@@ -463,7 +463,7 @@ mpi4py = ["mpi4py (>=3,<4)"]
 
 [[package]]
 name = "fast-oad-cs23"
-version = "1.0.4"
+version = "1.1.0"
 description = "FAST-OAD-CS23 is a framework for performing rapid Overall Aircraft Design for General Aircraft"
 category = "main"
 optional = false
@@ -471,7 +471,7 @@ python-versions = "^3.7, <3.10"
 develop = false
 
 [package.dependencies]
-fast-oad-core = "~1.3.3"
+fast-oad-core = ">=1.3.3"
 openmdao = "<3.18.0"
 stdatm = "0.2.0"
 
@@ -482,7 +482,7 @@ jupyterlab = []
 type = "git"
 url = "https://github.com/supaero-aircraft-design/FAST-GA.git"
 reference = "main"
-resolved_reference = "2ba9bc0e40b76ec59807c515a6e12694efc22abc"
+resolved_reference = "461b87aa79ac53289f0695078af8ddf07502c73f"
 
 [[package]]
 name = "fastjsonschema"
@@ -810,6 +810,19 @@ python-versions = "*"
 
 [package.extras]
 dev = ["hypothesis"]
+
+[[package]]
+name = "jsonpickle"
+version = "3.0.1"
+description = "Python library for serializing any arbitrary object graph into JSON"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
+testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8 (>=1.1.1)", "pytest-black-multipy", "pytest-cov", "ecdsa", "feedparser", "gmpy2", "numpy", "pandas", "pymongo", "scikit-learn", "sqlalchemy"]
+"testing.libs" = ["simplejson", "ujson"]
 
 [[package]]
 name = "jsonrpclib-pelix"
@@ -1272,18 +1285,18 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "networkx"
-version = "2.8.5"
+version = "3.0"
 description = "Python package for creating and manipulating graphs and networks"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 
 [package.extras]
-default = ["numpy (>=1.19)", "scipy (>=1.8)", "matplotlib (>=3.4)", "pandas (>=1.3)"]
-developer = ["pre-commit (>=2.19)", "mypy (>=0.960)"]
-doc = ["sphinx (>=5)", "pydata-sphinx-theme (>=0.9)", "sphinx-gallery (>=0.10)", "numpydoc (>=1.4)", "pillow (>=9.1)", "nb2plots (>=0.6)", "texext (>=0.6.6)"]
-extra = ["lxml (>=4.6)", "pygraphviz (>=1.9)", "pydot (>=1.4.2)", "sympy (>=1.10)"]
-test = ["pytest (>=7.1)", "pytest-cov (>=3.0)", "codecov (>=2.1)"]
+default = ["numpy (>=1.20)", "scipy (>=1.8)", "matplotlib (>=3.4)", "pandas (>=1.3)"]
+developer = ["pre-commit (>=2.20)", "mypy (>=0.991)"]
+doc = ["sphinx (==5.2.3)", "pydata-sphinx-theme (>=0.11)", "sphinx-gallery (>=0.11)", "numpydoc (>=1.5)", "pillow (>=9.2)", "nb2plots (>=0.6)", "texext (>=0.6.7)"]
+extra = ["lxml (>=4.6)", "pygraphviz (>=1.10)", "pydot (>=1.4.2)", "sympy (>=1.10)"]
+test = ["pytest (>=7.2)", "pytest-cov (>=4.0)", "codecov (>=2.1)"]
 
 [[package]]
 name = "nodeenv"
@@ -1791,6 +1804,20 @@ description = "World timezone definitions, modern and historical"
 category = "main"
 optional = false
 python-versions = "*"
+
+[[package]]
+name = "pyvis"
+version = "0.3.1"
+description = "A Python network graph visualization library"
+category = "main"
+optional = false
+python-versions = ">3.6"
+
+[package.dependencies]
+ipython = ">=5.3.0"
+jinja2 = ">=2.9.6"
+jsonpickle = ">=1.4.1"
+networkx = ">=1.11"
 
 [[package]]
 name = "pyvplm"
@@ -2507,7 +2534,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8, <3.10"
-content-hash = "ea7c733b991c3eb1ebbcf2916c7ac6b972d36e0d8f60c396e95c12d39a69c973"
+content-hash = "e4336bd5cd197cccdeb4069713b10f79f8e8e736fbae8602b852fe0571172632"
 
 [metadata.files]
 aenum = []
@@ -2572,6 +2599,7 @@ jedi = []
 jinja2 = []
 joblib = []
 json5 = []
+jsonpickle = []
 jsonrpclib-pelix = []
 jsonschema = []
 julia = []
@@ -2644,6 +2672,7 @@ pytest = []
 pytest-cov = []
 python-dateutil = []
 pytz = []
+pyvis = []
 pyvplm = []
 pywin32 = []
 pywinpty = []

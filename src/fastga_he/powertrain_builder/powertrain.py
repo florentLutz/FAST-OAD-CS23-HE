@@ -92,6 +92,9 @@ class FASTGAHEPowerTrainConfigurator:
         # modules for the code to work
         self._components_promotes = None
 
+        # Contains a basic list of the connections in the power train, with no processing whatsoever
+        self._connection_list = None
+
         # Contains the list of all outputs (in the OpenMDAO sense of the term) needed to make the
         # connections between components
         self._components_connection_outputs = None
@@ -222,6 +225,7 @@ class FASTGAHEPowerTrainConfigurator:
             )
 
         connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
+        self._connection_list = connections_list
 
         # Create a dictionary to translate component name back to component_id to identify
         # outputs and inputs in each case
@@ -456,6 +460,21 @@ class FASTGAHEPowerTrainConfigurator:
             components_perf_watchers_name_organised_list,
             components_perf_watchers_unit_organised_list,
         )
+
+    def get_network_elements_list(self) -> tuple:
+        """
+        Returns the name of the components and their connections for the visualisation of the
+        power train as a network graph.
+        """
+
+        self._get_components()
+        self._get_connections()
+
+        curated_connection_list = []
+        for connections in self._connection_list:
+            curated_connection_list.append((connections["source"], connections["target"]))
+
+        return self._components_name, curated_connection_list, self._components_type_class
 
 
 class _YAMLSerializer(ABC):
