@@ -27,12 +27,34 @@
                         <capacitor>
                             <current_caliber units="A">400.0</current_caliber>
                             <current_max units="A">380.0</current_max>
+                            <capacity units="mF">0.460</capacity>
+                            <mass units="kg">1.21</mass>
                         </capacitor>
                         <inductor>
+                            <mass units="kg">102.0</mass>
+                            <inductance units="mH">0.447</inductance>
                             <current_caliber units="A">400.0</current_caliber>
                             <current_max units="A">380.0</current_max>
+                            <magnetic_energy_rating units="J">35.76</magnetic_energy_rating>
+                            <air_gap units="m">1e-2</air_gap>
+                            <iron_surface units="mm**2">15720.0</iron_surface>
+                            <reluctance units="H**-1">0.289e6</reluctance>
+                            <turn_number units="H**-1">11.36</turn_number>
+                            <wire_section_area units="m**2">8.0e-05</wire_section_area>
+                            <copper_mass units="kg">5.16</copper_mass>
+                            <core_mass units="kg">98.30</core_mass>
+                            <resistance units="ohm">1.4e-3</resistance>
+                            <core_dimension>
+                                <B units="m">0.3372215</B>
+                                <C units="m">0.126775</C>
+                            </core_dimension>
+                            <scaling>
+                                <core_mass>98.30</core_mass>
+                                <core_dimension>4.61</core_dimension>
+                            </scaling>
                         </inductor>
                         <module>
+                            <mass units="kg">0.335</mass>
                             <current_caliber units="A">400.0</current_caliber>
                         </module>
                         <igbt>

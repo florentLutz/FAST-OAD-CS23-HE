@@ -94,6 +94,8 @@
                             <current_max units="A">380.0</current_max>
                         </capacitor>
                         <inductor>
+                            <air_gap units="mm">10</air_gap>
+                            <resistance units="ohm">1.4e-3</resistance>
                             <current_caliber units="A">400.0</current_caliber>
                             <current_max units="A">380.0</current_max>
                         </inductor>
