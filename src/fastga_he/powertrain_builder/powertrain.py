@@ -474,7 +474,7 @@ class FASTGAHEPowerTrainConfigurator:
         for connections in self._connection_list:
             curated_connection_list.append((connections["source"], connections["target"]))
 
-        return self._components_name, curated_connection_list
+        return self._components_name, curated_connection_list, self._components_type_class
 
 
 class _YAMLSerializer(ABC):

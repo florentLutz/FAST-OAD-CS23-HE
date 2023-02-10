@@ -4,8 +4,6 @@
 
 import os
 
-from IPython.core.display import display, HTML
-
 import networkx as nx
 from pyvis.network import Network
 
@@ -18,17 +16,27 @@ def power_train_network_viewer(
 ):
 
     # Notebook is at True to prevent him from opening a browser
-    net = Network(notebook=True)
+    net = Network(
+        notebook=True,
+        cdn_resources="remote",
+        bgcolor="#222222",
+        font_color="white",
+        select_menu=True,
+    )
     # Create directed graph object
     graph = nx.DiGraph()
 
     configurator = FASTGAHEPowerTrainConfigurator()
     configurator.load(power_train_file_path)
 
-    names, connections = configurator.get_network_elements_list()
+    names, connections, components_type = configurator.get_network_elements_list()
 
-    for component_name in names:
-        graph.add_node(component_name)
+    for component_name, component_type in zip(names, components_type):
+        if component_type == "propulsor" or component_type == "source":
+            weight = 2.0
+        else:
+            weight = 1.0
+        graph.add_node(component_name, value=weight)
 
     for connection in connections:
         # When the component is connected to a bus, the output number is also specified but it
@@ -58,7 +66,6 @@ def power_train_network_viewer(
 
     net.from_nx(graph)
     net.show(graph_name)
-    display(HTML(graph_name))
 
     # Change the working directory back
     os.chdir(old_working_directory)
