@@ -70,6 +70,7 @@
       <wing>
         <aspect_ratio is_input="True">12.04<!--wing aspect ratio--></aspect_ratio>
         <sweep_25 units="deg" is_input="True">0.0<!--sweep angle at 25% chord of wing--></sweep_25>
+        <dihedral units="deg" is_input="True">0.0<!--sweep angle at 25% chord of wing--></dihedral>
         <taper_ratio is_input="True">1.0<!--taper ratio of wing--></taper_ratio>
         <thickness_ratio is_input="True">0.15<!--mean thickness ratio of wing--></thickness_ratio>
         <kink>
