@@ -1359,7 +1359,7 @@ python-versions = ">=3.8"
 
 [[package]]
 name = "openmdao"
-version = "3.17.0"
+version = "3.25.0"
 description = "OpenMDAO framework infrastructure"
 category = "main"
 optional = false
@@ -1368,16 +1368,16 @@ python-versions = ">=3.7"
 [package.dependencies]
 networkx = ">=2.0"
 numpy = "*"
-pyDOE2 = "*"
-pyparsing = "*"
+packaging = "*"
 requests = "*"
 scipy = "*"
 
 [package.extras]
-all = ["aiounittest", "bokeh (>=1.3.4)", "colorama", "ipympl", "ipyparallel", "ipython", "ipywidgets (>=7.6.5)", "jupyter", "jupyter-book", "jupyter-sphinx (==0.3.1)", "matplotlib", "matplotlib", "nbconvert", "notebook", "numpydoc (>=1.1)", "numpydoc (>=1.1)", "parameterized", "playwright (<1.15)", "pycodestyle (>=2.4.0)", "pydocstyle (==2.0.0)", "sphinx-sitemap", "tabulate", "tabulate", "testflo", "testflo (>=1.3.6websockets)"]
-docs = ["matplotlib", "jupyter", "nbconvert", "testflo", "ipyparallel", "numpydoc (>=1.1)", "tabulate", "jupyter-book", "jupyter-sphinx (==0.3.1)", "sphinx-sitemap"]
-notebooks = ["notebook", "tabulate", "ipython", "ipywidgets (>=7.6.5)", "ipympl"]
-test = ["parameterized", "numpydoc (>=1.1)", "pycodestyle (>=2.4.0)", "pydocstyle (==2.0.0)", "testflo (>=1.3.6websockets)", "aiounittest", "playwright (<1.15)"]
+all = ["aiounittest", "bokeh (>=1.3.4)", "colorama", "ipympl", "ipyparallel", "ipython", "ipywidgets (>=7.6.5)", "jupyter", "jupyter-book (>=0.8.0,<0.13)", "jupyter-client (>=7.4.0)", "jupyter-core (>=4.11.2)", "jupyter-sphinx", "matplotlib", "myst-nb", "nbconvert (>=6.3)", "notebook", "num2words", "numpydoc (>=1.1)", "parameterized", "playwright (>=1.20)", "pydoe2", "pycodestyle (>=2.4.0)", "pydocstyle (>=2.0.0)", "sphinx-sitemap", "testflo (>=1.3.6)", "websockets (>8)"]
+docs = ["matplotlib", "numpydoc (>=1.1)", "jupyter-core (>=4.11.2)", "jupyter-book (>=0.8.0,<0.13)", "jupyter-client (>=7.4.0)", "jupyter", "jupyter-sphinx", "sphinx-sitemap", "ipyparallel", "nbconvert (>=6.3)"]
+doe = ["pydoe2"]
+notebooks = ["notebook", "ipython", "ipywidgets (>=7.6.5)", "ipympl", "myst-nb"]
+test = ["parameterized", "numpydoc (>=1.1)", "pycodestyle (>=2.4.0)", "pydocstyle (>=2.0.0)", "testflo (>=1.3.6)", "websockets (>8)", "aiounittest", "playwright (>=1.20)", "num2words"]
 visualization = ["bokeh (>=1.3.4)", "matplotlib", "colorama"]
 
 [[package]]
@@ -1690,7 +1690,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 name = "pydoe2"
 version = "1.3.0"
 description = "Design of experiments for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
