@@ -8,7 +8,6 @@ import fastoad.api as oad
 from .perf_resistance import PerformancesResistance
 from .perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from .perf_losses_one_cable import PerformancesLossesOneCable
-from .perf_temperature import PerformancesTemperature
 from .perf_maximum import PerformancesMaximum
 
 from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
