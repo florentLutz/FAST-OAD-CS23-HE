@@ -52,6 +52,16 @@ class PerformancesAssembly(om.Group):
             PerformancesInverter(inverter_id="inverter_1", number_of_points=number_of_points),
             promotes=["data:*"],
         )
+
+        self.add_subsystem(
+            "dc_sspc_412",
+            PerformancesDCSSPC(
+                dc_sspc_id="dc_sspc_412",
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*"],
+        )
+
         self.add_subsystem(
             "dc_bus_1",
             PerformancesDCBus(
@@ -99,6 +109,15 @@ class PerformancesAssembly(om.Group):
             ),
             promotes=["data:*"],
         )
+
+        self.add_subsystem(
+            "dc_sspc_1337",
+            PerformancesDCSSPC(
+                dc_sspc_id="dc_sspc_1337", number_of_points=number_of_points, at_bus_output=False
+            ),
+            promotes=["data:*"],
+        )
+
         self.add_subsystem(
             "dc_dc_converter_1",
             PerformancesDCDCConverter(
@@ -125,12 +144,19 @@ class PerformancesAssembly(om.Group):
         self.connect("motor_1.ac_voltage_peak_in", "inverter_1.ac_voltage_peak_out")
         self.connect("motor_1.ac_voltage_rms_in", "inverter_1.ac_voltage_rms_out")
 
-        self.connect("dc_bus_1.dc_voltage", "inverter_1.dc_voltage_in")
-        self.connect("inverter_1.dc_current_in", "dc_bus_1.dc_current_out_1")
+        # INVERTER 1 to DC BUS 1
+        # self.connect("dc_bus_1.dc_voltage", "inverter_1.dc_voltage_in")
+        # self.connect("inverter_1.dc_current_in", "dc_bus_1.dc_current_out_1")
 
-        # self.connect("dc_bus_1.dc_voltage", "dc_line_1.dc_voltage_out")
-        # self.connect("dc_line_1.dc_current", "dc_bus_1.dc_current_in_1")
+        # INVERTER 1 to SSPC 412
+        self.connect("dc_sspc_412.dc_voltage_out", "inverter_1.dc_voltage_in")
+        self.connect("inverter_1.dc_current_in", "dc_sspc_412.dc_current_out")
 
+        # SSPC 412 to DC BUS 1
+        self.connect("dc_bus_1.dc_voltage", "dc_sspc_412.dc_voltage_in")
+        self.connect("dc_sspc_412.dc_current_in", "dc_bus_1.dc_current_out_1")
+
+        # DC BUS 1 TO SSPC 1
         self.connect("dc_bus_1.dc_voltage", "dc_sspc_1.dc_voltage_in")
         self.connect("dc_sspc_1.dc_current_in", "dc_bus_1.dc_current_in_1")
 
@@ -143,8 +169,17 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_bus_2.dc_voltage", "dc_sspc_2.dc_voltage_in")
         self.connect("dc_sspc_2.dc_current_in", "dc_bus_2.dc_current_out_1")
 
-        self.connect("dc_dc_converter_1.dc_current_out", "dc_bus_2.dc_current_in_1")
-        self.connect("dc_bus_2.dc_voltage", "dc_dc_converter_1.dc_voltage_out")
+        # DC BUS 2 TO DC DC CONVERTER
+        # self.connect("dc_dc_converter_1.dc_current_out", "dc_bus_2.dc_current_in_1")
+        # self.connect("dc_bus_2.dc_voltage", "dc_dc_converter_1.dc_voltage_out")
+
+        # DC BUS 2 TO SSPC 1337
+        self.connect("dc_bus_2.dc_voltage", "dc_sspc_1337.dc_voltage_in")
+        self.connect("dc_sspc_1337.dc_current_in", "dc_bus_2.dc_current_in_1")
+
+        # SSPC 1337 TO DC DC CONVERTER
+        self.connect("dc_sspc_1337.dc_voltage_out", "dc_dc_converter_1.dc_voltage_out")
+        self.connect("dc_dc_converter_1.dc_current_out", "dc_sspc_1337.dc_current_out")
 
         self.connect("battery_pack_1.voltage_out", "dc_dc_converter_1.dc_voltage_in")
         self.connect("dc_dc_converter_1.dc_current_in", "battery_pack_1.dc_current_out")
