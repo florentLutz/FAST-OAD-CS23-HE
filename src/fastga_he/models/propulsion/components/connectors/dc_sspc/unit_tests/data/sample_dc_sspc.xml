@@ -1,0 +1,23 @@
+<FASTOAD_model>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <DC_SSPC>
+                    <dc_sspc_1>
+                        <current_caliber units="A">400.0</current_caliber>
+                        <voltage_caliber units="V">750.0</voltage_caliber>
+                        <scaling>
+                            <resistance>1.125</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00169875</resistance>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00210375</resistance>
+                        </diode>
+                    </dc_sspc_1>
+                </DC_SSPC>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
