@@ -3,3 +3,4 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 from .components.perf_dc_sspc import PerformancesDCSSPC
+from .components.sizing_dc_sspc import SizingDCSSPC

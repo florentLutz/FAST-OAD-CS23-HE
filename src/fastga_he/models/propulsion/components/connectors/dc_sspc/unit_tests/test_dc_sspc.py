@@ -9,6 +9,7 @@ import numpy as np
 from ..components.sizing_resistance_scaling import SizingDCSSPCResistanceScaling
 from ..components.sizing_reference_resistance import SizingDCSSPCResistances
 from ..components.sizing_weight import SizingDCSSPCWeight
+from ..components.sizing_dc_sspc_cg import SizingDCSSPCCG
 from ..components.perf_resistance import PerformancesDCSSPCResistance
 from ..components.perf_current import PerformancesDCSSPCCurrent
 from ..components.perf_voltage_out import PerformancesDCSSPCVoltageOut
@@ -17,6 +18,10 @@ from ..components.perf_power import PerformancesDCSSPCPower
 from ..components.perf_efficiency import PerformancesDCSSPCEfficiency
 from ..components.perf_maximum import PerformancesDCSSPCMaximum
 
+from ..components.cstr_ensure import ConstraintsCurrentEnsure, ConstraintsVoltageEnsure
+from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
+
+from ..components.sizing_dc_sspc import SizingDCSSPC
 from ..components.perf_dc_sspc import PerformancesDCSSPC
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -81,6 +86,50 @@ def test_weight():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
     ) == pytest.approx(10.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_dc_sspc_cg():
+
+    expected_cg = [2.69, 0.45, 2.54]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(SizingDCSSPCCG(dc_sspc_id="dc_sspc_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(SizingDCSSPCCG(dc_sspc_id="dc_sspc_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_sizing_dc_sspc():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(list_inputs(SizingDCSSPC(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE)
+
+    problem = run_system(SizingDCSSPC(dc_sspc_id="dc_sspc_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:CG:x", units="m"
+    ) == pytest.approx(2.69, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:low_speed:CD0"
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:cruise:CD0"
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -254,6 +303,70 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:voltage_max", units="V"
     ) == pytest.approx(600, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_current_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentEnsure(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
+    )
+
+    problem = run_system(ConstraintsCurrentEnsure(dc_sspc_id="dc_sspc_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:DC_SSPC:dc_sspc_1:current_caliber", units="A"
+    ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_voltage_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnsure(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
+    )
+
+    problem = run_system(ConstraintsVoltageEnsure(dc_sspc_id="dc_sspc_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:DC_SSPC:dc_sspc_1:voltage_caliber", units="V"
+    ) == pytest.approx(-150.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_current_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentEnforce(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
+    )
+
+    problem = run_system(ConstraintsCurrentEnforce(dc_sspc_id="dc_sspc_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:current_caliber", units="A"
+    ) == pytest.approx(400.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_voltage_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnforce(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
+    )
+
+    problem = run_system(ConstraintsVoltageEnforce(dc_sspc_id="dc_sspc_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:voltage_caliber", units="V"
+    ) == pytest.approx(600.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

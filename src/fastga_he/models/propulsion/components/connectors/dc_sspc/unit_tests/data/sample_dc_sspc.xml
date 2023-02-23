@@ -1,11 +1,31 @@
 <FASTOAD_model>
     <data>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <MAC>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
         <propulsion>
             <he_power_train>
                 <DC_SSPC>
                     <dc_sspc_1>
                         <current_caliber units="A">400.0</current_caliber>
+                        <current_max units="A">400.0</current_max>
                         <voltage_caliber units="V">750.0</voltage_caliber>
+                        <voltage_max units="V">600.0</voltage_max>
                         <scaling>
                             <resistance>1.125</resistance>
                         </scaling>

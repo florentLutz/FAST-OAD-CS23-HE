@@ -2,7 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-SUBMODEL_CONSTRAINTS_CURRENT_DC_BUS = "submodel.propulsion.constraints.dc_sspc.current"
-SUBMODEL_CONSTRAINTS_VOLTAGE_DC_BUS = "submodel.propulsion.constraints.dc_sspc.voltage"
+SUBMODEL_CONSTRAINTS_CURRENT_DC_SSPC = "submodel.propulsion.constraints.dc_sspc.current"
+SUBMODEL_CONSTRAINTS_VOLTAGE_DC_SSPC = "submodel.propulsion.constraints.dc_sspc.voltage"
 
 POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]

@@ -179,6 +179,18 @@ def test_assembly_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(3000.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_2:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_412:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1337:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
 
     write_outputs(
         pth.join(outputs.__path__[0], "simple_assembly_sizing.xml"),
