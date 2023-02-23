@@ -8,6 +8,9 @@ from .perf_resistance import PerformancesDCSSPCResistance
 from .perf_current import PerformancesDCSSPCCurrent
 from .perf_voltage_out import PerformancesDCSSPCVoltageOut
 from .perf_maximum import PerformancesDCSSPCMaximum
+from .perf_losses import PerformancesDCSSPCLosses
+from .perf_power import PerformancesDCSSPCPower
+from .perf_efficiency import PerformancesDCSSPCEfficiency
 
 
 class PerformancesDCSSPC(om.Group):
@@ -59,6 +62,21 @@ class PerformancesDCSSPC(om.Group):
             PerformancesDCSSPCVoltageOut(
                 number_of_points=number_of_points, at_bus_output=at_bus_output
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "losses",
+            PerformancesDCSSPCLosses(number_of_points=number_of_points, closed=closed),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "power",
+            PerformancesDCSSPCPower(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "efficiency",
+            PerformancesDCSSPCEfficiency(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(

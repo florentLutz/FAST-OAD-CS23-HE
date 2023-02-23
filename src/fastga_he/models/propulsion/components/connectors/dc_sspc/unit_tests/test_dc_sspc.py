@@ -12,6 +12,9 @@ from ..components.sizing_weight import SizingDCSSPCWeight
 from ..components.perf_resistance import PerformancesDCSSPCResistance
 from ..components.perf_current import PerformancesDCSSPCCurrent
 from ..components.perf_voltage_out import PerformancesDCSSPCVoltageOut
+from ..components.perf_losses import PerformancesDCSSPCLosses
+from ..components.perf_power import PerformancesDCSSPCPower
+from ..components.perf_efficiency import PerformancesDCSSPCEfficiency
 from ..components.perf_maximum import PerformancesDCSSPCMaximum
 
 from ..components.perf_dc_sspc import PerformancesDCSSPC
@@ -155,6 +158,80 @@ def test_perf_voltage_out():
     problem.check_partials(compact_print=True)
 
 
+def test_perf_losses():
+
+    ivc = om.IndepVarComp()
+    output_current = np.linspace(400, 390, NB_POINTS_TEST)
+    ivc.add_output("dc_current_in", units="A", val=output_current)
+    resistance = np.full(NB_POINTS_TEST, 0.00380)
+    ivc.add_output("resistance_sspc", units="ohm", val=resistance)
+
+    problem = run_system(
+        PerformancesDCSSPCLosses(number_of_points=NB_POINTS_TEST, closed=True),
+        ivc,
+    )
+    expected_losses = np.array(
+        [608.0, 604.6, 601.3, 597.9, 594.6, 591.2, 587.9, 584.6, 581.3, 578.0]
+    )
+    assert problem.get_val("power_losses", units="W") == pytest.approx(expected_losses, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+    problem = run_system(
+        PerformancesDCSSPCLosses(number_of_points=NB_POINTS_TEST, closed=False),
+        ivc,
+    )
+    assert problem.get_val("power_losses", units="W") == pytest.approx(
+        np.zeros(NB_POINTS_TEST), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_perf_power():
+
+    ivc = om.IndepVarComp()
+    output_current = np.linspace(400, 390, NB_POINTS_TEST)
+    ivc.add_output("dc_current_in", units="A", val=output_current)
+    input_voltage = np.full(NB_POINTS_TEST, 600.0)
+    ivc.add_output("dc_voltage_in", units="V", val=input_voltage)
+    output_voltage = np.array(
+        [598.48, 598.48, 598.49, 598.49, 598.5, 598.5, 598.51, 598.51, 598.51, 598.52]
+    )
+    ivc.add_output("dc_voltage_out", units="V", val=output_voltage)
+
+    problem = run_system(
+        PerformancesDCSSPCPower(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    expected_power = np.array(
+        [240.0, 239.3, 238.7, 238.0, 237.3, 236.7, 236.0, 235.3, 234.7, 234.0]
+    )
+    assert problem.get_val("power_flow", units="kW") == pytest.approx(expected_power, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_perf_efficiency():
+
+    ivc = om.IndepVarComp()
+    losses = np.array([608.0, 604.6, 601.3, 597.9, 594.6, 591.2, 587.9, 584.6, 581.3, 578.0])
+    ivc.add_output("power_losses", units="W", val=losses)
+    power = np.array([240.0, 239.3, 238.7, 238.0, 237.3, 236.7, 236.0, 235.3, 234.7, 234.0])
+    ivc.add_output("power_flow", units="kW", val=power)
+
+    problem = run_system(
+        PerformancesDCSSPCEfficiency(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    expected_efficiency = np.array(
+        [0.99747, 0.99747, 0.99748, 0.99749, 0.99749, 0.9975, 0.99751, 0.99752, 0.99752, 0.99753]
+    )
+    assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_maximum():
 
     ivc = om.IndepVarComp()
@@ -203,11 +280,17 @@ def test_performances():
         [598.48, 598.48, 598.49, 598.49, 598.5, 598.5, 598.51, 598.51, 598.51, 598.52]
     )
     assert problem.get_val("dc_voltage_out", units="V") == pytest.approx(expected_voltage, rel=1e-2)
+
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:current_max", units="A"
     ) == pytest.approx(400, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:voltage_max", units="V"
     ) == pytest.approx(600, rel=1e-2)
+
+    expected_efficiency = np.array(
+        [0.99747, 0.99747, 0.99748, 0.99749, 0.99749, 0.9975, 0.99751, 0.99752, 0.99752, 0.99753]
+    )
+    assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-3)
 
     problem.check_partials(compact_print=True)
