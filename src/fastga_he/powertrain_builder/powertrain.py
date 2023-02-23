@@ -107,6 +107,15 @@ class FASTGAHEPowerTrainConfigurator:
         # performances watcher of the power train, meaning this should be a list of list
         self._components_perf_watchers = None
 
+        # Because of their very peculiar role, we will scan the architecture for any SSPC defined
+        # by the user and whether or not they are at the output of a bus, because a specific
+        # option needs to be turned on in this was
+        self._sspc_list = {}
+
+        # Contains the default state of the SSPC, will be used if other states are not specified
+        # as an option of the performances group
+        self._sspc_default_state = {}
+
         if power_train_file_path:
             self.load(power_train_file_path)
 
@@ -175,6 +184,22 @@ class FASTGAHEPowerTrainConfigurator:
             else:
                 components_position.append("")
 
+            if component_id == "fastga_he.pt_component.dc_sspc":
+                # Create a dictionary with SSPC name and a tag to see if they are at bus output
+                # or not, it will be set at False by default but be changed later on
+
+                self._sspc_list[component_name] = False
+
+                if "options" in component.keys():
+                    if "closed_by_default" in component["options"]:
+                        self._sspc_default_state[component_name] = component["options"][
+                            "closed_by_default"
+                        ]
+                    else:
+                        self._sspc_default_state[component_name] = True
+                else:
+                    self._sspc_default_state[component_name] = True
+
             components_name_list.append(component_name)
             components_name_id_list.append(resources.DICTIONARY_CN_ID[component_id])
             components_type_list.append(resources.DICTIONARY_CT[component_id])
@@ -184,17 +209,28 @@ class FASTGAHEPowerTrainConfigurator:
             components_perf_watchers_list.append(resources.DICTIONARY_MP[component_id])
 
             if "options" in component.keys():
-                components_options_list.append(component["options"])
 
-                # While we are at it, we also check that we have the right options and with the
-                # right names
+                # SSPC is treated above, this way of doing things however makes no other option
+                # for SSPC can be set, may need to be changed
+                if component_id != "fastga_he.pt_component.dc_sspc":
 
-                if set(component["options"].keys()) != set(resources.DICTIONARY_ATT[component_id]):
-                    raise FASTGAHEUnknownOption(
-                        "Component " + component_id + " does not have all options declare or they "
-                        "have an erroneous name. The following options should be declared: "
-                        + ", ".join(resources.DICTIONARY_ATT[component_id])
-                    )
+                    components_options_list.append(component["options"])
+
+                    # While we are at it, we also check that we have the right options and with the
+                    # right names
+
+                    if set(component["options"].keys()) != set(
+                        resources.DICTIONARY_ATT[component_id]
+                    ):
+                        raise FASTGAHEUnknownOption(
+                            "Component "
+                            + component_id
+                            + " does not have all options declare or they "
+                            "have an erroneous name. The following options should be declared: "
+                            + ", ".join(resources.DICTIONARY_ATT[component_id])
+                        )
+                else:
+                    components_options_list.append(None)
 
             else:
                 components_options_list.append(None)
@@ -241,21 +277,55 @@ class FASTGAHEPowerTrainConfigurator:
             # splitter, ...)
             if type(connection["source"]) is str:
                 source_name = connection["source"]
+                source_id = translator[source_name]
                 source_number = ""
-                source_inputs = resources.DICTIONARY_IN[translator[source_name]]
+                source_inputs = resources.DICTIONARY_IN[source_id]
             else:
                 source_name = connection["source"][0]
+                source_id = translator[source_name]
                 source_number = str(connection["source"][1])
-                source_inputs = resources.DICTIONARY_IN[translator[source_name]]
+                source_inputs = resources.DICTIONARY_IN[source_id]
 
             if type(connection["target"]) is str:
                 target_name = connection["target"]
+                target_id = translator[target_name]
                 target_number = ""
-                target_outputs = resources.DICTIONARY_OUT[translator[target_name]]
+                target_outputs = resources.DICTIONARY_OUT[target_id]
             else:
                 target_name = connection["target"][0]
+                target_id = translator[target_name]
                 target_number = str(connection["target"][1])
-                target_outputs = resources.DICTIONARY_OUT[translator[target_name]]
+                target_outputs = resources.DICTIONARY_OUT[target_id]
+
+            # First we check if we are dealing with an SSPC, because of their nature explained
+            # more in depth in the perf_voltage_out module, they will get a special treatment.
+            # They will always be connected to a bus and even more, their 'input' side will
+            # always be connected to a bus.
+
+            # If SSPC is source and connected to a bus there should be no worries, else we need a
+            # special treatment since the "input" side of the SSPC should be connected to the bus
+            if (
+                source_id == "fastga_he.pt_component.dc_sspc"
+                and not target_id == "fastga_he.pt_component.dc_bus"
+            ):
+                # We reverse the SSPC inputs and outputs
+                source_inputs = resources.DICTIONARY_OUT[source_id]
+            # Same reasoning here, we just have to reverse the SSPC inputs and outputs
+            elif (
+                target_id == "fastga_he.pt_component.dc_sspc"
+                and source_id == "fastga_he.pt_component.dc_bus"
+            ):
+
+                # We reverse the SSPC outputs and input
+                target_outputs = resources.DICTIONARY_IN[target_id]
+
+            # Because we need to know if the SSPC is at a bus output for the model to work,
+            # this check is necessary
+            if (
+                source_id == "fastga_he.pt_component.dc_sspc"
+                and target_id == "fastga_he.pt_component.dc_bus"
+            ):
+                self._sspc_list[source_name] = True
 
             for system_input, system_output in zip(source_inputs, target_outputs):
 
@@ -326,6 +396,8 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_connection_outputs,
             self._components_connection_inputs,
             self._components_promotes,
+            self._sspc_list,
+            self._sspc_default_state,
         )
 
     def get_mass_element_lists(self) -> list:

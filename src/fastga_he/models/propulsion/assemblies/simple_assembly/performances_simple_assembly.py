@@ -12,6 +12,7 @@ from ...components.connectors.dc_cable import PerformancesHarness
 from ...components.connectors.dc_sspc import PerformancesDCSSPC
 from ...components.connectors.dc_bus import PerformancesDCBus
 from ...components.connectors.dc_dc_converter import PerformancesDCDCConverter
+from ...components.connectors.dc_sspc import PerformancesDCSSPC
 from ...components.source.battery import PerformancesBatteryPack
 
 
@@ -160,6 +161,7 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_bus_1.dc_voltage", "dc_sspc_1.dc_voltage_in")
         self.connect("dc_sspc_1.dc_current_in", "dc_bus_1.dc_current_in_1")
 
+        # DC BUS 1 TO LINE 1
         self.connect("dc_sspc_1.dc_voltage_out", "dc_line_1.dc_voltage_out")
         self.connect("dc_line_1.dc_current", "dc_sspc_1.dc_current_out")
 

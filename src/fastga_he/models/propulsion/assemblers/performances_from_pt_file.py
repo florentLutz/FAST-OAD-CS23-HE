@@ -25,6 +25,7 @@ from fastga_he.models.propulsion.components import (
     PerformancesHarness,
     PerformancesDCDCConverter,
     PerformancesBatteryPack,
+    PerformancesDCSSPC,
 )
 
 from .constants import SUBMODEL_POWER_TRAIN_PERF, SUBMODEL_THRUST_DISTRIBUTOR
@@ -57,6 +58,22 @@ class PowerTrainPerformancesFromFile(om.Group):
             "but can be turned off when used jointly with the mission to save computation time",
             allow_none=False,
         )
+        self.options.declare(
+            name="sspc_closed_list",
+            default=[],
+            types=list,
+            desc="List of the states of the SSPC specified in the sspc_names_list option, "
+            "each element must be either True or False, when nothing is specified, "
+            "the default state from the PT file is used",
+            allow_none=True,
+        )
+        self.options.declare(
+            name="sspc_names_list",
+            default=[],
+            types=list,
+            desc="Contains the list of the SSPC name which state need to be changed. If this list is empty, nothing will be done.",
+            allow_none=False,
+        )
 
     def setup(self):
 
@@ -76,7 +93,17 @@ class PowerTrainPerformancesFromFile(om.Group):
             components_connection_outputs,
             components_connection_inputs,
             components_promotes,
+            sspc_list,
+            sspc_state,
         ) = self.configurator.get_performances_element_lists()
+
+        # We decide on the SSPCs state, we take the default state unless the options specify
+        # otherwise
+        if self.options["sspc_names_list"]:
+            for sspc_name, sspc_closed in zip(
+                self.options["sspc_names_list"], self.options["sspc_closed_list"]
+            ):
+                sspc_state[sspc_name] = sspc_closed
 
         options = {
             "power_train_file_path": self.options["power_train_file_path"],
@@ -106,6 +133,10 @@ class PowerTrainPerformancesFromFile(om.Group):
             local_sub_sys = klass()
             local_sub_sys.options[component_name_id] = component_name
             local_sub_sys.options["number_of_points"] = number_of_points
+
+            if component_name in sspc_list.keys():
+                local_sub_sys.options["at_bus_output"] = sspc_list[component_name]
+                local_sub_sys.options["closed"] = sspc_state[component_name]
 
             if component_option:
                 for option_name in component_option:

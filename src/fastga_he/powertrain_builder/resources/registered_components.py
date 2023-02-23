@@ -154,8 +154,29 @@ BATTERY_PACK = {
         {"relative_capacity": None},
     ],
 }
+DC_SSPC = {
+    ID: "fastga_he.pt_component.dc_sspc",
+    CN: "DCSSPC",
+    CN_ID: "dc_sspc_id",
+    CT: "DC_SSPC",
+    ATT: ["closed_by_default"],
+    PT: [],
+    IN: [("dc_voltage_in", None), (None, "dc_current_in")],
+    OUT: [(None, "dc_voltage_out"), ("dc_current_out", None)],
+    CTC: "connector",
+    MP: [{"dc_current_in": "A"}, {"efficiency": None}, {"power_losses": "W"}],
+}
 
-KNOWN_COMPONENTS = [PROPELLER, PMSM, INVERTER, DC_BUS, DC_LINE, DC_DC_CONVERTER, BATTERY_PACK]
+KNOWN_COMPONENTS = [
+    PROPELLER,
+    PMSM,
+    INVERTER,
+    DC_BUS,
+    DC_LINE,
+    DC_DC_CONVERTER,
+    BATTERY_PACK,
+    DC_SSPC,
+]
 
 KNOWN_ID = []
 
