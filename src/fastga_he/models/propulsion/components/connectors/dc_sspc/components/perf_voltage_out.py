@@ -18,6 +18,12 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare("at_bus_output", default=1, desc="number of equilibrium to be treated")
+        self.options.declare(
+            "closed",
+            default=True,
+            desc="Boolean to choose whether the breaker is closed or not.",
+            types=bool,
+        )
 
     def setup(self):
 
@@ -69,24 +75,47 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
         # now since all connection are done through the power train builder mechanic, which we
         # can change at will.
 
-        if self.options["at_bus_output"]:
-            factor = -1.0
-        else:
-            factor = 1.0
+        if self.options["closed"]:
+            if self.options["at_bus_output"]:
+                factor = -1.0
+            else:
+                factor = 1.0
 
-        outputs["dc_voltage_out"] = (
-            inputs["dc_voltage_in"] + factor * inputs["dc_current_in"] * inputs["resistance_sspc"]
-        )
+            outputs["dc_voltage_out"] = (
+                inputs["dc_voltage_in"]
+                + factor * inputs["dc_current_in"] * inputs["resistance_sspc"]
+            )
+        else:
+
+            # If we start from the principle that there will be a logic for the opening of SSPC (
+            # which for instance will open both SSPC at the side of a cable if either one side
+            # was to fail or if the cable was to fail, to ensure that no current flows through
+            # the cable we must put the same value at each side of said cable (so it also assume
+            # that there is a SSPC at both side of the cable)
+            outputs["dc_voltage_out"] = np.zeros_like(inputs["dc_voltage_in"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         number_of_points = self.options["number_of_points"]
 
-        if self.options["at_bus_output"]:
-            factor = -1.0
-        else:
-            factor = 1.0
+        if self.options["closed"]:
+            if self.options["at_bus_output"]:
+                factor = -1.0
+            else:
+                factor = 1.0
 
-        partials["dc_voltage_out", "dc_voltage_in"] = np.eye(number_of_points)
-        partials["dc_voltage_out", "resistance_sspc"] = factor * np.diag(inputs["dc_current_in"])
-        partials["dc_voltage_out", "dc_current_in"] = factor * np.diag(inputs["resistance_sspc"])
+            partials["dc_voltage_out", "dc_voltage_in"] = np.eye(number_of_points)
+            partials["dc_voltage_out", "resistance_sspc"] = factor * np.diag(
+                inputs["dc_current_in"]
+            )
+            partials["dc_voltage_out", "dc_current_in"] = factor * np.diag(
+                inputs["resistance_sspc"]
+            )
+        else:
+            partials["dc_voltage_out", "dc_voltage_in"] = np.eye(number_of_points)
+            partials["dc_voltage_out", "resistance_sspc"] = np.zeros(
+                (number_of_points, number_of_points)
+            )
+            partials["dc_voltage_out", "dc_current_in"] = np.zeros(
+                (number_of_points, number_of_points)
+            )

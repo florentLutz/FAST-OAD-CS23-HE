@@ -1,4 +1,4 @@
-title: Sample power train file for testing purposes
+title: Sample quad propeller powertrain for testing purposes, no cross connections
 
 power_train_components:
 
@@ -32,22 +32,22 @@ power_train_components:
   dc_bus_1:
     id: fastga_he.pt_component.dc_bus
     options:
-      number_of_inputs: 2
+      number_of_inputs: 1
       number_of_outputs: 1
   dc_bus_2:
     id: fastga_he.pt_component.dc_bus
     options:
       number_of_inputs: 1
-      number_of_outputs: 2
+      number_of_outputs: 1
   dc_bus_3:
     id: fastga_he.pt_component.dc_bus
     options:
       number_of_inputs: 1
-      number_of_outputs: 2
+      number_of_outputs: 1
   dc_bus_4:
     id: fastga_he.pt_component.dc_bus
     options:
-      number_of_inputs: 2
+      number_of_inputs: 1
       number_of_outputs: 1
 
   harness_1:
@@ -58,27 +58,6 @@ power_train_components:
     id: fastga_he.pt_component.dc_line
   harness_4:
     id: fastga_he.pt_component.dc_line
-  harness_5:
-    id: fastga_he.pt_component.dc_line
-  harness_6:
-    id: fastga_he.pt_component.dc_line
-
-  dc_sspc_1:
-    id: fastga_he.pt_component.dc_sspc
-    options:
-      closed_by_default: False
-  dc_sspc_2:
-    id: fastga_he.pt_component.dc_sspc
-    options:
-      closed_by_default: False
-  dc_sspc_3:
-    id: fastga_he.pt_component.dc_sspc
-    options:
-      closed_by_default: False
-  dc_sspc_4:
-    id: fastga_he.pt_component.dc_sspc
-    options:
-      closed_by_default: False
 
   dc_bus_5:
     id: fastga_he.pt_component.dc_bus
@@ -123,42 +102,18 @@ component_connections:
   # DC BUS 1
   - source: [dc_bus_1, 1]
     target: harness_1
-  - source: [dc_bus_1, 2]
-    target: dc_sspc_1
-
-  # DC SSPC 1
-  - source: dc_sspc_1
-    target: harness_5
 
   # DC BUS 2
   - source: [dc_bus_2, 1]
     target: harness_2
-  - source: dc_sspc_3
-    target: [dc_bus_2, 2]
-
-  # DC SSPC 3
-  - source: harness_5
-    target: dc_sspc_3
 
   # DC BUS 3
   - source: [ dc_bus_3, 1 ]
     target: harness_3
-  - source: dc_sspc_4
-    target: [ dc_bus_3, 2 ]
-
-  # DC SSPC 4
-  - source: harness_6
-    target: dc_sspc_4
 
   # DC BUS 4
   - source: [ dc_bus_4, 1 ]
     target: harness_4
-  - source: [ dc_bus_4, 2 ]
-    target: dc_sspc_2
-
-  # DC SSPC 2
-  - source: dc_sspc_2
-    target: harness_6
 
   # DC BUS 5
   - source: harness_1
@@ -175,5 +130,3 @@ component_connections:
 
   - source: dc_dc_converter_1
     target: battery_pack_1
-
-watcher_file_path: ./quad_assembly_performances.csv

@@ -637,7 +637,7 @@
         <DC_DC_converter>
           <dc_dc_converter_1>
             <inductor>
-              <air_gap units="m" is_input="False">-0.005519561467562554<!--Constraints on maximum air gap in the inductor, respected if <0--></air_gap>
+              <air_gap units="m" is_input="False">-0.005519561467562559<!--Constraints on maximum air gap in the inductor, respected if <0--></air_gap>
             </inductor>
           </dc_dc_converter_1>
         </DC_DC_converter>

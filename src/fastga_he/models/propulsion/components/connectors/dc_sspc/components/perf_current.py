@@ -17,6 +17,12 @@ class PerformancesDCSSPCCurrent(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            "closed",
+            default=True,
+            desc="Boolean to choose whether the breaker is closed or not.",
+            types=bool,
+        )
 
     def setup(self):
 
@@ -34,8 +40,24 @@ class PerformancesDCSSPCCurrent(om.ExplicitComponent):
             units="A",
         )
 
-        self.declare_partials(of="*", wrt="*", val=np.eye(number_of_points))
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["dc_current_in"] = inputs["dc_current_out"]
+        number_of_points = self.options["number_of_points"]
+
+        if self.options["closed"]:
+            outputs["dc_current_in"] = inputs["dc_current_out"]
+        else:
+            outputs["dc_current_in"] = np.zeros(number_of_points)
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+
+        number_of_points = self.options["number_of_points"]
+
+        if self.options["closed"]:
+            partials["dc_current_in", "dc_current_out"] = np.eye(number_of_points)
+        else:
+            partials["dc_current_in", "dc_current_out"] = np.zeros(
+                (number_of_points, number_of_points)
+            )

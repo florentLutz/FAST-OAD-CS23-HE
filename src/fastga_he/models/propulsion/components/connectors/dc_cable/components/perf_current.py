@@ -5,6 +5,9 @@
 import numpy as np
 import openmdao.api as om
 
+# Should be an option ?
+CUTOFF_CABLE_VOLTAGE = 0.5  # in V
+
 
 class PerformancesCurrent(om.ExplicitComponent):
     def initialize(self):
@@ -72,7 +75,18 @@ class PerformancesCurrent(om.ExplicitComponent):
 
         equivalent_resistance = resistance_per_cable / number_cables
         total_current = (voltage_in - voltage_out) / equivalent_resistance
-        current = total_current / number_cables
+
+        # On some tests, it happened that while the voltage were very low (indicating an open
+        # SSPC in this case), current was still flowing through the cable. We will put a simple
+        # failsafe checking that voltage is greater than 0.5V which is big enough to filter out
+        # the cases of an open SSPC and hopefully small enough to not cause problem with low
+        # voltage loads (12V bus for instance)
+        low_voltage = np.logical_and(
+            np.less_equal(voltage_out, np.full_like(voltage_out, CUTOFF_CABLE_VOLTAGE)),
+            np.less_equal(voltage_in, np.full_like(voltage_in, CUTOFF_CABLE_VOLTAGE)),
+            dtype=bool,
+        )
+        current = np.where(low_voltage, 0.0, total_current / number_cables)
 
         # Equivalent to :
         # current = (voltage_in - voltage_out) / resistance_per_cable ?

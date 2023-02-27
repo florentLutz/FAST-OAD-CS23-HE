@@ -164,7 +164,7 @@ def test_perf_resistance():
         ),
         ivc,
     )
-    expected_resistance = np.full(NB_POINTS_TEST, np.inf)
+    expected_resistance = np.full(NB_POINTS_TEST, 1e6)
     assert problem.get_val("resistance_sspc", units="ohm") == pytest.approx(
         expected_resistance, rel=1e-2
     )

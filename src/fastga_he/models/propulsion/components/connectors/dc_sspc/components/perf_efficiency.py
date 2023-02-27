@@ -16,6 +16,12 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            "closed",
+            default=True,
+            desc="Boolean to choose whether the breaker is closed or not.",
+            types=bool,
+        )
 
     def setup(self):
 
@@ -42,16 +48,26 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        # To avoid division by zero when the sspc is open
-        efficiency = np.where(
-            inputs["power_flow"] > 1.0, 1.0 - inputs["power_losses"] / inputs["power_flow"], 1.0
-        )
+        number_of_points = self.options["number_of_points"]
+
+        if self.options["closed"]:
+            efficiency = np.where(
+                inputs["power_flow"] > 1.0, 1.0 - inputs["power_losses"] / inputs["power_flow"], 1.0
+            )
+        else:
+            efficiency = np.ones(number_of_points)
 
         outputs["efficiency"] = efficiency
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["efficiency", "power_losses"] = -np.diag(1.0 / inputs["power_flow"])
-        partials["efficiency", "power_flow"] = np.diag(
-            inputs["power_losses"] / inputs["power_flow"] ** 2.0
-        )
+        number_of_points = self.options["number_of_points"]
+
+        if self.options["closed"]:
+            partials["efficiency", "power_losses"] = -np.diag(1.0 / inputs["power_flow"])
+            partials["efficiency", "power_flow"] = np.diag(
+                inputs["power_losses"] / inputs["power_flow"] ** 2.0
+            )
+        else:
+            partials["efficiency", "power_losses"] = np.zeros((number_of_points, number_of_points))
+            partials["efficiency", "power_flow"] = np.zeros((number_of_points, number_of_points))

@@ -164,7 +164,12 @@ DC_SSPC = {
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [(None, "dc_voltage_out"), ("dc_current_out", None)],
     CTC: "connector",
-    MP: [{"dc_current_in": "A"}, {"efficiency": None}, {"power_losses": "W"}],
+    MP: [
+        {"dc_current_in": "A"},
+        {"efficiency": None},
+        {"power_losses": "W"},
+        {"dc_voltage_out": "V"},
+    ],
 }
 
 KNOWN_COMPONENTS = [

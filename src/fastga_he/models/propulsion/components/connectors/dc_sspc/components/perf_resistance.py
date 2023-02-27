@@ -28,7 +28,7 @@ class PerformancesDCSSPCResistance(om.ExplicitComponent):
         self.options.declare(
             "closed",
             default=True,
-            desc="Boolean to choose whether the breaker is closed or " "not.",
+            desc="Boolean to choose whether the breaker is closed or not.",
             types=bool,
         )
 
@@ -73,8 +73,9 @@ class PerformancesDCSSPCResistance(om.ExplicitComponent):
             )
 
         else:
-
-            outputs["resistance_sspc"] = np.full(number_of_points, np.inf)
+            # In reality the resistance would be close to infinity but if we were to put infinity
+            # here, the residuals computation would crash so instead we put a large enough value
+            outputs["resistance_sspc"] = np.full(number_of_points, 1e6)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 

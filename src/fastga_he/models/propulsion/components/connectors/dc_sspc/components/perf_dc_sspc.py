@@ -54,13 +54,13 @@ class PerformancesDCSSPC(om.Group):
         )
         self.add_subsystem(
             "current",
-            PerformancesDCSSPCCurrent(number_of_points=number_of_points),
+            PerformancesDCSSPCCurrent(number_of_points=number_of_points, closed=closed),
             promotes=["*"],
         )
         self.add_subsystem(
             "voltage",
             PerformancesDCSSPCVoltageOut(
-                number_of_points=number_of_points, at_bus_output=at_bus_output
+                number_of_points=number_of_points, at_bus_output=at_bus_output, closed=closed
             ),
             promotes=["*"],
         )
@@ -76,7 +76,7 @@ class PerformancesDCSSPC(om.Group):
         )
         self.add_subsystem(
             "efficiency",
-            PerformancesDCSSPCEfficiency(number_of_points=number_of_points),
+            PerformancesDCSSPCEfficiency(number_of_points=number_of_points, closed=closed),
             promotes=["*"],
         )
         self.add_subsystem(
