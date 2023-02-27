@@ -20,9 +20,6 @@ power_train_components:
     closed_by_default: True
   dc_line_1:
     id: fastga_he.pt_component.dc_line
-  dc_sspc_3:
-    id: fastga_he.pt_component.dc_sspc
-    closed_by_default: True
   dc_bus_2:
     id: fastga_he.pt_component.dc_bus
     options:
@@ -53,9 +50,6 @@ component_connections:
     target: dc_line_1
 
   - source: dc_line_1
-    target: dc_sspc_3
-
-  - source: dc_sspc_3
     target: [dc_bus_2, 1]
 
   - source: [dc_bus_2, 1]

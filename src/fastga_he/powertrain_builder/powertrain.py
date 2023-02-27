@@ -18,10 +18,13 @@ from typing import Tuple
 from jsonschema import validate
 from ruamel.yaml import YAML
 
+import networkx as nx
+
 from .exceptions import (
     FASTGAHEUnknownComponentID,
     FASTGAHEUnknownOption,
     FASTGAHEComponentsNotIdentified,
+    FASTGAHESingleSSPCAtEndOfLine,
 )
 
 from . import resources
@@ -115,6 +118,12 @@ class FASTGAHEPowerTrainConfigurator:
         # Contains the default state of the SSPC, will be used if other states are not specified
         # as an option of the performances group
         self._sspc_default_state = {}
+
+        # After construction contains a graph (graph theory) with all components and their
+        # connection. It will for instance allow to check if a cable has SSPC's at both its end
+        # or check if a propulsor is not connected to a power source, in which case, we should not
+        # be able to require thrust from him (will come later)
+        self._connection_graph = None
 
         if power_train_file_path:
             self.load(power_train_file_path)
@@ -362,6 +371,79 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
 
+    def _construct_connection_graph(self):
+
+        graph = nx.Graph()
+
+        for component in self._components_name:
+            graph.add_node(component)
+
+        for connection in self._connection_list:
+
+            # When the component is connected to a bus, the output number is also specified but it
+            # isn't meaningful when drawing a graph, so we will just filter it
+
+            if type(connection["source"]) is list:
+                source = connection["source"][0]
+            else:
+                source = connection["source"]
+
+            if type(connection["target"]) is list:
+                target = connection["target"][0]
+            else:
+                target = connection["target"]
+
+            graph.add_edge(source, target)
+
+        self._connection_graph = graph
+
+    def check_sspc_states(self, declared_state):
+
+        self._construct_connection_graph()
+        graph = self._connection_graph
+
+        components_to_check = {}
+
+        name_to_id = dict(zip(self._components_name, self._components_id))
+
+        # For now we will only check cable that have SSPC on both ends
+        for component_id, component_name in zip(self._components_id, self._components_name):
+            if component_id == "fastga_he.pt_component.dc_line":
+                neighbors = graph.adj[component_name]
+                # If component is a dc line, check that it has neighbors, then check if one at
+                # least one of those is an sspc
+                if neighbors:
+                    sspc_neighbors = []
+                    for neighbor in neighbors:
+                        if name_to_id[neighbor] == "fastga_he.pt_component.dc_sspc":
+                            sspc_neighbors.append(neighbor)
+                    if len(sspc_neighbors) == 1:
+                        raise FASTGAHESingleSSPCAtEndOfLine(
+                            "Line " + component_name + " is connected to a single SSPC, this will "
+                            "work as long as the SSPC is closed, but won't allow to open it"
+                        )
+                    # If there are no SSPC neighbor, no need to check the harness
+                    elif len(sspc_neighbors) == 2:
+                        components_to_check[component_name] = sspc_neighbors
+
+        # For all case to check, see the default state that was given to them and change it if
+        # need be
+        actual_state = copy.deepcopy(declared_state)
+        if components_to_check:
+            for component_to_check in components_to_check:
+                front_end, back_end = components_to_check[component_to_check]
+                # If both are in a different state raise a warning and change both of them to
+                # False (circuit open)
+                if declared_state[front_end] ^ declared_state[back_end]:
+                    _LOGGER.warning(
+                        "SSPCs " + front_end + " and " + back_end + " should be in "
+                        "the same state, they are thus forced at open"
+                    )
+                    actual_state[front_end] = False
+                    actual_state[back_end] = False
+
+        return actual_state
+
     def get_sizing_element_lists(self) -> tuple:
         """
         Returns the list of parameters necessary to create the sizing group based on what is
@@ -386,6 +468,11 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._get_components()
         self._get_connections()
+
+        # We now need to check if the SSPC "logic" is respected, the main rule being for now that
+        # if a cable has one SSPC at each end of the cable, they should both be in the same
+        # state. We will consider that the open state has the priority since it is what would
+        # happen in reality.
 
         return (
             self._components_name,

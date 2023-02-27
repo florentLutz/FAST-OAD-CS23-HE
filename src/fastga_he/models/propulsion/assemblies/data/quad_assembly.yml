@@ -66,7 +66,9 @@ power_train_components:
   dc_sspc_1:
     id: fastga_he.pt_component.dc_sspc
     options:
-      closed_by_default: False
+      closed_by_default: True
+  # Theoretically, this sspc can be opened or closed at will, as long as dc_sspc_3 remains open
+  # the implemented "logic" will force this one to open (if one SSPC is open, both should be)
   dc_sspc_2:
     id: fastga_he.pt_component.dc_sspc
     options:

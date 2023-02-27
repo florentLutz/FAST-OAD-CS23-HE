@@ -105,6 +105,10 @@ class PowerTrainPerformancesFromFile(om.Group):
             ):
                 sspc_state[sspc_name] = sspc_closed
 
+        # We check the value the resulting states to see if it agrees with the logic and change
+        # it if it is not the case
+        sspc_state = self.configurator.check_sspc_states(sspc_state)
+
         options = {
             "power_train_file_path": self.options["power_train_file_path"],
             "number_of_points": number_of_points,
