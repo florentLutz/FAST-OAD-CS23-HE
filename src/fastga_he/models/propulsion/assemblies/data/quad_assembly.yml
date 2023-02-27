@@ -63,6 +63,15 @@ power_train_components:
   harness_6:
     id: fastga_he.pt_component.dc_line
 
+  dc_sspc_1:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: True
+  dc_sspc_2:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: True
+
   dc_bus_5:
     id: fastga_he.pt_component.dc_bus
     options:
@@ -107,6 +116,10 @@ component_connections:
   - source: [dc_bus_1, 1]
     target: harness_1
   - source: [dc_bus_1, 2]
+    target: dc_sspc_1
+
+  # DC SSPC 1
+  - source: dc_sspc_1
     target: harness_5
 
   # DC BUS 2
@@ -125,6 +138,10 @@ component_connections:
   - source: [ dc_bus_4, 1 ]
     target: harness_4
   - source: [ dc_bus_4, 2 ]
+    target: dc_sspc_2
+
+  # DC SSPC 2
+  - source: dc_sspc_2
     target: harness_6
 
   # DC BUS 5

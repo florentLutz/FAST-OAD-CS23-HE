@@ -20,6 +20,58 @@
                         </cell>
                     </battery_pack_1>
                 </battery_pack>
+                <DC_SSPC>
+                    <dc_sspc_1>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <CG>
+                            <x units="m">2.69</x>
+                        </CG>
+                        <mass units="kg">10.0</mass>
+                        <current_caliber units="A">400.0</current_caliber>
+                        <voltage_caliber units="V">750.0</voltage_caliber>
+                        <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
+                        <voltage_max units="V" is_input="False">846.7684101430876<!--Maximum voltage at the terminals SSPC--></voltage_max>
+                        <scaling>
+                            <resistance>1.125</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00169875</resistance>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00210375</resistance>
+                        </diode>
+                    </dc_sspc_1>
+                    <dc_sspc_2>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <CG>
+                            <x units="m">2.69</x>
+                        </CG>
+                        <mass units="kg">10.0</mass>
+                        <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
+                        <voltage_max units="V" is_input="False">847.5972788599612<!--Maximum voltage at the terminals SSPC--></voltage_max>
+                        <current_caliber units="A">400.0</current_caliber>
+                        <voltage_caliber units="V">750.0</voltage_caliber>
+                        <scaling>
+                            <resistance>1.125</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00169875</resistance>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00210375</resistance>
+                        </diode>
+                    </dc_sspc_2>
+                </DC_SSPC>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
