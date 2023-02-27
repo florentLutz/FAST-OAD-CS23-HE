@@ -8,7 +8,6 @@ import fastoad.api as oad
 from .perf_resistance import PerformancesResistance
 from .perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from .perf_losses_one_cable import PerformancesLossesOneCable
-from .perf_temperature import PerformancesTemperature
 from .perf_maximum import PerformancesMaximum
 
 from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
@@ -21,7 +20,7 @@ class PerformancesHarness(om.Group):
         # Solvers setup
         self.nonlinear_solver = om.NonlinearBlockGS()
         self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 200
+        self.nonlinear_solver.options["maxiter"] = 100
         self.nonlinear_solver.options["rtol"] = 1e-5
         self.linear_solver = om.LinearBlockGS()
 

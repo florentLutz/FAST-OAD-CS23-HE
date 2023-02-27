@@ -119,16 +119,16 @@ def test_assembly_performances():
     ) * problem.get_val("performances.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                187277.0,
-                188236.0,
-                189173.0,
-                190095.0,
-                191006.0,
-                191907.0,
-                192800.0,
-                193680.0,
-                194546.0,
-                195395.0,
+                188015.0,
+                188982.0,
+                189927.0,
+                190856.0,
+                191775.0,
+                192684.0,
+                193583.0,
+                194472.0,
+                195345.0,
+                196201.0,
             ]
         ),
         abs=1,
@@ -179,6 +179,18 @@ def test_assembly_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(3000.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_2:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_412:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1337:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
 
     write_outputs(
         pth.join(outputs.__path__[0], "simple_assembly_sizing.xml"),
@@ -332,9 +344,21 @@ def test_assembly_sizing_from_pt_file():
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(3000.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_2:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_412:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1337:mass", units="kg"
+    ) == pytest.approx(10.0, rel=1e-2)
 
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        3164.28, rel=1e-2
+        3224.92, rel=1e-2
     )
     assert problem.get_val("data:propulsion:he_power_train:CG:x", units="m") == pytest.approx(
         2.867, rel=1e-2
@@ -393,16 +417,16 @@ def test_performances_from_pt_file():
     assert current_in * voltage_in == pytest.approx(
         np.array(
             [
-                187277.0,
-                188236.0,
-                189173.0,
-                190095.0,
-                191006.0,
-                191907.0,
-                192800.0,
-                193680.0,
-                194546.0,
-                195395.0,
+                188016.0,
+                188983.0,
+                189928.0,
+                190857.0,
+                191776.0,
+                192685.0,
+                193585.0,
+                194473.0,
+                195346.0,
+                196203.0,
             ]
         ),
         abs=1,

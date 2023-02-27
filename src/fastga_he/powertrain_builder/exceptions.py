@@ -24,3 +24,11 @@ class FASTGAHEComponentsNotIdentified(FastError):
     Class for managing errors that result from trying to run the _get_connection method before
     having identified the components in the power train with the _get_components method.
     """
+
+
+class FASTGAHESingleSSPCAtEndOfLine(FastError):
+    """
+    Class for managing errors that result from connecting a dc line to an SSPC but only a single
+    one. Because of the way equations were coded, if one end of a harness is connected to an
+    SSPC, the other shall be as well to allow for a possible opening of the 2 SSPCs.
+    """

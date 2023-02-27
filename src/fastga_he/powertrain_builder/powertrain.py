@@ -18,10 +18,13 @@ from typing import Tuple
 from jsonschema import validate
 from ruamel.yaml import YAML
 
+import networkx as nx
+
 from .exceptions import (
     FASTGAHEUnknownComponentID,
     FASTGAHEUnknownOption,
     FASTGAHEComponentsNotIdentified,
+    FASTGAHESingleSSPCAtEndOfLine,
 )
 
 from . import resources
@@ -107,6 +110,21 @@ class FASTGAHEPowerTrainConfigurator:
         # performances watcher of the power train, meaning this should be a list of list
         self._components_perf_watchers = None
 
+        # Because of their very peculiar role, we will scan the architecture for any SSPC defined
+        # by the user and whether or not they are at the output of a bus, because a specific
+        # option needs to be turned on in this was
+        self._sspc_list = {}
+
+        # Contains the default state of the SSPC, will be used if other states are not specified
+        # as an option of the performances group
+        self._sspc_default_state = {}
+
+        # After construction contains a graph (graph theory) with all components and their
+        # connection. It will for instance allow to check if a cable has SSPC's at both its end
+        # or check if a propulsor is not connected to a power source, in which case, we should not
+        # be able to require thrust from him (will come later)
+        self._connection_graph = None
+
         if power_train_file_path:
             self.load(power_train_file_path)
 
@@ -175,6 +193,22 @@ class FASTGAHEPowerTrainConfigurator:
             else:
                 components_position.append("")
 
+            if component_id == "fastga_he.pt_component.dc_sspc":
+                # Create a dictionary with SSPC name and a tag to see if they are at bus output
+                # or not, it will be set at False by default but be changed later on
+
+                self._sspc_list[component_name] = False
+
+                if "options" in component.keys():
+                    if "closed_by_default" in component["options"]:
+                        self._sspc_default_state[component_name] = component["options"][
+                            "closed_by_default"
+                        ]
+                    else:
+                        self._sspc_default_state[component_name] = True
+                else:
+                    self._sspc_default_state[component_name] = True
+
             components_name_list.append(component_name)
             components_name_id_list.append(resources.DICTIONARY_CN_ID[component_id])
             components_type_list.append(resources.DICTIONARY_CT[component_id])
@@ -184,17 +218,28 @@ class FASTGAHEPowerTrainConfigurator:
             components_perf_watchers_list.append(resources.DICTIONARY_MP[component_id])
 
             if "options" in component.keys():
-                components_options_list.append(component["options"])
 
-                # While we are at it, we also check that we have the right options and with the
-                # right names
+                # SSPC is treated above, this way of doing things however makes no other option
+                # for SSPC can be set, may need to be changed
+                if component_id != "fastga_he.pt_component.dc_sspc":
 
-                if set(component["options"].keys()) != set(resources.DICTIONARY_ATT[component_id]):
-                    raise FASTGAHEUnknownOption(
-                        "Component " + component_id + " does not have all options declare or they "
-                        "have an erroneous name. The following options should be declared: "
-                        + ", ".join(resources.DICTIONARY_ATT[component_id])
-                    )
+                    components_options_list.append(component["options"])
+
+                    # While we are at it, we also check that we have the right options and with the
+                    # right names
+
+                    if set(component["options"].keys()) != set(
+                        resources.DICTIONARY_ATT[component_id]
+                    ):
+                        raise FASTGAHEUnknownOption(
+                            "Component "
+                            + component_id
+                            + " does not have all options declare or they "
+                            "have an erroneous name. The following options should be declared: "
+                            + ", ".join(resources.DICTIONARY_ATT[component_id])
+                        )
+                else:
+                    components_options_list.append(None)
 
             else:
                 components_options_list.append(None)
@@ -241,21 +286,55 @@ class FASTGAHEPowerTrainConfigurator:
             # splitter, ...)
             if type(connection["source"]) is str:
                 source_name = connection["source"]
+                source_id = translator[source_name]
                 source_number = ""
-                source_inputs = resources.DICTIONARY_IN[translator[source_name]]
+                source_inputs = resources.DICTIONARY_IN[source_id]
             else:
                 source_name = connection["source"][0]
+                source_id = translator[source_name]
                 source_number = str(connection["source"][1])
-                source_inputs = resources.DICTIONARY_IN[translator[source_name]]
+                source_inputs = resources.DICTIONARY_IN[source_id]
 
             if type(connection["target"]) is str:
                 target_name = connection["target"]
+                target_id = translator[target_name]
                 target_number = ""
-                target_outputs = resources.DICTIONARY_OUT[translator[target_name]]
+                target_outputs = resources.DICTIONARY_OUT[target_id]
             else:
                 target_name = connection["target"][0]
+                target_id = translator[target_name]
                 target_number = str(connection["target"][1])
-                target_outputs = resources.DICTIONARY_OUT[translator[target_name]]
+                target_outputs = resources.DICTIONARY_OUT[target_id]
+
+            # First we check if we are dealing with an SSPC, because of their nature explained
+            # more in depth in the perf_voltage_out module, they will get a special treatment.
+            # They will always be connected to a bus and even more, their 'input' side will
+            # always be connected to a bus.
+
+            # If SSPC is source and connected to a bus there should be no worries, else we need a
+            # special treatment since the "input" side of the SSPC should be connected to the bus
+            if (
+                source_id == "fastga_he.pt_component.dc_sspc"
+                and not target_id == "fastga_he.pt_component.dc_bus"
+            ):
+                # We reverse the SSPC inputs and outputs
+                source_inputs = resources.DICTIONARY_OUT[source_id]
+            # Same reasoning here, we just have to reverse the SSPC inputs and outputs
+            elif (
+                target_id == "fastga_he.pt_component.dc_sspc"
+                and source_id == "fastga_he.pt_component.dc_bus"
+            ):
+
+                # We reverse the SSPC outputs and input
+                target_outputs = resources.DICTIONARY_IN[target_id]
+
+            # Because we need to know if the SSPC is at a bus output for the model to work,
+            # this check is necessary
+            if (
+                source_id == "fastga_he.pt_component.dc_sspc"
+                and target_id == "fastga_he.pt_component.dc_bus"
+            ):
+                self._sspc_list[source_name] = True
 
             for system_input, system_output in zip(source_inputs, target_outputs):
 
@@ -292,6 +371,79 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
 
+    def _construct_connection_graph(self):
+
+        graph = nx.Graph()
+
+        for component in self._components_name:
+            graph.add_node(component)
+
+        for connection in self._connection_list:
+
+            # When the component is connected to a bus, the output number is also specified but it
+            # isn't meaningful when drawing a graph, so we will just filter it
+
+            if type(connection["source"]) is list:
+                source = connection["source"][0]
+            else:
+                source = connection["source"]
+
+            if type(connection["target"]) is list:
+                target = connection["target"][0]
+            else:
+                target = connection["target"]
+
+            graph.add_edge(source, target)
+
+        self._connection_graph = graph
+
+    def check_sspc_states(self, declared_state):
+
+        self._construct_connection_graph()
+        graph = self._connection_graph
+
+        components_to_check = {}
+
+        name_to_id = dict(zip(self._components_name, self._components_id))
+
+        # For now we will only check cable that have SSPC on both ends
+        for component_id, component_name in zip(self._components_id, self._components_name):
+            if component_id == "fastga_he.pt_component.dc_line":
+                neighbors = graph.adj[component_name]
+                # If component is a dc line, check that it has neighbors, then check if one at
+                # least one of those is an sspc
+                if neighbors:
+                    sspc_neighbors = []
+                    for neighbor in neighbors:
+                        if name_to_id[neighbor] == "fastga_he.pt_component.dc_sspc":
+                            sspc_neighbors.append(neighbor)
+                    if len(sspc_neighbors) == 1:
+                        raise FASTGAHESingleSSPCAtEndOfLine(
+                            "Line " + component_name + " is connected to a single SSPC, this will "
+                            "work as long as the SSPC is closed, but won't allow to open it"
+                        )
+                    # If there are no SSPC neighbor, no need to check the harness
+                    elif len(sspc_neighbors) == 2:
+                        components_to_check[component_name] = sspc_neighbors
+
+        # For all case to check, see the default state that was given to them and change it if
+        # need be
+        actual_state = copy.deepcopy(declared_state)
+        if components_to_check:
+            for component_to_check in components_to_check:
+                front_end, back_end = components_to_check[component_to_check]
+                # If both are in a different state raise a warning and change both of them to
+                # False (circuit open)
+                if declared_state[front_end] ^ declared_state[back_end]:
+                    _LOGGER.warning(
+                        "SSPCs " + front_end + " and " + back_end + " should be in "
+                        "the same state, they are thus forced at open"
+                    )
+                    actual_state[front_end] = False
+                    actual_state[back_end] = False
+
+        return actual_state
+
     def get_sizing_element_lists(self) -> tuple:
         """
         Returns the list of parameters necessary to create the sizing group based on what is
@@ -317,6 +469,11 @@ class FASTGAHEPowerTrainConfigurator:
         self._get_components()
         self._get_connections()
 
+        # We now need to check if the SSPC "logic" is respected, the main rule being for now that
+        # if a cable has one SSPC at each end of the cable, they should both be in the same
+        # state. We will consider that the open state has the priority since it is what would
+        # happen in reality.
+
         return (
             self._components_name,
             self._components_name_id,
@@ -326,6 +483,8 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_connection_outputs,
             self._components_connection_inputs,
             self._components_promotes,
+            self._sspc_list,
+            self._sspc_default_state,
         )
 
     def get_mass_element_lists(self) -> list:

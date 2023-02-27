@@ -88,7 +88,7 @@ class SizingDCBus(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            name="converter_CG",
+            name="bus_CG",
             subsys=SizingDCBusCG(dc_bus_id=dc_bus_id, position=position),
             promotes=["*"],
         )

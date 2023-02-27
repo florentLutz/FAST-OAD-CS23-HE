@@ -10,6 +10,7 @@ import pytest
 from stdatm import Atmosphere
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
+from utils.filter_residuals import filter_residuals
 
 from fastga_he.models.propulsion.assemblers.performances_from_pt_file import (
     PowerTrainPerformancesFromFile,
@@ -569,62 +570,165 @@ def test_assembly_from_pt_file():
         ivc,
     )
 
-    assert problem.get_val("non_consumable_energy_t_econ", units="kW*h") == pytest.approx(
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    assert problem.get_val("non_consumable_energy_t_econ", units="W*h") == pytest.approx(
         np.array(
             [
-                4.13,
-                4.14,
-                4.16,
-                4.17,
-                4.19,
-                4.2,
-                4.22,
-                4.23,
-                4.25,
-                4.26,
-                4.28,
-                4.29,
-                4.31,
-                4.32,
-                4.34,
-                4.36,
-                4.37,
-                4.39,
-                4.4,
-                4.42,
-                4.43,
-                4.45,
-                4.47,
-                4.48,
-                4.5,
-                4.51,
-                4.53,
-                4.55,
-                4.56,
-                4.58,
-                4.59,
-                4.61,
-                4.63,
-                4.64,
-                4.66,
-                4.68,
-                4.69,
-                4.71,
-                4.72,
-                4.74,
-                4.76,
-                4.77,
-                4.79,
-                4.81,
-                4.82,
-                4.84,
-                4.86,
-                4.87,
-                4.89,
-                4.91,
+                4124.84,
+                4139.858,
+                4154.917,
+                4170.017,
+                4185.158,
+                4200.337,
+                4215.556,
+                4230.813,
+                4246.108,
+                4261.441,
+                4276.81,
+                4292.217,
+                4307.659,
+                4323.138,
+                4338.653,
+                4354.203,
+                4369.789,
+                4385.41,
+                4401.067,
+                4416.759,
+                4432.487,
+                4448.251,
+                4464.051,
+                4479.888,
+                4495.762,
+                4511.673,
+                4527.621,
+                4543.608,
+                4559.634,
+                4575.7,
+                4591.805,
+                4607.952,
+                4624.141,
+                4640.372,
+                4656.647,
+                4672.966,
+                4689.331,
+                4705.741,
+                4722.2,
+                4738.706,
+                4755.262,
+                4771.868,
+                4788.525,
+                4805.235,
+                4821.998,
+                4838.815,
+                4855.687,
+                4872.615,
+                4889.599,
+                4906.641,
             ]
         ),
+        abs=1e-3,
+    )
+    assert problem.get_val("fuel_consumed_t_econ", units="kg") == pytest.approx(
+        np.zeros(NB_POINTS_TEST),
         abs=1,
+    )
+
+    # om.n2(problem)
+
+
+def test_assembly_no_cross_from_pt_file():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly_no_cross.yml")
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PowerTrainPerformancesFromFile(
+                power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(500, 550, NB_POINTS_TEST) * 4.0, units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 50))
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PowerTrainPerformancesFromFile(
+            power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    assert problem.get_val("non_consumable_energy_t_econ", units="W*h") == pytest.approx(
+        np.array(
+            [
+                4124.84,
+                4139.858,
+                4154.917,
+                4170.017,
+                4185.158,
+                4200.337,
+                4215.556,
+                4230.813,
+                4246.108,
+                4261.441,
+                4276.81,
+                4292.217,
+                4307.659,
+                4323.138,
+                4338.653,
+                4354.203,
+                4369.789,
+                4385.41,
+                4401.067,
+                4416.759,
+                4432.487,
+                4448.251,
+                4464.051,
+                4479.888,
+                4495.762,
+                4511.673,
+                4527.621,
+                4543.608,
+                4559.634,
+                4575.7,
+                4591.805,
+                4607.952,
+                4624.141,
+                4640.372,
+                4656.647,
+                4672.966,
+                4689.331,
+                4705.741,
+                4722.2,
+                4738.706,
+                4755.262,
+                4771.868,
+                4788.525,
+                4805.235,
+                4821.998,
+                4838.815,
+                4855.687,
+                4872.615,
+                4889.599,
+                4906.641,
+            ]
+        ),
+        abs=1e-3,
     )
     assert problem.get_val("fuel_consumed_t_econ", units="kg") == pytest.approx(
         np.zeros(NB_POINTS_TEST),
