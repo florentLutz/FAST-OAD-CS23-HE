@@ -13,6 +13,7 @@ from stdatm import Atmosphere
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
+from utils.filter_residuals import filter_residuals
 
 from .simple_assembly.performances_simple_assembly import PerformancesAssembly
 from .simple_assembly.sizing_simple_assembly import SizingAssembly
@@ -434,6 +435,59 @@ def test_performances_from_pt_file():
 
     write_outputs(
         pth.join(outputs.__path__[0], "assembly_performances_from_pt_file.xml"),
+        problem,
+    )
+
+
+def test_performances_from_pt_file_two_conv():
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_two_conv.yml")
+    xml_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_two_conv.xml")
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PowerTrainPerformancesFromFile(
+                power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        xml_file_path,
+    )
+
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    problem = run_system(
+        PowerTrainPerformancesFromFile(
+            power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    # om.n2(problem)
+
+    _, _, residuals = problem.model.component.get_nonlinear_vectors()
+
+    current_in = problem.get_val("component.dc_dc_converter_1.dc_current_in", units="A")
+    voltage_in = problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V")
+
+    current_in_2 = problem.get_val("component.dc_dc_converter_2.dc_current_in", units="A")
+    voltage_in_2 = problem.get_val("component.dc_dc_converter_2.dc_voltage_in", units="V")
+
+    # This test is expected to crash, so there should be nans in some residuals, hence the
+    # filtered list should not be empty
+    assert len(filter_residuals(residuals)) != 0
+    assert current_in * voltage_in != pytest.approx(current_in_2 * voltage_in_2, abs=1)
+
+    write_outputs(
+        pth.join(outputs.__path__[0], "assembly_performances_from_pt_file_two_conv.xml"),
         problem,
     )
 
