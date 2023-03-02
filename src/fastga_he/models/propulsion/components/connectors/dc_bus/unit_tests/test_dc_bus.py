@@ -296,9 +296,6 @@ def test_constraints_current_ensure():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:DC_bus:dc_bus_1:current_caliber", units="A"
     ) == pytest.approx(-141.2, rel=1e-2)
-    assert problem.get_val(
-        "constraints:propulsion:he_power_train:DC_bus:dc_bus_1:voltage_caliber", units="V"
-    ) == pytest.approx(-88.2, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

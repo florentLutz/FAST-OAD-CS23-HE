@@ -21,9 +21,25 @@
         <propulsion>
             <he_power_train>
                 <DC_splitter>
-                    <dc_splitter>
+                    <dc_splitter_1>
+                        <current_max units="A">500.0</current_max>
+                        <current_caliber units="A">499.0</current_caliber>
+                        <voltage_max units="V">635.0</voltage_max>
+                        <voltage_caliber units="V">672.01</voltage_caliber>
                         <weight units="kg">0.0</weight>
-                    </dc_splitter>
+                        <height units="cm">0.787</height>
+                        <length units="cm">50.556</length>
+                        <width units="cm">4.716</width>
+                        <cross_section>
+                            <area units="cm**2">1.01</area>
+                            <thickness units="cm">0.224</thickness>
+                            <width units="cm">4.49</width>
+                            <length units="cm">50.0</length>
+                        </cross_section>
+                        <insulation>
+                            <thickness units="cm">0.113</thickness>
+                        </insulation>
+                    </dc_splitter_1>
                 </DC_splitter>
             </he_power_train>
         </propulsion>

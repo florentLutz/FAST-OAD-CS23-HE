@@ -6,8 +6,18 @@ import openmdao.api as om
 import pytest
 import numpy as np
 
+from ..components.sizing_dc_splitter_cross_section_area import SizingDCSplitterCrossSectionArea
+from ..components.sizing_dc_splitter_cross_section_dimensions import (
+    SizingSplitterCrossSectionDimensions,
+)
+from ..components.sizing_dc_splitter_insulation_thickness import SizingDCSplitterInsulationThickness
+from ..components.sizing_dc_splitter_dimensions import SizingDCSplitterDimensions
+from ..components.sizing_dc_splitter_weight import SizingDCSplitterWeight
 from ..components.sizing_dc_splitter_cg import SizingDCSplitterCG
 from ..components.perf_mission_power_split import PerformancesMissionPowerSplit
+
+from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
+from ..components.cstr_ensure import ConstraintsCurrentEnsure, ConstraintsVoltageEnsure
 
 from ..components.sizing_dc_splitter import SizingDCSplitter
 
@@ -19,6 +29,112 @@ XML_FILE = "sample_dc_splitter.xml"
 NB_POINTS_TEST = 10
 
 
+def test_splitter_cross_section_area():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCSplitterCrossSectionArea(dc_splitter_id="dc_splitter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingDCSplitterCrossSectionArea(dc_splitter_id="dc_splitter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:cross_section:area", units="cm**2"
+    ) == pytest.approx(1.01, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_bus_bar_cross_section_dimensions():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingSplitterCrossSectionDimensions(dc_splitter_id="dc_splitter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingSplitterCrossSectionDimensions(dc_splitter_id="dc_splitter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:cross_section:thickness",
+            units="cm",
+        )
+        == pytest.approx(0.224, rel=1e-2)
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:cross_section:width", units="cm"
+    ) == pytest.approx(4.49, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_bus_bar_insulation_thickness():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCSplitterInsulationThickness(dc_splitter_id="dc_splitter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingDCSplitterInsulationThickness(dc_splitter_id="dc_splitter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:insulation:thickness", units="cm"
+    ) == pytest.approx(0.113, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_bus_bar_dimensions():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCSplitterDimensions(dc_splitter_id="dc_splitter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingDCSplitterDimensions(dc_splitter_id="dc_splitter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:length", units="cm"
+    ) == pytest.approx(50.226, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:height", units="cm"
+    ) == pytest.approx(0.787, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:width", units="cm"
+    ) == pytest.approx(4.716, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_bus_bar_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCSplitterWeight(dc_splitter_id="dc_splitter_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingDCSplitterWeight(dc_splitter_id="dc_splitter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:mass", units="kg"
+    ) == pytest.approx(1.027, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_dc_sspc_cg():
 
     expected_cg = [2.69, 0.45, 2.54]
@@ -26,20 +142,84 @@ def test_dc_sspc_cg():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingDCSplitterCG(dc_splitter_id="dc_splitter_id_1", position=option)),
+            list_inputs(SizingDCSplitterCG(dc_splitter_id="dc_splitter_1", position=option)),
             __file__,
             XML_FILE,
         )
 
         problem = run_system(
-            SizingDCSplitterCG(dc_splitter_id="dc_splitter_id_1", position=option), ivc
+            SizingDCSplitterCG(dc_splitter_id="dc_splitter_1", position=option), ivc
         )
 
         assert problem.get_val(
-            "data:propulsion:he_power_train:DC_splitter:dc_splitter_id_1:CG:x", units="m"
+            "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:CG:x", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
+
+
+def test_constraints_current_enforce():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentEnforce(dc_splitter_id="dc_splitter_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsCurrentEnforce(dc_splitter_id="dc_splitter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:current_caliber", units="A"
+    ) == pytest.approx(500.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_voltage_enforce():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnforce(dc_splitter_id="dc_splitter_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsVoltageEnforce(dc_splitter_id="dc_splitter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:voltage_caliber", units="V"
+    ) == pytest.approx(635.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_current_ensure():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentEnsure(dc_splitter_id="dc_splitter_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsCurrentEnsure(dc_splitter_id="dc_splitter_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:DC_splitter:dc_splitter_1:current_caliber", units="A"
+    ) == pytest.approx(1.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_voltage_ensure():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnsure(dc_splitter_id="dc_splitter_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsVoltageEnsure(dc_splitter_id="dc_splitter_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:DC_splitter:dc_splitter_1:voltage_caliber", units="V"
+    ) == pytest.approx(-37.01, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_perf_power_split_formatting():
@@ -98,7 +278,7 @@ def test_sizing_dc_splitter():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:mass", units="kg"
-    ) == pytest.approx(0.0, rel=1e-2)
+    ) == pytest.approx(1.027, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:CG:x", units="m"
     ) == pytest.approx(2.69, rel=1e-2)

@@ -3,11 +3,16 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
+from .sizing_dc_splitter_cross_section_area import SizingDCSplitterCrossSectionArea
+from .sizing_dc_splitter_cross_section_dimensions import SizingSplitterCrossSectionDimensions
+from .sizing_dc_splitter_insulation_thickness import SizingDCSplitterInsulationThickness
+from .sizing_dc_splitter_dimensions import SizingDCSplitterDimensions
 from .sizing_dc_splitter_weight import SizingDCSplitterWeight
 from .sizing_dc_splitter_cg import SizingDCSplitterCG
 from .sizing_dc_splitter_drag import SizingDCSplitterDrag
+
+from .cstr_dc_splitter import ConstraintsDCSplitter
 
 from ..constants import POSSIBLE_POSITION
 
@@ -41,6 +46,32 @@ class SizingDCSplitter(om.Group):
         position = self.options["position"]
         dc_splitter_id = self.options["dc_splitter_id"]
 
+        self.add_subsystem(
+            name="constraints_dc_splitter",
+            subsys=ConstraintsDCSplitter(dc_splitter_id=dc_splitter_id),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="splitter_cross_section_area",
+            subsys=SizingDCSplitterCrossSectionArea(dc_splitter_id=dc_splitter_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="splitter_cross_section_dimensions",
+            subsys=SizingSplitterCrossSectionDimensions(dc_splitter_id=dc_splitter_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="splitter_insulation",
+            subsys=SizingDCSplitterInsulationThickness(dc_splitter_id=dc_splitter_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="splitter_dimensions",
+            subsys=SizingDCSplitterDimensions(dc_splitter_id=dc_splitter_id),
+            promotes=["*"],
+        )
         self.add_subsystem(
             name="splitter_weight",
             subsys=SizingDCSplitterWeight(dc_splitter_id=dc_splitter_id),
