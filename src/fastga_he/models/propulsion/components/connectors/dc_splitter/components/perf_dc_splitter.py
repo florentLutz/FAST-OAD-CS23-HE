@@ -6,6 +6,7 @@ import openmdao.api as om
 
 from .perf_mission_power_split import PerformancesMissionPowerSplit
 from .perf_electric_node import PerformancesElectricalNode
+from .perf_maximum import PerformancesMaximum
 
 
 class PerformancesDCSplitter(om.Group):
@@ -37,6 +38,14 @@ class PerformancesDCSplitter(om.Group):
         self.add_subsystem(
             name="electrical_node",
             subsys=PerformancesElectricalNode(
+                number_of_points=number_of_points,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="maximum",
+            subsys=PerformancesMaximum(
+                dc_splitter_id=dc_splitter_id,
                 number_of_points=number_of_points,
             ),
             promotes=["*"],

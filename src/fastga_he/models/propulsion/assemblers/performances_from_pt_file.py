@@ -26,6 +26,7 @@ from fastga_he.models.propulsion.components import (
     PerformancesDCDCConverter,
     PerformancesBatteryPack,
     PerformancesDCSSPC,
+    PerformancesDCSplitter,
 )
 
 from .constants import SUBMODEL_POWER_TRAIN_PERF, SUBMODEL_THRUST_DISTRIBUTOR

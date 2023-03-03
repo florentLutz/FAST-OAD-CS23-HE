@@ -15,6 +15,7 @@ from ..components.sizing_dc_splitter_dimensions import SizingDCSplitterDimension
 from ..components.sizing_dc_splitter_weight import SizingDCSplitterWeight
 from ..components.sizing_dc_splitter_cg import SizingDCSplitterCG
 from ..components.perf_mission_power_split import PerformancesMissionPowerSplit
+from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
 from ..components.cstr_ensure import ConstraintsCurrentEnsure, ConstraintsVoltageEnsure
@@ -265,6 +266,44 @@ def test_perf_power_split_formatting():
         units="percent",
     )
     assert power_split_output == pytest.approx(power_split_array, rel=1e-4)
+
+
+def test_perf_maximum():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "dc_voltage",
+        val=np.linspace(500, 612, NB_POINTS_TEST),
+        units="V",
+    )
+    ivc.add_output(
+        "dc_current_out",
+        val=np.linspace(120, 345, NB_POINTS_TEST),
+        units="A",
+    )
+    ivc.add_output(
+        "dc_current_in_1",
+        val=np.linspace(150, 400, NB_POINTS_TEST),
+        units="A",
+    )
+    ivc.add_output(
+        "dc_current_in_2",
+        val=np.linspace(-30, -55, NB_POINTS_TEST),
+        units="A",
+    )
+
+    problem = run_system(
+        PerformancesMaximum(dc_splitter_id="dc_splitter_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:voltage_max"
+    ) == pytest.approx(612, rel=1e-4)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:current_max"
+    ) == pytest.approx(400, rel=1e-4)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_sizing_dc_splitter():

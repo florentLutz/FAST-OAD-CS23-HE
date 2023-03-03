@@ -58,12 +58,12 @@
                         <cruise>
                             <CD0>0.0</CD0>
                         </cruise>
-                        <mass units="kg">4960.0</mass>
+                        <mass units="kg">2480.0</mass>
                         <cell_temperature_mission units="degK">288.15</cell_temperature_mission>
                         <SOC_min>40.0</SOC_min>
                         <min_safe_SOC>20.0</min_safe_SOC>
-                        <number_modules>200.0</number_modules>
-                        <number_cells>8000.0</number_cells>
+                        <number_modules>100.0</number_modules>
+                        <number_cells>4000.0</number_cells>
                         <module>
                             <number_cells>150.0</number_cells>
                             <mass units="kg">198.4</mass>
@@ -84,12 +84,12 @@
                         <cruise>
                             <CD0>0.0</CD0>
                         </cruise>
-                        <mass units="kg">4960.0</mass>
+                        <mass units="kg">2480.0</mass>
                         <cell_temperature_mission units="degK">288.15</cell_temperature_mission>
                         <SOC_min>40.0</SOC_min>
                         <min_safe_SOC>20.0</min_safe_SOC>
-                        <number_modules>200.0</number_modules>
-                        <number_cells>8000.0</number_cells>
+                        <number_modules>100.0</number_modules>
+                        <number_cells>4000.0</number_cells>
                         <module>
                             <number_cells>150.0</number_cells>
                             <mass units="kg">198.4</mass>
@@ -568,9 +568,11 @@
                     </propeller_1>
                 </propeller>
                 <DC_splitter>
-                    <dc_splitter_1>
-                        <power_split units="percent">50.</power_split>
-                    </dc_splitter_1>
+                  <dc_splitter_1>
+                    <current_max units="A" is_input="False">500.0</current_max>
+                    <power_split units="percent" is_input="True">50.0<!--Percent of the power going to the first (primary) input, in %--></power_split>
+                    <voltage_max units="V" is_input="False">850.0</voltage_max>
+                  </dc_splitter_1>
                 </DC_splitter>
                 <DC_bus>
                     <dc_bus_2>
