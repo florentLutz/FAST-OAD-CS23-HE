@@ -181,16 +181,16 @@ def test_assembly_sizing():
     ) == pytest.approx(3000.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.47, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_2:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.47, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_412:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.47, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1337:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.47, rel=1e-2)
 
     write_outputs(
         pth.join(outputs.__path__[0], "simple_assembly_sizing.xml"),
@@ -296,7 +296,7 @@ def test_performances_sizing_assembly_battery_ensure():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
-    ) == pytest.approx(37.29, rel=1e-2)
+    ) == pytest.approx(36.84, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(3000.0, rel=1e-2)
@@ -346,16 +346,16 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(3000.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.40, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_2:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.40, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_412:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.40, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1337:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.40, rel=1e-2)
 
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
         3224.92, rel=1e-2

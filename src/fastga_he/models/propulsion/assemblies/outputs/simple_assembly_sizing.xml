@@ -125,11 +125,11 @@
         </DC_DC_converter>
         <DC_SSPC>
           <dc_sspc_1337>
-            <current_caliber units="A" is_input="True">400.0<!--Current caliber of the SSPC--></current_caliber>
+            <current_caliber units="A" is_input="False">226.9965558424665<!--Current caliber of the SSPC--></current_caliber>
             <current_max units="A" is_input="True">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
-            <mass units="kg" is_input="False">10.0<!--Mass of the SSPC--></mass>
+            <mass units="kg" is_input="False">6.431569082203218<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
-            <voltage_caliber units="V" is_input="True">750.0<!--Voltage caliber of the SSPC--></voltage_caliber>
+            <voltage_caliber units="V" is_input="False">850.0000000000001<!--Voltage caliber of the SSPC--></voltage_caliber>
             <voltage_max units="V" is_input="True">850.0000000000001<!--Maximum voltage flowing through the SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC SSPC center of gravity--></x>
@@ -138,24 +138,24 @@
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <diode>
-              <resistance units="ohm" is_input="False">0.0021037499999999997</resistance>
+              <resistance units="ohm" is_input="False">0.0037071047041964513</resistance>
             </diode>
             <igbt>
-              <resistance units="ohm" is_input="False">0.0016987500000000002</resistance>
+              <resistance units="ohm" is_input="False">0.0029934374884153167</resistance>
             </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <resistance is_input="False">1.125</resistance>
+              <resistance is_input="False">1.982408932725375</resistance>
             </scaling>
           </dc_sspc_1337>
           <dc_sspc_1>
-            <current_caliber units="A" is_input="True">400.0<!--Current caliber of the SSPC--></current_caliber>
+            <current_caliber units="A" is_input="False">226.9965558424665<!--Current caliber of the SSPC--></current_caliber>
             <current_max units="A" is_input="True">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
-            <mass units="kg" is_input="False">10.0<!--Mass of the SSPC--></mass>
+            <mass units="kg" is_input="False">6.407117089956065<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
-            <voltage_caliber units="V" is_input="True">750.0<!--Voltage caliber of the SSPC--></voltage_caliber>
+            <voltage_caliber units="V" is_input="False">846.7684101430876<!--Voltage caliber of the SSPC--></voltage_caliber>
             <voltage_max units="V" is_input="True">846.7684101430876<!--Maximum voltage flowing through the SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC SSPC center of gravity--></x>
@@ -164,24 +164,24 @@
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <diode>
-              <resistance units="ohm" is_input="False">0.0021037499999999997</resistance>
+              <resistance units="ohm" is_input="False">0.0037071047041964513</resistance>
             </diode>
             <igbt>
-              <resistance units="ohm" is_input="False">0.0016987500000000002</resistance>
+              <resistance units="ohm" is_input="False">0.0029934374884153167</resistance>
             </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <resistance is_input="False">1.125</resistance>
+              <resistance is_input="False">1.982408932725375</resistance>
             </scaling>
           </dc_sspc_1>
           <dc_sspc_2>
-            <current_caliber units="A" is_input="True">400.0<!--Current caliber of the SSPC--></current_caliber>
+            <current_caliber units="A" is_input="False">226.9965558424665<!--Current caliber of the SSPC--></current_caliber>
             <current_max units="A" is_input="True">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
-            <mass units="kg" is_input="False">10.0<!--Mass of the SSPC--></mass>
+            <mass units="kg" is_input="False">6.413388768088595<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
-            <voltage_caliber units="V" is_input="True">750.0<!--Voltage caliber of the SSPC--></voltage_caliber>
+            <voltage_caliber units="V" is_input="False">847.5972788599612<!--Voltage caliber of the SSPC--></voltage_caliber>
             <voltage_max units="V" is_input="True">847.5972788599612<!--Maximum voltage flowing through the SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC SSPC center of gravity--></x>
@@ -190,24 +190,24 @@
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <diode>
-              <resistance units="ohm" is_input="False">0.0021037499999999997</resistance>
+              <resistance units="ohm" is_input="False">0.0037071047041964513</resistance>
             </diode>
             <igbt>
-              <resistance units="ohm" is_input="False">0.0016987500000000002</resistance>
+              <resistance units="ohm" is_input="False">0.0029934374884153167</resistance>
             </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <resistance is_input="False">1.125</resistance>
+              <resistance is_input="False">1.982408932725375</resistance>
             </scaling>
           </dc_sspc_2>
           <dc_sspc_412>
-            <current_caliber units="A" is_input="True">400.0<!--Current caliber of the SSPC--></current_caliber>
+            <current_caliber units="A" is_input="False">227.588167623899<!--Current caliber of the SSPC--></current_caliber>
             <current_max units="A" is_input="True">227.588167623899<!--Maximum current flowing through the SSPC--></current_max>
-            <mass units="kg" is_input="False">10.0<!--Mass of the SSPC--></mass>
+            <mass units="kg" is_input="False">6.442043392261338<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
-            <voltage_caliber units="V" is_input="True">750.0<!--Voltage caliber of the SSPC--></voltage_caliber>
+            <voltage_caliber units="V" is_input="False">849.1711312831264<!--Voltage caliber of the SSPC--></voltage_caliber>
             <voltage_max units="V" is_input="True">849.1711312831264<!--Maximum voltage flowing through the SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC SSPC center of gravity--></x>
@@ -216,16 +216,16 @@
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <diode>
-              <resistance units="ohm" is_input="False">0.0021037499999999997</resistance>
+              <resistance units="ohm" is_input="False">0.0036974681451393434</resistance>
             </diode>
             <igbt>
-              <resistance units="ohm" is_input="False">0.0016987500000000002</resistance>
+              <resistance units="ohm" is_input="False">0.0029856560958077057</resistance>
             </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <resistance is_input="False">1.125</resistance>
+              <resistance is_input="False">1.9772556925878844</resistance>
             </scaling>
           </dc_sspc_412>
         </DC_SSPC>
@@ -562,24 +562,6 @@
   <constraints>
     <propulsion>
       <he_power_train>
-        <DC_SSPC>
-          <dc_sspc_1337>
-            <current_caliber units="A" is_input="False">-173.0034441575335<!--Ensure the SSPC current rating is enough for the maximum it sees during the mission, constraint is respected if < 0--></current_caliber>
-            <voltage_caliber units="V" is_input="False">100.00000000000011<!--Ensure the SSPC voltage rating is enough for the maximum it sees during the mission, constraint is respected if < 0--></voltage_caliber>
-          </dc_sspc_1337>
-          <dc_sspc_1>
-            <current_caliber units="A" is_input="False">-173.0034441575335<!--Ensure the SSPC current rating is enough for the maximum it sees during the mission, constraint is respected if < 0--></current_caliber>
-            <voltage_caliber units="V" is_input="False">96.76841014308764<!--Ensure the SSPC voltage rating is enough for the maximum it sees during the mission, constraint is respected if < 0--></voltage_caliber>
-          </dc_sspc_1>
-          <dc_sspc_2>
-            <current_caliber units="A" is_input="False">-173.0034441575335<!--Ensure the SSPC current rating is enough for the maximum it sees during the mission, constraint is respected if < 0--></current_caliber>
-            <voltage_caliber units="V" is_input="False">97.5972788599612<!--Ensure the SSPC voltage rating is enough for the maximum it sees during the mission, constraint is respected if < 0--></voltage_caliber>
-          </dc_sspc_2>
-          <dc_sspc_412>
-            <current_caliber units="A" is_input="False">-172.411832376101<!--Ensure the SSPC current rating is enough for the maximum it sees during the mission, constraint is respected if < 0--></current_caliber>
-            <voltage_caliber units="V" is_input="False">99.17113128312644<!--Ensure the SSPC voltage rating is enough for the maximum it sees during the mission, constraint is respected if < 0--></voltage_caliber>
-          </dc_sspc_412>
-        </DC_SSPC>
         <battery_pack>
           <battery_pack_1>
             <min_safe_SOC units="percent" is_input="False">-20.0<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>

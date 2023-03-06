@@ -271,13 +271,13 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(1500.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.40, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_2:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.40, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_412:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(6.40, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:mass", units="kg"

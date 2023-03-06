@@ -120,7 +120,7 @@ def test_sizing_dc_sspc():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
-    ) == pytest.approx(10.0, rel=1e-2)
+    ) == pytest.approx(8.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:CG:x", units="m"
     ) == pytest.approx(2.69, rel=1e-2)

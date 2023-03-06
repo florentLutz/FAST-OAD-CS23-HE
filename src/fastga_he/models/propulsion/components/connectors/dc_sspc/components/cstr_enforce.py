@@ -9,6 +9,18 @@ import numpy as np
 
 import fastoad.api as oad
 
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_CONSTRAINTS_CURRENT_DC_SSPC
+] = "fastga_he.submodel.propulsion.constraints.dc_sspc.current.enforce"
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_CONSTRAINTS_VOLTAGE_DC_SSPC
+] = "fastga_he.submodel.propulsion.constraints.dc_sspc.voltage.enforce"
+
+# If value of sizing current and voltage are too low, like in the case of an inactive SSPC,
+# these value should be chosen
+MINIMUM_CURRENT = 1.0
+MINIMUM_VOLTAGE = 10.0
+
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_CURRENT_DC_SSPC,
@@ -55,9 +67,14 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
 
         dc_sspc_id = self.options["dc_sspc_id"]
 
+        current_max = max(
+            MINIMUM_CURRENT,
+            inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"],
+        )
+
         outputs[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber"
-        ] = inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"]
+        ] = current_max
 
 
 @oad.RegisterSubmodel(
@@ -105,6 +122,11 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
 
         dc_sspc_id = self.options["dc_sspc_id"]
 
+        voltage_max = max(
+            MINIMUM_VOLTAGE,
+            inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_max"],
+        )
+
         outputs[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber"
-        ] = inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_max"]
+        ] = voltage_max
