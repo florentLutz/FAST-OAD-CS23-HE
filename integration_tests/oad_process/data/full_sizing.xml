@@ -11,6 +11,7 @@
     <geometry>
       <flap_type is_input="True">1.0<!--flap type (0.0 - plain flap, 2.0 - single slotted flap, 3.0 - split flap)--></flap_type>
       <has_T_tail is_input="True">1.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>
+      <wing_configuration is_input="True">3.0</wing_configuration>
       <cabin>
         <aisle_width units="m" is_input="True">0.0<!--width of aisles--></aisle_width>
         <luggage>
@@ -71,6 +72,7 @@
         <aspect_ratio is_input="True">12.04<!--wing aspect ratio--></aspect_ratio>
         <sweep_25 units="deg" is_input="True">0.0<!--sweep angle at 25% chord of wing--></sweep_25>
         <dihedral units="deg" is_input="True">0.0<!--sweep angle at 25% chord of wing--></dihedral>
+        <twist units="deg" is_input="True">0.0<!--sweep angle at 25% chord of wing--></twist>
         <taper_ratio is_input="True">1.0<!--taper ratio of wing--></taper_ratio>
         <thickness_ratio is_input="True">0.15<!--mean thickness ratio of wing--></thickness_ratio>
         <kink>
@@ -119,6 +121,33 @@
             </inductor>
           </dc_dc_converter_1>
         </DC_DC_converter>
+        <DC_SSPC>
+          <dc_sspc_1>
+            <low_speed>
+                <CD0>0.0</CD0>
+            </low_speed>
+            <cruise>
+                <CD0>0.0</CD0>
+            </cruise>
+            <CG>
+                <x units="m">2.69</x>
+            </CG>
+            <mass units="kg">10.0</mass>
+            <current_caliber units="A">800.0</current_caliber>
+            <voltage_caliber units="V">850.0</voltage_caliber>
+            <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
+            <voltage_max units="V" is_input="False">846.7684101430876<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <scaling>
+                <resistance>1.125</resistance>
+            </scaling>
+            <igbt>
+                <resistance units="ohm">0.00169875</resistance>
+            </igbt>
+            <diode>
+                <resistance units="ohm">0.00210375</resistance>
+            </diode>
+        </dc_sspc_1>
+        </DC_SSPC>
         <DC_bus>
           <dc_bus_1>
             <front_length_ratio is_input="True">0.9<!--Location of the DC bus CG as a ratio of the aircraft front length--></front_length_ratio>

@@ -25,6 +25,11 @@ power_train_components:
       number_of_inputs: 1
       number_of_outputs: 1
     position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_sspc_1:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: True
+    position: inside_the_wing
   dc_dc_converter_1:
     id: fastga_he.pt_component.dc_dc_converter
     position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
@@ -49,9 +54,12 @@ component_connections:
     target: [dc_bus_2, 1]
 
   - source: [dc_bus_2, 1]
+    target: dc_sspc_1
+
+  - source: dc_sspc_1
     target: dc_dc_converter_1
 
   - source: dc_dc_converter_1
     target: battery_pack_1
 
-watcher_file_path: ./power_train_data.csv
+watcher_file_path: ../results/power_train_data.csv
