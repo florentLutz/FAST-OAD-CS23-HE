@@ -1084,7 +1084,7 @@ def test_mission_vector():
         ivc,
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(61.86, abs=1e-2)
+    assert sizing_fuel == pytest.approx(43.69852864, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1123,4 +1123,4 @@ def test_mission_vector_from_yml():
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(-0.03245453, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.06715826, abs=1e-2)

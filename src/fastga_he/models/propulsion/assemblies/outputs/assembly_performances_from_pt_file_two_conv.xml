@@ -2,7 +2,7 @@
   <altitude units="m" is_input="True">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</altitude>
   <exterior_temperature units="degK" is_input="True">[288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15]<!--temperature outside of the cable--></exterior_temperature>
   <fuel_consumed_t_econ units="kg" is_input="False">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--fuel consumed at each time step--></fuel_consumed_t_econ>
-  <non_consumable_energy_t_econ units="W*h" is_input="False">[191312.54621727907, 77080.49655010618, -10193909.402443232, 70997505.5021073, 7215559695.463917, -7650984604219.326, 1.0901197119195462e+16, -2.5501227765489607e+19, -1.831030684078618e+24, -1.6222819446921403e+28]<!--Non consumable energy at each time step--></non_consumable_energy_t_econ>
+  <non_consumable_energy_t_econ units="W*h" is_input="False">[191312.54621739985, 77080.67749101686, -10193907.904238932, 70997534.08202294, 7215502387.007815, -7650890210138.616, 1.0902669107498782e+16, -2.5504654739810775e+19, -1.8312583905731526e+24, -1.6224864897522922e+28]<!--Non consumable energy at each time step--></non_consumable_energy_t_econ>
   <thrust units="N" is_input="True">[1550.0, 1538.888888888889, 1527.7777777777778, 1516.6666666666667, 1505.5555555555557, 1494.4444444444443, 1483.3333333333333, 1472.2222222222222, 1461.111111111111, 1450.0]</thrust>
   <time_step units="s" is_input="True">[500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0]</time_step>
   <true_airspeed units="m/s" is_input="True">[81.8, 82.76666666666667, 83.73333333333333, 84.7, 85.66666666666667, 86.63333333333333, 87.6, 88.56666666666666, 89.53333333333333, 90.5]</true_airspeed>
@@ -12,19 +12,19 @@
         <thrust_distribution is_input="True">1.0</thrust_distribution>
         <DC_DC_converter>
           <dc_dc_converter_1>
-            <current_in_max units="A" is_input="False">201252869897530.66</current_in_max>
-            <losses_max units="W" is_input="False">2.992439575184565e+19</losses_max>
+            <current_in_max units="A" is_input="False">201280045066207.62</current_in_max>
+            <losses_max units="W" is_input="False">2.262718627033389e+19</losses_max>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_in_max units="V" is_input="False">750.0</voltage_in_max>
-            <voltage_out_max units="V" is_input="False">6309369.4629459195</voltage_out_max>
+            <voltage_out_max units="V" is_input="False">5486478.132218529</voltage_out_max>
             <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <capacitor>
-              <current_max units="A" is_input="False">8247600395.243392</current_max>
+              <current_max units="A" is_input="False">7171833389.950078</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </capacitor>
             <diode>
-              <current_max units="A" is_input="False">8289150282.366432</current_max>
+              <current_max units="A" is_input="False">7207963761.638495</current_max>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="True">0.002805</resistance>
             </diode>
@@ -44,28 +44,28 @@
               <c is_input="True">-3.005e-08</c>
             </energy_rr>
             <igbt>
-              <current_max units="A" is_input="False">82476003952.43388</current_max>
+              <current_max units="A" is_input="False">71718333899.50075</current_max>
               <resistance units="ohm" is_input="True">0.002265</resistance>
             </igbt>
             <inductor>
-              <current_max units="A" is_input="False">82891502823.66429</current_max>
+              <current_max units="A" is_input="False">72079637616.38492</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
           </dc_dc_converter_1>
           <dc_dc_converter_2>
-            <current_in_max units="A" is_input="False">-2583.2622168264156</current_in_max>
-            <losses_max units="W" is_input="False">1.6376083876457696e+16</losses_max>
+            <current_in_max units="A" is_input="False">-2171.437303851125</current_in_max>
+            <losses_max units="W" is_input="False">1.238269286567966e+16</losses_max>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_in_max units="V" is_input="False">709.3731996141973</voltage_in_max>
-            <voltage_out_max units="V" is_input="False">497.4950630218809</voltage_out_max>
+            <voltage_out_max units="V" is_input="False">497.49506302177963</voltage_out_max>
             <voltage_out_target_mission units="V" is_input="True">750.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <capacitor>
-              <current_max units="A" is_input="False">-3777.6347256648028</current_max>
+              <current_max units="A" is_input="False">-3208.860146050882</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </capacitor>
             <diode>
-              <current_max units="A" is_input="False">-5883.76756270528</current_max>
+              <current_max units="A" is_input="False">-4925.010349950222</current_max>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="True">0.002805</resistance>
             </diode>
@@ -85,19 +85,19 @@
               <c is_input="True">-3.005e-08</c>
             </energy_rr>
             <igbt>
-              <current_max units="A" is_input="False">-4927.339729675524</current_max>
+              <current_max units="A" is_input="False">-4229.915211034153</current_max>
               <resistance units="ohm" is_input="True">0.002265</resistance>
             </igbt>
             <inductor>
-              <current_max units="A" is_input="False">-7674.463990636851</current_max>
+              <current_max units="A" is_input="False">-6492.142145675409</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
           </dc_dc_converter_2>
         </DC_DC_converter>
         <DC_SSPC>
           <dc_sspc_1337>
-            <current_max units="A" is_input="False">828915028.2366436<!--Maximum current flowing through the SSPC--></current_max>
-            <voltage_max units="V" is_input="False">6309369.4629459195<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <current_max units="A" is_input="False">720796376.1638498<!--Maximum current flowing through the SSPC--></current_max>
+            <voltage_max units="V" is_input="False">5486478.132218529<!--Maximum voltage at the terminals SSPC--></voltage_max>
             <diode>
               <resistance units="ohm" is_input="True">0.00210375</resistance>
             </diode>
@@ -106,8 +106,8 @@
             </igbt>
           </dc_sspc_1337>
           <dc_sspc_1338>
-            <current_max units="A" is_input="False">-4508.882472152788<!--Maximum current flowing through the SSPC--></current_max>
-            <voltage_max units="V" is_input="False">3157420.068076082<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <current_max units="A" is_input="False">-3736.166954273206<!--Maximum current flowing through the SSPC--></current_max>
+            <voltage_max units="V" is_input="False">2745649.91185549<!--Maximum voltage at the terminals SSPC--></voltage_max>
             <diode>
               <resistance units="ohm" is_input="True">0.00210375</resistance>
             </diode>
@@ -116,8 +116,8 @@
             </igbt>
           </dc_sspc_1338>
           <dc_sspc_1>
-            <current_max units="A" is_input="False">204.81033749518258<!--Maximum current flowing through the SSPC--></current_max>
-            <voltage_max units="V" is_input="False">3177269.876489882<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <current_max units="A" is_input="False">206.0532680475716<!--Maximum current flowing through the SSPC--></current_max>
+            <voltage_max units="V" is_input="False">2762909.955062972<!--Maximum voltage at the terminals SSPC--></voltage_max>
             <diode>
               <resistance units="ohm" is_input="True">0.00210375</resistance>
             </diode>
@@ -126,8 +126,8 @@
             </igbt>
           </dc_sspc_1>
           <dc_sspc_2>
-            <current_max units="A" is_input="False">-31.783503268507864<!--Maximum current flowing through the SSPC--></current_max>
-            <voltage_max units="V" is_input="False">3172295.1321474006<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <current_max units="A" is_input="False">-36.07371503905086<!--Maximum current flowing through the SSPC--></current_max>
+            <voltage_max units="V" is_input="False">2758584.192434285<!--Maximum voltage at the terminals SSPC--></voltage_max>
             <diode>
               <resistance units="ohm" is_input="True">0.00210375</resistance>
             </diode>
@@ -136,8 +136,8 @@
             </igbt>
           </dc_sspc_2>
           <dc_sspc_412>
-            <current_max units="A" is_input="False">814.4060047293639<!--Maximum current flowing through the SSPC--></current_max>
-            <voltage_max units="V" is_input="False">3157420.3150024298<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <current_max units="A" is_input="False">814.406004729359<!--Maximum current flowing through the SSPC--></current_max>
+            <voltage_max units="V" is_input="False">2745650.192749449<!--Maximum voltage at the terminals SSPC--></voltage_max>
             <diode>
               <resistance units="ohm" is_input="True">0.00210375</resistance>
             </diode>
@@ -148,22 +148,22 @@
         </DC_SSPC>
         <DC_bus>
           <dc_bus_1>
-            <current_max units="A" is_input="False">1308433.4431180912</current_max>
-            <voltage_max units="V" is_input="False">3172295.1321474006</voltage_max>
+            <current_max units="A" is_input="False">1137759.4562623682</current_max>
+            <voltage_max units="V" is_input="False">2758584.192434285</voltage_max>
           </dc_bus_1>
           <dc_bus_2>
-            <current_max units="A" is_input="False">616.6970593446231</current_max>
-            <voltage_max units="V" is_input="False">3157420.068076082</voltage_max>
+            <current_max units="A" is_input="False">617.9399898970096</current_max>
+            <voltage_max units="V" is_input="False">2745649.91185549</voltage_max>
           </dc_bus_2>
         </DC_bus>
         <DC_cable_harness>
           <harness_1>
-            <current_max units="A" is_input="False">814.4060047293639<!--Maximum current flowing through the harness, all cables included--></current_max>
+            <current_max units="A" is_input="False">814.406004729359<!--Maximum current flowing through the harness, all cables included--></current_max>
             <length units="m" is_input="True">7.0</length>
-            <losses_max units="W" is_input="False">965939.6595206135<!--Maximum losses in one cable of the harness--></losses_max>
+            <losses_max units="W" is_input="False">955446.2121700001<!--Maximum losses in one cable of the harness--></losses_max>
             <number_cables is_input="True">1.0</number_cables>
-            <temperature_max units="degK" is_input="False">68176.89874860145</temperature_max>
-            <voltage_max units="V" is_input="False">3172295.0112906294</voltage_max>
+            <temperature_max units="degK" is_input="False">67439.39200719068</temperature_max>
+            <voltage_max units="V" is_input="False">2758584.0552639836</voltage_max>
             <cable>
               <radius units="mm" is_input="True">6.47</radius>
               <resistance units="ohm" is_input="True">0.00333</resistance>
@@ -191,13 +191,13 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <SOC_min units="percent" is_input="False">0.0<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <c_rate_max units="1/h" is_input="False">300377417757.5084<!--Minimum state-of-charge of the battery during the mission--></c_rate_max>
+            <SOC_min units="percent" is_input="False">-4907271199465.324<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <c_rate_max units="1/h" is_input="False">300417977710.7576<!--Minimum state-of-charge of the battery during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <number_modules is_input="True">200.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">2.8250214142552877e+46<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <losses_max units="W" is_input="False">2.825579090514999e+46<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <voltage_max units="V" is_input="False">5.0<!--Maximum voltage needed by the cells during the mission--></voltage_max>
               <voltage_min units="V" is_input="False">2.6<!--Minimum voltage provided by the cells during the mission--></voltage_min>
             </cell>
@@ -207,14 +207,14 @@
           </battery_pack_1>
           <battery_pack_2>
             <SOC_min units="percent" is_input="False">100.0<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <c_rate_max units="1/h" is_input="False">-3.85561524899465<!--Minimum state-of-charge of the battery during the mission--></c_rate_max>
+            <c_rate_max units="1/h" is_input="False">-3.240951199777798<!--Minimum state-of-charge of the battery during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <number_modules is_input="True">200.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">800779496520.2932<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <losses_max units="W" is_input="False">606108973324.2444<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <voltage_max units="V" is_input="False">5.0<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">4.721762466744565<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <voltage_min units="V" is_input="False">4.625810047405238<!--Minimum voltage provided by the cells during the mission--></voltage_min>
             </cell>
             <module>
               <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
@@ -224,15 +224,15 @@
         <inverter>
           <inverter_1>
             <current_ac_max units="A" is_input="False">184.80516709572566<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
-            <current_dc_max units="A" is_input="False">204.81033749518258<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <current_dc_max units="A" is_input="False">206.0532680475716<!--Maximum value of the current at the input of the inverter--></current_dc_max>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <losses_max units="W" is_input="False">nan</losses_max>
-            <modulation_idx_max is_input="False">0.7419890101919974<!--Maximum modulation index during the mission--></modulation_idx_max>
+            <modulation_idx_max is_input="False">0.7467084825385111<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
             <voltage_ac_max units="V" is_input="False">413.0526427857553<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
-            <voltage_dc_max units="V" is_input="False">3177269.876489882<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
+            <voltage_dc_max units="V" is_input="False">2762909.955062972<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
             <casing>
               <temperature_max units="degK" is_input="False">nan</temperature_max>
               <thermal_resistance units="degK/W" is_input="True">0.01<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>

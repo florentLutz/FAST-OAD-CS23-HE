@@ -40,7 +40,7 @@ class SizingBatteryNumberCells(om.ExplicitComponent):
 
         self.add_output(
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_cells",
-            val=30000.0,
+            val=10000.0,
             desc="Total number of cells in the battery pack",
         )
 

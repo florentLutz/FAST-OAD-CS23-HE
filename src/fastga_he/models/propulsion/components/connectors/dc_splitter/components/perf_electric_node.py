@@ -51,9 +51,23 @@ class PerformancesElectricalNode(om.ImplicitComponent):
             val=np.full(number_of_points, 350),
             units="V",
             desc="Voltage of the bus",
+            lower=np.full(number_of_points, 0.0),
+            upper=np.full(number_of_points, 2.0e3),
         )
-        self.add_output(name="dc_voltage_in_1", val=np.full(number_of_points, 800.0), units="V")
-        self.add_output(name="dc_voltage_in_2", val=np.full(number_of_points, 800.0), units="V")
+        self.add_output(
+            name="dc_voltage_in_1",
+            val=np.full(number_of_points, 800.0),
+            units="V",
+            lower=np.full(number_of_points, 0.0),
+            upper=np.full(number_of_points, 2.0e3),
+        )
+        self.add_output(
+            name="dc_voltage_in_2",
+            val=np.full(number_of_points, 800.0),
+            units="V",
+            lower=np.full(number_of_points, 0.0),
+            upper=np.full(number_of_points, 2.0e3),
+        )
 
         self.declare_partials(
             of="dc_voltage",
