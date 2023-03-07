@@ -192,6 +192,31 @@
               <resistance units="ohm">1e-3</resistance>
             </igbt>
           </dc_sspc_1>
+          <dc_sspc_2>
+            <low_speed>
+                <CD0>0.0</CD0>
+            </low_speed>
+            <cruise>
+                <CD0>0.0</CD0>
+            </cruise>
+            <CG>
+                <x units="m">2.69</x>
+            </CG>
+            <mass units="kg">10.0</mass>
+            <current_caliber units="A">800.0</current_caliber>
+            <voltage_caliber units="V">850.0</voltage_caliber>
+            <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
+            <voltage_max units="V" is_input="False">846.7684101430876<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <scaling>
+                <resistance>1.125</resistance>
+            </scaling>
+            <igbt>
+                <resistance units="ohm">0.00169875</resistance>
+            </igbt>
+            <diode>
+                <resistance units="ohm">0.00210375</resistance>
+            </diode>
+          </dc_sspc_2>
         </DC_SSPC>
         <DC_DC_converter>
           <dc_dc_converter_1>
@@ -284,6 +309,23 @@
               <resistance is_input="False">0.408586123692909</resistance>
             </scaling>
           </dc_dc_converter_1>
+          <dc_dc_converter_2>
+            <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
+            <power_density units="W/kg" is_input="True">4000.0<!--Power density of the converter--></power_density>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
+            <voltage_out_target_mission units="V" is_input="True">500.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
+            <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
+            <capacitor>
+              <resistance units="ohm" is_input="True">0.0014</resistance>
+            </capacitor>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+            </diode>
+            <inductor>
+              <air_gap units="mm">10</air_gap>
+              <resistance units="ohm" is_input="True">0.0014</resistance>
+            </inductor>
+          </dc_dc_converter_2>
         </DC_DC_converter>
         <DC_bus>
           <dc_bus_1>
@@ -356,6 +398,11 @@
             </low_speed>
           </dc_bus_2>
         </DC_bus>
+        <DC_splitter>
+          <dc_splitter_1>
+            <power_split units="percent">50.0</power_split>
+          </dc_splitter_1>
+        </DC_splitter>
         <DC_cable_harness>
           <harness_1>
             <current_caliber units="A" is_input="False">636.3154654074525</current_caliber>
@@ -373,6 +420,7 @@
               <x units="m" is_input="False">2.9276943341139363<!--X position of the DC cable center of gravity--></x>
             </CG>
             <cable>
+              <initial_temperature units="degK" is_input="True">288.15</initial_temperature>
               <current_caliber units="A" is_input="False">636.3154654074525<!--Maximum current flowing in one cable of the harness--></current_caliber>
               <heat_capacity units="J/degK" is_input="False">11234.605008264247</heat_capacity>
               <heat_capacity_per_length units="J/degK/m" is_input="False">2633.432007863175</heat_capacity_per_length>
@@ -452,6 +500,16 @@
           </motor_1>
         </PMSM>
         <battery_pack>
+          <battery_pack_2>
+            <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
+            <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
+            <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <number_modules is_input="True">60.0<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <module>
+              <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
+            </module>
+          </battery_pack_2>
           <battery_pack_1>
             <SOC_min units="percent" is_input="False">4.226387822069779e-17<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">1.3995024387201023<!--Minimum state-of-charge of the battery during the mission--></c_rate_max>
@@ -461,7 +519,7 @@
             <mass units="kg" is_input="False">1148.1454267819038<!--Mass of the battery pack--></mass>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_cells is_input="False">17635.51375537004<!--Total number of cells in the battery pack--></number_cells>
-            <number_modules is_input="False">183.70326828510457<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <number_modules is_input="False">60.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <volume units="L" is_input="False">388.64263438396716<!--Volume of the battery pack--></volume>
             <CG>
               <x units="m" is_input="False">3.818621385069883<!--X position of the battery center of gravity--></x>
@@ -654,7 +712,7 @@
     </propulsion>
     <weight>
       <aircraft>
-        <MTOW units="kg" is_input="True">1747.3649929730034<!--maximum takeoff weight of the aircraft--></MTOW>
+        <MTOW units="kg" is_input="True">1000.0<!--maximum takeoff weight of the aircraft--></MTOW>
         <payload units="kg" is_input="True">390.0<!--design payload weight--></payload>
         <in_flight_variation>
           <fixed_mass_comp>

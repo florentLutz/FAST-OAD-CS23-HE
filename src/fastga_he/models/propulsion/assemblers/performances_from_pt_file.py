@@ -55,8 +55,8 @@ class PowerTrainPerformancesFromFile(om.Group):
         self.options.declare(
             name="add_solver",
             default=True,
-            desc="Boolean to add solvers to the power train performance group. Default is true "
-            "but can be turned off when used jointly with the mission to save computation time",
+            desc="Boolean to add solvers to the power train performance group. Default is False "
+            "it can be turned off when used jointly with the mission to save computation time",
             allow_none=False,
         )
         self.options.declare(
