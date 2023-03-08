@@ -3,6 +3,7 @@
 # Copyright (C) 2022 ISAE-SUPAERO.
 
 import os
+import logging
 
 import numpy as np
 import openmdao.api as om
@@ -40,6 +41,8 @@ CSV_DATA_LABELS = [
     "time step (s)",
     "name",
 ]
+
+_LOGGER = logging.getLogger(__name__)  # Logger for this module
 
 
 class ToCSV(om.ExplicitComponent):
@@ -274,5 +277,7 @@ class ToCSV(om.ExplicitComponent):
             results_df["time step (s)"] = time_step
 
             results_df.to_csv(self.options["out_file"])
+
+            _LOGGER.info("Saved mission results in %s", self.options["out_file"])
 
             outputs["tsfc"] = tsfc

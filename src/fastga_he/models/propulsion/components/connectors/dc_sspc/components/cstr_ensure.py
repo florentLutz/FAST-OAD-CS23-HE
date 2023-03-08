@@ -9,13 +9,6 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_CURRENT_DC_SSPC
-] = "fastga_he.submodel.propulsion.constraints.dc_sspc.current.ensure"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_VOLTAGE_DC_SSPC
-] = "fastga_he.submodel.propulsion.constraints.dc_sspc.voltage.ensure"
-
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_CURRENT_DC_SSPC,

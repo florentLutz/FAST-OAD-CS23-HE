@@ -312,17 +312,19 @@ class FASTGAHEPowerTrainConfigurator:
             # always be connected to a bus.
 
             # If SSPC is source and connected to a bus there should be no worries, else we need a
-            # special treatment since the "input" side of the SSPC should be connected to the bus
-            if (
-                source_id == "fastga_he.pt_component.dc_sspc"
-                and not target_id == "fastga_he.pt_component.dc_bus"
+            # special treatment since the "input" side of the SSPC should be connected to the
+            # bus. Same reasoning apply for splitter since they are a type of bus.
+            if source_id == "fastga_he.pt_component.dc_sspc" and not (
+                target_id == "fastga_he.pt_component.dc_bus"
+                or target_id == "fastga_he.pt_component.dc_splitter"
             ):
                 # We reverse the SSPC inputs and outputs
                 source_inputs = resources.DICTIONARY_OUT[source_id]
+
             # Same reasoning here, we just have to reverse the SSPC inputs and outputs
-            elif (
-                target_id == "fastga_he.pt_component.dc_sspc"
-                and source_id == "fastga_he.pt_component.dc_bus"
+            elif target_id == "fastga_he.pt_component.dc_sspc" and (
+                source_id == "fastga_he.pt_component.dc_bus"
+                or source_id == "fastga_he.pt_component.dc_splitter"
             ):
 
                 # We reverse the SSPC outputs and input
@@ -330,9 +332,9 @@ class FASTGAHEPowerTrainConfigurator:
 
             # Because we need to know if the SSPC is at a bus output for the model to work,
             # this check is necessary
-            if (
-                source_id == "fastga_he.pt_component.dc_sspc"
-                and target_id == "fastga_he.pt_component.dc_bus"
+            if source_id == "fastga_he.pt_component.dc_sspc" and (
+                target_id == "fastga_he.pt_component.dc_bus"
+                or target_id == "fastga_he.pt_component.dc_splitter"
             ):
                 self._sspc_list[source_name] = True
 

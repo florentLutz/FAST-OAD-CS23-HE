@@ -34,11 +34,8 @@ class PerformancesUpdateSOC(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
-        outputs["state_of_charge"] = np.clip(
-            np.full(number_of_points, 100.0)
-            - np.cumsum(np.concatenate((np.zeros(1), inputs["state_of_charge_decrease"][:-1]))),
-            np.full(number_of_points, 0.0),
-            np.full(number_of_points, 100.0),
+        outputs["state_of_charge"] = np.full(number_of_points, 100.0) - np.cumsum(
+            np.concatenate((np.zeros(1), inputs["state_of_charge_decrease"][:-1]))
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):

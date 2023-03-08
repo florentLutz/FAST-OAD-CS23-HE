@@ -7,6 +7,7 @@ from .connectors.dc_cable import SizingHarness, PerformancesHarness
 from .connectors.dc_dc_converter import SizingDCDCConverter, PerformancesDCDCConverter
 from .connectors.inverter import SizingInverter, PerformancesInverter
 from .connectors.dc_sspc import SizingDCSSPC, PerformancesDCSSPC
+from .connectors.dc_splitter import SizingDCSplitter, PerformancesDCSplitter
 
 from .loads.pmsm import SizingPMSM, PerformancesPMSM
 

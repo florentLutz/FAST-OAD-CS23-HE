@@ -31,7 +31,11 @@ class PerformancesEntropicHeatCoefficient(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        soc = inputs["state_of_charge"]
+        soc = np.clip(
+            inputs["state_of_charge"],
+            np.full_like(inputs["state_of_charge"], 10 - 1e-3),
+            np.full_like(inputs["state_of_charge"], 100 + 1e-3),
+        )
 
         outputs["entropic_heat_coefficient"] = (
             -0.355 + 2.154e-2 * soc - 2.869e-4 * soc ** 2.0 + 1.028e-6 * soc ** 3.0
@@ -39,7 +43,11 @@ class PerformancesEntropicHeatCoefficient(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        soc = inputs["state_of_charge"]
+        soc = np.clip(
+            inputs["state_of_charge"],
+            np.full_like(inputs["state_of_charge"], 10 - 1e-3),
+            np.full_like(inputs["state_of_charge"], 100 + 1e-3),
+        )
 
         partials["entropic_heat_coefficient", "state_of_charge"] = (
             np.diag(2.154e-2 - 2.0 * 2.869e-4 * soc + 3.0 * 1.028e-6 * soc ** 2.0) * 1e-3

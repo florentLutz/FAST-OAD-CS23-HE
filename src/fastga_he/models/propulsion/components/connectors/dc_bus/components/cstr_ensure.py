@@ -40,43 +40,17 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
             val=np.nan,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_max",
-            units="V",
-            val=np.nan,
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber",
-            units="V",
-            val=np.nan,
-        )
-        self.add_input(
             name="data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_caliber",
             units="A",
             val=np.nan,
         )
 
         self.add_output(
-            name="constraints:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber",
-            units="V",
-            val=800.0,
-            desc="Ensure the bus voltage rating is enough for the maximum it sees during the "
-            "mission, constraint is respected if < 0",
-        )
-        self.add_output(
             name="constraints:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_caliber",
             units="A",
             val=500.0,
             desc="Ensure the bus current rating is enough for the maximum it sees during the "
             "mission, constraint is respected if < 0",
-        )
-
-        self.declare_partials(
-            of="constraints:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber",
-            wrt=[
-                "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_max",
-                "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber",
-            ],
-            method="exact",
         )
 
         self.declare_partials(
@@ -92,12 +66,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
 
         dc_bus_id = self.options["dc_bus_id"]
 
-        outputs[
-            "constraints:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber"
-        ] = (
-            inputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_max"]
-            - inputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber"]
-        )
         outputs[
             "constraints:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_caliber"
         ] = (

@@ -54,6 +54,27 @@ def test_power_train_file_connections():
         print("[" + om_output + ", " + om_input + "]")
 
 
+def test_power_train_file_connections_splitter():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    print("\n")
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    for om_output, om_input in zip(
+        power_train_configurator._components_connection_outputs,
+        power_train_configurator._components_connection_inputs,
+    ):
+
+        print("[" + om_output + ", " + om_input + "]")
+
+
 def test_power_train_watcher_path():
 
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)

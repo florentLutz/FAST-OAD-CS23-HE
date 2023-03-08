@@ -171,6 +171,20 @@ DC_SSPC = {
         {"dc_voltage_out": "V"},
     ],
 }
+DC_SPLITTER = {
+    ID: "fastga_he.pt_component.dc_splitter",
+    CN: "DCSplitter",
+    CN_ID: "dc_splitter_id",
+    CT: "DC_splitter",
+    ATT: [],
+    PT: [],
+    IN: [(None, "dc_voltage_in_"), ("dc_current_in_", None)],
+    OUT: [(None, "dc_voltage"), ("dc_current_out", None)],
+    CTC: "connector",
+    MP: [
+        {"dc_voltage": "V"},
+    ],
+}
 
 KNOWN_COMPONENTS = [
     PROPELLER,
@@ -181,6 +195,7 @@ KNOWN_COMPONENTS = [
     DC_DC_CONVERTER,
     BATTERY_PACK,
     DC_SSPC,
+    DC_SPLITTER,
 ]
 
 KNOWN_ID = []

@@ -4,6 +4,8 @@ import logging
 
 import fastoad.api as oad
 
+from utils.filter_residuals import filter_residuals
+
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
@@ -27,5 +29,10 @@ def test_dummy():
     # Create problems with inputs
     problem = configurator.get_problem(read_inputs=True)
     problem.setup()
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=1000.0)
     problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
     problem.write_outputs()

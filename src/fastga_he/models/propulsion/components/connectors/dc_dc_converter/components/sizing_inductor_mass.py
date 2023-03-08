@@ -73,7 +73,7 @@ class SizingDCDCConverterInductorMass(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
-        test = 1.0
+
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
