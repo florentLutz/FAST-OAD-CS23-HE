@@ -192,7 +192,11 @@ RECTIFIER = {
     CT: "rectifier",
     ATT: None,
     PT: [],
-    IN: [("ac_voltage_peak_in", None), (None, "ac_voltage_rms_in")],
+    IN: [
+        (None, "ac_voltage_rms_in_one_phase"),
+        ("ac_voltage_rms_in", None),
+        ("ac_voltage_peak_in", None),
+    ],
     OUT: [("dc_voltage_out", None), (None, "dc_current_out")],
     CTC: "connector",
     MP: [

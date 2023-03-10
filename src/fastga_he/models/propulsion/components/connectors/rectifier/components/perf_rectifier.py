@@ -47,11 +47,6 @@ class PerformancesRectifier(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "peak_voltage_in",
-            PerformancesVoltagePeakIn(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-        self.add_subsystem(
             "modulation_idx",
             PerformancesModulationIndex(number_of_points=number_of_points),
             promotes=["*"],
@@ -73,7 +68,7 @@ class PerformancesRectifier(om.Group):
         )
         self.add_subsystem(
             "maximum",
-            PerformancesMaximum(number_of_points=number_of_points),
+            PerformancesMaximum(number_of_points=number_of_points, rectifier_id=rectifier_id),
             promotes=["*"],
         )
 
