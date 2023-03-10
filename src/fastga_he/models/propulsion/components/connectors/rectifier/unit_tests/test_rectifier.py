@@ -10,6 +10,17 @@ from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMis
 from ..components.perf_efficiency import PerformancesEfficiencyMission
 from ..components.perf_maximum import PerformancesMaximum
 
+from ..components.sizing_rectifier_weight import SizingRectifierWeight
+from ..components.sizing_rectifier_cg import SizingRectifierCG
+
+from ..components.sizing_rectifier import SizingRectifier
+
+from ..components.cstr_enforce import (
+    ConstraintsCurrentRMS1PhaseEnforce,
+    ConstraintsVoltagePeakEnforce,
+)
+from ..components.cstr_ensure import ConstraintsCurrentRMS1PhaseEnsure, ConstraintsVoltagePeakEnsure
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 from ..constants import POSSIBLE_POSITION
@@ -135,3 +146,153 @@ def test_maximum():
     ) == pytest.approx(500.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_constraint_enforce_current():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentRMS1PhaseEnforce(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsCurrentRMS1PhaseEnforce(rectifier_id="rectifier_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:current_ac_caliber", units="A"
+    ) == pytest.approx(133.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_enforce_voltage():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltagePeakEnforce(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsVoltagePeakEnforce(rectifier_id="rectifier_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:voltage_ac_caliber", units="V"
+    ) == pytest.approx(800.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_ensure_current():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsCurrentRMS1PhaseEnsure(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsCurrentRMS1PhaseEnsure(rectifier_id="rectifier_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:rectifier:rectifier_1:current_ac_caliber", units="A"
+    ) == pytest.approx(-17.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_ensure_voltage():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltagePeakEnsure(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsVoltagePeakEnsure(rectifier_id="rectifier_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:rectifier:rectifier_1:voltage_ac_caliber", units="V"
+    ) == pytest.approx(-10.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_rectifier_weight():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierWeight(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingRectifierWeight(rectifier_id="rectifier_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:mass", units="kg"
+    ) == pytest.approx(17.18, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_converter_cg():
+
+    expected_cg = [2.69, 0.45, 2.54]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(SizingRectifierCG(rectifier_id="rectifier_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(SizingRectifierCG(rectifier_id="rectifier_1", position=option), ivc)
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:rectifier:rectifier_1:CG:x",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
+
+
+def test_sizing_rectifier():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifier(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifier(rectifier_id="rectifier_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:mass", units="kg"
+    ) == pytest.approx(15.04, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:CG:x", units="m"
+    ) == pytest.approx(2.69, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:low_speed:CD0"
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:cruise:CD0"
+    ) == pytest.approx(0.0, rel=1e-2)

@@ -22,6 +22,10 @@
             <he_power_train>
                 <rectifier>
                     <rectifier_1>
+                        <current_ac_max units="A">133.0</current_ac_max>
+                        <current_ac_caliber units="A">150.0</current_ac_caliber>
+                        <voltage_ac_max units="V">800.0</voltage_ac_max>
+                        <voltage_ac_caliber units="V">810.0</voltage_ac_caliber>
                         <efficiency>0.98</efficiency>
                         <voltage_out_target_mission units="V">800.0</voltage_out_target_mission>
                     </rectifier_1>
