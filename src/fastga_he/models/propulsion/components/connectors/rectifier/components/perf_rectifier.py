@@ -6,7 +6,6 @@ import openmdao.api as om
 
 from .perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from .perf_efficiency import PerformancesEfficiencyMission
-from .perf_voltage_peak_in import PerformancesVoltagePeakIn
 from .perf_modulation_index import PerformancesModulationIndex
 from .perf_load_side import PerformancesRectifierLoadSide
 from .perf_generator_side import PerformancesRectifierGeneratorSide
