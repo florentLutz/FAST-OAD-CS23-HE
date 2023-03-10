@@ -323,4 +323,4 @@ def test_performances_rectifier():
         promotes=["*"],
     )
     problem.setup()
-    om.n2(problem)
+    om.n2(problem, show_browser=False)
