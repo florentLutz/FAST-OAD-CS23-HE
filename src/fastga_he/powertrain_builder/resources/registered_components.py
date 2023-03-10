@@ -185,6 +185,23 @@ DC_SPLITTER = {
         {"dc_voltage": "V"},
     ],
 }
+RECTIFIER = {
+    ID: "fastga_he.pt_component.rectifier",
+    CN: "Rectifier",
+    CN_ID: "rectifier_id",
+    CT: "rectifier",
+    ATT: None,
+    PT: [],
+    IN: [("ac_voltage_peak_in", None), (None, "ac_voltage_rms_in")],
+    OUT: [("dc_voltage_out", None), (None, "dc_current_out")],
+    CTC: "connector",
+    MP: [
+        {"efficiency": None},
+        {"modulation_index": None},
+        {"dc_current_in": "A"},
+        {"dc_current_out": "A"},
+    ],
+}
 
 KNOWN_COMPONENTS = [
     PROPELLER,
@@ -196,6 +213,7 @@ KNOWN_COMPONENTS = [
     BATTERY_PACK,
     DC_SSPC,
     DC_SPLITTER,
+    RECTIFIER,
 ]
 
 KNOWN_ID = []
