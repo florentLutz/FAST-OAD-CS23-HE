@@ -22,6 +22,13 @@
             <he_power_train>
                 <generator>
                     <generator_1>
+                        <rpm_mission units="min**-1">2500.0</rpm_mission>
+                        <torque_constant units="N*m/A">0.8</torque_constant>
+                        <loss_coefficient>
+                            <alpha units="W/N**2/m**2">0.025</alpha>
+                            <beta units="W*s/rad">3.38</beta>
+                            <gamma units="W*s**2/rad**2">0.00825</gamma>
+                        </loss_coefficient>
                     </generator_1>
                 </generator>
             </he_power_train>
