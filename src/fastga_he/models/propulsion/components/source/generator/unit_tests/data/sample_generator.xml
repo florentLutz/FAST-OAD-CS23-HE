@@ -24,6 +24,10 @@
                     <generator_1>
                         <rpm_mission units="min**-1">2500.0</rpm_mission>
                         <torque_constant units="N*m/A">0.8</torque_constant>
+                        <torque_max units="N*m">348.0</torque_max>
+                        <torque_rating units="N*m">350.0</torque_rating>
+                        <rpm_max units="min**-1">2500.0</rpm_max>
+                        <rpm_rating units="min**-1">2500.0</rpm_rating>
                         <loss_coefficient>
                             <alpha units="W/N**2/m**2">0.025</alpha>
                             <beta units="W*s/rad">3.38</beta>

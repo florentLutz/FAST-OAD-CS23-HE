@@ -7,6 +7,9 @@ import pytest
 
 import openmdao.api as om
 
+from ..components.cstr_enforce import ConstraintsTorqueEnforce, ConstraintsRPMEnforce
+from ..components.cstr_ensure import ConstraintsTorqueEnsure, ConstraintsRPMEnsure
+
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_current_rms_3_phases import PerformancesCurrentRMS3Phases
 from ..components.perf_torque import PerformancesTorque
@@ -329,3 +332,59 @@ def test_performances():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_constraints_enforce_torque():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsTorqueEnforce(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+    problem = run_system(ConstraintsTorqueEnforce(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:torque_rating", units="N*m"
+    ) == pytest.approx(348, rel=1e-2)
+
+
+def test_constraints_enforce_rpm():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsRPMEnforce(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+    problem = run_system(ConstraintsRPMEnforce(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:rpm_rating", units="min**-1"
+    ) == pytest.approx(2500.0, rel=1e-2)
+
+
+def test_constraints_ensure_torque():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsTorqueEnsure(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+    problem = run_system(ConstraintsTorqueEnsure(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:generator:generator_1:torque_rating", units="N*m"
+    ) == pytest.approx(-2.0, rel=1e-2)
+
+
+def test_constraints_ensure_rpm():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsRPMEnsure(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+    problem = run_system(ConstraintsRPMEnsure(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:generator:generator_1:rpm_rating", units="min**-1"
+    ) == pytest.approx(0.0, rel=1e-2)
