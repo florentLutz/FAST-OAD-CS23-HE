@@ -10,6 +10,19 @@ import openmdao.api as om
 from ..components.cstr_enforce import ConstraintsTorqueEnforce, ConstraintsRPMEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure, ConstraintsRPMEnsure
 
+from ..components.sizing_diameter_scaling import SizingGeneratorDiameterScaling
+from ..components.sizing_diameter import SizingGeneratorDiameter
+from ..components.sizing_length_scaling import SizingGeneratorLengthScaling
+from ..components.sizing_length import SizingGeneratorLength
+from ..components.sizing_loss_coefficient_scaling import SizingGeneratorLossCoefficientScaling
+from ..components.sizing_loss_coefficient import SizingGeneratorLossCoefficient
+from ..components.sizing_resistance_scaling import SizingGeneratorPhaseResistanceScaling
+from ..components.sizing_resistance import SizingGeneratorPhaseResistance
+from ..components.sizing_torque_constant_scaling import SizingGeneratorTorqueConstantScaling
+from ..components.sizing_torque_constant import SizingGeneratorTorqueConstant
+from ..components.sizing_weight import SizingGeneratorWeight
+from ..components.sizing_generator_cg import SizingGeneratorCG
+
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_current_rms_3_phases import PerformancesCurrentRMS3Phases
 from ..components.perf_torque import PerformancesTorque
@@ -23,11 +36,272 @@ from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.perf_generator import PerformancesGenerator
+from ..components.sizing_generator import SizingGenerator
+
+from ..constants import POSSIBLE_POSITION
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "sample_generator.xml"
 NB_POINTS_TEST = 10
+
+
+def test_diameter_scaling():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorDiameterScaling(generator_id="generator_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorDiameterScaling(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:scaling:diameter"
+    ) == pytest.approx(1.8, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_diameter():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorDiameter(generator_id="generator_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorDiameter(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:diameter", units="m"
+    ) == pytest.approx(0.4824, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_length_scaling():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorLengthScaling(generator_id="generator_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorLengthScaling(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:scaling:length"
+    ) == pytest.approx(0.403, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_length():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorLength(generator_id="generator_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorLength(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:length", units="m"
+    ) == pytest.approx(0.03667, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_loss_coefficients_scaling():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorLossCoefficientScaling(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorLossCoefficientScaling(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:scaling:alpha"
+    ) == pytest.approx(0.236, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:scaling:beta"
+    ) == pytest.approx(340.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:scaling:gamma"
+    ) == pytest.approx(152.60, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_loss_coefficients():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorLossCoefficient(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorLossCoefficient(generator_id="generator_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:generator:generator_1:loss_coefficient:alpha",
+            units="W/N**2/m**2",
+        )
+        == pytest.approx(0.008, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:generator:generator_1:loss_coefficient:beta",
+            units="W*s/rad",
+        )
+        == pytest.approx(26.56, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:generator:generator_1:loss_coefficient:gamma",
+            units="W*s**2/rad**2",
+        )
+        == pytest.approx(0.0375, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_resistance_scaling():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorPhaseResistanceScaling(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorPhaseResistanceScaling(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:scaling:phase_resistance"
+    ) == pytest.approx(1.40, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_resistance():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorPhaseResistance(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorPhaseResistance(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:phase_resistance", units="ohm"
+    ) == pytest.approx(0.03206, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_torque_constant_scaling():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorTorqueConstantScaling(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorTorqueConstantScaling(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:scaling:torque_constant"
+    ) == pytest.approx(2.43, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_torque_constant():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorTorqueConstant(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorTorqueConstant(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:torque_constant", units="N*m/A"
+    ) == pytest.approx(4.617, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGeneratorWeight(generator_id="generator_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGeneratorWeight(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:mass", units="kg"
+    ) == pytest.approx(30.876, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_motor_cg():
+
+    expected_cg = [0.48, 1.99]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(SizingGeneratorCG(generator_id="generator_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(SizingGeneratorCG(generator_id="generator_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:generator:generator_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_sizing():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingGenerator(generator_id="generator_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingGenerator(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:mass", units="kg"
+    ) == pytest.approx(30.876, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:CG:x", units="m"
+    ) == pytest.approx(1.99, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:low_speed:CD0"
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:cruise:CD0"
+    ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_rpm_mission():

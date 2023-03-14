@@ -51,7 +51,7 @@ class SizingMotorPhaseResistance(om.ExplicitComponent):
         resistance_ref = self.options["resistance_ref"]
 
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":phase_resistance"] = (
-            resistance_ref * resistance_scaling
+            resistance_ref * 1e-3 * resistance_scaling
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -63,4 +63,6 @@ class SizingMotorPhaseResistance(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":phase_resistance",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:phase_resistance",
-        ] = resistance_ref
+        ] = (
+            resistance_ref * 1e-3
+        )
