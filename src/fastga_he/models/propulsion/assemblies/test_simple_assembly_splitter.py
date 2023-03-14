@@ -64,30 +64,35 @@ def test_assembly_performances_splitter_50_50():
 
     _, _, residuals = problem.model.performances.get_nonlinear_vectors()
 
-    current_in = problem.get_val("performances.dc_dc_converter_1.dc_current_in", units="A")
-    voltage_in = problem.get_val("performances.dc_dc_converter_1.dc_voltage_in", units="V")
+    current_in = problem.get_val("performances.dc_dc_converter_1.dc_current_out", units="A")
+    voltage_in = problem.get_val("performances.dc_dc_converter_1.dc_voltage_out", units="V")
 
-    current_in_2 = problem.get_val("performances.dc_dc_converter_2.dc_current_in", units="A")
-    voltage_in_2 = problem.get_val("performances.dc_dc_converter_2.dc_voltage_in", units="V")
+    current_in_2 = problem.get_val("performances.rectifier_1.dc_current_out", units="A")
+    voltage_in_2 = problem.get_val("performances.rectifier_1.dc_voltage_out", units="V")
 
     assert current_in * voltage_in == pytest.approx(
         current_in_2 * voltage_in_2,
         abs=1,
     )
 
-    assert current_in * voltage_in == pytest.approx(
+    torque_generator = problem.get_val("performances.generator_1.torque_in", units="N*m")
+    omega_generator = (
+        problem.get_val("performances.generator_1.rpm", units="min**-1") * 2.0 * np.pi / 60.0
+    )
+
+    assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                93759.9,
-                94232.5,
-                94695.5,
-                95150.9,
-                95599.7,
-                96042.7,
-                96479.6,
-                96909.9,
-                97332.5,
-                97746.7,
+                99500.7,
+                100002.5,
+                100496.2,
+                100981.6,
+                101458.6,
+                101927.2,
+                102387.3,
+                102838.7,
+                103281.4,
+                103715.3,
             ]
         ),
         abs=1,
@@ -142,15 +147,38 @@ def test_assembly_performances_splitter_60_40():
 
     _, _, residuals = problem.model.performances.get_nonlinear_vectors()
 
-    current_in = problem.get_val("performances.dc_dc_converter_1.dc_current_in", units="A")
-    voltage_in = problem.get_val("performances.dc_dc_converter_1.dc_voltage_in", units="V")
+    current_in = problem.get_val("performances.dc_dc_converter_1.dc_current_out", units="A")
+    voltage_in = problem.get_val("performances.dc_dc_converter_1.dc_voltage_out", units="V")
 
-    current_in_2 = problem.get_val("performances.dc_dc_converter_2.dc_current_in", units="A")
-    voltage_in_2 = problem.get_val("performances.dc_dc_converter_2.dc_voltage_in", units="V")
+    current_in_2 = problem.get_val("performances.rectifier_1.dc_current_out", units="A")
+    voltage_in_2 = problem.get_val("performances.rectifier_1.dc_voltage_out", units="V")
 
     assert voltage_in * current_in == pytest.approx(
         1.5 * voltage_in_2 * current_in_2,
         rel=5e-3,
+    )
+
+    torque_generator = problem.get_val("performances.generator_1.torque_in", units="N*m")
+    omega_generator = (
+        problem.get_val("performances.generator_1.rpm", units="min**-1") * 2.0 * np.pi / 60.0
+    )
+
+    assert torque_generator * omega_generator == pytest.approx(
+        np.array(
+            [
+                79295.1,
+                79690.3,
+                80079.0,
+                80461.2,
+                80836.7,
+                81205.6,
+                81567.7,
+                81923.0,
+                82271.4,
+                82612.8,
+            ]
+        ),
+        abs=1,
     )
 
     write_outputs(
@@ -225,7 +253,7 @@ def test_performances_from_pt_file():
     )
 
     write_outputs(
-        pth.join(outputs.__path__[0], "simple_assembly_performances_splitter_50_50.xml"),
+        pth.join(outputs.__path__[0], "simple_assembly_performances_splitter_50_50_pt_file.xml"),
         problem,
     )
 

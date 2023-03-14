@@ -422,7 +422,7 @@
             <from_LE units="m" is_input="True">0.15<!--Distance between the PMSM front face and the leading edge--></from_LE>
             <length units="m" is_input="False">0.06825</length>
             <mass units="kg" is_input="False">16.196786057760463</mass>
-            <phase_resistance units="ohm" is_input="False">37.25555849870176</phase_resistance>
+            <phase_resistance units="ohm" is_input="False">0.03725555849870176</phase_resistance>
             <rpm_max units="1/min" is_input="True">4500.0<!--Maximum value of the motor rpm during the mission--></rpm_max>
             <rpm_rating units="1/min" is_input="False">4500.0<!--Max continuous rpm of the motor--></rpm_rating>
             <torque_constant units="N*m/A" is_input="False">2.098756386137008</torque_constant>

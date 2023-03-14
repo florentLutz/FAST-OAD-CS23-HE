@@ -34,7 +34,7 @@ class PerformancesVoltagePeak(om.ExplicitComponent):
         self.add_output(
             "ac_voltage_peak_out",
             units="V",
-            val=np.full(number_of_points, 500.0),
+            val=np.full(number_of_points, 800.0),
             shape=number_of_points,
             desc="Peak line to neutral voltage at the output of the generator",
         )

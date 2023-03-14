@@ -29,7 +29,7 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
         self.add_output(
             "ac_voltage_rms_out",
             units="V",
-            val=np.full(number_of_points, 10.0),
+            val=np.full(number_of_points, 500.0),
             shape=number_of_points,
             desc="RMS voltage at the output of the generator",
         )
