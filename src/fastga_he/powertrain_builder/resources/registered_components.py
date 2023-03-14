@@ -193,7 +193,7 @@ RECTIFIER = {
     ATT: None,
     PT: [],
     IN: [
-        (None, "ac_voltage_rms_in_one_phase"),
+        (None, "ac_current_rms_in_one_phase"),
         ("ac_voltage_rms_in", None),
         ("ac_voltage_peak_in", None),
     ],
@@ -202,8 +202,32 @@ RECTIFIER = {
     MP: [
         {"efficiency": None},
         {"modulation_index": None},
-        {"dc_current_in": "A"},
+        {"ac_current_rms_in_one_phase": "A"},
         {"dc_current_out": "A"},
+    ],
+}
+GENERATOR = {
+    ID: "fastga_he.pt_component.generator",
+    CN: "Generator",
+    CN_ID: "generator_id",
+    CT: "generator",
+    ATT: None,
+    PT: [],
+    IN: [(None, "rpm"), (None, "shaft_power_in")],
+    OUT: [
+        ("ac_current_rms_out_one_phase", None),
+        (None, "ac_voltage_rms_out"),
+        (None, "ac_voltage_peak_out"),
+    ],
+    CTC: "connector",
+    MP: [
+        {"rpm": "1/min"},
+        {"shaft_power_in": "kW"},
+        {"power_losses": "W"},
+        {"torque_in": "N*m"},
+        {"efficiency": None},
+        {"ac_voltage_rms_out": "V"},
+        {"ac_voltage_peak_out": "V"},
     ],
 }
 
@@ -218,6 +242,7 @@ KNOWN_COMPONENTS = [
     DC_SSPC,
     DC_SPLITTER,
     RECTIFIER,
+    GENERATOR,
 ]
 
 KNOWN_ID = []

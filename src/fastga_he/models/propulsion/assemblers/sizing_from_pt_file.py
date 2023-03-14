@@ -20,6 +20,8 @@ from fastga_he.models.propulsion.components import (
     SizingBatteryPack,
     SizingDCSSPC,
     SizingDCSplitter,
+    SizingRectifier,
+    SizingGenerator,
 )
 
 from .constants import SUBMODEL_POWER_TRAIN_MASS, SUBMODEL_POWER_TRAIN_CG, SUBMODEL_POWER_TRAIN_DRAG
