@@ -14,6 +14,8 @@ from ...components.connectors.dc_splitter import PerformancesDCSplitter
 from ...components.connectors.dc_dc_converter import PerformancesDCDCConverter
 from ...components.connectors.dc_sspc import PerformancesDCSSPC
 from ...components.source.battery import PerformancesBatteryPack
+from ...components.connectors.rectifier import PerformancesRectifier
+from ...components.source.generator import PerformancesGenerator
 
 
 class PerformancesAssemblySplitter(om.Group):
@@ -26,6 +28,9 @@ class PerformancesAssemblySplitter(om.Group):
         self.nonlinear_solver.options["iprint"] = 2
         self.nonlinear_solver.options["maxiter"] = 200
         self.nonlinear_solver.options["rtol"] = 1e-8
+        self.nonlinear_solver.options["atol"] = 1e-8
+        self.nonlinear_solver.options["stall_limit"] = 10
+        self.nonlinear_solver.options["stall_tol"] = 1e-6
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):
@@ -127,20 +132,20 @@ class PerformancesAssemblySplitter(om.Group):
         )
 
         self.add_subsystem(
-            "dc_dc_converter_2",
-            PerformancesDCDCConverter(
-                dc_dc_converter_id="dc_dc_converter_2",
+            "rectifier_1",
+            PerformancesRectifier(
+                rectifier_id="rectifier_1",
                 number_of_points=number_of_points,
             ),
             promotes=["data:*"],
         )
         self.add_subsystem(
-            "battery_pack_2",
-            PerformancesBatteryPack(
-                battery_pack_id="battery_pack_2",
+            "generator_1",
+            PerformancesGenerator(
+                generator_id="generator_1",
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "time_step"],
+            promotes=["data:*"],
         )
 
         self.connect("propeller_1.rpm", "motor_1.rpm")
@@ -174,15 +179,19 @@ class PerformancesAssemblySplitter(om.Group):
         self.connect("dc_splitter_1.dc_voltage", "dc_sspc_2.dc_voltage_in")
         self.connect("dc_sspc_2.dc_current_in", "dc_splitter_1.dc_current_out")
 
-        # DC BUS 2 TO DC/DC Converter
+        # Battery branch
         self.connect("dc_splitter_1.dc_voltage_in_1", "dc_dc_converter_1.dc_voltage_out")
         self.connect("dc_dc_converter_1.dc_current_out", "dc_splitter_1.dc_current_in_1")
-
-        self.connect("dc_splitter_1.dc_voltage_in_2", "dc_dc_converter_2.dc_voltage_out")
-        self.connect("dc_dc_converter_2.dc_current_out", "dc_splitter_1.dc_current_in_2")
 
         self.connect("battery_pack_1.voltage_out", "dc_dc_converter_1.dc_voltage_in")
         self.connect("dc_dc_converter_1.dc_current_in", "battery_pack_1.dc_current_out")
 
-        self.connect("battery_pack_2.voltage_out", "dc_dc_converter_2.dc_voltage_in")
-        self.connect("dc_dc_converter_2.dc_current_in", "battery_pack_2.dc_current_out")
+        # Generator branch
+        self.connect("dc_splitter_1.dc_voltage_in_2", "rectifier_1.dc_voltage_out")
+        self.connect("rectifier_1.dc_current_out", "dc_splitter_1.dc_current_in_2")
+
+        self.connect("generator_1.ac_voltage_peak_out", "rectifier_1.ac_voltage_peak_in")
+        self.connect("generator_1.ac_voltage_rms_out", "rectifier_1.ac_voltage_rms_in")
+        self.connect(
+            "rectifier_1.ac_current_rms_in_one_phase", "generator_1.ac_current_rms_out_one_phase"
+        )

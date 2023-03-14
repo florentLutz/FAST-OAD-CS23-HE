@@ -1,0 +1,53 @@
+<FASTOAD_model>
+    <data>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <MAC>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <generator>
+                    <generator_1>
+                        <rpm_mission units="min**-1">2500.0</rpm_mission>
+                        <torque_constant units="N*m/A">0.8</torque_constant>
+                        <torque_max units="N*m">348.0</torque_max>
+                        <torque_rating units="N*m">350.0</torque_rating>
+                        <rpm_max units="min**-1">2500.0</rpm_max>
+                        <rpm_rating units="min**-1">2500.0</rpm_rating>
+                        <voltage_caliber units="V">400.0</voltage_caliber>
+                        <loss_coefficient>
+                            <alpha units="W/N**2/m**2">0.025</alpha>
+                            <beta units="W*s/rad">3.38</beta>
+                            <gamma units="W*s**2/rad**2">0.00825</gamma>
+                        </loss_coefficient>
+                        <scaling>
+                            <alpha>0.5</alpha>
+                            <beta>4.0</beta>
+                            <gamma>2.5</gamma>
+                            <diameter>1.8</diameter>
+                            <length>0.403</length>
+                            <phase_resistance>1.40</phase_resistance>
+                            <torque_constant>2.43</torque_constant>
+                        </scaling>
+                        <diameter units="m">0.4824</diameter>
+                        <length units="m">0.03667</length>
+                    </generator_1>
+                </generator>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>

@@ -6,7 +6,6 @@ import openmdao.api as om
 
 from .perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from .perf_efficiency import PerformancesEfficiencyMission
-from .perf_voltage_peak_in import PerformancesVoltagePeakIn
 from .perf_modulation_index import PerformancesModulationIndex
 from .perf_load_side import PerformancesRectifierLoadSide
 from .perf_generator_side import PerformancesRectifierGeneratorSide
@@ -47,11 +46,6 @@ class PerformancesRectifier(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "peak_voltage_in",
-            PerformancesVoltagePeakIn(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-        self.add_subsystem(
             "modulation_idx",
             PerformancesModulationIndex(number_of_points=number_of_points),
             promotes=["*"],
@@ -73,7 +67,7 @@ class PerformancesRectifier(om.Group):
         )
         self.add_subsystem(
             "maximum",
-            PerformancesMaximum(number_of_points=number_of_points),
+            PerformancesMaximum(number_of_points=number_of_points, rectifier_id=rectifier_id),
             promotes=["*"],
         )
 

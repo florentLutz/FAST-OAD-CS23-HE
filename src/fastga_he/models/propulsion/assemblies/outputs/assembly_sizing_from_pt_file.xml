@@ -36,9 +36,9 @@
     </geometry>
     <propulsion>
       <he_power_train>
-        <mass units="kg" is_input="False">3300.4789438750845</mass>
+        <mass units="kg" is_input="False">1743.6166375918724</mass>
         <CG>
-          <x units="m" is_input="False">2.850460635323771</x>
+          <x units="m" is_input="False">2.8125939736339163</x>
         </CG>
         <cruise>
           <CD0 is_input="False">0.0003524184026434314</CD0>
@@ -132,91 +132,6 @@
               <resistance is_input="False">1.1538461538461537</resistance>
             </scaling>
           </dc_dc_converter_1>
-          <dc_dc_converter_2>
-            <current_in_caliber units="A" is_input="False">400.0</current_in_caliber>
-            <current_in_max units="A" is_input="True">400.0</current_in_max>
-            <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
-            <mass units="kg" is_input="False">96.63377311953948<!--Mass of the converter--></mass>
-            <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT module in the converter--></switching_frequency>
-            <switching_frequency_max units="Hz" is_input="True">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
-            <voltage_caliber units="V" is_input="False">860.0<!--Voltage caliber of the converter--></voltage_caliber>
-            <voltage_in_caliber units="V" is_input="False">860.0</voltage_in_caliber>
-            <voltage_in_max units="V" is_input="True">860.0</voltage_in_max>
-            <voltage_out_max units="V" is_input="True">850.0</voltage_out_max>
-            <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
-            <CG>
-              <x units="m" is_input="False">2.692856507431314<!--X position of the DC/DC converter center of gravity--></x>
-            </CG>
-            <capacitor>
-              <capacity units="F" is_input="False">0.00046027131782945736<!--Capacity of the capacitor--></capacity>
-              <current_caliber units="A" is_input="False">380.0<!--Current caliber of the DC/DC converter--></current_caliber>
-              <current_max units="A" is_input="True">380.0</current_max>
-              <mass units="g" is_input="False">1218.2889919293032<!--Mass of the capacitor--></mass>
-            </capacitor>
-            <cruise>
-              <CD0 is_input="False">0.0</CD0>
-            </cruise>
-            <diode>
-              <current_max units="A" is_input="True">380.0</current_max>
-              <resistance units="ohm" is_input="False">0.0021576923076923075</resistance>
-            </diode>
-            <energy_off>
-              <a is_input="False">0.017392647871229468</a>
-              <b is_input="False">0.0002539092853205021</b>
-              <c is_input="False">-1.5071834983196048e-07</c>
-            </energy_off>
-            <energy_on>
-              <a is_input="False">0.018303296361679374</a>
-              <b is_input="False">3.3256504177779456e-05</b>
-              <c is_input="False">4.4500542281847815e-07</c>
-            </energy_on>
-            <energy_rr>
-              <a is_input="False">0.004901722743493418</a>
-              <b is_input="False">0.00034030311012866587</b>
-              <c is_input="False">-3.9100999935978736e-08</c>
-            </energy_rr>
-            <igbt>
-              <current_max units="A" is_input="True">390.0</current_max>
-              <resistance units="ohm" is_input="False">0.0017423076923076923</resistance>
-            </igbt>
-            <inductor>
-              <air_gap units="mm" is_input="True">10.0<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">5.052852664641343<!--Mass of the copper in the inductor--></copper_mass>
-              <core_mass units="kg" is_input="False">45.015815731484416<!--Mass of the E-core in the inductor--></core_mass>
-              <current_caliber units="A" is_input="False">380.0<!--Current caliber of the DC/DC converter--></current_caliber>
-              <current_max units="A" is_input="True">380.0</current_max>
-              <inductance units="H" is_input="False">0.0004714912280701754<!--Inductance of the inductor--></inductance>
-              <iron_surface units="m**2" is_input="False">0.014964716666666664<!--Iron surface of the E-core inductor--></iron_surface>
-              <magnetic_energy_rating units="J" is_input="False">34.041666666666664<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
-              <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
-              <mass units="kg" is_input="False">95.08448412761018<!--Mass of the inductor--></mass>
-              <reluctance units="1/H" is_input="False">304021.1611213277<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.0019851261667233064<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">11.972606675925483<!--Number of turns in the inductor--></turn_number>
-              <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
-              <wire_section_area units="m**2" is_input="False">7.6e-05<!--Section area of the copper wire inside the inductor--></wire_section_area>
-              <core_dimension>
-                <B units="m" is_input="False">0.3293975759355827<!--B dimension of the E-core in the inductor--></B>
-                <C units="m" is_input="False">0.1238336751637529<!--C dimension of the E-core in the inductor--></C>
-              </core_dimension>
-              <scaling>
-                <core_dimension is_input="False">4.503042733227378<!--Scaling factor for the dimensions of the E-core--></core_dimension>
-                <core_mass is_input="False">91.30997105777772<!--Scaling factor for the mass of the E-core--></core_mass>
-              </scaling>
-            </inductor>
-            <low_speed>
-              <CD0 is_input="False">0.0</CD0>
-            </low_speed>
-            <module>
-              <current_caliber units="A" is_input="False">390.0<!--Current caliber of the DC/DC converter--></current_caliber>
-              <mass units="kg" is_input="False">0.33099999999999996<!--Weight of the diode and IGBT module--></mass>
-            </module>
-            <scaling>
-              <a is_input="False">1.1538461538461537</a>
-              <c is_input="False">0.8666666666666667</c>
-              <resistance is_input="False">1.1538461538461537</resistance>
-            </scaling>
-          </dc_dc_converter_2>
         </DC_DC_converter>
         <DC_SSPC>
           <dc_sspc_1>
@@ -422,7 +337,7 @@
             <from_LE units="m" is_input="True">0.15<!--Distance between the PMSM front face and the leading edge--></from_LE>
             <length units="m" is_input="False">0.06825</length>
             <mass units="kg" is_input="False">16.196786057760463</mass>
-            <phase_resistance units="ohm" is_input="False">37.25555849870176</phase_resistance>
+            <phase_resistance units="ohm" is_input="False">0.03725555849870176</phase_resistance>
             <rpm_max units="1/min" is_input="True">4500.0<!--Maximum value of the motor rpm during the mission--></rpm_max>
             <rpm_rating units="1/min" is_input="False">4500.0<!--Max continuous rpm of the motor--></rpm_rating>
             <torque_constant units="N*m/A" is_input="False">2.098756386137008</torque_constant>
@@ -491,40 +406,44 @@
               <volume units="L" is_input="False">3.3056249999999996<!--Volume of one module of the battery--></volume>
             </module>
           </battery_pack_1>
-          <battery_pack_2>
-            <SOC_min is_input="True">40.0<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
-            <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <mass units="kg" is_input="False">1500.0<!--Mass of the battery pack--></mass>
-            <min_safe_SOC is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_cells is_input="False">15000.0<!--Total number of cells in the battery pack--></number_cells>
-            <number_modules is_input="True">100.0<!--Number of modules in parallel inside the battery pack--></number_modules>
-            <volume units="L" is_input="False">330.56249999999994<!--Volume of the battery pack--></volume>
+        </battery_pack>
+        <generator>
+          <generator_1>
+            <diameter units="m" is_input="False">0.4824</diameter>
+            <length units="m" is_input="False">0.04146717500685886</length>
+            <mass units="kg" is_input="False">34.08806691621024</mass>
+            <phase_resistance units="ohm" is_input="False">0.10492789102414854</phase_resistance>
+            <rpm_max units="1/min" is_input="True">2500.0<!--Maximum value of the generator rpm during the mission--></rpm_max>
+            <rpm_rating units="1/min" is_input="False">2500.0<!--Max continuous rpm of the generator--></rpm_rating>
+            <torque_constant units="N*m/A" is_input="False">8.895244105697092</torque_constant>
+            <torque_max units="N*m" is_input="True">396.16336848356326<!--Maximum value of the torque the generator receives--></torque_max>
+            <torque_rating units="N*m" is_input="False">396.16336848356326<!--Max continuous torque of the generator--></torque_rating>
+            <voltage_caliber units="V" is_input="True">850.0<!--Max voltage of the motor--></voltage_caliber>
             <CG>
-              <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
+              <x units="m" is_input="False">1.9981507712456423<!--X position of the generator center of gravity--></x>
             </CG>
-            <cell>
-              <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
-              <volume units="L" is_input="False">0.01763<!--Volume of the cell used for the assembly of the battery pack--></volume>
-            </cell>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
-            <dimension>
-              <height units="m" is_input="False">0.17490647178226212<!--Height of the battery, as in the size of the battery along the Z-axis--></height>
-              <length units="m" is_input="False">0.5114874519835109<!--Length of the battery, as in the size of the battery along the X-axis--></length>
-              <width units="m" is_input="False">3.6949853531288834<!--Width of the battery, as in the size of the battery along the Y-axis--></width>
-            </dimension>
+            <loss_coefficient>
+              <alpha units="W/N**2/m**2" is_input="False">0.0033447749726887048</alpha>
+              <beta units="W*s/rad" is_input="False">1778.3451188366873</beta>
+              <gamma units="W*s**2/rad**2" is_input="False">1.8805600177022836</gamma>
+            </loss_coefficient>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
-            <module>
-              <mass units="kg" is_input="False">15.0<!--Mass of one module of the battery--></mass>
-              <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
-              <volume units="L" is_input="False">3.3056249999999996<!--Volume of one module of the battery--></volume>
-            </module>
-          </battery_pack_2>
-        </battery_pack>
+            <scaling>
+              <alpha is_input="False">0.20904843579304405</alpha>
+              <beta is_input="False">267.8230600657662</beta>
+              <diameter is_input="False">1.7999999999999998</diameter>
+              <gamma is_input="False">125.37066784681892</gamma>
+              <length is_input="False">0.4556832418336139</length>
+              <phase_resistance is_input="False">4.582003974853648<!--Scaling factor for the phase resistance of the motor--></phase_resistance>
+              <torque_constant is_input="False">4.681707424051101</torque_constant>
+            </scaling>
+          </generator_1>
+        </generator>
         <inverter>
           <inverter_1>
             <current_ac_max units="A" is_input="True">400.0</current_ac_max>
@@ -656,6 +575,25 @@
             </low_speed>
           </propeller_1>
         </propeller>
+        <rectifier>
+          <rectifier_1>
+            <current_ac_caliber units="A" is_input="False">165.0680702014847<!--Caliber RMS current flowing through one arm of the rectifier, used for sizing--></current_ac_caliber>
+            <current_ac_max units="A" is_input="True">165.0680702014847<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
+            <mass units="kg" is_input="False">5.683399920117223</mass>
+            <power_density units="kW/kg" is_input="True">15.0</power_density>
+            <voltage_ac_caliber units="V" is_input="False">243.4614167842755<!--Caliber peak voltage at the input of the rectifier, used for sizing--></voltage_ac_caliber>
+            <voltage_ac_max units="V" is_input="True">243.4614167842755<!--Maximum peak voltage at the input of the rectifier--></voltage_ac_max>
+            <CG>
+              <x units="m" is_input="False">2.692856507431314<!--X position of the rectifier center of gravity--></x>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+          </rectifier_1>
+        </rectifier>
       </he_power_train>
     </propulsion>
   </data>
@@ -666,9 +604,6 @@
           <battery_pack_1>
             <min_safe_SOC units="percent" is_input="False">-20.0<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
           </battery_pack_1>
-          <battery_pack_2>
-            <min_safe_SOC units="percent" is_input="False">-20.0<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
-          </battery_pack_2>
         </battery_pack>
         <DC_DC_converter>
           <dc_dc_converter_1>
@@ -676,11 +611,6 @@
               <air_gap units="m" is_input="False">-0.0023833675163752906<!--Constraints on maximum air gap in the inductor, respected if <0--></air_gap>
             </inductor>
           </dc_dc_converter_1>
-          <dc_dc_converter_2>
-            <inductor>
-              <air_gap units="m" is_input="False">-0.0023833675163752906<!--Constraints on maximum air gap in the inductor, respected if <0--></air_gap>
-            </inductor>
-          </dc_dc_converter_2>
         </DC_DC_converter>
       </he_power_train>
     </propulsion>
@@ -730,13 +660,6 @@
               <iron_permeability units="H/m" is_input="True">4.396e-06<!--Permeability of the iron core--></iron_permeability>
             </inductor>
           </dc_dc_converter_1>
-          <dc_dc_converter_2>
-            <inductor>
-              <copper_density units="kg/m**3" is_input="True">7800.0<!--Density of the copper used in the inductor--></copper_density>
-              <copper_resistivity units="ohm/m" is_input="True">1.77e-08<!--Resistivity of the copper used in the inductor [Ohm/m]--></copper_resistivity>
-              <iron_permeability units="H/m" is_input="True">4.396e-06<!--Permeability of the iron core--></iron_permeability>
-            </inductor>
-          </dc_dc_converter_2>
         </DC_DC_converter>
         <inverter>
           <inverter_1>

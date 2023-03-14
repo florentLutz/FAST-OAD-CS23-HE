@@ -140,7 +140,7 @@ def test_resistance():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:phase_resistance", units="ohm"
-    ) == pytest.approx(21.36, rel=1e-2)
+    ) == pytest.approx(21.36e-3, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

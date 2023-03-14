@@ -47,6 +47,45 @@
         </geometry>
         <propulsion>
             <he_power_train>
+                <rectifier>
+                    <rectifier_1>
+                        <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
+                        <current_dc_max units="A" is_input="False">113.38180785745816<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
+                        <efficiency is_input="True">0.98<!--Efficiency of the rectifier for the points--></efficiency>
+                        <voltage_ac_max units="V" is_input="False">243.4614167842755<!--Maximum value of the peak voltage at the input of the rectifier (AC side)--></voltage_ac_max>
+                        <voltage_dc_max units="V" is_input="False">850.0<!--Maximum value of the voltage at the output of the rectifier (DC side)--></voltage_dc_max>
+                        <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
+                    </rectifier_1>
+                </rectifier>
+                <generator>
+                    <generator_1>
+                        <voltage_caliber units="V" is_input="False">850.0</voltage_caliber>
+                        <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum value of the RMS current flowing through one phase of the generator--></current_ac_max>
+                        <losses_max units="W" is_input="False">5373.963379446291</losses_max>
+                        <rpm_max units="1/min" is_input="False">2500.0<!--Maximum value of the generator rpm--></rpm_max>
+                        <rpm_mission units="1/min" is_input="True">2500.0<!--RPM of the propeller for the points--></rpm_mission>
+                        <shaft_power_max units="W" is_input="False">103715.3273374457</shaft_power_max>
+                        <torque_constant units="N*m/A" is_input="True">0.8</torque_constant>
+                        <torque_max units="N*m" is_input="False">396.16336848356326<!--Maximum value of the torque the generator receives--></torque_max>
+                        <voltage_ac_max units="V" is_input="False">243.4614167842755<!--Maximum value of the peak voltage at the output of the generator--></voltage_ac_max>
+                        <loss_coefficient>
+                            <alpha units="W/N**2/m**2">0.025</alpha>
+                            <beta units="W*s/rad">3.38</beta>
+                            <gamma units="W*s**2/rad**2">0.00825</gamma>
+                        </loss_coefficient>
+                        <scaling>
+                            <alpha>0.5</alpha>
+                            <beta>4.0</beta>
+                            <gamma>2.5</gamma>
+                            <diameter>1.8</diameter>
+                            <length>0.403</length>
+                            <phase_resistance>1.40</phase_resistance>
+                            <torque_constant>2.43</torque_constant>
+                        </scaling>
+                        <diameter units="m">0.4824</diameter>
+                        <length units="m">0.03667</length>
+                    </generator_1>
+                </generator>
                 <battery_pack>
                     <battery_pack_1>
                         <CG>

@@ -8,9 +8,11 @@ from .connectors.dc_dc_converter import SizingDCDCConverter, PerformancesDCDCCon
 from .connectors.inverter import SizingInverter, PerformancesInverter
 from .connectors.dc_sspc import SizingDCSSPC, PerformancesDCSSPC
 from .connectors.dc_splitter import SizingDCSplitter, PerformancesDCSplitter
+from .connectors.rectifier import SizingRectifier, PerformancesRectifier
 
 from .loads.pmsm import SizingPMSM, PerformancesPMSM
 
 from .propulsor.propeller import SizingPropeller, PerformancesPropeller
 
 from .source.battery import SizingBatteryPack, PerformancesBatteryPack
+from .source.generator import SizingGenerator, PerformancesGenerator

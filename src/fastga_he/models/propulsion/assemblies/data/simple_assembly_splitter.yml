@@ -31,13 +31,13 @@ power_train_components:
 
   dc_dc_converter_1:
     id: fastga_he.pt_component.dc_dc_converter
-  dc_dc_converter_2:
-    id: fastga_he.pt_component.dc_dc_converter
+  rectifier_1:
+    id: fastga_he.pt_component.rectifier
 
   battery_pack_1:
     id: fastga_he.pt_component.battery_pack
-  battery_pack_2:
-    id: fastga_he.pt_component.battery_pack
+  generator_1:
+    id: fastga_he.pt_component.generator
 
 component_connections:
   - source: propeller_1
@@ -71,9 +71,9 @@ component_connections:
     target: battery_pack_1
 
   - source: [dc_splitter_1, 2]
-    target: dc_dc_converter_2
+    target: rectifier_1
 
-  - source: dc_dc_converter_2
-    target: battery_pack_2
+  - source: rectifier_1
+    target: generator_1
 
 watcher_file_path: ./simple_assembly_performances_splitter.csv

@@ -14,6 +14,7 @@ from ..components.sizing_rectifier_weight import SizingRectifierWeight
 from ..components.sizing_rectifier_cg import SizingRectifierCG
 
 from ..components.sizing_rectifier import SizingRectifier
+from ..components.perf_rectifier import PerformancesRectifier
 
 from ..components.cstr_enforce import (
     ConstraintsCurrentRMS1PhaseEnforce,
@@ -296,3 +297,30 @@ def test_sizing_rectifier():
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:cruise:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
+
+
+def test_performances_rectifier():
+
+    # Not really a test, just need to check out which value are in/out
+    problem = om.Problem()
+    model = problem.model
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:voltage_out_target_mission",
+        val=850.0,
+        units="V",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:efficiency",
+        val=0.8,
+    )
+
+    model.add_subsystem("shaper", ivc, promotes=["*"])
+    model.add_subsystem(
+        "performances_rectifier",
+        PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
+        promotes=["*"],
+    )
+    problem.setup()
+    om.n2(problem, show_browser=False)
