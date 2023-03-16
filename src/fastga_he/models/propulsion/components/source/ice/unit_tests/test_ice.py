@@ -8,6 +8,14 @@ import pytest
 import openmdao.api as om
 
 from ..components.sizing_displacement_volume import SizingICEDisplacementVolume
+from ..components.sizing_ice_uninstalled_weight import SizingICEUninstalledWeight
+from ..components.sizing_ice_weight import SizingICEWeight
+from ..components.sizing_ice_dimensions_scaling import SizingICEDimensionsScaling
+from ..components.sizing_ice_dimensions import SizingICEDimensions
+from ..components.sizing_ice_nacelle_dimensions import SizingICENacelleDimensions
+from ..components.sizing_ice_nacelle_wet_area import SizingICENacelleWetArea
+from ..components.sizing_ice_drag import SizingICEDrag
+from ..components.sizing_ice_cg import SizingICECG
 
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
@@ -18,6 +26,8 @@ from ..components.perf_fuel_consumed import PerformancesICEFuelConsumed
 from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.perf_ice import PerformancesICE
+
+from ..constants import POSSIBLE_POSITION
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -39,6 +49,179 @@ def test_displacement_volume():
     ) == pytest.approx(0.0107, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_uninstalled_weight():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingICEUninstalledWeight(ice_id="ice_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingICEUninstalledWeight(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:uninstalled_mass", units="kg"
+    ) == pytest.approx(258.013, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def installed_weight():
+
+    ivc = get_indep_var_comp(list_inputs(SizingICEWeight(ice_id="ice_1")), __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingICEWeight(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:mass", units="kg"
+    ) == pytest.approx(361.218, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_installed_dimensions_scaling():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingICEDimensionsScaling(ice_id="ice_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingICEDimensionsScaling(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:scaling:length"
+    ) == pytest.approx(1.235, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:scaling:width"
+    ) == pytest.approx(1.235, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:scaling:height"
+    ) == pytest.approx(1.235, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_ice_dimensions():
+
+    ivc = get_indep_var_comp(list_inputs(SizingICEDimensions(ice_id="ice_1")), __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingICEDimensions(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:engine:length", units="m"
+    ) == pytest.approx(1.03, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:engine:width", units="m"
+    ) == pytest.approx(1.05, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:engine:height", units="m"
+    ) == pytest.approx(0.704, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_nacelle_dimensions():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingICENacelleDimensions(ice_id="ice_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingICENacelleDimensions(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:nacelle:length", units="m"
+    ) == pytest.approx(2.06, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:nacelle:width", units="m"
+    ) == pytest.approx(1.16, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:nacelle:height", units="m"
+    ) == pytest.approx(0.774, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_nacelle_wet_area():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingICENacelleWetArea(ice_id="ice_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingICENacelleWetArea(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:nacelle:wet_area", units="m**2"
+    ) == pytest.approx(7.92688, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_nacelle_drag():
+
+    expected_drag_ls = [5.38, 0.0, 0.0]
+    expected_drag_cruise = [5.32, 0.0, 0.0]
+
+    for option, ls_drag, cruise_drag in zip(
+        POSSIBLE_POSITION, expected_drag_ls, expected_drag_cruise
+    ):
+        for ls_option in [True, False]:
+            ivc = get_indep_var_comp(
+                list_inputs(
+                    SizingICEDrag(ice_id="ice_1", position=option, low_speed_aero=ls_option)
+                ),
+                __file__,
+                XML_FILE,
+            )
+            # Run problem and check obtained value(s) is/(are) correct
+            problem = run_system(
+                SizingICEDrag(ice_id="ice_1", position=option, low_speed_aero=ls_option), ivc
+            )
+
+            if ls_option:
+                assert (
+                    problem.get_val(
+                        "data:propulsion:he_power_train:ICE:ice_1:low_speed:CD0",
+                    )
+                    * 1e3
+                    == pytest.approx(ls_drag, rel=1e-2)
+                )
+            else:
+                assert (
+                    problem.get_val(
+                        "data:propulsion:he_power_train:ICE:ice_1:cruise:CD0",
+                    )
+                    * 1e3
+                    == pytest.approx(cruise_drag, rel=1e-2)
+                )
+
+            # Slight error on reynolds is due to step
+            problem.check_partials(compact_print=True)
+
+
+def test_motor_cg():
+
+    expected_cg = [3.03, 1.03, 3.00]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(SizingICECG(ice_id="ice_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(SizingICECG(ice_id="ice_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:ICE:ice_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
 
 
 def test_torque():

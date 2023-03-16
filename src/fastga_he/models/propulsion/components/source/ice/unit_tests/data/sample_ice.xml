@@ -1,5 +1,15 @@
 <FASTOAD_model>
     <data>
+        <aerodynamics>
+            <cruise>
+                  <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
+                  <unit_reynolds units="1/m" is_input="False">2948053.940803294<!--unitary reynolds number representative of high speed aerodynamics--></unit_reynolds>
+            </cruise>
+            <low_speed>
+                <mach is_input="False">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
+                <unit_reynolds units="1/m" is_input="False">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
+            </low_speed>
+        </aerodynamics>
         <geometry>
             <cabin>
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
@@ -11,7 +21,9 @@
                 <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
             </fuselage>
             <wing>
+                <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
                 <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
                   <at25percent>
                     <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
                   </at25percent>
@@ -22,8 +34,26 @@
             <he_power_train>
                 <ICE>
                     <ice_1>
+                        <from_LE units="m">0.5</from_LE>
                         <power_rating_SL units="kW">250.0</power_rating_SL>
                         <displacement_volume units="m**3">0.0107</displacement_volume>
+                        <uninstalled_mass units="kg">258.013</uninstalled_mass>
+                        <scaling>
+                            <length>1.235</length>
+                            <height>1.235</height>
+                            <width>1.235</width>
+                        </scaling>
+                        <engine>
+                            <length units="m">1.03</length>
+                            <height units="m">0.704</height>
+                            <width units="m">1.05</width>
+                        </engine>
+                        <nacelle>
+                            <length units="m">2.06</length>
+                            <height units="m">0.774</height>
+                            <width units="m">1.15</width>
+                            <wet_area units="m**2">7.92688</wet_area>
+                        </nacelle>
                     </ice_1>
                 </ICE>
             </he_power_train>

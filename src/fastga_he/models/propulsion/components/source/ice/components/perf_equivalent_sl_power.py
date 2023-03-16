@@ -13,7 +13,7 @@ class PerformancesEquivalentSeaLevelPower(om.ExplicitComponent):
     Because ICE tend to lose maximum power with altitude, and because we want to make sure to
     size the component (or at least make sure he can do what we ask of him), we will here compute
     what would be the maximum SL power required to achieve the power required. The formula used
-    is the so-called Gagg and Ferrar model. Formula take from :cite:`gudmundsson:2013`.
+    is the so-called Gagg and Ferrar model. Formula taken from :cite:`gudmundsson:2013`.
     """
 
     def initialize(self):
