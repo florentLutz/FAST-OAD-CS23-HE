@@ -47,6 +47,31 @@
         </geometry>
         <propulsion>
             <he_power_train>
+                <ICE>
+                    <ice_1>
+                        <from_LE units="m">0.5</from_LE>
+                        <power_rating_SL units="kW">250.0</power_rating_SL>
+                        <power_max_SL units="kW">245.0</power_max_SL>
+                        <displacement_volume units="m**3">0.0107</displacement_volume>
+                        <uninstalled_mass units="kg">258.013</uninstalled_mass>
+                        <scaling>
+                            <length>1.235</length>
+                            <height>1.235</height>
+                            <width>1.235</width>
+                        </scaling>
+                        <engine>
+                            <length units="m">1.03</length>
+                            <height units="m">0.704</height>
+                            <width units="m">1.05</width>
+                        </engine>
+                        <nacelle>
+                            <length units="m">2.06</length>
+                            <height units="m">0.774</height>
+                            <width units="m">1.15</width>
+                            <wet_area units="m**2">7.92688</wet_area>
+                        </nacelle>
+                    </ice_1>
+                </ICE>
                 <rectifier>
                     <rectifier_1>
                         <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>

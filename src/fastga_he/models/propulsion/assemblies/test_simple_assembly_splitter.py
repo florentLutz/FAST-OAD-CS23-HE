@@ -98,6 +98,11 @@ def test_assembly_performances_splitter_50_50():
         abs=1,
     )
 
+    assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
+        np.array([3.9, 3.91, 3.92, 3.94, 3.95, 3.96, 3.97, 3.97, 3.98, 3.99]),
+        abs=1e-2,
+    )
+
     write_outputs(
         pth.join(outputs.__path__[0], "simple_assembly_performances_splitter_50_50.xml"),
         problem,
@@ -179,6 +184,11 @@ def test_assembly_performances_splitter_60_40():
             ]
         ),
         abs=1,
+    )
+
+    assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
+        np.array([3.26, 3.27, 3.29, 3.31, 3.32, 3.34, 3.35, 3.37, 3.38, 3.4]),
+        abs=1e-2,
     )
 
     write_outputs(

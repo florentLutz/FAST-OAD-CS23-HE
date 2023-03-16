@@ -16,3 +16,4 @@ from .propulsor.propeller import SizingPropeller, PerformancesPropeller
 
 from .source.battery import SizingBatteryPack, PerformancesBatteryPack
 from .source.generator import SizingGenerator, PerformancesGenerator
+from .source.ice import SizingICE, PerformancesICE

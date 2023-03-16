@@ -112,6 +112,13 @@
             <voltage_max units="V" is_input="False">850.0</voltage_max>
           </dc_splitter_1>
         </DC_splitter>
+        <ICE>
+          <ice_1>
+            <displacement_volume units="m**3" is_input="True">0.0107</displacement_volume>
+            <power_max_SL units="W" is_input="False">103715.3273374457<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
+            <strokes_number is_input="True">4.0</strokes_number>
+          </ice_1>
+        </ICE>
         <PMSM>
           <motor_1>
             <current_ac_max units="A" is_input="False">184.80516709572566<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
