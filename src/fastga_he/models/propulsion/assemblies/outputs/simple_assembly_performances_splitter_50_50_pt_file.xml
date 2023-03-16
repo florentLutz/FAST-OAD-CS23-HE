@@ -1,7 +1,7 @@
 <FASTOAD_model>
   <altitude units="m" is_input="True">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</altitude>
   <exterior_temperature units="degK" is_input="True">[288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15]<!--temperature outside of the cable--></exterior_temperature>
-  <fuel_consumed_t_econ units="kg" is_input="False">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--fuel consumed at each time step--></fuel_consumed_t_econ>
+  <fuel_consumed_t_econ units="kg" is_input="False">[3.903417604393476, 3.91414003370286, 3.9246923450958406, 3.935073276888831, 3.945281470442861, 3.95531547340725, 3.9651737430307636, 3.9748546495325705, 3.984356479525991, 3.993677439487878]<!--fuel consumed at each time step--></fuel_consumed_t_econ>
   <non_consumable_energy_t_econ units="W*h" is_input="False">[13022.109190775744, 13087.740632416777, 13152.05103679782, 13215.291884009916, 13277.633836750745, 13339.15357931583, 13399.837946122405, 13459.596055338194, 13518.290423007844, 13575.813937060668]<!--Non consumable energy at each time step--></non_consumable_energy_t_econ>
   <thrust units="N" is_input="True">[1550.0, 1538.888888888889, 1527.7777777777778, 1516.6666666666667, 1505.5555555555557, 1494.4444444444443, 1483.3333333333333, 1472.2222222222222, 1461.111111111111, 1450.0]</thrust>
   <time_step units="s" is_input="True">[500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0]</time_step>
@@ -115,6 +115,13 @@
             <voltage_max units="V" is_input="False">850.0</voltage_max>
           </dc_splitter_1>
         </DC_splitter>
+        <ICE>
+          <ice_1>
+            <displacement_volume units="m**3" is_input="True">0.0107</displacement_volume>
+            <power_max_SL units="W" is_input="False">103714.44368985573<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
+            <strokes_number is_input="True">4.0</strokes_number>
+          </ice_1>
+        </ICE>
         <PMSM>
           <motor_1>
             <current_ac_max units="A" is_input="False">184.80516709572566<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>

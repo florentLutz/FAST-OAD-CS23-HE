@@ -266,6 +266,11 @@ def test_performances_from_pt_file():
         abs=1,
     )
 
+    assert problem.get_val("component.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
+        np.array([3.9, 3.91, 3.92, 3.94, 3.95, 3.96, 3.97, 3.97, 3.98, 3.99]),
+        abs=1e-2,
+    )
+
     write_outputs(
         pth.join(outputs.__path__[0], "simple_assembly_performances_splitter_50_50_pt_file.xml"),
         problem,
@@ -326,22 +331,24 @@ def test_assembly_sizing_from_pt_file():
     assert problem.get_val(
         "data:propulsion:he_power_train:generator:generator_1:mass", units="kg"
     ) == pytest.approx(34.08, rel=1e-2)
-
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:mass", units="kg"
     ) == pytest.approx(0.623, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:mass", units="kg"
+    ) == pytest.approx(353.50, rel=1e-2)
 
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        1743.61, rel=1e-2
+        2097.11, rel=1e-2
     )
     assert problem.get_val("data:propulsion:he_power_train:CG:x", units="m") == pytest.approx(
-        2.81, rel=1e-2
+        2.847, rel=1e-2
     )
     assert problem.get_val("data:propulsion:he_power_train:low_speed:CD0") == pytest.approx(
-        0.000357, rel=1e-2
+        0.00567915, rel=1e-2
     )
     assert problem.get_val("data:propulsion:he_power_train:cruise:CD0") == pytest.approx(
-        0.000352, rel=1e-2
+        0.00561219, rel=1e-2
     )
 
     write_outputs(
