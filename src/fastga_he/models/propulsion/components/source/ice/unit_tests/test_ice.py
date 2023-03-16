@@ -7,6 +7,9 @@ import pytest
 
 import openmdao.api as om
 
+from ..components.cstr_enforce import ConstraintsSeaLevelPowerEnforce
+from ..components.cstr_ensure import ConstraintsSeaLevelPowerEnsure
+
 from ..components.sizing_displacement_volume import SizingICEDisplacementVolume
 from ..components.sizing_ice_uninstalled_weight import SizingICEUninstalledWeight
 from ..components.sizing_ice_weight import SizingICEWeight
@@ -25,6 +28,7 @@ from ..components.perf_fuel_consumption import PerformancesICEFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesICEFuelConsumed
 from ..components.perf_maximum import PerformancesMaximum
 
+from ..components.sizing_ice import SizingICE
 from ..components.perf_ice import PerformancesICE
 
 from ..constants import POSSIBLE_POSITION
@@ -33,6 +37,38 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "sample_ice.xml"
 NB_POINTS_TEST = 10
+
+
+def test_constraint_power_enforce():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsSeaLevelPowerEnforce(ice_id="ice_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsSeaLevelPowerEnforce(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:power_rating_SL", units="kW"
+    ) == pytest.approx(245.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_power_ensure():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsSeaLevelPowerEnsure(ice_id="ice_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsSeaLevelPowerEnsure(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:ICE:ice_1:power_rating_SL", units="kW"
+    ) == pytest.approx(-5.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_displacement_volume():
@@ -222,6 +258,30 @@ def test_motor_cg():
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
+
+
+def test_ice_sizing():
+
+    ivc = get_indep_var_comp(list_inputs(SizingICE(ice_id="ice_1")), __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingICE(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:mass", units="kg"
+    ) == pytest.approx(353.49, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:CG:x", units="m"
+    ) == pytest.approx(3.03, rel=1e-2)
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:ICE:ice_1:low_speed:CD0",
+        )
+        * 1e3
+        == pytest.approx(5.32, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
 
 
 def test_torque():

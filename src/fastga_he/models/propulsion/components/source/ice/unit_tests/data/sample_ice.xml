@@ -36,6 +36,7 @@
                     <ice_1>
                         <from_LE units="m">0.5</from_LE>
                         <power_rating_SL units="kW">250.0</power_rating_SL>
+                        <power_max_SL units="kW">245.0</power_max_SL>
                         <displacement_volume units="m**3">0.0107</displacement_volume>
                         <uninstalled_mass units="kg">258.013</uninstalled_mass>
                         <scaling>
