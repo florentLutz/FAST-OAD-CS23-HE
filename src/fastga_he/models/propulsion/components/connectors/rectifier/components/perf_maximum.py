@@ -58,7 +58,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_max",
             units="A",
-            val=133.0,
+            val=250.0,
             desc="Maximum RMS current flowing through one arm of the rectifier",
         )
         self.declare_partials(
@@ -82,7 +82,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_dc_max",
             units="A",
-            val=500.0,
+            val=750.0,
             desc="Maximum value of the current at the output of the rectifier",
         )
         self.declare_partials(

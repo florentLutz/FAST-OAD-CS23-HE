@@ -38,7 +38,9 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["ac_voltage_rms_out"] = inputs["apparent_power"] / inputs["ac_current_rms_out"]
+        ac_voltage_rms_out = inputs["apparent_power"] / inputs["ac_current_rms_out"]
+
+        outputs["ac_voltage_rms_out"] = ac_voltage_rms_out
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 

@@ -30,7 +30,7 @@ class PerformancesCurrentRMS3Phases(om.ExplicitComponent):
 
         self.add_output(
             "ac_current_rms_out",
-            val=np.full(number_of_points, 400.0),
+            val=np.full(number_of_points, 600.0),
             units="A",
             desc="Current at the output side of the generator",
         )

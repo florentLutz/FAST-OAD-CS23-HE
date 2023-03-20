@@ -38,7 +38,7 @@ class PerformancesRectifierGeneratorSide(om.ImplicitComponent):
 
         self.add_output(
             "dc_current_out",
-            val=np.full(number_of_points, 400.0),
+            val=np.full(number_of_points, 500.0),
             units="A",
             desc="Current at the output side of the rectifier",
         )

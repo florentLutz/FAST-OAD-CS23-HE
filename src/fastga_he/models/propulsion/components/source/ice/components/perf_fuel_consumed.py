@@ -25,7 +25,7 @@ class PerformancesICEFuelConsumed(om.ExplicitComponent):
         self.add_input("fuel_consumption", units="kg/h", val=np.nan, shape=number_of_points)
         self.add_input("time_step", units="h", val=np.full(number_of_points, np.nan))
 
-        self.add_output("fuel_consumed_t", np.full(number_of_points, 0.0), units="kg")
+        self.add_output("fuel_consumed_t", np.full(number_of_points, 1.0), units="kg")
 
         self.declare_partials(of="*", wrt="*", method="exact")
 

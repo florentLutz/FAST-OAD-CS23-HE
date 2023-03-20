@@ -49,7 +49,7 @@ class SizingICENacelleWetArea(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:wet_area",
             val=0.5,
-            desc="Height of the ICE nacelle",
+            desc="Wet area of the ICE nacelle",
             units="m**2",
         )
 

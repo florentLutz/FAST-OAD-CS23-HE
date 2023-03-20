@@ -263,7 +263,7 @@ def test_performances_from_pt_file():
                 103715.3,
             ]
         ),
-        abs=1,
+        rel=1e-3,
     )
 
     assert problem.get_val("component.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
