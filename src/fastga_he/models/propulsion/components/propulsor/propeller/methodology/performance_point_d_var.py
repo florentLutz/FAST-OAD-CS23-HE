@@ -10,8 +10,13 @@ from stdatm.atmosphere import Atmosphere
 
 from fastga.models.aerodynamics.external.propeller_code.propeller_core import PropellerCoreModule
 
-from .performance_point import _ComputePropellerPointPerformance, _AdjustTwistLaw
+from fastga_he.models.propulsion.components.propulsor.propeller.methodology.performance_point import (
+    _ComputePropellerPointPerformance,
+    _AdjustTwistLaw,
+)
 from fastga_he.models.aerodynamics.external.xfoil.xfoil_polar import XfoilPolarMod
+
+from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 
 class ComputePropellerPointPerformanceDVar(om.Group):
@@ -409,3 +414,33 @@ class _ComputePropellerPointPerformanceDVar(PropellerCoreModule):
     def diff_to_density(altitude, target_density):
 
         return Atmosphere(altitude, altitude_in_feet=False).density - target_density
+
+
+if __name__ == "__main__":
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:geometry:propeller:radius_ratio_vect",
+        val=np.array([0.165, 0.3, 0.45, 0.655, 0.835, 0.975, 1.0]),
+    )
+    ivc.add_output(
+        "data:geometry:propeller:chord_vect",
+        units="m",
+        val=np.array(
+            [0.11163526, 0.15856474, 0.16254664, 0.21189369, 0.18558474, 0.11163526, 0.11163526]
+        ),
+    )
+    ivc.add_output(
+        "data:geometry:propeller:diameter",
+        units="m",
+        val=1.98,
+    )
+    ivc.add_output(
+        "data:geometry:propeller:blades_number",
+        val=3.0,
+    )
+
+    #  Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(_ComputeSimilarityParameters(), ivc)
+
+    test = 1.0

@@ -29,6 +29,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("equivalent_SL_power", units="W", val=np.full(number_of_points, np.nan))
+        self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
 
         self.add_output(
             "data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL",
@@ -36,8 +37,24 @@ class PerformancesMaximum(om.ExplicitComponent):
             val=250e3,
             desc="Maximum power the motor has to provide at Sea Level",
         )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL",
+            wrt="equivalent_SL_power",
+            method="exact",
+        )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.add_output(
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":shaft_power_max",
+            units="W",
+            val=42000.0,
+            desc="Maximum power seen during the mission, without accounting for altitude effect, "
+            "only used for power rate",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:ICE:" + ice_id + ":shaft_power_max",
+            wrt="shaft_power_out",
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -45,6 +62,10 @@ class PerformancesMaximum(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL"] = np.max(
             inputs["equivalent_SL_power"]
+        )
+
+        outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":shaft_power_max"] = np.max(
+            inputs["shaft_power_out"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -57,3 +78,8 @@ class PerformancesMaximum(om.ExplicitComponent):
         ] = np.where(
             inputs["equivalent_SL_power"] == np.max(inputs["equivalent_SL_power"]), 1.0, 0.0
         )
+
+        partials[
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":shaft_power_max",
+            "shaft_power_out",
+        ] = np.where(inputs["shaft_power_out"] == np.max(inputs["shaft_power_out"]), 1.0, 0.0)

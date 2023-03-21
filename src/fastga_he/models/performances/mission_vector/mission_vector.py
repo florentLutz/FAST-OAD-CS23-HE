@@ -74,7 +74,7 @@ class MissionVector(om.Group):
                 number_of_points_descent=number_of_points_descent,
                 number_of_points_reserve=number_of_points_reserve,
             ),
-            promotes_inputs=["data:*"],
+            promotes_inputs=["data:*", "settings:*"],
             promotes_outputs=[],
         )
         self.add_subsystem(

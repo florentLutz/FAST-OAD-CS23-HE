@@ -36,6 +36,11 @@ class SizingICECG(om.ExplicitComponent):
             val=np.nan,
             units="m",
         )
+        self.add_input(
+            name="settings:propulsion:he_power_train:ICE:" + ice_id + ":cg_in_nacelle",
+            val=0.5,
+            desc="Location of the engine CG in the nacelle, in percent of the nacelle length",
+        )
 
         if position == "on_the_wing":
 
@@ -68,6 +73,9 @@ class SizingICECG(om.ExplicitComponent):
         position = self.options["position"]
 
         motor_length = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length"]
+        cg_in_nacelle = inputs[
+            "settings:propulsion:he_power_train:ICE:" + ice_id + ":cg_in_nacelle"
+        ]
 
         if position == "on_the_wing":
 
@@ -76,12 +84,14 @@ class SizingICECG(om.ExplicitComponent):
             fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
 
             outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":CG:x"] = (
-                fa_length - 0.25 * l0_wing - distance_from_le + 0.5 * motor_length
+                fa_length - 0.25 * l0_wing - distance_from_le + cg_in_nacelle * motor_length
             )
 
         elif position == "in_the_front":
 
-            outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":CG:x"] = 0.5 * motor_length
+            outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":CG:x"] = (
+                cg_in_nacelle * motor_length
+            )
 
         else:
 
@@ -89,7 +99,7 @@ class SizingICECG(om.ExplicitComponent):
             cabin_length = inputs["data:geometry:cabin:length"]
 
             outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":CG:x"] = (
-                front_length + cabin_length + 0.5 * motor_length
+                front_length + cabin_length + cg_in_nacelle * motor_length
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -97,10 +107,19 @@ class SizingICECG(om.ExplicitComponent):
         ice_id = self.options["ice_id"]
         position = self.options["position"]
 
+        motor_length = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length"]
+        cg_in_nacelle = inputs[
+            "settings:propulsion:he_power_train:ICE:" + ice_id + ":cg_in_nacelle"
+        ]
+
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":CG:x",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length",
-        ] = 0.5
+        ] = cg_in_nacelle
+        partials[
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":CG:x",
+            "settings:propulsion:he_power_train:ICE:" + ice_id + ":cg_in_nacelle",
+        ] = motor_length
 
         if position == "on_the_wing":
 

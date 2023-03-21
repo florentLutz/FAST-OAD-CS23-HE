@@ -85,7 +85,7 @@ class SizingICE(om.Group):
         )
         self.add_subsystem(
             name="ice_cg",
-            subsys=SizingICECG(ice_id=ice_id),
+            subsys=SizingICECG(ice_id=ice_id, position=position),
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:

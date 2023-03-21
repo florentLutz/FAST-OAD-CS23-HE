@@ -18,15 +18,27 @@ class PerformancesSFC(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(
+            name="ice_id",
+            default=None,
+            desc="Identifier of the Internal Combustion Engine",
+            allow_none=False,
+        )
+        self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
 
+        ice_id = self.options["ice_id"]
         number_of_points = self.options["number_of_points"]
 
         self.add_input("mean_effective_pressure", units="bar", val=np.nan, shape=number_of_points)
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
+        self.add_input(
+            "settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc",
+            val=1.0,
+            desc="K-factor to adjust the sfc of the ICE",
+        )
 
         self.add_output(
             "specific_fuel_consumption", units="g/kW/h", val=200.0, shape=number_of_points
@@ -35,6 +47,8 @@ class PerformancesSFC(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        ice_id = self.options["ice_id"]
 
         # Formula was established with dimensionless parameters, the division in the following
         # lines corresponds to the value used to render the value dimensionless. Also,
@@ -65,9 +79,13 @@ class PerformancesSFC(om.ExplicitComponent):
             - 490.36976312 * pme ** 3.0
         )
 
-        outputs["specific_fuel_consumption"] = sfc
+        outputs["specific_fuel_consumption"] = (
+            sfc * inputs["settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
+
+        ice_id = self.options["ice_id"]
 
         rpm = inputs["rpm"] / 2700.0
         pme = inputs["mean_effective_pressure"] / 20.62807778
@@ -85,6 +103,7 @@ class PerformancesSFC(om.ExplicitComponent):
                 - 3.0 * 490.36976312 * pme ** 2.0
             )
             * d_pme_d_input_pme
+            * inputs["settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc"]
         )
         partials["specific_fuel_consumption", "rpm"] = np.diag(
             (
@@ -96,4 +115,20 @@ class PerformancesSFC(om.ExplicitComponent):
                 + 253.52716382 * pme ** 2.0
             )
             * d_rpm_d_input_rpm
+            * inputs["settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc"]
+        )
+        partials[
+            "specific_fuel_consumption",
+            "settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc",
+        ] = (
+            -1663.04917125
+            + 6507.41622273 * rpm
+            + 829.44035557 * pme
+            - 6292.54999479 * rpm ** 2.0
+            - 4236.01419045 * pme * rpm
+            + 1116.74781595 * pme ** 2.0
+            + 2037.26111092 * rpm ** 3.0
+            + 2217.65637191 * rpm ** 2.0 * pme
+            + 253.52716382 * rpm * pme ** 2.0
+            - 490.36976312 * pme ** 3.0
         )

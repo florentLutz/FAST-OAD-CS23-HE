@@ -555,7 +555,7 @@ class FASTGAHEPowerTrainConfigurator:
         for component_type_class, component_name in zip(
             self._components_type_class, self._components_name
         ):
-            if component_type_class == "propulsor":
+            if "propulsor" in component_type_class:
                 components_names.append(component_name)
 
         return components_names
@@ -573,7 +573,7 @@ class FASTGAHEPowerTrainConfigurator:
         for component_type_class, component_name, component_type in zip(
             self._components_type_class, self._components_name, self._components_type
         ):
-            if component_type_class == "propulsive_load":
+            if "propulsive_load" in component_type_class:
                 components_names.append(component_name)
                 components_types.append(component_type)
 
@@ -591,7 +591,7 @@ class FASTGAHEPowerTrainConfigurator:
         for component_type_class, component_name in zip(
             self._components_type_class, self._components_name
         ):
-            if component_type_class == "source":
+            if "source" in component_type_class:
                 components_names.append(component_name)
 
         return components_names

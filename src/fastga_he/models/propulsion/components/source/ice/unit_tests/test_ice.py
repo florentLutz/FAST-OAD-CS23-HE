@@ -376,7 +376,7 @@ def test_sfc():
     # value for partial check
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PerformancesSFC(number_of_points=NB_POINTS_TEST), ivc)
+    problem = run_system(PerformancesSFC(number_of_points=NB_POINTS_TEST, ice_id="ice_1"), ivc)
 
     assert problem.get_val("specific_fuel_consumption", units="g/kW/h") == pytest.approx(
         np.array([246.0, 246.0, 247.0, 249.0, 252.0, 257.0, 262.0, 267.0, 274.0, 280.0]), rel=1e-2
@@ -439,12 +439,21 @@ def test_maximum():
         val=np.array([198.0, 206.0, 213.0, 220.0, 226.0, 232.0, 237.0, 242.0, 246.0, 250.0]),
         units="kW",
     )
+    ivc.add_output(
+        "shaft_power_out",
+        val=np.linspace(150.0, 250.0, NB_POINTS_TEST),
+        units="kW",
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(PerformancesMaximum(ice_id="ice_1", number_of_points=NB_POINTS_TEST), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:ICE:ice_1:power_max_SL", units="W"
+    ) == pytest.approx(250e3, rel=1e-2)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:shaft_power_max", units="W"
     ) == pytest.approx(250e3, rel=1e-2)
 
     problem.check_partials(compact_print=True)

@@ -51,7 +51,7 @@ class PerformancesICE(om.Group):
         )
         self.add_subsystem(
             name="sfc",
-            subsys=PerformancesSFC(number_of_points=number_of_points),
+            subsys=PerformancesSFC(number_of_points=number_of_points, ice_id="ice_1"),
             promotes=["*"],
         )
         self.add_subsystem(

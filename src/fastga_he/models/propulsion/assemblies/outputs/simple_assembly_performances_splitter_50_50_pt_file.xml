@@ -119,6 +119,7 @@
           <ice_1>
             <displacement_volume units="m**3" is_input="True">0.0107</displacement_volume>
             <power_max_SL units="W" is_input="False">103716.03590628272<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
+            <shaft_power_max units="W" is_input="False">103716.03590628272<!--Maximum power seen during the mission, without accounting for altitude effect, only used for power rate--></shaft_power_max>
             <strokes_number is_input="True">4.0</strokes_number>
           </ice_1>
         </ICE>
@@ -256,6 +257,11 @@
   <settings>
     <propulsion>
       <he_power_train>
+        <ICE>
+          <ice_1>
+            <k_sfc is_input="True">1.0<!--K-factor to adjust the sfc of the ICE--></k_sfc>
+          </ice_1>
+        </ICE>
         <PMSM>
           <motor_1>
             <power_factor is_input="True">1.0</power_factor>

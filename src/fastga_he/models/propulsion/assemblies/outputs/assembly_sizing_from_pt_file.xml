@@ -186,7 +186,7 @@
               <resistance is_input="False">1.982408932725375</resistance>
             </scaling>
           </dc_sspc_2>
-          <dc_sspc_412>
+          <dc_sspc_3>
             <current_caliber units="A" is_input="False">227.588167623899<!--Current caliber of the SSPC--></current_caliber>
             <current_max units="A" is_input="True">227.588167623899<!--Maximum current flowing through the SSPC--></current_max>
             <mass units="kg" is_input="False">6.442043392261338<!--Mass of the SSPC--></mass>
@@ -211,7 +211,7 @@
             <scaling>
               <resistance is_input="False">1.9772556925878844</resistance>
             </scaling>
-          </dc_sspc_412>
+          </dc_sspc_3>
         </DC_SSPC>
         <DC_bus>
           <dc_bus_1>

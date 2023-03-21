@@ -236,10 +236,10 @@ ICE = {
     CN_ID: "ice_id",
     CT: "ICE",
     ATT: None,
-    PT: ["time_step"],
+    PT: ["time_step", "altitude", "settings:*"],
     IN: None,
     OUT: [("rpm", None), ("shaft_power_out", None)],
-    CTC: "source",
+    CTC: ["source", "propulsive_load"],
     MP: [
         {"torque_out": "N*m"},
         {"specific_fuel_consumption": "kg/kW/h"},
