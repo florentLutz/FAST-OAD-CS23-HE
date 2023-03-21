@@ -3,43 +3,57 @@ title: Sample power train file for testing purposes
 power_train_components:
   propeller_1:
     id: fastga_he.pt_component.propeller
+    position: in_the_nose  # "on_the_wing", "in_the_nose"
   motor_1:
     id: fastga_he.pt_component.pmsm
+    position: in_the_nose  # "on_the_wing", "in_the_nose"
   inverter_1:
     id: fastga_he.pt_component.inverter
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
   dc_sspc_1:
     id: fastga_he.pt_component.dc_sspc
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
     options:
       closed_by_default: True
   dc_bus_1:
     id: fastga_he.pt_component.dc_bus
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
     options:
       number_of_inputs: 1
       number_of_outputs: 1
   dc_sspc_2:
     id: fastga_he.pt_component.dc_sspc
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
     options:
       closed_by_default: True
   harness_1:
     id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
   dc_sspc_3:
     id: fastga_he.pt_component.dc_sspc
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
     options:
       closed_by_default: True
   dc_splitter_1:
     id: fastga_he.pt_component.dc_splitter
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
 
   dc_dc_converter_1:
     id: fastga_he.pt_component.dc_dc_converter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
   rectifier_1:
     id: fastga_he.pt_component.rectifier
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
 
   battery_pack_1:
     id: fastga_he.pt_component.battery_pack
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
   generator_1:
     id: fastga_he.pt_component.generator
+    position: in_the_back  # "in_the_front", "in_the_back"
   ice_1:
     id: fastga_he.pt_component.internal_combustion_engine
+    position: in_the_back  # "on_the_wing", "in_the_front", "in_the_back"
 
 component_connections:
   - source: propeller_1
@@ -82,4 +96,4 @@ component_connections:
     target: ice_1
 
 
-watcher_file_path: ./simple_assembly_performances_splitter.csv
+watcher_file_path: ../results/fuel_and_battery_propulsion.csv

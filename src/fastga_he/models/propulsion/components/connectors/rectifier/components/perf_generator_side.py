@@ -38,22 +38,20 @@ class PerformancesRectifierGeneratorSide(om.ImplicitComponent):
 
         self.add_output(
             "dc_current_out",
-            val=np.full(number_of_points, 500.0),
+            val=np.full(number_of_points, 400.0),
             units="A",
             desc="Current at the output side of the rectifier",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
-    def apply_nonlinear(
-        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
-    ):
+    def apply_nonlinear(self, inputs, outputs, residuals):
 
         residuals["dc_current_out"] = inputs["voltage_target"] - inputs["dc_voltage_out"]
 
-    def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
+    def linearize(self, inputs, outputs, partials):
 
         number_of_points = self.options["number_of_points"]
 
-        jacobian["dc_current_out", "voltage_target"] = np.eye(number_of_points)
-        jacobian["dc_current_out", "dc_voltage_out"] = -np.eye(number_of_points)
+        partials["dc_current_out", "voltage_target"] = np.eye(number_of_points)
+        partials["dc_current_out", "dc_voltage_out"] = -np.eye(number_of_points)
