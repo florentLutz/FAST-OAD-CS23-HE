@@ -269,7 +269,7 @@ def test_ice_sizing():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:ICE:ice_1:mass", units="kg"
-    ) == pytest.approx(353.49, rel=1e-2)
+    ) == pytest.approx(363.59, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:ICE:ice_1:CG:x", units="m"
     ) == pytest.approx(3.03, rel=1e-2)

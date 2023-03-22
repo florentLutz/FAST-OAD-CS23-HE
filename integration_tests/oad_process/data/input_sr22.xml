@@ -145,7 +145,7 @@
             <diameter units="m" is_input="True">1.98<!--Diameter of the propeller--></diameter>
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
-            <rpm_mission units="1/min" is_input="True">[2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700,2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700,2700, 2700, 2700, 2700, 2700, 2700, 2700, 2700, 2500, 2500, 2500,2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500,2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500,2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500,2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500,2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500,2500, 2500, 2500]<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_mission units="1/min" is_input="True">2700.0</rpm_mission>
             <solidity is_input="True">0.13117604<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>
