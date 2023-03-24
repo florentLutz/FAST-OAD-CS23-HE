@@ -44,10 +44,11 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
 
         self.add_output(
             "ac_current_rms_in_one_phase",
-            val=np.full(number_of_points, 200.0),
+            val=np.full(number_of_points, 133.0),
             units="A",
             desc="Current at the input side of the rectifier",
-            lower=1e-4,
+            lower=-1000.0,
+            upper=1000.0,
         )
 
         self.declare_partials(of="ac_current_rms_in_one_phase", wrt="*", method="exact")
@@ -55,7 +56,6 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         outputs["ac_current_rms_in_one_phase"] = inputs["power"] / inputs["ac_voltage_rms_in"] / 3.0
-        _LOGGER.debug("Load side voltage rms %s", str(inputs["ac_voltage_rms_in"]))
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 

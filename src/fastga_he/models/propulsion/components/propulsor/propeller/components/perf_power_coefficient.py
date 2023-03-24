@@ -49,7 +49,7 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
             desc="Twist between the propeller blade root and tip",
         )
 
-        self.add_output("power_coefficient", shape=number_of_points)
+        self.add_output("power_coefficient", shape=number_of_points, val=0.2)
 
         self.declare_partials(
             of="*",

@@ -36,8 +36,10 @@ class PerformancesDCSSPCCurrent(om.ExplicitComponent):
 
         self.add_output(
             "dc_current_in",
-            val=np.full(number_of_points, 550.0),
+            val=np.full(number_of_points, 400.0),
             units="A",
+            lower=-1000.0,
+            upper=1000.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

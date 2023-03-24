@@ -119,7 +119,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max"
         ] = (
-            np.amax(inputs["dc_current_one_cable"])
+            np.amax(np.abs(inputs["dc_current_one_cable"]))
             * inputs[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
             ]
@@ -148,7 +148,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
             "dc_current_one_cable",
         ] = (
-            np.where(current == np.amax(current), 1.0, 0.0)
+            np.where(current == np.amax(np.abs(current)), 1.0, 0.0)
             * inputs[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables"
             ]

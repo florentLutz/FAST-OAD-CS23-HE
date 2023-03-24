@@ -35,7 +35,9 @@ class PerformancesModulationIndex(om.ImplicitComponent):
             desc="Bus voltage on the DC side of the inverter",
         )
 
-        self.add_output("modulation_index", val=np.full(number_of_points, 0.7))
+        self.add_output(
+            "modulation_index", val=np.full(number_of_points, 0.95), lower=0.0, upper=2.0
+        )
 
         self.declare_partials(of="*", wrt="*", method="exact")
 

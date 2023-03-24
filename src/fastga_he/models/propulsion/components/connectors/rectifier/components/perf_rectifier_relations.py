@@ -49,13 +49,13 @@ class PerformancesRectifierRelations(om.ImplicitComponent):
 
         self.add_output(
             "voltage_out_rel",
-            val=np.full(number_of_points, 800.0),
+            val=np.full(number_of_points, 500.0),
             units="V",
             desc="Voltage of the output side in the relations equation",
         )
         self.add_output(
             "power_rel",
-            val=np.full(number_of_points, 500.0e3),
+            val=np.full(number_of_points, 300.0e3),
             units="W",
             desc="Power in the relations equation",
         )

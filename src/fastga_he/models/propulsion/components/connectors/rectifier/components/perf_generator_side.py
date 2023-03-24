@@ -41,6 +41,8 @@ class PerformancesRectifierGeneratorSide(om.ImplicitComponent):
             val=np.full(number_of_points, 400.0),
             units="A",
             desc="Current at the output side of the rectifier",
+            lower=-1000.0,
+            upper=1000.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
