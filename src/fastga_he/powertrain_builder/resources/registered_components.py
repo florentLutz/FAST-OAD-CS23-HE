@@ -230,6 +230,24 @@ GENERATOR = {
         {"ac_voltage_peak_out": "V"},
     ],
 }
+ICE = {
+    ID: "fastga_he.pt_component.internal_combustion_engine",
+    CN: "ICE",
+    CN_ID: "ice_id",
+    CT: "ICE",
+    ATT: None,
+    PT: ["time_step", "altitude", "settings:*"],
+    IN: None,
+    OUT: [("rpm", None), ("shaft_power_out", None)],
+    CTC: ["source", "propulsive_load"],
+    MP: [
+        {"torque_out": "N*m"},
+        {"specific_fuel_consumption": "kg/kW/h"},
+        {"mean_effective_pressure": "bar"},
+        {"fuel_consumption": "kg/h"},
+        {"fuel_consumed_t": "kg"},
+    ],
+}
 
 KNOWN_COMPONENTS = [
     PROPELLER,
@@ -243,6 +261,7 @@ KNOWN_COMPONENTS = [
     DC_SPLITTER,
     RECTIFIER,
     GENERATOR,
+    ICE,
 ]
 
 KNOWN_ID = []

@@ -45,7 +45,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:generator:" + generator_id + ":current_ac_max",
             units="A",
-            val=500.0,
+            val=600.0,
             desc="Maximum value of the RMS current flowing through one phase of the generator",
         )
         self.declare_partials(

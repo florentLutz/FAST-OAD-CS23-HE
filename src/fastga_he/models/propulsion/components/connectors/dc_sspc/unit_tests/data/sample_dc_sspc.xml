@@ -22,6 +22,7 @@
             <he_power_train>
                 <DC_SSPC>
                     <dc_sspc_1>
+                        <efficiency>0.98</efficiency>
                         <current_caliber units="A">400.0</current_caliber>
                         <current_max units="A">400.0</current_max>
                         <voltage_caliber units="V">750.0</voltage_caliber>

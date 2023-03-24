@@ -22,7 +22,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         self.add_input("shaft_power_in", units="W", val=np.nan, shape=number_of_points)
         self.add_input("power_losses", units="W", val=np.nan, shape=number_of_points)
 
-        self.add_output("efficiency", val=np.full(number_of_points, 0.95), shape=number_of_points)
+        self.add_output("efficiency", val=np.full(number_of_points, 1.0), shape=number_of_points)
 
         self.declare_partials(of="*", wrt="*", method="exact")
 

@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import fastoad.api as oad
 
 from .sizing_diameter_scaling import SizingMotorDiameterScaling
 from .sizing_diameter import SizingMotorDiameter

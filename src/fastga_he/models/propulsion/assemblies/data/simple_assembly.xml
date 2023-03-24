@@ -145,6 +145,7 @@
                 </DC_DC_converter>
                 <DC_SSPC>
                     <dc_sspc_412>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -170,6 +171,7 @@
                         </diode>
                     </dc_sspc_412>
                     <dc_sspc_1>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -195,6 +197,7 @@
                         </diode>
                     </dc_sspc_1>
                     <dc_sspc_2>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -220,6 +223,7 @@
                         </diode>
                     </dc_sspc_2>
                     <dc_sspc_1337>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>

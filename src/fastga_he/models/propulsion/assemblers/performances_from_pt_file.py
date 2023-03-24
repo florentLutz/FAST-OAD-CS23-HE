@@ -29,6 +29,7 @@ from fastga_he.models.propulsion.components import (
     PerformancesDCSplitter,
     PerformancesRectifier,
     PerformancesGenerator,
+    PerformancesICE,
 )
 
 from .constants import SUBMODEL_POWER_TRAIN_PERF, SUBMODEL_THRUST_DISTRIBUTOR
@@ -120,6 +121,22 @@ class PowerTrainPerformancesFromFile(om.Group):
             name="thrust_splitter",
             subsys=oad.RegisterSubmodel.get_submodel(SUBMODEL_THRUST_DISTRIBUTOR, options=options),
             promotes=["data:*", "thrust"],
+        )
+
+        # Enforces SSPC are added last, not done before because it might breaks the connections
+        # necessary to ensure the coherence of SSPC states when connected to both end of a cable
+        (
+            components_name,
+            components_name_id,
+            components_om_type,
+            components_options,
+            components_promotes,
+        ) = self.configurator.enforce_sspc_last(
+            components_name,
+            components_name_id,
+            components_om_type,
+            components_options,
+            components_promotes,
         )
 
         for (

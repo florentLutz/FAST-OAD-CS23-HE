@@ -16,6 +16,7 @@ from ...components.connectors.dc_sspc import PerformancesDCSSPC
 from ...components.source.battery import PerformancesBatteryPack
 from ...components.connectors.rectifier import PerformancesRectifier
 from ...components.source.generator import PerformancesGenerator
+from ...components.source.ice import PerformancesICE
 
 
 class PerformancesAssemblySplitter(om.Group):
@@ -147,6 +148,14 @@ class PerformancesAssemblySplitter(om.Group):
             ),
             promotes=["data:*"],
         )
+        self.add_subsystem(
+            "ice_1",
+            PerformancesICE(
+                ice_id="ice_1",
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*", "time_step"],
+        )
 
         self.connect("propeller_1.rpm", "motor_1.rpm")
         self.connect("propeller_1.shaft_power_in", "motor_1.shaft_power_out")
@@ -195,3 +204,6 @@ class PerformancesAssemblySplitter(om.Group):
         self.connect(
             "rectifier_1.ac_current_rms_in_one_phase", "generator_1.ac_current_rms_out_one_phase"
         )
+
+        self.connect("generator_1.rpm", "ice_1.rpm")
+        self.connect("generator_1.shaft_power_in", "ice_1.shaft_power_out")

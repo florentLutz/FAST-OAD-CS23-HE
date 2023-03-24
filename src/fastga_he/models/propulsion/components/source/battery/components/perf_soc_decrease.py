@@ -28,7 +28,9 @@ class PerformancesSOCDecrease(om.ExplicitComponent):
         self.add_input("relative_capacity", val=np.full(number_of_points, np.nan))
 
         self.add_output(
-            "state_of_charge_decrease", units="percent", val=np.full(number_of_points, 1.0)
+            "state_of_charge_decrease",
+            units="percent",
+            val=np.full(number_of_points, 80.0 / number_of_points),
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

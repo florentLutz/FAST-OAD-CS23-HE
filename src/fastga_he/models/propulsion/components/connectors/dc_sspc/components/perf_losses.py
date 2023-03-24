@@ -36,9 +36,14 @@ class PerformancesDCSSPCLosses(om.ExplicitComponent):
             units="A",
         )
         self.add_input(
-            "resistance_sspc",
+            "dc_voltage_in",
             val=np.full(number_of_points, np.nan),
-            units="ohm",
+            units="V",
+        )
+        self.add_input(
+            "dc_voltage_out",
+            val=np.full(number_of_points, np.nan),
+            units="V",
         )
 
         self.add_output(
@@ -63,7 +68,9 @@ class PerformancesDCSSPCLosses(om.ExplicitComponent):
 
         else:
 
-            outputs["power_losses"] = inputs["resistance_sspc"] * inputs["dc_current_in"] ** 2.0
+            outputs["power_losses"] = (
+                np.abs(inputs["dc_voltage_in"] - inputs["dc_voltage_out"]) * inputs["dc_current_in"]
+            )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -71,15 +78,25 @@ class PerformancesDCSSPCLosses(om.ExplicitComponent):
 
         if not self.options["closed"]:
 
-            partials["power_losses", "resistance_sspc"] = np.zeros(
+            partials["power_losses", "dc_current_in"] = np.zeros(
                 (number_of_points, number_of_points)
             )
-            partials["power_losses", "dc_current_in"] = np.zeros(
+            partials["power_losses", "dc_voltage_in"] = np.zeros(
+                (number_of_points, number_of_points)
+            )
+            partials["power_losses", "dc_voltage_out"] = np.zeros(
                 (number_of_points, number_of_points)
             )
 
         else:
-            partials["power_losses", "resistance_sspc"] = np.diag(inputs["dc_current_in"] ** 2.0)
-            partials["power_losses", "dc_current_in"] = 2.0 * np.diag(
-                inputs["resistance_sspc"] * inputs["dc_current_in"]
+            partials["power_losses", "dc_current_in"] = np.diag(
+                np.abs(inputs["dc_voltage_in"] - inputs["dc_voltage_out"])
+            )
+            partials["power_losses", "dc_voltage_in"] = np.diag(
+                np.sign(inputs["dc_voltage_in"] - inputs["dc_voltage_out"])
+                * inputs["dc_current_in"]
+            )
+            partials["power_losses", "dc_voltage_out"] = np.diag(
+                -np.sign(inputs["dc_voltage_in"] - inputs["dc_voltage_out"])
+                * inputs["dc_current_in"]
             )

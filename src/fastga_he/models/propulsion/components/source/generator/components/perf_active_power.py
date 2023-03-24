@@ -23,7 +23,10 @@ class PerformancesActivePower(om.ExplicitComponent):
         self.add_input("efficiency", val=np.nan, shape=number_of_points)
 
         self.add_output(
-            "active_power", units="W", val=np.full(number_of_points, 50e3), shape=number_of_points
+            "active_power",
+            units="W",
+            val=np.full(number_of_points, 500.0e3),
+            shape=number_of_points,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

@@ -22,7 +22,7 @@ power_train_components:
       closed_by_default: True
   harness_1:
     id: fastga_he.pt_component.dc_line
-  dc_sspc_412:
+  dc_sspc_3:
     id: fastga_he.pt_component.dc_sspc
     options:
       closed_by_default: True
@@ -38,6 +38,8 @@ power_train_components:
     id: fastga_he.pt_component.battery_pack
   generator_1:
     id: fastga_he.pt_component.generator
+  ice_1:
+    id: fastga_he.pt_component.internal_combustion_engine
 
 component_connections:
   - source: propeller_1
@@ -59,9 +61,9 @@ component_connections:
     target: harness_1
 
   - source: harness_1
-    target: dc_sspc_412
+    target: dc_sspc_3
 
-  - source: dc_sspc_412
+  - source: dc_sspc_3
     target: dc_splitter_1
 
   - source: [dc_splitter_1, 1]
@@ -75,5 +77,9 @@ component_connections:
 
   - source: rectifier_1
     target: generator_1
+
+  - source: generator_1
+    target: ice_1
+
 
 watcher_file_path: ./simple_assembly_performances_splitter.csv

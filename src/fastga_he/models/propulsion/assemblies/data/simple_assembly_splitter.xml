@@ -47,6 +47,31 @@
         </geometry>
         <propulsion>
             <he_power_train>
+                <ICE>
+                    <ice_1>
+                        <from_LE units="m">0.5</from_LE>
+                        <power_rating_SL units="kW">250.0</power_rating_SL>
+                        <power_max_SL units="kW">245.0</power_max_SL>
+                        <displacement_volume units="m**3">0.0107</displacement_volume>
+                        <uninstalled_mass units="kg">258.013</uninstalled_mass>
+                        <scaling>
+                            <length>1.235</length>
+                            <height>1.235</height>
+                            <width>1.235</width>
+                        </scaling>
+                        <engine>
+                            <length units="m">1.03</length>
+                            <height units="m">0.704</height>
+                            <width units="m">1.05</width>
+                        </engine>
+                        <nacelle>
+                            <length units="m">2.06</length>
+                            <height units="m">0.774</height>
+                            <width units="m">1.15</width>
+                            <wet_area units="m**2">7.92688</wet_area>
+                        </nacelle>
+                    </ice_1>
+                </ICE>
                 <rectifier>
                     <rectifier_1>
                         <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
@@ -275,7 +300,34 @@
                     </dc_dc_converter_2>
                 </DC_DC_converter>
                 <DC_SSPC>
+                    <dc_sspc_3>
+                        <efficiency>0.99</efficiency>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <CG>
+                            <x units="m">2.69</x>
+                        </CG>
+                        <mass units="kg">10.0</mass>
+                        <current_caliber units="A">400.0</current_caliber>
+                        <voltage_caliber units="V">750.0</voltage_caliber>
+                        <current_max units="A" is_input="False">227.588167623899<!--Maximum current flowing through the SSPC--></current_max>
+                        <voltage_max units="V" is_input="False">849.1711312831264<!--Maximum voltage at the terminals SSPC--></voltage_max>
+                        <scaling>
+                            <resistance>1.125</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00169875</resistance>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00210375</resistance>
+                        </diode>
+                    </dc_sspc_3>
                     <dc_sspc_412>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -301,6 +353,7 @@
                         </diode>
                     </dc_sspc_412>
                     <dc_sspc_1>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -326,6 +379,7 @@
                         </diode>
                     </dc_sspc_1>
                     <dc_sspc_2>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -351,6 +405,7 @@
                         </diode>
                     </dc_sspc_2>
                     <dc_sspc_1337>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -376,6 +431,7 @@
                         </diode>
                     </dc_sspc_1337>
                     <dc_sspc_1338>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>

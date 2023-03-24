@@ -1,0 +1,37 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  dc_sspc_1:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+  dc_line_1:
+    id: fastga_he.pt_component.dc_line
+  dc_sspc_2:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+
+component_connections:
+
+  - source: [dc_bus_1, 1]
+    target: dc_sspc_1
+
+  - source: dc_sspc_1
+    target: dc_line_1
+
+  - source: dc_line_1
+    target: dc_sspc_2
+
+  - source: dc_sspc_2
+    target: [dc_bus_2, 1]
+
+watcher_file_path:

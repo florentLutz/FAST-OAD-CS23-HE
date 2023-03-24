@@ -2,8 +2,12 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import logging
+
 import openmdao.api as om
 import numpy as np
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class PerformancesRectifierLoadSide(om.ExplicitComponent):
@@ -40,10 +44,11 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
 
         self.add_output(
             "ac_current_rms_in_one_phase",
-            val=np.full(number_of_points, 400.0),
+            val=np.full(number_of_points, 133.0),
             units="A",
             desc="Current at the input side of the rectifier",
-            lower=1e-4,
+            lower=-1000.0,
+            upper=1000.0,
         )
 
         self.declare_partials(of="ac_current_rms_in_one_phase", wrt="*", method="exact")

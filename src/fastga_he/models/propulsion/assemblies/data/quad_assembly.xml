@@ -22,6 +22,7 @@
                 </battery_pack>
                 <DC_SSPC>
                     <dc_sspc_1>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -47,6 +48,7 @@
                         </diode>
                     </dc_sspc_1>
                     <dc_sspc_2>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -72,6 +74,7 @@
                         </diode>
                     </dc_sspc_2>
                     <dc_sspc_3>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -97,6 +100,7 @@
                         </diode>
                     </dc_sspc_3>
                     <dc_sspc_4>
+                        <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>

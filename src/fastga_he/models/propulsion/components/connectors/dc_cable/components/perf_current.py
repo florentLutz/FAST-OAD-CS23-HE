@@ -59,6 +59,8 @@ class PerformancesCurrent(om.ExplicitComponent):
             desc="current of line",
             shape=number_of_points,
             val=250.0,
+            lower=-1000.0,
+            upper=1000.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

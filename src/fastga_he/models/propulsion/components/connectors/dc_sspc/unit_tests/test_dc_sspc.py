@@ -8,9 +8,9 @@ import numpy as np
 
 from ..components.sizing_resistance_scaling import SizingDCSSPCResistanceScaling
 from ..components.sizing_reference_resistance import SizingDCSSPCResistances
+from ..components.sizing_efficiency import SizingDCSSPCEfficiency
 from ..components.sizing_weight import SizingDCSSPCWeight
 from ..components.sizing_dc_sspc_cg import SizingDCSSPCCG
-from ..components.perf_resistance import PerformancesDCSSPCResistance
 from ..components.perf_current import PerformancesDCSSPCCurrent
 from ..components.perf_voltage_out import PerformancesDCSSPCVoltageOut
 from ..components.perf_losses import PerformancesDCSSPCLosses
@@ -74,6 +74,22 @@ def test_resistance():
     problem.check_partials(compact_print=True)
 
 
+def test_efficiency_sizing():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCSSPCEfficiency(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
+    )
+
+    problem = run_system(SizingDCSSPCEfficiency(dc_sspc_id="dc_sspc_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:efficiency"
+    ) == pytest.approx(0.995, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_weight():
 
     # Research independent input value in .xml file
@@ -130,44 +146,11 @@ def test_sizing_dc_sspc():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:cruise:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:efficiency"
+    ) == pytest.approx(0.995, rel=1e-2)
 
     problem.check_partials(compact_print=True)
-
-
-def test_perf_resistance():
-
-    # Research independent input value in .xml file, should be the same regardless of option
-    ivc = get_indep_var_comp(
-        list_inputs(
-            PerformancesDCSSPCResistance(
-                dc_sspc_id="dc_sspc_1", number_of_points=NB_POINTS_TEST, closed=True
-            )
-        ),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(
-        PerformancesDCSSPCResistance(
-            dc_sspc_id="dc_sspc_1", number_of_points=NB_POINTS_TEST, closed=True
-        ),
-        ivc,
-    )
-    expected_resistance = np.full(NB_POINTS_TEST, 0.00380)
-    assert problem.get_val("resistance_sspc", units="ohm") == pytest.approx(
-        expected_resistance, rel=1e-2
-    )
-
-    problem = run_system(
-        PerformancesDCSSPCResistance(
-            dc_sspc_id="dc_sspc_1", number_of_points=NB_POINTS_TEST, closed=False
-        ),
-        ivc,
-    )
-    expected_resistance = np.full(NB_POINTS_TEST, 1e6)
-    assert problem.get_val("resistance_sspc", units="ohm") == pytest.approx(
-        expected_resistance, rel=1e-2
-    )
 
 
 def test_perf_currents():
@@ -212,15 +195,15 @@ def test_perf_losses():
     ivc = om.IndepVarComp()
     output_current = np.linspace(400, 390, NB_POINTS_TEST)
     ivc.add_output("dc_current_in", units="A", val=output_current)
-    resistance = np.full(NB_POINTS_TEST, 0.00380)
-    ivc.add_output("resistance_sspc", units="ohm", val=resistance)
+    ivc.add_output("dc_voltage_in", units="V", val=np.linspace(500, 490, NB_POINTS_TEST))
+    ivc.add_output("dc_voltage_out", units="V", val=np.linspace(490, 500, NB_POINTS_TEST))
 
     problem = run_system(
         PerformancesDCSSPCLosses(number_of_points=NB_POINTS_TEST, closed=True),
         ivc,
     )
     expected_losses = np.array(
-        [608.0, 604.6, 601.3, 597.9, 594.6, 591.2, 587.9, 584.6, 581.3, 578.0]
+        [4000.0, 3102.5, 2209.9, 1322.2, 439.5, 438.3, 1311.1, 2179.0, 3042.0, 3900.0]
     )
     assert problem.get_val("power_losses", units="W") == pytest.approx(expected_losses, rel=1e-2)
 
@@ -263,19 +246,19 @@ def test_perf_power():
 
 def test_perf_efficiency():
 
-    ivc = om.IndepVarComp()
-    losses = np.array([608.0, 604.6, 601.3, 597.9, 594.6, 591.2, 587.9, 584.6, 581.3, 578.0])
-    ivc.add_output("power_losses", units="W", val=losses)
-    power = np.array([240.0, 239.3, 238.7, 238.0, 237.3, 236.7, 236.0, 235.3, 234.7, 234.0])
-    ivc.add_output("power_flow", units="kW", val=power)
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesDCSSPCEfficiency(number_of_points=NB_POINTS_TEST, dc_sspc_id="dc_sspc_1")
+        ),
+        __file__,
+        XML_FILE,
+    )
 
     problem = run_system(
-        PerformancesDCSSPCEfficiency(number_of_points=NB_POINTS_TEST),
+        PerformancesDCSSPCEfficiency(number_of_points=NB_POINTS_TEST, dc_sspc_id="dc_sspc_1"),
         ivc,
     )
-    expected_efficiency = np.array(
-        [0.99747, 0.99747, 0.99748, 0.99749, 0.99749, 0.9975, 0.99751, 0.99752, 0.99752, 0.99753]
-    )
+    expected_efficiency = np.full(NB_POINTS_TEST, 0.98)
     assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -389,11 +372,8 @@ def test_performances():
         PerformancesDCSSPC(dc_sspc_id="dc_sspc_1", number_of_points=NB_POINTS_TEST, closed=True),
         ivc,
     )
-    expected_voltage = np.array(
-        [598.48, 598.48, 598.49, 598.49, 598.5, 598.5, 598.51, 598.51, 598.51, 598.52]
-    )
+    expected_voltage = np.full(NB_POINTS_TEST, 588.0)
     assert problem.get_val("dc_voltage_out", units="V") == pytest.approx(expected_voltage, rel=1e-2)
-
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:current_max", units="A"
     ) == pytest.approx(400, rel=1e-2)
@@ -401,9 +381,7 @@ def test_performances():
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:voltage_max", units="V"
     ) == pytest.approx(600, rel=1e-2)
 
-    expected_efficiency = np.array(
-        [0.99747, 0.99747, 0.99748, 0.99749, 0.99749, 0.9975, 0.99751, 0.99752, 0.99752, 0.99753]
-    )
+    expected_efficiency = np.full(NB_POINTS_TEST, 0.98)
     assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-3)
 
     problem.check_partials(compact_print=True)
