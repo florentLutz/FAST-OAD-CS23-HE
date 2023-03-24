@@ -19,20 +19,14 @@ power_train_components:
   harness_1:
     id: fastga_he.pt_component.dc_line
     position: from_rear_to_front  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
-  dc_splitter_1:
-    id: fastga_he.pt_component.dc_splitter
-    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
-
-  dc_dc_converter_1:
-    id: fastga_he.pt_component.dc_dc_converter
-    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
   rectifier_1:
     id: fastga_he.pt_component.rectifier
     position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
-
-  battery_pack_1:
-    id: fastga_he.pt_component.battery_pack
-    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
   generator_1:
     id: fastga_he.pt_component.generator
     position: in_the_back  # "in_the_front", "in_the_back"
@@ -56,6 +50,7 @@ power_train_components:
     options:
       closed_by_default: True
 
+
 component_connections:
   - source: propeller_1
     target: motor_1
@@ -67,9 +62,9 @@ component_connections:
     target: dc_sspc_1
 
   - source: dc_sspc_1
-    target: [dc_bus_1, 1]
+    target: [ dc_bus_1, 1 ]
 
-  - source: [dc_bus_1, 1]
+  - source: [ dc_bus_1, 1 ]
     target: dc_sspc_2
 
   - source: dc_sspc_2
@@ -79,15 +74,9 @@ component_connections:
     target: dc_sspc_3
 
   - source: dc_sspc_3
-    target: dc_splitter_1
+    target: [ dc_bus_2, 1 ]
 
-  - source: [dc_splitter_1, 1]
-    target: dc_dc_converter_1
-
-  - source: dc_dc_converter_1
-    target: battery_pack_1
-
-  - source: [dc_splitter_1, 2]
+  - source: [ dc_bus_2, 1 ]
     target: rectifier_1
 
   - source: rectifier_1
@@ -97,4 +86,4 @@ component_connections:
     target: ice_1
 
 
-watcher_file_path: ../results/fuel_and_battery_propulsion.csv
+watcher_file_path: ../results/fuel_turbo_propulsion.csv

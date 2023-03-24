@@ -1120,7 +1120,7 @@ def test_mission_vector_from_yml():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(140.08, abs=1e-2)
+    assert sizing_energy == pytest.approx(141.18, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
@@ -1156,16 +1156,16 @@ def test_mission_vector_from_yml_fuel():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(32.48, abs=1e-2)
+    assert sizing_fuel == pytest.approx(32.17, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
 
-def test_mission_vector_from_yml_fuel_and_battery():
+def test_mission_vector_from_yml_fuel_turbo():
 
     # Define used files depending on options
     xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
-    process_file_name = "mission_vector_fuel_and_battery_propulsion.yml"
+    process_file_name = "fuel_turbo_propulsion_mission_vector.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
 
@@ -1190,10 +1190,44 @@ def test_mission_vector_from_yml_fuel_and_battery():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
+    assert sizing_fuel == pytest.approx(33.57, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(140.08, abs=1e-2)
+    assert sizing_energy == pytest.approx(0.0, abs=1e-2)
+
+
+def test_mission_vector_from_yml_fuel_and_battery():
+
+    # Define used files depending on options
+    xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
+    process_file_name = "fuel_and_battery_propulsion_mission_vector.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+    configurator.write_needed_inputs(ref_inputs)
+
+    # Create problems with inputs
+    problem = configurator.get_problem(read_inputs=True)
+    problem.setup()
+
+    # om.n2(problem)
+
+    problem.run_model()
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    if not pth.exists(RESULTS_FOLDER_PATH):
+        os.mkdir(RESULTS_FOLDER_PATH)
+
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(17.32, abs=1e-2)
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(71.16, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.06715826, abs=1e-2)
+    assert mission_end_soc == pytest.approx(-0.0134, abs=1e-2)

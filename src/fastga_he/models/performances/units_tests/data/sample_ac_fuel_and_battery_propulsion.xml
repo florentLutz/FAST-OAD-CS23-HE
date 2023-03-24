@@ -270,11 +270,11 @@
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT module in the converter--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
-            <voltage_caliber units="V" is_input="False">500.0<!--Voltage caliber of the converter--></voltage_caliber>
+            <voltage_caliber units="V" is_input="False">650.0<!--Voltage caliber of the converter--></voltage_caliber>
             <voltage_in_caliber units="V" is_input="False">395.36583359345315</voltage_in_caliber>
             <voltage_in_max units="V" is_input="False">395.2573859239932</voltage_in_max>
             <voltage_out_max units="V" is_input="False">500.0</voltage_out_max>
-            <voltage_out_target_mission units="V" is_input="True">500.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
+            <voltage_out_target_mission units="V" is_input="True">650.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
             <CG>
               <x units="m" is_input="False">3.4550815011709046<!--X position of the DC/DC converter center of gravity--></x>
@@ -515,7 +515,7 @@
             <torque_max units="N*m" is_input="False">1198.7967514390286<!--Maximum value of the torque the motor has to provide--></torque_max>
             <torque_rating units="N*m" is_input="False">1198.7967514384413<!--Max continuous torque of the motor--></torque_rating>
             <voltage_ac_max units="V" is_input="False">110.58410260165384<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
-            <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
+            <voltage_caliber units="V" is_input="True">700.0<!--Max voltage of the motor--></voltage_caliber>
             <CG>
               <x units="m" is_input="False">0.46823<!--X position of the PMSM center of gravity--></x>
             </CG>
@@ -781,8 +781,8 @@
                 <current_dc_max units="A" is_input="False">113.38180785745816<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
                 <efficiency is_input="True">0.98<!--Efficiency of the rectifier for the points--></efficiency>
                 <voltage_ac_max units="V" is_input="False">243.4614167842755<!--Maximum value of the peak voltage at the input of the rectifier (AC side)--></voltage_ac_max>
-                <voltage_dc_max units="V" is_input="False">850.0<!--Maximum value of the voltage at the output of the rectifier (DC side)--></voltage_dc_max>
-                <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
+                <voltage_dc_max units="V" is_input="False">650.0<!--Maximum value of the voltage at the output of the rectifier (DC side)--></voltage_dc_max>
+                <voltage_out_target_mission units="V" is_input="True">650.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
             </rectifier_1>
         </rectifier>
         <generator>
@@ -791,6 +791,7 @@
                 <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum value of the RMS current flowing through one phase of the generator--></current_ac_max>
                 <losses_max units="W" is_input="False">5373.963379446291</losses_max>
                 <rpm_max units="1/min" is_input="False">2500.0<!--Maximum value of the generator rpm--></rpm_max>
+                <rpm_rating units="1/min" is_input="False">4500.0<!--Maximum value of the generator rpm--></rpm_rating>
                 <rpm_mission units="1/min" is_input="True">2500.0<!--RPM of the propeller for the points--></rpm_mission>
                 <shaft_power_max units="W" is_input="False">103715.3273374457</shaft_power_max>
                 <torque_constant units="N*m/A" is_input="True">0.8</torque_constant>

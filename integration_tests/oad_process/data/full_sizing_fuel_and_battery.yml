@@ -27,6 +27,12 @@ model:
     result_folder_path: D:/tmp
     compute_mach_interpolation: false
     compute_slipstream: false
+  power_train_sizing:
+    id: fastga_he.power_train.sizing
+    power_train_file_path: ./fuel_and_battery_propulsion.yml
+  weight:
+    id: fastga.weight.legacy
+    propulsion_id: fastga.wrapper.propulsion.basicIC_engine
   performances:
     id: fastga_he.performances.mission_vector
     number_of_points_climb: 30
@@ -35,12 +41,6 @@ model:
     number_of_points_reserve: 10
     power_train_file_path: ./fuel_and_battery_propulsion.yml
     out_file: ../results/mission_data_fuel_and_battery.csv
-  power_train_sizing:
-    id: fastga_he.power_train.sizing
-    power_train_file_path: ./fuel_and_battery_propulsion.yml
-  weight:
-    id: fastga.weight.legacy
-    propulsion_id: fastga.wrapper.propulsion.basicIC_engine
   mtow:
     id: fastga.loop.mtow
   hq:
