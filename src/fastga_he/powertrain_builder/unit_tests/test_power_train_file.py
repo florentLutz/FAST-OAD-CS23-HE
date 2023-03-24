@@ -12,7 +12,7 @@ from ..exceptions import FASTGAHESingleSSPCAtEndOfLine
 YML_FILE = "sample_power_train_file.yml"
 
 
-def test_power_train_file_components():
+def test_power_train_file_components_sizing():
 
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
@@ -33,6 +33,80 @@ def test_power_train_file_components():
     assert components_type
     assert components_om_type
     assert components_position
+
+
+def test_power_train_file_components_performances():
+
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    (
+        components_name,
+        components_name_id,
+        components_type,
+        components_om_type,
+        components_options,
+        components_connection_outputs,
+        components_connection_inputs,
+        components_promotes,
+        sspc_list,
+        sspc_default_state,
+    ) = power_train_configurator.get_performances_element_lists()
+
+    # Check that they are not empty
+    assert components_name
+    assert components_name_id
+    assert components_type
+    assert components_om_type
+    assert components_options
+    assert components_connection_outputs
+    assert components_connection_inputs
+    assert components_promotes
+    assert sspc_list
+    assert sspc_default_state
+
+
+def test_power_train_file_components_performances_sspc_last():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_sspc_last.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    (
+        cp_name,
+        cp_id,
+        cp_type,
+        cp_om_type,
+        cp_option,
+        _,
+        _,
+        cp_promotes,
+        _,
+        _,
+    ) = power_train_configurator.get_performances_element_lists()
+
+    (components_name, components_name_id, _, _, _,) = power_train_configurator.enforce_sspc_last(
+        cp_name,
+        cp_id,
+        cp_om_type,
+        cp_option,
+        cp_promotes,
+    )
+
+    # Check that they are not empty
+    assert components_name == ["dc_bus_1", "dc_line_1", "dc_bus_2", "dc_sspc_1", "dc_sspc_2"]
+    assert components_name_id == [
+        "dc_bus_id",
+        "harness_id",
+        "dc_bus_id",
+        "dc_sspc_id",
+        "dc_sspc_id",
+    ]
 
 
 def test_power_train_file_connections():

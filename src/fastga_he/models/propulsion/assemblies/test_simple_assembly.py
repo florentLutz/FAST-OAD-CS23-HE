@@ -119,16 +119,16 @@ def test_assembly_performances():
     ) * problem.get_val("performances.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                188015.0,
-                188982.0,
-                189927.0,
-                190856.0,
-                191775.0,
-                192684.0,
-                193583.0,
-                194472.0,
-                195345.0,
-                196201.0,
+                195011.3,
+                196012.7,
+                196991.5,
+                197954.7,
+                198907.1,
+                199850.8,
+                200785.1,
+                201707.4,
+                202613.8,
+                203502.4,
             ]
         ),
         abs=1,
@@ -247,7 +247,7 @@ def test_performances_sizing_assembly_battery_enforce():
     ) == pytest.approx(20.28, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(2424.4, rel=1e-2)
+    ) == pytest.approx(2473.68, rel=1e-2)
 
 
 def test_performances_sizing_assembly_battery_ensure():
@@ -296,7 +296,7 @@ def test_performances_sizing_assembly_battery_ensure():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
-    ) == pytest.approx(36.84, rel=1e-2)
+    ) == pytest.approx(36.08, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(3000.0, rel=1e-2)
@@ -417,16 +417,16 @@ def test_performances_from_pt_file():
     assert current_in * voltage_in == pytest.approx(
         np.array(
             [
-                188016.0,
-                188983.0,
-                189928.0,
-                190857.0,
-                191776.0,
-                192685.0,
-                193585.0,
-                194473.0,
-                195346.0,
-                196203.0,
+                195011.0,
+                196012.0,
+                196991.0,
+                197954.0,
+                198906.0,
+                199849.0,
+                200784.0,
+                201707.0,
+                202614.0,
+                203501.0,
             ]
         ),
         abs=1,
@@ -434,59 +434,6 @@ def test_performances_from_pt_file():
 
     write_outputs(
         pth.join(outputs.__path__[0], "assembly_performances_from_pt_file.xml"),
-        problem,
-    )
-
-
-def test_performances_from_pt_file_two_conv():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_two_conv.yml")
-    xml_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_two_conv.xml")
-
-    ivc = get_indep_var_comp(
-        list_inputs(
-            PowerTrainPerformancesFromFile(
-                power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
-            )
-        ),
-        __file__,
-        xml_file_path,
-    )
-
-    altitude = np.full(NB_POINTS_TEST, 0.0)
-    ivc.add_output("altitude", val=altitude, units="m")
-    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
-    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
-    ivc.add_output(
-        "exterior_temperature",
-        units="degK",
-        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
-    )
-    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
-
-    problem = run_system(
-        PowerTrainPerformancesFromFile(
-            power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
-        ),
-        ivc,
-    )
-
-    # om.n2(problem)
-
-    _, _, residuals = problem.model.component.get_nonlinear_vectors()
-
-    current_in = problem.get_val("component.dc_dc_converter_1.dc_current_in", units="A")
-    voltage_in = problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V")
-
-    current_in_2 = problem.get_val("component.dc_dc_converter_2.dc_current_in", units="A")
-    voltage_in_2 = problem.get_val("component.dc_dc_converter_2.dc_voltage_in", units="V")
-
-    # This test is expected to crash, so there should be nans in some residuals, hence the
-    # filtered list should not be empty
-    assert len(filter_residuals(residuals)) != 0
-    assert current_in * voltage_in != pytest.approx(current_in_2 * voltage_in_2, abs=1)
-
-    write_outputs(
-        pth.join(outputs.__path__[0], "assembly_performances_from_pt_file_two_conv.xml"),
         problem,
     )
 

@@ -99,4 +99,6 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
                 )
 
         else:
-            partials["dc_voltage_out", "dc_voltage_in"] = np.zeros(number_of_points)
+            partials["dc_voltage_out", "dc_voltage_in"] = np.zeros(
+                (number_of_points, number_of_points)
+            )

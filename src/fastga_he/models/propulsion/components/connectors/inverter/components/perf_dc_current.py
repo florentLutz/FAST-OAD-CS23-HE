@@ -51,8 +51,8 @@ class PerformancesDCCurrent(om.ImplicitComponent):
             val=np.full(number_of_points, 150.0),
             units="A",
             desc="Current coming in from the DC side of the inverter",
-            lower=-1000.0,
-            upper=1000.0,
+            lower=-2000.0,
+            upper=2000.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

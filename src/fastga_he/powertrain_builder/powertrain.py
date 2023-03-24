@@ -489,6 +489,86 @@ class FASTGAHEPowerTrainConfigurator:
             self._sspc_default_state,
         )
 
+    @staticmethod
+    def enforce_sspc_last(
+        components_name: list,
+        components_name_id: list,
+        components_om_type: list,
+        components_options: list,
+        components_promotes: list,
+    ) -> Tuple[list, list, list, list, list]:
+        """
+        It turns out that the SSPC can cause a bit of a mess when connected to cable, because,
+        as one side is computed and the other not, this might create huge current which will more
+        often than not prevent the code from converging. A solution found was to make it so that
+        the SSPC are always computed last in the performances. So far it works.
+
+        :param components_name: list that contains the name of the component as it will be found
+        in the input/output file
+        :param components_name_id: list that contains the name of the options used to provide the
+        names in self._components_name
+        :param components_om_type: list that contains the suffix of the component added to
+        Performances and Sizing
+        :param components_options: list that contains the options of the components
+        :param components_promotes: list that contains the list of aircraft inputs that are
+        necessary to promote in the performances modules for the code to work
+        """
+
+        sspc_list_components_name = []
+        sspc_list_components_name_id = []
+        sspc_list_components_om_type = []
+        sspc_list_components_options = []
+        sspc_list_components_promotes = []
+
+        other_components_name = []
+        other_components_name_id = []
+        other_components_om_type = []
+        other_components_options = []
+        other_components_promotes = []
+
+        for (
+            component_name,
+            component_name_id,
+            component_om_type,
+            component_options,
+            component_promotes,
+        ) in zip(
+            components_name,
+            components_name_id,
+            components_om_type,
+            components_options,
+            components_promotes,
+        ):
+            if resources.DICTIONARY_CN_ID["fastga_he.pt_component.dc_sspc"] in component_name_id:
+
+                sspc_list_components_name.append(component_name)
+                sspc_list_components_name_id.append(component_name_id)
+                sspc_list_components_om_type.append(component_om_type)
+                sspc_list_components_options.append(component_options)
+                sspc_list_components_promotes.append(component_promotes)
+
+            else:
+
+                other_components_name.append(component_name)
+                other_components_name_id.append(component_name_id)
+                other_components_om_type.append(component_om_type)
+                other_components_options.append(component_options)
+                other_components_promotes.append(component_promotes)
+
+        components_name = other_components_name + sspc_list_components_name
+        components_name_id = other_components_name_id + sspc_list_components_name_id
+        components_om_type = other_components_om_type + sspc_list_components_om_type
+        components_options = other_components_options + sspc_list_components_options
+        components_promotes = other_components_promotes + sspc_list_components_promotes
+
+        return (
+            components_name,
+            components_name_id,
+            components_om_type,
+            components_options,
+            components_promotes,
+        )
+
     def get_mass_element_lists(self) -> list:
         """
         Returns the list of OpenMDAO variables necessary to create the component which computes

@@ -123,6 +123,22 @@ class PowerTrainPerformancesFromFile(om.Group):
             promotes=["data:*", "thrust"],
         )
 
+        # Enforces SSPC are added last, not done before because it might breaks the connections
+        # necessary to ensure the coherence of SSPC states when connected to both end of a cable
+        (
+            components_name,
+            components_name_id,
+            components_om_type,
+            components_options,
+            components_promotes,
+        ) = self.configurator.enforce_sspc_last(
+            components_name,
+            components_name_id,
+            components_om_type,
+            components_options,
+            components_promotes,
+        )
+
         for (
             component_name,
             component_name_id,

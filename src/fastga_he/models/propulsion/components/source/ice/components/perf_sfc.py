@@ -2,12 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import logging
-
 import openmdao.api as om
 import numpy as np
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class PerformancesSFC(om.ExplicitComponent):
@@ -55,15 +51,9 @@ class PerformancesSFC(om.ExplicitComponent):
         # this correlation is valid for rpm between 2200.0 and 2700.0 and PME between 20.62 and
         # 8.08191746 bar, we will implement a simple and warning
         clipped_pme = np.clip(inputs["mean_effective_pressure"], 8.081, 20.62807778)
-        if (clipped_pme != inputs["mean_effective_pressure"]).any():
-            _LOGGER.warning(
-                "Value of Mean Effective Pressure outside of the interpolation range, value clipped"
-            )
         pme = clipped_pme / 20.62807778
 
         clipped_rpm = np.clip(inputs["rpm"], 2200.0, 2700.0)
-        if (clipped_rpm != inputs["rpm"]).any():
-            _LOGGER.warning("Value of RPM outside of the interpolation range, value clipped")
         rpm = clipped_rpm / 2700.0
 
         sfc = (
