@@ -4,7 +4,6 @@
 
 import openmdao.api as om
 
-from .perf_resistance import PerformancesDCSSPCResistance
 from .perf_current import PerformancesDCSSPCCurrent
 from .perf_voltage_out import PerformancesDCSSPCVoltageOut
 from .perf_maximum import PerformancesDCSSPCMaximum
@@ -46,9 +45,11 @@ class PerformancesDCSSPC(om.Group):
         at_bus_output = self.options["at_bus_output"]
 
         self.add_subsystem(
-            "resistance",
-            PerformancesDCSSPCResistance(
-                dc_sspc_id=dc_sspc_id, number_of_points=number_of_points, closed=closed
+            "efficiency",
+            PerformancesDCSSPCEfficiency(
+                number_of_points=number_of_points,
+                closed=closed,
+                dc_sspc_id=dc_sspc_id,
             ),
             promotes=["*"],
         )
@@ -60,7 +61,9 @@ class PerformancesDCSSPC(om.Group):
         self.add_subsystem(
             "voltage",
             PerformancesDCSSPCVoltageOut(
-                number_of_points=number_of_points, at_bus_output=at_bus_output, closed=closed
+                number_of_points=number_of_points,
+                at_bus_output=at_bus_output,
+                closed=closed,
             ),
             promotes=["*"],
         )
@@ -72,11 +75,6 @@ class PerformancesDCSSPC(om.Group):
         self.add_subsystem(
             "power",
             PerformancesDCSSPCPower(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            "efficiency",
-            PerformancesDCSSPCEfficiency(number_of_points=number_of_points, closed=closed),
             promotes=["*"],
         )
         self.add_subsystem(

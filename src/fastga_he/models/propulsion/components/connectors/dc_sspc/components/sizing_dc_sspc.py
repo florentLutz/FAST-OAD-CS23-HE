@@ -8,6 +8,7 @@ from .cstr_dc_sspc import ConstraintsDCSSPC
 
 from .sizing_resistance_scaling import SizingDCSSPCResistanceScaling
 from .sizing_reference_resistance import SizingDCSSPCResistances
+from .sizing_efficiency import SizingDCSSPCEfficiency
 from .sizing_weight import SizingDCSSPCWeight
 from .sizing_dc_sspc_cg import SizingDCSSPCCG
 from .sizing_dc_sspc_drag import SizingDCSSPCDrag
@@ -56,6 +57,11 @@ class SizingDCSSPC(om.Group):
         self.add_subsystem(
             name="resistance",
             subsys=SizingDCSSPCResistances(dc_sspc_id=dc_sspc_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="efficiency",
+            subsys=SizingDCSSPCEfficiency(dc_sspc_id=dc_sspc_id),
             promotes=["*"],
         )
         self.add_subsystem(

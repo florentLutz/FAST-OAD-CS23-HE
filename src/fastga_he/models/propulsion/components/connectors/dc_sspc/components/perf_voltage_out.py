@@ -29,16 +29,11 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
-        # self.add_input(
-        #     "dc_current_in",
-        #     val=np.full(number_of_points, np.nan),
-        #     units="A",
-        # )
-        # self.add_input(
-        #     "resistance_sspc",
-        #     val=np.full(number_of_points, np.nan),
-        #     units="ohm",
-        # )
+        self.add_input(
+            "efficiency",
+            val=np.full(number_of_points, 0.99),
+            desc="Value of the SSPC efficiency, assumed constant during operations (eases convergence)",
+        )
         self.add_input(
             "dc_voltage_in",
             val=np.full(number_of_points, np.nan),
@@ -77,11 +72,9 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
 
         if self.options["closed"]:
             if self.options["at_bus_output"]:
-                factor = 0.99
+                outputs["dc_voltage_out"] = inputs["dc_voltage_in"] * inputs["efficiency"]
             else:
-                factor = 1.0 / 0.99
-
-            outputs["dc_voltage_out"] = inputs["dc_voltage_in"] * factor
+                outputs["dc_voltage_out"] = inputs["dc_voltage_in"] / inputs["efficiency"]
         else:
 
             # If we start from the principle that there will be a logic for the opening of SSPC (
@@ -97,22 +90,13 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
 
         if self.options["closed"]:
             if self.options["at_bus_output"]:
-                factor = 0.99
+                partials["dc_voltage_out", "dc_voltage_in"] = np.diag(inputs["efficiency"])
+                partials["dc_voltage_out", "efficiency"] = np.diag(inputs["dc_voltage_in"])
             else:
-                factor = 1.0 / 0.99
+                partials["dc_voltage_out", "dc_voltage_in"] = np.diag(1.0 / inputs["efficiency"])
+                partials["dc_voltage_out", "efficiency"] = np.diag(
+                    -inputs["dc_voltage_in"] / inputs["efficiency"] ** 2.0
+                )
 
-            partials["dc_voltage_out", "dc_voltage_in"] = np.eye(number_of_points) * factor
-            # partials["dc_voltage_out", "resistance_sspc"] = factor * np.diag(
-            #     inputs["dc_current_in"]
-            # )
-            # partials["dc_voltage_out", "dc_current_in"] = factor * np.diag(
-            #     inputs["resistance_sspc"]
-            # )
         else:
             partials["dc_voltage_out", "dc_voltage_in"] = np.zeros(number_of_points)
-            # partials["dc_voltage_out", "resistance_sspc"] = np.zeros(
-            #     (number_of_points, number_of_points)
-            # )
-            # partials["dc_voltage_out", "dc_current_in"] = np.zeros(
-            #     (number_of_points, number_of_points)
-            # )

@@ -14,6 +14,12 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(
+            name="dc_sspc_id",
+            default=None,
+            desc="Identifier of the DC SSPC",
+            allow_none=False,
+        )
+        self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
@@ -26,17 +32,12 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
     def setup(self):
 
         number_of_points = self.options["number_of_points"]
+        dc_sspc_id = self.options["dc_sspc_id"]
 
         self.add_input(
-            "power_losses",
-            val=np.full(number_of_points, np.nan),
-            units="W",
-        )
-        self.add_input(
-            "power_flow",
-            val=np.full(number_of_points, np.nan),
-            units="W",
-            desc="Power at the terminal of the SSPC with the greatest voltage",
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency",
+            val=np.nan,
+            desc="Value of the SSPC efficiency, assumed constant during operations (eases convergence)",
         )
 
         self.add_output(
@@ -49,10 +50,12 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         number_of_points = self.options["number_of_points"]
+        dc_sspc_id = self.options["dc_sspc_id"]
 
         if self.options["closed"]:
-            efficiency = np.where(
-                inputs["power_flow"] > 1.0, 1.0 - inputs["power_losses"] / inputs["power_flow"], 1.0
+            efficiency = np.full(
+                number_of_points,
+                inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency"],
             )
         else:
             efficiency = np.ones(number_of_points)
@@ -62,12 +65,13 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         number_of_points = self.options["number_of_points"]
+        dc_sspc_id = self.options["dc_sspc_id"]
 
         if self.options["closed"]:
-            partials["efficiency", "power_losses"] = -np.diag(1.0 / inputs["power_flow"])
-            partials["efficiency", "power_flow"] = np.diag(
-                inputs["power_losses"] / inputs["power_flow"] ** 2.0
-            )
+            partials[
+                "efficiency", "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency"
+            ] = np.ones(number_of_points)
         else:
-            partials["efficiency", "power_losses"] = np.zeros((number_of_points, number_of_points))
-            partials["efficiency", "power_flow"] = np.zeros((number_of_points, number_of_points))
+            partials[
+                "efficiency", "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency"
+            ] = np.zeros(number_of_points)
