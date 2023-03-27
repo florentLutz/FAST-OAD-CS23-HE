@@ -666,6 +666,7 @@
                   <dc_splitter_1>
                     <current_max units="A" is_input="False">500.0</current_max>
                     <power_split units="percent" is_input="True">50.0<!--Percent of the power going to the first (primary) input, in %--></power_split>
+                    <power_share units="kW" is_input="True">150.0<!--Power threshold for how much power is going into the primary input--></power_share>
                     <voltage_max units="V" is_input="False">850.0</voltage_max>
                   </dc_splitter_1>
                 </DC_splitter>

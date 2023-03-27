@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesElectricalNode(om.ImplicitComponent):
+class PerformancesElectricalNodePercentSplit(om.ImplicitComponent):
     def initialize(self):
         self.options.declare(
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"

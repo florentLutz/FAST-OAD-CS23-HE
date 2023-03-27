@@ -15,6 +15,7 @@ from ..components.sizing_dc_splitter_dimensions import SizingDCSplitterDimension
 from ..components.sizing_dc_splitter_weight import SizingDCSplitterWeight
 from ..components.sizing_dc_splitter_cg import SizingDCSplitterCG
 from ..components.perf_mission_power_split import PerformancesMissionPowerSplit
+from ..components.perf_mission_power_share import PerformancesMissionPowerShare
 from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
@@ -266,6 +267,55 @@ def test_perf_power_split_formatting():
         units="percent",
     )
     assert power_split_output == pytest.approx(power_split_array, rel=1e-4)
+
+
+def test_perf_power_share_formatting():
+
+    power_split_float = 150.0e3
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_share",
+        val=power_split_float,
+        units="W",
+    )
+
+    problem = run_system(
+        PerformancesMissionPowerShare(
+            dc_splitter_id="dc_splitter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+    power_split_output = problem.get_val(
+        "power_share",
+        units="W",
+    )
+    expected_power_split = np.full(NB_POINTS_TEST, power_split_float)
+    assert power_split_output == pytest.approx(expected_power_split, rel=1e-4)
+
+    problem.check_partials(compact_print=True)
+
+    # Let's now try with a full power split
+    power_split_array = np.linspace(60e3, 40e3, NB_POINTS_TEST)
+    ivc_2 = om.IndepVarComp()
+    ivc_2.add_output(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_share",
+        val=power_split_array,
+        units="W",
+    )
+
+    problem = run_system(
+        PerformancesMissionPowerShare(
+            dc_splitter_id="dc_splitter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc_2,
+    )
+    power_split_output = problem.get_val(
+        "power_share",
+        units="W",
+    )
+    assert power_split_output == pytest.approx(power_split_array, rel=1e-4)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_perf_maximum():
