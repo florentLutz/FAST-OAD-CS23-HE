@@ -100,7 +100,7 @@ def test_assembly_performances_splitter_150_kw():
 def test_assembly_performances_splitter_150_kw_low_requirement():
 
     # Same test as above except the thrust required will be much lower to check if it indeed
-    # output zero current in the secondary branch
+    # output zero current in the secondary branch and primary branch is equal to the output
 
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitterPowerShare(number_of_points=NB_POINTS_TEST)),

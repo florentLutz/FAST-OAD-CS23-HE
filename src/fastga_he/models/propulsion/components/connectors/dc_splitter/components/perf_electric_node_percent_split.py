@@ -99,22 +99,31 @@ class PerformancesElectricalNodePercentSplit(om.ImplicitComponent):
         dc_voltage_in_1 = outputs["dc_voltage_in_1"]
         dc_voltage_in_2 = outputs["dc_voltage_in_2"]
 
-        residuals["dc_voltage"] = (dc_voltage_in_1 + dc_voltage_in_2) / 2 - dc_voltage
-        residuals["dc_voltage_in_1"] = dc_current_in_1 - power_split * dc_current_out / 100.0
-        residuals["dc_voltage_in_2"] = dc_current_in_1 + dc_current_in_2 - dc_current_out
+        residuals["dc_voltage"] = (dc_voltage_in_1 + dc_voltage_in_2) - dc_voltage * 2.0
+
+        # Playing around with this accelerated the convergence of the code so we will leave it
+        # like that
+        factor = np.where(dc_current_in_2 < 1e-3, 1, 1e3)
+
+        residuals["dc_voltage_in_1"] = (
+            dc_current_in_1 * 100 - power_split * dc_current_out
+        ) * factor
+        residuals["dc_voltage_in_2"] = (dc_current_in_1 + dc_current_in_2 - dc_current_out) * factor
 
     def linearize(self, inputs, outputs, partials):
 
         number_of_points = self.options["number_of_points"]
 
-        partials["dc_voltage", "dc_voltage_in_1"] = np.eye(number_of_points) / 2.0
-        partials["dc_voltage", "dc_voltage_in_2"] = np.eye(number_of_points) / 2.0
-        partials["dc_voltage", "dc_voltage"] = -np.eye(number_of_points)
+        factor = np.where(inputs["dc_current_in_2"] < 1e-3, 1, 1e3)
 
-        partials["dc_voltage_in_1", "dc_current_in_1"] = np.eye(number_of_points)
-        partials["dc_voltage_in_1", "power_split"] = -np.diag(inputs["dc_current_out"] / 100.0)
-        partials["dc_voltage_in_1", "dc_current_out"] = -np.diag(inputs["power_split"] / 100.0)
+        partials["dc_voltage", "dc_voltage_in_1"] = np.eye(number_of_points)
+        partials["dc_voltage", "dc_voltage_in_2"] = np.eye(number_of_points)
+        partials["dc_voltage", "dc_voltage"] = -np.eye(number_of_points) * 2.0
 
-        partials["dc_voltage_in_2", "dc_current_in_1"] = np.eye(number_of_points)
-        partials["dc_voltage_in_2", "dc_current_in_2"] = np.eye(number_of_points)
-        partials["dc_voltage_in_2", "dc_current_out"] = -np.eye(number_of_points)
+        partials["dc_voltage_in_1", "dc_current_in_1"] = np.eye(number_of_points) * 100.0 * factor
+        partials["dc_voltage_in_1", "power_split"] = -np.diag(inputs["dc_current_out"]) * factor
+        partials["dc_voltage_in_1", "dc_current_out"] = -np.diag(inputs["power_split"]) * factor
+
+        partials["dc_voltage_in_2", "dc_current_in_1"] = np.eye(number_of_points) * factor
+        partials["dc_voltage_in_2", "dc_current_in_2"] = np.eye(number_of_points) * factor
+        partials["dc_voltage_in_2", "dc_current_out"] = -np.eye(number_of_points) * factor
