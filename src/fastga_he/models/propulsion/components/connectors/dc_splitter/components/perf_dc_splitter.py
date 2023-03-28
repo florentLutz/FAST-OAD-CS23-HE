@@ -6,8 +6,8 @@ import openmdao.api as om
 
 from .perf_mission_power_split import PerformancesMissionPowerSplit
 from .perf_mission_power_share import PerformancesMissionPowerShare
+from .perf_percent_split_equivalent import PerformancesPercentSplitEquivalent
 from .perf_electric_node_percent_split import PerformancesElectricalNodePercentSplit
-from .perf_electric_node_power_share import PerformancesElectricalNodePowerShare
 from .perf_maximum import PerformancesMaximum
 
 
@@ -44,13 +44,6 @@ class PerformancesDCSplitter(om.Group):
                 ),
                 promotes=["*"],
             )
-            self.add_subsystem(
-                name="electrical_node",
-                subsys=PerformancesElectricalNodePercentSplit(
-                    number_of_points=number_of_points,
-                ),
-                promotes=["*"],
-            )
         else:
             self.add_subsystem(
                 name="control_parameter_formatting",
@@ -61,12 +54,19 @@ class PerformancesDCSplitter(om.Group):
                 promotes=["*"],
             )
             self.add_subsystem(
-                name="electrical_node",
-                subsys=PerformancesElectricalNodePowerShare(
+                name="percent_split_equivalent",
+                subsys=PerformancesPercentSplitEquivalent(
                     number_of_points=number_of_points,
                 ),
                 promotes=["*"],
             )
+        self.add_subsystem(
+            name="electrical_node",
+            subsys=PerformancesElectricalNodePercentSplit(
+                number_of_points=number_of_points,
+            ),
+            promotes=["*"],
+        )
         self.add_subsystem(
             name="maximum",
             subsys=PerformancesMaximum(

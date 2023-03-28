@@ -279,3 +279,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         ] = np.where(
             inputs["switching_frequency"] == np.max(inputs["switching_frequency"]), 1.0, 0.0
         )
+        partials[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":modulation_idx_max",
+            "modulation_index",
+        ] = np.where(inputs["modulation_index"] == np.max(inputs["modulation_index"]), 1.0, 0.0)

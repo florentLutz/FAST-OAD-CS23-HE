@@ -50,7 +50,7 @@ class PerformancesElectricalNodePercentSplit(om.ImplicitComponent):
             name="dc_voltage",
             val=np.full(number_of_points, 350),
             units="V",
-            desc="Voltage of the bus",
+            desc="Voltage of the splitter",
             lower=np.full(number_of_points, 0.0),
             upper=np.full(number_of_points, 2.0e3),
         )
