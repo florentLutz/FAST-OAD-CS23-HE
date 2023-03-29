@@ -44,8 +44,18 @@ class PerformancesModuleCurrent(om.ExplicitComponent):
 
         battery_pack_id = self.options["battery_pack_id"]
 
+        # The tolerance on the convergence might cause the code to consider that value of current
+        # that should be zero is actually equal to a very small albeit non-zero value making the
+        # battery slowly discharge. While this is not an issue considering that this is a
+        # preliminary design tool, it might shock user to see the battery discharge ever so
+        # slightly when it shouldn't
+
+        # TODO: This threshold value could be an input, the first of many "tuning" parameters
+        #  that could be added to the code after discussing it
+        current_out = np.where(np.abs(inputs["dc_current_out"] < 1), 0.0, inputs["dc_current_out"])
+
         outputs["current_one_module"] = (
-            inputs["dc_current_out"]
+            current_out
             / inputs[
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules"
             ]

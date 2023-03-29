@@ -68,18 +68,26 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        # The 1e3 is indeed a very unexpected operation here, but without it, for reasons I don't
-        # have time to investigate now not having it makes the code not converge
-        # TODO: Add it as an option/input and rename it as a "convergence" parameter to make it
-        #  sound more legitimate like the compressor map parameters in GasTurb
-
-        power_output = inputs["dc_voltage"] * 1e3 * inputs["dc_current_out"]
+        power_output = inputs["dc_voltage"] * inputs["dc_current_out"]
         power_share = inputs["power_share"]
 
-        partials["power_split", "power_share"] = np.diag(100.0 / power_output)
-        partials["power_split", "dc_voltage"] = np.diag(
-            -100.0 * power_share / power_output / inputs["dc_voltage"]
+        # In case the power output is below the power share, the percent split should always be
+        # 100% but that will means that the partials are at zero potentially only during a few
+        # point of the mission which the solver might interpret as the Jacobian not being full in
+        # rank. Consequently, instead of putting it at 0 we put a very small value.
+        partials_power_share = np.where(power_share < power_output, 100.0 / power_output, 0.0)
+        partials["power_split", "power_share"] = np.diag(partials_power_share)
+
+        partials_voltage_out = np.where(
+            power_share < power_output,
+            -100.0 * power_share / power_output / inputs["dc_voltage"],
+            1e-6,
         )
-        partials["power_split", "dc_current_out"] = np.diag(
+        partials["power_split", "dc_voltage"] = np.diag(partials_voltage_out)
+
+        partials_current_out = np.where(
+            power_share < power_output,
             -100.0 * power_share / power_output / inputs["dc_current_out"],
+            1e-6,
         )
+        partials["power_split", "dc_current_out"] = np.diag(partials_current_out)

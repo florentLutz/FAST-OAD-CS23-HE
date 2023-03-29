@@ -176,7 +176,7 @@ DC_SPLITTER = {
     CN: "DCSplitter",
     CN_ID: "dc_splitter_id",
     CT: "DC_splitter",
-    ATT: [],
+    ATT: ["splitter_mode"],
     PT: [],
     IN: [(None, "dc_voltage_in_"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out", None)],
