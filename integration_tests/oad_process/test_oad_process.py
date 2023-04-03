@@ -6,6 +6,7 @@ import logging
 import pytest
 
 import fastoad.api as oad
+import openmdao.api as om
 
 from utils.filter_residuals import filter_residuals
 
@@ -121,6 +122,41 @@ def test_sizing_sr22(cleanup):
     )
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
         257.90, rel=1e-2
+    )
+
+    problem.write_outputs()
+
+
+def test_sizing_fuel_and_battery_share(cleanup):
+
+    """Test the overall aircraft design process with wing positioning under VLM method."""
+    logging.basicConfig(level=logging.WARNING)
+
+    # Define used files depending on options
+    xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
+    process_file_name = "fuel_and_battery_share_mission.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+    configurator.write_needed_inputs(ref_inputs)
+
+    # Create problems with inputs
+    problem = configurator.get_problem(read_inputs=True)
+    problem.setup()
+
+    # om.n2(problem, show_browser=True)
+
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=1000.0)
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        1662.0, rel=1e-2
     )
 
     problem.write_outputs()

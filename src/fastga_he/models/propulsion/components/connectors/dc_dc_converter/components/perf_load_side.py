@@ -40,18 +40,30 @@ class PerformancesConverterLoadSide(om.ExplicitComponent):
             val=np.full(number_of_points, 400.0),
             units="A",
             desc="Current at the input side of the converter",
-            lower=1e-4,
+            lower=-1000.0,
+            upper=1000.0,
         )
 
         self.declare_partials(of="dc_current_in", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["dc_current_in"] = inputs["power"] / inputs["dc_voltage_in"]
+        # If power is too low, we consider that there is no current, may prevent some convergence
+        # issue
+        current_in = np.where(
+            np.abs(inputs["power"]) < 10.0, 0.0, inputs["power"] / inputs["dc_voltage_in"]
+        )
+
+        outputs["dc_current_in"] = current_in
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["dc_current_in", "dc_voltage_in"] = -np.diag(
-            inputs["power"] / inputs["dc_voltage_in"] ** 2
+        partials_voltage = np.where(
+            np.abs(inputs["power"]) < 10.0, 1e-8, -inputs["power"] / inputs["dc_voltage_in"] ** 2
         )
-        partials["dc_current_in", "power"] = np.diag(1.0 / inputs["dc_voltage_in"])
+        partials["dc_current_in", "dc_voltage_in"] = np.diag(partials_voltage)
+
+        partials_power = np.where(
+            np.abs(inputs["power"]) < 10.0, 1e-8, 1.0 / inputs["dc_voltage_in"]
+        )
+        partials["dc_current_in", "power"] = np.diag(partials_power)

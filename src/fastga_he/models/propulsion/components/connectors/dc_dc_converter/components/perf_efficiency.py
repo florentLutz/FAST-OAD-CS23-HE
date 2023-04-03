@@ -34,11 +34,15 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["efficiency"] = (
+        efficiency = np.where(
+            np.abs(inputs["dc_current_out"]) < 1,
+            1.0,
             inputs["dc_current_out"]
             * inputs["dc_voltage_out"]
-            / (inputs["dc_current_out"] * inputs["dc_voltage_out"] + inputs["losses_converter"])
+            / (inputs["dc_current_out"] * inputs["dc_voltage_out"] + inputs["losses_converter"]),
         )
+
+        outputs["efficiency"] = efficiency
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -48,12 +52,23 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         useful_power = dc_current_out * voltage_out
 
-        partials["efficiency", "dc_voltage_out"] = np.diag(
-            dc_current_out * losses_converter / (useful_power + losses_converter) ** 2.0
+        partials_voltage_out = np.where(
+            np.abs(inputs["dc_current_out"]) < 1,
+            1e-6,
+            dc_current_out * losses_converter / (useful_power + losses_converter) ** 2.0,
         )
-        partials["efficiency", "dc_current_out"] = np.diag(
-            voltage_out * losses_converter / (useful_power + losses_converter) ** 2.0
+        partials["efficiency", "dc_voltage_out"] = np.diag(partials_voltage_out)
+
+        partials_current_out = np.where(
+            np.abs(inputs["dc_current_out"]) < 1,
+            1e-6,
+            voltage_out * losses_converter / (useful_power + losses_converter) ** 2.0,
         )
-        partials["efficiency", "losses_converter"] = np.diag(
-            -useful_power / (useful_power + losses_converter) ** 2.0
+        partials["efficiency", "dc_current_out"] = np.diag(partials_current_out)
+
+        partials_losses = np.where(
+            np.abs(inputs["dc_current_out"]) < 1,
+            1e-6,
+            -useful_power / (useful_power + losses_converter) ** 2.0,
         )
+        partials["efficiency", "losses_converter"] = np.diag(partials_losses)
