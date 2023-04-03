@@ -1,5 +1,6 @@
 import os
 import os.path as pth
+from shutil import rmtree
 import logging
 
 import pytest
@@ -12,7 +13,14 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
 
-def test_pipistrel_like():
+@pytest.fixture(scope="module")
+def cleanup():
+    """Empties results folder to avoid any conflicts."""
+    rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
+    rmtree("D:/tmp", ignore_errors=True)
+
+
+def test_pipistrel_like(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -44,7 +52,7 @@ def test_pipistrel_like():
     problem.write_outputs()
 
 
-def test_fuel_and_battery():
+def test_fuel_and_battery(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -74,13 +82,13 @@ def test_fuel_and_battery():
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         722.0, rel=1e-2
     )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(19.32, rel=1e-2)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(22.57, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(126.0, rel=1e-2)
+    ) == pytest.approx(126.34, rel=1e-2)
 
 
-def test_sizing_sr22():
+def test_sizing_sr22(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)

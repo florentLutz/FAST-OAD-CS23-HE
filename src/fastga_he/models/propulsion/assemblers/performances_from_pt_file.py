@@ -5,6 +5,8 @@
 import openmdao.api as om
 import fastoad.api as oad
 
+import numpy as np
+
 from fastga_he.powertrain_builder.powertrain import (
     FASTGAHEPowerTrainConfigurator,
     PROMOTION_FROM_MISSION,
@@ -238,3 +240,11 @@ class PowerTrainPerformancesFromFile(om.Group):
                     + "_"
                     + component_performances_watcher_name,
                 )
+
+    def guess_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
+
+        number_of_points = self.options["number_of_points"]
+
+        # This one will be passe in before going into the first pt components

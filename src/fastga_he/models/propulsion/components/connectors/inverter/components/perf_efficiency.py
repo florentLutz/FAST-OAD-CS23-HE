@@ -30,7 +30,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
         self.add_input("ac_voltage_rms_out", units="V", val=np.full(number_of_points, np.nan))
 
-        self.add_output("efficiency", val=np.full(number_of_points, 1.0))
+        self.add_output("efficiency", val=np.full(number_of_points, 1.0), lower=0.0, upper=1.0)
 
         self.declare_partials(of="*", wrt="*", method="exact")
 

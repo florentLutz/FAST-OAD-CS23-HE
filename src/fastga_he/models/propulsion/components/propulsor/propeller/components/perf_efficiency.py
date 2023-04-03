@@ -28,7 +28,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         self.add_input("power_coefficient", val=KILMER, shape=number_of_points)
         self.add_input("advance_ratio", val=KILMER, shape=number_of_points)
 
-        self.add_output("efficiency", shape=number_of_points)
+        self.add_output("efficiency", shape=number_of_points, lower=0.0, upper=1.0)
 
         self.declare_partials(
             of="*",

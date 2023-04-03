@@ -23,7 +23,7 @@ class PerformancesTorque(om.ExplicitComponent):
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
 
         self.add_output("shaft_power_for_power_rate", units="W", val=50e3, shape=number_of_points)
-        self.add_output("torque_out", units="N*m", val=500.0, shape=number_of_points)
+        self.add_output("torque_out", units="N*m", val=500.0, shape=number_of_points, lower=0.0)
 
         self.declare_partials(of="torque_out", wrt="*", method="exact")
         self.declare_partials(

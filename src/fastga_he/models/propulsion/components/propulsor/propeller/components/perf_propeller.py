@@ -59,24 +59,24 @@ class PerformancesPropeller(om.Group):
             PerformancesThrustCoefficient(
                 propeller_id=propeller_id, number_of_points=number_of_points
             ),
-            promotes=["rpm", "thrust", "altitude", "data:*"],
+            promotes=["rpm", "thrust", "altitude", "data:*", "thrust_coefficient"],
         )
         self.add_subsystem(
             "power_coefficient",
             PerformancesPowerCoefficient(
                 propeller_id=propeller_id, number_of_points=number_of_points
             ),
-            promotes=["data:*", "advance_ratio"],
+            promotes=["data:*", "advance_ratio", "power_coefficient", "thrust_coefficient"],
         )
         self.add_subsystem(
             "efficiency",
             PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=["efficiency", "advance_ratio"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "shaft_power",
             PerformancesShaftPower(propeller_id=propeller_id, number_of_points=number_of_points),
-            promotes=["data:*", "altitude", "shaft_power_in", "rpm"],
+            promotes=["data:*", "altitude", "shaft_power_in", "rpm", "power_coefficient"],
         )
 
         self.add_subsystem(
@@ -92,11 +92,3 @@ class PerformancesPropeller(om.Group):
 
         self.connect("tip_mach.tip_mach", ["power_coefficient.tip_mach", "maximum.tip_mach"])
         self.connect("blade_diameter_reynolds.reynolds_D", "power_coefficient.reynolds_D")
-        self.connect(
-            "thrust_coefficient.thrust_coefficient",
-            ["power_coefficient.thrust_coefficient", "efficiency.thrust_coefficient"],
-        )
-        self.connect(
-            "power_coefficient.power_coefficient",
-            ["shaft_power.power_coefficient", "efficiency.power_coefficient"],
-        )

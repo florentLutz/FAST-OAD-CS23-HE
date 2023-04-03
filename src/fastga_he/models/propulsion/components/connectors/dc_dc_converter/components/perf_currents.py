@@ -73,7 +73,11 @@ class PerformancesCurrents(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        duty_cycle = inputs["duty_cycle"]
+        duty_cycle = np.clip(
+            inputs["duty_cycle"],
+            np.full_like(inputs["duty_cycle"], 1e-3),
+            np.full_like(inputs["duty_cycle"], 1.0 - 1e-3),
+        )
         current_out = inputs["dc_current_out"]
 
         partials["current_IGBT", "duty_cycle"] = (

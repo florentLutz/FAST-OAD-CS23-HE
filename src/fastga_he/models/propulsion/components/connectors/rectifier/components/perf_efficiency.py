@@ -39,7 +39,7 @@ class PerformancesEfficiencyMission(om.ExplicitComponent):
             shape_by_conn=True,
         )
 
-        self.add_output("efficiency", val=1.0, shape=number_of_points)
+        self.add_output("efficiency", val=0.98, shape=number_of_points, lower=0.0, upper=1.0)
 
         self.declare_partials(of="*", wrt="*", method="exact")
 

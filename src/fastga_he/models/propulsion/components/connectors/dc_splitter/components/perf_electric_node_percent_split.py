@@ -92,7 +92,7 @@ class PerformancesElectricalNodePercentSplit(om.ImplicitComponent):
         dc_current_in_1 = inputs["dc_current_in_1"]
         dc_current_in_2 = inputs["dc_current_in_2"]
 
-        power_split = np.clip(inputs["power_split"], 0.0, 100.0)
+        power_split = inputs["power_split"]
 
         dc_voltage = outputs["dc_voltage"]
 
