@@ -12,6 +12,7 @@ from stdatm import Atmosphere
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
+from utils.filter_residuals import filter_residuals
 
 from .simple_assembly.performances_simple_assembly_splitter import PerformancesAssemblySplitter
 
@@ -239,6 +240,7 @@ def test_assembly_performances_splitter_100_0():
     # om.n2(problem)
 
     _, _, residuals = problem.model.performances.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
 
     current_out = problem.get_val("performances.dc_splitter_1.dc_current_out", units="A")
     voltage_out = problem.get_val("performances.dc_splitter_1.dc_voltage", units="V")

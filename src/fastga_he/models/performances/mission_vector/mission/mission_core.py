@@ -2,6 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO.
 
+import numpy as np
+
 import openmdao.api as om
 import fastoad.api as oad
 
@@ -123,4 +125,50 @@ class MissionCore(om.Group):
         self.connect(
             "compute_time_step.time_step",
             "compute_dep_equilibrium.preparation_for_energy_consumption.time_step",
+        )
+
+    def guess_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+        number_of_points_total = (
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
+        )
+
+        mtow = inputs["update_mass.data:weight:aircraft:MTOW"]
+
+        dummy_fuel_consumed = np.linspace(0, 10.0, number_of_points_total)
+        outputs["update_mass.mass"] = np.full(number_of_points_total, mtow) - np.cumsum(
+            dummy_fuel_consumed
+        )
+        outputs["compute_dep_equilibrium.compute_equilibrium.alpha"] = np.concatenate(
+            (
+                np.full(number_of_points_climb, 3.0),
+                np.full(number_of_points_cruise, 2.0),
+                np.full(number_of_points_descent, 1.0),
+                np.full(number_of_points_reserve, 7.0),
+            )
+        )
+        outputs["compute_dep_equilibrium.compute_equilibrium.delta_m"] = np.concatenate(
+            (
+                np.full(number_of_points_climb, -10.0),
+                np.full(number_of_points_cruise, -2.0),
+                np.full(number_of_points_descent, -5.0),
+                np.full(number_of_points_reserve, -2.0),
+            )
+        )
+        outputs["compute_dep_equilibrium.compute_equilibrium.thrust"] = np.concatenate(
+            (
+                np.full(number_of_points_climb, 2.0 * mtow),
+                np.full(number_of_points_cruise, mtow / 1.3),
+                np.full(number_of_points_descent, 0.5 * mtow),
+                np.full(number_of_points_reserve, mtow / 1.3),
+            )
         )

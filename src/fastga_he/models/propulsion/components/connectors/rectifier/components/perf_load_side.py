@@ -58,7 +58,7 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
         # If power is too low, we consider that there is no current, may prevent some convergence
         # issue
         current_in = np.where(
-            np.abs(inputs["power"]) < 10.0, 0.0, inputs["power"] / inputs["ac_voltage_rms_in"] / 3.0
+            inputs["power"] < 10.0, 0.0, inputs["power"] / inputs["ac_voltage_rms_in"] / 3.0
         )
 
         outputs["ac_current_rms_in_one_phase"] = current_in
@@ -66,14 +66,14 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         partials_voltage_in = np.where(
-            np.abs(inputs["power"]) < 10.0,
+            inputs["power"] < 10.0,
             1e-6,
             -inputs["power"] / inputs["ac_voltage_rms_in"] ** 2 / 3.0,
         )
         partials["ac_current_rms_in_one_phase", "ac_voltage_rms_in"] = -np.diag(partials_voltage_in)
 
         partials_power = np.where(
-            np.abs(inputs["power"]) < 10.0,
+            inputs["power"] < 10.0,
             1e-6,
             1.0 / inputs["ac_voltage_rms_in"] / 3.0,
         )

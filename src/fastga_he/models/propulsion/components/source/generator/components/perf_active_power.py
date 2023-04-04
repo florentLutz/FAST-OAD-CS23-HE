@@ -14,13 +14,25 @@ class PerformancesActivePower(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            name="generator_id", default=None, desc="Identifier of the generator", allow_none=False
+        )
 
     def setup(self):
 
         number_of_points = self.options["number_of_points"]
+        generator_id = self.options["generator_id"]
 
-        self.add_input("shaft_power_in", units="W", val=np.nan, shape=number_of_points)
-        self.add_input("efficiency", val=np.nan, shape=number_of_points)
+        self.add_input(
+            "settings:propulsion:he_power_train:generator:" + generator_id + ":power_factor",
+            val=1.0,
+        )
+        self.add_input(
+            "apparent_power",
+            units="W",
+            val=np.full(number_of_points, np.nan),
+            shape=number_of_points,
+        )
 
         self.add_output(
             "active_power",
@@ -33,9 +45,27 @@ class PerformancesActivePower(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["active_power"] = inputs["shaft_power_in"] * inputs["efficiency"]
+        generator_id = self.options["generator_id"]
+
+        outputs["active_power"] = (
+            inputs["apparent_power"]
+            * inputs[
+                "settings:propulsion:he_power_train:generator:" + generator_id + ":power_factor"
+            ]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["active_power", "shaft_power_in"] = np.diag(inputs["efficiency"])
-        partials["active_power", "efficiency"] = np.diag(inputs["shaft_power_in"])
+        generator_id = self.options["generator_id"]
+        number_of_points = self.options["number_of_points"]
+
+        partials["active_power", "apparent_power"] = (
+            np.eye(number_of_points)
+            * inputs[
+                "settings:propulsion:he_power_train:generator:" + generator_id + ":power_factor"
+            ]
+        )
+        partials[
+            "active_power",
+            "settings:propulsion:he_power_train:generator:" + generator_id + ":power_factor",
+        ] = inputs["apparent_power"]

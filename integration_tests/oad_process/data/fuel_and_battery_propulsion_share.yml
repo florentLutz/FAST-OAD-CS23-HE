@@ -98,4 +98,4 @@ component_connections:
     target: ice_1
 
 
-watcher_file_path: ../results/fuel_and_battery_propulsion.csv
+watcher_file_path: ../results/fuel_and_battery_propulsion_share.csv

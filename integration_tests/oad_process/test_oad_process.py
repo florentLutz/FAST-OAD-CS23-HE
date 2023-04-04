@@ -149,14 +149,15 @@ def test_sizing_fuel_and_battery_share(cleanup):
 
     # om.n2(problem, show_browser=True)
 
-    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=1000.0)
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=600.0)
     problem.run_model()
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
-    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        1662.0, rel=1e-2
-    )
-
     problem.write_outputs()
+
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(14.8, abs=1e-2)
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(16.98, abs=1e-2)

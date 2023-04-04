@@ -26,7 +26,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
             "efficiency",
             val=np.full(number_of_points, 1.0),
             shape=number_of_points,
-            lower=0.0,
+            lower=0.75,
             upper=1.0,
         )
 
@@ -37,14 +37,29 @@ class PerformancesEfficiency(om.ExplicitComponent):
         # To avoid dividing by zero
         power_shaft_in = np.clip(inputs["shaft_power_in"], 1.0, None)
 
-        outputs["efficiency"] = 1.0 - inputs["power_losses"] / power_shaft_in
+        # The model was based on an efficiency map where the minimum value was 0.86, we will clip
+        # a little below just in case
+        efficiency = np.clip(1.0 - inputs["power_losses"] / power_shaft_in, 0.75, 1.0)
+
+        outputs["efficiency"] = efficiency
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         # To avoid dividing by zero
         power_shaft_in = np.clip(inputs["shaft_power_in"], 1.0, None)
 
-        partials["efficiency", "shaft_power_in"] = np.diag(
-            inputs["power_losses"] / power_shaft_in ** 2.0
+        efficiency_untouched = 1.0 - inputs["power_losses"] / power_shaft_in
+
+        partials_shaft_power = np.where(
+            np.clip(efficiency_untouched, 0.75, 1.0) != efficiency_untouched,
+            1e-6,
+            inputs["power_losses"] / power_shaft_in ** 2.0,
         )
-        partials["efficiency", "power_losses"] = np.diag(-1.0 / power_shaft_in)
+        partials["efficiency", "shaft_power_in"] = np.diag(partials_shaft_power)
+
+        partials_losses = np.where(
+            np.clip(efficiency_untouched, 0.75, 1.0) != efficiency_untouched,
+            1e-6,
+            -1.0 / power_shaft_in,
+        )
+        partials["efficiency", "power_losses"] = np.diag(partials_losses)

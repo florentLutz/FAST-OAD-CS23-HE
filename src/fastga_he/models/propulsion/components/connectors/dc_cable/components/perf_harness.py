@@ -22,6 +22,8 @@ class PerformancesHarness(om.Group):
         self.nonlinear_solver.options["iprint"] = 0
         self.nonlinear_solver.options["maxiter"] = 100
         self.nonlinear_solver.options["rtol"] = 1e-5
+        self.nonlinear_solver.options["stall_limit"] = 5
+        self.nonlinear_solver.options["stall_tol"] = 1e-5
         self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
         self.linear_solver = om.LinearBlockGS()
 

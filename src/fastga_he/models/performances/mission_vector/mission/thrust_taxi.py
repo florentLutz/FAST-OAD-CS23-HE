@@ -20,7 +20,7 @@ class ThrustTaxi(om.ExplicitComponent):
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
         self.add_input("data:mission:sizing:taxi_out:speed", np.nan, units="m/s")
-        self.add_output("data:mission:sizing:taxi_out:thrust", 1500, units="N")
+        self.add_output("data:mission:sizing:taxi_out:thrust", 500, units="N")
 
         self.declare_partials(
             of="data:mission:sizing:taxi_out:thrust",
@@ -34,7 +34,7 @@ class ThrustTaxi(om.ExplicitComponent):
         )
 
         self.add_input("data:mission:sizing:taxi_in:speed", np.nan, units="m/s")
-        self.add_output("data:mission:sizing:taxi_in:thrust", 1500, units="N")
+        self.add_output("data:mission:sizing:taxi_in:thrust", 500, units="N")
 
         self.declare_partials(
             of="data:mission:sizing:taxi_in:thrust",
@@ -61,11 +61,16 @@ class ThrustTaxi(om.ExplicitComponent):
         cd = cd0 + coeff_k_wing * cl0_wing ** 2.0
         density = Atmosphere(altitude=0.0).density
 
-        outputs["data:mission:sizing:taxi_out:thrust"] = (
-            0.5 * density * speed_to ** 2.0 * wing_area * cd
+        # To avoid issue with the convergence of the power train, we will ensure that the thrust
+        # required is high enough, by requesting a minimum of 10 kW during taxi
+        min_thrust_to = 5e3 / speed_to
+        min_thrust_ti = 5e3 / speed_ti
+
+        outputs["data:mission:sizing:taxi_out:thrust"] = np.maximum(
+            0.5 * density * speed_to ** 2.0 * wing_area * cd, min_thrust_to
         )
-        outputs["data:mission:sizing:taxi_in:thrust"] = (
-            0.5 * density * speed_ti ** 2.0 * wing_area * cd
+        outputs["data:mission:sizing:taxi_in:thrust"] = np.maximum(
+            0.5 * density * speed_ti ** 2.0 * wing_area * cd, min_thrust_ti
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):

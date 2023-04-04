@@ -15,28 +15,15 @@ class PerformancesTorque(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(
-            name="generator_id", default=None, desc="Identifier of the motor", allow_none=False
-        )
-        self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
 
-        generator_id = self.options["generator_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input(
-            "ac_current_rms_out",
-            val=np.full(number_of_points, np.nan),
-            units="A",
-            desc="Current at the output side of the generator",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:generator:" + generator_id + ":torque_constant",
-            val=1.0,
-            units="N*m/A",
-        )
+        self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
+        self.add_input("shaft_power_in", units="W", val=np.nan, shape=number_of_points)
 
         self.add_output("torque_in", units="N*m", val=400.0, shape=number_of_points)
 
@@ -44,27 +31,15 @@ class PerformancesTorque(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        generator_id = self.options["generator_id"]
+        omega = inputs["rpm"] * 2.0 * np.pi / 60
 
-        current_rms_out = inputs["ac_current_rms_out"]
-        k_t = inputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":torque_constant"
-        ]
-
-        outputs["torque_in"] = current_rms_out * k_t
+        outputs["torque_in"] = inputs["shaft_power_in"] / omega
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        generator_id = self.options["generator_id"]
-        number_of_points = self.options["number_of_points"]
+        omega = inputs["rpm"] * 2.0 * np.pi / 60
 
-        current_rms_out = inputs["ac_current_rms_out"]
-        k_t = inputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":torque_constant"
-        ]
-
-        partials["torque_in", "ac_current_rms_out"] = k_t * np.eye(number_of_points)
-        partials[
-            "torque_in",
-            "data:propulsion:he_power_train:generator:" + generator_id + ":torque_constant",
-        ] = current_rms_out
+        partials["torque_in", "shaft_power_in"] = np.diag(1.0 / omega)
+        partials["torque_in", "rpm"] = (
+            -np.diag(inputs["shaft_power_in"] / omega ** 2.0) * 2.0 * np.pi / 60
+        )

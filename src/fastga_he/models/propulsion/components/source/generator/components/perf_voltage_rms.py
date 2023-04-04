@@ -2,17 +2,15 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import logging
+
 import numpy as np
 import openmdao.api as om
 
+_LOGGER = logging.getLogger(__name__)
 
-class PerformancesVoltageRMS(om.ExplicitComponent):
-    """
-    Computation of the RMS of the voltage from the RMS of the current and apparent power.
 
-    Formula can be seen in :cite:`wildi:2005`.
-    """
-
+class PerformancesVoltageRMS(om.ImplicitComponent):
     def initialize(self):
 
         self.options.declare(
@@ -23,8 +21,7 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("ac_current_rms_out", units="A", val=np.nan, shape=number_of_points)
-        self.add_input("apparent_power", units="W", val=np.nan, shape=number_of_points)
+        self.add_input("voltage_out_target", units="V", val=np.nan, shape=number_of_points)
 
         self.add_output(
             "ac_voltage_rms_out",
@@ -36,17 +33,15 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+    def apply_nonlinear(self, inputs, outputs, residuals):
 
-        ac_voltage_rms_out = inputs["apparent_power"] / inputs["ac_current_rms_out"]
-
-        outputs["ac_voltage_rms_out"] = ac_voltage_rms_out
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        partials["ac_voltage_rms_out", "apparent_power"] = np.diag(
-            1.0 / (inputs["ac_current_rms_out"])
+        residuals["ac_voltage_rms_out"] = (
+            outputs["ac_voltage_rms_out"] - inputs["voltage_out_target"]
         )
-        partials["ac_voltage_rms_out", "ac_current_rms_out"] = -np.diag(
-            inputs["apparent_power"] / (inputs["ac_current_rms_out"] ** 2.0)
-        )
+
+    def linearize(self, inputs, outputs, partials):
+
+        number_of_points = self.options["number_of_points"]
+
+        partials["ac_voltage_rms_out", "ac_voltage_rms_out"] = np.eye(number_of_points)
+        partials["ac_voltage_rms_out", "voltage_out_target"] = -np.eye(number_of_points)
