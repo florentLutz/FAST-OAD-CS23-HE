@@ -12,6 +12,11 @@ from .mission.mission_core import MissionCore
 from .to_csv import ToCSV
 from fastga.models.weight.cg.cg_variation import InFlightCGVariation
 
+from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
+from fastga_he.models.propulsion.assemblers.performances_watcher import (
+    PowerTrainPerformancesWatcher,
+)
+
 
 @oad.RegisterOpenMDAOSystem("fastga_he.performances.mission_vector", domain=ModelDomain.OTHER)
 class MissionVector(om.Group):
@@ -27,6 +32,8 @@ class MissionVector(om.Group):
         self.nonlinear_solver.options["rtol"] = 1e-5
         self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
         self.linear_solver = om.LinearBlockGS()
+
+        self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
 
@@ -64,6 +71,8 @@ class MissionVector(om.Group):
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
         number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        pt_file_path = self.options["power_train_file_path"]
 
         self.add_subsystem("in_flight_cg_variation", InFlightCGVariation(), promotes=["*"])
         self.add_subsystem(
@@ -237,3 +246,71 @@ class MissionVector(om.Group):
         )
 
         self.connect("solve_equilibrium.compute_time_step.time_step", "to_csv.time_step")
+
+        # Add the powertrain watcher here to avoid opening and closing csv all the time
+
+        if pt_file_path:
+
+            self.configurator.load(pt_file_path)
+
+            if self.configurator.get_watcher_file_path():
+
+                number_of_points = (
+                    1
+                    + number_of_points_climb
+                    + number_of_points_cruise
+                    + number_of_points_descent
+                    + number_of_points_reserve
+                    + 1
+                )
+                self.add_subsystem(
+                    "performances_watcher",
+                    PowerTrainPerformancesWatcher(
+                        power_train_file_path=self.options["power_train_file_path"],
+                        number_of_points=number_of_points,
+                    ),
+                )
+
+                (
+                    components_name,
+                    components_performances_watchers_names,
+                    components_performances_watchers_units,
+                ) = self.configurator.get_performance_watcher_elements_list()
+
+                for (component_name, component_performances_watcher_name,) in zip(
+                    components_name,
+                    components_performances_watchers_names,
+                ):
+
+                    self.connect(
+                        "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances."
+                        + component_name
+                        + "."
+                        + component_performances_watcher_name,
+                        "performances_watcher"
+                        + "."
+                        + component_name
+                        + "_"
+                        + component_performances_watcher_name,
+                    )
+
+                self.connect(
+                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.thrust_econ",
+                    "performances_watcher.thrust",
+                )
+                self.connect(
+                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.altitude_econ",
+                    "performances_watcher.altitude",
+                )
+                self.connect(
+                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.time_step_econ",
+                    "performances_watcher.time_step",
+                )
+                self.connect(
+                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.true_airspeed_econ",
+                    "performances_watcher.true_airspeed",
+                )
+                self.connect(
+                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.exterior_temperature_econ",
+                    "performances_watcher.exterior_temperature",
+                )

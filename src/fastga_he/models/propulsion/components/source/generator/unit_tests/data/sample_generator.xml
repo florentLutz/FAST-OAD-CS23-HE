@@ -23,6 +23,7 @@
                 <generator>
                     <generator_1>
                         <rpm_mission units="min**-1">2500.0</rpm_mission>
+                        <voltage_out_target_mission units="V">400.0</voltage_out_target_mission>
                         <torque_constant units="N*m/A">0.8</torque_constant>
                         <torque_max units="N*m">348.0</torque_max>
                         <torque_rating units="N*m">350.0</torque_rating>

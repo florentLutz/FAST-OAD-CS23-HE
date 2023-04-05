@@ -284,6 +284,7 @@
         <DC_splitter>
           <dc_splitter_1>
             <power_split>15.0</power_split> <!-- Primary input is here the battery-->
+            <power_share units="W">30.0e3</power_share> <!-- Primary input is here the battery-->
           </dc_splitter_1>
         </DC_splitter>
         <DC_bus>

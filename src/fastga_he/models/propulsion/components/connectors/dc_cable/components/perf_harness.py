@@ -47,17 +47,17 @@ class PerformancesHarness(om.Group):
         self.add_subsystem(
             "resistance",
             PerformancesResistance(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "settings:*", "cable_temperature"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "cable_current",
             PerformancesCurrent(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "dc_voltage_out", "dc_voltage_in"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "losses_one_cable",
             PerformancesLossesOneCable(number_of_points=number_of_points),
-            promotes=["conduction_losses"],
+            promotes=["*"],
         )
 
         options_dict = {"harness_id": harness_id, "number_of_points": number_of_points}
@@ -68,11 +68,7 @@ class PerformancesHarness(om.Group):
                 SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE, options=options_dict
             ),
             promotes=[
-                "data:*",
-                "exterior_temperature",
-                "cable_temperature",
-                "conduction_losses",
-                "time_step",
+                "*",
             ],
         )
         # Though harness current depend on a variable stuck in the loop its output is not used in
@@ -80,30 +76,12 @@ class PerformancesHarness(om.Group):
         self.add_subsystem(
             "harness_current",
             PerformancesHarnessCurrent(harness_id=harness_id, number_of_points=number_of_points),
-            promotes=["data:*", "dc_current"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(harness_id=harness_id, number_of_points=number_of_points),
             promotes=[
-                "data:*",
-                "dc_voltage_out",
-                "dc_voltage_in",
-                "cable_temperature",
-                "conduction_losses",
-            ],
-        )
-
-        self.connect(
-            "resistance.resistance_per_cable",
-            ["cable_current.resistance_per_cable", "losses_one_cable.resistance_per_cable"],
-        )
-
-        self.connect(
-            "cable_current.dc_current_one_cable",
-            [
-                "harness_current.dc_current_one_cable",
-                "losses_one_cable.dc_current_one_cable",
-                "maximum.dc_current_one_cable",
+                "*",
             ],
         )

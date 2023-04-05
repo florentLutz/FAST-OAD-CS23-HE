@@ -42,6 +42,8 @@ PROPELLER = {
         {"torque_in": "N*m"},
         {"efficiency": None},
         {"advance_ratio": None},
+        {"reynolds_D": None},
+        {"tip_mach": None},
         {"thrust_coefficient": None},
         {"power_coefficient": None},
     ],

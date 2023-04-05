@@ -520,12 +520,12 @@ if __name__ == "__main__":
     )
     fig2.add_trace(sfc_contour_new)
     fig2.update_layout(
-        title_text="Interpolated data for ICE SFC",
+        title_text="Interpolated data for ICE SFC [g/kW/h]",
         title_x=0.5,
         xaxis_title="Mean Effective Pressure [bar]",
         yaxis_title="RPM [min**-1]",
     )
-    # fig2.show()
+    fig2.show()
 
     sfc_diff = (new_sfc_for_contour - sfc_data) / sfc_data * 100.0
     fig3 = go.Figure()
@@ -552,4 +552,4 @@ if __name__ == "__main__":
         xaxis_title="Mean Effective Pressure [bar]",
         yaxis_title="RPM [min**-1]",
     )
-    fig3.show()
+    # fig3.show()

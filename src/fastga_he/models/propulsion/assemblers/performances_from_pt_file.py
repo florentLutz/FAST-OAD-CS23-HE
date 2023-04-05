@@ -77,7 +77,8 @@ class PowerTrainPerformancesFromFile(om.Group):
             name="sspc_names_list",
             default=[],
             types=list,
-            desc="Contains the list of the SSPC name which state need to be changed. If this list is empty, nothing will be done.",
+            desc="Contains the list of the SSPC name which state need to be changed. If this list "
+            "is empty, nothing will be done.",
             allow_none=False,
         )
 
@@ -210,36 +211,8 @@ class PowerTrainPerformancesFromFile(om.Group):
             self.nonlinear_solver.options["rtol"] = 1e-4
             self.linear_solver = om.DirectSolver()
 
-        if self.configurator.get_watcher_file_path():
-
-            self.add_subsystem(
-                "performances_watcher",
-                PowerTrainPerformancesWatcher(
-                    power_train_file_path=self.options["power_train_file_path"],
-                    number_of_points=number_of_points,
-                ),
-                promotes=list(PROMOTION_FROM_MISSION.keys()),
-            )
-
-            (
-                components_name,
-                components_performances_watchers_names,
-                components_performances_watchers_units,
-            ) = self.configurator.get_performance_watcher_elements_list()
-
-            for (component_name, component_performances_watcher_name,) in zip(
-                components_name,
-                components_performances_watchers_names,
-            ):
-
-                self.connect(
-                    component_name + "." + component_performances_watcher_name,
-                    "performances_watcher"
-                    + "."
-                    + component_name
-                    + "_"
-                    + component_performances_watcher_name,
-                )
+        # The performances watcher was moved at the same level as the mission performances
+        # watcher so that it is not opened as much, they could be merged eventually
 
     def guess_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None

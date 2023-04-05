@@ -44,4 +44,4 @@ class PowerTrainMassFromFile(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["data:propulsion:he_power_train:mass"] = np.sum(inputs.values())
+        outputs["data:propulsion:he_power_train:mass"] = sum(inputs.values())

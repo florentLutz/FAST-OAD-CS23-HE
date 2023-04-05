@@ -38,4 +38,4 @@ class PerformancesApparentPower(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         partials["apparent_power", "ac_voltage_rms_out"] = np.diag(inputs["ac_current_rms_out"])
-        partials["apparent_power", "ac_voltage_rms_out"] = np.diag(inputs["ac_voltage_rms_out"])
+        partials["apparent_power", "ac_current_rms_out"] = np.diag(inputs["ac_voltage_rms_out"])

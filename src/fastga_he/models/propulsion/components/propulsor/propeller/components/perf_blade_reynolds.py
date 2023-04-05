@@ -35,7 +35,7 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input("altitude", units="m", val=0.0, shape=number_of_points)
 
-        self.add_output("reynolds_D", val=0.05, shape=number_of_points)
+        self.add_output("reynolds_D", val=2e7, shape=number_of_points)
 
         self.declare_partials(
             of="reynolds_D",

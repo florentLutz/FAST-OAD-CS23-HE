@@ -34,75 +34,53 @@ class PerformancesPMSM(om.Group):
         self.add_subsystem(
             "torque",
             PerformancesTorque(number_of_points=number_of_points),
-            promotes=["shaft_power_out", "rpm", "shaft_power_for_power_rate", "torque_out"],
+            promotes=["*"],
         )
 
         self.add_subsystem(
             "losses",
             PerformancesLosses(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["data:*", "rpm", "torque_out"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "efficiency",
             PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=["shaft_power_out", "efficiency"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "active_power",
             PerformancesActivePower(number_of_points=number_of_points),
-            promotes=["shaft_power_out", "efficiency"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "apparent_power",
             PerformancesApparentPower(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["settings:*"],
+            promotes=["*"],
         )
 
         self.add_subsystem(
             "current_rms",
             PerformancesCurrentRMS(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["data:*", "ac_current_rms_in", "torque_out"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "current_rms_one_phase",
             PerformancesCurrentRMS1Phase(number_of_points=number_of_points),
-            promotes=["ac_current_rms_in", "ac_current_rms_in_one_phase"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "voltage_rms",
             PerformancesVoltageRMS(number_of_points=number_of_points),
-            promotes=["ac_current_rms_in", "ac_voltage_rms_in"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "voltage_peak",
             PerformancesVoltagePeak(number_of_points=number_of_points),
-            promotes=["ac_voltage_peak_in", "ac_voltage_rms_in"],
+            promotes=["*"],
         )
 
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(number_of_points=number_of_points, motor_id=motor_id),
-            promotes=[
-                "data:*",
-                "ac_current_rms_in_one_phase",
-                "ac_voltage_peak_in",
-                "rpm",
-                "shaft_power_out",
-                "torque_out",
-            ],
-        )
-
-        self.connect(
-            "losses.power_losses",
-            ["efficiency.power_losses", "maximum.power_losses"],
-        )
-
-        self.connect(
-            "active_power.active_power",
-            "apparent_power.active_power",
-        )
-
-        self.connect(
-            "apparent_power.apparent_power",
-            "voltage_rms.apparent_power",
+            promotes=["*"],
         )

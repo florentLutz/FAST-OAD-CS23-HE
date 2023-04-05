@@ -284,7 +284,7 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
     )
 
     assert problem.get_val("component.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.31, 3.78, 4.08, 4.4, 4.79, 5.23, 5.57, 5.57, 5.57, 5.57]),
+        np.array([3.32, 3.79, 4.09, 4.42, 4.81, 5.27, 5.58, 5.58, 5.58, 5.58]),
         abs=1e-2,
     )
     assert problem.get_val(
