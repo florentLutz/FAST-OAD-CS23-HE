@@ -93,9 +93,15 @@ class ConstraintsSOCEnforce(om.ExplicitComponent):
 
         number_of_module_before = number_cells_tot / number_cells_module
 
+        multiplicative_factor = 1.0 + (soc_min_required - soc_min_mission) / 100.0
+
+        # In order to avoid reducing too much the number of cells at one time, (increasing it
+        # should not be an issue), we cap this factor at 2/3 (arbitrary)
+        multiplicative_factor = np.clip(multiplicative_factor, 2.0 / 3.0, None)
+
         outputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules"
-        ] = number_of_module_before * (1.0 + (soc_min_required - soc_min_mission) / 100.0)
+        ] = (number_of_module_before * multiplicative_factor)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -117,28 +123,33 @@ class ConstraintsSOCEnforce(om.ExplicitComponent):
         ]
 
         number_of_module_before = number_cells_tot / number_cells_module
+        multiplicative_factor = 1.0 + (soc_min_required - soc_min_mission) / 100.0
 
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_cells",
-        ] = (1.0 + (soc_min_required - soc_min_mission) / 100.0) / number_cells_module
+        ] = np.where(
+            multiplicative_factor < 2.0 / 3.0,
+            1e-6,
+            (1.0 + (soc_min_required - soc_min_mission) / 100.0) / number_cells_module,
+        )
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":module:number_cells",
-        ] = (
+        ] = np.where(
+            multiplicative_factor < 2.0 / 3.0,
+            1e-6,
             -number_cells_tot
             * (1.0 + (soc_min_required - soc_min_mission) / 100.0)
-            / number_cells_module ** 2.0
+            / number_cells_module ** 2.0,
         )
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":SOC_min",
-        ] = -(number_of_module_before / 100)
+        ] = np.where(multiplicative_factor < 2.0 / 3.0, 1e-6, -number_of_module_before / 100)
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":min_safe_SOC",
-        ] = (
-            number_of_module_before / 100
-        )
+        ] = np.where(multiplicative_factor < 2.0 / 3.0, 1e-6, number_of_module_before / 100)

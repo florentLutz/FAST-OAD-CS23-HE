@@ -1,10 +1,12 @@
 import os
 import os.path as pth
+from shutil import rmtree
 import logging
 
 import pytest
 
 import fastoad.api as oad
+import openmdao.api as om
 
 from utils.filter_residuals import filter_residuals
 
@@ -12,7 +14,14 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
 
-def test_pipistrel_like():
+@pytest.fixture(scope="module")
+def cleanup():
+    """Empties results folder to avoid any conflicts."""
+    rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
+    rmtree("D:/tmp", ignore_errors=True)
+
+
+def test_pipistrel_like(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -38,13 +47,13 @@ def test_pipistrel_like():
     residuals = filter_residuals(residuals)
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        606.0, rel=1e-2
+        614.0, rel=1e-2
     )
 
     problem.write_outputs()
 
 
-def test_fuel_and_battery():
+def test_fuel_and_battery(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -72,15 +81,15 @@ def test_fuel_and_battery():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        722.0, rel=1e-2
+        731.0, rel=1e-2
     )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(19.32, rel=1e-2)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(23.34, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(126.0, rel=1e-2)
+    ) == pytest.approx(126.93, rel=1e-2)
 
 
-def test_sizing_sr22():
+def test_sizing_sr22(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -116,3 +125,43 @@ def test_sizing_sr22():
     )
 
     problem.write_outputs()
+
+
+def test_sizing_fuel_and_battery_share(cleanup):
+
+    """Test the overall aircraft design process with wing positioning under VLM method."""
+    logging.basicConfig(level=logging.WARNING)
+
+    # Define used files depending on options
+    xml_file_name = "full_sizing_fuel_and_battery_share.xml"
+    process_file_name = "full_sizing_fuel_and_battery_share.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+    configurator.write_needed_inputs(ref_inputs)
+
+    # Create problems with inputs
+    problem = configurator.get_problem(read_inputs=True)
+    problem.setup()
+
+    # om.n2(problem, show_browser=True)
+
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=700.0)
+    problem.set_val("data:geometry:wing:area", units="m**2", val=10.0)
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(23.53, abs=1e-2)
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(36.059, abs=1e-2)
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        974.0, rel=1e-2
+    )

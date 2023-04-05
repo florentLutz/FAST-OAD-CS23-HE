@@ -24,6 +24,7 @@ from ..components.sizing_weight import SizingGeneratorWeight
 from ..components.sizing_generator_cg import SizingGeneratorCG
 
 from ..components.perf_mission_rpm import PerformancesRPMMission
+from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_current_rms_3_phases import PerformancesCurrentRMS3Phases
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_losses import PerformancesLosses
@@ -325,6 +326,32 @@ def test_rpm_mission():
     problem.check_partials(compact_print=True)
 
 
+def test_voltage_out_target():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesVoltageOutTargetMission(
+                generator_id="generator_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesVoltageOutTargetMission(
+            generator_id="generator_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("voltage_out_target", units="V") == pytest.approx(
+        np.full(NB_POINTS_TEST, 400.0), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_rms_current_3_phases():
 
     ivc = om.IndepVarComp()
@@ -341,24 +368,92 @@ def test_rms_current_3_phases():
     problem.check_partials(compact_print=True)
 
 
-def test_torque():
+def test_apparent_power():
 
-    ivc = get_indep_var_comp(
-        list_inputs(
-            PerformancesTorque(generator_id="generator_1", number_of_points=NB_POINTS_TEST)
-        ),
-        __file__,
-        XML_FILE,
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "ac_current_rms_out",
+        val=np.linspace(375.0, 435.0, NB_POINTS_TEST),
+        units="A",
     )
-    ivc.add_output("ac_current_rms_out", val=np.linspace(375.0, 435.0, NB_POINTS_TEST), units="A")
+    ivc.add_output(
+        "ac_voltage_rms_out",
+        val=np.full(NB_POINTS_TEST, 400),
+        units="V",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PerformancesApparentPower(number_of_points=NB_POINTS_TEST), ivc)
+
+    assert problem.get_val("apparent_power", units="kW") == pytest.approx(
+        np.array([150.0, 152.7, 155.3, 158.0, 160.7, 163.3, 166.0, 168.7, 171.3, 174.0]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_active_power():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "apparent_power",
+        val=np.array([150.0, 152.7, 155.3, 158.0, 160.7, 163.3, 166.0, 168.7, 171.3, 174.0]),
+        units="kW",
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesTorque(generator_id="generator_1", number_of_points=NB_POINTS_TEST), ivc
+        PerformancesActivePower(generator_id="generator_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
+    assert problem.get_val("active_power", units="kW") == pytest.approx(
+        np.array([150.0, 152.7, 155.3, 158.0, 160.7, 163.3, 166.0, 168.7, 171.3, 174.0]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_shaft_power_in():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "active_power",
+        units="kW",
+        val=np.array([150.0, 152.7, 155.3, 158.0, 160.7, 163.3, 166.0, 168.7, 171.3, 174.0]),
+    )
+    ivc.add_output(
+        "efficiency",
+        val=np.array([0.953, 0.953, 0.952, 0.952, 0.952, 0.952, 0.952, 0.951, 0.951, 0.951]),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PerformancesShaftPowerIn(number_of_points=NB_POINTS_TEST), ivc)
+
+    assert problem.get_val("shaft_power_in", units="kW") == pytest.approx(
+        np.array([157.4, 160.2, 163.1, 166.0, 168.8, 171.5, 174.4, 177.4, 180.1, 183.0]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_torque():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "shaft_power_in",
+        val=np.array([157.4, 160.2, 163.1, 166.0, 168.8, 171.5, 174.4, 177.4, 180.1, 183.0]),
+        units="kW",
+    )
+    ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500.0), units="min**-1")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PerformancesTorque(number_of_points=NB_POINTS_TEST), ivc)
+
     assert problem.get_val("torque_in", units="N*m") == pytest.approx(
-        np.linspace(300.0, 348.0, NB_POINTS_TEST), rel=1e-2
+        np.array([601.2, 611.9, 623.0, 634.1, 644.8, 655.1, 666.2, 677.6, 687.9, 699.0]), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -374,32 +469,19 @@ def test_losses():
         XML_FILE,
     )
     ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500.0), units="min**-1")
-    ivc.add_output("torque_in", val=np.linspace(300.0, 348.0, NB_POINTS_TEST), units="N*m")
+    ivc.add_output(
+        "torque_in",
+        val=np.array([601.2, 611.9, 623.0, 634.1, 644.8, 655.1, 666.2, 677.6, 687.9, 699.0]),
+        units="N*m",
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesLosses(generator_id="generator_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    assert problem.get_val("power_losses", units="W") == pytest.approx(
-        np.array([3700.3, 3781.0, 3863.2, 3946.7, 4031.7, 4118.1, 4205.9, 4295.2, 4385.8, 4477.9]),
-        rel=1e-2,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_shaft_power_in():
-
-    ivc = om.IndepVarComp()
-    ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500.0), units="min**-1")
-    ivc.add_output("torque_in", val=np.linspace(300.0, 348.0, NB_POINTS_TEST), units="N*m")
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PerformancesShaftPowerIn(number_of_points=NB_POINTS_TEST), ivc)
-
-    assert problem.get_val("shaft_power_in", units="kW") == pytest.approx(
-        np.array([78.5, 79.9, 81.3, 82.7, 84.1, 85.5, 86.9, 88.3, 89.7, 91.1]),
+    assert problem.get_val("power_losses", units="kW") == pytest.approx(
+        np.array([10.5, 10.8, 11.2, 11.5, 11.8, 12.2, 12.5, 12.9, 13.3, 13.7]),
         rel=1e-2,
     )
 
@@ -411,89 +493,20 @@ def test_efficiency():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "shaft_power_in",
-        val=np.array([78.5, 79.9, 81.3, 82.7, 84.1, 85.5, 86.9, 88.3, 89.7, 91.1]),
+        val=np.array([157.4, 160.2, 163.1, 166.0, 168.8, 171.5, 174.4, 177.4, 180.1, 183.0]),
         units="kW",
     )
     ivc.add_output(
         "power_losses",
-        val=np.array(
-            [3700.3, 3781.0, 3863.2, 3946.7, 4031.7, 4118.1, 4205.9, 4295.2, 4385.8, 4477.9]
-        ),
-        units="W",
+        val=np.array([10.5, 10.8, 11.2, 11.5, 11.8, 12.2, 12.5, 12.9, 13.3, 13.7]),
+        units="kW",
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(PerformancesEfficiency(number_of_points=NB_POINTS_TEST), ivc)
 
     assert problem.get_val("efficiency") == pytest.approx(
-        np.array([0.953, 0.953, 0.952, 0.952, 0.952, 0.952, 0.952, 0.951, 0.951, 0.951]),
-        rel=1e-2,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_active_power():
-
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "shaft_power_in",
-        val=np.array([78.5, 79.9, 81.3, 82.7, 84.1, 85.5, 86.9, 88.3, 89.7, 91.1]),
-        units="kW",
-    )
-    ivc.add_output(
-        "efficiency",
-        val=np.array([0.953, 0.953, 0.952, 0.952, 0.952, 0.952, 0.952, 0.951, 0.951, 0.951]),
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PerformancesActivePower(number_of_points=NB_POINTS_TEST), ivc)
-
-    assert problem.get_val("active_power", units="kW") == pytest.approx(
-        np.array([74.8, 76.1, 77.4, 78.7, 80.1, 81.4, 82.7, 84.0, 85.3, 86.6]),
-        rel=1e-2,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_apparent_power():
-
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "active_power",
-        val=np.array([74.8, 76.1, 77.4, 78.7, 80.1, 81.4, 82.7, 84.0, 85.3, 86.6]),
-        units="kW",
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesApparentPower(generator_id="generator_1", number_of_points=NB_POINTS_TEST), ivc
-    )
-
-    assert problem.get_val("apparent_power", units="kW") == pytest.approx(
-        np.array([74.8, 76.1, 77.4, 78.7, 80.1, 81.4, 82.7, 84.0, 85.3, 86.6]),
-        rel=1e-2,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_voltage_rms():
-
-    ivc = om.IndepVarComp()
-    ivc.add_output("ac_current_rms_out", val=np.linspace(375.0, 435.0, NB_POINTS_TEST), units="A")
-    ivc.add_output(
-        "apparent_power",
-        val=np.array([74.8, 76.1, 77.4, 78.7, 80.1, 81.4, 82.7, 84.0, 85.3, 86.6]),
-        units="kW",
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PerformancesVoltageRMS(number_of_points=NB_POINTS_TEST), ivc)
-
-    assert problem.get_val("ac_voltage_rms_out", units="V") == pytest.approx(
-        np.array([199.47, 199.39, 199.31, 199.24, 199.42, 199.35, 199.28, 199.21, 199.14, 199.08]),
+        np.array([0.933, 0.933, 0.931, 0.931, 0.93, 0.929, 0.928, 0.927, 0.926, 0.925]),
         rel=1e-2,
     )
 
@@ -571,39 +584,6 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:generator:generator_1:shaft_power_max", units="W"
     ) == pytest.approx(91.1e3, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_performances():
-
-    ivc = get_indep_var_comp(
-        list_inputs(
-            PerformancesGenerator(generator_id="generator_1", number_of_points=NB_POINTS_TEST)
-        ),
-        __file__,
-        XML_FILE,
-    )
-    ivc.add_output(
-        "ac_current_rms_out_one_phase", val=np.linspace(125, 145, NB_POINTS_TEST), units="A"
-    )
-
-    problem = run_system(
-        PerformancesGenerator(generator_id="generator_1", number_of_points=NB_POINTS_TEST), ivc
-    )
-
-    assert problem.get_val("ac_voltage_peak_out", units="V") == pytest.approx(
-        np.array([244.3, 244.2, 244.1, 244.02, 244.24, 244.15, 244.07, 243.98, 243.9, 243.82]),
-        rel=1e-2,
-    )
-    assert problem.get_val("shaft_power_in", units="kW") == pytest.approx(
-        np.array([78.5, 79.9, 81.3, 82.7, 84.1, 85.5, 86.9, 88.3, 89.7, 91.1]),
-        rel=1e-2,
-    )
-    assert problem.get_val("efficiency") == pytest.approx(
-        np.array([0.953, 0.953, 0.952, 0.952, 0.952, 0.952, 0.952, 0.951, 0.951, 0.951]),
-        rel=1e-2,
-    )
 
     problem.check_partials(compact_print=True)
 

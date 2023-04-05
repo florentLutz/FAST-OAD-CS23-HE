@@ -65,7 +65,7 @@ class PerformancesInverter(om.Group):
         self.add_subsystem(
             "modulation_idx",
             PerformancesModulationIndex(number_of_points=number_of_points),
-            promotes=["ac_voltage_peak_out", "dc_voltage_in", "modulation_index"],
+            promotes=["*"],
         )
         # Switching losses do not depend on current and gate voltage so we take them out of the
         # loop to save some time
@@ -73,22 +73,18 @@ class PerformancesInverter(om.Group):
             "switching_losses",
             PerformancesSwitchingLosses(inverter_id=inverter_id, number_of_points=number_of_points),
             promotes=[
-                "data:*",
-                "ac_current_rms_out_one_phase",
-                "switching_frequency",
-                "switching_losses_IGBT",
-                "switching_losses_diode",
+                "*",
             ],
         )
         self.add_subsystem(
             "resistance",
             PerformancesResistance(inverter_id=inverter_id, number_of_points=number_of_points),
-            promotes=["data:*", "settings:*", "diode_temperature", "IGBT_temperature"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "gate_voltage",
             PerformancesGateVoltage(inverter_id=inverter_id, number_of_points=number_of_points),
-            promotes=["data:*", "settings:*", "diode_temperature", "IGBT_temperature"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "conduction_losses",
@@ -96,22 +92,14 @@ class PerformancesInverter(om.Group):
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
             promotes=[
-                "data:*",
-                "ac_current_rms_out_one_phase",
-                "modulation_index",
-                "conduction_losses_IGBT",
-                "conduction_losses_diode",
+                "*",
             ],
         )
         self.add_subsystem(
             "total_losses",
             PerformancesLosses(number_of_points=number_of_points),
             promotes=[
-                "losses_inverter",
-                "switching_losses_IGBT",
-                "switching_losses_diode",
-                "conduction_losses_IGBT",
-                "conduction_losses_diode",
+                "*",
             ],
         )
         self.add_subsystem(
@@ -120,10 +108,7 @@ class PerformancesInverter(om.Group):
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
             promotes=[
-                "data:*",
-                "heat_sink_temperature",
-                "casing_temperature",
-                "losses_inverter",
+                "*",
             ],
         )
         self.add_subsystem(
@@ -132,56 +117,27 @@ class PerformancesInverter(om.Group):
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
             promotes=[
-                "data:*",
-                "diode_temperature",
-                "IGBT_temperature",
-                "casing_temperature",
-                "switching_losses_IGBT",
-                "switching_losses_diode",
-                "conduction_losses_IGBT",
-                "conduction_losses_diode",
+                "*",
             ],
         )
         self.add_subsystem(
             "efficiency",
             PerformancesEfficiency(number_of_points=number_of_points),
             promotes=[
-                "ac_current_rms_out_one_phase",
-                "ac_voltage_rms_out",
-                "efficiency",
-                "losses_inverter",
+                "*",
             ],
         )
         self.add_subsystem(
             "dc_side_current",
             PerformancesDCCurrent(number_of_points=number_of_points),
             promotes=[
-                "ac_current_rms_out_one_phase",
-                "dc_voltage_in",
-                "ac_voltage_rms_out",
-                "dc_current_in",
-                "efficiency",
+                "*",
             ],
         )
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(inverter_id=inverter_id, number_of_points=number_of_points),
             promotes=[
-                "data:*",
-                "ac_current_rms_out_one_phase",
-                "dc_voltage_in",
-                "ac_voltage_peak_out",
-                "dc_current_in",
-                "switching_frequency",
-                "modulation_index",
-                "diode_temperature",
-                "IGBT_temperature",
-                "casing_temperature",
-                "losses_inverter",
+                "*",
             ],
         )
-
-        self.connect("resistance.resistance_igbt", "conduction_losses.resistance_igbt")
-        self.connect("gate_voltage.gate_voltage_igbt", "conduction_losses.gate_voltage_igbt")
-        self.connect("resistance.resistance_diode", "conduction_losses.resistance_diode")
-        self.connect("gate_voltage.gate_voltage_diode", "conduction_losses.gate_voltage_diode")

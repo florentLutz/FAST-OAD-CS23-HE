@@ -19,8 +19,10 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("torque_in", units="N*m", val=np.nan, shape=number_of_points)
-        self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
+        self.add_input(
+            "active_power", units="W", val=np.full(number_of_points, np.nan), shape=number_of_points
+        )
+        self.add_input("efficiency", val=np.nan, shape=number_of_points)
 
         self.add_output("shaft_power_in", units="W", val=500.0e3, shape=number_of_points)
 
@@ -28,11 +30,11 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        omega = inputs["rpm"] * 2.0 * np.pi / 60
-
-        outputs["shaft_power_in"] = inputs["torque_in"] * omega
+        outputs["shaft_power_in"] = inputs["active_power"] / inputs["efficiency"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["shaft_power_in", "torque_in"] = np.diag(inputs["rpm"] * 2.0 * np.pi / 60)
-        partials["shaft_power_in", "rpm"] = np.diag(inputs["torque_in"] * 2.0 * np.pi / 60)
+        partials["shaft_power_in", "active_power"] = np.diag(1.0 / inputs["efficiency"])
+        partials["shaft_power_in", "efficiency"] = -np.diag(
+            inputs["active_power"] / inputs["efficiency"] ** 2.0
+        )

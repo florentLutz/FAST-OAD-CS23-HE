@@ -69,6 +69,10 @@ class PerformancesSFC(om.ExplicitComponent):
             - 490.36976312 * pme ** 3.0
         )
 
+        # The upper value is completely arbitrary, but is here to prevent the code looking for
+        # absurdly high values
+        sfc = np.clip(sfc, 0.0, 1.0e3)
+
         outputs["specific_fuel_consumption"] = (
             sfc * inputs["settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc"]
         )
@@ -83,7 +87,9 @@ class PerformancesSFC(om.ExplicitComponent):
         d_rpm_d_input_rpm = 1.0 / 2700.0
         d_pme_d_input_pme = 1.0 / 20.62807778
 
-        partials["specific_fuel_consumption", "mean_effective_pressure"] = np.diag(
+        partials_mep = np.where(
+            np.clip(inputs["mean_effective_pressure"], 8.081, 20.62807778)
+            == inputs["mean_effective_pressure"],
             (
                 +829.44035557
                 - 4236.01419045 * rpm
@@ -93,8 +99,12 @@ class PerformancesSFC(om.ExplicitComponent):
                 - 3.0 * 490.36976312 * pme ** 2.0
             )
             * d_pme_d_input_pme
-            * inputs["settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc"]
+            * inputs["settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc"],
+            1e-6,
         )
+
+        partials["specific_fuel_consumption", "mean_effective_pressure"] = np.diag(partials_mep)
+
         partials["specific_fuel_consumption", "rpm"] = np.diag(
             (
                 +6507.41622273

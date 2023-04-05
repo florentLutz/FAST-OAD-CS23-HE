@@ -49,7 +49,7 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
             desc="Twist between the propeller blade root and tip",
         )
 
-        self.add_output("power_coefficient", shape=number_of_points, val=0.2)
+        self.add_output("power_coefficient", shape=number_of_points, val=0.1)
 
         self.declare_partials(
             of="*",
@@ -108,6 +108,13 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
             )
             * activity_factor ** (-0.00292 * np.log10(activity_factor) ** 2 * np.log10(twist_blade))
         )
+
+        # Let's clip the cp in case the value goes haywire, clipped at zero but if we were to
+        # ever look at energy recuperation, it might need to be changed. To compute the upper
+        # bound, instead of having a fixed value we will assume a very low efficiency and compute
+        # it from there
+        lower_efficiency = 0.4
+        cp = np.clip(cp, 0.0, j * ct / lower_efficiency)
 
         outputs["power_coefficient"] = cp
 

@@ -5,6 +5,8 @@
 import openmdao.api as om
 import fastoad.api as oad
 
+import numpy as np
+
 from fastga_he.powertrain_builder.powertrain import (
     FASTGAHEPowerTrainConfigurator,
     PROMOTION_FROM_MISSION,
@@ -75,7 +77,8 @@ class PowerTrainPerformancesFromFile(om.Group):
             name="sspc_names_list",
             default=[],
             types=list,
-            desc="Contains the list of the SSPC name which state need to be changed. If this list is empty, nothing will be done.",
+            desc="Contains the list of the SSPC name which state need to be changed. If this list "
+            "is empty, nothing will be done.",
             allow_none=False,
         )
 
@@ -208,33 +211,13 @@ class PowerTrainPerformancesFromFile(om.Group):
             self.nonlinear_solver.options["rtol"] = 1e-4
             self.linear_solver = om.DirectSolver()
 
-        if self.configurator.get_watcher_file_path():
+        # The performances watcher was moved at the same level as the mission performances
+        # watcher so that it is not opened as much, they could be merged eventually
 
-            self.add_subsystem(
-                "performances_watcher",
-                PowerTrainPerformancesWatcher(
-                    power_train_file_path=self.options["power_train_file_path"],
-                    number_of_points=number_of_points,
-                ),
-                promotes=list(PROMOTION_FROM_MISSION.keys()),
-            )
+    def guess_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
 
-            (
-                components_name,
-                components_performances_watchers_names,
-                components_performances_watchers_units,
-            ) = self.configurator.get_performance_watcher_elements_list()
+        number_of_points = self.options["number_of_points"]
 
-            for (component_name, component_performances_watcher_name,) in zip(
-                components_name,
-                components_performances_watchers_names,
-            ):
-
-                self.connect(
-                    component_name + "." + component_performances_watcher_name,
-                    "performances_watcher"
-                    + "."
-                    + component_name
-                    + "_"
-                    + component_performances_watcher_name,
-                )
+        # This one will be passe in before going into the first pt components

@@ -42,6 +42,10 @@ PROPELLER = {
         {"torque_in": "N*m"},
         {"efficiency": None},
         {"advance_ratio": None},
+        {"reynolds_D": None},
+        {"tip_mach": None},
+        {"thrust_coefficient": None},
+        {"power_coefficient": None},
     ],
 }
 PMSM = {
@@ -176,14 +180,12 @@ DC_SPLITTER = {
     CN: "DCSplitter",
     CN_ID: "dc_splitter_id",
     CT: "DC_splitter",
-    ATT: [],
+    ATT: ["splitter_mode"],
     PT: [],
     IN: [(None, "dc_voltage_in_"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out", None)],
     CTC: "connector",
-    MP: [
-        {"dc_voltage": "V"},
-    ],
+    MP: [{"dc_voltage": "V"}, {"power_split": "percent"}],
 }
 RECTIFIER = {
     ID: "fastga_he.pt_component.rectifier",

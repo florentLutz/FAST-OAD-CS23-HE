@@ -69,7 +69,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_max",
             units="N*m",
-            val=1000.0,
+            val=500.0,
             desc="Maximum value of the torque the motor has to provide",
         )
         self.declare_partials(

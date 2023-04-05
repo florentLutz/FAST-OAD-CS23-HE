@@ -787,6 +787,7 @@
         </rectifier>
         <generator>
             <generator_1>
+                <voltage_out_target_mission units="V" is_input="True">530.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
                 <voltage_caliber units="V" is_input="False">850.0</voltage_caliber>
                 <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum value of the RMS current flowing through one phase of the generator--></current_ac_max>
                 <losses_max units="W" is_input="False">5373.963379446291</losses_max>

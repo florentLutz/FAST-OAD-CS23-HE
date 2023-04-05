@@ -24,24 +24,38 @@ class PerformancesBatteryEfficiency(om.ExplicitComponent):
         self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
         self.add_input("voltage_out", units="V", val=np.full(number_of_points, np.nan))
 
-        self.add_output("efficiency", val=np.full(number_of_points, 1.0))
+        self.add_output("efficiency", val=np.full(number_of_points, 1.0), lower=0.0, upper=1.0)
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["efficiency"] = 1.0 - inputs["losses_battery"] / (
-            inputs["dc_current_out"] * inputs["voltage_out"]
+        efficiency = np.where(
+            np.abs(inputs["dc_current_out"]) < 1.0,
+            1.0,
+            1.0 - inputs["losses_battery"] / (inputs["dc_current_out"] * inputs["voltage_out"]),
         )
+        outputs["efficiency"] = efficiency
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["efficiency", "losses_battery"] = -np.diag(
-            1.0 / (inputs["dc_current_out"] * inputs["voltage_out"])
+        partials_losses = np.where(
+            np.abs(inputs["dc_current_out"]) < 1.0,
+            1e-6,
+            -1.0 / (inputs["dc_current_out"] * inputs["voltage_out"]),
         )
-        partials["efficiency", "dc_current_out"] = np.diag(
-            inputs["losses_battery"] / (inputs["dc_current_out"] ** 2.0 * inputs["voltage_out"])
+        partials["efficiency", "losses_battery"] = np.diag(partials_losses)
+
+        partials_current_out = np.where(
+            np.abs(inputs["dc_current_out"]) < 1.0,
+            1e-6,
+            inputs["losses_battery"] / (inputs["dc_current_out"] ** 2.0 * inputs["voltage_out"]),
         )
-        partials["efficiency", "voltage_out"] = np.diag(
-            inputs["losses_battery"] / (inputs["dc_current_out"] * inputs["voltage_out"] ** 2.0)
+        partials["efficiency", "dc_current_out"] = np.diag(partials_current_out)
+
+        partials_voltage_out = np.where(
+            np.abs(inputs["dc_current_out"]) < 1.0,
+            1e-6,
+            inputs["losses_battery"] / (inputs["dc_current_out"] * inputs["voltage_out"] ** 2.0),
         )
+        partials["efficiency", "voltage_out"] = np.diag(partials_voltage_out)

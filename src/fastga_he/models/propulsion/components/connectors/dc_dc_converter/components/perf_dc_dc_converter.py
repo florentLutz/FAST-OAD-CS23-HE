@@ -61,36 +61,36 @@ class PerformancesDCDCConverter(om.Group):
         self.add_subsystem(
             "duty_cycle",
             PerformancesDutyCycle(number_of_points=number_of_points),
-            promotes=["dc_voltage_in", "dc_voltage_out", "duty_cycle"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "currents",
             PerformancesCurrents(number_of_points=number_of_points),
-            promotes=["dc_current_out", "duty_cycle"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "switching_losses",
             PerformancesSwitchingLosses(
                 number_of_points=number_of_points, dc_dc_converter_id=dc_dc_converter_id
             ),
-            promotes=["data:*", "switching_frequency"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "conduction_losses",
             PerformancesConductionLosses(
                 number_of_points=number_of_points, dc_dc_converter_id=dc_dc_converter_id
             ),
-            promotes=["data:*", "dc_current_out"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "total_losses",
             PerformancesLosses(number_of_points=number_of_points),
-            promotes=[],
+            promotes=["*"],
         )
         self.add_subsystem(
             "efficiency",
             PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=["dc_current_out", "dc_voltage_out", "efficiency"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "maximum",
@@ -98,11 +98,7 @@ class PerformancesDCDCConverter(om.Group):
                 number_of_points=number_of_points, dc_dc_converter_id=dc_dc_converter_id
             ),
             promotes=[
-                "data:*",
-                "dc_voltage_in",
-                "dc_voltage_out",
-                "dc_current_in",
-                "switching_frequency",
+                "*",
             ],
         )
         self.add_subsystem(
@@ -116,49 +112,3 @@ class PerformancesDCDCConverter(om.Group):
         self.connect("converter_relation.power_rel", "load_side.power")
         self.connect("dc_current_out", "converter_relation.dc_current_out")
         self.connect("converter_relation.voltage_out_rel", "generator_side.voltage_target")
-        self.connect(
-            "currents.current_IGBT",
-            [
-                "switching_losses.current_IGBT",
-                "conduction_losses.current_IGBT",
-                "maximum.current_IGBT",
-            ],
-        )
-        self.connect(
-            "currents.current_diode",
-            [
-                "switching_losses.current_diode",
-                "conduction_losses.current_diode",
-                "maximum.current_diode",
-            ],
-        )
-        self.connect(
-            "currents.current_inductor",
-            ["conduction_losses.current_inductor", "maximum.current_inductor"],
-        )
-        self.connect(
-            "currents.current_capacitor",
-            ["conduction_losses.current_capacitor", "maximum.current_capacitor"],
-        )
-        self.connect(
-            "switching_losses.switching_losses_diode", "total_losses.switching_losses_diode"
-        )
-        self.connect("switching_losses.switching_losses_IGBT", "total_losses.switching_losses_IGBT")
-        self.connect(
-            "conduction_losses.conduction_losses_diode", "total_losses.conduction_losses_diode"
-        )
-        self.connect(
-            "conduction_losses.conduction_losses_IGBT", "total_losses.conduction_losses_IGBT"
-        )
-        self.connect(
-            "conduction_losses.conduction_losses_inductor",
-            "total_losses.conduction_losses_inductor",
-        )
-        self.connect(
-            "conduction_losses.conduction_losses_capacitor",
-            "total_losses.conduction_losses_capacitor",
-        )
-        self.connect(
-            "total_losses.losses_converter",
-            ["efficiency.losses_converter", "maximum.losses_converter"],
-        )

@@ -51,6 +51,9 @@ class PowerRate(om.ExplicitComponent):
 
         # Now for the "mock-up" part
         self.add_input("engine_setting_econ", val=np.nan, shape=number_of_points)
+        self.add_input(
+            "exterior_temperature_econ", val=273.15, shape=number_of_points, units="degK"
+        )
 
         self.add_output("thrust_rate_t_econ", val=np.ones(number_of_points))
 

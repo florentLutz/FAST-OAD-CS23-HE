@@ -12,22 +12,15 @@ class PerformancesApparentPower(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(
-            name="generator_id", default=None, desc="Identifier of the generator", allow_none=False
-        )
-        self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
 
-        generator_id = self.options["generator_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("active_power", units="W", val=np.nan, shape=number_of_points)
-        self.add_input(
-            "settings:propulsion:he_power_train:generator:" + generator_id + ":power_factor",
-            val=1.0,
-        )
+        self.add_input("ac_current_rms_out", units="A", val=np.nan, shape=number_of_points)
+        self.add_input("ac_voltage_rms_out", units="V", val=np.nan, shape=number_of_points)
 
         self.add_output(
             "apparent_power",
@@ -40,33 +33,9 @@ class PerformancesApparentPower(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        generator_id = self.options["generator_id"]
-
-        outputs["apparent_power"] = (
-            inputs["active_power"]
-            / inputs[
-                "settings:propulsion:he_power_train:generator:" + generator_id + ":power_factor"
-            ]
-        )
+        outputs["apparent_power"] = inputs["ac_current_rms_out"] * inputs["ac_voltage_rms_out"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        generator_id = self.options["generator_id"]
-        number_of_points = self.options["number_of_points"]
-
-        partials["apparent_power", "active_power"] = (
-            np.eye(number_of_points)
-            / inputs[
-                "settings:propulsion:he_power_train:generator:" + generator_id + ":power_factor"
-            ]
-        )
-        partials[
-            "apparent_power",
-            "settings:propulsion:he_power_train:generator:" + generator_id + ":power_factor",
-        ] = -(
-            inputs["active_power"]
-            / inputs[
-                "settings:propulsion:he_power_train:generator:" + generator_id + ":power_factor"
-            ]
-            ** 2.0
-        )
+        partials["apparent_power", "ac_voltage_rms_out"] = np.diag(inputs["ac_current_rms_out"])
+        partials["apparent_power", "ac_current_rms_out"] = np.diag(inputs["ac_voltage_rms_out"])

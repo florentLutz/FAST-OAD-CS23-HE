@@ -37,7 +37,9 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
         self.add_input("data:propulsion:he_power_train:ICE:" + ice_id + ":strokes_number", val=4.0)
         self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
 
-        self.add_output("mean_effective_pressure", units="Pa", val=15.0e5, shape=number_of_points)
+        self.add_output(
+            "mean_effective_pressure", units="Pa", val=15.0e5, shape=number_of_points, lower=0.0
+        )
 
         self.declare_partials(of="*", wrt="*", method="exact")
 

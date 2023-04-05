@@ -5,6 +5,7 @@
 import openmdao.api as om
 
 from ..components.perf_mission_rpm import PerformancesRPMMission
+from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_current_rms_3_phases import PerformancesCurrentRMS3Phases
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_losses import PerformancesLosses
@@ -24,6 +25,17 @@ class PerformancesGenerator(om.Group):
     described the use of EMRAX motor as a generator in a configuration coupled to an ICE, see
     :cite:`geiss:2018` and :cite:`kalwara:2021`.
     """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Solvers setup
+        self.nonlinear_solver = om.NonlinearBlockGS()
+        self.nonlinear_solver.options["iprint"] = 0
+        self.nonlinear_solver.options["maxiter"] = 200
+        self.nonlinear_solver.options["rtol"] = 1e-5
+        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
+        self.linear_solver = om.DirectSolver()
 
     def initialize(self):
 
@@ -47,18 +59,27 @@ class PerformancesGenerator(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
+            name="voltage_target",
+            subsys=PerformancesVoltageOutTargetMission(
+                generator_id=generator_id, number_of_points=number_of_points
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
             name="rms_current_3_phases",
             subsys=PerformancesCurrentRMS3Phases(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(
-            name="torque",
-            subsys=PerformancesTorque(generator_id=generator_id, number_of_points=number_of_points),
+            name="apparent_power",
+            subsys=PerformancesApparentPower(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(
-            name="losses",
-            subsys=PerformancesLosses(generator_id=generator_id, number_of_points=number_of_points),
+            name="active_power",
+            subsys=PerformancesActivePower(
+                generator_id=generator_id, number_of_points=number_of_points
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -67,20 +88,18 @@ class PerformancesGenerator(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
+            name="torque",
+            subsys=PerformancesTorque(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="losses",
+            subsys=PerformancesLosses(generator_id=generator_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
             name="efficiency",
             subsys=PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="active_power",
-            subsys=PerformancesActivePower(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="apparent_power",
-            subsys=PerformancesApparentPower(
-                generator_id=generator_id, number_of_points=number_of_points
-            ),
             promotes=["*"],
         )
         self.add_subsystem(

@@ -12,6 +12,7 @@ from stdatm import Atmosphere
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
+from utils.filter_residuals import filter_residuals
 
 from .simple_assembly.performances_simple_assembly_splitter import PerformancesAssemblySplitter
 
@@ -197,6 +198,129 @@ def test_assembly_performances_splitter_60_40():
     )
 
 
+def test_assembly_performances_splitter_100_0():
+
+    ivc = get_indep_var_comp(
+        list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    problem = oad.FASTOADProblem(reports=False)
+    model = problem.model
+    model.add_subsystem(
+        name="inputs",
+        subsys=ivc,
+        promotes=["*"],
+    )
+    model.add_subsystem(
+        name="performances",
+        subsys=PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST),
+        promotes=["*"],
+    )
+    problem.setup()
+    problem.set_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_split",
+        val=100.0,
+        units="percent",
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem.run_model()
+
+    # om.n2(problem)
+
+    _, _, residuals = problem.model.performances.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    current_out = problem.get_val("performances.dc_splitter_1.dc_current_out", units="A")
+    voltage_out = problem.get_val("performances.dc_splitter_1.dc_voltage", units="V")
+
+    current_in = problem.get_val("performances.dc_dc_converter_1.dc_current_out", units="A")
+    voltage_in = problem.get_val("performances.dc_dc_converter_1.dc_voltage_out", units="V")
+
+    current_in_2 = problem.get_val("performances.rectifier_1.dc_current_out", units="A")
+    voltage_in_2 = problem.get_val("performances.rectifier_1.dc_voltage_out", units="V")
+
+    assert voltage_in * current_in == pytest.approx(
+        current_out * voltage_out,
+        rel=5e-3,
+    )
+    assert current_in_2 == pytest.approx(np.zeros(NB_POINTS_TEST), abs=5e-3)
+
+    assert voltage_out == pytest.approx(voltage_in_2, rel=5e-3)
+
+
+def test_assembly_performances_splitter_100_0_only_part():
+
+    input_list = list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST))
+    input_list.remove("data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_split")
+
+    ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+    split_array = np.array([100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 90.0, 80.0, 70.0])
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_split",
+        val=split_array,
+        units="percent",
+    )
+
+    problem = oad.FASTOADProblem(reports=False)
+    model = problem.model
+    model.add_subsystem(
+        name="inputs",
+        subsys=ivc,
+        promotes=["*"],
+    )
+    model.add_subsystem(
+        name="performances",
+        subsys=PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST),
+        promotes=["*"],
+    )
+    problem.setup()
+    # Run problem and check obtained value(s) is/(are) correct
+    problem.run_model()
+
+    # om.n2(problem)
+
+    _, _, residuals = problem.model.performances.get_nonlinear_vectors()
+
+    current_out = problem.get_val("performances.dc_splitter_1.dc_current_out", units="A")
+    voltage_out = problem.get_val("performances.dc_splitter_1.dc_voltage", units="V")
+
+    current_in = problem.get_val("performances.dc_dc_converter_1.dc_current_out", units="A")
+    voltage_in = problem.get_val("performances.dc_dc_converter_1.dc_voltage_out", units="V")
+
+    current_in_2 = problem.get_val("performances.rectifier_1.dc_current_out", units="A")
+    voltage_in_2 = problem.get_val("performances.rectifier_1.dc_voltage_out", units="V")
+
+    assert voltage_in * current_in == pytest.approx(
+        current_out * voltage_out * split_array / 100.0,
+        rel=5e-3,
+    )
+    assert current_in_2 == pytest.approx(current_out * (1.0 - split_array / 100.0), abs=5e-3)
+
+    assert voltage_out == pytest.approx(voltage_in_2, rel=5e-3)
+
+
 def test_performances_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_splitter.yml")
 
@@ -271,10 +395,10 @@ def test_performances_from_pt_file():
         abs=1e-2,
     )
 
-    write_outputs(
-        pth.join(outputs.__path__[0], "simple_assembly_performances_splitter_50_50_pt_file.xml"),
-        problem,
-    )
+    # write_outputs(
+    #     pth.join(outputs.__path__[0], "simple_assembly_performances_splitter_50_50_pt_file.xml"),
+    #     problem,
+    # )
 
 
 def test_assembly_sizing_from_pt_file():

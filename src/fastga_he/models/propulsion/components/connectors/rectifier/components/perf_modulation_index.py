@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesModulationIndex(om.ExplicitComponent):
+class PerformancesModulationIndex(om.ImplicitComponent):
     """
     Component which computes the value of the modulation index of the rectifier.
     """
@@ -43,13 +43,28 @@ class PerformancesModulationIndex(om.ExplicitComponent):
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+    def apply_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
 
-        outputs["modulation_index"] = inputs["dc_voltage_out"] / inputs["ac_voltage_peak_in"]
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        partials["modulation_index", "dc_voltage_out"] = np.diag(1.0 / inputs["ac_voltage_peak_in"])
-        partials["modulation_index", "ac_voltage_peak_in"] = -np.diag(
-            inputs["dc_voltage_out"] / inputs["ac_voltage_peak_in"] ** 2.0
+        residuals["modulation_index"] = (
+            inputs["ac_voltage_peak_in"] - outputs["modulation_index"] * inputs["dc_voltage_out"]
         )
+
+    def linearize(self, inputs, outputs, partials):
+        number_of_points = self.options["number_of_points"]
+
+        partials["modulation_index", "ac_voltage_peak_in"] = np.eye(number_of_points)
+        partials["modulation_index", "dc_voltage_out"] = -np.diag(outputs["modulation_index"])
+        partials["modulation_index", "modulation_index"] = -np.diag(inputs["dc_voltage_out"])
+
+    def guess_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
+        if any(
+            np.clip(inputs["ac_voltage_peak_in"] / inputs["dc_voltage_out"], 0, 1.0)
+            != inputs["ac_voltage_peak_in"] / inputs["dc_voltage_out"]
+        ):
+            outputs["modulation_index"] = np.clip(
+                inputs["ac_voltage_peak_in"] / inputs["dc_voltage_out"], 0, 1.0
+            )

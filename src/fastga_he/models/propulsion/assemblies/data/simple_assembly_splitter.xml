@@ -84,6 +84,7 @@
                 </rectifier>
                 <generator>
                     <generator_1>
+                        <voltage_out_target_mission units="V" is_input="True">690.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
                         <voltage_caliber units="V" is_input="False">850.0</voltage_caliber>
                         <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum value of the RMS current flowing through one phase of the generator--></current_ac_max>
                         <losses_max units="W" is_input="False">5373.963379446291</losses_max>
@@ -666,6 +667,7 @@
                   <dc_splitter_1>
                     <current_max units="A" is_input="False">500.0</current_max>
                     <power_split units="percent" is_input="True">50.0<!--Percent of the power going to the first (primary) input, in %--></power_split>
+                    <power_share units="kW" is_input="True">150.0<!--Power threshold for how much power is going into the primary input--></power_share>
                     <voltage_max units="V" is_input="False">850.0</voltage_max>
                   </dc_splitter_1>
                 </DC_splitter>

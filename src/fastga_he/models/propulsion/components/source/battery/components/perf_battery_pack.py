@@ -67,7 +67,7 @@ class PerformancesBatteryPack(om.Group):
             PerformancesModuleCurrent(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
-            promotes=["data:*", "dc_current_out"],
+            promotes=["*"],
         )
 
         self.add_subsystem(
@@ -75,41 +75,41 @@ class PerformancesBatteryPack(om.Group):
             PerformancesModuleCRate(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
-            promotes=["data:*", "c_rate"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "battery_relative_capacity",
             PerformancesRelativeCapacity(number_of_points=number_of_points),
-            promotes=["relative_capacity"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "battery_soc_decrease",
             PerformancesSOCDecrease(number_of_points=number_of_points),
-            promotes=["time_step", "c_rate", "relative_capacity"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "update_soc",
             PerformancesUpdateSOC(number_of_points=number_of_points),
-            promotes=["state_of_charge"],
+            promotes=["*"],
         )
         # Though these variable depends on variables that are looped on, they don't affect the
         # value that we loop on hence why they are put here to save time.
         self.add_subsystem(
             "open_circuit_voltage",
             PerformancesOpenCircuitVoltage(number_of_points=number_of_points),
-            promotes=["state_of_charge", "open_circuit_voltage"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "internal_resistance",
             PerformancesInternalResistance(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
-            promotes=["state_of_charge", "internal_resistance", "settings:*", "cell_temperature"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "cell_voltage",
             PerformancesCellVoltage(number_of_points=number_of_points),
-            promotes=["internal_resistance", "open_circuit_voltage"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "module_voltage",
@@ -117,54 +117,54 @@ class PerformancesBatteryPack(om.Group):
                 number_of_points=number_of_points,
                 battery_pack_id=battery_pack_id,
             ),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "battery_voltage",
             PerformancesBatteryVoltage(number_of_points=number_of_points),
-            promotes=["voltage_out"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "joule_losses_cell",
             PerformancesCellJouleLosses(number_of_points=number_of_points),
-            promotes=["internal_resistance"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "entropic_heat_coefficient",
             PerformancesEntropicHeatCoefficient(number_of_points=number_of_points),
-            promotes=["state_of_charge"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "entropic_losses_cell",
             PerformancesCellEntropicLosses(number_of_points=number_of_points),
-            promotes=["cell_temperature"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "losses_cell",
             PerformancesCellLosses(number_of_points=number_of_points),
-            promotes=[],
+            promotes=["*"],
         )
         self.add_subsystem(
             "battery_losses",
             PerformancesBatteryLosses(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
-            promotes=["data:*", "losses_battery"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(number_of_points=number_of_points, battery_pack_id=battery_pack_id),
-            promotes=["data:*", "state_of_charge", "c_rate"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "efficiency",
             PerformancesBatteryEfficiency(number_of_points=number_of_points),
-            promotes=["dc_current_out", "voltage_out", "losses_battery", "efficiency"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "energy_consumption",
             PerformancesEnergyConsumption(number_of_points=number_of_points),
-            promotes=["dc_current_out", "voltage_out", "time_step", "non_consumable_energy_t"],
+            promotes=["*"],
         )
 
         fuel_consumed = om.IndepVarComp()
@@ -172,42 +172,5 @@ class PerformancesBatteryPack(om.Group):
         self.add_subsystem(
             "fuel_consumed",
             fuel_consumed,
-            promotes=["fuel_consumed_t"],
-        )
-
-        self.connect(
-            "current_per_module.current_one_module",
-            [
-                "cell_voltage.current_one_module",
-                "battery_c_rate.current_one_module",
-                "battery_relative_capacity.current_one_module",
-                "joule_losses_cell.current_one_module",
-                "entropic_losses_cell.current_one_module",
-            ],
-        )
-        self.connect(
-            "cell_voltage.terminal_voltage",
-            ["module_voltage.terminal_voltage", "maximum.terminal_voltage"],
-        )
-        self.connect("module_voltage.module_voltage", "battery_voltage.module_voltage")
-
-        self.connect(
-            "battery_soc_decrease.state_of_charge_decrease", "update_soc.state_of_charge_decrease"
-        )
-
-        self.connect(
-            "entropic_heat_coefficient.entropic_heat_coefficient",
-            "entropic_losses_cell.entropic_heat_coefficient",
-        )
-        self.connect(
-            "joule_losses_cell.joule_losses_cell",
-            "losses_cell.joule_losses_cell",
-        )
-        self.connect(
-            "entropic_losses_cell.entropic_losses_cell",
-            "losses_cell.entropic_losses_cell",
-        )
-        self.connect(
-            "losses_cell.losses_cell",
-            ["battery_losses.losses_cell", "maximum.losses_cell"],
+            promotes=["*"],
         )

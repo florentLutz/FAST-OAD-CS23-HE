@@ -4,8 +4,8 @@ title: Sample OAD Process
 module_folders:
 
 # Input and output files
-input_file: ./full_sizing_in.xml
-output_file: ./full_sizing_out.xml
+input_file: ../results/full_sizing_in.xml
+output_file: ../results/full_sizing_out.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA', debug_print=["objs"])
@@ -27,20 +27,20 @@ model:
     result_folder_path: D:/tmp
     compute_mach_interpolation: false
     compute_slipstream: false
+  power_train_sizing:
+    id: fastga_he.power_train.sizing
+    power_train_file_path: ./fuel_and_battery_propulsion_share.yml
+  weight:
+    id: fastga.weight.legacy
+    propulsion_id: fastga.wrapper.propulsion.basicIC_engine
   performances:
     id: fastga_he.performances.mission_vector
     number_of_points_climb: 30
     number_of_points_cruise: 30
     number_of_points_descent: 20
     number_of_points_reserve: 10
-    power_train_file_path: ./simple_assembly.yml
-    out_file: ./mission_data.csv
-  power_train_sizing:
-    id: fastga_he.power_train.sizing
-    power_train_file_path: ./simple_assembly.yml
-  weight:
-    id: fastga.weight.legacy
-    propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+    power_train_file_path: ./fuel_and_battery_propulsion_share.yml
+    out_file: ../results/mission_data_fuel_and_battery_share.csv
   mtow:
     id: fastga.loop.mtow
   hq:
@@ -59,8 +59,9 @@ submodels:
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
   submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
-  submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+  submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
+  submodel.propulsion.constraints.generator.rpm: fastga_he.submodel.propulsion.constraints.generator.rpm.ensure
   submodel.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
   submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
   submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
