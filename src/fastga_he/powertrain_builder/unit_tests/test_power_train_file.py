@@ -196,3 +196,43 @@ def test_power_train_logic_check():
     state_check = {"dc_sspc_1": True, "dc_sspc_2": False, "dc_sspc_3": False}
 
     assert power_train_configurator.check_sspc_states(new_state) == state_check
+
+
+def test_distance_from_propulsive_load():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    print("\n")
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    print("\n")
+    distance_from_prop_load = power_train_configurator.get_distance_from_propulsive_load()
+
+    assert distance_from_prop_load["battery_pack_1"] == 9
+    assert distance_from_prop_load["ice_1"] == 10
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    print("\n")
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    print("\n")
+    distance_from_prop_load = power_train_configurator.get_distance_from_propulsive_load()
+
+    assert distance_from_prop_load["dc_bus_1"] == 3
+    assert distance_from_prop_load["dc_bus_2"] == 3
+    assert distance_from_prop_load["dc_bus_3"] == 3
+
+    assert distance_from_prop_load["dc_bus_4"] == 7

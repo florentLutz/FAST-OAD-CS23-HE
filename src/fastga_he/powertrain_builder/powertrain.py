@@ -15,6 +15,7 @@ from abc import ABC
 from importlib.resources import open_text
 from typing import Tuple
 
+import numpy as np
 from jsonschema import validate
 from ruamel.yaml import YAML
 
@@ -398,6 +399,52 @@ class FASTGAHEPowerTrainConfigurator:
             graph.add_edge(source, target)
 
         self._connection_graph = graph
+
+    def get_distance_from_propulsive_load(self):
+
+        propulsor_name = []
+        propulsive_load_names = []
+
+        # First and for reason that will appear clear later, we get a list of propulsor
+        for component_type_class, component_name in zip(
+            self._components_type_class, self._components_name
+        ):
+            if "propulsor" in component_type_class:
+                propulsor_name.append(component_name)
+
+        self._construct_connection_graph()
+        graph = self._connection_graph
+
+        # We now get a list of propulsive loads. Because of the use envisioned for this function (
+        # mostly post-processing), the ICE won't be considered a propulsive load if no propulsor
+        # is attached to it
+        for component_type_class, component_name in zip(
+            self._components_type_class, self._components_name
+        ):
+            if "propulsive_load" == [component_type_class]:
+                propulsive_load_names.append(component_name)
+
+            # This case will correspond to ICE/turbomachinery
+            elif "propulsive_load" in component_type_class:
+
+                # Check whether or not at least one neighbor is a propulsor
+                neighbors = list(graph.neighbors(component_name))
+                if set(neighbors).intersection(propulsor_name):
+                    propulsive_load_names.append(component_name)
+
+        distance_from_propulsive_load = {}
+        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
+
+        for component_name in self._components_name:
+            min_distance = np.inf
+            for prop_load in propulsive_load_names:
+                distance_to_load = connections_length_between_nodes[component_name][prop_load]
+                if distance_to_load < min_distance:
+                    min_distance = distance_to_load
+
+            distance_from_propulsive_load[component_name] = min_distance
+
+        return distance_from_propulsive_load
 
     def check_sspc_states(self, declared_state):
 
