@@ -444,7 +444,7 @@ class FASTGAHEPowerTrainConfigurator:
 
             distance_from_propulsive_load[component_name] = min_distance
 
-        return distance_from_propulsive_load
+        return distance_from_propulsive_load, propulsive_load_names
 
     def check_sspc_states(self, declared_state):
 
@@ -758,11 +758,25 @@ class FASTGAHEPowerTrainConfigurator:
         self._get_components()
         self._get_connections()
 
+        icons_name = []
+        icons_size = []
+        for component_id in self._components_id:
+            icons_name.append(resources.DICTIONARY_ICON[component_id])
+            icons_size.append(resources.DICTIONARY_ICON_SIZE[component_id])
+
+        # If the connection is between a bus and an sspc, we shorthen the length
         curated_connection_list = []
+
         for connections in self._connection_list:
             curated_connection_list.append((connections["source"], connections["target"]))
 
-        return self._components_name, curated_connection_list, self._components_type_class
+        return (
+            self._components_name,
+            curated_connection_list,
+            self._components_type_class,
+            icons_name,
+            icons_size,
+        )
 
 
 class _YAMLSerializer(ABC):

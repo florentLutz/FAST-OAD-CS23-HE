@@ -3,11 +3,30 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import os
+import os.path as pth
 
 import networkx as nx
 from pyvis.network import Network
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
+
+from . import icons
+
+# TODO: since it is private for now it should not be an issue but for any release, we should get
+#  approval from the site below ? Images for node icons courtesy of www.materialui.co
+# Image URLs for graph nodes
+
+icons_dict = {
+    "battery": pth.join(icons.__path__[0], "battery.png"),
+    "bus_bar": pth.join(icons.__path__[0], "bus_bar.png"),
+    "cable": pth.join(icons.__path__[0], "cable.png"),
+    "e_motor": pth.join(icons.__path__[0], "e_motor.png"),
+    "ice": pth.join(icons.__path__[0], "ice.png"),
+    "power": pth.join(icons.__path__[0], "power.png"),
+    "power_electronics": pth.join(icons.__path__[0], "power_electronics.png"),
+    "propeller": pth.join(icons.__path__[0], "propeller.png"),
+    "splitter": pth.join(icons.__path__[0], "battery.png"),
+}
 
 
 def power_train_network_viewer(
@@ -19,9 +38,10 @@ def power_train_network_viewer(
     net = Network(
         notebook=True,
         cdn_resources="remote",
-        bgcolor="#222222",
+        bgcolor="#a9a9a9",
         font_color="white",
         select_menu=True,
+        layout=True,
     )
     # Create directed graph object
     graph = nx.DiGraph()
@@ -29,14 +49,37 @@ def power_train_network_viewer(
     configurator = FASTGAHEPowerTrainConfigurator()
     configurator.load(power_train_file_path)
 
-    names, connections, components_type = configurator.get_network_elements_list()
+    (
+        names,
+        connections,
+        components_type,
+        icons_name,
+        icons_size,
+    ) = configurator.get_network_elements_list()
+    distance_from_prop_loads, prop_loads = configurator.get_distance_from_propulsive_load()
 
-    for component_name, component_type in zip(names, components_type):
-        if component_type == "propulsor" or component_type == "source":
-            weight = 2.0
+    for component_name, component_type, icon_name, icon_size in zip(
+        names, components_type, icons_name, icons_size
+    ):
+        if "propulsor" in component_type:
+            level = 0
+        elif "propulsive_load" in component_type:
+            level = 1
+        elif "source" in component_type:
+            if component_name in prop_loads:
+                level = 1
+            else:
+                level = distance_from_prop_loads[component_name] + 1
         else:
-            weight = 1.0
-        graph.add_node(component_name, value=weight)
+            level = distance_from_prop_loads[component_name] + 1
+
+        graph.add_node(
+            component_name,
+            value=icon_size,
+            level=level,
+            shape="image",
+            image="file://" + icons_dict[icon_name],
+        )
 
     for connection in connections:
         # When the component is connected to a bus, the output number is also specified but it

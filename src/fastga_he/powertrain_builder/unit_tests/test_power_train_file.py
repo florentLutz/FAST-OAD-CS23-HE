@@ -212,7 +212,7 @@ def test_distance_from_propulsive_load():
     power_train_configurator._get_connections()
 
     print("\n")
-    distance_from_prop_load = power_train_configurator.get_distance_from_propulsive_load()
+    distance_from_prop_load, _ = power_train_configurator.get_distance_from_propulsive_load()
 
     assert distance_from_prop_load["battery_pack_1"] == 9
     assert distance_from_prop_load["ice_1"] == 10
@@ -229,7 +229,7 @@ def test_distance_from_propulsive_load():
     power_train_configurator._get_connections()
 
     print("\n")
-    distance_from_prop_load = power_train_configurator.get_distance_from_propulsive_load()
+    distance_from_prop_load, _ = power_train_configurator.get_distance_from_propulsive_load()
 
     assert distance_from_prop_load["dc_bus_1"] == 3
     assert distance_from_prop_load["dc_bus_2"] == 3
