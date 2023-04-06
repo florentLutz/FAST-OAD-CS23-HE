@@ -23,12 +23,14 @@ from .simple_assembly.performances_simple_assembly_splitter_power_share import (
 )
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 
+import fastga_he.api as api_he
 
 from . import outputs
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
+OUTPUT_FOLDER_PATH = pth.join(pth.dirname(__file__), "outputs")
 
 XML_FILE = "simple_assembly_splitter.xml"
 NB_POINTS_TEST = 10
@@ -252,41 +254,12 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_case_reader():
 
-    fig = go.Figure()
-    cr = om.CaseReader("propulsion/assemblies/outputs/cases.sql")
-
-    solver_case = cr.get_cases("root.performances.nonlinear_solver")
-    splitter_voltage_mean = []
-    splitter_voltage_min = []
-    splitter_voltage_max = []
-    for i, case in enumerate(solver_case):
-
-        splitter_voltage_mean.append(np.mean(case.residuals["dc_bus_1.dc_voltage"]))
-        splitter_voltage_min.append(np.min(case.residuals["dc_bus_1.dc_voltage"]))
-        splitter_voltage_max.append(np.max(case.residuals["dc_bus_1.dc_voltage"]))
-
-    scatter_mean = go.Scatter(
-        x=np.arange(len(splitter_voltage_mean)),
-        y=splitter_voltage_mean,
-        mode="lines+markers",
-        name="Mean splitter voltage residuals array",
+    fig = api_he.residuals_viewer(
+        recorder_data_file_path=pth.join(OUTPUT_FOLDER_PATH, "cases.sql"),
+        case="root.performances.nonlinear_solver",
+        power_train_file_path=pth.join(DATA_FOLDER_PATH, "pt_file_equivalent.yml"),
+        what_to_plot="residuals",
     )
-    fig.add_trace(scatter_mean)
-    scatter_min = go.Scatter(
-        x=np.arange(len(splitter_voltage_mean)),
-        y=splitter_voltage_min,
-        mode="lines+markers",
-        name="Min splitter voltage residuals array",
-    )
-    fig.add_trace(scatter_min)
-    scatter_max = go.Scatter(
-        x=np.arange(len(splitter_voltage_mean)),
-        y=splitter_voltage_max,
-        mode="lines+markers",
-        name="Max splitter voltage residuals array",
-    )
-    fig.add_trace(scatter_max)
-
     fig.show()
 
 
