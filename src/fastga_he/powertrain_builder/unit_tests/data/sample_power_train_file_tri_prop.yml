@@ -1,0 +1,163 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+  dc_sspc_1_1:
+    id : fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  dc_sspc_1_2:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+  dc_line_1:
+    id: fastga_he.pt_component.dc_line
+  dc_sspc_1_3:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+  motor_2:
+    id: fastga_he.pt_component.pmsm
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+  dc_sspc_2_1:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  dc_sspc_2_2:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+  dc_line_2:
+    id: fastga_he.pt_component.dc_line
+  dc_sspc_2_3:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+
+  propeller_3:
+    id: fastga_he.pt_component.propeller
+  motor_3:
+    id: fastga_he.pt_component.pmsm
+  inverter_3:
+    id: fastga_he.pt_component.inverter
+  dc_sspc_3_1:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+  dc_bus_3:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  dc_sspc_3_2:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+  dc_line_3:
+    id: fastga_he.pt_component.dc_line
+  dc_sspc_3_3:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+
+  dc_bus_4:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 3
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+  battery_pack_1:
+    id: fastga_he.pt_component.battery_pack
+
+component_connections:
+  - source: propeller_1
+    target: motor_1
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: inverter_1
+    target: dc_sspc_1_1
+
+  - source: dc_sspc_1_1
+    target: [dc_bus_1, 1]
+
+  - source: [dc_bus_1, 1]
+    target: dc_sspc_1_2
+
+  - source: dc_sspc_1_2
+    target: dc_line_1
+
+  - source: dc_line_1
+    target: dc_sspc_1_3
+
+  - source: dc_sspc_1_3
+    target: [dc_bus_4, 1]
+
+  - source: propeller_2
+    target: motor_2
+
+  - source: motor_2
+    target: inverter_2
+
+  - source: inverter_2
+    target: dc_sspc_2_1
+
+  - source: dc_sspc_2_1
+    target: [ dc_bus_2, 1 ]
+
+  - source: [ dc_bus_2, 1 ]
+    target: dc_sspc_2_2
+
+  - source: dc_sspc_2_2
+    target: dc_line_2
+
+  - source: dc_line_2
+    target: dc_sspc_2_3
+
+  - source: dc_sspc_2_3
+    target: [ dc_bus_4, 2 ]
+
+  - source: propeller_3
+    target: motor_3
+
+  - source: motor_3
+    target: inverter_3
+
+  - source: inverter_3
+    target: dc_sspc_3_1
+
+  - source: dc_sspc_3_1
+    target: [ dc_bus_3, 1 ]
+
+  - source: [ dc_bus_3, 1 ]
+    target: dc_sspc_3_2
+
+  - source: dc_sspc_3_2
+    target: dc_line_3
+
+  - source: dc_line_3
+    target: dc_sspc_3_3
+
+  - source: dc_sspc_3_3
+    target: [ dc_bus_4, 3 ]
+
+  - source: [dc_bus_4, 1]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: battery_pack_1
+
+watcher_file_path:

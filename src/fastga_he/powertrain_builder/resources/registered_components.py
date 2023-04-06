@@ -25,6 +25,10 @@ PT = "promoted_variables"
 # The MP field will contain the variables that will be of interest for the analysis of the
 # mission performances and that will be registered in the power train performances CSV file
 MP = "mission_performances_watcher"
+# ICON contains the name of the icon used to represent this component when displaying the graph
+ICON = "icon_for_network_graph"
+# ICON_SIZE contains the size of th icon used to represent this component when displaying the graph
+ICON_SIZE = "icon_size_for_network_graph"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -47,6 +51,8 @@ PROPELLER = {
         {"thrust_coefficient": None},
         {"power_coefficient": None},
     ],
+    ICON: "propeller",
+    ICON_SIZE: 30,
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -68,6 +74,8 @@ PMSM = {
         {"ac_current_rms_in": "A"},
         {"ac_voltage_rms_in": "V"},
     ],
+    ICON: "e_motor",
+    ICON_SIZE: 40,
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -96,6 +104,8 @@ INVERTER = {
         {"conduction_losses_IGBT": "W"},
         {"conduction_losses_diode": "W"},
     ],
+    ICON: "power_electronics",
+    ICON_SIZE: 30,
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -108,6 +118,8 @@ DC_BUS = {
     OUT: [(None, "dc_voltage"), ("dc_current_out_", None)],
     CTC: "connector",
     MP: [{"dc_voltage": "V"}],
+    ICON: "bus_bar",
+    ICON_SIZE: 20,
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -120,6 +132,8 @@ DC_LINE = {
     OUT: [("dc_voltage_out", None), (None, "dc_current")],
     CTC: "connector",
     MP: [{"dc_current": "A"}, {"cable_temperature": "degK"}, {"conduction_losses": "W"}],
+    ICON: "cable",
+    ICON_SIZE: 30,
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -137,6 +151,8 @@ DC_DC_CONVERTER = {
         {"dc_current_in": "A"},
         {"dc_current_out": "A"},
     ],
+    ICON: "power_electronics",
+    ICON_SIZE: 30,
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -157,6 +173,8 @@ BATTERY_PACK = {
         {"efficiency": None},
         {"relative_capacity": None},
     ],
+    ICON: "battery",
+    ICON_SIZE: 40,
 }
 DC_SSPC = {
     ID: "fastga_he.pt_component.dc_sspc",
@@ -174,6 +192,8 @@ DC_SSPC = {
         {"power_losses": "W"},
         {"dc_voltage_out": "V"},
     ],
+    ICON: "power",
+    ICON_SIZE: 2,
 }
 DC_SPLITTER = {
     ID: "fastga_he.pt_component.dc_splitter",
@@ -186,6 +206,8 @@ DC_SPLITTER = {
     OUT: [(None, "dc_voltage"), ("dc_current_out", None)],
     CTC: "connector",
     MP: [{"dc_voltage": "V"}, {"power_split": "percent"}],
+    ICON: "splitter",
+    ICON_SIZE: 20,
 }
 RECTIFIER = {
     ID: "fastga_he.pt_component.rectifier",
@@ -207,6 +229,8 @@ RECTIFIER = {
         {"ac_current_rms_in_one_phase": "A"},
         {"dc_current_out": "A"},
     ],
+    ICON: "power_electronics",
+    ICON_SIZE: 30,
 }
 GENERATOR = {
     ID: "fastga_he.pt_component.generator",
@@ -231,6 +255,8 @@ GENERATOR = {
         {"ac_voltage_rms_out": "V"},
         {"ac_voltage_peak_out": "V"},
     ],
+    ICON: "e_motor",
+    ICON_SIZE: 30,
 }
 ICE = {
     ID: "fastga_he.pt_component.internal_combustion_engine",
@@ -249,6 +275,8 @@ ICE = {
         {"fuel_consumption": "kg/h"},
         {"fuel_consumed_t": "kg"},
     ],
+    ICON: "ice",
+    ICON_SIZE: 40,
 }
 
 KNOWN_COMPONENTS = [
@@ -277,6 +305,8 @@ DICTIONARY_IN = {}
 DICTIONARY_OUT = {}
 DICTIONARY_CTC = {}
 DICTIONARY_MP = {}
+DICTIONARY_ICON = {}
+DICTIONARY_ICON_SIZE = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -289,3 +319,5 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_OUT[known_component[ID]] = known_component[OUT]
     DICTIONARY_CTC[known_component[ID]] = known_component[CTC]
     DICTIONARY_MP[known_component[ID]] = known_component[MP]
+    DICTIONARY_ICON[known_component[ID]] = known_component[ICON]
+    DICTIONARY_ICON_SIZE[known_component[ID]] = known_component[ICON_SIZE]

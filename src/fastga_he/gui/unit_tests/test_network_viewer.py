@@ -36,3 +36,23 @@ def test_pt_network_viewer(cleanup):
 
     # Cleanup to avoid any overclogging
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
+
+
+def test_pt_network_viewer_tri_prop(cleanup):
+    """
+    Basic tests for testing the power train weight breakdown.
+    """
+
+    # Create a directory to save graph to
+    os.makedirs(RESULTS_FOLDER_PATH)
+
+    # No real way to verify the plot, we wil just check that it is created.
+    power_train_network_viewer(
+        os.path.join(DATA_FOLDER_PATH, "simple_assembly_tri_prop.yml"),
+        os.path.join(RESULTS_FOLDER_PATH, "network.html"),
+    )
+
+    assert os.path.exists(os.path.join(RESULTS_FOLDER_PATH, "network.html"))
+
+    # Cleanup to avoid any overclogging
+    rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
