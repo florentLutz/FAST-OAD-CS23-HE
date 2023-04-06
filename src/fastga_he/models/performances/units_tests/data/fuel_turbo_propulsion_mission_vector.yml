@@ -24,6 +24,7 @@ model:
     number_of_points_reserve: 10
     power_train_file_path: fuel_turbo_propulsion.yml
     out_file: ../results/mission_data_fuel_turbo.csv
+    use_linesearch: False
 
 
 submodels:

@@ -21,6 +21,8 @@ import pytest
 import numpy as np
 import openmdao.api as om
 
+import plotly.graph_objects as go
+
 import fastoad.api as oad
 
 from fastga_he.models.performances.mission_vector.initialization.initialize_altitude import (
@@ -49,6 +51,7 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_time
 )
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
+from fastga_he.models.propulsion.assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from utils.filter_residuals import filter_residuals
@@ -56,6 +59,7 @@ from utils.filter_residuals import filter_residuals
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 XML_FILE = "sample_ac.xml"
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def test_initialize_altitude():
@@ -1069,6 +1073,7 @@ def test_mission_vector():
                 number_of_points_cruise=30,
                 number_of_points_descent=20,
                 number_of_points_reserve=10,
+                use_linesearch=False,
             )
         ),
         __file__,
@@ -1081,6 +1086,7 @@ def test_mission_vector():
             number_of_points_cruise=30,
             number_of_points_descent=20,
             number_of_points_reserve=10,
+            use_linesearch=False,
         ),
         ivc,
     )
@@ -1231,3 +1237,108 @@ def test_mission_vector_from_yml_fuel_and_battery():
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
     assert mission_end_soc == pytest.approx(0.058, abs=1e-2)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_recording():
+
+    oad.RegisterSubmodel.active_models[
+        "submodel.performances_he.energy_consumption"
+    ] = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.constraints.pmsm.rpm"
+    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.constraints.battery.state_of_charge"
+    ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce"
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.performances.dc_line.temperature_profile"
+    ] = "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics"
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.constraints.inverter.current"
+    ] = "fastga_he.submodel.propulsion.constraints.inverter.current.enforce"
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.constraints.pmsm.torque"
+    ] = "fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce"
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.constraints.generator.rpm"
+    ] = "fastga_he.submodel.propulsion.constraints.generator.rpm.ensure"
+
+    # Define used files depending on options
+    xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
+
+    problem = om.Problem()
+    model = problem.model
+
+    group = om.Group()
+    group.add_subsystem(
+        "pt_sizing",
+        PowerTrainSizingFromFile(
+            power_train_file_path="data/fuel_and_battery_propulsion.yml",
+        ),
+        promotes=["*"],
+    )
+    group.add_subsystem(
+        "mission_vector",
+        MissionVector(
+            number_of_points_climb=30,
+            number_of_points_cruise=30,
+            number_of_points_descent=20,
+            number_of_points_reserve=10,
+            power_train_file_path="data/fuel_and_battery_propulsion.yml",
+            out_file="results/mission_data_fuel_and_battery.csv",
+            use_linesearch=False,
+        ),
+        promotes=["*"],
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(group),
+        __file__,
+        xml_file_name,
+    )
+
+    # Create a new problem
+    model.add_subsystem("data", ivc, promotes=["*"])
+    model.add_subsystem("group", group, promotes=["*"])
+    model.nonlinear_solver = om.NonlinearBlockGS(
+        maxiter=10, iprint=2, rtol=1e-5, debug_print=True, reraise_child_analysiserror=True
+    )
+    model.linear_solver = om.LinearBlockGS()
+
+    problem.setup()
+
+    # Adding a recorder
+    recorder = om.SqliteRecorder("results/cases.sql")
+    solver = model.nonlinear_solver
+    solver.add_recorder(recorder)
+    solver.recording_options["record_solver_residuals"] = True
+
+    problem.run_model()
+
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(19.32, abs=1e-2)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_case_reader():
+
+    fig = go.Figure()
+    cr = om.CaseReader("results/cases.sql")
+
+    solver_case = cr.get_cases("root.nonlinear_solver")
+    for i, case in enumerate(solver_case):
+
+        battery_soc = case[
+            "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_1.state_of_charge"
+        ]
+
+        scatter = go.Scatter(
+            x=np.arange(len(battery_soc)),
+            y=battery_soc,
+            mode="lines+markers",
+            name="Battery SOC during case " + str(i),
+        )
+        fig.add_trace(scatter)
+
+    fig.show()

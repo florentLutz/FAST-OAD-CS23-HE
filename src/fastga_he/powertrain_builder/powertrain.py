@@ -723,6 +723,24 @@ class FASTGAHEPowerTrainConfigurator:
 
         return components_names
 
+    def get_residuals_watcher_elements_list(self) -> tuple:
+        """
+        Returns the list of OpenMDAO variables that are interesting to monitor in the residuals
+        watcher.
+        """
+        self._get_components()
+
+        components_residuals_watchers_name_organised_list = []
+        components_name_organised_list = []
+
+        for component_name, component_id in zip(self._components_name, self._components_id):
+            component_res_list = resources.DICTIONARY_RSD[component_id]
+            for components_res_watcher in component_res_list:
+                components_name_organised_list.append(component_name)
+                components_residuals_watchers_name_organised_list.append(components_res_watcher)
+
+        return components_name_organised_list, components_residuals_watchers_name_organised_list
+
     def get_performance_watcher_elements_list(self) -> tuple:
         """
         Returns the list of OpenMDAO variables that are to be registered by the performances

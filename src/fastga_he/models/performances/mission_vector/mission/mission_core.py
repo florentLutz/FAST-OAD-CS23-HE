@@ -45,6 +45,13 @@ class MissionCore(om.Group):
             default=1,
             desc="number of equilibrium to be treated in reserve",
         )
+        self.options.declare(
+            "use_linesearch",
+            default=True,
+            types=bool,
+            desc="boolean to turn off the use of a linesearch algorithm during the mission."
+            "Can be turned off to speed up the process but might not converge.",
+        )
 
     def setup(self):
 
@@ -78,6 +85,7 @@ class MissionCore(om.Group):
             "number_of_points_reserve": number_of_points_reserve,
             "propulsion_id": self.options["propulsion_id"],
             "power_train_file_path": self.options["power_train_file_path"],
+            "use_linesearch": self.options["use_linesearch"],
         }
         self.add_subsystem(
             "compute_dep_equilibrium",

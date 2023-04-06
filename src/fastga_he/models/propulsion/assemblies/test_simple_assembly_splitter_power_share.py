@@ -2,13 +2,17 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import os
 import os.path as pth
 
 import numpy as np
 import pytest
 
+import openmdao.api as om
 import fastoad.api as oad
 from stdatm import Atmosphere
+
+import plotly.graph_objects as go
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
@@ -19,10 +23,14 @@ from .simple_assembly.performances_simple_assembly_splitter_power_share import (
 )
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 
+import fastga_he.api as api_he
 
 from . import outputs
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
+OUTPUT_FOLDER_PATH = pth.join(pth.dirname(__file__), "outputs")
 
 XML_FILE = "simple_assembly_splitter.xml"
 NB_POINTS_TEST = 10
@@ -168,6 +176,7 @@ def test_assembly_performances_splitter_150_kw_low_requirement():
     problem.check_partials(compact_print=True)
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
 
     ivc = get_indep_var_comp(
@@ -200,6 +209,14 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     )
     problem.setup()
     # Run problem and check obtained value(s) is/(are) correct
+
+    # Adding a recorder
+    if not pth.exists("propulsion/assemblies/outputs/cases.sql"):
+        recorder = om.SqliteRecorder("propulsion/assemblies/outputs/cases.sql")
+        solver = model.performances.nonlinear_solver
+        solver.add_recorder(recorder)
+        solver.recording_options["record_solver_residuals"] = True
+
     problem.run_model()
 
     # om.n2(problem)
@@ -232,6 +249,18 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     )
 
     problem.check_partials(compact_print=True)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_case_reader():
+
+    fig = api_he.residuals_viewer(
+        recorder_data_file_path=pth.join(OUTPUT_FOLDER_PATH, "cases.sql"),
+        case="root.performances.nonlinear_solver",
+        power_train_file_path=pth.join(DATA_FOLDER_PATH, "pt_file_equivalent.yml"),
+        what_to_plot="residuals",
+    )
+    fig.show()
 
 
 def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():

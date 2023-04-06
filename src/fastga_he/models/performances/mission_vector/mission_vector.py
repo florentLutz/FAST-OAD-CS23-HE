@@ -30,7 +30,6 @@ class MissionVector(om.Group):
         self.nonlinear_solver.options["iprint"] = 0
         self.nonlinear_solver.options["maxiter"] = 100
         self.nonlinear_solver.options["rtol"] = 1e-5
-        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
         self.linear_solver = om.LinearBlockGS()
 
         self.configurator = FASTGAHEPowerTrainConfigurator()
@@ -64,6 +63,13 @@ class MissionVector(om.Group):
             default="",
             desc="Path to the file containing the description of the power",
         )
+        self.options.declare(
+            "use_linesearch",
+            default=True,
+            types=bool,
+            desc="boolean to turn off the use of a linesearch algorithm during the mission."
+            "Can be turned off to speed up the process but might not converge.",
+        )
 
     def setup(self):
 
@@ -95,6 +101,7 @@ class MissionVector(om.Group):
                 number_of_points_reserve=number_of_points_reserve,
                 propulsion_id=self.options["propulsion_id"],
                 power_train_file_path=self.options["power_train_file_path"],
+                use_linesearch=self.options["use_linesearch"],
             ),
             promotes=["data:*"],
         )

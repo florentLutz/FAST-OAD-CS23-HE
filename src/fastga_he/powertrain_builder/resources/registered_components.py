@@ -29,6 +29,8 @@ MP = "mission_performances_watcher"
 ICON = "icon_for_network_graph"
 # ICON_SIZE contains the size of th icon used to represent this component when displaying the graph
 ICON_SIZE = "icon_size_for_network_graph"
+# RSD contains the list of residuals that will be displayed when using the residuals viewer
+RSD = "interesting_residuals"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -53,6 +55,7 @@ PROPELLER = {
     ],
     ICON: "propeller",
     ICON_SIZE: 30,
+    RSD: ["thrust_coefficient", "power_coefficient"],
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -76,6 +79,7 @@ PMSM = {
     ],
     ICON: "e_motor",
     ICON_SIZE: 40,
+    RSD: ["ac_current_rms_in", "ac_voltage_rms_in"],
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -106,6 +110,7 @@ INVERTER = {
     ],
     ICON: "power_electronics",
     ICON_SIZE: 30,
+    RSD: ["modulation_index", "dc_current_in"],
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -120,6 +125,7 @@ DC_BUS = {
     MP: [{"dc_voltage": "V"}],
     ICON: "bus_bar",
     ICON_SIZE: 20,
+    RSD: ["dc_voltage"],
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -134,6 +140,7 @@ DC_LINE = {
     MP: [{"dc_current": "A"}, {"cable_temperature": "degK"}, {"conduction_losses": "W"}],
     ICON: "cable",
     ICON_SIZE: 30,
+    RSD: ["dc_current"],
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -153,6 +160,7 @@ DC_DC_CONVERTER = {
     ],
     ICON: "power_electronics",
     ICON_SIZE: 30,
+    RSD: ["dc_current_in", "dc_current_out", "duty_cycle"],
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -175,6 +183,7 @@ BATTERY_PACK = {
     ],
     ICON: "battery",
     ICON_SIZE: 40,
+    RSD: ["voltage_out", "state_of_charge", "c_rate"],
 }
 DC_SSPC = {
     ID: "fastga_he.pt_component.dc_sspc",
@@ -194,6 +203,7 @@ DC_SSPC = {
     ],
     ICON: "power",
     ICON_SIZE: 2,
+    RSD: ["dc_voltage_out", "dc_current_in"],
 }
 DC_SPLITTER = {
     ID: "fastga_he.pt_component.dc_splitter",
@@ -208,6 +218,7 @@ DC_SPLITTER = {
     MP: [{"dc_voltage": "V"}, {"power_split": "percent"}],
     ICON: "splitter",
     ICON_SIZE: 20,
+    RSD: ["power_split", "dc_voltage"],
 }
 RECTIFIER = {
     ID: "fastga_he.pt_component.rectifier",
@@ -231,6 +242,7 @@ RECTIFIER = {
     ],
     ICON: "power_electronics",
     ICON_SIZE: 30,
+    RSD: ["dc_current_out", "modulation_index", "ac_current_rms_in_one_phase"],
 }
 GENERATOR = {
     ID: "fastga_he.pt_component.generator",
@@ -257,6 +269,7 @@ GENERATOR = {
     ],
     ICON: "e_motor",
     ICON_SIZE: 30,
+    RSD: ["shaft_power_in", "ac_voltage_rms_out", "efficiency"],
 }
 ICE = {
     ID: "fastga_he.pt_component.internal_combustion_engine",
@@ -277,6 +290,7 @@ ICE = {
     ],
     ICON: "ice",
     ICON_SIZE: 40,
+    RSD: ["fuel_consumption", "mean_effective_pressure", "torque_out"],
 }
 
 KNOWN_COMPONENTS = [
@@ -307,6 +321,7 @@ DICTIONARY_CTC = {}
 DICTIONARY_MP = {}
 DICTIONARY_ICON = {}
 DICTIONARY_ICON_SIZE = {}
+DICTIONARY_RSD = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -321,3 +336,4 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_MP[known_component[ID]] = known_component[MP]
     DICTIONARY_ICON[known_component[ID]] = known_component[ICON]
     DICTIONARY_ICON_SIZE[known_component[ID]] = known_component[ICON_SIZE]
+    DICTIONARY_RSD[known_component[ID]] = known_component[RSD]
