@@ -23,6 +23,7 @@ model:
     number_of_points_descent: 20
     number_of_points_reserve: 10
     power_train_file_path: simple_assembly.yml
+    use_linesearch: False
 
 submodels:
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file

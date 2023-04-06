@@ -29,7 +29,6 @@ class DEPEquilibrium(om.Group):
         self.nonlinear_solver.options["atol"] = 1e-6
         self.nonlinear_solver.options["stall_limit"] = 5
         self.nonlinear_solver.options["stall_tol"] = 1e-6
-        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):
@@ -70,6 +69,13 @@ class DEPEquilibrium(om.Group):
             default="cruise",
             desc="position of the flaps for the computation of the equilibrium",
         )
+        self.options.declare(
+            "use_linesearch",
+            default=True,
+            types=bool,
+            desc="boolean to turn off the use of a linesearch algorithm during the mission."
+            "Can be turned off to speed up the process but might not converge.",
+        )
 
     def setup(self):
 
@@ -84,6 +90,9 @@ class DEPEquilibrium(om.Group):
             + number_of_points_descent
             + number_of_points_reserve
         )
+
+        if self.options["use_linesearch"]:
+            self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
 
         if self.options["promotes_all_variables"]:
             self.add_subsystem(
