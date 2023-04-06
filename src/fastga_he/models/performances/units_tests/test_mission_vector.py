@@ -21,6 +21,8 @@ import pytest
 import numpy as np
 import openmdao.api as om
 
+import plotly.graph_objects as go
+
 import fastoad.api as oad
 
 from fastga_he.models.performances.mission_vector.initialization.initialize_altitude import (
@@ -57,6 +59,7 @@ from utils.filter_residuals import filter_residuals
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 XML_FILE = "sample_ac.xml"
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def test_initialize_altitude():
@@ -1236,9 +1239,8 @@ def test_mission_vector_from_yml_fuel_and_battery():
     assert mission_end_soc == pytest.approx(0.058, abs=1e-2)
 
 
-def test_mission_vector_from_yml_fuel_and_battery_pure_om():
-
-    from openmdao.test_suite.components.sellar_feature import SellarMDAWithUnits
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_recording():
 
     oad.RegisterSubmodel.active_models[
         "submodel.performances_he.energy_consumption"
@@ -1307,11 +1309,36 @@ def test_mission_vector_from_yml_fuel_and_battery_pure_om():
     problem.setup()
 
     # Adding a recorder
-    recorder = om.SqliteRecorder("cases.sql")
+    recorder = om.SqliteRecorder("results/cases.sql")
     solver = model.nonlinear_solver
     solver.add_recorder(recorder)
+    solver.recording_options["record_solver_residuals"] = True
 
     problem.run_model()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(19.32, abs=1e-2)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_case_reader():
+
+    fig = go.Figure()
+    cr = om.CaseReader("results/cases.sql")
+
+    solver_case = cr.get_cases("root.nonlinear_solver")
+    for i, case in enumerate(solver_case):
+
+        battery_soc = case[
+            "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_1.state_of_charge"
+        ]
+
+        scatter = go.Scatter(
+            x=np.arange(len(battery_soc)),
+            y=battery_soc,
+            mode="lines+markers",
+            name="Battery SOC during case " + str(i),
+        )
+        fig.add_trace(scatter)
+
+    fig.show()
