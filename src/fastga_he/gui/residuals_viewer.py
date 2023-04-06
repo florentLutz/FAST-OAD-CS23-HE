@@ -81,7 +81,7 @@ def residuals_viewer(
         scatter_mean = go.Scatter(
             x=data_x,
             y=data_mean,
-            mode="lines+markers",
+            mode="markers",
             name=component_name + "." + residual_name + " : Mean residuals for variable",
             legendgroup=component_name + "." + residual_name,
             legendgrouptitle_text=component_name + "." + residual_name,
@@ -91,7 +91,7 @@ def residuals_viewer(
         scatter_min = go.Scatter(
             x=data_x,
             y=data_min,
-            mode="lines+markers",
+            mode="markers",
             name=component_name + "." + residual_name + " : Min residuals for variable",
             legendgroup=component_name + "." + residual_name,
             marker=dict(symbol="triangle-up", color=color, size=10),
@@ -100,11 +100,22 @@ def residuals_viewer(
         scatter_max = go.Scatter(
             x=data_x,
             y=data_max,
-            mode="lines+markers",
+            mode="markers",
             name=component_name + "." + residual_name + " : Max residuals for variable",
             legendgroup=component_name + "." + residual_name,
             marker=dict(symbol="triangle-down", color=color, size=10),
         )
         fig.add_trace(scatter_max)
+
+        for x_value, y_min, y_max in zip(data_x, data_min, data_max):
+            scatter_uncertainty = go.Scatter(
+                x=[x_value, x_value],
+                y=[y_min, y_max],
+                mode="lines",
+                legendgroup=component_name + "." + residual_name,
+                line=dict(color=color),
+                showlegend=False,
+            )
+            fig.add_trace(scatter_uncertainty)
 
     return fig
