@@ -52,6 +52,13 @@ class MissionCore(om.Group):
             desc="boolean to turn off the use of a linesearch algorithm during the mission."
             "Can be turned off to speed up the process but might not converge.",
         )
+        self.options.declare(
+            name="pre_condition_voltage",
+            default=False,
+            desc="Boolean to pre_condition the voltages of the different components of the PT, "
+            "can save some time in specific cases",
+            allow_none=False,
+        )
 
     def setup(self):
 
@@ -86,6 +93,7 @@ class MissionCore(om.Group):
             "propulsion_id": self.options["propulsion_id"],
             "power_train_file_path": self.options["power_train_file_path"],
             "use_linesearch": self.options["use_linesearch"],
+            "pre_condition_voltage": self.options["pre_condition_voltage"],
         }
         self.add_subsystem(
             "compute_dep_equilibrium",

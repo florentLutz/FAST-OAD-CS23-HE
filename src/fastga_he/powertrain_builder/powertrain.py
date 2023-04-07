@@ -978,15 +978,10 @@ class FASTGAHEPowerTrainConfigurator:
                 # Now that we have the id of the node, we can check if there are some voltage to set
                 voltages_to_set = resources.DICTIONARY_V_TO_SET[component_id]
 
-                distance_from_setter = spl[node][voltage_setter] - 1
-
                 for voltage_to_set in voltages_to_set:
 
                     variable_name = component_name + "." + voltage_to_set
-                    # The further we go from the setter the lower the voltage because of
-                    # component efficiencies
-                    value_of_voltage = reference_voltage * 0.995 ** (distance_from_setter / 2.0)
-                    voltage_dict_subgraph[variable_name] = value_of_voltage
+                    voltage_dict_subgraph[variable_name] = reference_voltage
 
             final_list.append(voltage_dict_subgraph)
 

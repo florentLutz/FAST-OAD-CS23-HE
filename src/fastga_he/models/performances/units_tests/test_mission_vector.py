@@ -1119,6 +1119,7 @@ def test_mission_vector_from_yml():
     problem.write_outputs()
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
 
     if not pth.exists(RESULTS_FOLDER_PATH):
         os.mkdir(RESULTS_FOLDER_PATH)

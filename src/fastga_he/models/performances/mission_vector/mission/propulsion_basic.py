@@ -33,6 +33,15 @@ class FuelConsumed(om.ExplicitComponent):
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
+        ########## NOT USED BUT NEEDED TO ENSURE COMPATIBILITY #####################################
+        self.options.declare(
+            name="pre_condition_voltage",
+            default=False,
+            desc="Boolean to pre_condition the voltages of the different components of the PT, "
+            "can save some time in specific cases",
+            allow_none=False,
+        )
+
     def setup(self):
         number_of_points = self.options["number_of_points"]
 

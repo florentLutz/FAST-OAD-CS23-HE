@@ -25,6 +25,7 @@ model:
     power_train_file_path: fuel_turbo_propulsion.yml
     out_file: ../results/mission_data_fuel_turbo.csv
     use_linesearch: False
+    pre_condition_voltage: True
 
 
 submodels:
