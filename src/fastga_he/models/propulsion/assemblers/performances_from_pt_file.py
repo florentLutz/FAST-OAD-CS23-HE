@@ -218,6 +218,8 @@ class PowerTrainPerformancesFromFile(om.Group):
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
 
+        # This one will be passe in before going into the first pt components
         number_of_points = self.options["number_of_points"]
 
-        # This one will be passe in before going into the first pt components
+        # Let's first check the coherence of the voltage
+        self.configurator.check_voltage_coherence(inputs=inputs, number_of_points=number_of_points)

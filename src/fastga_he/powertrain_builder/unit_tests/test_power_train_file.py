@@ -10,12 +10,15 @@ import pytest
 import networkx as nx
 import matplotlib.pyplot as plt
 
+import openmdao.api as om
+
 from ..powertrain import FASTGAHEPowerTrainConfigurator
 from ..exceptions import FASTGAHESingleSSPCAtEndOfLine
 
 YML_FILE = "sample_power_train_file.yml"
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+NB_POINTS_TEST = 10
 
 
 def test_power_train_file_components_sizing():
@@ -262,3 +265,22 @@ def test_independent_voltage_subgraph():
 
             nx.draw_circular(sub_graph, ax=fig.add_subplot(), with_labels=True)
             fig.savefig("powertrain_builder/unit_tests/outputs/graph_" + str(i + 1) + ".png")
+
+
+def test_voltage_setter_list():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    voltage_setter_list = power_train_configurator._list_voltage_coherence_to_check()
+
+    # In the .yml that serves for this test, there are 3 subgraphs, one with a DC/DC converter
+    # and a rectifier (both sets voltage), one with a generator (which sets voltage) and one with
+    # nothing that sets the voltage
+    assert [] in voltage_setter_list
+    assert ["dc_dc_converter_1_out", "rectifier_1_out"] in voltage_setter_list
+    assert ["generator_1_out"] in voltage_setter_list

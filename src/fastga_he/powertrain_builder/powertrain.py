@@ -26,6 +26,7 @@ from .exceptions import (
     FASTGAHEUnknownOption,
     FASTGAHEComponentsNotIdentified,
     FASTGAHESingleSSPCAtEndOfLine,
+    FASTGAHEIncoherentVoltage,
 )
 
 from . import resources
@@ -818,6 +819,106 @@ class FASTGAHEPowerTrainConfigurator:
         sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
 
         return sub_graphs
+
+    def _list_voltage_coherence_to_check(self) -> list:
+        """
+        Makes a list, for all sub graphs, of the components that sets the voltage inside of them,
+        the check on the coherency of the value will be ade later.
+        """
+
+        # This line prompts the identification of the power train from the file
+        sub_graphs = self.get_graphs_connected_voltage()
+
+        # We create a dictionary to associate name to id
+        name_to_id_dict = dict(zip(self._components_name, self._components_id))
+
+        sub_graphs_voltage_setter = []
+
+        for sub_graph in sub_graphs:
+            # First we make a list of all components in the sub graph that sets the voltage.
+            nodes_list = list(sub_graph.nodes)
+
+            # Then we turns those nodes (components name) in the corresponding component id and
+            # check if this id sets the voltage and count how many of them do.
+            node_that_sets_voltage = []
+
+            for node in nodes_list:
+
+                clean_node_name = node.replace("_in", "").replace("_out", "")
+
+                node_id = name_to_id_dict[clean_node_name]
+
+                # Since only the output of the components set the voltage, we will oly include
+                # them in the list
+                if resources.DICTIONARY_SETS_V[node_id] and "_out" in node:
+                    node_that_sets_voltage.append(node)
+
+            sub_graphs_voltage_setter.append(node_that_sets_voltage)
+
+        return sub_graphs_voltage_setter
+
+    def check_voltage_coherence(self, inputs, number_of_points: int):
+        """
+        Check that all the sub graphs of independent voltage are compatible, meaning that if
+        there is more than one component that sets the voltage, they have the same target voltage.
+
+        :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
+        voltages to check
+        :param number_of_points: number of points in the data to check
+        """
+
+        sub_graphs_voltage_setters = self._list_voltage_coherence_to_check()
+
+        # Template array just serves as an argument in the asarray() below
+        template_array = np.full(number_of_points, 42.0)
+
+        name_to_type = dict(zip(self._components_name, self._components_type))
+
+        for sub_graph_voltage_setters in sub_graphs_voltage_setters:
+            ref_voltage = None
+            # If zero or one voltage setters nothing to check
+            if len(sub_graph_voltage_setters) < 2:
+                pass
+            else:
+                # Now for all those setter, we put them in the same format (if it was given as a
+                # float we transform it in array)
+                will_work = True
+                variables_to_check = []
+                for voltage_setter in sub_graph_voltage_setters:
+                    clean_setter_name = voltage_setter.replace("_in", "").replace("_out", "")
+                    setter_type = name_to_type[clean_setter_name]
+                    input_name = (
+                        PT_DATA_PREFIX
+                        + setter_type
+                        + ":"
+                        + clean_setter_name
+                        + ":voltage_out_target_mission"
+                    )
+                    variables_to_check.append(input_name)
+                    data_value = inputs[input_name]
+                    # We initiate the test with the first value we find
+                    if ref_voltage is None:
+                        # If not a float, it is an array !
+                        if len(data_value) == 1:
+                            ref_voltage = np.full(number_of_points, data_value)
+                        else:
+                            ref_voltage = data_value
+                    # We check if coherent with other value
+                    else:
+                        if len(data_value) == 1:
+                            data_value = np.full(number_of_points, data_value)
+                        else:
+                            data_value = data_value
+
+                        if not np.array_equal(ref_voltage, data_value):
+                            will_work = False
+
+                if not will_work:
+                    raise FASTGAHEIncoherentVoltage(
+                        "The target voltage chosen for the following input: "
+                        + ", ".join(variables_to_check)
+                        + " is incoherent. Ensure that they have the same value and/or units"
+                    )
 
     def get_network_elements_list(self) -> tuple:
         """
