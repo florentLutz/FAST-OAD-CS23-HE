@@ -39,6 +39,9 @@ SETS_V = "set_voltage"
 # terms of voltage. For instance, regardless of the voltage at the input of a converter,
 # its output will always be at target_voltage_out, only current will change.
 IO_INDEP_V = "input_output_voltage_independant"
+# V_TO_SET contains a list, for each type of components of their voltage caracteristic that can
+# be set
+V_TO_SET = "voltage_to_precondition"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -66,6 +69,7 @@ PROPELLER = {
     RSD: ["thrust_coefficient", "power_coefficient"],
     SETS_V: False,
     IO_INDEP_V: False,
+    V_TO_SET: [],
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -92,6 +96,7 @@ PMSM = {
     RSD: ["ac_current_rms_in", "ac_voltage_rms_in"],
     SETS_V: False,
     IO_INDEP_V: False,
+    V_TO_SET: ["ac_voltage_rms_in", "ac_voltage_peak_in"],
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -125,6 +130,7 @@ INVERTER = {
     RSD: ["modulation_index", "dc_current_in"],
     SETS_V: False,
     IO_INDEP_V: False,
+    V_TO_SET: [],
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -142,6 +148,7 @@ DC_BUS = {
     RSD: ["dc_voltage"],
     SETS_V: False,
     IO_INDEP_V: False,
+    V_TO_SET: ["dc_voltage"],
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -159,6 +166,7 @@ DC_LINE = {
     RSD: ["dc_current"],
     SETS_V: False,
     IO_INDEP_V: False,
+    V_TO_SET: [],
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -181,6 +189,7 @@ DC_DC_CONVERTER = {
     RSD: ["dc_current_in", "dc_current_out", "duty_cycle"],
     SETS_V: True,
     IO_INDEP_V: True,
+    V_TO_SET: [],  # It is a bit paradoxical but you cant set a setter's voltage :p
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -206,6 +215,7 @@ BATTERY_PACK = {
     RSD: ["voltage_out", "state_of_charge", "c_rate"],
     SETS_V: False,
     IO_INDEP_V: False,
+    V_TO_SET: [],
 }
 DC_SSPC = {
     ID: "fastga_he.pt_component.dc_sspc",
@@ -228,6 +238,7 @@ DC_SSPC = {
     RSD: ["dc_voltage_out", "dc_current_in"],
     SETS_V: False,
     IO_INDEP_V: False,
+    V_TO_SET: ["dc_voltage_out"],
 }
 DC_SPLITTER = {
     ID: "fastga_he.pt_component.dc_splitter",
@@ -245,6 +256,7 @@ DC_SPLITTER = {
     RSD: ["power_split", "dc_voltage"],
     SETS_V: False,
     IO_INDEP_V: False,
+    V_TO_SET: ["dc_voltage", "dc_voltage_in_1", "dc_voltage_in_2"],
 }
 RECTIFIER = {
     ID: "fastga_he.pt_component.rectifier",
@@ -271,6 +283,7 @@ RECTIFIER = {
     RSD: ["dc_current_out", "modulation_index", "ac_current_rms_in_one_phase"],
     SETS_V: True,
     IO_INDEP_V: True,
+    V_TO_SET: [],
 }
 GENERATOR = {
     ID: "fastga_he.pt_component.generator",
@@ -300,6 +313,7 @@ GENERATOR = {
     RSD: ["shaft_power_in", "ac_voltage_rms_out", "efficiency"],
     SETS_V: True,
     IO_INDEP_V: False,
+    V_TO_SET: ["ac_voltage_rms_out", "ac_voltage_peak_out"],
 }
 ICE = {
     ID: "fastga_he.pt_component.internal_combustion_engine",
@@ -323,6 +337,7 @@ ICE = {
     RSD: ["fuel_consumption", "mean_effective_pressure", "torque_out"],
     SETS_V: False,
     IO_INDEP_V: False,
+    V_TO_SET: [],
 }
 
 KNOWN_COMPONENTS = [
@@ -356,6 +371,7 @@ DICTIONARY_ICON_SIZE = {}
 DICTIONARY_RSD = {}
 DICTIONARY_SETS_V = {}
 DICTIONARY_IO_INDEP_V = {}
+DICTIONARY_V_TO_SET = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -373,3 +389,4 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_RSD[known_component[ID]] = known_component[RSD]
     DICTIONARY_SETS_V[known_component[ID]] = known_component[SETS_V]
     DICTIONARY_IO_INDEP_V[known_component[ID]] = known_component[IO_INDEP_V]
+    DICTIONARY_V_TO_SET[known_component[ID]] = known_component[V_TO_SET]

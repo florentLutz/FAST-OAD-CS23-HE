@@ -263,7 +263,7 @@ def test_independent_voltage_subgraph():
         for i, sub_graph in enumerate(sub_graphs):
             fig = plt.figure(figsize=(12, 9), dpi=80)
 
-            nx.draw_circular(sub_graph, ax=fig.add_subplot(), with_labels=True)
+            nx.draw_kamada_kawai(sub_graph, ax=fig.add_subplot(), with_labels=True)
             fig.savefig("powertrain_builder/unit_tests/outputs/graph_" + str(i + 1) + ".png")
 
 

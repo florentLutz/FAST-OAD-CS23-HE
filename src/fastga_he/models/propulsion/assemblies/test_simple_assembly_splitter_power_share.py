@@ -269,7 +269,9 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
     ivc = get_indep_var_comp(
         list_inputs(
             PowerTrainPerformancesFromFile(
-                power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+                pre_condition_voltage=True,
             )
         ),
         __file__,
@@ -288,7 +290,9 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
 
     problem = run_system(
         PowerTrainPerformancesFromFile(
-            power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_voltage=True,
         ),
         ivc,
     )
@@ -334,7 +338,9 @@ def test_incoherent_voltage():
 
     input_list = list_inputs(
         PowerTrainPerformancesFromFile(
-            power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_voltage=True,
         )
     )
     input_list.remove(
@@ -368,7 +374,9 @@ def test_incoherent_voltage():
     # Should work
     problem = run_system(
         PowerTrainPerformancesFromFile(
-            power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_voltage=True,
         ),
         ivc_work,
     )
@@ -384,7 +392,9 @@ def test_incoherent_voltage():
     with pytest.raises(FASTGAHEIncoherentVoltage) as e_info:
         problem = run_system(
             PowerTrainPerformancesFromFile(
-                power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+                pre_condition_voltage=True,
             ),
             ivc_workn_t,
         )

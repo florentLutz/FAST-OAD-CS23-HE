@@ -5,17 +5,11 @@
 import openmdao.api as om
 import fastoad.api as oad
 
-import numpy as np
-
 from fastga_he.powertrain_builder.powertrain import (
     FASTGAHEPowerTrainConfigurator,
-    PROMOTION_FROM_MISSION,
 )
 from fastga_he.models.propulsion.assemblers.energy_consumption_from_pt_file import (
     EnergyConsumptionFromPTFile,
-)
-from fastga_he.models.propulsion.assemblers.performances_watcher import (
-    PowerTrainPerformancesWatcher,
 )
 
 # noinspection PyUnresolvedReferences
@@ -62,6 +56,13 @@ class PowerTrainPerformancesFromFile(om.Group):
             default=True,
             desc="Boolean to add solvers to the power train performance group. Default is False "
             "it can be turned off when used jointly with the mission to save computation time",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="pre_condition_voltage",
+            default=False,
+            desc="Boolean to pre_condition the voltages of the different components of the PT, "
+            "can save some time in specific cases",
             allow_none=False,
         )
         self.options.declare(
@@ -223,3 +224,12 @@ class PowerTrainPerformancesFromFile(om.Group):
 
         # Let's first check the coherence of the voltage
         self.configurator.check_voltage_coherence(inputs=inputs, number_of_points=number_of_points)
+
+        if self.options["pre_condition_voltage"]:
+            voltage_to_set = self.configurator.get_voltage_to_set(
+                inputs=inputs, number_of_points=number_of_points
+            )
+
+            for sub_graphs in voltage_to_set:
+                for voltage in sub_graphs:
+                    outputs[voltage] = sub_graphs[voltage]
