@@ -31,6 +31,14 @@ ICON = "icon_for_network_graph"
 ICON_SIZE = "icon_size_for_network_graph"
 # RSD contains the list of residuals that will be displayed when using the residuals viewer
 RSD = "interesting_residuals"
+# SETS_V contains a boolean that indicates if, as part of the load flow analysis method,
+# this component set the voltage of one part of the architecture
+SETS_V = "set_voltage"
+# IO_INDEP_V contains a boolean that indicates if the voltage at the output of a component is
+# independent of the voltage at the input, which would separate two part of the architecture in
+# terms of voltage. For instance, regardless of the voltage at the input of a converter,
+# its output will always be at target_voltage_out, only current will change.
+IO_INDEP_V = "input_output_voltage_independant"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -56,6 +64,8 @@ PROPELLER = {
     ICON: "propeller",
     ICON_SIZE: 30,
     RSD: ["thrust_coefficient", "power_coefficient"],
+    SETS_V: False,
+    IO_INDEP_V: False,
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -80,6 +90,8 @@ PMSM = {
     ICON: "e_motor",
     ICON_SIZE: 40,
     RSD: ["ac_current_rms_in", "ac_voltage_rms_in"],
+    SETS_V: False,
+    IO_INDEP_V: False,
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -111,6 +123,8 @@ INVERTER = {
     ICON: "power_electronics",
     ICON_SIZE: 30,
     RSD: ["modulation_index", "dc_current_in"],
+    SETS_V: False,
+    IO_INDEP_V: False,
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -126,6 +140,8 @@ DC_BUS = {
     ICON: "bus_bar",
     ICON_SIZE: 20,
     RSD: ["dc_voltage"],
+    SETS_V: False,
+    IO_INDEP_V: False,
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -141,6 +157,8 @@ DC_LINE = {
     ICON: "cable",
     ICON_SIZE: 30,
     RSD: ["dc_current"],
+    SETS_V: False,
+    IO_INDEP_V: False,
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -161,6 +179,8 @@ DC_DC_CONVERTER = {
     ICON: "power_electronics",
     ICON_SIZE: 30,
     RSD: ["dc_current_in", "dc_current_out", "duty_cycle"],
+    SETS_V: True,
+    IO_INDEP_V: True,
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -184,6 +204,8 @@ BATTERY_PACK = {
     ICON: "battery",
     ICON_SIZE: 40,
     RSD: ["voltage_out", "state_of_charge", "c_rate"],
+    SETS_V: False,
+    IO_INDEP_V: False,
 }
 DC_SSPC = {
     ID: "fastga_he.pt_component.dc_sspc",
@@ -204,6 +226,8 @@ DC_SSPC = {
     ICON: "power",
     ICON_SIZE: 2,
     RSD: ["dc_voltage_out", "dc_current_in"],
+    SETS_V: False,
+    IO_INDEP_V: False,
 }
 DC_SPLITTER = {
     ID: "fastga_he.pt_component.dc_splitter",
@@ -219,6 +243,8 @@ DC_SPLITTER = {
     ICON: "splitter",
     ICON_SIZE: 20,
     RSD: ["power_split", "dc_voltage"],
+    SETS_V: False,
+    IO_INDEP_V: False,
 }
 RECTIFIER = {
     ID: "fastga_he.pt_component.rectifier",
@@ -243,6 +269,8 @@ RECTIFIER = {
     ICON: "power_electronics",
     ICON_SIZE: 30,
     RSD: ["dc_current_out", "modulation_index", "ac_current_rms_in_one_phase"],
+    SETS_V: True,
+    IO_INDEP_V: True,
 }
 GENERATOR = {
     ID: "fastga_he.pt_component.generator",
@@ -270,6 +298,8 @@ GENERATOR = {
     ICON: "e_motor",
     ICON_SIZE: 30,
     RSD: ["shaft_power_in", "ac_voltage_rms_out", "efficiency"],
+    SETS_V: True,
+    IO_INDEP_V: False,
 }
 ICE = {
     ID: "fastga_he.pt_component.internal_combustion_engine",
@@ -291,6 +321,8 @@ ICE = {
     ICON: "ice",
     ICON_SIZE: 40,
     RSD: ["fuel_consumption", "mean_effective_pressure", "torque_out"],
+    SETS_V: False,
+    IO_INDEP_V: False,
 }
 
 KNOWN_COMPONENTS = [
@@ -322,6 +354,8 @@ DICTIONARY_MP = {}
 DICTIONARY_ICON = {}
 DICTIONARY_ICON_SIZE = {}
 DICTIONARY_RSD = {}
+DICTIONARY_SETS_V = {}
+DICTIONARY_IO_INDEP_V = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -337,3 +371,5 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_ICON[known_component[ID]] = known_component[ICON]
     DICTIONARY_ICON_SIZE[known_component[ID]] = known_component[ICON_SIZE]
     DICTIONARY_RSD[known_component[ID]] = known_component[RSD]
+    DICTIONARY_SETS_V[known_component[ID]] = known_component[SETS_V]
+    DICTIONARY_IO_INDEP_V[known_component[ID]] = known_component[IO_INDEP_V]

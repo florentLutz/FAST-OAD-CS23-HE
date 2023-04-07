@@ -2,14 +2,20 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import os
 import os.path as pth
 
 import pytest
+
+import networkx as nx
+import matplotlib.pyplot as plt
 
 from ..powertrain import FASTGAHEPowerTrainConfigurator
 from ..exceptions import FASTGAHESingleSSPCAtEndOfLine
 
 YML_FILE = "sample_power_train_file.yml"
+
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def test_power_train_file_components_sizing():
@@ -236,3 +242,23 @@ def test_distance_from_propulsive_load():
     assert distance_from_prop_load["dc_bus_3"] == 3
 
     assert distance_from_prop_load["dc_bus_4"] == 7
+
+
+def test_independent_voltage_subgraph():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    print("\n")
+    sub_graphs = power_train_configurator.get_graphs_connected_voltage()
+
+    # Skip drawing if in GitHub actions
+    if not IN_GITHUB_ACTIONS:
+        for i, sub_graph in enumerate(sub_graphs):
+            fig = plt.figure(figsize=(12, 9), dpi=80)
+
+            nx.draw_circular(sub_graph, ax=fig.add_subplot(), with_labels=True)
+            fig.savefig("powertrain_builder/unit_tests/outputs/graph_" + str(i + 1) + ".png")

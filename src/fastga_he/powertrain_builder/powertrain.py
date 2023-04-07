@@ -767,6 +767,58 @@ class FASTGAHEPowerTrainConfigurator:
             components_perf_watchers_unit_organised_list,
         )
 
+    def get_graphs_connected_voltage(self) -> list:
+        """
+        This function returns a list of graphs of connected PT components that have more or less
+        the same imposed voltage. What is meant by that is that since some component impose the
+        voltage on the circuit while other have independent I/O in terms of voltage e.g the DC/DC
+        converter this will make it so that there might some subgraph of the architecture with
+        different connected voltage.
+        """
+
+        self._get_components()
+        self._get_connections()
+
+        graph = nx.Graph()
+
+        for component_name, component_id in zip(self._components_name, self._components_id):
+            graph.add_node(
+                component_name + "_out",
+            )
+            graph.add_node(
+                component_name + "_in",
+            )
+
+            if not resources.DICTIONARY_IO_INDEP_V[component_id]:
+
+                graph.add_edge(
+                    component_name + "_out",
+                    component_name + "_in",
+                )
+
+        for connection in self._connection_list:
+            # For bus and splitter, we don't really care about what number of input it is
+            # connected to so we do the following
+
+            if type(connection["source"]) is list:
+                source = connection["source"][0]
+            else:
+                source = connection["source"]
+
+            if type(connection["target"]) is list:
+                target = connection["target"][0]
+            else:
+                target = connection["target"]
+
+            graph.add_edge(
+                source + "_in",
+                target + "_out",
+            )
+
+        sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+
+        return sub_graphs
+
     def get_network_elements_list(self) -> tuple:
         """
         Returns the name of the components and their connections for the visualisation of the
