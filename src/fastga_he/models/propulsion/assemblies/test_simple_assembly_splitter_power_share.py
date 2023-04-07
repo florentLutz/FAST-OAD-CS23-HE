@@ -1,7 +1,7 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
-
+import copy
 import os
 import os.path as pth
 
@@ -12,18 +12,17 @@ import openmdao.api as om
 import fastoad.api as oad
 from stdatm import Atmosphere
 
-import plotly.graph_objects as go
-
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
 from utils.filter_residuals import filter_residuals
+
+import fastga_he.api as api_he
+from fastga_he.powertrain_builder.exceptions import FASTGAHEIncoherentVoltage
 
 from .simple_assembly.performances_simple_assembly_splitter_power_share import (
     PerformancesAssemblySplitterPowerShare,
 )
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
-
-import fastga_he.api as api_he
 
 from . import outputs
 
@@ -211,8 +210,8 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     # Run problem and check obtained value(s) is/(are) correct
 
     # Adding a recorder
-    if not pth.exists("propulsion/assemblies/outputs/cases.sql"):
-        recorder = om.SqliteRecorder("propulsion/assemblies/outputs/cases.sql")
+    if not pth.exists(pth.join(OUTPUT_FOLDER_PATH, "cases.sql")):
+        recorder = om.SqliteRecorder(pth.join(OUTPUT_FOLDER_PATH, "cases.sql"))
         solver = model.performances.nonlinear_solver
         solver.add_recorder(recorder)
         solver.recording_options["record_solver_residuals"] = True
@@ -270,7 +269,9 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
     ivc = get_indep_var_comp(
         list_inputs(
             PowerTrainPerformancesFromFile(
-                power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+                pre_condition_voltage=True,
             )
         ),
         __file__,
@@ -289,7 +290,9 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
 
     problem = run_system(
         PowerTrainPerformancesFromFile(
-            power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_voltage=True,
         ),
         ivc,
     )
@@ -324,3 +327,82 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_incoherent_voltage():
+
+    # Small test to see if the check that prevent the problem from running with incoherent value
+    # works
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_splitter_power_share.yml")
+
+    input_list = list_inputs(
+        PowerTrainPerformancesFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_voltage=True,
+        )
+    )
+    input_list.remove(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_out_target_mission"
+    )
+
+    ivc_blank = get_indep_var_comp(
+        input_list,
+        __file__,
+        XML_FILE,
+    )
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc_blank.add_output("altitude", val=altitude, units="m")
+    ivc_blank.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc_blank.add_output("thrust", val=np.linspace(500, 1500, NB_POINTS_TEST), units="N")
+    ivc_blank.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc_blank.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    ivc_work = copy.deepcopy(ivc_blank)
+
+    ivc_work.add_output(
+        name="data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_out_target_mission",
+        units="V",
+        val=np.full(NB_POINTS_TEST, 850),
+    )
+
+    # Should work
+    problem = run_system(
+        PowerTrainPerformancesFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_voltage=True,
+        ),
+        ivc_work,
+    )
+
+    ivc_workn_t = copy.deepcopy(ivc_blank)
+    ivc_workn_t.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1"
+        ":voltage_out_target_mission",
+        units="V",
+        val=np.full(NB_POINTS_TEST, 400),
+    )
+    # Should return an exception
+    with pytest.raises(FASTGAHEIncoherentVoltage) as e_info:
+        problem = run_system(
+            PowerTrainPerformancesFromFile(
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+                pre_condition_voltage=True,
+            ),
+            ivc_workn_t,
+        )
+
+    assert (
+        e_info.value.args[0] == "The target voltage chosen for the following input: "
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1"
+        ":voltage_out_target_mission, "
+        "data:propulsion:he_power_train:rectifier:rectifier_1:voltage_out_target_mission is "
+        "incoherent. Ensure that they have the same value and/or units"
+    )

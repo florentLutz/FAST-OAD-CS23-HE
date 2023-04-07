@@ -382,7 +382,9 @@ def test_performances_from_pt_file():
     ivc = get_indep_var_comp(
         list_inputs(
             PowerTrainPerformancesFromFile(
-                power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+                pre_condition_voltage=True,
             )
         ),
         __file__,
@@ -402,7 +404,9 @@ def test_performances_from_pt_file():
 
     problem = run_system(
         PowerTrainPerformancesFromFile(
-            power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_voltage=True,
         ),
         ivc,
     )
@@ -417,16 +421,16 @@ def test_performances_from_pt_file():
     assert current_in * voltage_in == pytest.approx(
         np.array(
             [
-                195011.0,
-                196012.0,
-                196991.0,
-                197954.0,
-                198906.0,
-                199849.0,
-                200784.0,
-                201707.0,
-                202614.0,
-                203501.0,
+                195011.2,
+                196012.6,
+                196991.4,
+                197954.6,
+                198907.0,
+                199850.7,
+                200785.0,
+                201707.3,
+                202613.7,
+                203502.3,
             ]
         ),
         abs=1,

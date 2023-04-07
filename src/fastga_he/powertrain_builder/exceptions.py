@@ -32,3 +32,12 @@ class FASTGAHESingleSSPCAtEndOfLine(FastError):
     one. Because of the way equations were coded, if one end of a harness is connected to an
     SSPC, the other shall be as well to allow for a possible opening of the 2 SSPCs.
     """
+
+
+class FASTGAHEIncoherentVoltage(FastError):
+    """
+    Class for managing errors that result from connecting two component that sets the voltage of
+    their subgraph and set them with a different voltage. This will not cause an error at
+    OpenMDAO level, but from experience, it will not converge, so we will make it fail as soon as
+    possible.
+    """

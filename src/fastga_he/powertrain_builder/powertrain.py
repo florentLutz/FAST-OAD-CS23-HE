@@ -13,7 +13,7 @@ import os.path as pth
 
 from abc import ABC
 from importlib.resources import open_text
-from typing import Tuple
+from typing import Tuple, List
 
 import numpy as np
 from jsonschema import validate
@@ -26,6 +26,7 @@ from .exceptions import (
     FASTGAHEUnknownOption,
     FASTGAHEComponentsNotIdentified,
     FASTGAHESingleSSPCAtEndOfLine,
+    FASTGAHEIncoherentVoltage,
 )
 
 from . import resources
@@ -767,6 +768,225 @@ class FASTGAHEPowerTrainConfigurator:
             components_perf_watchers_unit_organised_list,
         )
 
+    def get_graphs_connected_voltage(self) -> list:
+        """
+        This function returns a list of graphs of connected PT components that have more or less
+        the same imposed voltage. What is meant by that is that since some component impose the
+        voltage on the circuit while other have independent I/O in terms of voltage e.g the DC/DC
+        converter this will make it so that there might some subgraph of the architecture with
+        different connected voltage.
+        """
+
+        self._get_components()
+        self._get_connections()
+
+        graph = nx.Graph()
+
+        for component_name, component_id in zip(self._components_name, self._components_id):
+            graph.add_node(
+                component_name + "_out",
+            )
+            graph.add_node(
+                component_name + "_in",
+            )
+
+            if not resources.DICTIONARY_IO_INDEP_V[component_id]:
+
+                graph.add_edge(
+                    component_name + "_out",
+                    component_name + "_in",
+                )
+
+        for connection in self._connection_list:
+            # For bus and splitter, we don't really care about what number of input it is
+            # connected to so we do the following
+
+            if type(connection["source"]) is list:
+                source = connection["source"][0]
+            else:
+                source = connection["source"]
+
+            if type(connection["target"]) is list:
+                target = connection["target"][0]
+            else:
+                target = connection["target"]
+
+            graph.add_edge(
+                source + "_in",
+                target + "_out",
+            )
+
+        sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+
+        return sub_graphs
+
+    def _list_voltage_coherence_to_check(self) -> list:
+        """
+        Makes a list, for all sub graphs, of the components that sets the voltage inside of them,
+        the check on the coherency of the value will be ade later.
+        """
+
+        # This line prompts the identification of the power train from the file
+        sub_graphs = self.get_graphs_connected_voltage()
+
+        # We create a dictionary to associate name to id
+        name_to_id_dict = dict(zip(self._components_name, self._components_id))
+
+        sub_graphs_voltage_setter = []
+
+        for sub_graph in sub_graphs:
+            # First we make a list of all components in the sub graph that sets the voltage.
+            nodes_list = list(sub_graph.nodes)
+
+            # Then we turns those nodes (components name) in the corresponding component id and
+            # check if this id sets the voltage and count how many of them do.
+            node_that_sets_voltage = []
+
+            for node in nodes_list:
+
+                clean_node_name = node.replace("_in", "").replace("_out", "")
+
+                node_id = name_to_id_dict[clean_node_name]
+
+                # Since only the output of the components set the voltage, we will oly include
+                # them in the list
+                if resources.DICTIONARY_SETS_V[node_id] and "_out" in node:
+                    node_that_sets_voltage.append(node)
+
+            sub_graphs_voltage_setter.append(node_that_sets_voltage)
+
+        return sub_graphs_voltage_setter
+
+    def check_voltage_coherence(self, inputs, number_of_points: int):
+        """
+        Check that all the sub graphs of independent voltage are compatible, meaning that if
+        there is more than one component that sets the voltage, they have the same target voltage.
+
+        :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
+        voltages to check
+        :param number_of_points: number of points in the data to check
+        """
+
+        sub_graphs_voltage_setters = self._list_voltage_coherence_to_check()
+
+        name_to_type = dict(zip(self._components_name, self._components_type))
+
+        for sub_graph_voltage_setters in sub_graphs_voltage_setters:
+            ref_voltage = None
+            # If zero or one voltage setters nothing to check
+            if len(sub_graph_voltage_setters) < 2:
+                pass
+            else:
+                # Now for all those setter, we put them in the same format (if it was given as a
+                # float we transform it in array)
+                will_work = True
+                variables_to_check = []
+                for voltage_setter in sub_graph_voltage_setters:
+                    clean_setter_name = voltage_setter.replace("_in", "").replace("_out", "")
+                    setter_type = name_to_type[clean_setter_name]
+                    input_name = (
+                        PT_DATA_PREFIX
+                        + setter_type
+                        + ":"
+                        + clean_setter_name
+                        + ":voltage_out_target_mission"
+                    )
+                    variables_to_check.append(input_name)
+                    data_value = inputs[input_name]
+                    # We initiate the test with the first value we find
+                    if ref_voltage is None:
+                        # If not a float, it is an array !
+                        if len(data_value) == 1:
+                            ref_voltage = np.full(number_of_points, data_value)
+                        else:
+                            ref_voltage = data_value
+                    # We check if coherent with other value
+                    else:
+                        if len(data_value) == 1:
+                            data_value = np.full(number_of_points, data_value)
+
+                        if not np.array_equal(ref_voltage, data_value):
+                            will_work = False
+
+                if not will_work:
+                    raise FASTGAHEIncoherentVoltage(
+                        "The target voltage chosen for the following input: "
+                        + ", ".join(variables_to_check)
+                        + " is incoherent. Ensure that they have the same value and/or units"
+                    )
+
+    def get_voltage_to_set(self, inputs, number_of_points: int) -> List[dict]:
+        """
+        Returns a list of the dict of voltage variable names and the value they should be set at
+        for each of the subgraph. Dict will be empty if there is no voltage to set. The voltage
+        to set are defined in the registered_components.py file. Note that this function was
+        coded based on the assumption that the voltage coherence checker was ran before hand. It
+        also assumes that all the voltage setter are RMS value when the voltage to set is an AC
+        voltage.
+
+        :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
+        voltages to check
+        :param number_of_points: number of points in the data to check
+        """
+
+        # This line prompts the identification of the power train from the file
+        sub_graphs = self.get_graphs_connected_voltage()
+        # TODO: the line above is repeated in the function below, could be improved !
+        sub_graphs_voltage_setters = self._list_voltage_coherence_to_check()
+
+        name_to_type = dict(zip(self._components_name, self._components_type))
+        name_to_id = dict(zip(self._components_name, self._components_id))
+
+        final_list = []
+
+        for sub_graph, sub_graph_voltage_setters in zip(sub_graphs, sub_graphs_voltage_setters):
+            # First and foremost, we get the value that will serve as the for the setting of the
+            # voltage in this subgraph. If there are not setters in this subgraph we just pass along
+
+            if not sub_graph_voltage_setters:
+                continue
+
+            spl = dict(nx.all_pairs_shortest_path_length(sub_graph))
+            voltage_dict_subgraph = {}
+
+            voltage_setter = sub_graph_voltage_setters[0]
+            clean_setter_name = voltage_setter.replace("_in", "").replace("_out", "")
+            setter_type = name_to_type[clean_setter_name]
+            input_name = (
+                PT_DATA_PREFIX
+                + setter_type
+                + ":"
+                + clean_setter_name
+                + ":voltage_out_target_mission"
+            )
+            reference_voltage = inputs[input_name]
+
+            # We now transform it in the proper array
+            if len(reference_voltage):
+                reference_voltage = np.full(number_of_points, reference_voltage)
+
+            # Now that we have the voltage to set, we can go through the node in the
+            # architecture, check if they have a voltage to set, how far from the setter they are
+            # and then compute what the voltage to set is.
+
+            nodes_list = list(sub_graph.nodes)
+            for node in nodes_list:
+
+                component_name = node.replace("_in", "").replace("_out", "")
+                component_id = name_to_id[component_name]
+
+                # Now that we have the id of the node, we can check if there are some voltage to set
+                voltages_to_set = resources.DICTIONARY_V_TO_SET[component_id]
+
+                for voltage_to_set in voltages_to_set:
+
+                    variable_name = component_name + "." + voltage_to_set
+                    voltage_dict_subgraph[variable_name] = reference_voltage
+
+            final_list.append(voltage_dict_subgraph)
+
+        return final_list
+
     def get_network_elements_list(self) -> tuple:
         """
         Returns the name of the components and their connections for the visualisation of the
@@ -782,7 +1002,7 @@ class FASTGAHEPowerTrainConfigurator:
             icons_name.append(resources.DICTIONARY_ICON[component_id])
             icons_size.append(resources.DICTIONARY_ICON_SIZE[component_id])
 
-        # If the connection is between a bus and an sspc, we shorthen the length
+        # If the connection is between a bus and an sspc, we shorten the length
         curated_connection_list = []
 
         for connections in self._connection_list:
