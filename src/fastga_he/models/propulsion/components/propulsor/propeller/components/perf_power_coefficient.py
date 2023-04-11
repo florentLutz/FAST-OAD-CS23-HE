@@ -48,6 +48,13 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
             units="rad",
             desc="Twist between the propeller blade root and tip",
         )
+        self.add_input(
+            name="settings:propulsion:he_power_train:propeller:"
+            + propeller_id
+            + ":installation_effect",
+            val=0.95,
+            desc="Increase in the power coefficient due to installation effects on the propeller",
+        )
 
         self.add_output("power_coefficient", shape=number_of_points, val=0.1)
 
@@ -75,6 +82,9 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         twist_blade = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":blade_twist"
         ]
+        k_installation = inputs[
+            "settings:propulsion:he_power_train:propeller:" + propeller_id + ":installation_effect"
+        ]
 
         cp = (
             10 ** 2.31538
@@ -107,7 +117,7 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
                 - 0.05141 * np.log10(ct) ** 2
             )
             * activity_factor ** (-0.00292 * np.log10(activity_factor) ** 2 * np.log10(twist_blade))
-        )
+        ) / k_installation
 
         # Let's clip the cp in case the value goes haywire, clipped at zero but if we were to
         # ever look at energy recuperation, it might need to be changed. To compute the upper
@@ -132,6 +142,9 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         twist_blade = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":blade_twist"
         ]
+        k_installation = inputs[
+            "settings:propulsion:he_power_train:propeller:" + propeller_id + ":installation_effect"
+        ]
 
         cp = (
             10 ** 2.31538
@@ -164,7 +177,7 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
                 - 0.05141 * np.log10(ct) ** 2
             )
             * activity_factor ** (-0.00292 * np.log10(activity_factor) ** 2 * np.log10(twist_blade))
-        )
+        ) / k_installation
 
         d_pi1_d_log_pi_1 = 10 ** np.log10(cp) * np.log(10)
 
@@ -263,4 +276,10 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":blade_twist",
         ] = (
             d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi8 * d_log_pi8_d_pi8
+        )
+        partials[
+            "power_coefficient",
+            "settings:propulsion:he_power_train:propeller:" + propeller_id + ":installation_effect",
+        ] = (
+            cp * k_installation
         )
