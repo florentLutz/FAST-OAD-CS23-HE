@@ -1,0 +1,26 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  ice_1:
+    id: fastga_he.pt_component.internal_combustion_engine
+    position: on_the_wing  # "on_the_wing", "in_the_front", "in_the_back"
+
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  ice_2:
+    id: fastga_he.pt_component.internal_combustion_engine
+    position: on_the_wing  # "on_the_wing", "in_the_front", "in_the_back"
+
+component_connections:
+  - source: propeller_1
+    target: ice_1
+
+  - source: propeller_2
+    target: ice_2
+
+
+watcher_file_path: ../results/two_fuel_propulsion.csv

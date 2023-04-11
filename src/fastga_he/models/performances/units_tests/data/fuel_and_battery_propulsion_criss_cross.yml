@@ -1,0 +1,216 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_sspc_1:
+    id: fastga_he.pt_component.dc_sspc
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      closed_by_default: True
+  dc_splitter_1:
+    id: fastga_he.pt_component.dc_splitter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  motor_2:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_sspc_2:
+    id: fastga_he.pt_component.dc_sspc
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      closed_by_default: True
+  dc_splitter_2:
+    id: fastga_he.pt_component.dc_splitter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+
+  dc_sspc_1_1:  # For cable 1
+    id: fastga_he.pt_component.dc_sspc
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      closed_by_default: True
+  harness_1:
+    id: fastga_he.pt_component.dc_line
+    position: inside_the_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+  dc_sspc_1_2:
+    id: fastga_he.pt_component.dc_sspc
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      closed_by_default: True
+
+  dc_sspc_2_1: # For cable 2
+    id: fastga_he.pt_component.dc_sspc
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      closed_by_default: True
+  harness_2:
+    id: fastga_he.pt_component.dc_line
+    position: inside_the_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+  dc_sspc_2_2:
+    id: fastga_he.pt_component.dc_sspc
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      closed_by_default: True
+
+  dc_sspc_3_1: # For cable 3
+    id: fastga_he.pt_component.dc_sspc
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      closed_by_default: True
+  harness_3:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+  dc_sspc_3_2:
+    id: fastga_he.pt_component.dc_sspc
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      closed_by_default: True
+
+  dc_sspc_4_1: # For cable 3
+    id: fastga_he.pt_component.dc_sspc
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      closed_by_default: True
+  harness_4:
+    id: fastga_he.pt_component.dc_line
+    position: inside_the_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+  dc_sspc_4_2:
+    id: fastga_he.pt_component.dc_sspc
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      closed_by_default: True
+
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 2
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 2
+
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  battery_pack_1:
+    id: fastga_he.pt_component.battery_pack
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
+
+  rectifier_1:
+    id: fastga_he.pt_component.rectifier
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
+  generator_1:
+    id: fastga_he.pt_component.generator
+    position: in_the_back  # "in_the_front", "in_the_back"
+  ice_1:
+    id: fastga_he.pt_component.internal_combustion_engine
+    position: in_the_back  # "on_the_wing", "in_the_front", "in_the_back"
+
+
+component_connections:
+  - source: propeller_1
+    target: motor_1
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: inverter_1
+    target: dc_sspc_1
+
+  - source: dc_sspc_1
+    target: dc_splitter_1
+
+  - source: propeller_2
+    target: motor_2
+
+  - source: motor_2
+    target: inverter_2
+
+  - source: inverter_2
+    target: dc_sspc_2
+
+  - source: dc_sspc_2
+    target: dc_splitter_2
+
+  - source: [dc_splitter_1, 1]
+    target: dc_sspc_1_1
+
+  - source: dc_sspc_1_1
+    target: harness_1
+
+  - source: harness_1
+    target: dc_sspc_1_2
+
+  - source: dc_sspc_1_2
+    target: [dc_bus_1, 1]
+
+  - source: [ dc_splitter_1, 2 ]
+    target: dc_sspc_2_1
+
+  - source: dc_sspc_2_1
+    target: harness_2
+
+  - source: harness_2
+    target: dc_sspc_2_2
+
+  - source: dc_sspc_2_2
+    target: [ dc_bus_2, 1 ]
+
+  - source: [ dc_splitter_2, 1]
+    target: dc_sspc_3_1
+
+  - source: dc_sspc_3_1
+    target: harness_3
+
+  - source: harness_3
+    target: dc_sspc_3_2
+
+  - source: dc_sspc_3_2
+    target: [ dc_bus_1, 2 ]
+
+
+  - source: [ dc_splitter_2, 2 ]
+    target: dc_sspc_4_1
+
+  - source: dc_sspc_4_1
+    target: harness_4
+
+  - source: harness_4
+    target: dc_sspc_4_2
+
+  - source: dc_sspc_4_2
+    target: [ dc_bus_2, 2 ]
+
+  - source: [dc_bus_1, 1]
+    target: rectifier_1
+
+  - source: rectifier_1
+    target: generator_1
+
+  - source: generator_1
+    target: ice_1
+
+  - source: [dc_bus_2, 1]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: battery_pack_1
+
+watcher_file_path: ../results/fuel_and_battery_propulsion_criss_cross.csv

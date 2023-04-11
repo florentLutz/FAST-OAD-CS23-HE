@@ -63,7 +63,7 @@ def power_train_network_viewer(
     ):
         if "propulsor" in component_type:
             level = 0
-        elif "propulsive_load" in component_type:
+        elif ("propulsive_load" in component_type) and (component_name in prop_loads):
             level = 1
         elif "source" in component_type:
             if component_name in prop_loads:

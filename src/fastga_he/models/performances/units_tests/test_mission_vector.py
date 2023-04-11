@@ -25,6 +25,8 @@ import plotly.graph_objects as go
 
 import fastoad.api as oad
 
+import fastga_he.api as oad_he
+
 from fastga_he.models.performances.mission_vector.initialization.initialize_altitude import (
     InitializeAltitude,
 )
@@ -1168,6 +1170,40 @@ def test_mission_vector_from_yml_fuel():
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
 
+def test_mission_vector_from_yml_two_fuel():
+
+    # Define used files depending on options
+    xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
+    process_file_name = "two_fuel_propulsion_mission_vector.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+    configurator.write_needed_inputs(ref_inputs)
+
+    # Create problems with inputs
+    problem = configurator.get_problem(read_inputs=True)
+    problem.setup()
+
+    # om.n2(problem)
+
+    problem.run_model()
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    if not pth.exists(RESULTS_FOLDER_PATH):
+        os.mkdir(RESULTS_FOLDER_PATH)
+
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(31.8, abs=1e-2)
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(0.0, abs=1e-2)
+
+
 def test_mission_vector_from_yml_fuel_turbo():
 
     # Define used files depending on options
@@ -1343,3 +1379,51 @@ def test_case_reader():
         fig.add_trace(scatter)
 
     fig.show()
+
+
+def test_criss_cross_network_viewer():
+
+    # Define used files depending on options
+    pt_file_name = "fuel_and_battery_propulsion_criss_cross.yml"
+
+    oad_he.power_train_network_viewer(
+        power_train_file_path=pth.join(DATA_FOLDER_PATH, pt_file_name),
+        network_file_path=pth.join(RESULTS_FOLDER_PATH, "criss_cross.html"),
+    )
+
+
+def test_mission_criss_cross():
+    # Define used files depending on options
+    xml_file_name = "sample_ac_fuel_and_battery_propulsion_criss_cross.xml"
+    process_file_name = "fuel_and_battery_propulsion_criss_cross_mission_vector.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+    configurator.write_needed_inputs(ref_inputs)
+
+    # Create problems with inputs
+    problem = configurator.get_problem(read_inputs=True)
+    problem.setup()
+
+    # om.n2(problem)
+
+    problem.run_model()
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    if not pth.exists(RESULTS_FOLDER_PATH):
+        os.mkdir(RESULTS_FOLDER_PATH)
+
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(24.91, abs=1e-2)
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(48.175, abs=1e-2)
+    mission_end_soc = problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
+    )
+    assert mission_end_soc == pytest.approx(-0.27, abs=1e-2)

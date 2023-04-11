@@ -43,12 +43,19 @@ class SizingCableGauge(om.Group):
 
         harness_id = self.options["harness_id"]
 
-        self.add_subsystem("log_solution", _LogSolution(harness_id=harness_id), promotes=["data:*"])
         self.add_subsystem(
-            "actual_solution", _SolutionGauge(harness_id=harness_id), promotes=["data:*"]
+            "log_solution" + harness_id, _LogSolution(harness_id=harness_id), promotes=["data:*"]
+        )
+        self.add_subsystem(
+            "actual_solution" + harness_id,
+            _SolutionGauge(harness_id=harness_id),
+            promotes=["data:*"],
         )
 
-        self.connect("log_solution.log_solution", "actual_solution.log_solution")
+        self.connect(
+            "log_solution" + harness_id + ".log_solution",
+            "actual_solution" + harness_id + ".log_solution",
+        )
 
 
 class _LogSolution(om.ExplicitComponent):
