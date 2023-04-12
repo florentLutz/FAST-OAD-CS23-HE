@@ -2,6 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO.
 
+import logging
+
 import openmdao.api as om
 
 import fastoad.api as oad
@@ -16,6 +18,13 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 from fastga_he.models.propulsion.assemblers.performances_watcher import (
     PowerTrainPerformancesWatcher,
 )
+
+from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_ENERGY_CONSUMPTION
+from fastga_he.models.propulsion.assemblers.energy_consumption_mission_vector import (
+    ENERGY_CONSUMPTION_FROM_PT_FILE,
+)
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.performances.mission_vector", domain=ModelDomain.OTHER)
@@ -262,9 +271,15 @@ class MissionVector(om.Group):
 
         self.connect("solve_equilibrium.compute_time_step.time_step", "to_csv.time_step")
 
-        # Add the powertrain watcher here to avoid opening and closing csv all the time
+        # Add the powertrain watcher here to avoid opening and closing csv all the time. We will
+        # add here a check to ensure that the module that computes the performances base on the
+        # powertrain builder is used. Because if it is not used, no pt file will be provided
+        # meaning the load instruction of the configurator will fail and so will the connects.
 
-        if pt_file_path:
+        if (
+            oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION]
+            == ENERGY_CONSUMPTION_FROM_PT_FILE
+        ):
 
             self.configurator.load(pt_file_path)
 
@@ -329,3 +344,14 @@ class MissionVector(om.Group):
                     "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.exterior_temperature_econ",
                     "performances_watcher.exterior_temperature",
                 )
+
+        else:
+
+            _LOGGER.warning(
+                "Power train builder is not used for the performances computation. If "
+                "this was intended, you can ignore this warning. Else, make sure to select the "
+                + ENERGY_CONSUMPTION_FROM_PT_FILE
+                + " submodel for the "
+                + HE_SUBMODEL_ENERGY_CONSUMPTION
+                + " service"
+            )

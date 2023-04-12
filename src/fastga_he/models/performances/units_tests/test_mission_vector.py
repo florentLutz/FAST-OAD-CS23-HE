@@ -1173,7 +1173,7 @@ def test_mission_vector_from_yml_fuel():
 def test_mission_vector_from_yml_two_fuel():
 
     # Define used files depending on options
-    xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
+    xml_file_name = "sample_ac_fuel_and_battery_propulsion_criss_cross.xml"
     process_file_name = "two_fuel_propulsion_mission_vector.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))

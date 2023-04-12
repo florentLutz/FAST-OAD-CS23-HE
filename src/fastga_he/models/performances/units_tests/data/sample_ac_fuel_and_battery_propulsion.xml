@@ -188,7 +188,7 @@
     <propulsion>
       <he_power_train>
         <mass units="kg" is_input="False">1646.1519140377213</mass>
-        <thrust_distribution is_input="True">[1.0, 1.0]</thrust_distribution>
+        <thrust_distribution is_input="True">1.0</thrust_distribution>
         <CG>
           <x units="m" is_input="False">3.4353283023795735</x>
         </CG>
