@@ -24,7 +24,7 @@ class PerformancesHarness(om.Group):
 
         # Solvers setup
         self.nonlinear_solver = om.NonlinearBlockGS()
-        self.nonlinear_solver.options["iprint"] = 2
+        self.nonlinear_solver.options["iprint"] = 0
         self.nonlinear_solver.options["maxiter"] = 100
         self.nonlinear_solver.options["rtol"] = 1e-5
         self.linear_solver = om.LinearBlockGS()
