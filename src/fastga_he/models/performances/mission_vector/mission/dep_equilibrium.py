@@ -11,7 +11,9 @@ from ..constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
 )
 from ..mission.energy_consumption_preparation import PrepareForEnergyConsumption
-from ..mission.equilibrium import Equilibrium
+from .equilibrium_alpha import EquilibriumAlpha
+from .equilibrium_thrust import EquilibriumThrust
+from .equilibrium_delta_m import EquilibriumDeltaM
 
 
 @oad.RegisterSubmodel(HE_SUBMODEL_EQUILIBRIUM, "fastga_he.submodel.performances.equilibrium.legacy")
@@ -114,12 +116,28 @@ class DEPEquilibrium(om.Group):
                 promotes_outputs=["*"],
             )
             self.add_subsystem(
-                "compute_equilibrium",
-                Equilibrium(
+                "compute_equilibrium_alpha",
+                EquilibriumAlpha(
                     number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
                 ),
                 promotes_inputs=["*"],
-                promotes_outputs=["*"],
+                promotes_outputs=[],
+            )
+            self.add_subsystem(
+                "compute_equilibrium_thrust",
+                EquilibriumThrust(
+                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                ),
+                promotes_inputs=["*"],
+                promotes_outputs=[],
+            )
+            self.add_subsystem(
+                "compute_equilibrium_delta_m",
+                EquilibriumDeltaM(
+                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                ),
+                promotes_inputs=["*"],
+                promotes_outputs=[],
             )
             options_dep = {
                 "number_of_points": number_of_points,
@@ -158,8 +176,24 @@ class DEPEquilibrium(om.Group):
                 promotes_outputs=[],
             )
             self.add_subsystem(
-                "compute_equilibrium",
-                Equilibrium(
+                "compute_equilibrium_alpha",
+                EquilibriumAlpha(
+                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                ),
+                promotes_inputs=["data:*"],
+                promotes_outputs=[],
+            )
+            self.add_subsystem(
+                "compute_equilibrium_thrust",
+                EquilibriumThrust(
+                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                ),
+                promotes_inputs=["data:*"],
+                promotes_outputs=[],
+            )
+            self.add_subsystem(
+                "compute_equilibrium_delta_m",
+                EquilibriumDeltaM(
                     number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
                 ),
                 promotes_inputs=["data:*"],
@@ -189,17 +223,36 @@ class DEPEquilibrium(om.Group):
                 promotes=["data:*"],
             )
 
-            self.connect("compute_dep_effect.delta_Cl", "compute_equilibrium.delta_Cl")
+            self.connect(
+                "compute_dep_effect.delta_Cl",
+                ["compute_equilibrium_alpha.delta_Cl", "compute_equilibrium_thrust.delta_Cl"],
+            )
 
-            self.connect("compute_dep_effect.delta_Cd", "compute_equilibrium.delta_Cd")
+            self.connect("compute_dep_effect.delta_Cd", "compute_equilibrium_thrust.delta_Cd")
 
-            self.connect("compute_dep_effect.delta_Cm", "compute_equilibrium.delta_Cm")
-
-            self.connect("compute_equilibrium.alpha", "compute_dep_effect.alpha")
+            self.connect("compute_dep_effect.delta_Cm", "compute_equilibrium_delta_m.delta_Cm")
 
             self.connect(
-                "compute_equilibrium.thrust",
-                "compute_dep_effect.thrust",
+                "compute_equilibrium_alpha.alpha",
+                [
+                    "compute_dep_effect.alpha",
+                    "compute_equilibrium_thrust.alpha",
+                    "compute_equilibrium_delta_m.alpha",
+                ],
+            )
+
+            self.connect(
+                "compute_equilibrium_delta_m.delta_m",
+                ["compute_equilibrium_alpha.delta_m", "compute_equilibrium_thrust.delta_m"],
+            )
+
+            self.connect(
+                "compute_equilibrium_thrust.thrust",
+                [
+                    "compute_dep_effect.thrust",
+                    "preparation_for_energy_consumption.thrust",
+                    "compute_equilibrium_alpha.thrust",
+                ],
             )
 
             self.connect(
@@ -225,9 +278,4 @@ class DEPEquilibrium(om.Group):
             self.connect(
                 "preparation_for_energy_consumption.true_airspeed_econ",
                 "compute_energy_consumed.true_airspeed_econ",
-            )
-
-            self.connect(
-                "compute_equilibrium.thrust",
-                "preparation_for_energy_consumption.thrust",
             )

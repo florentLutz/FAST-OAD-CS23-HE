@@ -156,7 +156,7 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_center_of_gravity.x_cg",
             [
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.x_cg",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.x_cg",
                 "to_csv.x_cg",
             ],
         )
@@ -178,7 +178,7 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_airspeed_time_derivatives.d_vx_dt",
             [
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.d_vx_dt",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.d_vx_dt",
                 "to_csv.d_vx_dt",
             ],
         )
@@ -186,7 +186,8 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_airspeed.true_airspeed",
             [
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.true_airspeed",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.true_airspeed",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.true_airspeed",
                 "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect.true_airspeed",
                 "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption"
                 + ".true_airspeed",
@@ -210,15 +211,17 @@ class MissionVector(om.Group):
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.alpha", "to_csv.alpha"
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.alpha",
+            "to_csv.alpha",
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.thrust", "to_csv.thrust"
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.thrust",
+            "to_csv.thrust",
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.delta_m",
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.delta_m",
             "to_csv.delta_m",
         )
 
@@ -255,14 +258,19 @@ class MissionVector(om.Group):
 
         self.connect(
             "initialization.initialize_gamma.gamma",
-            ["to_csv.gamma", "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.gamma"],
+            [
+                "to_csv.gamma",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.gamma",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.gamma",
+            ],
         )
 
         self.connect(
             "initialization.altitude",
             [
                 "to_csv.altitude",
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.altitude",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.altitude",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.altitude",
                 "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect.altitude",
                 "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption"
                 + ".altitude",
