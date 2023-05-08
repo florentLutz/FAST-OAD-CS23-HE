@@ -27,6 +27,6 @@ class ComputeCoolantTankVolume(om.ExplicitComponent):
         M_cool = inputs["data:thermal:coolant:mass"]
         rho_cool = inputs["data:thermal:coolant:density"]
 
-        V_tank = M_cool / rho_cool
+        V = M_cool / rho_cool
 
-        outputs["data:thermal:coolant_tank:volume"] = V_tank
+        outputs["data:thermal:coolant_tank:volume"] = V

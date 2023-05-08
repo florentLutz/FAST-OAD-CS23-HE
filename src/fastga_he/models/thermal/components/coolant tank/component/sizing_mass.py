@@ -24,10 +24,10 @@ class ComputeCoolantTankMass(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        V_tank = inputs["data:thermal:coolant_tank:volume"]
-        rho_tank = inputs["data:thermal:coolant_tank:material:density"]
+        V = inputs["data:thermal:coolant_tank:volume"]
+        rho = inputs["data:thermal:coolant_tank:material:density"]
 
-        M_tank = rho_tank*V_tank
+        M = rho*V
 
-        outputs["data:thermal:coolant_tank:mass"] = M_tank
+        outputs["data:thermal:coolant_tank:mass"] = M
 
