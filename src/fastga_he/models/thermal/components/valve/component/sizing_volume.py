@@ -7,8 +7,8 @@ class ComputeValvzVolume(om.ExplicitComponent):
     def setup(self):
 
         self.add_input(
-            name="data:thermal:coolant:mass:flow",
-            units="m",
+            name="data:thermal:coolant:mass_flow",
+            units="kg/s",
             val=np.nan,
             desc="coolant mass flow",
         )
@@ -17,6 +17,6 @@ class ComputeValvzVolume(om.ExplicitComponent):
 
         m_flow = inputs["data:thermal:coolant:mass_flow"]
 
-        V_valve = 6e-05 * m_flow + 8e-05
+        V = 6e-05 * m_flow + 8e-05
 
-        outputs["data:thermal:valvevolume"] = V_valve
+        outputs["data:thermal:valvevolume"] = V
