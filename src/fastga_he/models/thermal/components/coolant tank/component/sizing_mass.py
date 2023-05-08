@@ -16,7 +16,7 @@ class ComputeCoolantTankMass(om.ExplicitComponent):
         self.add_input(
             name="settings:thermal:coolant_tank:material:density",
             units="kg/m**3"
-            val=2.640 ,
+            val=2640 ,
             desc="material density of the coolant tank"
         )
 
