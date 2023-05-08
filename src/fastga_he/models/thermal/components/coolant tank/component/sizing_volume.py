@@ -20,12 +20,6 @@ class ComputeCoolantTankVolume(om.ExplicitComponent):
             desc="density of coolant",
         )
 
-        self.add_input(
-            name="data:thermal:coolant_tank:volume_factor",
-            val=np.nan,
-            desc="coolant tank extra volume",
-        )
-
         self.add_output(name="data:thermal:coolant_tank:volume", units="m**3")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

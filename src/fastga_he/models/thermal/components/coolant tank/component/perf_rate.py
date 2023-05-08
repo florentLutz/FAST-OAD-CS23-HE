@@ -71,29 +71,29 @@ class ComputeCoolantTankRate(om.ExplicitComponent):
             desc="mission time",
         )
         
-        self.add_output(name="data:thermal:pipes:coolant_tank:exit_temperature", units="K")
-        self.add_output(name="data:thermal:pipes:coolant_tank:rate", units="K/s")
+        self.add_output(name="data:thermal:coolant_tank:exit_temperature", units="K")
+        self.add_output(name="data:thermal:coolant_tank:rate", units="K/s")
 
         # self.declare_partials(
-        #     of="data:thermal:pipes:coolant_tank:rate",
+        #     of="data:thermal:coolant_tank:rate",
         #     wrt="data:thermal:coolant:mass_flow",
         #     method="exact",
         # )
 
         # self.declare_partials(
-        #     of="data:thermal:pipes:coolant_tank:rate",
+        #     of="data:thermal:coolant_tank:rate",
         #     wrt="data:thermal:coolant:mass",
         #     method="exact",
         # ) 
 
         # self.declare_partials(
-        #     of="data:thermal:pipes:coolant_tank:rate",
+        #     of="data:thermal:coolant_tank:rate",
         #     wrt="data:thermal:coolant_tank:entry_temperature",
         #     method="exact",
         # )
 
         # self.declare_partials(
-        #     of="data:thermal:pipes:coolant_tank:rate",
+        #     of="data:thermal:coolant_tank:rate",
         #     wrt="data:thermal:coolant_tank:exit_temperature",
         #     method="exact",
         # )       
@@ -124,7 +124,9 @@ class ComputeCoolantTankRate(om.ExplicitComponent):
             coolant_type = "potassium formate"
         elif coolant_type == 8:
             coolant_type = "R134a"
-
+        elif coolant_type == 9:
+            coolant_type = "liquid hydrogen"
+        
         coolant = FluidCharacteristics(
             temperature=T_cool_in,
             pressure=P_cool,
@@ -146,10 +148,10 @@ class ComputeCoolantTankRate(om.ExplicitComponent):
         T_cool_out = compute_temperature(300, 310, 100, 0.1, dTdt_func, 0.1, 100)
         dTdt = dTdt_func(m_cool, M_cool, T_cool_out, T_cool_in)
 
-        # partials["data:thermal:pipes:coolant_tank:rate", "data:thermal:coolant:M_cool"] = -m_cool / (M_cool ** 2) * (T_cool_in - T_cool_out)
-        # partials["data:thermal:pipes:coolant_tank:rate", "data:thermal:coolant:M_cool_flow"] = 1 / M_cool * (T_cool_in - T_cool_out)
-        # partials["data:thermal:pipes:coolant_tank:rate", "data:thermal:coolant_tank:entry_temperature"] = m_cool / M_cool
-        # partials["data:thermal:pipes:coolant_tank:rate", "data:thermal:coolant_tank:exit_temperature"] = - m_cool / M_cool
+        # partials["data:thermal:coolant_tank:rate", "data:thermal:coolant:M_cool"] = -m_cool / (M_cool ** 2) * (T_cool_in - T_cool_out)
+        # partials["data:thermal:coolant_tank:rate", "data:thermal:coolant:M_cool_flow"] = 1 / M_cool * (T_cool_in - T_cool_out)
+        # partials["data:thermal:coolant_tank:rate", "data:thermal:coolant_tank:entry_temperature"] = m_cool / M_cool
+        # partials["data:thermal:coolant_tank:rate", "data:thermal:coolant_tank:exit_temperature"] = - m_cool / M_cool
 
         outputs["data:thermal:coolant_tank:exit_temperature"] = T_cool_out
-        outputs["data:thermal:pipes:coolant_tank:rate"] = dTdt
+        outputs["data:thermal:coolant_tank:rate"] = dTdt

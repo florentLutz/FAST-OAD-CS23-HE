@@ -4,11 +4,11 @@ import openmdao.api as om
 from utils.fluid_characteristics import FluidCharacteristics
 from scipy.optimize import root
 from scipy.optimize import minimize, fsolve
-import sympy as sym
 
-
-class ComputeHEXCharacteristics(om.ExplicitComponent):
-
+class ComputePerformanceEvaporator(om.ExplicitComponent):
+    """
+    Evaporator model
+    """
     """
     fluids list and numbering:
     air: 1
@@ -19,126 +19,127 @@ class ComputeHEXCharacteristics(om.ExplicitComponent):
     propylene glycol: 6
     potassium formate: 7
     R134a: 8
+    liquid hydrogen: 9
     """
 
-    def setup(self):
+def setup(self):
 
-        ##  general HEX characteristics
+        ##  general evaporator characteristics
         self.add_input(
-            name="data:thermal:HEX:effectiveness",
-            val=0.9,
-            desc="HEX effectiveness",
+            name="data:thermal:evaporator:effectiveness",
+            val=0.8,
+            desc="evaporator effectivenes",
         )
         self.add_input(
-            name="settings:thermal:HEX:gas_side:hydraulic_diameter",
+            name="settings:thermal:evaporator:gas_side:hydraulic_diameter",
             units="m",
             val=0.0036,
             desc="hydraulic diameter of gas side",
         )
         self.add_input(
-            name="settings:thermal:HEX:gas_side:surface_area_to_volume_ratio",
+            name="settings:thermal:evaporator:gas_side:surface_area_to_volume_ratio",
             units="m**(-1)",
             val=751,
-            desc="ratio of HEX surface area to volume ratio on the gas side",
+            desc="ratio of evaporator surface area to volume ratio on the gas side",
         )
         self.add_input(
-            name="settings:thermal:HEX:gas_side:flow_surface_to_frontal_surface_area_ratio",
+            name="settings:thermal:evaporator:gas_side:flow_surface_to_frontal_surface_area_ratio",
             val=0.697,
-            desc="ratio of HEX flow surface to frontal surface area on the gas side",
+            desc="ratio of evaporator flow surface to frontal surface area on the gas side",
         )
         self.add_input(
-            name="settings:thermal:HEX:fin_surface_to_total_surface_area_ratio",
+            name="settings:thermal:evaporator:fin_surface_to_total_surface_area_ratio",
             val=0.795,
-            desc="HEX fin surface to total heat exchanger surface area",
+            desc="evaporator fin surface to total heat exchanger surface area",
         )
         self.add_input(
-            name="settings:thermal:HEX:fin:thickness",
+            name="settings:thermal:evaporator:fin:thickness",
             units="m",
             val=0.0001,
-            desc="HEX fin thickness",
+            desc="evaporator fin thickness",
         )
         self.add_input(
-            name="settings:thermal:HEX:fin:half_length",
+            name="settings:thermal:evaporator:fin:half_length",
             units="m",
             val=0.004011,
-            desc="HEX final half length",
+            desc="evaporator final half length",
         )
         self.add_input(
-            name="settings:thermal:HEX:fin:thermal_conductivity",
+            name="settings:thermal:evaporator:fin:thermal_conductivity",
             units="W/m/K",
             val=200,
-            desc="HEX fin thermal conductivity",
+            desc="evaporator fin thermal conductivity",
         )
         self.add_input(
-            name="settings:thermal:HEX:liquid_side:hydraulic_diameter",
+            name="settings:thermal:evaporator:liquid_side:hydraulic_diameter",
             units="m",
             val=5.48e-03,
             desc="hydraulic diameter of liquid side",
         )
         self.add_input(
-            name="settings:thermal:HEX:liquid_side:surface_area_to_volume_ratio",
+            name="settings:thermal:evaporator:liquid_side:surface_area_to_volume_ratio",
             units="m**(-1)",
             val=1.60e2,
-            desc="ratio of HEX surface area to volume ratio on the liquid side",
+            desc="ratio of evaporator surface area to volume ratio on the liquid side",
         )
         self.add_input(
-            name="settings:thermal:HEX:liquid_side:flow_surface_to_frontal_surface_area_ratio",
+            name="settings:thermal:evaporator:liquid_side:flow_surface_to_frontal_surface_area_ratio",
             val=2.19e-01,
-            desc="ratio of HEX flow surface to frontal surface area on the liquid side",
+            desc="ratio of evaporator flow surface to frontal surface area on the liquid side",
         )
         self.add_input(
-            name="settings:thermal:HEX:tube:frontal_surface",
+            name="settings:thermal:evaporator:tube:frontal_surface",
             units="m**2",
             val=0.000298,
-            desc="Frontal surface area of HEX",
+            desc="Frontal surface area of evaporator",
         )
         self.add_input(
-            name="settings:thermal:HEX:tube:flow_section",
+            name="settings:thermal:evaporator:tube:flow_section",
             units="m**2",
             val=6.54e-05,
             desc="heat exchanger ",
         )
         self.add_input(
-            name="settings:thermal:HEX:tube:height",
+            name="settings:thermal:evaporator:tube:height",
             units="m",
             val=0.00305,
-            desc="HEX tube height",
+            desc="evaporator tube height",
         )
         self.add_input(
-            name="settings:thermal:HEX:tube:length",
+            name="settings:thermal:evaporator:tube:length",
             units="m",
             val=0.0221,
-            desc="HEX tube length",
+            desc="evaporator tube length",
         )
         self.add_input(
-            name="settings:thermal:HEX:tube:thickness",
+            name="settings:thermal:evaporator:tube:thickness",
             units="m",
             val=0.0001,
-            desc="HEX tube thickness",
+            desc="evaporator tube thickness",
         )
         self.add_input(
-            name="settings:thermal:HEX:tube:vertical_separation",
+            name="settings:thermal:evaporator:tube:vertical_separation",
             units="m",
             val=0.00802,
-            desc="HEX tube vertical separation",
+            desc="evaporator tube vertical separation",
         )
         self.add_input(
-            name="settings:thermal:HEX:tube:horizontal_separation",
+            name="settings:thermal:evaporator:tube:horizontal_separation",
             units="m",
             val=0.00482,
-            desc="HEX tube horizontal separation",
+            desc="evaporator tube horizontal separation",
         )
         self.add_input(
-            name="settings:thermal:HEX:plate:separation",
+            name="settings:thermal:evaporator:plate:separation",
             units="m",
             val=0.00252,
-            desc="HEX plate separation",
+            desc="evaporator plate separation",
         )
         self.add_input(
-            name="settings:thermal:HEX:material_density",
+            name="settings:thermal:evaporator:material_density",
             units="kg/m**3",
             val=2712,
-            desc="HEX material density",
+            desc="evaporator material density",
         )
 
         ## fluid characteristics
@@ -173,7 +174,7 @@ class ComputeHEXCharacteristics(om.ExplicitComponent):
         )
         self.add_input(
             name="data:thermal:liquid_fluid:type",
-            val=2,
+            val=9,
             desc="type of liquid fluid",
         )
         self.add_input(
@@ -203,63 +204,64 @@ class ComputeHEXCharacteristics(om.ExplicitComponent):
 
         ## outputs
         self.add_output(
-            name="data:thermal:HEX:NTU",
-            desc="HEX number of transfer units",
+            name="data:thermal:evaporator:NTU",
+            desc="evaporator number of transfer units",
         )
         self.add_output(
-            name="data:thermal:HEX:UA",
-            desc="HEX UA",
+            name="data:thermal:evaporator:UA",
+            desc="evaporator UA",
         )
         self.add_output(
-            name="data:thermal:HEX:width",
+            name="data:thermal:evaporator:width",
             units="m",
-            desc="HEX width",
+            desc="evaporator width",
         )
         self.add_output(
-            name="data:thermal:HEX:height",
+            name="data:thermal:evaporator:height",
             units="m",
-            desc="HEX height",
+            desc="evaporator height",
         )
         self.add_output(
-            name="data:thermal:HEX:length",
+            name="data:thermal:evaporator:length",
             units="m",
-            desc="HEX length",
+            desc="evaporator length",
         )
         self.add_output(
-            name="data:thermal:HEX:unit_density",
+            name="data:thermal:evaporator:unit_density",
             units="kg/m**3",
-            desc="HEX unit density",
+            desc="evaporator unit density",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        ## general HEX characteristics
-        D_h_gas = inputs["settings:thermal:HEX:gas_side:hydraulic_diameter"]
-        alpha_gas = inputs["settings:thermal:HEX:gas_side:surface_area_to_volume_ratio"]
+        
+        ## general evaporator characteristics
+        D_h_gas = inputs["settings:thermal:evaporator:gas_side:hydraulic_diameter"]
+        alpha_gas = inputs["settings:thermal:evaporator:gas_side:surface_area_to_volume_ratio"]
         sigma_gas = inputs[
-            "settings:thermal:HEX:gas_side:flow_surface_to_frontal_surface_area_ratio"
+            "settings:thermal:evaporator:gas_side:flow_surface_to_frontal_surface_area_ratio"
         ]
-        t_fin = inputs["settings:thermal:HEX:fin:thickness"]
-        half_fin = inputs["settings:thermal:HEX:fin:half_length"]
-        lambda_fin = inputs["settings:thermal:HEX:fin:thermal_conductivity"]
+        t_fin = inputs["settings:thermal:evaporator:fin:thickness"]
+        half_fin = inputs["settings:thermal:evaporator:fin:half_length"]
+        lambda_fin = inputs["settings:thermal:evaporator:fin:thermal_conductivity"]
         fin_surface_to_total_surface_ratio = inputs[
-            "settings:thermal:HEX:fin_surface_to_total_surface_area_ratio"
+            "settings:thermal:evaporator:fin_surface_to_total_surface_area_ratio"
         ]
 
-        D_h_liquid = inputs["settings:thermal:HEX:liquid_side:hydraulic_diameter"]
-        alpha_liquid = inputs["settings:thermal:HEX:liquid_side:surface_area_to_volume_ratio"]
+        D_h_liquid = inputs["settings:thermal:evaporator:liquid_side:hydraulic_diameter"]
+        alpha_liquid = inputs["settings:thermal:evaporator:liquid_side:surface_area_to_volume_ratio"]
         sigma_liquid = inputs[
-            "settings:thermal:HEX:liquid_side:flow_surface_to_frontal_surface_area_ratio"
+            "settings:thermal:evaporator:liquid_side:flow_surface_to_frontal_surface_area_ratio"
         ]
-        A_flow_liquid = inputs["settings:thermal:HEX:tube:flow_section"]
+        A_flow_liquid = inputs["settings:thermal:evaporator:tube:flow_section"]
         t_tube = t_fin  # assuming tube thickness same as fin thickness
 
-        tube_height = inputs["settings:thermal:HEX:tube:height"]
-        tube_length = inputs["settings:thermal:HEX:tube:length"]
-        tube_vsep = inputs["settings:thermal:HEX:tube:vertical_separation"]
-        tube_hsep = inputs["settings:thermal:HEX:tube:horizontal_separation"]
-        plate_sep = inputs["settings:thermal:HEX:plate:separation"]
+        tube_height = inputs["settings:thermal:evaporator:tube:height"]
+        tube_length = inputs["settings:thermal:evaporator:tube:length"]
+        tube_vsep = inputs["settings:thermal:evaporator:tube:vertical_separation"]
+        tube_hsep = inputs["settings:thermal:evaporator:tube:horizontal_separation"]
+        plate_sep = inputs["settings:thermal:evaporator:plate:separation"]
 
-        rho_material = inputs["settings:thermal:HEX:material_density"]
+        rho_material = inputs["settings:thermal:evaporator:material_density"]
 
         ## gas fluid basic
         gas_type = inputs["data:thermal:gas_fluid:type"]
@@ -286,6 +288,8 @@ class ComputeHEXCharacteristics(om.ExplicitComponent):
             gas_type = "potassium formate"
         elif gas_type == 8:
             gas_type = "R134a"
+        elif gas_type == 9:
+            gas_type = "liquid hydrogen"
 
         gas_fluid = FluidCharacteristics(
             temperature=T_gas_avg,
@@ -325,6 +329,8 @@ class ComputeHEXCharacteristics(om.ExplicitComponent):
             liquid_type = "potassium formate"
         elif liquid_type == 8:
             liquid_type = "R134a"
+        elif liquid_type == 9:
+            liquid_type = "liquid hydrogen"
 
         liquid_fluid = FluidCharacteristics(
             temperature=T_liquid_avg,
@@ -337,21 +343,17 @@ class ComputeHEXCharacteristics(om.ExplicitComponent):
         lambda_liquid = liquid_fluid.thermal_conductivity
         Pr_liquid = liquid_fluid.Prandtl
         nu_liquid = liquid_fluid.specific_volume
-        C_liquid = m_liquid * cp_liquid
 
         ## general
-        Cr = min(C_gas, C_liquid) / max(C_gas, C_liquid)
-        eff = inputs["data:thermal:HEX:effectiveness"]
+        eff = inputs["data:thermal:evaporator:effectiveness"]
 
         func = lambda x: eff - (
-            1 - np.e ** ((1 / Cr) * (x[0]) ** (0.22) * (np.e ** (-Cr * (x[0]) ** 0.78) - 1))
+            1 - np.e ** (-x[0])
         )
         res = root(func, x0=1)
         [NTU] = res.x
 
-        UA = NTU * min(
-            C_gas, C_liquid
-        )  # need UA gasing requirements to match UA given by HEX dimensions
+        UA = NTU * C_gas # need UA gasing requirements to match UA given by evaporator dimensions
 
         def objective(x):
             length, height, width = x
@@ -375,7 +377,7 @@ class ComputeHEXCharacteristics(om.ExplicitComponent):
                     0.13 * Re_gas ** (-0.28)
                 ) ** (1 - (1 / (1 + (Re_gas / 2000) ** 9)))
 
-            St_gas = Darcy_gas / Pr_gas ** (2 / 3)
+            St_gas = Colburn_gas / Pr_gas ** (2 / 3)
             h_gas = St_gas * rho_gas * v_gas * cp_gas
 
             S_gas = alpha_gas * length * height * width
@@ -421,7 +423,7 @@ class ComputeHEXCharacteristics(om.ExplicitComponent):
             return abs(UA_new - UA)
 
         initial_guesses = [(0.1, 0.1, 0.1), (0.7, 0.5, 0.1), (1, 0.7, 0.1)]
-        bounds = [(0.02692, None), (0.01107, None), (tube_height, None)]
+        bounds = [(tube_length, None), (0.01107, None), (plate_sep + t_fin, None)]
 
         results = []
 
@@ -452,14 +454,14 @@ class ComputeHEXCharacteristics(om.ExplicitComponent):
             * (plate_sep + t_fin)
             * rho_material
         )
-        M_unit_HEX = M_unit_plate + M_unit_cool + M_unit_tube
-        rho_unit_HEX = M_unit_HEX / (
+        M_unit_evaporator = M_unit_plate + M_unit_cool + M_unit_tube
+        rho_unit_evaporator = M_unit_evaporator / (
             (plate_sep + t_fin) * (tube_vsep + tube_height) * (tube_length + tube_hsep)
         )
 
-        outputs["data:thermal:HEX:NTU"] = NTU
-        outputs["data:thermal:HEX:UA"] = UA
-        outputs["data:thermal:HEX:length"] = length
-        outputs["data:thermal:HEX:height"] = height
-        outputs["data:thermal:HEX:width"] = width
-        outputs["data:thermal:HEX:unit_density"] = rho_unit_HEX
+        outputs["data:thermal:evaporator:NTU"] = NTU
+        outputs["data:thermal:evaporator:UA"] = UA
+        outputs["data:thermal:evaporator:length"] = length
+        outputs["data:thermal:evaporator:height"] = height
+        outputs["data:thermal:evaporator:width"] = width
+        outputs["data:thermal:evaporator:unit_density"] = rho_unit_evaporator
