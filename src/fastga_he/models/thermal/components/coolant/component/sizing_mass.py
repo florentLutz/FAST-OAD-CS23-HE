@@ -35,7 +35,7 @@ class ComputeCoolantMass(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:thermal:coolant:extra_factor",
+            name="data:thermal:coolant:extra_coolant_factor",
             val=1.2,
             desc="add extra coolant then needed, to be stored in reservoir",
         )
@@ -48,8 +48,8 @@ class ComputeCoolantMass(om.ExplicitComponent):
         R_pipe = inputs["data:thermal:pipes:radius"]
         d_pipe = inputs["data:thermal:pipes:distance"]
         t_pipe = inputs["data:thermal:pipes:thickness"]
-        factor = inputs["data:thermal:coolant:extra_factor"]
+        factor = inputs["data:thermal:coolant:extra_coolant_factor"]
 
-        M_coolant = rho_coolant * np.pi * d_pipe * [(R_pipe + t_pipe) ** 2 - R_pipe**2]
-        M_coolant = M_coolant * factor
-        outputs["data:thermal:coolant:mass"] = M_coolant
+        M = rho_coolant * np.pi * d_pipe * [(R_pipe + t_pipe) ** 2 - R_pipe**2]
+        M = M * factor
+        outputs["data:thermal:coolant:mass"] = M
