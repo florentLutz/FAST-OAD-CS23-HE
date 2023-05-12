@@ -21,8 +21,9 @@ if __name__ == "__main__":
     scatter = go.Scatter(
         x=current,
         y=relative_capacity,
-        mode="lines+markers",
-        name="Battery cell relative capacity",
+        mode="markers",
+        name="Manufacturers data",
+        marker=dict(symbol="diamond", size=10),
     )
     fig.add_trace(scatter)
 
@@ -32,8 +33,17 @@ if __name__ == "__main__":
     scatter_inter = go.Scatter(
         x=np.linspace(680, 8000, 50),
         y=np.polyval(poly, np.linspace(680, 8000, 50)),
-        mode="lines+markers",
+        mode="lines",
         name="Battery cell relative capacity interpolation",
     )
     fig.add_trace(scatter_inter)
+
+    fig.update_layout(
+        title_text="Battery relative capacity",
+        title_x=0.5,
+        xaxis_title="Cell current [mA]",
+        yaxis_title="Relative capacity [-]",
+        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+    )
+
     fig.show()
