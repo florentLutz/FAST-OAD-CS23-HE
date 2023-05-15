@@ -48,6 +48,7 @@ casadi = "3.5.5"
 networkx = "*"
 pyvis = "*"
 Pillow = "9.3"
+kaleido = "0.2.1"
 
 [tool.poetry.dev-dependencies]
 pyvplm = { git = "https://github.com/SizingLab/pyvplm.git", branch = "master" }
