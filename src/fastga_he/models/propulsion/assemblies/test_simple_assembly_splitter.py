@@ -84,23 +84,23 @@ def test_assembly_performances_splitter_50_50():
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                102317.0,
-                102833.0,
-                103340.0,
-                103838.0,
-                104328.0,
-                104809.0,
-                105281.0,
-                105745.0,
-                106200.0,
-                106645.0,
+                108259.0,
+                108808.0,
+                109349.0,
+                109881.0,
+                110403.0,
+                110917.0,
+                111420.0,
+                111915.0,
+                112400.0,
+                112875.0,
             ]
         ),
         abs=1,
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.96, 3.97, 3.99, 4.0, 4.01, 4.02, 4.03, 4.04, 4.05, 4.06]),
+        np.array([4.09, 4.10, 4.12, 4.13, 4.14, 4.15, 4.16, 4.17, 4.18, 4.19]),
         abs=1e-2,
     )
 
@@ -172,23 +172,23 @@ def test_assembly_performances_splitter_60_40():
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                81513.0,
-                81918.0,
-                82317.0,
-                82709.0,
-                83095.0,
-                83473.0,
-                83845.0,
-                84210.0,
-                84567.0,
-                84918.0,
+                86186.0,
+                86619.0,
+                87044.0,
+                87462.0,
+                87872.0,
+                88276.0,
+                88672.0,
+                89060.0,
+                89441.0,
+                89815.0,
             ]
         ),
         abs=1,
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.35, 3.37, 3.38, 3.4, 3.41, 3.43, 3.45, 3.46, 3.48, 3.49]),
+        np.array([3.54, 3.56, 3.58, 3.59, 3.61, 3.63, 3.64, 3.66, 3.68, 3.69]),
         abs=1e-2,
     )
 
@@ -379,23 +379,23 @@ def test_performances_from_pt_file():
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                102316.9,
-                102832.3,
-                103339.2,
-                103837.7,
-                104327.5,
-                104808.7,
-                105281.1,
-                105744.6,
-                106199.2,
-                106644.7,
+                108259.2,
+                108808.8,
+                109349.5,
+                109881.2,
+                110403.7,
+                110917.0,
+                111421.0,
+                111915.5,
+                112400.5,
+                112875.8,
             ]
         ),
         rel=1e-3,
     )
 
     assert problem.get_val("component.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.96, 3.97, 3.99, 4.0, 4.01, 4.02, 4.03, 4.04, 4.05, 4.06]),
+        np.array([4.09, 4.1, 4.12, 4.13, 4.14, 4.15, 4.16, 4.17, 4.18, 4.19]),
         abs=1e-2,
     )
 
