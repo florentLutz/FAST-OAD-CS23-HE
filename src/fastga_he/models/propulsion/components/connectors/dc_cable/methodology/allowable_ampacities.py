@@ -212,8 +212,11 @@ if __name__ == "__main__":
         yaxis_title="Area [mm2]",
         xaxis_title="Ampacities [A]",
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        height=800,
+        width=1600,
     )
     fig2.show()
+    fig2.write_image("conductor_scaling.pdf")
     # Works well but only on the values used for the extrapolation
 
     print("========== With power law ================")

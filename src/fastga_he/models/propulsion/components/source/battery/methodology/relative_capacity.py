@@ -43,7 +43,10 @@ if __name__ == "__main__":
         title_x=0.5,
         xaxis_title="Cell current [mA]",
         yaxis_title="Relative capacity [-]",
-        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
+        height=800,
+        width=1600,
     )
 
     fig.show()
+    fig.write_image("relative_cap.pdf")

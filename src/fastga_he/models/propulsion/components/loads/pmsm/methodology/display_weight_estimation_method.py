@@ -96,6 +96,10 @@ if __name__ == "__main__":
         xaxis_title="Reference motors",
         yaxis_title=r"$m^{*}$",
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        height=800,
+        width=1600,
     )
     fig.update_layout(legend=dict(font=dict(size=20)))
     fig.show()
+
+    fig.write_image("mass_scaling.pdf")

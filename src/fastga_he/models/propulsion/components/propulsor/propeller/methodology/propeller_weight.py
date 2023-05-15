@@ -1327,6 +1327,7 @@ if __name__ == "__main__":
             )
         )
     )
+    print("Number of propellers: ", len(weight))
 
     scatter_estimated = go.Scatter(
         x=max_cont_torque[idx_aluminium],
