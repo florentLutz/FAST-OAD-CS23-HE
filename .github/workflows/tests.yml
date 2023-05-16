@@ -28,9 +28,8 @@ jobs:
           cache: 'poetry'
 
       - name: Activate environment and install dependencies
-        run: |
-          poetry env use ${{ matrix.python-version }}
-          poetry install
+        run: poetry install
+        shell: bash
 
       - name: Check with Black
         run: |
