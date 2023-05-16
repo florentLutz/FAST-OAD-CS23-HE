@@ -422,6 +422,8 @@
           <battery_pack_1>
             <SOC_min units="percent" is_input="False">20.505806451640808<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">0.7135287389055691<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
+            <c_rate_multiplier is_input="False">0.29784698452070946<!--Multiplier for the the number of module if the c-rate of the battery is the active constraint--></c_rate_multiplier>
+            <capacity_multiplier is_input="False">0.9959653181582301<!--Multiplier for the the number of module if the capacity of the battery is the active constraint--></capacity_multiplier>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
@@ -623,15 +625,6 @@
       </he_power_train>
     </propulsion>
   </data>
-  <convergence>
-    <propulsion>
-      <he_power_train>
-        <battery_pack>
-          <battery_pack_1number_modules_limiter is_input="True">0.3333333333333333<!--Convergence parameter used the reduction of the amount of cell from one loop to the other--></battery_pack_1number_modules_limiter>
-        </battery_pack>
-      </he_power_train>
-    </propulsion>
-  </convergence>
   <constraints>
     <propulsion>
       <he_power_train>
@@ -650,6 +643,17 @@
       </he_power_train>
     </propulsion>
   </constraints>
+  <convergence>
+    <propulsion>
+      <he_power_train>
+        <battery_pack>
+          <battery_pack_1>
+            <number_modules_limiter is_input="True">0.6666666666666666<!--Convergence parameter used the reduction of the amount of cell from one loop to the other--></number_modules_limiter>
+          </battery_pack_1>
+        </battery_pack>
+      </he_power_train>
+    </propulsion>
+  </convergence>
   <settings>
     <propulsion>
       <he_power_train>

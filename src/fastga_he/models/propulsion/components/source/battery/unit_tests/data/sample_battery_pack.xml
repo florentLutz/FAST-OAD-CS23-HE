@@ -49,6 +49,7 @@
             <he_power_train>
                 <battery_pack>
                     <battery_pack_1>
+                        <c_rate_max units="h**-1">0.7</c_rate_max>
                         <dimension>
                             <length units="m">0.81</length>
                             <height units="m">1.67</height>
