@@ -4,7 +4,7 @@
 
 import openmdao.api as om
 
-from .sizing_dimension_heat_sink import SizingInverterHeatSinkDimension
+from .sizing_heat_sink_dimension import SizingInverterHeatSinkDimension
 from .sizing_heat_sink_tube_length import SizingInverterHeatSinkTubeLength
 from .sizing_heat_sink_tube_mass_flow import SizingInverterHeatSinkTubeMassFlow
 from .sizing_heat_sink_coolant_prandtl import SizingInverterHeatSinkCoolantPrandtl

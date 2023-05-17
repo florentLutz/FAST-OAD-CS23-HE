@@ -134,7 +134,13 @@ class MissionCore(om.Group):
             "performance_per_phase.thrust_rate_t_econ",
         )
 
-        self.connect("update_mass.mass", "compute_dep_equilibrium.compute_equilibrium.mass")
+        self.connect(
+            "update_mass.mass",
+            [
+                "compute_dep_equilibrium.compute_equilibrium_thrust.mass",
+                "compute_dep_equilibrium.compute_equilibrium_alpha.mass",
+            ],
+        )
 
         self.connect("performance_per_phase.fuel_consumed_t", "update_mass.fuel_consumed_t")
 
@@ -164,7 +170,7 @@ class MissionCore(om.Group):
         outputs["update_mass.mass"] = np.full(number_of_points_total, mtow) - np.cumsum(
             dummy_fuel_consumed
         )
-        outputs["compute_dep_equilibrium.compute_equilibrium.alpha"] = np.concatenate(
+        outputs["compute_dep_equilibrium.compute_equilibrium_alpha.alpha"] = np.concatenate(
             (
                 np.full(number_of_points_climb, 3.0),
                 np.full(number_of_points_cruise, 2.0),
@@ -172,7 +178,7 @@ class MissionCore(om.Group):
                 np.full(number_of_points_reserve, 7.0),
             )
         )
-        outputs["compute_dep_equilibrium.compute_equilibrium.delta_m"] = np.concatenate(
+        outputs["compute_dep_equilibrium.compute_equilibrium_delta_m.delta_m"] = np.concatenate(
             (
                 np.full(number_of_points_climb, -10.0),
                 np.full(number_of_points_cruise, -2.0),
@@ -180,7 +186,7 @@ class MissionCore(om.Group):
                 np.full(number_of_points_reserve, -2.0),
             )
         )
-        outputs["compute_dep_equilibrium.compute_equilibrium.thrust"] = np.concatenate(
+        outputs["compute_dep_equilibrium.compute_equilibrium_thrust.thrust"] = np.concatenate(
             (
                 np.full(number_of_points_climb, 2.0 * mtow),
                 np.full(number_of_points_cruise, mtow / 1.3),

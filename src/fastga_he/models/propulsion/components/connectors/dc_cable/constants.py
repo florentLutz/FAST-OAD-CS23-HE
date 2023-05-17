@@ -9,6 +9,9 @@ SUBMODEL_DC_LINE_SIZING_LENGTH = "submodel.propulsion.sizing.dc_line.length"
 SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE = (
     "submodel.propulsion.performances.dc_line.temperature_profile"
 )
+SUBMODEL_DC_LINE_PERFORMANCES_RESISTANCE_PROFILE = (
+    "submodel.propulsion.performances.dc_line.resistance_profile"
+)
 
 POSSIBLE_POSITION = [
     "inside_the_wing",

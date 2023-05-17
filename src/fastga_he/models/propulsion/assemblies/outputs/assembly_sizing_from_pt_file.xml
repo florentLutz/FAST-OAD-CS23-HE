@@ -423,6 +423,7 @@
         <battery_pack>
           <battery_pack_1>
             <SOC_min is_input="True">40.0<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <c_rate_max units="1/h" is_input="True">0.7<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <mass units="kg" is_input="False">1500.0<!--Mass of the battery pack--></mass>
@@ -454,6 +455,9 @@
               <volume units="L" is_input="False">3.3056249999999996<!--Volume of one module of the battery--></volume>
             </module>
           </battery_pack_1>
+          <battery_pack_1cell>
+            <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
+          </battery_pack_1cell>
         </battery_pack>
         <generator>
           <generator_1>
@@ -651,6 +655,9 @@
         <battery_pack>
           <battery_pack_1>
             <min_safe_SOC units="percent" is_input="False">-20.0<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
+            <cell>
+              <max_c_rate units="percent" is_input="False">-1.7<!--Constraints on the maximum cell c_rate, respected if <0--></max_c_rate>
+            </cell>
           </battery_pack_1>
         </battery_pack>
         <DC_DC_converter>

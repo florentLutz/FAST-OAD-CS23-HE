@@ -71,6 +71,43 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
             method="exact",
         )
 
+        self.add_input(
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max",
+            val=np.nan,
+            units="h**-1",
+            desc="Maximum C-rate of the battery modules during the mission",
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + "cell:c_rate_caliber",
+            val=2.4,
+            units="h**-1",
+            desc="Maximum C-rate that the battery reference cell can provide",
+        )
+
+        self.add_output(
+            "constraints:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":cell:max_c_rate",
+            val=0.0,
+            units="percent",
+            desc="Constraints on the maximum cell c_rate, respected if <0",
+        )
+
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":cell:max_c_rate",
+            wrt=[
+                "data:propulsion:he_power_train:battery_pack:"
+                + battery_pack_id
+                + "cell:c_rate_caliber",
+                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max",
+            ],
+            method="exact",
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         battery_pack_id = self.options["battery_pack_id"]
@@ -84,6 +121,19 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":min_safe_SOC"
             ]
             - inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":SOC_min"]
+        )
+
+        outputs[
+            "constraints:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":cell:max_c_rate"
+        ] = (
+            inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max"]
+            - inputs[
+                "data:propulsion:he_power_train:battery_pack:"
+                + battery_pack_id
+                + "cell:c_rate_caliber"
+            ]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -101,4 +151,19 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
             + battery_pack_id
             + ":min_safe_SOC",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":SOC_min",
+        ] = -1.0
+
+        partials[
+            "constraints:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":cell:max_c_rate",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max",
+        ] = 1.0
+        partials[
+            "constraints:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":cell:max_c_rate",
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + "cell:c_rate_caliber",
         ] = -1.0

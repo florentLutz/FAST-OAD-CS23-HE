@@ -25,7 +25,7 @@ icons_dict = {
     "power": pth.join(icons.__path__[0], "power.png"),
     "power_electronics": pth.join(icons.__path__[0], "power_electronics.png"),
     "propeller": pth.join(icons.__path__[0], "propeller.png"),
-    "splitter": pth.join(icons.__path__[0], "battery.png"),
+    "splitter": pth.join(icons.__path__[0], "splitter.png"),
 }
 
 

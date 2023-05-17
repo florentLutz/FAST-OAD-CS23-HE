@@ -1,6 +1,7 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
+import copy
 
 import openmdao.api as om
 import pytest
@@ -258,23 +259,55 @@ def test_battery_drag():
 
 def test_constraints_enforce_soc():
 
+    inputs_list = list_inputs(ConstraintsSOCEnforce(battery_pack_id="battery_pack_1"))
+    inputs_list.remove("data:propulsion:he_power_train:battery_pack:battery_pack_1:c_rate_max")
+
     # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(ConstraintsSOCEnforce(battery_pack_id="battery_pack_1")),
+    ivc_base = get_indep_var_comp(
+        inputs_list,
         __file__,
         XML_FILE,
+    )
+
+    ivc_capacity_con = copy.deepcopy(ivc_base)
+    ivc_capacity_con.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:c_rate_max",
+        val=1.25,
+        units="h**-1",
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         ConstraintsSOCEnforce(battery_pack_id="battery_pack_1"),
-        ivc,
+        ivc_capacity_con,
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
         )
         == pytest.approx(42.66, rel=1e-2)
+    )
+
+    # Partials will be hard to justify here since there is a rounding inside the module
+    problem.check_partials(compact_print=True)
+
+    ivc_c_rate_con = copy.deepcopy(ivc_base)
+    ivc_c_rate_con.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:c_rate_max",
+        val=6.2,
+        units="h**-1",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        ConstraintsSOCEnforce(battery_pack_id="battery_pack_1"),
+        ivc_c_rate_con,
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
+        )
+        == pytest.approx(138.0, rel=1e-2)
     )
 
     # Partials will be hard to justify here since there is a rounding inside the module
@@ -301,6 +334,13 @@ def test_constraints_ensure_soc():
             units="percent",
         )
         == pytest.approx(-20.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:battery_pack:battery_pack_1:cell:max_c_rate",
+            units="percent",
+        )
+        == pytest.approx(-1.7, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)

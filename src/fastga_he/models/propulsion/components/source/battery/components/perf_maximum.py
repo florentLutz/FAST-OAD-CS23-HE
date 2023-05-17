@@ -74,7 +74,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max",
             val=2.0,
             units="h**-1",
-            desc="Minimum state-of-charge of the battery during the mission",
+            desc="Maximum C-rate of the battery modules during the mission",
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max",

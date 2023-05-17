@@ -2,6 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO.
 
+import logging
+
 import openmdao.api as om
 
 import fastoad.api as oad
@@ -16,6 +18,13 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 from fastga_he.models.propulsion.assemblers.performances_watcher import (
     PowerTrainPerformancesWatcher,
 )
+
+from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_ENERGY_CONSUMPTION
+from fastga_he.models.propulsion.assemblers.energy_consumption_mission_vector import (
+    ENERGY_CONSUMPTION_FROM_PT_FILE,
+)
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.performances.mission_vector", domain=ModelDomain.OTHER)
@@ -147,7 +156,7 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_center_of_gravity.x_cg",
             [
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.x_cg",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.x_cg",
                 "to_csv.x_cg",
             ],
         )
@@ -169,7 +178,7 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_airspeed_time_derivatives.d_vx_dt",
             [
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.d_vx_dt",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.d_vx_dt",
                 "to_csv.d_vx_dt",
             ],
         )
@@ -177,7 +186,8 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_airspeed.true_airspeed",
             [
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.true_airspeed",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.true_airspeed",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.true_airspeed",
                 "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect.true_airspeed",
                 "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption"
                 + ".true_airspeed",
@@ -201,15 +211,17 @@ class MissionVector(om.Group):
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.alpha", "to_csv.alpha"
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.alpha",
+            "to_csv.alpha",
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.thrust", "to_csv.thrust"
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.thrust",
+            "to_csv.thrust",
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.delta_m",
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.delta_m",
             "to_csv.delta_m",
         )
 
@@ -246,14 +258,19 @@ class MissionVector(om.Group):
 
         self.connect(
             "initialization.initialize_gamma.gamma",
-            ["to_csv.gamma", "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.gamma"],
+            [
+                "to_csv.gamma",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.gamma",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.gamma",
+            ],
         )
 
         self.connect(
             "initialization.altitude",
             [
                 "to_csv.altitude",
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium.altitude",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.altitude",
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.altitude",
                 "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect.altitude",
                 "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption"
                 + ".altitude",
@@ -262,9 +279,15 @@ class MissionVector(om.Group):
 
         self.connect("solve_equilibrium.compute_time_step.time_step", "to_csv.time_step")
 
-        # Add the powertrain watcher here to avoid opening and closing csv all the time
+        # Add the powertrain watcher here to avoid opening and closing csv all the time. We will
+        # add here a check to ensure that the module that computes the performances base on the
+        # powertrain builder is used. Because if it is not used, no pt file will be provided
+        # meaning the load instruction of the configurator will fail and so will the connects.
 
-        if pt_file_path:
+        if (
+            oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION]
+            == ENERGY_CONSUMPTION_FROM_PT_FILE
+        ):
 
             self.configurator.load(pt_file_path)
 
@@ -329,3 +352,14 @@ class MissionVector(om.Group):
                     "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.exterior_temperature_econ",
                     "performances_watcher.exterior_temperature",
                 )
+
+        else:
+
+            _LOGGER.warning(
+                "Power train builder is not used for the performances computation. If "
+                "this was intended, you can ignore this warning. Else, make sure to select the "
+                + ENERGY_CONSUMPTION_FROM_PT_FILE
+                + " submodel for the "
+                + HE_SUBMODEL_ENERGY_CONSUMPTION
+                + " service"
+            )

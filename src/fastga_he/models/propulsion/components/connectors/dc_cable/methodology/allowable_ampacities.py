@@ -52,7 +52,7 @@ if __name__ == "__main__":
     scatter_cu_orig = go.Scatter(
         x=np.exp(area_log),
         y=copper_ampacities,
-        mode="lines+markers",
+        mode="markers",
         name="Copper original data",
         legendgroup="copper",
         legendgrouptitle_text="Copper",
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     scatter_al_orig = go.Scatter(
         x=np.exp(area_log),
         y=aluminium_ampacities,
-        mode="lines+markers",
+        mode="markers",
         name="Aluminium original data",
         legendgroup="aluminium",
         legendgrouptitle_text="Aluminium",
@@ -163,36 +163,46 @@ if __name__ == "__main__":
     scatter_cu_orig = go.Scatter(
         y=np.exp(area_log),
         x=copper_ampacities,
-        mode="lines+markers",
+        mode="markers",
         name="Copper original data",
         legendgroup="copper",
         legendgrouptitle_text="Copper",
+        marker_size=15,
+        marker_symbol="circle",
+        marker=dict(color="red"),
     )
     fig2.add_trace(scatter_cu_orig)
     scatter_al_orig = go.Scatter(
         y=np.exp(area_log),
         x=aluminium_ampacities,
-        mode="lines+markers",
+        mode="markers",
         name="Aluminium original data",
         legendgroup="aluminium",
         legendgrouptitle_text="Aluminium",
+        marker_size=15,
+        marker_symbol="circle",
+        marker=dict(color="grey"),
     )
     fig2.add_trace(scatter_al_orig)
 
+    x_values_plot_copper = np.linspace(min(copper_ampacities), max(copper_ampacities), 1000)
     scatter_cu = go.Scatter(
-        y=np.exp(np.polyval(polyfit_copper_inv, copper_ampacities)),
-        x=copper_ampacities,
-        mode="lines+markers",
+        y=np.exp(np.polyval(polyfit_copper_inv, x_values_plot_copper)),
+        x=x_values_plot_copper,
+        mode="lines",
         name="Copper interpolated data",
         legendgroup="copper",
+        line=dict(color="red"),
     )
     fig2.add_trace(scatter_cu)
+    x_values_plot_alu = np.linspace(min(aluminium_ampacities), max(aluminium_ampacities), 1000)
     scatter_al = go.Scatter(
-        y=np.exp(np.polyval(polyfit_alu_inv, aluminium_ampacities)),
-        x=aluminium_ampacities,
-        mode="lines+markers",
+        y=np.exp(np.polyval(polyfit_alu_inv, x_values_plot_alu)),
+        x=x_values_plot_alu,
+        mode="lines",
         name="Aluminium interpolated data",
         legendgroup="aluminium",
+        line=dict(color="grey"),
     )
     fig2.add_trace(scatter_al)
 
@@ -202,8 +212,11 @@ if __name__ == "__main__":
         yaxis_title="Area [mm2]",
         xaxis_title="Ampacities [A]",
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        height=800,
+        width=1600,
     )
     fig2.show()
+    fig2.write_image("conductor_scaling.pdf")
     # Works well but only on the values used for the extrapolation
 
     print("========== With power law ================")

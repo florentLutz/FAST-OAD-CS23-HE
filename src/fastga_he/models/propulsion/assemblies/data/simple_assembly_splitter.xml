@@ -114,6 +114,7 @@
                 </generator>
                 <battery_pack>
                     <battery_pack_1>
+                        <c_rate_max units="h**-1">0.7</c_rate_max>
                         <CG>
                             <x units="m">2.88</x>
                         </CG>

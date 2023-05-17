@@ -15,10 +15,12 @@ from fastga_he.models.propulsion.assemblers.constants import (
     SUBMODEL_POWER_RATE,
 )
 
+ENERGY_CONSUMPTION_FROM_PT_FILE = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+
 
 @oad.RegisterSubmodel(
     HE_SUBMODEL_ENERGY_CONSUMPTION,
-    "fastga_he.submodel.performances.energy_consumption.from_pt_file",
+    ENERGY_CONSUMPTION_FROM_PT_FILE,
 )
 class PowerTrainPerformancesFromFileWithInterface(om.Group):
     """

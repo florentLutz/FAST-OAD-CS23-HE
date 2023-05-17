@@ -326,7 +326,7 @@ def test_power_coefficient():
     )
 
     assert problem.get_val("power_coefficient") == pytest.approx(
-        np.array([0.0658, 0.0661, 0.0662, 0.0671, 0.0672, 0.0675, 0.0677, 0.0678, 0.0681, 0.0689]),
+        np.array([0.0693, 0.0696, 0.0697, 0.0706, 0.0707, 0.0711, 0.0713, 0.0714, 0.0717, 0.0725]),
         rel=1e-2,
     )
 
@@ -517,7 +517,7 @@ def test_propeller_performances():
     )
 
     assert problem.get_val("shaft_power_in", units="kW") == pytest.approx(
-        np.array([178.0, 178.8, 179.1, 181.5, 181.8, 182.6, 183.1, 183.4, 184.2, 186.4]),
+        np.array([187.4, 188.2, 188.5, 191.1, 191.4, 192.2, 192.7, 193.1, 193.9, 196.2]),
         rel=1e-2,
     )
 

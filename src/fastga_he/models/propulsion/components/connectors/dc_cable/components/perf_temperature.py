@@ -8,14 +8,18 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
 
+SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE = (
+    "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+)
+
 oad.RegisterSubmodel.active_models[
     SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
-] = "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+] = SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE
 
 
 @oad.RegisterSubmodel(
     SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
-    "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state",
+    SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE,
 )
 class PerformancesTemperature(om.ExplicitComponent):
     def initialize(self):

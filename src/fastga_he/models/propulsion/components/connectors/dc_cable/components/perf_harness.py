@@ -10,7 +10,12 @@ from .perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from .perf_losses_one_cable import PerformancesLossesOneCable
 from .perf_maximum import PerformancesMaximum
 
-from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
+from .perf_resistance_no_loop import SUBMODEL_DC_LINE_RESISTANCE_NO_LOOP
+
+from ..constants import (
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
+    SUBMODEL_DC_LINE_PERFORMANCES_RESISTANCE_PROFILE,
+)
 
 
 class PerformancesHarness(om.Group):
@@ -41,9 +46,13 @@ class PerformancesHarness(om.Group):
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
+        options_dict = {"harness_id": harness_id, "number_of_points": number_of_points}
+
         self.add_subsystem(
             "resistance",
-            PerformancesResistance(harness_id=harness_id, number_of_points=number_of_points),
+            oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_DC_LINE_PERFORMANCES_RESISTANCE_PROFILE, options=options_dict
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -57,16 +66,12 @@ class PerformancesHarness(om.Group):
             promotes=["*"],
         )
 
-        options_dict = {"harness_id": harness_id, "number_of_points": number_of_points}
-
         self.add_subsystem(
             "temperature",
             oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE, options=options_dict
             ),
-            promotes=[
-                "*",
-            ],
+            promotes=["*"],
         )
         # Though harness current depend on a variable stuck in the loop its output is not used in
         # the loop so we can take it out

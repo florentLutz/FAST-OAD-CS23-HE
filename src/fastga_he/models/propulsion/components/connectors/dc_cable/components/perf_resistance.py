@@ -5,7 +5,19 @@
 import numpy as np
 import openmdao.api as om
 
+import fastoad.api as oad
 
+from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_RESISTANCE_PROFILE
+
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_DC_LINE_PERFORMANCES_RESISTANCE_PROFILE
+] = "fastga_he.submodel.propulsion.performances.dc_line.resistance_profile.from_temperature"
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_DC_LINE_PERFORMANCES_RESISTANCE_PROFILE,
+    "fastga_he.submodel.propulsion.performances.dc_line.resistance_profile.from_temperature",
+)
 class PerformancesResistance(om.ExplicitComponent):
     def initialize(self):
 

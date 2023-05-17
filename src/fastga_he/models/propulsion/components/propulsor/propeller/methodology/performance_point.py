@@ -595,7 +595,7 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         # Needed for the computation of the hub lost factor
         phi = np.arctan2(v_ax, max((omega * radius - v_t) * np.cos(sweep * np.pi / 180.0), 1e-6))
 
-        # f_tip is the tip loose factor
+        # f_tip is the tip loss factor
         f_tip = (
             2
             / np.pi
@@ -612,7 +612,7 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
             )
         )
 
-        # f_hub is the hub loose factor
+        # f_hub is the hub loss factor
         f_hub = np.clip(
             2
             / np.pi

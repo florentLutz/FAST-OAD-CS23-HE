@@ -15,7 +15,7 @@ from ..components.sizing_thermal_resistance_casing import SizingInverterCasingTh
 from ..components.sizing_weight_casing import SizingInverterCasingsWeight
 from ..components.sizing_heat_capacity_casing import SizingInverterCasingHeatCapacity
 from ..components.sizing_dimension_module import SizingInverterModuleDimension
-from ..components.sizing_dimension_heat_sink import SizingInverterHeatSinkDimension
+from ..components.sizing_heat_sink_dimension import SizingInverterHeatSinkDimension
 from ..components.sizing_heat_sink_tube_length import SizingInverterHeatSinkTubeLength
 from ..components.sizing_heat_sink_tube_mass_flow import SizingInverterHeatSinkTubeMassFlow
 from ..components.sizing_heat_sink_coolant_prandtl import SizingInverterHeatSinkCoolantPrandtl

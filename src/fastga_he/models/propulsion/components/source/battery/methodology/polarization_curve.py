@@ -594,5 +594,8 @@ if __name__ == "__main__":
         yaxis_title="Terminal voltage [V]",
         xaxis_title="SOC [%]",
         legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
+        height=800,
+        width=1600,
     )
     fig.show()
+    fig.write_image("polarization_curve.pdf")
