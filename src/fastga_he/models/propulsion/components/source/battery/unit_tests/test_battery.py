@@ -259,9 +259,12 @@ def test_battery_drag():
 
 def test_constraints_enforce_soc():
 
+    inputs_list = list_inputs(ConstraintsSOCEnforce(battery_pack_id="battery_pack_1"))
+    inputs_list.remove("data:propulsion:he_power_train:battery_pack:battery_pack_1:c_rate_max")
+
     # Research independent input value in .xml file
     ivc_base = get_indep_var_comp(
-        list_inputs(ConstraintsSOCEnforce(battery_pack_id="battery_pack_1")),
+        inputs_list,
         __file__,
         XML_FILE,
     )
