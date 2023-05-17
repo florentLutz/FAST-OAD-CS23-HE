@@ -5,7 +5,6 @@
 import numpy as np
 import openmdao.api as om
 from scipy.constants import g
-from stdatm import Atmosphere
 
 
 class EquilibriumAlpha(om.ImplicitComponent):
@@ -28,7 +27,7 @@ class EquilibriumAlpha(om.ImplicitComponent):
 
         self.add_input("mass", val=np.full(number_of_points, 1500.0), units="kg")
         self.add_input("gamma", val=np.full(number_of_points, 0.0), units="deg")
-        self.add_input("altitude", val=np.full(number_of_points, 0.0), units="m")
+        self.add_input("density", val=np.full(number_of_points, 1.225), units="kg/m**3")
         self.add_input("true_airspeed", val=np.full(number_of_points, 50.0), units="m/s")
 
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
@@ -56,19 +55,9 @@ class EquilibriumAlpha(om.ImplicitComponent):
         self.declare_partials(
             of="alpha",
             wrt=[
-                "altitude",
-            ],
-            method="fd",
-            form="central",
-            step=1.0e2,
-            rows=np.arange(number_of_points),
-            cols=np.arange(number_of_points),
-        )
-        self.declare_partials(
-            of="alpha",
-            wrt=[
                 "mass",
                 "gamma",
+                "density",
                 "true_airspeed",
                 "data:geometry:wing:area",
                 "data:aerodynamics:wing:cruise:CL0_clean",
@@ -98,7 +87,6 @@ class EquilibriumAlpha(om.ImplicitComponent):
 
         mass = inputs["mass"]
         true_airspeed = inputs["true_airspeed"]
-        altitude = inputs["altitude"]
         gamma = inputs["gamma"] * np.pi / 180.0
 
         wing_area = inputs["data:geometry:wing:area"]
@@ -111,11 +99,9 @@ class EquilibriumAlpha(om.ImplicitComponent):
         thrust = inputs["thrust"]
         delta_m = inputs["delta_m"] * np.pi / 180.0
 
-        rho = Atmosphere(altitude, altitude_in_feet=False).density
+        rho = inputs["density"]
 
-        dynamic_pressure = 1.0 / 2.0 * rho * np.square(true_airspeed)
-
-        d_q_d_airspeed = rho * true_airspeed
+        dynamic_pressure = 0.5 * rho * true_airspeed ** 2.0
 
         # ------------------ Derivatives wrt alpha residuals ------------------ #
 
@@ -125,7 +111,7 @@ class EquilibriumAlpha(om.ImplicitComponent):
             number_of_points
         )
         partials["alpha", "data:aerodynamics:horizontal_tail:cruise:CL_alpha"] = alpha
-        partials["alpha", "delta_Cl"] = np.identity(number_of_points)
+        partials["alpha", "delta_Cl"] = np.eye(number_of_points)
         partials["alpha", "data:aerodynamics:elevator:low_speed:CL_delta"] = delta_m
         d_alpha_d_mass_vector = -g * np.cos(gamma) / (dynamic_pressure * wing_area)
         partials["alpha", "mass"] = np.diag(d_alpha_d_mass_vector)
@@ -136,7 +122,7 @@ class EquilibriumAlpha(om.ImplicitComponent):
         d_alpha_d_q_vector = -(thrust * np.sin(alpha) - mass * g * np.cos(gamma)) / (
             wing_area * dynamic_pressure ** 2.0
         )
-        partials["alpha", "true_airspeed"] = np.diag(d_alpha_d_q_vector * d_q_d_airspeed)
+        partials["alpha", "true_airspeed"] = np.diag(d_alpha_d_q_vector * rho * true_airspeed)
         d_alpha_d_s_vector = -(thrust * np.sin(alpha) - mass * g * np.cos(gamma)) / (
             dynamic_pressure * wing_area ** 2.0
         )
@@ -144,8 +130,10 @@ class EquilibriumAlpha(om.ImplicitComponent):
         d_alpha_d_alpha_vector = (
             cl_alpha_wing + cl_alpha_htp + thrust * np.cos(alpha) / (dynamic_pressure * wing_area)
         )
+        partials["alpha", "density"] = np.diag(d_alpha_d_q_vector * 0.5 * true_airspeed ** 2.0)
         partials["alpha", "alpha"] = np.diag(d_alpha_d_alpha_vector) * np.pi / 180.0
-        partials["alpha", "delta_m"] = np.identity(number_of_points) * cl_delta_m * np.pi / 180.0
+        partials["alpha", "delta_m"] = np.eye(number_of_points) * cl_delta_m * np.pi / 180.0
+
         if self.options["flaps_position"] == "takeoff":
             partials["alpha", "data:aerodynamics:flaps:takeoff:CL"] = np.ones(number_of_points)
         if self.options["flaps_position"] == "landing":
@@ -158,7 +146,6 @@ class EquilibriumAlpha(om.ImplicitComponent):
         mass = inputs["mass"]
         gamma = inputs["gamma"] * np.pi / 180.0
         true_airspeed = inputs["true_airspeed"]
-        altitude = inputs["altitude"]
 
         wing_area = inputs["data:geometry:wing:area"]
 
@@ -181,12 +168,11 @@ class EquilibriumAlpha(om.ImplicitComponent):
         thrust = inputs["thrust"]
         delta_m = inputs["delta_m"] * np.pi / 180.0
 
-        rho = Atmosphere(altitude, altitude_in_feet=False).density
+        rho = inputs["density"]
 
-        dynamic_pressure = 1.0 / 2.0 * rho * np.square(true_airspeed)
+        dynamic_pressure = 0.5 * rho * true_airspeed ** 2.0
 
-        cl_wing_clean = cl0_wing + cl_alpha_wing * alpha
-        cl_wing = cl_wing_clean + delta_cl_flaps + delta_cl
+        cl_wing = cl0_wing + cl_alpha_wing * alpha + delta_cl_flaps + delta_cl
         cl_htp = cl0_htp + cl_alpha_htp * alpha + cl_delta_m * delta_m
 
         residuals["alpha"] = (

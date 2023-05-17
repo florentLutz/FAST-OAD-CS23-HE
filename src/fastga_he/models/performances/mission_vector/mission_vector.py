@@ -158,6 +158,12 @@ class MissionVector(om.Group):
                 "to_csv.x_cg",
             ],
         )
+        self.connect(
+            "initialization.initialize_density.density",
+            [
+                "solve_equilibrium.compute_dep_equilibrium.density",
+            ],
+        )
 
         self.connect(
             "initialization.initialize_time_and_distance.position",

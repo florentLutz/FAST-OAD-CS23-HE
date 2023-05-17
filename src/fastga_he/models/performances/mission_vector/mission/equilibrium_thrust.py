@@ -5,7 +5,6 @@
 import numpy as np
 import openmdao.api as om
 from scipy.constants import g
-from stdatm import Atmosphere
 
 
 class EquilibriumThrust(om.ImplicitComponent):
@@ -29,7 +28,7 @@ class EquilibriumThrust(om.ImplicitComponent):
         self.add_input("d_vx_dt", val=np.full(number_of_points, 0.0), units="m/s**2")
         self.add_input("mass", val=np.full(number_of_points, 1500.0), units="kg")
         self.add_input("gamma", val=np.full(number_of_points, 0.0), units="deg")
-        self.add_input("altitude", val=np.full(number_of_points, 0.0), units="m")
+        self.add_input("density", val=np.full(number_of_points, 1.225), units="kg/m**3")
         self.add_input("true_airspeed", val=np.full(number_of_points, 50.0), units="m/s")
 
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
@@ -52,7 +51,6 @@ class EquilibriumThrust(om.ImplicitComponent):
             self.add_input("data:aerodynamics:flaps:landing:CL", val=np.nan)
             self.add_input("data:aerodynamics:flaps:landing:CD", val=np.nan)
 
-        self.add_input("delta_Cl", val=np.full(number_of_points, 0.0))
         self.add_input("delta_Cd", val=np.full(number_of_points, 0.0))
 
         self.add_input("alpha", val=np.full(number_of_points, np.nan), units="deg")
@@ -63,18 +61,8 @@ class EquilibriumThrust(om.ImplicitComponent):
         self.declare_partials(
             of="thrust",
             wrt=[
-                "altitude",
-            ],
-            method="fd",
-            form="central",
-            step=1.0e2,
-            rows=np.arange(number_of_points),
-            cols=np.arange(number_of_points),
-        )
-        self.declare_partials(
-            of="thrust",
-            wrt=[
                 "gamma",
+                "density",
                 "d_vx_dt",
                 "mass",
                 "true_airspeed",
@@ -109,7 +97,6 @@ class EquilibriumThrust(om.ImplicitComponent):
         mass = inputs["mass"]
         d_vx_dt = inputs["d_vx_dt"]
         true_airspeed = inputs["true_airspeed"]
-        altitude = inputs["altitude"]
         gamma = inputs["gamma"] * np.pi / 180.0
 
         wing_area = inputs["data:geometry:wing:area"]
@@ -138,14 +125,13 @@ class EquilibriumThrust(om.ImplicitComponent):
             delta_cl_flaps = 0.0
             delta_cd_flaps = 0.0
 
-        delta_cl = inputs["delta_Cl"]
         delta_cd = inputs["delta_Cd"]
 
-        rho = Atmosphere(altitude, altitude_in_feet=False).density
+        rho = inputs["density"]
 
         dynamic_pressure = 1.0 / 2.0 * rho * np.square(true_airspeed)
 
-        cl_wing = cl0_wing + cl_alpha_wing * alpha + delta_cl + delta_cl_flaps
+        cl_wing = cl0_wing + cl_alpha_wing * alpha + delta_cl_flaps
         cl_htp = cl0_htp + cl_alpha_htp * alpha + cl_delta_m * delta_m
 
         cd_tot = (
@@ -157,21 +143,16 @@ class EquilibriumThrust(om.ImplicitComponent):
             + (cd_delta_m * delta_m ** 2.0)
         )
 
-        d_q_d_airspeed = rho * true_airspeed
-
         # ------------------ Derivatives wrt thrust residuals ------------------ #
 
         d_thrust_d_cl_w = -2.0 * dynamic_pressure * wing_area * coeff_k_wing * cl_wing
         d_thrust_d_cl_h = -2.0 * dynamic_pressure * wing_area * coeff_k_htp * cl_htp
 
-        d_cl_w_d_cl_alpha_w = alpha
-        d_cl_h_d_cl_alpha_h = alpha
-        d_cl_h_d_cl_delta = delta_m
-
         partials["thrust", "d_vx_dt"] = np.diag(-mass)
         partials["thrust", "gamma"] = np.diag(-mass * g * np.cos(gamma) * np.pi / 180.0)
+        partials["thrust", "density"] = -np.diag(wing_area * cd_tot * 0.5 * true_airspeed ** 2.0)
         partials["thrust", "mass"] = np.diag(-d_vx_dt - g * np.sin(gamma))
-        partials["thrust", "true_airspeed"] = -np.diag(wing_area * cd_tot * d_q_d_airspeed)
+        partials["thrust", "true_airspeed"] = -np.diag(wing_area * cd_tot * rho * true_airspeed)
         partials["thrust", "data:geometry:wing:area"] = -dynamic_pressure * cd_tot
         partials["thrust", "data:aerodynamics:aircraft:cruise:CD0"] = -dynamic_pressure * wing_area
         partials["thrust", "data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient"] = (
@@ -185,15 +166,13 @@ class EquilibriumThrust(om.ImplicitComponent):
             -dynamic_pressure * wing_area * delta_m ** 2.0
         )
         partials["thrust", "data:aerodynamics:elevator:low_speed:CL_delta"] = (
-            d_thrust_d_cl_h * d_cl_h_d_cl_delta
+            d_thrust_d_cl_h * delta_m
         )
         partials["thrust", "data:aerodynamics:wing:cruise:CL0_clean"] = d_thrust_d_cl_w
-        partials["thrust", "data:aerodynamics:wing:cruise:CL_alpha"] = (
-            d_thrust_d_cl_w * d_cl_w_d_cl_alpha_w
-        )
+        partials["thrust", "data:aerodynamics:wing:cruise:CL_alpha"] = d_thrust_d_cl_w * alpha
         partials["thrust", "data:aerodynamics:horizontal_tail:cruise:CL0"] = d_thrust_d_cl_h
         partials["thrust", "data:aerodynamics:horizontal_tail:cruise:CL_alpha"] = (
-            d_thrust_d_cl_h * d_cl_h_d_cl_alpha_h
+            d_thrust_d_cl_h * alpha
         )
         partials["thrust", "thrust"] = np.diag(np.cos(alpha))
         d_thrust_d_alpha_vector = (
@@ -228,7 +207,6 @@ class EquilibriumThrust(om.ImplicitComponent):
         mass = inputs["mass"]
         gamma = inputs["gamma"] * np.pi / 180.0
         true_airspeed = inputs["true_airspeed"]
-        altitude = inputs["altitude"]
 
         wing_area = inputs["data:geometry:wing:area"]
 
@@ -258,12 +236,9 @@ class EquilibriumThrust(om.ImplicitComponent):
         thrust = outputs["thrust"]
         delta_m = inputs["delta_m"] * np.pi / 180.0
 
-        rho = Atmosphere(altitude, altitude_in_feet=False).density
+        dynamic_pressure = 1.0 / 2.0 * inputs["density"] * np.square(true_airspeed)
 
-        dynamic_pressure = 1.0 / 2.0 * rho * np.square(true_airspeed)
-
-        cl_wing_clean = cl0_wing + cl_alpha_wing * alpha
-        cl_wing_flaps = cl_wing_clean + delta_cl_flaps
+        cl_wing_flaps = cl0_wing + cl_alpha_wing * alpha + delta_cl_flaps
         cl_htp = cl0_htp + cl_alpha_htp * alpha + cl_delta_m * delta_m
 
         cd_tot = (
