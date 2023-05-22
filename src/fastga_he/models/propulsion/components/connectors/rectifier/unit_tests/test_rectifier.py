@@ -7,6 +7,8 @@ import pytest
 import numpy as np
 
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
+from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
+from ..components.perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
 from ..components.perf_efficiency import PerformancesEfficiencyMission
 from ..components.perf_maximum import PerformancesMaximum
 
@@ -77,6 +79,94 @@ def test_voltage_out_target_mission():
     problem2.check_partials(compact_print=True)
 
 
+def test_switching_frequency_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency_mission",
+        val=12.0e3,
+        units="Hz",
+    )
+
+    problem = run_system(
+        PerformancesSwitchingFrequencyMission(
+            rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("switching_frequency", units="Hz") == pytest.approx(
+        np.full(NB_POINTS_TEST, 12.0e3), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency_mission",
+        val=[15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 420],
+        units="Hz",
+    )
+
+    problem3 = run_system(
+        PerformancesSwitchingFrequencyMission(
+            rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc3,
+    )
+
+    assert problem3.get_val("switching_frequency", units="Hz") == pytest.approx(
+        np.array([15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 15e3, 12e3, 10e3, 420]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
+
+
+def test_heat_sink_temperature_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:heat_sink_temperature_mission",
+        val=290.0,
+        units="degK",
+    )
+
+    problem = run_system(
+        PerformancesHeatSinkTemperatureMission(
+            rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("heat_sink_temperature", units="degK") == pytest.approx(
+        np.full(NB_POINTS_TEST, 290), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:heat_sink_temperature_mission",
+        val=[290, 270, 290, 290, 270, 290, 290, 270, 290, 42],
+        units="degK",
+    )
+
+    problem3 = run_system(
+        PerformancesHeatSinkTemperatureMission(
+            rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc3,
+    )
+
+    assert problem3.get_val("heat_sink_temperature", units="degK") == pytest.approx(
+        np.array([290, 270, 290, 290, 270, 290, 290, 270, 290, 42]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
+
+
 def test_efficiency():
     # Will eventually disappear
 
@@ -127,6 +217,9 @@ def test_maximum():
     ivc.add_output(
         "ac_current_rms_in_one_phase", units="A", val=np.linspace(133.0, 120.0, NB_POINTS_TEST)
     )
+    ivc.add_output(
+        "switching_frequency", units="Hz", val=np.linspace(10.0e3, 12.0e3, NB_POINTS_TEST)
+    )
 
     problem = run_system(
         PerformancesMaximum(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
@@ -145,6 +238,9 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:voltage_dc_max", units="V"
     ) == pytest.approx(500.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency_max", units="Hz"
+    ) == pytest.approx(12.0e3, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -314,6 +410,16 @@ def test_performances_rectifier():
     ivc.add_output(
         "data:propulsion:he_power_train:rectifier:rectifier_1:efficiency",
         val=0.8,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency_mission",
+        val=12.0e3,
+        units="Hz",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:heat_sink_temperature_mission",
+        val=290.0,
+        units="degK",
     )
 
     model.add_subsystem("shaper", ivc, promotes=["*"])

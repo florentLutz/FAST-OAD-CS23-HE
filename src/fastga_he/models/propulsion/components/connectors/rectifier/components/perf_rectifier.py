@@ -5,6 +5,8 @@
 import openmdao.api as om
 
 from .perf_voltage_out_target import PerformancesVoltageOutTargetMission
+from .perf_switching_frequency import PerformancesSwitchingFrequencyMission
+from .perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
 from .perf_efficiency import PerformancesEfficiencyMission
 from .perf_modulation_index import PerformancesModulationIndex
 from .perf_load_side import PerformancesRectifierLoadSide
@@ -39,8 +41,15 @@ class PerformancesRectifier(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "efficiency",
-            PerformancesEfficiencyMission(
+            "switching_frequency",
+            PerformancesSwitchingFrequencyMission(
+                number_of_points=number_of_points, rectifier_id=rectifier_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "heat_sink_temperature",
+            PerformancesHeatSinkTemperatureMission(
                 number_of_points=number_of_points, rectifier_id=rectifier_id
             ),
             promotes=["*"],
@@ -48,6 +57,13 @@ class PerformancesRectifier(om.Group):
         self.add_subsystem(
             "modulation_idx",
             PerformancesModulationIndex(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "efficiency",
+            PerformancesEfficiencyMission(
+                number_of_points=number_of_points, rectifier_id=rectifier_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
