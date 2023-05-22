@@ -9,9 +9,12 @@ import numpy as np
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
+from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_efficiency import PerformancesEfficiencyMission
 from ..components.perf_maximum import PerformancesMaximum
 
+from ..components.sizing_energy_coefficient_scaling import SizingRectifierEnergyCoefficientScaling
+from ..components.sizing_energy_coefficients import SizingRectifierEnergyCoefficients
 from ..components.sizing_rectifier_weight import SizingRectifierWeight
 from ..components.sizing_rectifier_cg import SizingRectifierCG
 
@@ -325,6 +328,104 @@ def test_constraint_ensure_voltage():
     problem.check_partials(compact_print=True)
 
 
+def test_scaling_ratio():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierEnergyCoefficientScaling(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingRectifierEnergyCoefficientScaling(rectifier_id="rectifier_1"), ivc)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:scaling:a"
+    ) == pytest.approx(0.333, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:scaling:c"
+    ) == pytest.approx(3.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_energy_coefficient():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierEnergyCoefficients(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierEnergyCoefficients(rectifier_id="rectifier_1"), ivc)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:energy_on:a"
+    ) == pytest.approx(0.00528233, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:energy_rr:a"
+    ) == pytest.approx(0.00501952, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:energy_off:a"
+    ) == pytest.approx(0.00141464, rel=1e-2)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:energy_on:b"
+    ) == pytest.approx(3.326e-05, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:energy_rr:b"
+    ) == pytest.approx(0.000254, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:energy_off:b"
+    ) == pytest.approx(0.000340, rel=1e-2)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:energy_on:c"
+    ) == pytest.approx(1.54040339e-06, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:energy_rr:c"
+    ) == pytest.approx(-5.21717365e-07, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:energy_off:c"
+    ) == pytest.approx(-1.35349615e-07, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_switching_losses():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesSwitchingLosses(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "ac_current_rms_in_one_phase", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A"
+    )
+    ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST))
+
+    problem = run_system(
+        PerformancesSwitchingLosses(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    expected_losses_igbt = np.array(
+        [107.1, 175.2, 263.6, 374.4, 510.0, 672.8, 865.1, 1089.3, 1347.7, 1642.6]
+    )
+    assert problem.get_val("switching_losses_IGBT", units="W") == pytest.approx(
+        expected_losses_igbt, rel=1e-2
+    )
+    expected_losses_diode = np.array(
+        [56.8, 82.6, 110.5, 139.4, 168.6, 197.3, 224.4, 249.2, 270.7, 288.2]
+    )
+    assert problem.get_val("switching_losses_diode", units="W") == pytest.approx(
+        expected_losses_diode, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_rectifier_weight():
 
     ivc = get_indep_var_comp(
@@ -397,36 +498,23 @@ def test_sizing_rectifier():
 
 def test_performances_rectifier():
 
-    # Not really a test, just need to check out which value are in/out
-    problem = om.Problem()
-    model = problem.model
-
-    ivc = om.IndepVarComp()
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output("dc_voltage_out", units="V", val=np.linspace(500.0, 480.0, NB_POINTS_TEST))
+    ivc.add_output("ac_voltage_peak_in", units="V", val=np.linspace(500.0, 480.0, NB_POINTS_TEST))
     ivc.add_output(
-        "data:propulsion:he_power_train:rectifier:rectifier_1:voltage_out_target_mission",
-        val=850.0,
+        "ac_voltage_rms_in",
         units="V",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:rectifier:rectifier_1:efficiency",
-        val=0.8,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency_mission",
-        val=12.0e3,
-        units="Hz",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:rectifier:rectifier_1:heat_sink_temperature_mission",
-        val=290.0,
-        units="degK",
+        val=np.linspace(500.0, 480.0, NB_POINTS_TEST) / np.sqrt(3.0 / 2.0),
     )
 
-    model.add_subsystem("shaper", ivc, promotes=["*"])
-    model.add_subsystem(
-        "performances_rectifier",
-        PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
-        promotes=["*"],
+    problem = run_system(
+        PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST), ivc
     )
-    problem.setup()
+
     om.n2(problem, show_browser=False)

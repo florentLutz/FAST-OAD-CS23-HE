@@ -4,6 +4,8 @@
 
 import openmdao.api as om
 
+from .sizing_energy_coefficient_scaling import SizingRectifierEnergyCoefficientScaling
+from .sizing_energy_coefficients import SizingRectifierEnergyCoefficients
 from .sizing_rectifier_weight import SizingRectifierWeight
 from .sizing_rectifier_cg import SizingRectifierCG
 from .sizing_rectifier_drag import SizingRectifierDrag
@@ -42,6 +44,16 @@ class SizingRectifier(om.Group):
             promotes=["*"],
         )
 
+        self.add_subsystem(
+            name="energy_coefficient_scaling",
+            subsys=SizingRectifierEnergyCoefficientScaling(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="energy_coefficient",
+            subsys=SizingRectifierEnergyCoefficients(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
         self.add_subsystem(
             name="rectifier_weight",
             subsys=SizingRectifierWeight(rectifier_id=rectifier_id),

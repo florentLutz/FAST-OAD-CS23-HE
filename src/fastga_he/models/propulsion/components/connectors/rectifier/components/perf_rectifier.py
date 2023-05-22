@@ -9,6 +9,7 @@ from .perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from .perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
 from .perf_efficiency import PerformancesEfficiencyMission
 from .perf_modulation_index import PerformancesModulationIndex
+from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_load_side import PerformancesRectifierLoadSide
 from .perf_generator_side import PerformancesRectifierGeneratorSide
 from .perf_rectifier_relations import PerformancesRectifierRelations
@@ -57,6 +58,13 @@ class PerformancesRectifier(om.Group):
         self.add_subsystem(
             "modulation_idx",
             PerformancesModulationIndex(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "switching_losses",
+            PerformancesSwitchingLosses(
+                number_of_points=number_of_points, rectifier_id=rectifier_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(

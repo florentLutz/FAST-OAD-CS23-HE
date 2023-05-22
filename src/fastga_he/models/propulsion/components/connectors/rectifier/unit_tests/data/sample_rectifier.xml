@@ -28,6 +28,27 @@
                         <voltage_ac_caliber units="V">810.0</voltage_ac_caliber>
                         <efficiency>0.98</efficiency>
                         <voltage_out_target_mission units="V">800.0</voltage_out_target_mission>
+                        <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
+                        <heat_sink_temperature_mission units="degK">12.0e3</heat_sink_temperature_mission>
+                        <scaling>
+                            <a>0.333</a>
+                            <c>3.0</c>
+                        </scaling>
+                        <energy_on>
+                            <a>0.00528233</a>
+                            <b>3.326e-05</b>
+                            <c>1.54040339e-06</c>
+                        </energy_on>
+                        <energy_off>
+                            <a>0.00141464</a>
+                            <b>0.000254</b>
+                            <c>-1.35349615e-07</c>
+                        </energy_off>
+                        <energy_rr>
+                            <a>0.00501952</a>
+                            <b>0.000340</b>
+                            <c>-5.21717365e-07</c>
+                        </energy_rr>
                     </rectifier_1>
                 </rectifier>
             </he_power_train>
