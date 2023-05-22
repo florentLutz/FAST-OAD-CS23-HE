@@ -138,8 +138,7 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_engine_setting.engine_setting",
             [
-                "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption"
-                + ".engine_setting",
+                "solve_equilibrium.compute_dep_equilibrium.engine_setting",
                 "to_csv.engine_setting",
             ],
         )
@@ -147,8 +146,7 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_temperature.exterior_temperature",
             [
-                "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption"
-                + ".exterior_temperature",
+                "solve_equilibrium.compute_dep_equilibrium.exterior_temperature",
                 "to_csv.exterior_temperature",
             ],
         )
@@ -156,8 +154,14 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_center_of_gravity.x_cg",
             [
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.x_cg",
+                "solve_equilibrium.compute_dep_equilibrium.x_cg",
                 "to_csv.x_cg",
+            ],
+        )
+        self.connect(
+            "initialization.initialize_density.density",
+            [
+                "solve_equilibrium.compute_dep_equilibrium.density",
             ],
         )
 
@@ -178,7 +182,7 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_airspeed_time_derivatives.d_vx_dt",
             [
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.d_vx_dt",
+                "solve_equilibrium.compute_dep_equilibrium.d_vx_dt",
                 "to_csv.d_vx_dt",
             ],
         )
@@ -186,42 +190,38 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_airspeed.true_airspeed",
             [
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.true_airspeed",
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.true_airspeed",
-                "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect.true_airspeed",
-                "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption"
-                + ".true_airspeed",
+                "solve_equilibrium.compute_dep_equilibrium.true_airspeed",
                 "to_csv.true_airspeed",
             ],
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect.delta_Cl",
+            "solve_equilibrium.compute_dep_equilibrium.delta_Cl",
             "to_csv.delta_Cl",
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect.delta_Cd",
+            "solve_equilibrium.compute_dep_equilibrium.delta_Cd",
             "to_csv.delta_Cd",
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect.delta_Cm",
+            "solve_equilibrium.compute_dep_equilibrium.delta_Cm",
             "to_csv.delta_Cm",
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.alpha",
+            "solve_equilibrium.compute_dep_equilibrium.alpha",
             "to_csv.alpha",
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.thrust",
+            "solve_equilibrium.compute_dep_equilibrium.thrust",
             "to_csv.thrust",
         )
 
         self.connect(
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.delta_m",
+            "solve_equilibrium.compute_dep_equilibrium.delta_m",
             "to_csv.delta_m",
         )
 
@@ -230,7 +230,7 @@ class MissionVector(om.Group):
         )
 
         self.connect(
-            "solve_equilibrium.update_mass.mass",
+            "solve_equilibrium.mass",
             [
                 "to_csv.mass",
                 "initialization.mass",
@@ -238,7 +238,7 @@ class MissionVector(om.Group):
         )
 
         self.connect(
-            "solve_equilibrium.performance_per_phase.fuel_consumed_t",
+            "solve_equilibrium.fuel_consumed_t",
             [
                 "to_csv.fuel_consumed_t",
                 "initialization.initialize_center_of_gravity.fuel_consumed_t",
@@ -260,8 +260,7 @@ class MissionVector(om.Group):
             "initialization.initialize_gamma.gamma",
             [
                 "to_csv.gamma",
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.gamma",
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.gamma",
+                "solve_equilibrium.compute_dep_equilibrium.gamma",
             ],
         )
 
@@ -269,15 +268,11 @@ class MissionVector(om.Group):
             "initialization.altitude",
             [
                 "to_csv.altitude",
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.altitude",
-                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.altitude",
-                "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect.altitude",
-                "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption"
-                + ".altitude",
+                "solve_equilibrium.compute_dep_equilibrium.altitude",
             ],
         )
 
-        self.connect("solve_equilibrium.compute_time_step.time_step", "to_csv.time_step")
+        self.connect("solve_equilibrium.time_step", "to_csv.time_step")
 
         # Add the powertrain watcher here to avoid opening and closing csv all the time. We will
         # add here a check to ensure that the module that computes the performances base on the
@@ -333,23 +328,23 @@ class MissionVector(om.Group):
                     )
 
                 self.connect(
-                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.thrust_econ",
+                    "solve_equilibrium.compute_dep_equilibrium.thrust_econ",
                     "performances_watcher.thrust",
                 )
                 self.connect(
-                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.altitude_econ",
+                    "solve_equilibrium.compute_dep_equilibrium.altitude_econ",
                     "performances_watcher.altitude",
                 )
                 self.connect(
-                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.time_step_econ",
+                    "solve_equilibrium.compute_dep_equilibrium.time_step_econ",
                     "performances_watcher.time_step",
                 )
                 self.connect(
-                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.true_airspeed_econ",
+                    "solve_equilibrium.compute_dep_equilibrium.true_airspeed_econ",
                     "performances_watcher.true_airspeed",
                 )
                 self.connect(
-                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.exterior_temperature_econ",
+                    "solve_equilibrium.compute_dep_equilibrium.exterior_temperature_econ",
                     "performances_watcher.exterior_temperature",
                 )
 

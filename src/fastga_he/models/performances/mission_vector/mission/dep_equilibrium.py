@@ -172,32 +172,28 @@ class DEPEquilibrium(om.Group):
                     number_of_points_descent=number_of_points_descent,
                     number_of_points_reserve=number_of_points_reserve,
                 ),
-                promotes_inputs=["data:*"],
-                promotes_outputs=[],
+                promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_alpha",
                 EquilibriumAlpha(
                     number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
                 ),
-                promotes_inputs=["data:*"],
-                promotes_outputs=[],
+                promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_thrust",
                 EquilibriumThrust(
                     number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
                 ),
-                promotes_inputs=["data:*"],
-                promotes_outputs=[],
+                promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
                 EquilibriumDeltaM(
                     number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
                 ),
-                promotes_inputs=["data:*"],
-                promotes_outputs=[],
+                promotes=["*"],
             )
             options_dep = {
                 "number_of_points": number_of_points,
@@ -206,8 +202,8 @@ class DEPEquilibrium(om.Group):
             self.add_subsystem(
                 "compute_dep_effect",
                 oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
-                promotes_inputs=["data:*"],
-                promotes_outputs=[],
+                promotes_inputs=["data:*", "alpha", "thrust", "altitude", "true_airspeed"],
+                promotes_outputs=["delta_Cl", "delta_Cd", "delta_Cm"],
             )
             options_propulsion = {
                 "number_of_points": number_of_points,
@@ -220,62 +216,17 @@ class DEPEquilibrium(om.Group):
                 oad.RegisterSubmodel.get_submodel(
                     HE_SUBMODEL_ENERGY_CONSUMPTION, options=options_propulsion
                 ),
-                promotes=["data:*"],
-            )
-
-            self.connect(
-                "compute_dep_effect.delta_Cl",
-                ["compute_equilibrium_alpha.delta_Cl", "compute_equilibrium_thrust.delta_Cl"],
-            )
-
-            self.connect("compute_dep_effect.delta_Cd", "compute_equilibrium_thrust.delta_Cd")
-
-            self.connect("compute_dep_effect.delta_Cm", "compute_equilibrium_delta_m.delta_Cm")
-
-            self.connect(
-                "compute_equilibrium_alpha.alpha",
-                [
-                    "compute_dep_effect.alpha",
-                    "compute_equilibrium_thrust.alpha",
-                    "compute_equilibrium_delta_m.alpha",
+                promotes=[
+                    "data:*",
+                    "fuel_consumed_t_econ",
+                    "non_consumable_energy_t_econ",
+                    "thrust_rate_t_econ",
+                    "true_airspeed_econ",
+                    "true_airspeed_econ",
+                    "time_step_econ",
+                    "exterior_temperature_econ",
+                    "altitude_econ",
+                    "thrust_econ",
+                    "engine_setting_econ",
                 ],
-            )
-
-            self.connect(
-                "compute_equilibrium_delta_m.delta_m",
-                ["compute_equilibrium_alpha.delta_m", "compute_equilibrium_thrust.delta_m"],
-            )
-
-            self.connect(
-                "compute_equilibrium_thrust.thrust",
-                [
-                    "compute_dep_effect.thrust",
-                    "preparation_for_energy_consumption.thrust",
-                    "compute_equilibrium_alpha.thrust",
-                ],
-            )
-
-            self.connect(
-                "preparation_for_energy_consumption.engine_setting_econ",
-                "compute_energy_consumed.engine_setting_econ",
-            )
-            self.connect(
-                "preparation_for_energy_consumption.thrust_econ",
-                "compute_energy_consumed.thrust_econ",
-            )
-            self.connect(
-                "preparation_for_energy_consumption.altitude_econ",
-                "compute_energy_consumed.altitude_econ",
-            )
-            self.connect(
-                "preparation_for_energy_consumption.exterior_temperature_econ",
-                "compute_energy_consumed.exterior_temperature_econ",
-            )
-            self.connect(
-                "preparation_for_energy_consumption.time_step_econ",
-                "compute_energy_consumed.time_step_econ",
-            )
-            self.connect(
-                "preparation_for_energy_consumption.true_airspeed_econ",
-                "compute_energy_consumed.true_airspeed_econ",
             )

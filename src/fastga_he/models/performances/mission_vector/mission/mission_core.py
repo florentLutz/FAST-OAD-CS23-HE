@@ -83,7 +83,7 @@ class MissionCore(om.Group):
             "compute_time_step",
             ComputeTimeStep(number_of_points=number_of_points),
             promotes_inputs=[],
-            promotes_outputs=[],
+            promotes_outputs=["time_step"],
         )
         options_equilibrium = {
             "number_of_points_climb": number_of_points_climb,
@@ -98,7 +98,14 @@ class MissionCore(om.Group):
         self.add_subsystem(
             "compute_dep_equilibrium",
             oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_EQUILIBRIUM, options=options_equilibrium),
-            promotes=["data:*"],
+            promotes=[
+                "data:*",
+                "mass",
+                "time_step",
+                "thrust_rate_t_econ",
+                "non_consumable_energy_t_econ",
+                "fuel_consumed_t_econ",
+            ],
         )
         self.add_subsystem(
             "performance_per_phase",
@@ -108,45 +115,18 @@ class MissionCore(om.Group):
                 number_of_points_descent=number_of_points_descent,
                 number_of_points_reserve=number_of_points_reserve,
             ),
-            promotes_inputs=[],
-            promotes_outputs=["data:*"],
+            promotes_inputs=[
+                "thrust_rate_t_econ",
+                "non_consumable_energy_t_econ",
+                "fuel_consumed_t_econ",
+            ],
+            promotes_outputs=["data:*", "fuel_consumed_t"],
         )
         self.add_subsystem("sizing_fuel", SizingEnergy(), promotes=["*"])
         self.add_subsystem(
             "update_mass",
             UpdateMass(number_of_points=number_of_points),
-            promotes_inputs=["data:*"],
-            promotes_outputs=[],
-        )
-
-        self.connect(
-            "compute_dep_equilibrium.compute_energy_consumed.fuel_consumed_t_econ",
-            "performance_per_phase.fuel_consumed_t_econ",
-        )
-
-        self.connect(
-            "compute_dep_equilibrium.compute_energy_consumed.non_consumable_energy_t_econ",
-            "performance_per_phase.non_consumable_energy_t_econ",
-        )
-
-        self.connect(
-            "compute_dep_equilibrium.compute_energy_consumed.thrust_rate_t_econ",
-            "performance_per_phase.thrust_rate_t_econ",
-        )
-
-        self.connect(
-            "update_mass.mass",
-            [
-                "compute_dep_equilibrium.compute_equilibrium_thrust.mass",
-                "compute_dep_equilibrium.compute_equilibrium_alpha.mass",
-            ],
-        )
-
-        self.connect("performance_per_phase.fuel_consumed_t", "update_mass.fuel_consumed_t")
-
-        self.connect(
-            "compute_time_step.time_step",
-            "compute_dep_equilibrium.preparation_for_energy_consumption.time_step",
+            promotes=["*"],
         )
 
     def guess_nonlinear(

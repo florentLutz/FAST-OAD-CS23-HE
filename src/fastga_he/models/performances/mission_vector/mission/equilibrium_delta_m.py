@@ -148,9 +148,9 @@ class EquilibriumDeltaM(om.ImplicitComponent):
             x_cg - x_htp
         ) * delta_m
         partials["delta_m", "delta_m"] = (
-            np.identity(number_of_points) * (x_cg - x_htp) * cl_delta_m * np.pi / 180.0
+            np.eye(number_of_points) * (x_cg - x_htp) * cl_delta_m * np.pi / 180.0
         )
-        partials["delta_m", "x_cg"] = (cl_wing + cl_htp) * np.identity(number_of_points)
+        partials["delta_m", "x_cg"] = (cl_wing + cl_htp) * np.eye(number_of_points)
         partials["delta_m", "data:geometry:wing:MAC:at25percent:x"] = -(cl_wing + cl_htp) * np.ones(
             number_of_points
         )

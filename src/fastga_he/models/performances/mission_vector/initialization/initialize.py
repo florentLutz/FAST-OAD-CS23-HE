@@ -16,6 +16,7 @@ from ..initialization.initialize_cg import InitializeCoG
 from ..initialization.initialize_airspeed import InitializeAirspeed
 from ..initialization.initialize_airspeed_derivatives import InitializeAirspeedDerivatives
 from ..initialization.initialize_altitude import InitializeAltitude
+from ..initialization.initialize_density import InitializeDensity
 from ..initialization.initialize_temperature import InitializeTemperature
 from ..initialization.initialize_gamma import InitializeGamma
 from ..initialization.initialize_horizontal_speed import InitializeHorizontalSpeed
@@ -75,6 +76,17 @@ class Initialize(om.Group):
             ),
             promotes_inputs=["data:*"],
             promotes_outputs=["*"],
+        )
+        self.add_subsystem(
+            "initialize_density",
+            InitializeDensity(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+                number_of_points_reserve=number_of_points_reserve,
+            ),
+            promotes_inputs=["altitude"],
+            promotes_outputs=[],
         )
         self.add_subsystem(
             "initialize_temperature",
