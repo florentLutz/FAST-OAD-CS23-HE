@@ -1588,21 +1588,19 @@ def test_performances_inverter_tot():
     expected_efficiency = np.array(
         [0.985, 0.986, 0.987, 0.987, 0.988, 0.988, 0.988, 0.989, 0.989, 0.989]
     )
-    assert problem.get_val("component.efficiency.efficiency") == pytest.approx(
-        expected_efficiency, rel=1e-2
-    )
+    assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-2)
     expected_temperature_igbt = np.array(
         [371.6, 381.1, 391.2, 401.8, 413.1, 424.9, 437.4, 450.6, 464.5, 479.3]
     )
-    assert problem.get_val(
-        "component.temperature_junction.IGBT_temperature", units="degK"
-    ) == pytest.approx(expected_temperature_igbt, rel=1e-2)
+    assert problem.get_val("IGBT_temperature", units="degK") == pytest.approx(
+        expected_temperature_igbt, rel=1e-2
+    )
     expected_temperature_diode = np.array(
         [352.7, 361.7, 370.8, 380.0, 389.2, 398.4, 407.6, 416.9, 426.2, 435.5]
     )
-    assert problem.get_val(
-        "component.temperature_junction.diode_temperature", units="degK"
-    ) == pytest.approx(expected_temperature_diode, rel=1e-2)
+    assert problem.get_val("diode_temperature", units="degK") == pytest.approx(
+        expected_temperature_diode, rel=1e-2
+    )
     expected_dc_current_in = np.array(
         [353.3, 422.31, 494.94, 571.07, 650.71, 733.97, 820.68, 911.02, 1005.04, 1102.5]
     )
