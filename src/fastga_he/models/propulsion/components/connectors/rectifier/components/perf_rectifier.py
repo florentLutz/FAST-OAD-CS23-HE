@@ -7,7 +7,6 @@ import openmdao.api as om
 from .perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from .perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from .perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
-from .perf_efficiency import PerformancesEfficiencyMission
 from .perf_modulation_index import PerformancesModulationIndex
 from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_resistance import PerformancesResistance
@@ -16,6 +15,7 @@ from .perf_conduction_loss import PerformancesConductionLosses
 from .perf_total_loss import PerformancesLosses
 from .perf_casing_temperature import PerformancesCasingTemperature
 from .perf_junction_temperature import PerformancesJunctionTemperature
+from .perf_efficiency import PerformancesEfficiency
 from .perf_load_side import PerformancesRectifierLoadSide
 from .perf_generator_side import PerformancesRectifierGeneratorSide
 from .perf_rectifier_relations import PerformancesRectifierRelations
@@ -82,9 +82,7 @@ class PerformancesRectifier(om.Group):
         )
         self.add_subsystem(
             "efficiency",
-            PerformancesEfficiencyMission(
-                number_of_points=number_of_points, rectifier_id=rectifier_id
-            ),
+            PerformancesEfficiency(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -117,7 +115,8 @@ class PerformancesRectifierTemperature(om.Group):
         super().__init__(**kwargs)
 
         # Solvers setup
-        self.nonlinear_solver = om.NonlinearBlockGS()
+        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
         self.nonlinear_solver.options["iprint"] = 0
         self.nonlinear_solver.options["maxiter"] = 50
         self.nonlinear_solver.options["rtol"] = 1e-5

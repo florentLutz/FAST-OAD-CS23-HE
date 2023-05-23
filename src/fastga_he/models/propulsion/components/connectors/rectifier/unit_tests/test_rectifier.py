@@ -16,7 +16,7 @@ from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_total_loss import PerformancesLosses
 from ..components.perf_casing_temperature import PerformancesCasingTemperature
 from ..components.perf_junction_temperature import PerformancesJunctionTemperature
-from ..components.perf_efficiency import PerformancesEfficiencyMission
+from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.sizing_energy_coefficient_scaling import SizingRectifierEnergyCoefficientScaling
@@ -477,42 +477,28 @@ def test_perf_junction_temperature():
 def test_efficiency():
     # Will eventually disappear
 
-    ivc = get_indep_var_comp(
-        list_inputs(
-            PerformancesEfficiencyMission(
-                rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
-            )
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "losses_rectifier",
+        val=np.array(
+            [1690.8, 2428.2, 3320.4, 4375.2, 5601.6, 7009.2, 8603.4, 10393.8, 12383.4, 14582.4]
         ),
-        __file__,
-        XML_FILE,
+        units="W",
     )
+    ivc.add_output("dc_current_out", units="A", val=np.linspace(300.0, 280.0, NB_POINTS_TEST))
+    ivc.add_output("dc_voltage_out", units="V", val=np.linspace(500.0, 480.0, NB_POINTS_TEST))
 
     problem = run_system(
-        PerformancesEfficiencyMission(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
+        PerformancesEfficiency(number_of_points=NB_POINTS_TEST),
         ivc,
     )
 
-    assert problem.get_val("efficiency") == pytest.approx(np.full(NB_POINTS_TEST, 0.98), rel=1e-2)
+    expected_efficiency = np.array(
+        [0.989, 0.984, 0.978, 0.971, 0.962, 0.953, 0.942, 0.93, 0.917, 0.902]
+    )
+    assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-2)
 
     problem.check_partials(compact_print=True)
-
-    ivc2 = om.IndepVarComp()
-    ivc2.add_output(
-        "data:propulsion:he_power_train:rectifier:rectifier_1:efficiency",
-        val=[0.98, 0.97, 0.96, 0.95, 0.94, 0.94, 0.95, 0.96, 0.97, 0.98],
-    )
-
-    problem2 = run_system(
-        PerformancesEfficiencyMission(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
-        ivc2,
-    )
-
-    assert problem2.get_val("efficiency") == pytest.approx(
-        np.array([0.98, 0.97, 0.96, 0.95, 0.94, 0.94, 0.95, 0.96, 0.97, 0.98]),
-        rel=1e-2,
-    )
-
-    problem2.check_partials(compact_print=True)
 
 
 def test_maximum():
@@ -796,7 +782,7 @@ def test_rectifier_weight():
     problem.check_partials(compact_print=True)
 
 
-def test_converter_cg():
+def test_rectifier_cg():
 
     expected_cg = [2.69, 0.45, 2.54]
 

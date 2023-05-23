@@ -74,12 +74,48 @@
                 </ICE>
                 <rectifier>
                     <rectifier_1>
+                        <power_factor>1.0</power_factor>
                         <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
                         <current_dc_max units="A" is_input="False">113.38180785745816<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
                         <efficiency is_input="True">0.98<!--Efficiency of the rectifier for the points--></efficiency>
                         <voltage_ac_max units="V" is_input="False">243.4614167842755<!--Maximum value of the peak voltage at the input of the rectifier (AC side)--></voltage_ac_max>
                         <voltage_dc_max units="V" is_input="False">850.0<!--Maximum value of the voltage at the output of the rectifier (DC side)--></voltage_dc_max>
                         <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
+                        <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
+                        <heat_sink_temperature_mission units="degK">12.0e3</heat_sink_temperature_mission>
+                        <casing>
+                            <thermal_resistance units="K/W">0.01</thermal_resistance>
+                        </casing>
+                        <scaling>
+                            <a>0.333</a>
+                            <c>3.0</c>
+                            <resistance>3.0</resistance>
+                        </scaling>
+                        <energy_on>
+                            <a>0.00528233</a>
+                            <b>3.326e-05</b>
+                            <c>1.54040339e-06</c>
+                        </energy_on>
+                        <energy_off>
+                            <a>0.00141464</a>
+                            <b>0.000254</b>
+                            <c>-1.35349615e-07</c>
+                        </energy_off>
+                        <energy_rr>
+                            <a>0.00501952</a>
+                            <b>0.000340</b>
+                            <c>-5.21717365e-07</c>
+                        </energy_rr>
+                        <igbt>
+                            <resistance units="ohm">4.53e-3</resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                            <thermal_resistance units="K/W">0.249</thermal_resistance>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">5.61e-3</resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                            <thermal_resistance units="K/W">0.321</thermal_resistance>
+                        </diode>
                     </rectifier_1>
                 </rectifier>
                 <generator>

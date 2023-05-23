@@ -100,8 +100,8 @@
         <ICE>
           <ice_1>
             <displacement_volume units="m**3" is_input="True">0.0107</displacement_volume>
-            <power_max_SL units="W" is_input="False">89815.28152228295<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
-            <shaft_power_max units="W" is_input="False">89815.28152228295<!--Maximum power seen during the mission, without accounting for altitude effect, only used for power rate--></shaft_power_max>
+            <power_max_SL units="W" is_input="False">89735.67029220791<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
+            <shaft_power_max units="W" is_input="False">89735.67029220791<!--Maximum power seen during the mission, without accounting for altitude effect, only used for power rate--></shaft_power_max>
             <strokes_number is_input="True">4.0</strokes_number>
           </ice_1>
         </ICE>
@@ -140,12 +140,12 @@
         </battery_pack>
         <generator>
           <generator_1>
-            <current_ac_max units="A" is_input="False">41.26692910388729<!--Maximum value of the RMS current flowing through one phase of the generator--></current_ac_max>
-            <losses_max units="W" is_input="False">4392.73827723624</losses_max>
+            <current_ac_max units="A" is_input="False">41.23098837692319<!--Maximum value of the RMS current flowing through one phase of the generator--></current_ac_max>
+            <losses_max units="W" is_input="False">4387.524351976919</losses_max>
             <rpm_max units="1/min" is_input="False">2500.0<!--Maximum value of the generator rpm--></rpm_max>
             <rpm_mission units="1/min" is_input="True">2500.0<!--RPM of the propeller for the points--></rpm_mission>
-            <shaft_power_max units="W" is_input="False">89815.28152228295</shaft_power_max>
-            <torque_max units="N*m" is_input="False">343.06910446707604<!--Maximum value of the torque the generator receives--></torque_max>
+            <shaft_power_max units="W" is_input="False">89735.67029220791</shaft_power_max>
+            <torque_max units="N*m" is_input="False">342.7650119680664<!--Maximum value of the torque the generator receives--></torque_max>
             <voltage_ac_max units="V" is_input="False">845.0739612601964<!--Maximum value of the peak voltage at the output of the generator--></voltage_ac_max>
             <voltage_out_target_mission units="V" is_input="True">690.0<!--Target output voltage of the generator for the points--></voltage_out_target_mission>
             <loss_coefficient>
@@ -225,12 +225,53 @@
         </propeller>
         <rectifier>
           <rectifier_1>
-            <current_ac_max units="A" is_input="False">41.26692910388729<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
+            <current_ac_max units="A" is_input="False">41.23098837692319<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
             <current_dc_max units="A" is_input="False">98.48716750605382<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
-            <efficiency is_input="True">0.98<!--Efficiency of the rectifier for the points--></efficiency>
+            <heat_sink_temperature_mission units="degK" is_input="True">12000.0<!--Heat sink temperature of the rectifier for the points--></heat_sink_temperature_mission>
+            <power_factor is_input="True">1.0</power_factor>
+            <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum value of the switching frequency of the rectifier--></switching_frequency_max>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the rectifier for the points--></switching_frequency_mission>
             <voltage_ac_max units="V" is_input="False">845.0739612601964<!--Maximum value of the peak voltage at the input of the rectifier (AC side)--></voltage_ac_max>
             <voltage_dc_max units="V" is_input="False">850.0<!--Maximum value of the voltage at the output of the rectifier (DC side)--></voltage_dc_max>
             <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
+            <casing>
+              <thermal_resistance units="degK/W" is_input="True">0.01<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
+            </casing>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+              <resistance units="ohm" is_input="True">0.00561</resistance>
+              <thermal_resistance units="degK/W" is_input="True">0.321<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
+            </diode>
+            <energy_off>
+              <a is_input="True">0.00141464</a>
+              <b is_input="True">0.000254</b>
+              <c is_input="True">-1.35349615e-07</c>
+            </energy_off>
+            <energy_on>
+              <a is_input="True">0.00528233</a>
+              <b is_input="True">3.326e-05</b>
+              <c is_input="True">1.54040339e-06</c>
+            </energy_on>
+            <energy_rr>
+              <a is_input="True">0.00501952</a>
+              <b is_input="True">0.00034</b>
+              <c is_input="True">-5.21717365e-07</c>
+            </energy_rr>
+            <igbt>
+              <gate_voltage units="V" is_input="True">0.87</gate_voltage>
+              <resistance units="ohm" is_input="True">0.00453</resistance>
+              <thermal_resistance units="degK/W" is_input="True">0.249<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
+            </igbt>
+            <properties>
+              <resistance_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">0.0033</diode>
+                <igbt units="1/degK" is_input="True">0.0041</igbt>
+              </resistance_temperature_scale_factor>
+              <voltage_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">-0.0022</diode>
+                <igbt units="1/degK" is_input="True">-0.00105</igbt>
+              </voltage_temperature_scale_factor>
+            </properties>
           </rectifier_1>
         </rectifier>
       </he_power_train>

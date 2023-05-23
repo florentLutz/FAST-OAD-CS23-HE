@@ -638,12 +638,43 @@
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the rectifier center of gravity--></x>
             </CG>
+            <casing>
+              <thermal_resistance units="degK/W" is_input="False">0.01<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
+            </casing>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
+            <diode>
+              <resistance units="ohm" is_input="False">0.005097896879589443</resistance>
+              <thermal_resistance units="degK/W" is_input="False">0.2916978428428184</thermal_resistance>
+            </diode>
+            <energy_off>
+              <a is_input="False">0.0015583011675711722</a>
+              <b is_input="False">0.00034030311012866587</b>
+              <c is_input="False">-1.2299436377773738e-07</c>
+            </energy_off>
+            <energy_on>
+              <a is_input="False">0.005818780372404077</a>
+              <b is_input="False">3.3256504177779456e-05</b>
+              <c is_input="False">1.3997892367667836e-06</c>
+            </energy_on>
+            <energy_rr>
+              <a is_input="False">0.005529277134425411</a>
+              <b is_input="False">0.0002539092853205021</b>
+              <c is_input="False">-4.740929279958174e-07</c>
+            </energy_rr>
+            <igbt>
+              <resistance units="ohm" is_input="False">0.004116483576566877</resistance>
+              <thermal_resistance units="degK/W" is_input="False">0.22627028930798065</thermal_resistance>
+            </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
+            <scaling>
+              <a is_input="False">0.3668179337810771</a>
+              <c is_input="False">2.726148063951574</c>
+              <resistance is_input="False">2.726148063951574</resistance>
+            </scaling>
           </rectifier_1>
         </rectifier>
       </he_power_train>

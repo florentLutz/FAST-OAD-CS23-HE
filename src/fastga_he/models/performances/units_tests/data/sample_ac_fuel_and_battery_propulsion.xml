@@ -828,12 +828,20 @@
         </ICE>
         <rectifier>
             <rectifier_1>
+                <power_factor>1.0</power_factor>
                 <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
                 <current_dc_max units="A" is_input="False">113.38180785745816<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
-                <efficiency is_input="True">0.98<!--Efficiency of the rectifier for the points--></efficiency>
+                <heat_sink_temperature_mission units="degK" is_input="True">273.15</heat_sink_temperature_mission>
+                <switching_frequency_mission units="Hz" is_input="True">12.0e3</switching_frequency_mission>
                 <voltage_ac_max units="V" is_input="False">243.4614167842755<!--Maximum value of the peak voltage at the input of the rectifier (AC side)--></voltage_ac_max>
                 <voltage_dc_max units="V" is_input="False">650.0<!--Maximum value of the voltage at the output of the rectifier (DC side)--></voltage_dc_max>
                 <voltage_out_target_mission units="V" is_input="True">650.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
+                <igbt>
+                    <gate_voltage units="V">0.87</gate_voltage>
+                </igbt>
+                <diode>
+                    <gate_voltage units="V">1.3</gate_voltage>
+                </diode>
             </rectifier_1>
         </rectifier>
         <generator>
