@@ -2,10 +2,11 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import os.path as pth
+
 import numpy as np
 import pytest
 import openmdao.api as om
-import fastoad.api as oad
 
 from stdatm import Atmosphere
 
@@ -818,6 +819,8 @@ def test_performances_harness():
     ) == pytest.approx(800.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_resistance_no_loop():
