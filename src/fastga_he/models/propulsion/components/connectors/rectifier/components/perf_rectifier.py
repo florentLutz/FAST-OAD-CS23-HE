@@ -14,6 +14,8 @@ from .perf_resistance import PerformancesResistance
 from .perf_gate_voltage import PerformancesGateVoltage
 from .perf_conduction_loss import PerformancesConductionLosses
 from .perf_total_loss import PerformancesLosses
+from .perf_casing_temperature import PerformancesCasingTemperature
+from .perf_junction_temperature import PerformancesJunctionTemperature
 from .perf_load_side import PerformancesRectifierLoadSide
 from .perf_generator_side import PerformancesRectifierGeneratorSide
 from .perf_rectifier_relations import PerformancesRectifierRelations
@@ -72,25 +74,10 @@ class PerformancesRectifier(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "resistance_profile",
-            PerformancesResistance(number_of_points=number_of_points, rectifier_id=rectifier_id),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            "gate_voltage_profile",
-            PerformancesGateVoltage(number_of_points=number_of_points, rectifier_id=rectifier_id),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            "conduction_losses",
-            PerformancesConductionLosses(
+            "temperature_profile",
+            PerformancesRectifierTemperature(
                 number_of_points=number_of_points, rectifier_id=rectifier_id
             ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            "total_losses",
-            PerformancesLosses(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -123,3 +110,71 @@ class PerformancesRectifier(om.Group):
 
         self.connect("converter_relation.power_rel", "load_side.power")
         self.connect("converter_relation.voltage_out_rel", "generator_side.voltage_target")
+
+
+class PerformancesRectifierTemperature(om.Group):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Solvers setup
+        self.nonlinear_solver = om.NonlinearBlockGS()
+        self.nonlinear_solver.options["iprint"] = 0
+        self.nonlinear_solver.options["maxiter"] = 50
+        self.nonlinear_solver.options["rtol"] = 1e-5
+        self.nonlinear_solver.options["stall_limit"] = 10
+        self.nonlinear_solver.options["stall_tol"] = 1e-5
+        self.linear_solver = om.DirectSolver()
+
+    def initialize(self):
+
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            name="rectifier_id",
+            default=None,
+            desc="Identifier of the rectifier",
+            allow_none=False,
+        )
+
+    def setup(self):
+
+        rectifier_id = self.options["rectifier_id"]
+        number_of_points = self.options["number_of_points"]
+
+        self.add_subsystem(
+            "resistance_profile",
+            PerformancesResistance(number_of_points=number_of_points, rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "gate_voltage_profile",
+            PerformancesGateVoltage(number_of_points=number_of_points, rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "conduction_losses",
+            PerformancesConductionLosses(
+                number_of_points=number_of_points, rectifier_id=rectifier_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "total_losses",
+            PerformancesLosses(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "casing_temperature",
+            PerformancesCasingTemperature(
+                number_of_points=number_of_points, rectifier_id=rectifier_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "junction_temperature",
+            PerformancesJunctionTemperature(
+                number_of_points=number_of_points, rectifier_id=rectifier_id
+            ),
+            promotes=["*"],
+        )

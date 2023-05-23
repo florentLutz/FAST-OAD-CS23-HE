@@ -8,6 +8,8 @@ from .sizing_energy_coefficient_scaling import SizingRectifierEnergyCoefficientS
 from .sizing_energy_coefficients import SizingRectifierEnergyCoefficients
 from .sizing_resistance_scaling import SizingRectifierResistanceScaling
 from .sizing_reference_resistance import SizingRectifierResistances
+from .sizing_thermal_resistance import SizingRectifierThermalResistances
+from .sizing_thermal_resistance_casing import SizingRectifierCasingThermalResistance
 from .sizing_rectifier_weight import SizingRectifierWeight
 from .sizing_rectifier_cg import SizingRectifierCG
 from .sizing_rectifier_drag import SizingRectifierDrag
@@ -64,6 +66,16 @@ class SizingRectifier(om.Group):
         self.add_subsystem(
             name="reference_resistance",
             subsys=SizingRectifierResistances(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="thermal_resistance",
+            subsys=SizingRectifierThermalResistances(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="thermal_resistance_casing",
+            subsys=SizingRectifierCasingThermalResistance(rectifier_id=rectifier_id),
             promotes=["*"],
         )
         self.add_subsystem(

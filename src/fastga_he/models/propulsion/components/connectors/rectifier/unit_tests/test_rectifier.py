@@ -14,6 +14,8 @@ from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_gate_voltage import PerformancesGateVoltage
 from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_total_loss import PerformancesLosses
+from ..components.perf_casing_temperature import PerformancesCasingTemperature
+from ..components.perf_junction_temperature import PerformancesJunctionTemperature
 from ..components.perf_efficiency import PerformancesEfficiencyMission
 from ..components.perf_maximum import PerformancesMaximum
 
@@ -21,6 +23,8 @@ from ..components.sizing_energy_coefficient_scaling import SizingRectifierEnergy
 from ..components.sizing_energy_coefficients import SizingRectifierEnergyCoefficients
 from ..components.sizing_resistance_scaling import SizingRectifierResistanceScaling
 from ..components.sizing_reference_resistance import SizingRectifierResistances
+from ..components.sizing_thermal_resistance import SizingRectifierThermalResistances
+from ..components.sizing_thermal_resistance_casing import SizingRectifierCasingThermalResistance
 from ..components.sizing_rectifier_weight import SizingRectifierWeight
 from ..components.sizing_rectifier_cg import SizingRectifierCG
 
@@ -366,6 +370,110 @@ def test_total_losses_rectifier():
     problem.check_partials(compact_print=True)
 
 
+def test_perf_casing_temperature():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesCasingTemperature(
+                rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    total_losses = np.array(
+        [1690.8, 2428.2, 3320.4, 4375.2, 5601.6, 7009.2, 8603.4, 10393.8, 12383.4, 14582.4]
+    )
+    ivc.add_output("losses_rectifier", val=total_losses, units="W")
+    ivc.add_output("heat_sink_temperature", units="degK", val=np.full_like(total_losses, 288.15))
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesCasingTemperature(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    expected_temperature = np.array(
+        [293.8, 296.2, 299.2, 302.7, 306.8, 311.5, 316.8, 322.8, 329.4, 336.8]
+    )
+    assert (
+        problem.get_val(
+            "casing_temperature",
+            units="degK",
+        )
+        == pytest.approx(expected_temperature, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_perf_junction_temperature():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesJunctionTemperature(
+                rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "casing_temperature",
+        units="degK",
+        val=np.array([293.8, 296.2, 299.2, 302.7, 306.8, 311.5, 316.8, 322.8, 329.4, 336.8]),
+    )
+    ivc.add_output(
+        "switching_losses_IGBT",
+        [107.1, 175.2, 263.6, 374.4, 510.0, 672.8, 865.1, 1089.3, 1347.7, 1642.6],
+        units="W",
+    )
+    ivc.add_output(
+        "switching_losses_diode",
+        [56.8, 82.6, 110.5, 139.4, 168.6, 197.3, 224.4, 249.2, 270.7, 288.2],
+        units="W",
+    )
+    ivc.add_output(
+        "conduction_losses_IGBT",
+        [54.1, 74.4, 99.4, 129.8, 166.0, 208.6, 257.9, 314.2, 377.5, 448.3],
+        units="W",
+    )
+    ivc.add_output(
+        "conduction_losses_diode",
+        [63.8, 72.5, 79.9, 85.6, 89.0, 89.5, 86.5, 79.6, 68.0, 51.3],
+        units="W",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesJunctionTemperature(
+            rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    expected_temperature_diode = np.array(
+        [332.5, 346.0, 360.3, 374.9, 389.5, 403.6, 416.6, 428.3, 438.1, 445.8]
+    )
+    assert (
+        problem.get_val(
+            "diode_temperature",
+            units="degK",
+        )
+        == pytest.approx(expected_temperature_diode, rel=1e-2)
+    )
+    expected_temperature_igbt = np.array(
+        [333.9, 358.4, 389.6, 428.2, 475.1, 531.0, 596.4, 672.3, 759.0, 857.4]
+    )
+    assert (
+        problem.get_val(
+            "IGBT_temperature",
+            units="degK",
+        )
+        == pytest.approx(expected_temperature_igbt, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_efficiency():
     # Will eventually disappear
 
@@ -625,6 +733,49 @@ def test_resistance():
     problem.check_partials(compact_print=True)
 
 
+def test_thermal_resistance_casing():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierCasingThermalResistance(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierCasingThermalResistance(rectifier_id="rectifier_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:casing:thermal_resistance",
+            units="K/W",
+        )
+        == pytest.approx(0.010, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_thermal_resistance():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierThermalResistances(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierThermalResistances(rectifier_id="rectifier_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:igbt:thermal_resistance", units="K/W"
+    ) == pytest.approx(0.249, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:diode:thermal_resistance", units="K/W"
+    ) == pytest.approx(0.321, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_rectifier_weight():
 
     ivc = get_indep_var_comp(
@@ -711,11 +862,6 @@ def test_performances_rectifier():
         units="V",
         val=np.linspace(500.0, 480.0, NB_POINTS_TEST) / np.sqrt(3.0 / 2.0),
     )
-    temperature = np.array(
-        [288.15, 301.626, 313.719, 324.429, 333.762, 341.721, 348.306, 353.523, 357.375, 359.862]
-    )
-    ivc.add_output("diode_temperature", units="degK", val=temperature)
-    ivc.add_output("IGBT_temperature", units="degK", val=temperature)
 
     problem = run_system(
         PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST), ivc
