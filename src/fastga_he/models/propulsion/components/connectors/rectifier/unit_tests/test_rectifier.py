@@ -25,6 +25,9 @@ from ..components.sizing_resistance_scaling import SizingRectifierResistanceScal
 from ..components.sizing_reference_resistance import SizingRectifierResistances
 from ..components.sizing_thermal_resistance import SizingRectifierThermalResistances
 from ..components.sizing_thermal_resistance_casing import SizingRectifierCasingThermalResistance
+from ..components.sizing_capacitor_current_caliber import SizingRectifierCapacitorCurrentCaliber
+from ..components.sizing_capacitor_capacity import SizingRectifierCapacitorCapacity
+from ..components.sizing_capacitor_weight import SizingRectifierCapacitorWeight
 from ..components.sizing_rectifier_weight import SizingRectifierWeight
 from ..components.sizing_rectifier_cg import SizingRectifierCG
 
@@ -807,6 +810,72 @@ def test_thermal_resistance():
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:diode:thermal_resistance", units="K/W"
     ) == pytest.approx(0.321, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_capacitor_current_caliber():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierCapacitorCurrentCaliber(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierCapacitorCurrentCaliber(rectifier_id="rectifier_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:capacitor:current_caliber",
+            units="A",
+        )
+        == pytest.approx(68.91, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_capacitor_capacity():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierCapacitorCapacity(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierCapacitorCapacity(rectifier_id="rectifier_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:capacitor:capacity",
+            units="F",
+        )
+        == pytest.approx(4.33e-4, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_capacitor_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierCapacitorWeight(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierCapacitorWeight(rectifier_id="rectifier_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:capacitor:mass",
+            units="kg",
+        )
+        == pytest.approx(1.162, rel=1e-2)
+    )
 
     problem.check_partials(compact_print=True)
 

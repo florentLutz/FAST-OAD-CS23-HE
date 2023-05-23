@@ -10,6 +10,9 @@ from .sizing_resistance_scaling import SizingRectifierResistanceScaling
 from .sizing_reference_resistance import SizingRectifierResistances
 from .sizing_thermal_resistance import SizingRectifierThermalResistances
 from .sizing_thermal_resistance_casing import SizingRectifierCasingThermalResistance
+from .sizing_capacitor_current_caliber import SizingRectifierCapacitorCurrentCaliber
+from .sizing_capacitor_capacity import SizingRectifierCapacitorCapacity
+from .sizing_capacitor_weight import SizingRectifierCapacitorWeight
 from .sizing_rectifier_weight import SizingRectifierWeight
 from .sizing_rectifier_cg import SizingRectifierCG
 from .sizing_rectifier_drag import SizingRectifierDrag
@@ -76,6 +79,21 @@ class SizingRectifier(om.Group):
         self.add_subsystem(
             name="thermal_resistance_casing",
             subsys=SizingRectifierCasingThermalResistance(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="capacitor_capacity",
+            subsys=SizingRectifierCapacitorCapacity(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="capacitor_caliber",
+            subsys=SizingRectifierCapacitorCurrentCaliber(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="capacitor_weight",
+            subsys=SizingRectifierCapacitorWeight(rectifier_id=rectifier_id),
             promotes=["*"],
         )
         self.add_subsystem(
