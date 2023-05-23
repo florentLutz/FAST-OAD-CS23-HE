@@ -13,6 +13,7 @@ from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_gate_voltage import PerformancesGateVoltage
 from ..components.perf_conduction_loss import PerformancesConductionLosses
+from ..components.perf_total_loss import PerformancesLosses
 from ..components.perf_efficiency import PerformancesEfficiencyMission
 from ..components.perf_maximum import PerformancesMaximum
 
@@ -324,6 +325,42 @@ def test_conduction_losses():
     expected_losses_diode = np.array([63.8, 72.5, 79.9, 85.6, 89.0, 89.5, 86.5, 79.6, 68.0, 51.3])
     assert problem.get_val("conduction_losses_diode", units="W") == pytest.approx(
         expected_losses_diode, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_total_losses_rectifier():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "switching_losses_IGBT",
+        [107.1, 175.2, 263.6, 374.4, 510.0, 672.8, 865.1, 1089.3, 1347.7, 1642.6],
+        units="W",
+    )
+    ivc.add_output(
+        "switching_losses_diode",
+        [56.8, 82.6, 110.5, 139.4, 168.6, 197.3, 224.4, 249.2, 270.7, 288.2],
+        units="W",
+    )
+    ivc.add_output(
+        "conduction_losses_IGBT",
+        [54.1, 74.4, 99.4, 129.8, 166.0, 208.6, 257.9, 314.2, 377.5, 448.3],
+        units="W",
+    )
+    ivc.add_output(
+        "conduction_losses_diode",
+        [63.8, 72.5, 79.9, 85.6, 89.0, 89.5, 86.5, 79.6, 68.0, 51.3],
+        units="W",
+    )
+
+    problem = run_system(PerformancesLosses(number_of_points=NB_POINTS_TEST), ivc)
+
+    expected_losses = np.array(
+        [1690.8, 2428.2, 3320.4, 4375.2, 5601.6, 7009.2, 8603.4, 10393.8, 12383.4, 14582.4]
+    )
+    assert problem.get_val("losses_rectifier", units="W") == pytest.approx(
+        expected_losses, rel=1e-2
     )
 
     problem.check_partials(compact_print=True)

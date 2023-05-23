@@ -13,6 +13,7 @@ from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_resistance import PerformancesResistance
 from .perf_gate_voltage import PerformancesGateVoltage
 from .perf_conduction_loss import PerformancesConductionLosses
+from .perf_total_loss import PerformancesLosses
 from .perf_load_side import PerformancesRectifierLoadSide
 from .perf_generator_side import PerformancesRectifierGeneratorSide
 from .perf_rectifier_relations import PerformancesRectifierRelations
@@ -85,6 +86,11 @@ class PerformancesRectifier(om.Group):
             PerformancesConductionLosses(
                 number_of_points=number_of_points, rectifier_id=rectifier_id
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "total_losses",
+            PerformancesLosses(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(
