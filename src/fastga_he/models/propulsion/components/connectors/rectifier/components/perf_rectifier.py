@@ -10,6 +10,9 @@ from .perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
 from .perf_efficiency import PerformancesEfficiencyMission
 from .perf_modulation_index import PerformancesModulationIndex
 from .perf_switching_losses import PerformancesSwitchingLosses
+from .perf_resistance import PerformancesResistance
+from .perf_gate_voltage import PerformancesGateVoltage
+from .perf_conduction_loss import PerformancesConductionLosses
 from .perf_load_side import PerformancesRectifierLoadSide
 from .perf_generator_side import PerformancesRectifierGeneratorSide
 from .perf_rectifier_relations import PerformancesRectifierRelations
@@ -63,6 +66,23 @@ class PerformancesRectifier(om.Group):
         self.add_subsystem(
             "switching_losses",
             PerformancesSwitchingLosses(
+                number_of_points=number_of_points, rectifier_id=rectifier_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "resistance_profile",
+            PerformancesResistance(number_of_points=number_of_points, rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "gate_voltage_profile",
+            PerformancesGateVoltage(number_of_points=number_of_points, rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "conduction_losses",
+            PerformancesConductionLosses(
                 number_of_points=number_of_points, rectifier_id=rectifier_id
             ),
             promotes=["*"],

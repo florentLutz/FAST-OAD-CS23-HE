@@ -10,11 +10,16 @@ from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMis
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
+from ..components.perf_resistance import PerformancesResistance
+from ..components.perf_gate_voltage import PerformancesGateVoltage
+from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_efficiency import PerformancesEfficiencyMission
 from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.sizing_energy_coefficient_scaling import SizingRectifierEnergyCoefficientScaling
 from ..components.sizing_energy_coefficients import SizingRectifierEnergyCoefficients
+from ..components.sizing_resistance_scaling import SizingRectifierResistanceScaling
+from ..components.sizing_reference_resistance import SizingRectifierResistances
 from ..components.sizing_rectifier_weight import SizingRectifierWeight
 from ..components.sizing_rectifier_cg import SizingRectifierCG
 
@@ -168,6 +173,160 @@ def test_heat_sink_temperature_mission():
     )
 
     problem3.check_partials(compact_print=True)
+
+
+def test_switching_losses():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesSwitchingLosses(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "ac_current_rms_in_one_phase", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A"
+    )
+    ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST))
+
+    problem = run_system(
+        PerformancesSwitchingLosses(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    expected_losses_igbt = np.array(
+        [107.1, 175.2, 263.6, 374.4, 510.0, 672.8, 865.1, 1089.3, 1347.7, 1642.6]
+    )
+    assert problem.get_val("switching_losses_IGBT", units="W") == pytest.approx(
+        expected_losses_igbt, rel=1e-2
+    )
+    expected_losses_diode = np.array(
+        [56.8, 82.6, 110.5, 139.4, 168.6, 197.3, 224.4, 249.2, 270.7, 288.2]
+    )
+    assert problem.get_val("switching_losses_diode", units="W") == pytest.approx(
+        expected_losses_diode, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_resistance_profile():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesResistance(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    temperature = np.array(
+        [288.15, 301.626, 313.719, 324.429, 333.762, 341.721, 348.306, 353.523, 357.375, 359.862]
+    )
+    ivc.add_output("diode_temperature", units="degK", val=temperature)
+    ivc.add_output("IGBT_temperature", units="degK", val=temperature)
+
+    problem = run_system(
+        PerformancesResistance(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+    expected_resistance_igbt = (
+        np.array([4.44, 4.69, 4.91, 5.11, 5.28, 5.43, 5.55, 5.65, 5.72, 5.77]) * 1e-3
+    )
+    assert problem.get_val("resistance_igbt", units="ohm") == pytest.approx(
+        expected_resistance_igbt, rel=1e-2
+    )
+    resistance_diode = np.array([5.52, 5.77, 5.99, 6.19, 6.36, 6.51, 6.63, 6.73, 6.8, 6.85]) * 1e-3
+    assert problem.get_val("resistance_diode", units="ohm") == pytest.approx(
+        resistance_diode, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_gate_voltage_profile():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesGateVoltage(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    temperature = np.array(
+        [288.15, 301.626, 313.719, 324.429, 333.762, 341.721, 348.306, 353.523, 357.375, 359.862]
+    )
+    ivc.add_output("diode_temperature", units="degK", val=temperature)
+    ivc.add_output("IGBT_temperature", units="degK", val=temperature)
+
+    problem = run_system(
+        PerformancesGateVoltage(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+    expected_gate_voltage_igbt = np.array(
+        [0.875, 0.862, 0.851, 0.841, 0.833, 0.826, 0.82, 0.815, 0.811, 0.809]
+    )
+    assert problem.get_val("gate_voltage_igbt", units="V") == pytest.approx(
+        expected_gate_voltage_igbt, rel=1e-2
+    )
+    expected_gate_voltage_diode = np.array(
+        [1.314, 1.276, 1.241, 1.211, 1.184, 1.161, 1.142, 1.127, 1.116, 1.109]
+    )
+    assert problem.get_val("gate_voltage_diode", units="V") == pytest.approx(
+        expected_gate_voltage_diode, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_conduction_losses():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesConductionLosses(
+                rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "ac_current_rms_in_one_phase", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A"
+    )
+    ivc.add_output("modulation_index", np.linspace(0.1, 1.0, NB_POINTS_TEST))
+    ivc.add_output(
+        "resistance_igbt",
+        np.array([4.44, 4.69, 4.91, 5.11, 5.28, 5.43, 5.55, 5.65, 5.72, 5.77]) * 1e-3,
+        units="ohm",
+    )
+    ivc.add_output(
+        "resistance_diode",
+        np.array([5.52, 5.77, 5.99, 6.19, 6.36, 6.51, 6.63, 6.73, 6.8, 6.85]) * 1e-3,
+        units="ohm",
+    )
+    ivc.add_output(
+        "gate_voltage_igbt",
+        np.array([0.875, 0.862, 0.851, 0.841, 0.833, 0.826, 0.82, 0.815, 0.811, 0.809]),
+        units="V",
+    )
+    ivc.add_output(
+        "gate_voltage_diode",
+        np.array([1.314, 1.276, 1.241, 1.211, 1.184, 1.161, 1.142, 1.127, 1.116, 1.109]),
+        units="V",
+    )
+
+    problem = run_system(
+        PerformancesConductionLosses(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    expected_losses_igbt = np.array(
+        [54.1, 74.4, 99.4, 129.8, 166.0, 208.6, 257.9, 314.2, 377.5, 448.3]
+    )
+    assert problem.get_val("conduction_losses_IGBT", units="W") == pytest.approx(
+        expected_losses_igbt, rel=1e-2
+    )
+    expected_losses_diode = np.array([63.8, 72.5, 79.9, 85.6, 89.0, 89.5, 86.5, 79.6, 68.0, 51.3])
+    assert problem.get_val("conduction_losses_diode", units="W") == pytest.approx(
+        expected_losses_diode, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
 
 
 def test_efficiency():
@@ -392,36 +551,39 @@ def test_energy_coefficient():
     problem.check_partials(compact_print=True)
 
 
-def test_switching_losses():
+def test_resistance_scaling():
 
+    # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(
-            PerformancesSwitchingLosses(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)
-        ),
+        list_inputs(SizingRectifierResistanceScaling(rectifier_id="rectifier_1")),
         __file__,
         XML_FILE,
     )
-    ivc.add_output(
-        "ac_current_rms_in_one_phase", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A"
-    )
-    ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST))
 
-    problem = run_system(
-        PerformancesSwitchingLosses(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
-        ivc,
+    problem = run_system(SizingRectifierResistanceScaling(rectifier_id="rectifier_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:scaling:resistance"
+    ) == pytest.approx(3.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_resistance():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierResistances(rectifier_id="rectifier_1")), __file__, XML_FILE
     )
-    expected_losses_igbt = np.array(
-        [107.1, 175.2, 263.6, 374.4, 510.0, 672.8, 865.1, 1089.3, 1347.7, 1642.6]
-    )
-    assert problem.get_val("switching_losses_IGBT", units="W") == pytest.approx(
-        expected_losses_igbt, rel=1e-2
-    )
-    expected_losses_diode = np.array(
-        [56.8, 82.6, 110.5, 139.4, 168.6, 197.3, 224.4, 249.2, 270.7, 288.2]
-    )
-    assert problem.get_val("switching_losses_diode", units="W") == pytest.approx(
-        expected_losses_diode, rel=1e-2
-    )
+
+    problem = run_system(SizingRectifierResistances(rectifier_id="rectifier_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:igbt:resistance", units="ohm"
+    ) == pytest.approx(4.53e-3, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:diode:resistance", units="ohm"
+    ) == pytest.approx(5.61e-3, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -512,6 +674,11 @@ def test_performances_rectifier():
         units="V",
         val=np.linspace(500.0, 480.0, NB_POINTS_TEST) / np.sqrt(3.0 / 2.0),
     )
+    temperature = np.array(
+        [288.15, 301.626, 313.719, 324.429, 333.762, 341.721, 348.306, 353.523, 357.375, 359.862]
+    )
+    ivc.add_output("diode_temperature", units="degK", val=temperature)
+    ivc.add_output("IGBT_temperature", units="degK", val=temperature)
 
     problem = run_system(
         PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST), ivc

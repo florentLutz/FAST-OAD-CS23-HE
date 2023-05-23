@@ -22,6 +22,7 @@
             <he_power_train>
                 <rectifier>
                     <rectifier_1>
+                        <power_factor>1.0</power_factor>
                         <current_ac_max units="A">133.0</current_ac_max>
                         <current_ac_caliber units="A">150.0</current_ac_caliber>
                         <voltage_ac_max units="V">800.0</voltage_ac_max>
@@ -33,6 +34,7 @@
                         <scaling>
                             <a>0.333</a>
                             <c>3.0</c>
+                            <resistance>3.0</resistance>
                         </scaling>
                         <energy_on>
                             <a>0.00528233</a>
@@ -49,6 +51,14 @@
                             <b>0.000340</b>
                             <c>-5.21717365e-07</c>
                         </energy_rr>
+                        <igbt>
+                            <resistance units="ohm">4.53e-3</resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">5.61e-3</resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                        </diode>
                     </rectifier_1>
                 </rectifier>
             </he_power_train>
