@@ -8,6 +8,7 @@ import fastoad.api as oad
 from ..constants import (
     SUBMODEL_CONSTRAINTS_RECTIFIER_CURRENT_IN_RMS_1_PHASE,
     SUBMODEL_CONSTRAINTS_RECTIFIER_VOLTAGE_IN,
+    SUBMODEL_CONSTRAINTS_RECTIFIER_FREQUENCY,
 )
 
 
@@ -40,6 +41,13 @@ class ConstraintsRectifier(om.Group):
             name="constraint_ac_voltage_peak",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_RECTIFIER_VOLTAGE_IN, options=option_rectifier_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="constraint_frequency",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_RECTIFIER_FREQUENCY, options=option_rectifier_id
             ),
             promotes=["*"],
         )

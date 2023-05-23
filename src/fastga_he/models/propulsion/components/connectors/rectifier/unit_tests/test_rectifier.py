@@ -34,8 +34,13 @@ from ..components.perf_rectifier import PerformancesRectifier
 from ..components.cstr_enforce import (
     ConstraintsCurrentRMS1PhaseEnforce,
     ConstraintsVoltagePeakEnforce,
+    ConstraintsFrequencyEnforce,
 )
-from ..components.cstr_ensure import ConstraintsCurrentRMS1PhaseEnsure, ConstraintsVoltagePeakEnsure
+from ..components.cstr_ensure import (
+    ConstraintsCurrentRMS1PhaseEnsure,
+    ConstraintsVoltagePeakEnsure,
+    ConstraintsFrequencyEnsure,
+)
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -578,6 +583,26 @@ def test_constraint_enforce_voltage():
     problem.check_partials(compact_print=True)
 
 
+def test_constraint_enforce_frequency():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsFrequencyEnforce(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsFrequencyEnforce(rectifier_id="rectifier_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency", units="Hz"
+    ) == pytest.approx(12.0e3, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraint_ensure_current():
 
     ivc = get_indep_var_comp(
@@ -614,6 +639,30 @@ def test_constraint_ensure_voltage():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:rectifier:rectifier_1:voltage_ac_caliber", units="V"
     ) == pytest.approx(-10.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_ensure_frequency():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsFrequencyEnsure(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        ConstraintsFrequencyEnsure(rectifier_id="rectifier_1"),
+        ivc,
+    )
+
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency",
+            units="Hz",
+        )
+        == pytest.approx(-3.0e3, rel=1e-2)
+    )
 
     problem.check_partials(compact_print=True)
 

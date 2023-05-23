@@ -23,6 +23,8 @@
                 <rectifier>
                     <rectifier_1>
                         <power_factor>1.0</power_factor>
+                        <switching_frequency units="Hz">15.0e3</switching_frequency>
+                        <switching_frequency_max units="Hz">12.0e3</switching_frequency_max>
                         <current_ac_max units="A">133.0</current_ac_max>
                         <current_ac_caliber units="A">150.0</current_ac_caliber>
                         <voltage_ac_max units="V">800.0</voltage_ac_max>
@@ -30,7 +32,7 @@
                         <efficiency>0.98</efficiency>
                         <voltage_out_target_mission units="V">800.0</voltage_out_target_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
-                        <heat_sink_temperature_mission units="degK">12.0e3</heat_sink_temperature_mission>
+                        <heat_sink_temperature_mission units="degK">283.15</heat_sink_temperature_mission>
                         <casing>
                             <thermal_resistance units="K/W">0.01</thermal_resistance>
                         </casing>

@@ -10,6 +10,7 @@ import fastoad.api as oad
 from ..constants import (
     SUBMODEL_CONSTRAINTS_RECTIFIER_CURRENT_IN_RMS_1_PHASE,
     SUBMODEL_CONSTRAINTS_RECTIFIER_VOLTAGE_IN,
+    SUBMODEL_CONSTRAINTS_RECTIFIER_FREQUENCY,
 )
 
 
@@ -171,4 +172,102 @@ class ConstraintsVoltagePeakEnsure(om.ExplicitComponent):
             + rectifier_id
             + ":voltage_ac_caliber",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_caliber",
+        ] = -1.0
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_RECTIFIER_FREQUENCY,
+    "fastga_he.submodel.propulsion.constraints.rectifier.frequency.ensure",
+)
+class ConstraintsFrequencyEnsure(om.ExplicitComponent):
+    """
+    Class that computes the difference between the maximum frequency seen by the rectifier during the
+    mission and the value used for sizing, ensuring each component works below its maxima.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="rectifier_id",
+            default=None,
+            desc="Identifier of the rectifier",
+            allow_none=False,
+        )
+
+    def setup(self):
+
+        rectifier_id = self.options["rectifier_id"]
+
+        self.add_input(
+            name="data:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":switching_frequency_max",
+            val=np.nan,
+            units="Hz",
+            desc="Maximum switching frequency seen by the IGBT modules in the rectifier during the "
+            "mission",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":switching_frequency",
+            val=np.nan,
+            units="Hz",
+            desc="Maximum switching frequency of the IGBT modules in the rectifier, used for sizing",
+        )
+        self.add_output(
+            name="constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":switching_frequency",
+            val=0.0,
+            units="Hz",
+            desc="Constraints on the maximum switching frequency of the IGBT modules in the "
+            "rectifier, respected when <0",
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":switching_frequency",
+            wrt=[
+                "data:propulsion:he_power_train:rectifier:"
+                + rectifier_id
+                + ":switching_frequency_max",
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency",
+            ],
+            method="exact",
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        rectifier_id = self.options["rectifier_id"]
+
+        outputs[
+            "constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":switching_frequency"
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:rectifier:"
+                + rectifier_id
+                + ":switching_frequency_max"
+            ]
+            - inputs[
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency"
+            ]
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+
+        rectifier_id = self.options["rectifier_id"]
+
+        partials[
+            "constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":switching_frequency",
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency_max",
+        ] = 1.0
+        partials[
+            "constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":switching_frequency",
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency",
         ] = -1.0
