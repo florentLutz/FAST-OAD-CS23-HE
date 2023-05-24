@@ -11,6 +11,7 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_RECTIFIER_CURRENT_IN_RMS_1_PHASE,
     SUBMODEL_CONSTRAINTS_RECTIFIER_VOLTAGE_IN,
     SUBMODEL_CONSTRAINTS_RECTIFIER_FREQUENCY,
+    SUBMODEL_CONSTRAINTS_RECTIFIER_LOSSES,
 )
 
 
@@ -270,4 +271,82 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             + rectifier_id
             + ":switching_frequency",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency",
+        ] = -1.0
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_RECTIFIER_LOSSES,
+    "fastga_he.submodel.propulsion.constraints.rectifier.losses.ensure",
+)
+class ConstraintsLossesEnsure(om.ExplicitComponent):
+    """
+    Class that computes the difference between the maximum losses seen by the rectifier during the
+    mission and the dissipable heat used for sizing, ensuring each component works below its maxima.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="rectifier_id",
+            default=None,
+            desc="Identifier of the rectifier",
+            allow_none=False,
+        )
+
+    def setup(self):
+
+        rectifier_id = self.options["rectifier_id"]
+
+        self.add_input(
+            name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max",
+            val=np.nan,
+            units="W",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat",
+            val=np.nan,
+            units="W",
+        )
+        self.add_output(
+            name="constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":dissipable_heat",
+            val=800.0,
+            units="W",
+            desc="Respected if negative",
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":dissipable_heat",
+            wrt=[
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max",
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat",
+            ],
+            method="exact",
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        rectifier_id = self.options["rectifier_id"]
+
+        outputs[
+            "constraints:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat"
+        ] = (
+            inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max"]
+            - inputs[
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat"
+            ]
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+
+        rectifier_id = self.options["rectifier_id"]
+
+        partials[
+            "constraints:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat",
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max",
+        ] = 1.0
+        partials[
+            "constraints:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat",
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat",
         ] = -1.0

@@ -56,6 +56,12 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
         self.add_input("switching_frequency", units="Hz", val=np.nan, shape=number_of_points)
+        self.add_input(
+            "losses_rectifier",
+            units="W",
+            val=np.full(number_of_points, np.nan),
+            shape=number_of_points,
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_max",
@@ -121,6 +127,17 @@ class PerformancesMaximum(om.ExplicitComponent):
             method="exact",
         )
 
+        self.add_output(
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max",
+            units="W",
+            val=42.0,
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max",
+            wrt="losses_rectifier",
+            method="exact",
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         rectifier_id = self.options["rectifier_id"]
 
@@ -139,6 +156,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency_max"
         ] = np.max(inputs["switching_frequency"])
+        outputs[
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max"
+        ] = np.max(inputs["losses_rectifier"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -170,3 +190,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         ] = np.where(
             inputs["switching_frequency"] == np.max(inputs["switching_frequency"]), 1.0, 0.0
         )
+        partials[
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max",
+            "losses_rectifier",
+        ] = np.where(inputs["losses_rectifier"] == np.max(inputs["losses_rectifier"]), 1.0, 0.0)

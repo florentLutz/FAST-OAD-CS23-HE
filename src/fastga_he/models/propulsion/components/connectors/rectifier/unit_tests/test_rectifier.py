@@ -38,11 +38,13 @@ from ..components.cstr_enforce import (
     ConstraintsCurrentRMS1PhaseEnforce,
     ConstraintsVoltagePeakEnforce,
     ConstraintsFrequencyEnforce,
+    ConstraintsLossesEnforce,
 )
 from ..components.cstr_ensure import (
     ConstraintsCurrentRMS1PhaseEnsure,
     ConstraintsVoltagePeakEnsure,
     ConstraintsFrequencyEnsure,
+    ConstraintsLossesEnsure,
 )
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -521,6 +523,13 @@ def test_maximum():
     ivc.add_output(
         "switching_frequency", units="Hz", val=np.linspace(10.0e3, 12.0e3, NB_POINTS_TEST)
     )
+    ivc.add_output(
+        "losses_rectifier",
+        val=np.array(
+            [1690.8, 2428.2, 3320.4, 4375.2, 5601.6, 7009.2, 8603.4, 10393.8, 12383.4, 14582.4]
+        ),
+        units="W",
+    )
 
     problem = run_system(
         PerformancesMaximum(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
@@ -542,6 +551,9 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency_max", units="Hz"
     ) == pytest.approx(12.0e3, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:losses_max", units="W"
+    ) == pytest.approx(14582.4, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -606,6 +618,28 @@ def test_constraint_enforce_frequency():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_enforce_losses():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsLossesEnforce(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsLossesEnforce(rectifier_id="rectifier_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:dissipable_heat",
+            units="W",
+        )
+        == pytest.approx(14582.4, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraint_ensure_current():
 
     ivc = get_indep_var_comp(
@@ -665,6 +699,28 @@ def test_constraint_ensure_frequency():
             units="Hz",
         )
         == pytest.approx(-3.0e3, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure_losses():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsLossesEnsure(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsLossesEnsure(rectifier_id="rectifier_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:rectifier:rectifier_1:dissipable_heat",
+            units="W",
+        )
+        == pytest.approx(-417.6, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)

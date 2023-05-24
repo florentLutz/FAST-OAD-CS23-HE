@@ -25,6 +25,8 @@
                         <power_factor>1.0</power_factor>
                         <switching_frequency units="Hz">15.0e3</switching_frequency>
                         <switching_frequency_max units="Hz">12.0e3</switching_frequency_max>
+                        <losses_max units="W">14582.4</losses_max>
+                        <dissipable_heat units="W">15000.0</dissipable_heat>
                         <current_ac_max units="A">133.0</current_ac_max>
                         <current_ac_caliber units="A">150.0</current_ac_caliber>
                         <voltage_ac_max units="V">800.0</voltage_ac_max>
