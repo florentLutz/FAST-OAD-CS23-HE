@@ -13,11 +13,17 @@ from .sizing_thermal_resistance_casing import SizingRectifierCasingThermalResist
 from .sizing_capacitor_current_caliber import SizingRectifierCapacitorCurrentCaliber
 from .sizing_capacitor_capacity import SizingRectifierCapacitorCapacity
 from .sizing_capacitor_weight import SizingRectifierCapacitorWeight
+from .sizing_dimension_module import SizingRectifierModuleDimension
 from .sizing_rectifier_weight import SizingRectifierWeight
 from .sizing_rectifier_cg import SizingRectifierCG
 from .sizing_rectifier_drag import SizingRectifierDrag
 
 from .cstr_rectifier import ConstraintsRectifier
+
+from fastga_he.models.propulsion.sub_components.heat_sink.components.sizing_heat_sink import (
+    SizingHeatSink,
+)
+from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
 from ..constants import POSSIBLE_POSITION
 
@@ -94,6 +100,17 @@ class SizingRectifier(om.Group):
         self.add_subsystem(
             name="capacitor_weight",
             subsys=SizingRectifierCapacitorWeight(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="module_dimensions",
+            subsys=SizingRectifierModuleDimension(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        rectifier_prefix = PT_DATA_PREFIX + "rectifier:" + rectifier_id
+        self.add_subsystem(
+            name="heat_sink_sizing",
+            subsys=SizingHeatSink(prefix=rectifier_prefix),
             promotes=["*"],
         )
         self.add_subsystem(

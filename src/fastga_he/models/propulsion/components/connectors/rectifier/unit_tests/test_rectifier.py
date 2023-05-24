@@ -28,6 +28,7 @@ from ..components.sizing_thermal_resistance_casing import SizingRectifierCasingT
 from ..components.sizing_capacitor_current_caliber import SizingRectifierCapacitorCurrentCaliber
 from ..components.sizing_capacitor_capacity import SizingRectifierCapacitorCapacity
 from ..components.sizing_capacitor_weight import SizingRectifierCapacitorWeight
+from ..components.sizing_dimension_module import SizingRectifierModuleDimension
 from ..components.sizing_rectifier_weight import SizingRectifierWeight
 from ..components.sizing_rectifier_cg import SizingRectifierCG
 
@@ -46,6 +47,8 @@ from ..components.cstr_ensure import (
     ConstraintsFrequencyEnsure,
     ConstraintsLossesEnsure,
 )
+
+from .....sub_components.heat_sink.components.sizing_heat_sink import SizingHeatSink
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -931,6 +934,54 @@ def test_capacitor_weight():
             units="kg",
         )
         == pytest.approx(1.162, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_dimension_module():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierModuleDimension(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierModuleDimension(rectifier_id="rectifier_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:module:length", units="m"
+    ) == pytest.approx(0.107, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:module:width", units="m"
+    ) == pytest.approx(0.065, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:module:height", units="m"
+    ) == pytest.approx(0.021, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingHeatSink(prefix="data:propulsion:he_power_train:rectifier:rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingHeatSink(prefix="data:propulsion:he_power_train:rectifier:rectifier_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:heat_sink:mass",
+            units="kg",
+        )
+        == pytest.approx(0.444, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)

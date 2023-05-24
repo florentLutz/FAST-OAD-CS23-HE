@@ -72,6 +72,18 @@
                             <current_caliber units="A">68.91</current_caliber>
                             <capacity units="F">4.33e-4</capacity>
                         </capacitor>
+                        <heat_sink>
+                            <temperature_rating units="degK">373.15</temperature_rating>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                            </coolant>
+                        </heat_sink>
+                        <module>
+                            <length units="m">0.107</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
                     </rectifier_1>
                 </rectifier>
             </he_power_train>
