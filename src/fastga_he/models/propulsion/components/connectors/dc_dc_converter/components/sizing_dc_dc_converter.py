@@ -13,12 +13,17 @@ from .sizing_resistance_scaling import SizingDCDCConverterResistanceScaling
 from .sizing_reference_resistance import SizingDCDCConverterResistances
 from .sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
 from .sizing_capacitor_weight import SizingDCDCConverterCapacitorWeight
-from .sizing_inductor import SizingDCDCConverterInductor
+from .sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from .sizing_module_mass import SizingDCDCConverterCasingWeight
 from .sizing_dc_dc_converter_cg import SizingDCDCConverterCG
 from .sizing_dc_dc_converter_drag import SizingDCDCConverterDrag
 
 from .cstr_dc_dc_converter import ConstraintsDCDCConverter
+
+from fastga_he.models.propulsion.sub_components.inductor.components.sizing_inductor import (
+    SizingInductor,
+)
+from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
 from ..constants import POSSIBLE_POSITION, SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT
 
@@ -92,8 +97,14 @@ class SizingDCDCConverter(om.Group):
         )
 
         self.add_subsystem(
+            name="inductor_inductance",
+            subsys=SizingDCDCConverterInductorInductance(dc_dc_converter_id=dc_dc_converter_id),
+            promotes=["*"],
+        )
+        inverter_prefix = PT_DATA_PREFIX + "DC_DC_converter:" + dc_dc_converter_id
+        self.add_subsystem(
             "inductor_sizing",
-            SizingDCDCConverterInductor(dc_dc_converter_id=dc_dc_converter_id),
+            SizingInductor(prefix=inverter_prefix),
             promotes=["*"],
         )
 

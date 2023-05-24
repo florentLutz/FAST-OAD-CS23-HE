@@ -10,7 +10,6 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY,
-    SUBMODEL_CONSTRAINTS_DC_DC_INDUCTOR_AIR_GAP,
 )
 
 import openmdao.api as om
@@ -616,69 +615,3 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":switching_frequency_max"
         ]
-
-
-@oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_DC_DC_INDUCTOR_AIR_GAP,
-    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.inductor.air_gap.enforce",
-)
-class ConstraintsInductorAirGapEnforce(om.ExplicitComponent):
-    """
-    Class that enforces that the air gap chosen for the sizing of the inductor inside the
-    DC/DC converter is equal to the maximum allowed.
-    """
-
-    def initialize(self):
-        self.options.declare(
-            name="dc_dc_converter_id",
-            default=None,
-            desc="Identifier of the DC/DC converter",
-            allow_none=False,
-        )
-
-    def setup(self):
-
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        self.add_input(
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:core_dimension:C",
-            units="m",
-            val=np.nan,
-            desc="C dimension of the E-core in the inductor",
-        )
-        self.add_output(
-            name="data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:air_gap",
-            units="m",
-            val=1e-2,
-            desc="Air gap in the inductor",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:air_gap",
-            wrt="data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:core_dimension:C",
-            val=0.1,
-        )
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        outputs[
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:air_gap"
-        ] = (
-            0.1
-            * inputs[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":inductor:core_dimension:C"
-            ]
-        )

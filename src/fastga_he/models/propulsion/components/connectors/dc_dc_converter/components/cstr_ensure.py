@@ -10,17 +10,12 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY,
-    SUBMODEL_CONSTRAINTS_DC_DC_INDUCTOR_AIR_GAP,
 )
 
 import openmdao.api as om
 import numpy as np
 
 import fastoad.api as oad
-
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_DC_INDUCTOR_AIR_GAP
-] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.inductor.air_gap.ensure"
 
 
 @oad.RegisterSubmodel(
@@ -861,109 +856,3 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":switching_frequency",
         ] = -1.0
-
-
-@oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_DC_DC_INDUCTOR_AIR_GAP,
-    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.inductor.air_gap.ensure",
-)
-class ConstraintsInductorAirGapEnsure(om.ExplicitComponent):
-    """
-    Class that enforces that computes the difference between the air gap and the maximum value is
-    is allowed to take, ensuring it is below its minimum.
-    """
-
-    def initialize(self):
-        self.options.declare(
-            name="dc_dc_converter_id",
-            default=None,
-            desc="Identifier of the DC/DC converter",
-            allow_none=False,
-        )
-
-    def setup(self):
-
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        self.add_input(
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:core_dimension:C",
-            units="m",
-            val=np.nan,
-            desc="C dimension of the E-core in the inductor",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:air_gap",
-            units="m",
-            val=np.nan,
-            desc="Air gap in the inductor",
-        )
-
-        self.add_output(
-            name="constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:air_gap",
-            units="m",
-            val=-1e-3,
-            desc="Constraints on maximum air gap in the inductor, respected if <0",
-        )
-
-        self.declare_partials(
-            of="constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:air_gap",
-            wrt=[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":inductor:core_dimension:C",
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":inductor:air_gap",
-            ],
-            method="exact",
-        )
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        outputs[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:air_gap"
-        ] = (
-            inputs[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":inductor:air_gap"
-            ]
-            - 0.1
-            * inputs[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":inductor:core_dimension:C"
-            ]
-        )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:air_gap",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:air_gap",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:air_gap",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:core_dimension:C",
-        ] = -0.1
