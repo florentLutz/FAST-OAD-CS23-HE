@@ -3,6 +3,7 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
+import fastoad.api as oad
 
 from .sizing_energy_coefficient_scaling import SizingRectifierEnergyCoefficientScaling
 from .sizing_energy_coefficients import SizingRectifierEnergyCoefficients
@@ -14,6 +15,8 @@ from .sizing_capacitor_current_caliber import SizingRectifierCapacitorCurrentCal
 from .sizing_capacitor_capacity import SizingRectifierCapacitorCapacity
 from .sizing_capacitor_weight import SizingRectifierCapacitorWeight
 from .sizing_dimension_module import SizingRectifierModuleDimension
+from .sizing_weight_casing import SizingRectifierCasingsWeight
+from .sizing_contactor_weight import SizingRectifierContactorWeight
 from .sizing_rectifier_weight import SizingRectifierWeight
 from .sizing_rectifier_cg import SizingRectifierCG
 from .sizing_rectifier_drag import SizingRectifierDrag
@@ -25,7 +28,7 @@ from fastga_he.models.propulsion.sub_components.heat_sink.components.sizing_heat
 )
 from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
-from ..constants import POSSIBLE_POSITION
+from ..constants import POSSIBLE_POSITION, SUBMODEL_CONSTRAINTS_RECTIFIER_WEIGHT
 
 
 class SizingRectifier(om.Group):
@@ -114,8 +117,21 @@ class SizingRectifier(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
+            name="casings_weight",
+            subsys=SizingRectifierCasingsWeight(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="contactors_weight",
+            subsys=SizingRectifierContactorWeight(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        rectifier_options = {"rectifier_id": rectifier_id}
+        self.add_subsystem(
             name="rectifier_weight",
-            subsys=SizingRectifierWeight(rectifier_id=rectifier_id),
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_RECTIFIER_WEIGHT, options=rectifier_options
+            ),
             promotes=["*"],
         )
         self.add_subsystem(

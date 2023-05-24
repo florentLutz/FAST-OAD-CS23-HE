@@ -29,7 +29,9 @@ from ..components.sizing_capacitor_current_caliber import SizingRectifierCapacit
 from ..components.sizing_capacitor_capacity import SizingRectifierCapacitorCapacity
 from ..components.sizing_capacitor_weight import SizingRectifierCapacitorWeight
 from ..components.sizing_dimension_module import SizingRectifierModuleDimension
-from ..components.sizing_rectifier_weight import SizingRectifierWeight
+from ..components.sizing_weight_casing import SizingRectifierCasingsWeight
+from ..components.sizing_contactor_weight import SizingRectifierContactorWeight
+from ..components.sizing_rectifier_weight import SizingRectifierWeight, SizingRectifierWeightBySum
 from ..components.sizing_rectifier_cg import SizingRectifierCG
 
 from ..components.sizing_rectifier import SizingRectifier
@@ -963,6 +965,46 @@ def test_dimension_module():
     problem.check_partials(compact_print=True)
 
 
+def test_weight_casings():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierCasingsWeight(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierCasingsWeight(rectifier_id="rectifier_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:casing:mass", units="kg"
+    ) == pytest.approx(0.705, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_contactor_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierContactorWeight(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierContactorWeight(rectifier_id="rectifier_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:contactor:mass",
+            units="kg",
+        )
+        == pytest.approx(2.32, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_heat_sink():
 
     # Research independent input value in .xml file
@@ -1007,6 +1049,28 @@ def test_rectifier_weight():
     problem.check_partials(compact_print=True)
 
 
+def test_rectifier_weight_by_sum():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierWeightBySum(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierWeightBySum(rectifier_id="rectifier_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:mass",
+            units="kg",
+        )
+        == pytest.approx(5.651, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_rectifier_cg():
 
     expected_cg = [2.69, 0.45, 2.54]
@@ -1045,7 +1109,7 @@ def test_sizing_rectifier():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:mass", units="kg"
-    ) == pytest.approx(15.04, rel=1e-2)
+    ) == pytest.approx(5.526, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:CG:x", units="m"
     ) == pytest.approx(2.69, rel=1e-2)

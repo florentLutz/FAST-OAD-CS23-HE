@@ -37,6 +37,7 @@
                         <heat_sink_temperature_mission units="degK">283.15</heat_sink_temperature_mission>
                         <casing>
                             <thermal_resistance units="K/W">0.01</thermal_resistance>
+                            <mass units="kg">0.705</mass>
                         </casing>
                         <scaling>
                             <a>0.333</a>
@@ -71,9 +72,11 @@
                         <capacitor>
                             <current_caliber units="A">68.91</current_caliber>
                             <capacity units="F">4.33e-4</capacity>
+                            <mass units="kg">1.162</mass>
                         </capacitor>
                         <heat_sink>
                             <temperature_rating units="degK">373.15</temperature_rating>
+                            <mass units="kg">0.444</mass>
                             <coolant>
                                 <temperature_in_rating units="degK">323.15</temperature_in_rating>
                                 <temperature_out_rating units="degK">353.15</temperature_out_rating>
@@ -84,6 +87,9 @@
                             <height units="m">0.021</height>
                             <width units="m">0.065</width>
                         </module>
+                        <contactor>
+                            <mass units="kg">2.34</mass>
+                        </contactor>
                     </rectifier_1>
                 </rectifier>
             </he_power_train>
