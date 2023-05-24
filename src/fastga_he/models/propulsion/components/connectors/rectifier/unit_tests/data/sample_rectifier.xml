@@ -35,6 +35,12 @@
                         <voltage_out_target_mission units="V">800.0</voltage_out_target_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
                         <heat_sink_temperature_mission units="degK">283.15</heat_sink_temperature_mission>
+                        <inductor>
+                            <current_caliber units="A">150.0</current_caliber>
+                            <inductance units="H">300.0e-6</inductance>
+                            <air_gap units="m">1e-2</air_gap>
+                            <mass units="kg">2.12</mass>
+                        </inductor>
                         <casing>
                             <thermal_resistance units="K/W">0.01</thermal_resistance>
                             <mass units="kg">0.705</mass>

@@ -163,6 +163,11 @@ class SizingRectifierWeightBySum(om.ExplicitComponent):
             val=np.nan,
             desc="Mass of the 3 contactors",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":inductor:mass",
+            units="kg",
+            val=np.nan,
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass",
@@ -171,7 +176,23 @@ class SizingRectifierWeightBySum(om.ExplicitComponent):
             desc="Mass of the rectifier",
         )
 
-        self.declare_partials(of="*", wrt="*", val=1.0)
+        self.declare_partials(
+            of="*",
+            wrt=[
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":casing:mass",
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":heat_sink:mass",
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":capacitor:mass",
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":control_card:mass",
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":contactor:mass",
+            ],
+            val=1.0,
+        )
+        # One inductor on each phase
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":inductor:mass",
+            val=3.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         rectifier_id = self.options["rectifier_id"]
@@ -184,4 +205,6 @@ class SizingRectifierWeightBySum(om.ExplicitComponent):
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":control_card:mass"
             ]
             + inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":contactor:mass"]
+            + 3.0
+            * inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":inductor:mass"]
         )

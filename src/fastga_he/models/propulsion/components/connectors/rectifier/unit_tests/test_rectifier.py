@@ -29,6 +29,7 @@ from ..components.sizing_capacitor_current_caliber import SizingRectifierCapacit
 from ..components.sizing_capacitor_capacity import SizingRectifierCapacitorCapacity
 from ..components.sizing_capacitor_weight import SizingRectifierCapacitorWeight
 from ..components.sizing_dimension_module import SizingRectifierModuleDimension
+from ..components.sizing_inductor_current_caliber import SizingRectifierInductorCurrentCaliber
 from ..components.sizing_weight_casing import SizingRectifierCasingsWeight
 from ..components.sizing_contactor_weight import SizingRectifierContactorWeight
 from ..components.sizing_rectifier_weight import SizingRectifierWeight, SizingRectifierWeightBySum
@@ -51,6 +52,7 @@ from ..components.cstr_ensure import (
 )
 
 from .....sub_components.heat_sink.components.sizing_heat_sink import SizingHeatSink
+from .....sub_components.inductor.components.sizing_inductor import SizingInductor
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -965,6 +967,52 @@ def test_dimension_module():
     problem.check_partials(compact_print=True)
 
 
+def test_inductor_current_caliber():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingRectifierInductorCurrentCaliber(rectifier_id="rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierInductorCurrentCaliber(rectifier_id="rectifier_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:inductor:current_caliber",
+            units="A",
+        )
+        == pytest.approx(150.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInductor(prefix="data:propulsion:he_power_train:rectifier:rectifier_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingInductor(prefix="data:propulsion:he_power_train:rectifier:rectifier_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:inductor:mass",
+            units="kg",
+        )
+        == pytest.approx(4.40, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_weight_casings():
 
     # Research independent input value in .xml file
@@ -1065,7 +1113,7 @@ def test_rectifier_weight_by_sum():
             "data:propulsion:he_power_train:rectifier:rectifier_1:mass",
             units="kg",
         )
-        == pytest.approx(5.651, rel=1e-2)
+        == pytest.approx(12.011, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -1109,7 +1157,7 @@ def test_sizing_rectifier():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:mass", units="kg"
-    ) == pytest.approx(5.526, rel=1e-2)
+    ) == pytest.approx(15.63, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:CG:x", units="m"
     ) == pytest.approx(2.69, rel=1e-2)

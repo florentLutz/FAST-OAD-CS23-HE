@@ -15,9 +15,9 @@ from .sizing_capacitor_current_caliber import SizingRectifierCapacitorCurrentCal
 from .sizing_capacitor_capacity import SizingRectifierCapacitorCapacity
 from .sizing_capacitor_weight import SizingRectifierCapacitorWeight
 from .sizing_dimension_module import SizingRectifierModuleDimension
+from .sizing_inductor_current_caliber import SizingRectifierInductorCurrentCaliber
 from .sizing_weight_casing import SizingRectifierCasingsWeight
 from .sizing_contactor_weight import SizingRectifierContactorWeight
-from .sizing_rectifier_weight import SizingRectifierWeight
 from .sizing_rectifier_cg import SizingRectifierCG
 from .sizing_rectifier_drag import SizingRectifierDrag
 
@@ -25,6 +25,9 @@ from .cstr_rectifier import ConstraintsRectifier
 
 from fastga_he.models.propulsion.sub_components.heat_sink.components.sizing_heat_sink import (
     SizingHeatSink,
+)
+from fastga_he.models.propulsion.sub_components.inductor.components.sizing_inductor import (
+    SizingInductor,
 )
 from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
@@ -116,6 +119,18 @@ class SizingRectifier(om.Group):
             subsys=SizingHeatSink(prefix=rectifier_prefix),
             promotes=["*"],
         )
+
+        self.add_subsystem(
+            name="inductor_current_caliber",
+            subsys=SizingRectifierInductorCurrentCaliber(rectifier_id=rectifier_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="inductor_sizing",
+            subsys=SizingInductor(prefix=rectifier_prefix),
+            promotes=["*"],
+        )
+
         self.add_subsystem(
             name="casings_weight",
             subsys=SizingRectifierCasingsWeight(rectifier_id=rectifier_id),
