@@ -4,19 +4,19 @@
 
 import openmdao.api as om
 
-from .sizing_heat_sink_dimension import SizingInverterHeatSinkDimension
-from .sizing_heat_sink_tube_length import SizingInverterHeatSinkTubeLength
-from .sizing_heat_sink_tube_mass_flow import SizingInverterHeatSinkTubeMassFlow
-from .sizing_heat_sink_coolant_prandtl import SizingInverterHeatSinkCoolantPrandtl
+from .sizing_heat_sink_dimension import SizingHeatSinkDimension
+from .sizing_heat_sink_tube_length import SizingHeatSinkTubeLength
+from .sizing_heat_sink_tube_mass_flow import SizingHeatSinkTubeMassFlow
+from .sizing_heat_sink_coolant_prandtl import SizingHeatSinkCoolantPrandtl
 from .sizing_heat_sink_tube_inner_diameter import (
-    SizingInverterHeatSinkTubeInnerDiameter,
+    SizingHeatSinkTubeInnerDiameter,
 )
 from .sizing_heat_sink_tube_outer_diameter import (
-    SizingInverterHeatSinkTubeOuterDiameter,
+    SizingHeatSinkTubeOuterDiameter,
 )
-from .sizing_heat_sink_tube_weight import SizingInverterHeatSinkTubeWeight
-from .sizing_height_heat_sink import SizingInverterHeatSinkHeight
-from .sizing_heat_sink_weight import SizingInverterHeatSinkWeight
+from .sizing_heat_sink_tube_weight import SizingHeatSinkTubeWeight
+from .sizing_heat_sink_height import SizingHeatSinkHeight
+from .sizing_heat_sink_weight import SizingHeatSinkWeight
 
 
 class SizingHeatSink(om.Group):
@@ -27,58 +27,58 @@ class SizingHeatSink(om.Group):
 
     def initialize(self):
         self.options.declare(
-            name="inverter_id",
+            name="prefix",
             default=None,
-            desc="Identifier of the inverter",
+            desc="Prefix for the components that will use a heatsink",
             allow_none=False,
         )
 
     def setup(self):
 
-        inverter_id = self.options["inverter_id"]
+        prefix = self.options["prefix"]
 
         self.add_subsystem(
             "heat_sink_dimensions",
-            SizingInverterHeatSinkDimension(inverter_id=inverter_id),
+            SizingHeatSinkDimension(prefix=prefix),
             promotes=["*"],
         )
         self.add_subsystem(
             "heat_sink_tube_length",
-            SizingInverterHeatSinkTubeLength(inverter_id=inverter_id),
+            SizingHeatSinkTubeLength(prefix=prefix),
             promotes=["*"],
         )
         self.add_subsystem(
             "heat_sink_max_mass_flow",
-            SizingInverterHeatSinkTubeMassFlow(inverter_id=inverter_id),
+            SizingHeatSinkTubeMassFlow(prefix=prefix),
             promotes=["*"],
         )
         self.add_subsystem(
             "coolant_prandtl",
-            SizingInverterHeatSinkCoolantPrandtl(inverter_id=inverter_id),
+            SizingHeatSinkCoolantPrandtl(prefix=prefix),
             promotes=["*"],
         )
         self.add_subsystem(
             "heat_sink_tube_inner_diameter",
-            SizingInverterHeatSinkTubeInnerDiameter(inverter_id=inverter_id),
+            SizingHeatSinkTubeInnerDiameter(prefix=prefix),
             promotes=["*"],
         )
         self.add_subsystem(
             "heat_sink_tube_outer_diameter",
-            SizingInverterHeatSinkTubeOuterDiameter(inverter_id=inverter_id),
+            SizingHeatSinkTubeOuterDiameter(prefix=prefix),
             promotes=["*"],
         )
         self.add_subsystem(
             "heat_sink_tube_weight",
-            SizingInverterHeatSinkTubeWeight(inverter_id=inverter_id),
+            SizingHeatSinkTubeWeight(prefix=prefix),
             promotes=["*"],
         )
         self.add_subsystem(
             "heat_sink_height",
-            SizingInverterHeatSinkHeight(inverter_id=inverter_id),
+            SizingHeatSinkHeight(prefix=prefix),
             promotes=["*"],
         )
         self.add_subsystem(
             "heat_sink_weight",
-            SizingInverterHeatSinkWeight(inverter_id=inverter_id),
+            SizingHeatSinkWeight(prefix=prefix),
             promotes=["*"],
         )

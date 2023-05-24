@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class SizingInverterHeatSinkHeight(om.ExplicitComponent):
+class SizingHeatSinkHeight(om.ExplicitComponent):
     """
     Computation of the height of the heat sink of the inverter (plaque froide in french).
     Implementation of the formula from :cite:`giraud:2014`.
@@ -14,27 +14,25 @@ class SizingInverterHeatSinkHeight(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="inverter_id",
+            name="prefix",
             default=None,
-            desc="Identifier of the inverter",
+            desc="Prefix for the components that will use a heatsink",
             allow_none=False,
         )
 
     def setup(self):
 
-        inverter_id = self.options["inverter_id"]
+        prefix = self.options["prefix"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:inverter:"
-            + inverter_id
-            + ":heat_sink:tube:outer_diameter",
+            name=prefix + ":heat_sink:tube:outer_diameter",
             units="m",
             val=np.nan,
             desc="Outer diameter of the tube for the cooling of the inverter",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:height",
+            name=prefix + ":heat_sink:height",
             units="m",
             val=0.20,
             desc="Height of the heat sink",
@@ -48,24 +46,14 @@ class SizingInverterHeatSinkHeight(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        inverter_id = self.options["inverter_id"]
+        prefix = self.options["prefix"]
 
-        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:height"] = (
-            1.5
-            * inputs[
-                "data:propulsion:he_power_train:inverter:"
-                + inverter_id
-                + ":heat_sink:tube:outer_diameter"
-            ]
+        outputs[prefix + ":heat_sink:height"] = (
+            1.5 * inputs[prefix + ":heat_sink:tube:outer_diameter"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        inverter_id = self.options["inverter_id"]
+        prefix = self.options["prefix"]
 
-        partials[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:height",
-            "data:propulsion:he_power_train:inverter:"
-            + inverter_id
-            + ":heat_sink:tube:outer_diameter",
-        ] = 1.5
+        partials[prefix + ":heat_sink:height", prefix + ":heat_sink:tube:outer_diameter"] = 1.5

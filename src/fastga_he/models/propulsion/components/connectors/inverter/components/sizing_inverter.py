@@ -15,7 +15,6 @@ from .sizing_thermal_resistance_casing import SizingInverterCasingThermalResista
 from .sizing_weight_casing import SizingInverterCasingsWeight
 from .sizing_heat_capacity_casing import SizingInverterCasingHeatCapacity
 from .sizing_dimension_module import SizingInverterModuleDimension
-from .sizing_heat_sink import SizingHeatSink
 from .sizing_capacitor_current_caliber import SizingInverterCapacitorCurrentCaliber
 from .sizing_capacitor_capacity import SizingInverterCapacitorCapacity
 from .sizing_capacitor_weight import SizingInverterCapacitorWeight
@@ -26,6 +25,11 @@ from .sizing_inverter_weight import SizingInverterWeight
 from .sizing_inverter_power_density import SizingInverterPowerDensity
 from .sizing_inverter_cg import SizingInverterCG
 from .sizing_inverter_drag import SizingInverterDrag
+
+from fastga_he.models.propulsion.sub_components.heat_sink.components.sizing_heat_sink import (
+    SizingHeatSink,
+)
+from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
 from ..constants import POSSIBLE_POSITION
 
@@ -107,9 +111,10 @@ class SizingInverter(om.Group):
             subsys=SizingInverterModuleDimension(inverter_id=inverter_id),
             promotes=["*"],
         )
+        inverter_prefix = PT_DATA_PREFIX + "inverter:" + inverter_id
         self.add_subsystem(
             name="heat_sink_sizing",
-            subsys=SizingHeatSink(inverter_id=inverter_id),
+            subsys=SizingHeatSink(prefix=inverter_prefix),
             promotes=["*"],
         )
         self.add_subsystem(

@@ -1,0 +1,36 @@
+<FASTOAD_model>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <inverter>
+                    <inverter_1>
+                        <module>
+                            <length units="m">0.156</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
+                        <dissipable_heat units="W">11808.0</dissipable_heat>
+                        <heat_sink>
+                            <length units="m">0.2145</length>
+                            <width units="m">0.1716</width>
+                            <height units="m">0.005655</height>
+                            <temperature_rating units="degK">373.15</temperature_rating>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                            <tube>
+                                <length units="m">0.858</length>
+                                <inner_diameter units="m">1.27e-3</inner_diameter>
+                                <outer_diameter units="m">3.77e-3</outer_diameter>
+                                <mass units="kg">0.083</mass>
+                            </tube>
+                        </heat_sink>
+                    </inverter_1>
+                </inverter>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
