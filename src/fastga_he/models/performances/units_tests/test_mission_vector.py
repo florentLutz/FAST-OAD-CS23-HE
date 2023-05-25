@@ -1273,7 +1273,7 @@ def test_mission_vector_from_yml_fuel_and_battery():
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(-0.273, abs=1e-2)
+    assert mission_end_soc == pytest.approx(-0.056, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")

@@ -111,6 +111,17 @@ class SizingInverter(om.Group):
             subsys=SizingInverterModuleDimension(inverter_id=inverter_id),
             promotes=["*"],
         )
+
+        # The number of modules  in the rectifier isn't really up to the user to change,
+        # it depends on the topology. Here, the topology requires 3 modules to be cooled by one
+        # heat sink
+        ivc_module_number = om.IndepVarComp()
+        ivc_module_number.add_output(
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":module:number",
+            val=3,
+        )
+        self.add_subsystem(name="module_number", subsys=ivc_module_number, promotes=["*"])
+
         inverter_prefix = PT_DATA_PREFIX + "inverter:" + inverter_id
         self.add_subsystem(
             name="heat_sink_sizing",

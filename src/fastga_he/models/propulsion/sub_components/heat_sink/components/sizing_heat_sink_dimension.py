@@ -36,6 +36,11 @@ class SizingHeatSinkDimension(om.ExplicitComponent):
             val=np.nan,
             desc="Width of one module",
         )
+        self.add_input(
+            name=prefix + ":module:number",
+            val=np.nan,
+            desc="Number of module to cool down, will depend on the component (3 for inverter/rectifiers, 1 for DC/DC)",
+        )
 
         self.add_output(
             name=prefix + ":heat_sink:length",
@@ -52,7 +57,7 @@ class SizingHeatSinkDimension(om.ExplicitComponent):
 
         self.declare_partials(
             of=prefix + ":heat_sink:length",
-            wrt=prefix + ":module:width",
+            wrt=[prefix + ":module:width", prefix + ":module:number"],
             method="exact",
         )
         self.declare_partials(
@@ -65,12 +70,19 @@ class SizingHeatSinkDimension(om.ExplicitComponent):
 
         prefix = self.options["prefix"]
 
-        outputs[prefix + ":heat_sink:length"] = 3.3 * inputs[prefix + ":module:width"]
+        outputs[prefix + ":heat_sink:length"] = (
+            1.1 * inputs[prefix + ":module:width"] * inputs[prefix + ":module:number"]
+        )
         outputs[prefix + ":heat_sink:width"] = 1.1 * inputs[prefix + ":module:length"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         prefix = self.options["prefix"]
 
-        partials[prefix + ":heat_sink:length", prefix + ":module:width"] = 3.3
+        partials[prefix + ":heat_sink:length", prefix + ":module:width"] = (
+            1.1 * inputs[prefix + ":module:number"]
+        )
+        partials[prefix + ":heat_sink:length", prefix + ":module:number"] = (
+            1.1 * inputs[prefix + ":module:width"]
+        )
         partials[prefix + ":heat_sink:width", prefix + ":module:length"] = 1.1

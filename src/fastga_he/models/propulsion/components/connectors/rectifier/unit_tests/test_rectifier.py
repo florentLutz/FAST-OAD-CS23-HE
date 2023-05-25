@@ -1061,6 +1061,7 @@ def test_heat_sink():
         __file__,
         XML_FILE,
     )
+    ivc.add_output("data:propulsion:he_power_train:rectifier:rectifier_1:module:number", val=3)
 
     problem = run_system(
         SizingHeatSink(prefix="data:propulsion:he_power_train:rectifier:rectifier_1"), ivc

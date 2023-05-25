@@ -629,7 +629,7 @@
           <dc_dc_converter_1>
             <inductor>
               <copper_density units="kg/m**3" is_input="True">7800.0<!--Density of the copper used in the inductor--></copper_density>
-              <copper_resistivity units="ohm/m" is_input="True">1.77e-08<!--Resistivity of the copper used in the inductor [Ohm/m]--></copper_resistivity>
+              <copper_resistivity units="ohm*m" is_input="True">1.77e-08<!--Resistivity of the copper used in the inductor [Ohm/m]--></copper_resistivity>
               <iron_permeability units="H/m" is_input="True">4.396e-06<!--Permeability of the iron core--></iron_permeability>
             </inductor>
           </dc_dc_converter_1>

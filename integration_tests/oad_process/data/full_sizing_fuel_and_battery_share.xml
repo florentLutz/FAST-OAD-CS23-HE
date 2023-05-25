@@ -163,8 +163,19 @@
                         </nacelle>
                     </ice_1>
                 </ICE>
-        <rectifier>
+                <rectifier>
                     <rectifier_1>
+                        <inductor>
+                            <inductance units="H">300.0e-6</inductance>
+                            <air_gap units="m">1e-2</air_gap>
+                        </inductor>
+                        <heat_sink>
+                            <temperature_rating units="degK">373.15</temperature_rating>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                            </coolant>
+                        </heat_sink>
                         <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
                         <current_dc_max units="A" is_input="False">113.38180785745816<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
                         <efficiency is_input="True">0.98<!--Efficiency of the rectifier for the points--></efficiency>
@@ -173,7 +184,7 @@
                         <voltage_out_target_mission units="V" is_input="True">400.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
                     </rectifier_1>
                 </rectifier>
-        <generator>
+                <generator>
                     <generator_1>
                         <voltage_caliber units="V" is_input="False">400.0</voltage_caliber>
                         <voltage_out_target_mission units="V" is_input="False">320.0</voltage_out_target_mission>

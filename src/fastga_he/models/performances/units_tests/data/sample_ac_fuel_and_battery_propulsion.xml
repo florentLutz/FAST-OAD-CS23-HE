@@ -828,6 +828,17 @@
         </ICE>
         <rectifier>
             <rectifier_1>
+                <inductor>
+                    <inductance units="H">300.0e-6</inductance>
+                    <air_gap units="m">1e-2</air_gap>
+                </inductor>
+                <heat_sink>
+                    <temperature_rating units="degK">373.15</temperature_rating>
+                    <coolant>
+                        <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                        <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                    </coolant>
+                </heat_sink>
                 <power_factor>1.0</power_factor>
                 <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
                 <current_dc_max units="A" is_input="False">113.38180785745816<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
@@ -950,7 +961,7 @@
           <dc_dc_converter_1>
             <inductor>
               <copper_density units="kg/m**3" is_input="True">7800.0<!--Density of the copper used in the inductor--></copper_density>
-              <copper_resistivity units="ohm/m" is_input="True">1.77e-08<!--Resistivity of the copper used in the inductor [Ohm/m]--></copper_resistivity>
+              <copper_resistivity units="ohm*m" is_input="True">1.77e-08<!--Resistivity of the copper used in the inductor [Ohm/m]--></copper_resistivity>
               <iron_permeability units="H/m" is_input="True">4.396e-06<!--Permeability of the iron core--></iron_permeability>
             </inductor>
           </dc_dc_converter_1>
