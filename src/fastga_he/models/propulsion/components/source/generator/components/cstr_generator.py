@@ -6,7 +6,11 @@ import openmdao.api as om
 
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_CONSTRAINTS_GENERATOR_TORQUE, SUBMODEL_CONSTRAINTS_GENERATOR_RPM
+from ..constants import (
+    SUBMODEL_CONSTRAINTS_GENERATOR_TORQUE,
+    SUBMODEL_CONSTRAINTS_GENERATOR_RPM,
+    SUBMODEL_CONSTRAINTS_GENERATOR_VOLTAGE,
+)
 
 
 class ConstraintsGenerator(om.Group):
@@ -37,6 +41,13 @@ class ConstraintsGenerator(om.Group):
             name="constraints_rpm_generator",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_GENERATOR_RPM, options=option_generator_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="constraints_voltage_generator",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_GENERATOR_VOLTAGE, options=option_generator_id
             ),
             promotes=["*"],
         )
