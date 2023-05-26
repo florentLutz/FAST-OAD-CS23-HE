@@ -29,6 +29,9 @@ from fastga_he.models.propulsion.sub_components.heat_sink.components.sizing_heat
 from fastga_he.models.propulsion.sub_components.inductor.components.sizing_inductor import (
     SizingInductor,
 )
+from fastga_he.models.propulsion.sub_components.capacitor.components.sizing_capacitor import (
+    SizingCapacitor,
+)
 from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
 from ..constants import POSSIBLE_POSITION, SUBMODEL_CONSTRAINTS_RECTIFIER_WEIGHT
@@ -103,9 +106,12 @@ class SizingRectifier(om.Group):
             subsys=SizingRectifierCapacitorCurrentCaliber(rectifier_id=rectifier_id),
             promotes=["*"],
         )
+
+        rectifier_prefix = PT_DATA_PREFIX + "rectifier:" + rectifier_id
+
         self.add_subsystem(
             name="capacitor_weight",
-            subsys=SizingRectifierCapacitorWeight(rectifier_id=rectifier_id),
+            subsys=SizingCapacitor(prefix=rectifier_prefix),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -124,7 +130,6 @@ class SizingRectifier(om.Group):
         )
         self.add_subsystem(name="module_number", subsys=ivc_module_number, promotes=["*"])
 
-        rectifier_prefix = PT_DATA_PREFIX + "rectifier:" + rectifier_id
         self.add_subsystem(
             name="heat_sink_sizing",
             subsys=SizingHeatSink(prefix=rectifier_prefix),

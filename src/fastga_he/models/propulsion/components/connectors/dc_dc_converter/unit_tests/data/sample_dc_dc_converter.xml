@@ -29,6 +29,7 @@
                             <current_max units="A">380.0</current_max>
                             <capacity units="mF">0.460</capacity>
                             <mass units="kg">1.21</mass>
+                            <aspect_ratio units="kg">2.0</aspect_ratio>
                         </capacitor>
                         <inductor>
                             <mass units="kg">102.0</mass>

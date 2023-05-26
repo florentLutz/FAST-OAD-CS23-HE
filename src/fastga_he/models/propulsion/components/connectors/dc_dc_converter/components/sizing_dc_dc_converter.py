@@ -23,6 +23,9 @@ from .cstr_dc_dc_converter import ConstraintsDCDCConverter
 from fastga_he.models.propulsion.sub_components.inductor.components.sizing_inductor import (
     SizingInductor,
 )
+from fastga_he.models.propulsion.sub_components.capacitor.components.sizing_capacitor import (
+    SizingCapacitor,
+)
 from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
 from ..constants import POSSIBLE_POSITION, SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT
@@ -90,9 +93,10 @@ class SizingDCDCConverter(om.Group):
             SizingDCDCConverterCapacitorCapacity(dc_dc_converter_id=dc_dc_converter_id),
             promotes=["*"],
         )
+        inverter_prefix = PT_DATA_PREFIX + "DC_DC_converter:" + dc_dc_converter_id
         self.add_subsystem(
             "capacitor_weight",
-            SizingDCDCConverterCapacitorWeight(dc_dc_converter_id=dc_dc_converter_id),
+            SizingCapacitor(prefix=inverter_prefix),
             promotes=["*"],
         )
 
@@ -101,7 +105,6 @@ class SizingDCDCConverter(om.Group):
             subsys=SizingDCDCConverterInductorInductance(dc_dc_converter_id=dc_dc_converter_id),
             promotes=["*"],
         )
-        inverter_prefix = PT_DATA_PREFIX + "DC_DC_converter:" + dc_dc_converter_id
         self.add_subsystem(
             "inductor_sizing",
             SizingInductor(prefix=inverter_prefix),

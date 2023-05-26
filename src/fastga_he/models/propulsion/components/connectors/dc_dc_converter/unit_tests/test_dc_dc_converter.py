@@ -51,6 +51,7 @@ from ..components.cstr_ensure import (
 from ..components.sizing_dc_dc_converter import SizingDCDCConverter
 
 from .....sub_components.inductor.components.sizing_inductor import SizingInductor
+from .....sub_components.capacitor.components.sizing_capacitor import SizingCapacitor
 
 from ..constants import POSSIBLE_POSITION
 
@@ -274,13 +275,18 @@ def test_capacitor_weight():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingDCDCConverterCapacitorWeight(dc_dc_converter_id="dc_dc_converter_1")),
+        list_inputs(
+            SizingCapacitor(
+                prefix="data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1"
+            )
+        ),
         __file__,
         XML_FILE,
     )
 
     problem = run_system(
-        SizingDCDCConverterCapacitorWeight(dc_dc_converter_id="dc_dc_converter_1"), ivc
+        SizingCapacitor(prefix="data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1"),
+        ivc,
     )
 
     assert (
@@ -288,7 +294,7 @@ def test_capacitor_weight():
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:capacitor:mass",
             units="kg",
         )
-        == pytest.approx(1.21, rel=1e-2)
+        == pytest.approx(1.78, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -773,6 +779,13 @@ def test_dc_dc_converter_sizing():
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:cruise:CD0",
         )
         == pytest.approx(0.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:capacitor:mass",
+            units="kg",
+        )
+        == pytest.approx(1.78, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)

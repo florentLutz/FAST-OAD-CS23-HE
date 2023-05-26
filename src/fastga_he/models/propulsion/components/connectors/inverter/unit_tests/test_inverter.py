@@ -60,6 +60,7 @@ from ..components.cstr_ensure import (
 )
 
 from .....sub_components.heat_sink.components.sizing_heat_sink import SizingHeatSink
+from .....sub_components.capacitor.components.sizing_capacitor import SizingCapacitor
 
 from ..constants import POSSIBLE_POSITION
 
@@ -336,19 +337,21 @@ def test_capacitor_weight():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingInverterCapacitorWeight(inverter_id="inverter_1")),
+        list_inputs(SizingCapacitor(prefix="data:propulsion:he_power_train:inverter:inverter_1")),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(SizingInverterCapacitorWeight(inverter_id="inverter_1"), ivc)
+    problem = run_system(
+        SizingCapacitor(prefix="data:propulsion:he_power_train:inverter:inverter_1"), ivc
+    )
 
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:capacitor:mass",
             units="kg",
         )
-        == pytest.approx(3.832, rel=1e-2)
+        == pytest.approx(7.82, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -505,14 +508,14 @@ def test_inverter_sizing():
             "data:propulsion:he_power_train:inverter:inverter_1:mass",
             units="kg",
         )
-        == pytest.approx(11.50, rel=1e-2)
+        == pytest.approx(16.26, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:power_density",
             units="kW/kg",
         )
-        == pytest.approx(52.15, rel=1e-2)
+        == pytest.approx(36.9, rel=1e-2)
     )
     assert (
         problem.get_val(
