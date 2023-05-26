@@ -450,6 +450,13 @@ def test_converter_weight_by_sum():
         )
         == pytest.approx(106.224, rel=1e-2)
     )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:power_density",
+            units="kW/kg",
+        )
+        == pytest.approx(3.23, rel=1e-2)
+    )
 
     problem.check_partials(compact_print=True)
 
