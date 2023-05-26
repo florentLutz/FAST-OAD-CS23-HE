@@ -1117,6 +1117,13 @@ def test_rectifier_weight_by_sum():
         )
         == pytest.approx(12.011, rel=1e-2)
     )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:power_density",
+            units="kW/kg",
+        )
+        == pytest.approx(24.77, rel=1e-2)
+    )
 
     problem.check_partials(compact_print=True)
 
