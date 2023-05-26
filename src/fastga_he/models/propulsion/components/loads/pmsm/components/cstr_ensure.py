@@ -2,12 +2,20 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-from ..constants import SUBMODEL_CONSTRAINTS_PMSM_TORQUE, SUBMODEL_CONSTRAINTS_PMSM_RPM
+from ..constants import (
+    SUBMODEL_CONSTRAINTS_PMSM_TORQUE,
+    SUBMODEL_CONSTRAINTS_PMSM_RPM,
+    SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE,
+)
 
 import openmdao.api as om
 import numpy as np
 
 import fastoad.api as oad
+
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE
+] = "fastga_he.submodel.propulsion.constraints.pmsm.voltage.ensure"
 
 
 @oad.RegisterSubmodel(
@@ -145,4 +153,76 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
         partials[
             "constraints:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating",
+        ] = -1.0
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE,
+    "fastga_he.submodel.propulsion.constraints.pmsm.voltage.ensure",
+)
+class ConstraintsVoltageEnsure(om.ExplicitComponent):
+    """
+    Class that ensure that the maximum voltage seen by the motor during the mission is below the
+    one used for the sizing, ensuring each component works below its maximum.
+    """
+
+    def initialize(self):
+
+        self.options.declare(
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
+        )
+
+    def setup(self):
+
+        motor_id = self.options["motor_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_ac_max",
+            units="V",
+            val=np.nan,
+            desc="Maximum value of the peak voltage at the input of the motor",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
+            val=np.nan,
+            units="V",
+            desc="Max voltage of the motor",
+        )
+
+        self.add_output(
+            name="constraints:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
+            val=np.nan,
+            units="V",
+            desc="Respected if <0",
+        )
+
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
+            wrt=[
+                "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_ac_max",
+                "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
+            ],
+            method="exact",
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        motor_id = self.options["motor_id"]
+
+        outputs["constraints:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber"] = (
+            inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_ac_max"]
+            - inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber"]
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+
+        motor_id = self.options["motor_id"]
+
+        partials[
+            "constraints:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_ac_max",
+        ] = 1.0
+        partials[
+            "constraints:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
         ] = -1.0

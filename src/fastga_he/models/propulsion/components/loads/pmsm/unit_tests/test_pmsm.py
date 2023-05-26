@@ -30,8 +30,16 @@ from ..components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
-from ..components.cstr_enforce import ConstraintsTorqueEnforce, ConstraintsRPMEnforce
-from ..components.cstr_ensure import ConstraintsTorqueEnsure, ConstraintsRPMEnsure
+from ..components.cstr_enforce import (
+    ConstraintsTorqueEnforce,
+    ConstraintsRPMEnforce,
+    ConstraintsVoltageEnforce,
+)
+from ..components.cstr_ensure import (
+    ConstraintsTorqueEnsure,
+    ConstraintsRPMEnsure,
+    ConstraintsVoltageEnsure,
+)
 
 from ..components.sizing_pmsm import SizingPMSM
 from ..components.perf_pmsm import PerformancesPMSM
@@ -310,6 +318,21 @@ def test_constraints_rpm_enforce():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_voltage_enforce():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnforce(motor_id="motor_1")), __file__, XML_FILE
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsVoltageEnforce(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:voltage_caliber", units="V"
+    ) == pytest.approx(156.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraints_torque_ensure():
 
     ivc = get_indep_var_comp(
@@ -335,6 +358,20 @@ def test_constraints_rpm_ensure():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:PMSM:motor_1:rpm_rating", units="min**-1"
     ) == pytest.approx(-500.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_voltage_ensure():
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsVoltageEnsure(motor_id="motor_1")), __file__, XML_FILE
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsVoltageEnsure(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:PMSM:motor_1:voltage_caliber", units="V"
+    ) == pytest.approx(-543.8, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
