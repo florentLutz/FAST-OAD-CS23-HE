@@ -13,6 +13,7 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_IN,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN,
+    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY,
 )
 
@@ -76,6 +77,13 @@ class ConstraintsDCDCConverter(om.Group):
             name="constraints_input_voltage",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN, options=option_dc_dc_converter_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="constraints_losses",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES, options=option_dc_dc_converter_id
             ),
             promotes=["*"],
         )

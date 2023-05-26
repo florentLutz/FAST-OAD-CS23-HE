@@ -218,6 +218,14 @@ class SizingDCDCConverterWeightBySum(om.ExplicitComponent):
             val=np.nan,
             desc="Mass of the contactor",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":heat_sink:mass",
+            units="kg",
+            val=np.nan,
+            desc="Mass of the heat sink, includes tubes and core",
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass",
@@ -259,5 +267,10 @@ class SizingDCDCConverterWeightBySum(om.ExplicitComponent):
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
                 + ":contactor:mass"
+            ]
+            + inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":heat_sink:mass"
             ]
         )

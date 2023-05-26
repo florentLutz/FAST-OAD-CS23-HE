@@ -9,6 +9,7 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_IN,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN,
+    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY,
 )
 
@@ -749,6 +750,107 @@ class ConstraintsVoltageInputEnsure(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":voltage_in_caliber",
+        ] = -1.0
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES,
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.losses.ensure",
+)
+class ConstraintsLossesEnsure(om.ExplicitComponent):
+    """
+    Class that computes the difference between the maximum losses seen by the DC/DC converter
+    during the mission and the dissipable heat used for sizing, ensuring each component works
+    below its maxima.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="dc_dc_converter_id",
+            default=None,
+            desc="Identifier of the DC/DC converter",
+            allow_none=False,
+        )
+
+    def setup(self):
+
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":losses_max",
+            val=np.nan,
+            units="W",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat",
+            val=np.nan,
+            units="W",
+        )
+        self.add_output(
+            name="constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat",
+            val=800.0,
+            units="W",
+            desc="Respected if negative",
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat",
+            wrt=[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":losses_max",
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":dissipable_heat",
+            ],
+            method="exact",
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        outputs[
+            "constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat"
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":losses_max"
+            ]
+            - inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":dissipable_heat"
+            ]
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        partials[
+            "constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat",
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":losses_max",
+        ] = 1.0
+        partials[
+            "constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat",
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat",
         ] = -1.0
 
 

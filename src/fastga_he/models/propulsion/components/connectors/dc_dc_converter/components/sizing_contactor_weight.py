@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class SizingDC_DC_converterContactorWeight(om.ExplicitComponent):
+class SizingDCDCConverterContactorWeight(om.ExplicitComponent):
     """
     Computation of the weight of the contactors, based on a regression performed on the data from
     :cite:`giraud:2014`. Assumes that there is a single contactor in the converter. Correlation
@@ -17,7 +17,7 @@ class SizingDC_DC_converterContactorWeight(om.ExplicitComponent):
         self.options.declare(
             name="dc_dc_converter_id",
             default=None,
-            desc="Identifier of the DC_DC_converter",
+            desc="Identifier of the DC/DC converter",
             allow_none=False,
         )
 

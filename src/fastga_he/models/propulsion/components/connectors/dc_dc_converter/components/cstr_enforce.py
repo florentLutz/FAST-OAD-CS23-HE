@@ -10,6 +10,7 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY,
+    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES,
 )
 
 import openmdao.api as om
@@ -35,6 +36,9 @@ oad.RegisterSubmodel.active_models[
 oad.RegisterSubmodel.active_models[
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN
 ] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.voltage.input.enforce"
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES
+] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.losses.enforce"
 oad.RegisterSubmodel.active_models[
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY
 ] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.frequency.enforce"
@@ -551,6 +555,65 @@ class ConstraintsVoltageInputEnforce(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":voltage_in_max"
+        ]
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES,
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.losses.enforce",
+)
+class ConstraintsLossesEnforce(om.ExplicitComponent):
+    """
+    Class that enforces that the maximum losses seen by the converter during the mission are used
+    for the sizing, ensuring a fitted design of each component.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="dc_dc_converter_id",
+            default=None,
+            desc="Identifier of the DC/DC converter",
+            allow_none=False,
+        )
+
+    def setup(self):
+
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":losses_max",
+            val=np.nan,
+            units="W",
+        )
+        self.add_output(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat",
+            val=800.0,
+            units="W",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":losses_max",
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat"
+        ] = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":losses_max"
         ]
 
 

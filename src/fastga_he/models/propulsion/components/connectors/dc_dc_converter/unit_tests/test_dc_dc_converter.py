@@ -15,7 +15,8 @@ from ..components.sizing_reference_resistance import SizingDCDCConverterResistan
 from ..components.sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from ..components.sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
 from ..components.sizing_module_mass import SizingDCDCConverterCasingWeight
-from ..components.sizing_contactor_weight import SizingDC_DC_converterContactorWeight
+from ..components.sizing_dimension_module import SizingDCDCConverterModuleDimension
+from ..components.sizing_contactor_weight import SizingDCDCConverterContactorWeight
 from ..components.sizing_weight import SizingDCDCConverterWeight, SizingDCDCConverterWeightBySum
 from ..components.sizing_dc_dc_converter_cg import SizingDCDCConverterCG
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
@@ -36,6 +37,7 @@ from ..components.cstr_enforce import (
     ConstraintsCurrentInputEnforce,
     ConstraintsVoltageEnforce,
     ConstraintsVoltageInputEnforce,
+    ConstraintsLossesEnforce,
     ConstraintsFrequencyEnforce,
 )
 from ..components.cstr_ensure import (
@@ -45,13 +47,13 @@ from ..components.cstr_ensure import (
     ConstraintsCurrentInputEnsure,
     ConstraintsVoltageEnsure,
     ConstraintsVoltageInputEnsure,
+    ConstraintsLossesEnsure,
     ConstraintsFrequencyEnsure,
 )
 
 from ..components.sizing_dc_dc_converter import SizingDCDCConverter
 
-from .....sub_components.inductor.components.sizing_inductor import SizingInductor
-from .....sub_components.capacitor.components.sizing_capacitor import SizingCapacitor
+from .....sub_components import SizingInductor, SizingCapacitor, SizingHeatSink
 
 from ..constants import POSSIBLE_POSITION
 
@@ -324,17 +326,43 @@ def test_module_weight():
     problem.check_partials(compact_print=True)
 
 
-def test_contactor_weight():
+def test_dimension_module():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingDC_DC_converterContactorWeight(dc_dc_converter_id="dc_dc_converter_1")),
+        list_inputs(SizingDCDCConverterModuleDimension(dc_dc_converter_id="dc_dc_converter_1")),
         __file__,
         XML_FILE,
     )
 
     problem = run_system(
-        SizingDC_DC_converterContactorWeight(dc_dc_converter_id="dc_dc_converter_1"), ivc
+        SizingDCDCConverterModuleDimension(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:module:length", units="m"
+    ) == pytest.approx(0.1502, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:module:width", units="m"
+    ) == pytest.approx(0.065, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:module:height", units="m"
+    ) == pytest.approx(0.021, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_contactor_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDCDCConverterContactorWeight(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterContactorWeight(dc_dc_converter_id="dc_dc_converter_1"), ivc
     )
 
     assert (
@@ -343,6 +371,38 @@ def test_contactor_weight():
             units="kg",
         )
         == pytest.approx(1.53, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SizingHeatSink(
+                prefix="data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1"
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:module:number", val=1
+    )
+
+    problem = run_system(
+        SizingHeatSink(prefix="data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1"),
+        ivc,
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:heat_sink:mass",
+            units="kg",
+        )
+        == pytest.approx(0.149, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -388,7 +448,7 @@ def test_converter_weight_by_sum():
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass",
             units="kg",
         )
-        == pytest.approx(106.075, rel=1e-2)
+        == pytest.approx(106.224, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -568,6 +628,28 @@ def test_constraints_voltage_input_enforce():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_losses_enforce():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsLossesEnforce(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsLossesEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dissipable_heat",
+            units="W",
+        )
+        == pytest.approx(11.0e3, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraints_frequency_enforce():
 
     # Research independent input value in .xml file
@@ -726,6 +808,28 @@ def test_constraints_voltage_input_ensure():
             units="V",
         )
         == pytest.approx(0.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_losses_ensure():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsLossesEnsure(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsLossesEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dissipable_heat",
+            units="W",
+        )
+        == pytest.approx(-1.0e3, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)

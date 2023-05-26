@@ -51,9 +51,7 @@ from ..components.cstr_ensure import (
     ConstraintsLossesEnsure,
 )
 
-from .....sub_components.heat_sink.components.sizing_heat_sink import SizingHeatSink
-from .....sub_components.inductor.components.sizing_inductor import SizingInductor
-from .....sub_components.capacitor.components.sizing_capacitor import SizingCapacitor
+from .....sub_components import SizingHeatSink, SizingInductor, SizingCapacitor
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 

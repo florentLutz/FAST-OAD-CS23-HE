@@ -71,6 +71,21 @@
                             <resistance units="ohm">0.002805</resistance>
                             <gate_voltage units="V">1.3</gate_voltage>
                         </diode>
+                        <module>
+                            <length units="m">0.1502</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
+                        <heat_sink>
+                            <temperature_rating units="degK">373.15</temperature_rating>
+                            <mass units="kg">0.149</mass>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                            </coolant>
+                        </heat_sink>
+                        <dissipable_heat units="W">12000.0</dissipable_heat>
+                        <losses_max units="W">11000.0</losses_max>
                         <current_in_caliber units="A">400.0</current_in_caliber>
                         <current_in_max units="A">400.0</current_in_max>
                         <voltage_caliber units="V">860.0</voltage_caliber>

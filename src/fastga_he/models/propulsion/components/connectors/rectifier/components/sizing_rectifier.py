@@ -23,15 +23,12 @@ from .sizing_rectifier_drag import SizingRectifierDrag
 
 from .cstr_rectifier import ConstraintsRectifier
 
-from fastga_he.models.propulsion.sub_components.heat_sink.components.sizing_heat_sink import (
+from fastga_he.models.propulsion.sub_components import (
     SizingHeatSink,
-)
-from fastga_he.models.propulsion.sub_components.inductor.components.sizing_inductor import (
     SizingInductor,
-)
-from fastga_he.models.propulsion.sub_components.capacitor.components.sizing_capacitor import (
     SizingCapacitor,
 )
+
 from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
 from ..constants import POSSIBLE_POSITION, SUBMODEL_CONSTRAINTS_RECTIFIER_WEIGHT

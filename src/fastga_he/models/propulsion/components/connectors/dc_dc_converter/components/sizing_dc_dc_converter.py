@@ -14,18 +14,18 @@ from .sizing_reference_resistance import SizingDCDCConverterResistances
 from .sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
 from .sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from .sizing_module_mass import SizingDCDCConverterCasingWeight
-from .sizing_contactor_weight import SizingDC_DC_converterContactorWeight
+from .sizing_contactor_weight import SizingDCDCConverterContactorWeight
 from .sizing_dc_dc_converter_cg import SizingDCDCConverterCG
 from .sizing_dc_dc_converter_drag import SizingDCDCConverterDrag
 
 from .cstr_dc_dc_converter import ConstraintsDCDCConverter
 
-from fastga_he.models.propulsion.sub_components.inductor.components.sizing_inductor import (
+from fastga_he.models.propulsion.sub_components import (
     SizingInductor,
-)
-from fastga_he.models.propulsion.sub_components.capacitor.components.sizing_capacitor import (
     SizingCapacitor,
+    SizingHeatSink,
 )
+
 from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
 from ..constants import POSSIBLE_POSITION, SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT
@@ -93,10 +93,10 @@ class SizingDCDCConverter(om.Group):
             SizingDCDCConverterCapacitorCapacity(dc_dc_converter_id=dc_dc_converter_id),
             promotes=["*"],
         )
-        inverter_prefix = PT_DATA_PREFIX + "DC_DC_converter:" + dc_dc_converter_id
+        converter_prefix = PT_DATA_PREFIX + "DC_DC_converter:" + dc_dc_converter_id
         self.add_subsystem(
             "capacitor_weight",
-            SizingCapacitor(prefix=inverter_prefix),
+            SizingCapacitor(prefix=converter_prefix),
             promotes=["*"],
         )
 
@@ -107,7 +107,7 @@ class SizingDCDCConverter(om.Group):
         )
         self.add_subsystem(
             "inductor_sizing",
-            SizingInductor(prefix=inverter_prefix),
+            SizingInductor(prefix=converter_prefix),
             promotes=["*"],
         )
 
@@ -118,7 +118,25 @@ class SizingDCDCConverter(om.Group):
         )
         self.add_subsystem(
             "contactor_weight",
-            SizingDC_DC_converterContactorWeight(dc_dc_converter_id=dc_dc_converter_id),
+            SizingDCDCConverterContactorWeight(dc_dc_converter_id=dc_dc_converter_id),
+            promotes=["*"],
+        )
+
+        # The number of modules  in the inverter isn't really up to the user to change,
+        # it depends on the topology. Here, the topology requires 3 modules to be cooled by one
+        # heat sink
+        ivc_module_number = om.IndepVarComp()
+        ivc_module_number.add_output(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":module:number",
+            val=1,
+        )
+        self.add_subsystem(name="module_number", subsys=ivc_module_number, promotes=["*"])
+
+        self.add_subsystem(
+            name="heat_sink_sizing",
+            subsys=SizingHeatSink(prefix=converter_prefix),
             promotes=["*"],
         )
 
