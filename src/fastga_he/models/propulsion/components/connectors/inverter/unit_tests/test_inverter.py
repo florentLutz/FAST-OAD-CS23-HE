@@ -17,9 +17,8 @@ from ..components.sizing_heat_capacity_casing import SizingInverterCasingHeatCap
 from ..components.sizing_dimension_module import SizingInverterModuleDimension
 from ..components.sizing_capacitor_current_caliber import SizingInverterCapacitorCurrentCaliber
 from ..components.sizing_capacitor_capacity import SizingInverterCapacitorCapacity
-from ..components.sizing_capacitor_weight import SizingInverterCapacitorWeight
 from ..components.sizing_inductor_inductance import SizingInverterInductorInductance
-from ..components.sizing_inductor_weight import SizingInverterInductorWeight
+from ..components.sizing_inductor_current_caliber import SizingInverterInductorCurrentCaliber
 from ..components.sizing_contactor_weight import SizingInverterContactorWeight
 from ..components.sizing_inverter_weight import SizingInverterWeight
 from ..components.sizing_inverter_power_density import SizingInverterPowerDensity
@@ -61,6 +60,7 @@ from ..components.cstr_ensure import (
 
 from .....sub_components.heat_sink.components.sizing_heat_sink import SizingHeatSink
 from .....sub_components.capacitor.components.sizing_capacitor import SizingCapacitor
+from .....sub_components.inductor.components.sizing_inductor import SizingInductor
 
 from ..constants import POSSIBLE_POSITION
 
@@ -379,23 +379,47 @@ def test_inductor_inductance():
     problem.check_partials(compact_print=True)
 
 
-def test_inductor_weight():
+def test_inductor_current_caliber():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingInverterInductorWeight(inverter_id="inverter_1")),
+        list_inputs(SizingInverterInductorCurrentCaliber(inverter_id="inverter_1")),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(SizingInverterInductorWeight(inverter_id="inverter_1"), ivc)
+    problem = run_system(SizingInverterInductorCurrentCaliber(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:inductor:current_caliber",
+            units="A",
+        )
+        == pytest.approx(430.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInductor(prefix="data:propulsion:he_power_train:inverter:inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingInductor(prefix="data:propulsion:he_power_train:inverter:inverter_1"), ivc
+    )
 
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:inductor:mass",
             units="kg",
         )
-        == pytest.approx(31.064, rel=1e-2)
+        == pytest.approx(4.98, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -439,7 +463,7 @@ def test_inverter_weight():
             "data:propulsion:he_power_train:inverter:inverter_1:mass",
             units="kg",
         )
-        == pytest.approx(11.3456, rel=1e-2)
+        == pytest.approx(26.3456, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -508,14 +532,14 @@ def test_inverter_sizing():
             "data:propulsion:he_power_train:inverter:inverter_1:mass",
             units="kg",
         )
-        == pytest.approx(16.26, rel=1e-2)
+        == pytest.approx(28.69, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:power_density",
             units="kW/kg",
         )
-        == pytest.approx(36.9, rel=1e-2)
+        == pytest.approx(20.9, rel=1e-2)
     )
     assert (
         problem.get_val(

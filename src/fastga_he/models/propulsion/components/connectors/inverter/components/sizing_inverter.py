@@ -17,9 +17,7 @@ from .sizing_heat_capacity_casing import SizingInverterCasingHeatCapacity
 from .sizing_dimension_module import SizingInverterModuleDimension
 from .sizing_capacitor_current_caliber import SizingInverterCapacitorCurrentCaliber
 from .sizing_capacitor_capacity import SizingInverterCapacitorCapacity
-from .sizing_capacitor_weight import SizingInverterCapacitorWeight
-from .sizing_inductor_inductance import SizingInverterInductorInductance
-from .sizing_inductor_weight import SizingInverterInductorWeight
+from .sizing_inductor_current_caliber import SizingInverterInductorCurrentCaliber
 from .sizing_contactor_weight import SizingInverterContactorWeight
 from .sizing_inverter_weight import SizingInverterWeight
 from .sizing_inverter_power_density import SizingInverterPowerDensity
@@ -31,6 +29,9 @@ from fastga_he.models.propulsion.sub_components.heat_sink.components.sizing_heat
 )
 from fastga_he.models.propulsion.sub_components.capacitor.components.sizing_capacitor import (
     SizingCapacitor,
+)
+from fastga_he.models.propulsion.sub_components.inductor.components.sizing_inductor import (
+    SizingInductor,
 )
 from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
@@ -147,13 +148,13 @@ class SizingInverter(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            name="inductor_inductance",
-            subsys=SizingInverterInductorInductance(inverter_id=inverter_id),
+            name="inductor_current_caliber",
+            subsys=SizingInverterInductorCurrentCaliber(inverter_id=inverter_id),
             promotes=["*"],
         )
         self.add_subsystem(
             name="inductor_weight",
-            subsys=SizingInverterInductorWeight(inverter_id=inverter_id),
+            subsys=SizingInductor(prefix=inverter_prefix),
             promotes=["*"],
         )
         self.add_subsystem(
