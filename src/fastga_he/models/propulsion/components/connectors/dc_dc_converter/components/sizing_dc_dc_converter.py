@@ -12,9 +12,9 @@ from .sizing_energy_coefficients import SizingDCDCConverterEnergyCoefficients
 from .sizing_resistance_scaling import SizingDCDCConverterResistanceScaling
 from .sizing_reference_resistance import SizingDCDCConverterResistances
 from .sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
-from .sizing_capacitor_weight import SizingDCDCConverterCapacitorWeight
 from .sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from .sizing_module_mass import SizingDCDCConverterCasingWeight
+from .sizing_contactor_weight import SizingDC_DC_converterContactorWeight
 from .sizing_dc_dc_converter_cg import SizingDCDCConverterCG
 from .sizing_dc_dc_converter_drag import SizingDCDCConverterDrag
 
@@ -114,6 +114,11 @@ class SizingDCDCConverter(om.Group):
         self.add_subsystem(
             "module_weight",
             SizingDCDCConverterCasingWeight(dc_dc_converter_id=dc_dc_converter_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "contactor_weight",
+            SizingDC_DC_converterContactorWeight(dc_dc_converter_id=dc_dc_converter_id),
             promotes=["*"],
         )
 

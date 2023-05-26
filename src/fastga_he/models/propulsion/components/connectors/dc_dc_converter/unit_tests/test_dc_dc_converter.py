@@ -14,8 +14,8 @@ from ..components.sizing_resistance_scaling import SizingDCDCConverterResistance
 from ..components.sizing_reference_resistance import SizingDCDCConverterResistances
 from ..components.sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from ..components.sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
-from ..components.sizing_capacitor_weight import SizingDCDCConverterCapacitorWeight
 from ..components.sizing_module_mass import SizingDCDCConverterCasingWeight
+from ..components.sizing_contactor_weight import SizingDC_DC_converterContactorWeight
 from ..components.sizing_weight import SizingDCDCConverterWeight, SizingDCDCConverterWeightBySum
 from ..components.sizing_dc_dc_converter_cg import SizingDCDCConverterCG
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
@@ -205,7 +205,7 @@ def test_inductor_inductance():
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:inductance",
             units="mH",
         )
-        == pytest.approx(0.447, rel=1e-2)
+        == pytest.approx(0.223, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -234,14 +234,14 @@ def test_inductor_sizing():
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:resistance",
             units="ohm",
         )
-        == pytest.approx(0.00183188, rel=1e-2)
+        == pytest.approx(0.00129696, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:inductor:mass",
             units="kg",
         )
-        == pytest.approx(102.0, rel=1e-2)
+        == pytest.approx(37.81, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -324,6 +324,30 @@ def test_module_weight():
     problem.check_partials(compact_print=True)
 
 
+def test_contactor_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingDC_DC_converterContactorWeight(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDC_DC_converterContactorWeight(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:contactor:mass",
+            units="kg",
+        )
+        == pytest.approx(1.53, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_converter_weight():
 
     # Research independent input value in .xml file
@@ -364,7 +388,7 @@ def test_converter_weight_by_sum():
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass",
             units="kg",
         )
-        == pytest.approx(103.545, rel=1e-2)
+        == pytest.approx(106.075, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -745,7 +769,7 @@ def test_dc_dc_converter_sizing():
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass",
             units="kg",
         )
-        == pytest.approx(96.63, rel=1e-2)
+        == pytest.approx(40.046, rel=1e-2)
     )
     assert (
         problem.get_val(

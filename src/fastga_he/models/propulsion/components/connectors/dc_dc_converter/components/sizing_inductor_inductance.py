@@ -93,7 +93,7 @@ class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
         ]
 
         inductance = (
-            0.25 * voltage_caliber / (current_ripple * current_caliber * switching_frequency)
+            0.5 * voltage_caliber / (current_ripple * current_caliber * switching_frequency)
         )
 
         outputs[

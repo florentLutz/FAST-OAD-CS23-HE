@@ -202,6 +202,22 @@ class SizingDCDCConverterWeightBySum(om.ExplicitComponent):
             val=np.nan,
             desc="Weight of the diode and IGBT module",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":control_card:mass",
+            val=1.0,
+            units="kg",
+            desc="Weight of the control card, is generally constant, taken at 1 kg",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":contactor:mass",
+            units="kg",
+            val=np.nan,
+            desc="Mass of the contactor",
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass",
@@ -233,5 +249,15 @@ class SizingDCDCConverterWeightBySum(om.ExplicitComponent):
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
                 + ":module:mass"
+            ]
+            + inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":control_card:mass"
+            ]
+            + inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":contactor:mass"
             ]
         )

@@ -33,7 +33,7 @@
                         </capacitor>
                         <inductor>
                             <mass units="kg">102.0</mass>
-                            <inductance units="mH">0.447</inductance>
+                            <inductance units="mH">0.223</inductance>
                             <current_caliber units="A">400.0</current_caliber>
                             <current_max units="A">380.0</current_max>
                             <magnetic_energy_rating units="J">35.76</magnetic_energy_rating>
@@ -58,6 +58,9 @@
                             <mass units="kg">0.335</mass>
                             <current_caliber units="A">400.0</current_caliber>
                         </module>
+                        <contactor>
+                            <mass units="kg">1.53</mass>
+                        </contactor>
                         <igbt>
                             <current_max units="A">390.0</current_max>
                             <resistance units="ohm">0.002265</resistance>
@@ -74,7 +77,7 @@
                         <voltage_in_caliber units="V">860.0</voltage_in_caliber>
                         <voltage_in_max units="V">860.0</voltage_in_max>
                         <voltage_out_max units="V">850.0</voltage_out_max>
-                        <current_ripple>0.1</current_ripple>
+                        <current_ripple>0.4</current_ripple>
                         <switching_frequency units="Hz">12000.0</switching_frequency>
                         <switching_frequency_max units="Hz">12000.0</switching_frequency_max>
                         <scaling>
