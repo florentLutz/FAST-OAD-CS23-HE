@@ -130,7 +130,7 @@ def test_sizing_sr22(cleanup):
     )
 
 
-def test_sizing_fuel_and_battery_share(cleanup):
+def test_sizing_fuel_and_battery_share():
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -154,9 +154,7 @@ def test_sizing_fuel_and_battery_share(cleanup):
 
     problem.set_val("data:weight:aircraft:MTOW", units="kg", val=700.0)
     problem.set_val("data:geometry:wing:area", units="m**2", val=10.0)
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=25.0
-    )
+
     problem.run_model()
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
@@ -165,9 +163,9 @@ def test_sizing_fuel_and_battery_share(cleanup):
     problem.write_outputs()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(23.06, abs=1e-2)
+    assert sizing_fuel == pytest.approx(23.46, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(27.528, abs=1e-2)
+    assert sizing_energy == pytest.approx(32.431, abs=1e-2)
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        727.78, rel=1e-2
+        818.4, rel=1e-2
     )
