@@ -5,6 +5,7 @@
                 <inverter>
                     <inverter_1>
                         <module>
+                            <number>3.0</number>
                             <length units="m">0.156</length>
                             <height units="m">0.021</height>
                             <width units="m">0.065</width>

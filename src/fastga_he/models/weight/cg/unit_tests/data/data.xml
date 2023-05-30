@@ -509,6 +509,9 @@
                         </insulation>
                     </dc_bus_1>
                 </DC_bus>
+                <CG>
+                    <x units="m">3.455</x>
+                </CG>
             </he_power_train>
     </propulsion>
     <aerodynamics>
