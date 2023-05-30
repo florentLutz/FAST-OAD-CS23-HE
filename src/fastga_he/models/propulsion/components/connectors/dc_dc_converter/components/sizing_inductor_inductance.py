@@ -5,7 +5,15 @@
 import openmdao.api as om
 import numpy as np
 
+import fastoad.api as oad
 
+from ..constants import SUBMODEL_DC_DC_CONVERTER_INDUCTANCE
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_DC_DC_CONVERTER_INDUCTANCE,
+    "fastga_he.submodel.propulsion.dc_dc_converter.inductor.inductance.from_ripple",
+)
 class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
     """
     Computation of the inductance of the filter inductor, implementation of the formula from

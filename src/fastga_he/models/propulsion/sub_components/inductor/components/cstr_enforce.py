@@ -42,7 +42,7 @@ class ConstraintsInductorAirGapEnforce(om.ExplicitComponent):
         self.add_output(
             name=prefix + ":inductor:air_gap",
             units="m",
-            val=1e-2,
+            val=2.75e-3,
             desc="Air gap in the inductor",
         )
         self.declare_partials(

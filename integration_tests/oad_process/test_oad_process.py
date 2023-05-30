@@ -21,7 +21,7 @@ def cleanup():
     rmtree("D:/tmp", ignore_errors=True)
 
 
-def test_pipistrel_like(cleanup):
+def test_pipistrel_like():
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -46,14 +46,14 @@ def test_pipistrel_like(cleanup):
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
-    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        626.5, rel=1e-2
-    )
-
     problem.write_outputs()
 
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        608.94, rel=1e-2
+    )
 
-def test_fuel_and_battery(cleanup):
+
+def test_fuel_and_battery():
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -84,12 +84,12 @@ def test_fuel_and_battery(cleanup):
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        749.0, rel=1e-2
+        757.0, rel=1e-2
     )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(24.6, rel=1e-2)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(24.86, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(128.78, rel=1e-2)
+    ) == pytest.approx(128.36, rel=1e-2)
 
 
 def test_sizing_sr22(cleanup):

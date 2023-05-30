@@ -29,7 +29,11 @@ from fastga_he.models.propulsion.sub_components import (
 
 from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
-from ..constants import POSSIBLE_POSITION, SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT
+from ..constants import (
+    POSSIBLE_POSITION,
+    SUBMODEL_DC_DC_CONVERTER_WEIGHT,
+    SUBMODEL_DC_DC_CONVERTER_INDUCTANCE,
+)
 
 
 class SizingDCDCConverter(om.Group):
@@ -101,9 +105,13 @@ class SizingDCDCConverter(om.Group):
             promotes=["*"],
         )
 
+        option = {"dc_dc_converter_id": dc_dc_converter_id}
+
         self.add_subsystem(
             name="inductor_inductance",
-            subsys=SizingDCDCConverterInductorInductance(dc_dc_converter_id=dc_dc_converter_id),
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_DC_DC_CONVERTER_INDUCTANCE, options=option
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -146,13 +154,9 @@ class SizingDCDCConverter(om.Group):
             promotes=["*"],
         )
 
-        option = {"dc_dc_converter_id": dc_dc_converter_id}
-
         self.add_subsystem(
             "converter_weight",
-            oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT, options=option
-            ),
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_DC_DC_CONVERTER_WEIGHT, options=option),
             promotes=["*"],
         )
         self.add_subsystem(

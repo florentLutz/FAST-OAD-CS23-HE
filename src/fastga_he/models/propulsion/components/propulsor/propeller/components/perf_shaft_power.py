@@ -35,7 +35,7 @@ class PerformancesShaftPower(om.ExplicitComponent):
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input("altitude", units="m", val=0.0, shape=number_of_points)
 
-        self.add_output("shaft_power_in", val=5e3, shape=number_of_points, units="W")
+        self.add_output("shaft_power_in", val=50e3, shape=number_of_points, units="W")
 
         self.declare_partials(
             of="shaft_power_in",

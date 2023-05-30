@@ -7,15 +7,15 @@ import numpy as np
 
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT
+from ..constants import SUBMODEL_DC_DC_CONVERTER_WEIGHT
 
 oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT
+    SUBMODEL_DC_DC_CONVERTER_WEIGHT
 ] = "fastga_he.submodel.propulsion.dc_dc_converter.weight.sum"
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT,
+    SUBMODEL_DC_DC_CONVERTER_WEIGHT,
     "fastga_he.submodel.propulsion.dc_dc_converter.weight.power_to_mass",
 )
 class SizingDCDCConverterWeight(om.ExplicitComponent):
@@ -157,7 +157,7 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT,
+    SUBMODEL_DC_DC_CONVERTER_WEIGHT,
     "fastga_he.submodel.propulsion.dc_dc_converter.weight.sum",
 )
 class SizingDCDCConverterWeightBySum(om.Group):

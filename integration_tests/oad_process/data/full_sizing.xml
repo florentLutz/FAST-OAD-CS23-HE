@@ -104,36 +104,52 @@
         <thrust_distribution is_input="True">1.0</thrust_distribution>
         <DC_DC_converter>
           <dc_dc_converter_1>
-            <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
+            <current_ripple is_input="True">0.4<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <power_density units="W/kg" is_input="True">4000.0<!--Power density of the converter--></power_density>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_out_target_mission units="V" is_input="True">400.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
             <capacitor>
-              <resistance units="ohm" is_input="True">0.0014</resistance>
+              <aspect_ratio is_input="True">2.0</aspect_ratio>
             </capacitor>
+            <heat_sink>
+              <temperature_rating units="degK">373.15</temperature_rating>
+              <coolant>
+                  <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                  <temperature_out_rating units="degK">353.15</temperature_out_rating>
+              </coolant>
+            </heat_sink>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
             </diode>
             <inductor>
-              <air_gap units="mm">10</air_gap>
+              <air_gap units="mm">2.7</air_gap>
+              <inductance units="uH">75.0</inductance>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
           </dc_dc_converter_1>
           <dc_dc_converter_2>
-            <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
+            <current_ripple is_input="True">0.4<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <power_density units="W/kg" is_input="True">4000.0<!--Power density of the converter--></power_density>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_out_target_mission units="V" is_input="True">400.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
             <capacitor>
-              <resistance units="ohm" is_input="True">0.0014</resistance>
+              <aspect_ratio is_input="True">2.0</aspect_ratio>
             </capacitor>
+            <heat_sink>
+              <temperature_rating units="degK">373.15</temperature_rating>
+              <coolant>
+                  <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                  <temperature_out_rating units="degK">353.15</temperature_out_rating>
+              </coolant>
+            </heat_sink>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
             </diode>
             <inductor>
-              <air_gap units="mm">10</air_gap>
+              <inductance units="uH">75.0</inductance>
+              <air_gap units="mm">2.7</air_gap>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
           </dc_dc_converter_2>
@@ -290,8 +306,12 @@
             <igbt>
               <gate_voltage units="V" is_input="True">0.87</gate_voltage>
             </igbt>
+            <capacitor>
+              <aspect_ratio>2.0</aspect_ratio>
+            </capacitor>
             <inductor>
-              <short_circuit_time units="s" is_input="True">2e-06<!--Duration of the short circuit--></short_circuit_time>
+              <air_gap units="mm">2.7</air_gap>
+              <inductance units="H" is_input="False">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
             </inductor>
             <tube>
               <number_of_passes is_input="True">4.0<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
