@@ -79,6 +79,7 @@ class SizingMassPerLength(om.ExplicitComponent):
             + harness_id
             + ":cable:mass_per_length",
             units="kg/m",
+            val=2000.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

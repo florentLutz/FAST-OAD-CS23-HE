@@ -243,7 +243,17 @@
               <current_max units="A" is_input="False">730.4409873361676</current_max>
               <mass units="g" is_input="False">3062.72836880284<!--Mass of the capacitor--></mass>
               <resistance units="ohm" is_input="True">0.0014</resistance>
+              <aspect_ratio is_input="True">2.0</aspect_ratio>
             </capacitor>
+            <heat_sink>
+              <temperature_rating units="degK">373.15</temperature_rating>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+            </heat_sink>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
@@ -317,7 +327,17 @@
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
             <capacitor>
               <resistance units="ohm" is_input="True">0.0014</resistance>
+              <aspect_ratio is_input="True">2.0</aspect_ratio>
             </capacitor>
+            <heat_sink>
+              <temperature_rating units="degK">373.15</temperature_rating>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+            </heat_sink>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
             </diode>
@@ -577,6 +597,7 @@
             <capacitor>
               <capacity units="F" is_input="False">0.021463568861886526<!--Capacity required to dampen the design voltage ripple--></capacity>
               <current_caliber units="A" is_input="False">437.96816552901674<!--Current caliber of the capacitor of the inverter--></current_caliber>
+              <aspect_ratio is_input="False">2.0<!--Current caliber of the capacitor of the inverter--></aspect_ratio>
               <mass units="g" is_input="False">23923.056705267718<!--Mass of the capacitor--></mass>
             </capacitor>
             <casing>
@@ -649,6 +670,7 @@
             </igbt>
             <inductor>
               <inductance units="H" is_input="False">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
+              <air_gap units="mm" is_input="False">10<!--Inductance of the inductor--></air_gap>
               <mass units="kg" is_input="False">19.067129762867665<!--Mass of the 3 single phase inductor--></mass>
               <short_circuit_time units="s" is_input="True">2e-06<!--Duration of the short circuit--></short_circuit_time>
             </inductor>

@@ -74,6 +74,8 @@
                 </ICE>
                 <rectifier>
                     <rectifier_1>
+                        <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum value of the switching frequency of the rectifier--></switching_frequency_max>
+                        <losses_max units="W" is_input="False">1634.0535550532368</losses_max>
                         <power_factor>1.0</power_factor>
                         <current_ac_max units="A" is_input="False">165.0680702014847<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
                         <current_dc_max units="A" is_input="False">113.38180785745816<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
@@ -116,6 +118,22 @@
                             <gate_voltage units="V">1.3</gate_voltage>
                             <thermal_resistance units="K/W">0.321</thermal_resistance>
                         </diode>
+                        <capacitor>
+                            <aspect_ratio units="kg">2.0</aspect_ratio>
+                        </capacitor>
+                        <inductor>
+                            <inductance units="H">300.0e-6</inductance>
+                            <air_gap units="mm">10.0</air_gap>
+                        </inductor>
+                        <heat_sink>
+                            <temperature_rating units="degK">373.15</temperature_rating>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                        </heat_sink>
                     </rectifier_1>
                 </rectifier>
                 <generator>
@@ -215,11 +233,13 @@
                             <CD0>0.0</CD0>
                         </cruise>
                         <mass units="kg">86.0</mass>
+                        <losses_max units="W" is_input="False">1958.0316619368884</losses_max>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
                         <capacitor>
                             <current_caliber units="A">400.0</current_caliber>
                             <current_max units="A">380.0</current_max>
+                            <aspect_ratio units="kg">2.0</aspect_ratio>
                         </capacitor>
                         <inductor>
                             <air_gap units="mm">10</air_gap>
@@ -269,6 +289,15 @@
                             <b>0.000254</b>
                             <c>-1.158e-7</c>
                         </energy_off>
+                        <heat_sink>
+                            <temperature_rating units="degK">373.15</temperature_rating>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                        </heat_sink>
                     </dc_dc_converter_1>
                     <dc_dc_converter_2>
                         <CG>
@@ -601,8 +630,10 @@
                             <capacity units="F">2.02e-3</capacity>
                             <current_caliber units="A">199.18</current_caliber>
                             <mass units="kg">3.832</mass>
+                            <aspect_ratio units="kg">2.0</aspect_ratio>
                         </capacitor>
                         <inductor>
+                            <air_gap units="mm">10</air_gap>
                             <inductance units="H">11.5e-6</inductance>
                             <mass units="kg">31.064</mass>
                         </inductor>
@@ -643,6 +674,7 @@
                 </inverter>
                 <PMSM>
                     <motor_1>
+                        <voltage_ac_max units="V" is_input="False">414.83894592299646<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
                         <CG>
                             <x units="m">2.39</x>
                         </CG>

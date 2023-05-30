@@ -191,7 +191,7 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
 
         self.add_output(
             name="constraints:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
-            val=np.nan,
+            val=-0.0,
             units="V",
             desc="Respected if <0",
         )

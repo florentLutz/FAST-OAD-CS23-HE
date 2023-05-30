@@ -228,6 +228,7 @@
             <current_ac_max units="A" is_input="False">74.13822043219129<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
             <current_dc_max units="A" is_input="False">176.47058821264048<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
             <heat_sink_temperature_mission units="degK" is_input="True">12000.0<!--Heat sink temperature of the rectifier for the points--></heat_sink_temperature_mission>
+            <losses_max units="W" is_input="False">3466.1163138915394</losses_max>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum value of the switching frequency of the rectifier--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the rectifier for the points--></switching_frequency_mission>

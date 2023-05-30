@@ -476,10 +476,18 @@
             <voltage_out_max units="V" is_input="False">500.0</voltage_out_max>
             <voltage_out_target_mission units="V" is_input="True">650.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
+            <heat_sink>
+              <temperature_rating units="degK">373.15</temperature_rating>
+              <coolant>
+                  <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                  <temperature_out_rating units="degK">353.15</temperature_out_rating>
+              </coolant>
+            </heat_sink>
             <CG>
               <x units="m" is_input="False">3.4550815011709046<!--X position of the DC/DC converter center of gravity--></x>
             </CG>
             <capacitor>
+              <aspect_ratio>2.0</aspect_ratio>
               <capacity units="F" is_input="False">0.0015124177077996525<!--Capacity of the capacitor--></capacity>
               <current_caliber units="A" is_input="False">725.9604997438332<!--Current caliber of the DC/DC converter--></current_caliber>
               <current_max units="A" is_input="False">730.4409873361676</current_max>
@@ -1018,6 +1026,7 @@
               <x units="m" is_input="False">1.685628<!--X position of the inverter center of gravity--></x>
             </CG>
             <capacitor>
+              <aspect_ratio>2.0</aspect_ratio>
               <capacity units="F" is_input="False">0.021463568861886526<!--Capacity required to dampen the design voltage ripple--></capacity>
               <current_caliber units="A" is_input="False">437.96816552901674<!--Current caliber of the capacitor of the inverter--></current_caliber>
               <mass units="g" is_input="False">23923.056705267718<!--Mass of the capacitor--></mass>
@@ -1091,6 +1100,7 @@
               <thermal_resistance units="degK/W" is_input="False">0.039181185347742745<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
+              <air_gap units="mm">10.0</air_gap>
               <inductance units="H" is_input="False">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
               <mass units="kg" is_input="False">19.067129762867665<!--Mass of the 3 single phase inductor--></mass>
               <short_circuit_time units="s" is_input="True">2e-06<!--Duration of the short circuit--></short_circuit_time>
@@ -1146,6 +1156,7 @@
               <x units="m" is_input="False">1.685628<!--X position of the inverter center of gravity--></x>
             </CG>
             <capacitor>
+              <aspect_ratio>2.0</aspect_ratio>
               <capacity units="F" is_input="False">0.021463568861886526<!--Capacity required to dampen the design voltage ripple--></capacity>
               <current_caliber units="A" is_input="False">437.96816552901674<!--Current caliber of the capacitor of the inverter--></current_caliber>
               <mass units="g" is_input="False">23923.056705267718<!--Mass of the capacitor--></mass>
@@ -1219,6 +1230,7 @@
               <thermal_resistance units="degK/W" is_input="False">0.039181185347742745<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
+              <air_gap unnits="mm">10.0</air_gap>
               <inductance units="H" is_input="False">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
               <mass units="kg" is_input="False">19.067129762867665<!--Mass of the 3 single phase inductor--></mass>
               <short_circuit_time units="s" is_input="True">2e-06<!--Duration of the short circuit--></short_circuit_time>
@@ -1361,6 +1373,9 @@
                     <inductance units="H">300.0e-6</inductance>
                     <air_gap units="m">1e-2</air_gap>
                 </inductor>
+                <capacitor>
+                  <aspect_ratio>2.0</aspect_ratio>
+                </capacitor>
                 <heat_sink>
                     <temperature_rating units="degK">373.15</temperature_rating>
                     <coolant>

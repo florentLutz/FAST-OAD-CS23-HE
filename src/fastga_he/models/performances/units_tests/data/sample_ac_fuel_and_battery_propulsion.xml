@@ -279,12 +279,20 @@
             <CG>
               <x units="m" is_input="False">3.4550815011709046<!--X position of the DC/DC converter center of gravity--></x>
             </CG>
+            <heat_sink>
+                    <temperature_rating units="degK">373.15</temperature_rating>
+                    <coolant>
+                        <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                        <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                    </coolant>
+            </heat_sink>
             <capacitor>
               <capacity units="F" is_input="False">0.0015124177077996525<!--Capacity of the capacitor--></capacity>
               <current_caliber units="A" is_input="False">725.9604997438332<!--Current caliber of the DC/DC converter--></current_caliber>
               <current_max units="A" is_input="False">730.4409873361676</current_max>
               <mass units="g" is_input="False">3062.72836880284<!--Mass of the capacitor--></mass>
               <resistance units="ohm" is_input="True">0.0014</resistance>
+              <aspect_ratio is_input="False">2.0<!--Mass of the capacitor--></aspect_ratio>
             </capacitor>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
@@ -620,6 +628,7 @@
               <capacity units="F" is_input="False">0.021463568861886526<!--Capacity required to dampen the design voltage ripple--></capacity>
               <current_caliber units="A" is_input="False">437.96816552901674<!--Current caliber of the capacitor of the inverter--></current_caliber>
               <mass units="g" is_input="False">23923.056705267718<!--Mass of the capacitor--></mass>
+              <aspect_ratio is_input="False">2.0<!--Mass of the capacitor--></aspect_ratio>
             </capacitor>
             <casing>
               <heat_capacity units="J/degK" is_input="False">333.7832774951109<!--Heat capacity of one casing--></heat_capacity>
@@ -690,6 +699,7 @@
               <thermal_resistance units="degK/W" is_input="False">0.039181185347742745<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
+              <air_gap units="mm">10.0</air_gap>
               <inductance units="H" is_input="False">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
               <mass units="kg" is_input="False">19.067129762867665<!--Mass of the 3 single phase inductor--></mass>
               <short_circuit_time units="s" is_input="True">2e-06<!--Duration of the short circuit--></short_circuit_time>
@@ -828,6 +838,9 @@
         </ICE>
         <rectifier>
             <rectifier_1>
+                <capacitor>
+                  <aspect_ratio is_input="False">2.0<!--Mass of the capacitor--></aspect_ratio>
+                </capacitor>
                 <inductor>
                     <inductance units="H">300.0e-6</inductance>
                     <air_gap units="m">1e-2</air_gap>

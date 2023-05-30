@@ -14,6 +14,7 @@ from .sizing_reference_resistance import SizingDCDCConverterResistances
 from .sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
 from .sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from .sizing_module_mass import SizingDCDCConverterCasingWeight
+from .sizing_dimension_module import SizingDCDCConverterModuleDimension
 from .sizing_contactor_weight import SizingDCDCConverterContactorWeight
 from .sizing_dc_dc_converter_cg import SizingDCDCConverterCG
 from .sizing_dc_dc_converter_drag import SizingDCDCConverterDrag
@@ -119,6 +120,11 @@ class SizingDCDCConverter(om.Group):
         self.add_subsystem(
             "contactor_weight",
             SizingDCDCConverterContactorWeight(dc_dc_converter_id=dc_dc_converter_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "module_dimensions",
+            SizingDCDCConverterModuleDimension(dc_dc_converter_id=dc_dc_converter_id),
             promotes=["*"],
         )
 

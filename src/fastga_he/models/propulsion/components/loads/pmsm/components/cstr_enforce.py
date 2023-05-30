@@ -144,7 +144,7 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
         self.add_output(
             name="data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
-            val=np.nan,
+            val=800.0,
             units="V",
             desc="Max voltage of the motor",
         )

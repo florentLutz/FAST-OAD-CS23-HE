@@ -199,7 +199,7 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
             name="constraints:propulsion:he_power_train:generator:"
             + generator_id
             + ":voltage_caliber",
-            val=np.nan,
+            val=-0.0,
             units="V",
             desc="Respected if <0",
         )
