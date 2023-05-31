@@ -12,8 +12,6 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 from . import icons
 
-# TODO: since it is private for now it should not be an issue but for any release, we should get
-#  approval from the site below ? Images for node icons courtesy of www.materialui.co
 # Image URLs for graph nodes
 
 icons_dict = {
@@ -22,10 +20,12 @@ icons_dict = {
     "cable": pth.join(icons.__path__[0], "cable.png"),
     "e_motor": pth.join(icons.__path__[0], "e_motor.png"),
     "ice": pth.join(icons.__path__[0], "ice.png"),
-    "power": pth.join(icons.__path__[0], "power.png"),
-    "power_electronics": pth.join(icons.__path__[0], "power_electronics.png"),
+    "switch": pth.join(icons.__path__[0], "switch.png"),
     "propeller": pth.join(icons.__path__[0], "propeller.png"),
     "splitter": pth.join(icons.__path__[0], "splitter.png"),
+    "rectifier": pth.join(icons.__path__[0], "AC_DC.png"),
+    "dc_converter": pth.join(icons.__path__[0], "DC_DC.png"),
+    "inverter": pth.join(icons.__path__[0], "DC_AC.png"),
 }
 
 
