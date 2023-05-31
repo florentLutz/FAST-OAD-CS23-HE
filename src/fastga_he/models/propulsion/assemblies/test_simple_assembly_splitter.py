@@ -84,16 +84,16 @@ def test_assembly_performances_splitter_50_50():
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                108259.0,
-                108808.0,
-                109349.0,
-                109881.0,
-                110403.0,
-                110917.0,
-                111420.0,
-                111915.0,
-                112400.0,
-                112875.0,
+                108229.0,
+                108780.0,
+                109323.0,
+                109857.0,
+                110382.0,
+                110898.0,
+                111404.0,
+                111901.0,
+                112388.0,
+                112866.0,
             ]
         ),
         abs=1,
@@ -172,16 +172,16 @@ def test_assembly_performances_splitter_60_40():
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                86186.0,
-                86619.0,
-                87044.0,
-                87462.0,
-                87872.0,
-                88276.0,
-                88672.0,
-                89060.0,
-                89441.0,
-                89815.0,
+                86104.0,
+                86536.0,
+                86962.0,
+                87380.0,
+                87791.0,
+                88195.0,
+                88591.0,
+                88980.0,
+                89362.0,
+                89736.0,
             ]
         ),
         abs=1,
@@ -431,7 +431,7 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(16.19, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:mass", units="kg"
-    ) == pytest.approx(11.50, rel=1e-2)
+    ) == pytest.approx(19.95, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_bus:dc_bus_1:mass", units="kg"
     ) == pytest.approx(0.96, rel=1e-2)
@@ -440,7 +440,7 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(22.31, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass", units="kg"
-    ) == pytest.approx(96.63, rel=1e-2)
+    ) == pytest.approx(266.59, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(1500.0, rel=1e-2)
@@ -455,7 +455,7 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(6.40, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:mass", units="kg"
-    ) == pytest.approx(5.68, rel=1e-2)
+    ) == pytest.approx(28.93, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:generator:generator_1:mass", units="kg"
     ) == pytest.approx(34.08, rel=1e-2)
@@ -467,7 +467,7 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(363.50, rel=1e-2)
 
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        2097.11, rel=1e-2
+        2308.87, rel=1e-2
     )
     assert problem.get_val("data:propulsion:he_power_train:CG:x", units="m") == pytest.approx(
         2.847, rel=1e-2

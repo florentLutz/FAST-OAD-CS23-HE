@@ -12,15 +12,28 @@ from .sizing_energy_coefficients import SizingDCDCConverterEnergyCoefficients
 from .sizing_resistance_scaling import SizingDCDCConverterResistanceScaling
 from .sizing_reference_resistance import SizingDCDCConverterResistances
 from .sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
-from .sizing_capacitor_weight import SizingDCDCConverterCapacitorWeight
-from .sizing_inductor import SizingDCDCConverterInductor
+from .sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from .sizing_module_mass import SizingDCDCConverterCasingWeight
+from .sizing_dimension_module import SizingDCDCConverterModuleDimension
+from .sizing_contactor_weight import SizingDCDCConverterContactorWeight
 from .sizing_dc_dc_converter_cg import SizingDCDCConverterCG
 from .sizing_dc_dc_converter_drag import SizingDCDCConverterDrag
 
 from .cstr_dc_dc_converter import ConstraintsDCDCConverter
 
-from ..constants import POSSIBLE_POSITION, SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT
+from fastga_he.models.propulsion.sub_components import (
+    SizingInductor,
+    SizingCapacitor,
+    SizingHeatSink,
+)
+
+from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
+
+from ..constants import (
+    POSSIBLE_POSITION,
+    SUBMODEL_DC_DC_CONVERTER_WEIGHT,
+    SUBMODEL_DC_DC_CONVERTER_INDUCTANCE,
+)
 
 
 class SizingDCDCConverter(om.Group):
@@ -85,15 +98,25 @@ class SizingDCDCConverter(om.Group):
             SizingDCDCConverterCapacitorCapacity(dc_dc_converter_id=dc_dc_converter_id),
             promotes=["*"],
         )
+        converter_prefix = PT_DATA_PREFIX + "DC_DC_converter:" + dc_dc_converter_id
         self.add_subsystem(
             "capacitor_weight",
-            SizingDCDCConverterCapacitorWeight(dc_dc_converter_id=dc_dc_converter_id),
+            SizingCapacitor(prefix=converter_prefix),
             promotes=["*"],
         )
 
+        option = {"dc_dc_converter_id": dc_dc_converter_id}
+
+        self.add_subsystem(
+            name="inductor_inductance",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_DC_DC_CONVERTER_INDUCTANCE, options=option
+            ),
+            promotes=["*"],
+        )
         self.add_subsystem(
             "inductor_sizing",
-            SizingDCDCConverterInductor(dc_dc_converter_id=dc_dc_converter_id),
+            SizingInductor(prefix=converter_prefix),
             promotes=["*"],
         )
 
@@ -102,14 +125,38 @@ class SizingDCDCConverter(om.Group):
             SizingDCDCConverterCasingWeight(dc_dc_converter_id=dc_dc_converter_id),
             promotes=["*"],
         )
+        self.add_subsystem(
+            "contactor_weight",
+            SizingDCDCConverterContactorWeight(dc_dc_converter_id=dc_dc_converter_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "module_dimensions",
+            SizingDCDCConverterModuleDimension(dc_dc_converter_id=dc_dc_converter_id),
+            promotes=["*"],
+        )
 
-        option = {"dc_dc_converter_id": dc_dc_converter_id}
+        # The number of modules  in the inverter isn't really up to the user to change,
+        # it depends on the topology. Here, the topology requires 3 modules to be cooled by one
+        # heat sink
+        ivc_module_number = om.IndepVarComp()
+        ivc_module_number.add_output(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":module:number",
+            val=1,
+        )
+        self.add_subsystem(name="module_number", subsys=ivc_module_number, promotes=["*"])
+
+        self.add_subsystem(
+            name="heat_sink_sizing",
+            subsys=SizingHeatSink(prefix=converter_prefix),
+            promotes=["*"],
+        )
 
         self.add_subsystem(
             "converter_weight",
-            oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT, options=option
-            ),
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_DC_DC_CONVERTER_WEIGHT, options=option),
             promotes=["*"],
         )
         self.add_subsystem(

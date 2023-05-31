@@ -6,7 +6,11 @@ import openmdao.api as om
 
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_CONSTRAINTS_PMSM_TORQUE, SUBMODEL_CONSTRAINTS_PMSM_RPM
+from ..constants import (
+    SUBMODEL_CONSTRAINTS_PMSM_TORQUE,
+    SUBMODEL_CONSTRAINTS_PMSM_RPM,
+    SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE,
+)
 
 
 class ConstraintsPMSM(om.Group):
@@ -37,6 +41,13 @@ class ConstraintsPMSM(om.Group):
             name="constraints_rpm_pmsm",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_PMSM_RPM, options=option_motor_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="constraints_voltage_pmsm",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE, options=option_motor_id
             ),
             promotes=["*"],
         )

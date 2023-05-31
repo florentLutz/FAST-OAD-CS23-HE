@@ -46,7 +46,7 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         self.add_output(
             "constraints:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
             units="N*m",
-            val=np.nan,
+            val=-1.0,
             desc="Respected if negative",
         )
 

@@ -76,4 +76,4 @@ class SizingInverterModuleDimension(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":module:length",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
-        ] = 1.73e-1
+        ] = 1.73e-4

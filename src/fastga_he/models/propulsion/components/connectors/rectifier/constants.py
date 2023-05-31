@@ -8,5 +8,9 @@ SUBMODEL_CONSTRAINTS_RECTIFIER_CURRENT_IN_RMS_1_PHASE = (
 SUBMODEL_CONSTRAINTS_RECTIFIER_VOLTAGE_IN = (
     "submodel.propulsion.constraints.rectifier.voltage.input.peak"
 )
+SUBMODEL_CONSTRAINTS_RECTIFIER_LOSSES = "submodel.propulsion.constraints.rectifier.losses"
+SUBMODEL_CONSTRAINTS_RECTIFIER_FREQUENCY = "submodel.propulsion.constraints.rectifier.frequency"
+
+SUBMODEL_CONSTRAINTS_RECTIFIER_WEIGHT = "submodel.propulsion.rectifier.weight"
 
 POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]

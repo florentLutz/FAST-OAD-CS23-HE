@@ -23,12 +23,11 @@ SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE = (
 SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY = (
     "submodel.propulsion.constraints.dc_dc_converter.frequency"
 )
-SUBMODEL_CONSTRAINTS_DC_DC_INDUCTOR_AIR_GAP = (
-    "submodel.propulsion.constraints.dc_dc_converter.inductor.air_gap"
+SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES = (
+    "submodel.propulsion.constraints.dc_dc_converter.losses"
 )
 
-SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_WEIGHT = (
-    "submodel.propulsion.constraints.dc_dc_converter.weight"
-)
+SUBMODEL_DC_DC_CONVERTER_WEIGHT = "submodel.propulsion.dc_dc_converter.weight"
+SUBMODEL_DC_DC_CONVERTER_INDUCTANCE = "submodel.propulsion.dc_dc_converter.inductor.inductance"
 
 POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]

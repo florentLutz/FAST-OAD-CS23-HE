@@ -44,6 +44,7 @@ class PerformancesTemperatureFromIncrease(om.ExplicitComponent):
             units="degK",
             desc="temperature inside of the cable",
             shape=number_of_points,
+            lower=1.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

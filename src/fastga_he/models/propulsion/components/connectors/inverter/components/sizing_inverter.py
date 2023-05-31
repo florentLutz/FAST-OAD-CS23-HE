@@ -15,17 +15,21 @@ from .sizing_thermal_resistance_casing import SizingInverterCasingThermalResista
 from .sizing_weight_casing import SizingInverterCasingsWeight
 from .sizing_heat_capacity_casing import SizingInverterCasingHeatCapacity
 from .sizing_dimension_module import SizingInverterModuleDimension
-from .sizing_heat_sink import SizingHeatSink
 from .sizing_capacitor_current_caliber import SizingInverterCapacitorCurrentCaliber
 from .sizing_capacitor_capacity import SizingInverterCapacitorCapacity
-from .sizing_capacitor_weight import SizingInverterCapacitorWeight
-from .sizing_inductor_inductance import SizingInverterInductorInductance
-from .sizing_inductor_weight import SizingInverterInductorWeight
+from .sizing_inductor_current_caliber import SizingInverterInductorCurrentCaliber
 from .sizing_contactor_weight import SizingInverterContactorWeight
 from .sizing_inverter_weight import SizingInverterWeight
 from .sizing_inverter_power_density import SizingInverterPowerDensity
 from .sizing_inverter_cg import SizingInverterCG
 from .sizing_inverter_drag import SizingInverterDrag
+
+from fastga_he.models.propulsion.sub_components import (
+    SizingHeatSink,
+    SizingCapacitor,
+    SizingInductor,
+)
+from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
 
 from ..constants import POSSIBLE_POSITION
 
@@ -107,9 +111,21 @@ class SizingInverter(om.Group):
             subsys=SizingInverterModuleDimension(inverter_id=inverter_id),
             promotes=["*"],
         )
+
+        # The number of modules  in the rectifier isn't really up to the user to change,
+        # it depends on the topology. Here, the topology requires 3 modules to be cooled by one
+        # heat sink
+        ivc_module_number = om.IndepVarComp()
+        ivc_module_number.add_output(
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":module:number",
+            val=3,
+        )
+        self.add_subsystem(name="module_number", subsys=ivc_module_number, promotes=["*"])
+
+        inverter_prefix = PT_DATA_PREFIX + "inverter:" + inverter_id
         self.add_subsystem(
             name="heat_sink_sizing",
-            subsys=SizingHeatSink(inverter_id=inverter_id),
+            subsys=SizingHeatSink(prefix=inverter_prefix),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -124,17 +140,17 @@ class SizingInverter(om.Group):
         )
         self.add_subsystem(
             name="capacitor_weight",
-            subsys=SizingInverterCapacitorWeight(inverter_id=inverter_id),
+            subsys=SizingCapacitor(prefix=inverter_prefix),
             promotes=["*"],
         )
         self.add_subsystem(
-            name="inductor_inductance",
-            subsys=SizingInverterInductorInductance(inverter_id=inverter_id),
+            name="inductor_current_caliber",
+            subsys=SizingInverterInductorCurrentCaliber(inverter_id=inverter_id),
             promotes=["*"],
         )
         self.add_subsystem(
             name="inductor_weight",
-            subsys=SizingInverterInductorWeight(inverter_id=inverter_id),
+            subsys=SizingInductor(prefix=inverter_prefix),
             promotes=["*"],
         )
         self.add_subsystem(

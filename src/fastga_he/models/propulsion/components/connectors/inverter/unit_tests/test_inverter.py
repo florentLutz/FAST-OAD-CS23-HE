@@ -15,25 +15,10 @@ from ..components.sizing_thermal_resistance_casing import SizingInverterCasingTh
 from ..components.sizing_weight_casing import SizingInverterCasingsWeight
 from ..components.sizing_heat_capacity_casing import SizingInverterCasingHeatCapacity
 from ..components.sizing_dimension_module import SizingInverterModuleDimension
-from ..components.sizing_heat_sink_dimension import SizingInverterHeatSinkDimension
-from ..components.sizing_heat_sink_tube_length import SizingInverterHeatSinkTubeLength
-from ..components.sizing_heat_sink_tube_mass_flow import SizingInverterHeatSinkTubeMassFlow
-from ..components.sizing_heat_sink_coolant_prandtl import SizingInverterHeatSinkCoolantPrandtl
-from ..components.sizing_heat_sink_tube_inner_diameter import (
-    SizingInverterHeatSinkTubeInnerDiameter,
-)
-from ..components.sizing_heat_sink_tube_outer_diameter import (
-    SizingInverterHeatSinkTubeOuterDiameter,
-)
-from ..components.sizing_heat_sink_tube_weight import SizingInverterHeatSinkTubeWeight
-from ..components.sizing_height_heat_sink import SizingInverterHeatSinkHeight
-from ..components.sizing_heat_sink_weight import SizingInverterHeatSinkWeight
-from ..components.sizing_heat_sink import SizingHeatSink
 from ..components.sizing_capacitor_current_caliber import SizingInverterCapacitorCurrentCaliber
 from ..components.sizing_capacitor_capacity import SizingInverterCapacitorCapacity
-from ..components.sizing_capacitor_weight import SizingInverterCapacitorWeight
 from ..components.sizing_inductor_inductance import SizingInverterInductorInductance
-from ..components.sizing_inductor_weight import SizingInverterInductorWeight
+from ..components.sizing_inductor_current_caliber import SizingInverterInductorCurrentCaliber
 from ..components.sizing_contactor_weight import SizingInverterContactorWeight
 from ..components.sizing_inverter_weight import SizingInverterWeight
 from ..components.sizing_inverter_power_density import SizingInverterPowerDensity
@@ -72,6 +57,8 @@ from ..components.cstr_ensure import (
     ConstraintsLossesEnsure,
     ConstraintsFrequencyEnsure,
 )
+
+from .....sub_components import SizingHeatSink, SizingCapacitor, SizingInductor
 
 from ..constants import POSSIBLE_POSITION
 
@@ -275,207 +262,19 @@ def test_dimension_module():
     problem.check_partials(compact_print=True)
 
 
-def test_dimension_heat_sink():
-
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingInverterHeatSinkDimension(inverter_id="inverter_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(SizingInverterHeatSinkDimension(inverter_id="inverter_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:length", units="m"
-    ) == pytest.approx(0.2145, rel=1e-2)
-    assert problem.get_val(
-        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:width", units="m"
-    ) == pytest.approx(0.1716, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_length_heat_sink_tube():
-
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingInverterHeatSinkTubeLength(inverter_id="inverter_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(SizingInverterHeatSinkTubeLength(inverter_id="inverter_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:tube:length", units="m"
-    ) == pytest.approx(0.858, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_mass_flow_heat_sink_tube():
-
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingInverterHeatSinkTubeMassFlow(inverter_id="inverter_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(SizingInverterHeatSinkTubeMassFlow(inverter_id="inverter_1"), ivc)
-
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:coolant:max_mass_flow",
-            units="m**3/s",
-        )
-        == pytest.approx(11.1e-5, rel=1e-2)
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_mass_flow_heat_sink_coolant_prandtl():
-
-    problem = om.Problem(reports=False)
-    model = problem.model
-    model.add_subsystem(
-        "component", SizingInverterHeatSinkCoolantPrandtl(inverter_id="inverter_1"), promotes=["*"]
-    )
-    problem.setup()
-    problem.run_model()
-
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:coolant:Prandtl_number",
-        )
-        == pytest.approx(39.5, rel=1e-2)
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_heat_sink_tube_inner_diameter():
-
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingInverterHeatSinkTubeInnerDiameter(inverter_id="inverter_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(SizingInverterHeatSinkTubeInnerDiameter(inverter_id="inverter_1"), ivc)
-
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:tube:inner_diameter",
-            units="mm",
-        )
-        == pytest.approx(1.27, rel=1e-2)
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_heat_sink_tube_outer_diameter():
-
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingInverterHeatSinkTubeOuterDiameter(inverter_id="inverter_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(SizingInverterHeatSinkTubeOuterDiameter(inverter_id="inverter_1"), ivc)
-
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:tube:outer_diameter",
-            units="mm",
-        )
-        == pytest.approx(3.77, rel=1e-2)
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_heat_sink_height():
-
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingInverterHeatSinkHeight(inverter_id="inverter_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(SizingInverterHeatSinkHeight(inverter_id="inverter_1"), ivc)
-
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:height",
-            units="mm",
-        )
-        == pytest.approx(5.655, rel=1e-2)
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_heat_sink_tube_weight():
-
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingInverterHeatSinkTubeWeight(inverter_id="inverter_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(SizingInverterHeatSinkTubeWeight(inverter_id="inverter_1"), ivc)
-
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:tube:mass",
-            units="kg",
-        )
-        == pytest.approx(0.083, rel=1e-2)
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_heat_sink_weight():
-
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingInverterHeatSinkWeight(inverter_id="inverter_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(SizingInverterHeatSinkWeight(inverter_id="inverter_1"), ivc)
-
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:mass",
-            units="kg",
-        )
-        == pytest.approx(0.619, rel=1e-2)
-    )
-
-    problem.check_partials(compact_print=True)
-
-
 def test_heat_sink():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingHeatSink(inverter_id="inverter_1")),
+        list_inputs(SizingHeatSink(prefix="data:propulsion:he_power_train:inverter:inverter_1")),
         __file__,
         XML_FILE,
     )
+    ivc.add_output("data:propulsion:he_power_train:inverter:inverter_1:module:number", val=3)
 
-    problem = run_system(SizingHeatSink(inverter_id="inverter_1"), ivc)
+    problem = run_system(
+        SizingHeatSink(prefix="data:propulsion:he_power_train:inverter:inverter_1"), ivc
+    )
 
     assert (
         problem.get_val(
@@ -536,19 +335,21 @@ def test_capacitor_weight():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingInverterCapacitorWeight(inverter_id="inverter_1")),
+        list_inputs(SizingCapacitor(prefix="data:propulsion:he_power_train:inverter:inverter_1")),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(SizingInverterCapacitorWeight(inverter_id="inverter_1"), ivc)
+    problem = run_system(
+        SizingCapacitor(prefix="data:propulsion:he_power_train:inverter:inverter_1"), ivc
+    )
 
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:capacitor:mass",
             units="kg",
         )
-        == pytest.approx(3.832, rel=1e-2)
+        == pytest.approx(7.82, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -576,23 +377,47 @@ def test_inductor_inductance():
     problem.check_partials(compact_print=True)
 
 
-def test_inductor_weight():
+def test_inductor_current_caliber():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingInverterInductorWeight(inverter_id="inverter_1")),
+        list_inputs(SizingInverterInductorCurrentCaliber(inverter_id="inverter_1")),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(SizingInverterInductorWeight(inverter_id="inverter_1"), ivc)
+    problem = run_system(SizingInverterInductorCurrentCaliber(inverter_id="inverter_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:inverter:inverter_1:inductor:current_caliber",
+            units="A",
+        )
+        == pytest.approx(430.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inductor_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingInductor(prefix="data:propulsion:he_power_train:inverter:inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingInductor(prefix="data:propulsion:he_power_train:inverter:inverter_1"), ivc
+    )
 
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:inductor:mass",
             units="kg",
         )
-        == pytest.approx(31.064, rel=1e-2)
+        == pytest.approx(4.98, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -636,7 +461,7 @@ def test_inverter_weight():
             "data:propulsion:he_power_train:inverter:inverter_1:mass",
             units="kg",
         )
-        == pytest.approx(11.3456, rel=1e-2)
+        == pytest.approx(26.3456, rel=1e-2)
     )
 
     problem.check_partials(compact_print=True)
@@ -705,14 +530,14 @@ def test_inverter_sizing():
             "data:propulsion:he_power_train:inverter:inverter_1:mass",
             units="kg",
         )
-        == pytest.approx(11.50, rel=1e-2)
+        == pytest.approx(28.69, rel=1e-2)
     )
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:inverter:inverter_1:power_density",
             units="kW/kg",
         )
-        == pytest.approx(52.15, rel=1e-2)
+        == pytest.approx(20.9, rel=1e-2)
     )
     assert (
         problem.get_val(
@@ -1588,21 +1413,19 @@ def test_performances_inverter_tot():
     expected_efficiency = np.array(
         [0.985, 0.986, 0.987, 0.987, 0.988, 0.988, 0.988, 0.989, 0.989, 0.989]
     )
-    assert problem.get_val("component.efficiency.efficiency") == pytest.approx(
-        expected_efficiency, rel=1e-2
-    )
+    assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-2)
     expected_temperature_igbt = np.array(
         [371.6, 381.1, 391.2, 401.8, 413.1, 424.9, 437.4, 450.6, 464.5, 479.3]
     )
-    assert problem.get_val(
-        "component.temperature_junction.IGBT_temperature", units="degK"
-    ) == pytest.approx(expected_temperature_igbt, rel=1e-2)
+    assert problem.get_val("IGBT_temperature", units="degK") == pytest.approx(
+        expected_temperature_igbt, rel=1e-2
+    )
     expected_temperature_diode = np.array(
         [352.7, 361.7, 370.8, 380.0, 389.2, 398.4, 407.6, 416.9, 426.2, 435.5]
     )
-    assert problem.get_val(
-        "component.temperature_junction.diode_temperature", units="degK"
-    ) == pytest.approx(expected_temperature_diode, rel=1e-2)
+    assert problem.get_val("diode_temperature", units="degK") == pytest.approx(
+        expected_temperature_diode, rel=1e-2
+    )
     expected_dc_current_in = np.array(
         [353.3, 422.31, 494.94, 571.07, 650.71, 733.97, 820.68, 911.02, 1005.04, 1102.5]
     )

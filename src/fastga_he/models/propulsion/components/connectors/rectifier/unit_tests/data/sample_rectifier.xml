@@ -22,12 +22,81 @@
             <he_power_train>
                 <rectifier>
                     <rectifier_1>
+                        <power_factor>1.0</power_factor>
+                        <switching_frequency units="Hz">15.0e3</switching_frequency>
+                        <switching_frequency_max units="Hz">12.0e3</switching_frequency_max>
+                        <losses_max units="W">14582.4</losses_max>
+                        <dissipable_heat units="W">15000.0</dissipable_heat>
                         <current_ac_max units="A">133.0</current_ac_max>
                         <current_ac_caliber units="A">150.0</current_ac_caliber>
                         <voltage_ac_max units="V">800.0</voltage_ac_max>
                         <voltage_ac_caliber units="V">810.0</voltage_ac_caliber>
                         <efficiency>0.98</efficiency>
                         <voltage_out_target_mission units="V">800.0</voltage_out_target_mission>
+                        <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
+                        <heat_sink_temperature_mission units="degK">283.15</heat_sink_temperature_mission>
+                        <inductor>
+                            <current_caliber units="A">150.0</current_caliber>
+                            <inductance units="H">300.0e-6</inductance>
+                            <air_gap units="m">1e-2</air_gap>
+                            <mass units="kg">2.12</mass>
+                        </inductor>
+                        <casing>
+                            <thermal_resistance units="K/W">0.01</thermal_resistance>
+                            <mass units="kg">0.705</mass>
+                        </casing>
+                        <scaling>
+                            <a>0.333</a>
+                            <c>3.0</c>
+                            <resistance>3.0</resistance>
+                        </scaling>
+                        <energy_on>
+                            <a>0.00528233</a>
+                            <b>3.326e-05</b>
+                            <c>1.54040339e-06</c>
+                        </energy_on>
+                        <energy_off>
+                            <a>0.00141464</a>
+                            <b>0.000254</b>
+                            <c>-1.35349615e-07</c>
+                        </energy_off>
+                        <energy_rr>
+                            <a>0.00501952</a>
+                            <b>0.000340</b>
+                            <c>-5.21717365e-07</c>
+                        </energy_rr>
+                        <igbt>
+                            <resistance units="ohm">4.53e-3</resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                            <thermal_resistance units="K/W">0.249</thermal_resistance>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">5.61e-3</resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                            <thermal_resistance units="K/W">0.321</thermal_resistance>
+                        </diode>
+                        <capacitor>
+                            <current_caliber units="A">68.91</current_caliber>
+                            <capacity units="F">4.33e-4</capacity>
+                            <mass units="kg">1.162</mass>
+                            <aspect_ratio units="kg">2.0</aspect_ratio>
+                        </capacitor>
+                        <heat_sink>
+                            <temperature_rating units="degK">373.15</temperature_rating>
+                            <mass units="kg">0.444</mass>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                            </coolant>
+                        </heat_sink>
+                        <module>
+                            <length units="m">0.107</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
+                        <contactor>
+                            <mass units="kg">2.34</mass>
+                        </contactor>
                     </rectifier_1>
                 </rectifier>
             </he_power_train>

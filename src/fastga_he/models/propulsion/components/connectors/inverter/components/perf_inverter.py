@@ -20,16 +20,6 @@ from .perf_maximum import PerformancesMaximum
 
 
 class PerformancesInverter(om.Group):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        # Solvers setup
-        self.nonlinear_solver = om.NonlinearBlockGS()
-        self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 200
-        self.nonlinear_solver.options["rtol"] = 1e-5
-        self.linear_solver = om.DirectSolver()
-
     def initialize(self):
 
         self.options.declare(
@@ -71,10 +61,61 @@ class PerformancesInverter(om.Group):
         self.add_subsystem(
             "switching_losses",
             PerformancesSwitchingLosses(inverter_id=inverter_id, number_of_points=number_of_points),
-            promotes=[
-                "*",
-            ],
+            promotes=["*"],
         )
+        self.add_subsystem(
+            "temperature_profile",
+            PerformancesInverterTemperature(
+                inverter_id=inverter_id, number_of_points=number_of_points
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "efficiency", PerformancesEfficiency(number_of_points=number_of_points), promotes=["*"]
+        )
+        self.add_subsystem(
+            "dc_side_current",
+            PerformancesDCCurrent(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "maximum",
+            PerformancesMaximum(inverter_id=inverter_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+
+class PerformancesInverterTemperature(om.Group):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Solvers setup
+        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
+        self.nonlinear_solver.options["iprint"] = 0
+        self.nonlinear_solver.options["maxiter"] = 50
+        self.nonlinear_solver.options["rtol"] = 1e-5
+        self.nonlinear_solver.options["stall_limit"] = 20
+        self.nonlinear_solver.options["stall_tol"] = 1e-5
+        self.linear_solver = om.DirectSolver()
+
+    def initialize(self):
+
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            name="inverter_id",
+            default=None,
+            desc="Identifier of the inverter",
+            allow_none=False,
+        )
+
+    def setup(self):
+
+        inverter_id = self.options["inverter_id"]
+        number_of_points = self.options["number_of_points"]
+
         self.add_subsystem(
             "resistance",
             PerformancesResistance(inverter_id=inverter_id, number_of_points=number_of_points),
@@ -90,53 +131,24 @@ class PerformancesInverter(om.Group):
             PerformancesConductionLosses(
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
-            promotes=[
-                "*",
-            ],
+            promotes=["*"],
         )
         self.add_subsystem(
             "total_losses",
             PerformancesLosses(number_of_points=number_of_points),
-            promotes=[
-                "*",
-            ],
+            promotes=["*"],
         )
         self.add_subsystem(
             "temperature_casing",
             PerformancesCasingTemperature(
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
-            promotes=[
-                "*",
-            ],
+            promotes=["*"],
         )
         self.add_subsystem(
             "temperature_junction",
             PerformancesJunctionTemperature(
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
-            promotes=[
-                "*",
-            ],
-        )
-        self.add_subsystem(
-            "efficiency",
-            PerformancesEfficiency(number_of_points=number_of_points),
-            promotes=[
-                "*",
-            ],
-        )
-        self.add_subsystem(
-            "dc_side_current",
-            PerformancesDCCurrent(number_of_points=number_of_points),
-            promotes=[
-                "*",
-            ],
-        )
-        self.add_subsystem(
-            "maximum",
-            PerformancesMaximum(inverter_id=inverter_id, number_of_points=number_of_points),
-            promotes=[
-                "*",
-            ],
+            promotes=["*"],
         )

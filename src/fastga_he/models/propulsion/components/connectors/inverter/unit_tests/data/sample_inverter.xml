@@ -67,10 +67,13 @@
                             <capacity units="F">2.02e-3</capacity>
                             <current_caliber units="A">199.18</current_caliber>
                             <mass units="kg">3.832</mass>
+                            <aspect_ratio units="kg">2.0</aspect_ratio>
                         </capacitor>
                         <inductor>
-                            <inductance units="H">11.5e-6</inductance>
-                            <mass units="kg">31.064</mass>
+                            <air_gap units="mm">10</air_gap>
+                            <current_caliber units="A">433.0</current_caliber>
+                            <inductance units="H">4.0e-5</inductance>
+                            <mass units="kg">5.0</mass>
                         </inductor>
                         <contactor>
                             <mass units="kg">4.85</mass>

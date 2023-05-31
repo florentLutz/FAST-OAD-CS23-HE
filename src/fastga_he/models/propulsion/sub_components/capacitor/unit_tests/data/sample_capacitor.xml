@@ -1,0 +1,26 @@
+<FASTOAD_model>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <inverter>
+                    <inverter_1>
+                        <capacitor>
+                            <capacity units="F">2.02e-3</capacity>
+                            <aspect_ratio units="F">2.0</aspect_ratio>
+                            <diameter units="m">0.159</diameter>
+                            <height units="m">0.318</height>
+                            <scaling>
+                                <capacity>2.02</capacity>
+                                <diameter>1.59</diameter>
+                                <height>2.052</height>
+                                <thermal_resistance>0.58</thermal_resistance>
+                                <resistance>0.40</resistance>
+                                <mass>5.18</mass>
+                            </scaling>
+                        </capacitor>
+                    </inverter_1>
+                </inverter>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
