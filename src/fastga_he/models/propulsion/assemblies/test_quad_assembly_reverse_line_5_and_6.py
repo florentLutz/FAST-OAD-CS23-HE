@@ -77,22 +77,22 @@ class PerformancesAssembly(om.Group):
         self.add_subsystem(
             "propeller_1",
             PerformancesPropeller(propeller_id="propeller_1", number_of_points=number_of_points),
-            promotes=["true_airspeed", "altitude", "data:*"],
+            promotes=["true_airspeed", "altitude", "data:*", "density"],
         )
         self.add_subsystem(
             "propeller_2",
             PerformancesPropeller(propeller_id="propeller_2", number_of_points=number_of_points),
-            promotes=["true_airspeed", "altitude", "data:*"],
+            promotes=["true_airspeed", "altitude", "data:*", "density"],
         )
         self.add_subsystem(
             "propeller_3",
             PerformancesPropeller(propeller_id="propeller_3", number_of_points=number_of_points),
-            promotes=["true_airspeed", "altitude", "data:*"],
+            promotes=["true_airspeed", "altitude", "data:*", "density"],
         )
         self.add_subsystem(
             "propeller_4",
             PerformancesPropeller(propeller_id="propeller_4", number_of_points=number_of_points),
-            promotes=["true_airspeed", "altitude", "data:*"],
+            promotes=["true_airspeed", "altitude", "data:*", "density"],
         )
 
         # Motors
@@ -350,6 +350,7 @@ def test_assembly():
     )
     altitude = np.full(NB_POINTS_TEST, 0.0)
     ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
 
     ivc.add_output(

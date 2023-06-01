@@ -44,6 +44,7 @@ def test_assembly_performances_splitter_150_kw():
     )
     altitude = np.full(NB_POINTS_TEST, 0.0)
     ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
     ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
     ivc.add_output(
@@ -118,6 +119,7 @@ def test_assembly_performances_splitter_150_kw_low_requirement():
     )
     altitude = np.full(NB_POINTS_TEST, 0.0)
     ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
     ivc.add_output("thrust", val=np.linspace(550, 500, NB_POINTS_TEST), units="N")
     ivc.add_output(
@@ -185,6 +187,7 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     )
     altitude = np.full(NB_POINTS_TEST, 0.0)
     ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
     ivc.add_output("thrust", val=np.linspace(500, 1500, NB_POINTS_TEST), units="N")
     ivc.add_output(
@@ -279,6 +282,7 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
     )
     altitude = np.full(NB_POINTS_TEST, 0.0)
     ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
     ivc.add_output("thrust", val=np.linspace(500, 1500, NB_POINTS_TEST), units="N")
     ivc.add_output(
@@ -354,6 +358,7 @@ def test_incoherent_voltage():
     )
     altitude = np.full(NB_POINTS_TEST, 0.0)
     ivc_blank.add_output("altitude", val=altitude, units="m")
+    ivc_blank.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
     ivc_blank.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
     ivc_blank.add_output("thrust", val=np.linspace(500, 1500, NB_POINTS_TEST), units="N")
     ivc_blank.add_output(

@@ -41,7 +41,7 @@ class PerformancesAssembly(om.Group):
         self.add_subsystem(
             "propeller_1",
             PerformancesPropeller(propeller_id="propeller_1", number_of_points=number_of_points),
-            promotes=["true_airspeed", "altitude", "thrust", "data:*"],
+            promotes=["true_airspeed", "altitude", "thrust", "data:*", "density"],
         )
         self.add_subsystem(
             "motor_1",
