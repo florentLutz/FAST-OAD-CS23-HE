@@ -226,6 +226,7 @@ class DEPEquilibrium(om.Group):
                     "time_step_econ",
                     "exterior_temperature_econ",
                     "altitude_econ",
+                    "density_econ",
                     "thrust_econ",
                     "engine_setting_econ",
                 ],

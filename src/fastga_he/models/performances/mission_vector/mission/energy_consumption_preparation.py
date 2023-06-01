@@ -10,6 +10,8 @@ from stdatm import Atmosphere
 
 _LOGGER = logging.getLogger(__name__)
 
+RHO_SL = Atmosphere(0.0).density
+
 
 class PrepareForEnergyConsumption(om.ExplicitComponent):
     """
@@ -67,6 +69,12 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
             "altitude", shape=number_of_points, val=np.full(number_of_points, np.nan), units="m"
         )
         self.add_input(
+            "density",
+            shape=number_of_points,
+            val=np.full(number_of_points, np.nan),
+            units="kg/m**3",
+        )
+        self.add_input(
             "exterior_temperature",
             shape=number_of_points,
             val=np.full(number_of_points, np.nan),
@@ -90,12 +98,11 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         # consumption
         self.add_output("thrust_econ", shape=number_of_points + 2, units="N")
         self.add_output("altitude_econ", shape=number_of_points + 2, units="m")
+        self.add_output("density_econ", shape=number_of_points + 2, units="kg/m**3")
         self.add_output("exterior_temperature_econ", shape=number_of_points + 2, units="degK")
         self.add_output("time_step_econ", shape=number_of_points + 2, units="s")
         self.add_output("true_airspeed_econ", shape=number_of_points + 2, units="m/s")
         self.add_output("engine_setting_econ", shape=number_of_points + 2)
-
-    def setup_partials(self):
 
         self.declare_partials(
             of="thrust_econ",
@@ -107,20 +114,12 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
             method="exact",
         )
 
-        self.declare_partials(
-            of="altitude_econ",
-            wrt=[
-                "altitude",
-            ],
-            method="exact",
-        )
+        self.declare_partials(of="altitude_econ", wrt="altitude", method="exact")
+        self.declare_partials(of="density_econ", wrt="density", method="exact")
+        self.declare_partials(of="engine_setting_econ", wrt="engine_setting", method="exact")
 
         self.declare_partials(
-            of="exterior_temperature_econ",
-            wrt=[
-                "exterior_temperature",
-            ],
-            method="exact",
+            of="exterior_temperature_econ", wrt="exterior_temperature", method="exact"
         )
 
         self.declare_partials(
@@ -167,6 +166,12 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         outputs["thrust_econ"] = thrust_econ
 
         outputs["altitude_econ"] = np.concatenate((np.zeros(1), inputs["altitude"], np.zeros(1)))
+        outputs["density_econ"] = np.concatenate(
+            (np.array([RHO_SL]), inputs["density"], np.array([RHO_SL]))
+        )
+        outputs["engine_setting_econ"] = np.concatenate(
+            (np.ones(1), inputs["engine_setting"], np.ones(1))
+        )
 
         temp_sl = Atmosphere(np.array([0]), altitude_in_feet=True).temperature
         outputs["exterior_temperature_econ"] = np.concatenate(
@@ -197,10 +202,6 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         tas_taxi_in = float(inputs["data:mission:sizing:taxi_in:speed"])
         outputs["true_airspeed_econ"] = np.concatenate(
             (np.array([tas_taxi_out]), inputs["true_airspeed"], np.array([tas_taxi_in]))
-        )
-
-        outputs["engine_setting_econ"] = np.concatenate(
-            (np.ones(1), inputs["engine_setting"], np.ones(1))
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -237,6 +238,10 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         d_altitude_econ_d_altitude = np.zeros((number_of_points + 2, number_of_points))
         d_altitude_econ_d_altitude[1 : number_of_points + 1, :] = np.eye(number_of_points)
         partials["altitude_econ", "altitude"] = d_altitude_econ_d_altitude
+
+        # In value it is gonna be the same so we avoid over-burdening the compute_partials function
+        partials["density_econ", "density"] = d_altitude_econ_d_altitude
+        partials["engine_setting_econ", "engine_setting"] = d_altitude_econ_d_altitude
 
         d_temp_econ_d_temp = np.zeros((number_of_points + 2, number_of_points))
         d_temp_econ_d_temp[1 : number_of_points + 1, :] = np.eye(number_of_points)

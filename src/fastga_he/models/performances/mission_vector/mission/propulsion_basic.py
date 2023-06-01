@@ -59,6 +59,12 @@ class FuelConsumed(om.ExplicitComponent):
         )
         # Unused in this module but needed in the power train builder
         self.add_input(
+            "density_econ",
+            shape=number_of_points + 2,
+            val=np.full(number_of_points + 2, np.nan),
+            units="kg/m**3",
+        )
+        self.add_input(
             "exterior_temperature_econ",
             shape=number_of_points + 2,
             val=np.full(number_of_points + 2, np.nan),

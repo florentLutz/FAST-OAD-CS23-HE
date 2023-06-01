@@ -127,6 +127,8 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
                 "thrust_rate_t_econ",
                 "engine_setting_econ",
                 "exterior_temperature_econ",
+                "altitude_econ",
+                "density_econ",
             ],
         )
 

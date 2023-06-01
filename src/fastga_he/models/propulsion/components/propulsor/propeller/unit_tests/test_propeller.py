@@ -28,6 +28,8 @@ from ..components.sizing_propeller import SizingPropeller
 
 from ..constants import POSSIBLE_POSITION
 
+from stdatm import Atmosphere
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "reference_propeller.xml"
@@ -215,7 +217,8 @@ def test_thrust_coefficient():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
+    density = Atmosphere(altitude=np.full(NB_POINTS_TEST, 0.0)).density
+    ivc.add_output("density", val=density, units="kg/m**3")
     ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
     ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500), units="min**-1")
 
@@ -381,7 +384,8 @@ def test_shaft_power():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
+    density = Atmosphere(altitude=np.full(NB_POINTS_TEST, 0.0)).density
+    ivc.add_output("density", val=density, units="kg/m**3")
     ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500), units="min**-1")
     ivc.add_output(
         "power_coefficient",
@@ -506,6 +510,8 @@ def test_propeller_performances():
         __file__,
         XML_FILE,
     )
+    density = Atmosphere(altitude=np.full(NB_POINTS_TEST, 0.0)).density
+    ivc.add_output("density", val=density, units="kg/m**3")
     ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
     ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")

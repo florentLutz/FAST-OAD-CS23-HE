@@ -2,10 +2,14 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import os.path as pth
+
 import numpy as np
 import pytest
 
 import openmdao.api as om
+
+from stdatm import Atmosphere
 
 from ..components.cstr_enforce import ConstraintsSeaLevelPowerEnforce
 from ..components.cstr_ensure import ConstraintsSeaLevelPowerEnsure
@@ -316,10 +320,11 @@ def test_equivalent_power():
         val=np.linspace(150.0, 250.0, NB_POINTS_TEST),
         units="kW",
     )
+    altitude = np.linspace(8000.0, 0.0, NB_POINTS_TEST)
     ivc.add_output(
-        "altitude",
-        val=np.linspace(8000.0, 0.0, NB_POINTS_TEST),
-        units="ft",
+        "density",
+        val=Atmosphere(altitude, altitude_in_feet=True).density,
+        units="kg/m**3",
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -476,10 +481,11 @@ def test_performances_ice():
         val=np.linspace(2500.0, 2699.0, NB_POINTS_TEST),
         units="min**-1",
     )
+    altitude = np.linspace(8000.0, 0.0, NB_POINTS_TEST)
     ivc.add_output(
-        "altitude",
-        val=np.linspace(8000.0, 0.0, NB_POINTS_TEST),
-        units="ft",
+        "density",
+        val=Atmosphere(altitude, altitude_in_feet=True).density,
+        units="kg/m**3",
     )
     ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
 
@@ -499,3 +505,5 @@ def test_performances_ice():
     ) == pytest.approx(250e3, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
