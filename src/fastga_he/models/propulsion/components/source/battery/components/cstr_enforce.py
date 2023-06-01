@@ -356,8 +356,6 @@ class ConstraintsSOCPicker(om.ExplicitComponent):
             + ":number_modules_limiter"
         ]
 
-        number_of_module_before = number_cells_tot / number_cells_module
-
         multiplicative_factor_capa = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_multiplier"
         ]

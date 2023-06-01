@@ -123,7 +123,7 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         # ever look at energy recuperation, it might need to be changed. To compute the upper
         # bound, instead of having a fixed value we will assume a very low efficiency and compute
         # it from there
-        lower_efficiency = 0.4
+        lower_efficiency = 0.5
         cp = np.clip(cp, 0.0, j * ct / lower_efficiency)
 
         outputs["power_coefficient"] = cp
