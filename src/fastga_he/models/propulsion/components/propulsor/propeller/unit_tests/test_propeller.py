@@ -329,7 +329,7 @@ def test_power_coefficient():
     )
 
     assert problem.get_val("power_coefficient") == pytest.approx(
-        np.array([0.0693, 0.0696, 0.0697, 0.0706, 0.0707, 0.0711, 0.0713, 0.0714, 0.0717, 0.0725]),
+        np.array([0.0642, 0.0645, 0.0647, 0.0656, 0.0658, 0.0661, 0.0663, 0.0665, 0.0668, 0.0677]),
         rel=1e-2,
     )
 
