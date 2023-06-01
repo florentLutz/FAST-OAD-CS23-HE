@@ -19,6 +19,7 @@ icons_dict = {
     "bus_bar": pth.join(icons.__path__[0], "bus_bar.png"),
     "cable": pth.join(icons.__path__[0], "cable.png"),
     "e_motor": pth.join(icons.__path__[0], "e_motor.png"),
+    "generator": pth.join(icons.__path__[0], "generator.png"),
     "ice": pth.join(icons.__path__[0], "ice.png"),
     "switch": pth.join(icons.__path__[0], "switch.png"),
     "propeller": pth.join(icons.__path__[0], "propeller.png"),

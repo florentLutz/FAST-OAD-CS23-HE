@@ -308,7 +308,7 @@ GENERATOR = {
         {"ac_voltage_rms_out": "V"},
         {"ac_voltage_peak_out": "V"},
     ],
-    ICON: "e_motor",
+    ICON: "generator",
     ICON_SIZE: 30,
     RSD: ["shaft_power_in", "ac_voltage_rms_out", "efficiency"],
     SETS_V: True,
