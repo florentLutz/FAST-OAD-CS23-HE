@@ -281,5 +281,5 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
             "power_coefficient",
             "settings:propulsion:he_power_train:propeller:" + propeller_id + ":installation_effect",
         ] = (
-            cp * k_installation
+            -cp / k_installation
         )
