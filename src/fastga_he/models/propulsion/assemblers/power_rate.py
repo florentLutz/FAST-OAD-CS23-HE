@@ -50,6 +50,8 @@ class PowerRate(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         # Now for the "mock-up" part
+        self.add_input("altitude_econ", val=np.nan, shape=number_of_points, units="ft")
+        self.add_input("density_econ", val=np.nan, shape=number_of_points, units="kg/m**3")
         self.add_input("engine_setting_econ", val=np.nan, shape=number_of_points)
         self.add_input(
             "exterior_temperature_econ", val=273.15, shape=number_of_points, units="degK"

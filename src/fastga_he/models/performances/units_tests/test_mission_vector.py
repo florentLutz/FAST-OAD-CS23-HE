@@ -1129,7 +1129,7 @@ def test_mission_vector_from_yml():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(150.26, abs=1e-2)
+    assert sizing_energy == pytest.approx(149.81, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
@@ -1165,7 +1165,7 @@ def test_mission_vector_from_yml_fuel():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(34.30, abs=1e-2)
+    assert sizing_fuel == pytest.approx(34.18, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1199,7 +1199,7 @@ def test_mission_vector_from_yml_two_fuel():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(33.42, abs=1e-2)
+    assert sizing_fuel == pytest.approx(33.30, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1267,13 +1267,13 @@ def test_mission_vector_from_yml_fuel_and_battery():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(20.18, abs=1e-2)
+    assert sizing_fuel == pytest.approx(20.12, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(74.945, abs=1e-2)
+    assert sizing_energy == pytest.approx(74.724, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.05829972262790761, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.05860841716480536, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -1420,10 +1420,10 @@ def test_mission_criss_cross():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(25.88, abs=1e-2)
+    assert sizing_fuel == pytest.approx(25.79, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(50.391, abs=1e-2)
+    assert sizing_energy == pytest.approx(50.243, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.0596, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.0603, abs=1e-2)

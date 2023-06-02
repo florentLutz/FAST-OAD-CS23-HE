@@ -47,7 +47,7 @@ class PerformancesAssemblySplitter(om.Group):
         self.add_subsystem(
             "propeller_1",
             PerformancesPropeller(propeller_id="propeller_1", number_of_points=number_of_points),
-            promotes=["true_airspeed", "altitude", "thrust", "data:*"],
+            promotes=["true_airspeed", "altitude", "thrust", "data:*", "density"],
         )
         self.add_subsystem(
             "motor_1",
@@ -154,7 +154,7 @@ class PerformancesAssemblySplitter(om.Group):
                 ice_id="ice_1",
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "time_step"],
+            promotes=["data:*", "time_step", "density"],
         )
 
         self.connect("propeller_1.rpm", "motor_1.rpm")

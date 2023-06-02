@@ -1,5 +1,6 @@
 <FASTOAD_model>
   <altitude units="m" is_input="True">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</altitude>
+  <density units="kg/m**3" is_input="True">[1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587]</density>
   <exterior_temperature units="degK" is_input="True">[288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15]<!--temperature outside of the cable--></exterior_temperature>
   <fuel_consumed_t_econ units="kg" is_input="False">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--fuel consumed at each time step--></fuel_consumed_t_econ>
   <non_consumable_energy_t_econ units="W*h" is_input="False">[28624.939084201746, 28773.32999579417, 28918.238604255745, 29060.949972466336, 29202.28489567864, 29342.53615849748, 29481.50602476687, 29618.61634027313, 29753.23080613263, 29885.427627529254]<!--Non consumable energy at each time step--></non_consumable_energy_t_econ>

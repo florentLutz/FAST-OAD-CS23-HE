@@ -7,6 +7,8 @@ import numpy as np
 
 from stdatm import Atmosphere
 
+RHO_SL = Atmosphere(0.0).density
+
 
 class PerformancesEquivalentSeaLevelPower(om.ExplicitComponent):
     """
@@ -27,27 +29,17 @@ class PerformancesEquivalentSeaLevelPower(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
-        self.add_input("altitude", units="m", val=0.0, shape=number_of_points)
+        self.add_input("density", units="kg/m**3", val=np.nan, shape=number_of_points)
 
         self.add_output("equivalent_SL_power", units="W", val=np.full(number_of_points, 250e3))
 
-        self.declare_partials(of="equivalent_SL_power", wrt="shaft_power_out", method="exact")
-        self.declare_partials(
-            of="equivalent_SL_power",
-            wrt="altitude",
-            method="fd",
-            form="central",
-            step=1.0e2,
-            rows=np.arange(number_of_points),
-            cols=np.arange(number_of_points),
-        )
+        self.declare_partials(of="equivalent_SL_power", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         shaft_power_out = inputs["shaft_power_out"]
-
-        rho = Atmosphere(inputs["altitude"], altitude_in_feet=False).density
-        sigma = rho / Atmosphere(0.0).density
+        rho = inputs["density"]
+        sigma = rho / RHO_SL
 
         corrective_factor = sigma - (1 - sigma) / 7.55
 
@@ -55,9 +47,13 @@ class PerformancesEquivalentSeaLevelPower(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        rho = Atmosphere(inputs["altitude"], altitude_in_feet=False).density
-        sigma = rho / Atmosphere(0.0).density
+        shaft_power_out = inputs["shaft_power_out"]
+        rho = inputs["density"]
+        sigma = rho / RHO_SL
 
         corrective_factor = sigma - (1 - sigma) / 7.55
 
         partials["equivalent_SL_power", "shaft_power_out"] = np.diag(1.0 / corrective_factor)
+        partials["equivalent_SL_power", "density"] = -np.diag(
+            shaft_power_out / corrective_factor ** 2.0 * (8.55 / 7.55) / RHO_SL
+        )

@@ -32,28 +32,15 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
             desc="Diameter of the propeller",
         )
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
-        self.add_input("altitude", units="m", val=0.0, shape=number_of_points)
+        self.add_input("density", units="kg/m**3", val=np.nan, shape=number_of_points)
         self.add_input("thrust", units="N", val=1500, shape=number_of_points)
 
         self.add_output("thrust_coefficient", val=0.05, shape=number_of_points, lower=0.0)
 
         self.declare_partials(
             of="thrust_coefficient",
-            wrt=[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-                "rpm",
-                "thrust",
-            ],
+            wrt=["*"],
             method="exact",
-        )
-        self.declare_partials(
-            of="thrust_coefficient",
-            wrt="altitude",
-            method="fd",
-            form="central",
-            step=1.0e2,
-            rows=np.arange(number_of_points),
-            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -61,8 +48,7 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
 
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
-
-        rho = Atmosphere(inputs["altitude"], altitude_in_feet=False).density
+        rho = inputs["density"]
         rps = inputs["rpm"] / 60.0
 
         # Ensuring we take the absolute value for the computation of thrust in case we eventually
@@ -76,18 +62,21 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
 
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
 
-        rho = Atmosphere(inputs["altitude"], altitude_in_feet=False).density
+        rho = inputs["density"]
         rps = inputs["rpm"] / 60.0
 
         partials["thrust_coefficient", "thrust"] = np.diag(
-            1.0 / (rho * rps ** 2.0 * diameter ** 4.0)
+            np.sign(inputs["thrust"]) / (rho * rps ** 2.0 * diameter ** 4.0)
         )
-        partials["thrust_coefficient", "rpm"] = (
-            -2.0 * np.diag(inputs["thrust"] / (rho * rps ** 3 * diameter ** 4.0)) / 60.0
+        partials["thrust_coefficient", "rpm"] = np.diag(
+            -2.0 * np.abs(inputs["thrust"]) / (rho * rps ** 3 * diameter ** 4.0) / 60.0
         )
         partials[
             "thrust_coefficient",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
         ] = (
-            -4.0 * inputs["thrust"] / (rho * rps ** 2.0 * diameter ** 5.0)
+            -4.0 * np.abs(inputs["thrust"]) / (rho * rps ** 2.0 * diameter ** 5.0)
+        )
+        partials["thrust_coefficient", "density"] = -np.diag(
+            inputs["thrust"] / (rho ** 2.0 * rps ** 2.0 * diameter ** 4.0)
         )

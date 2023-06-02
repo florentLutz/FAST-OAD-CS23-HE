@@ -28,6 +28,8 @@ from ..components.sizing_propeller import SizingPropeller
 
 from ..constants import POSSIBLE_POSITION
 
+from stdatm import Atmosphere
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "reference_propeller.xml"
@@ -215,7 +217,8 @@ def test_thrust_coefficient():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
+    density = Atmosphere(altitude=np.full(NB_POINTS_TEST, 0.0)).density
+    ivc.add_output("density", val=density, units="kg/m**3")
     ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
     ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500), units="min**-1")
 
@@ -381,12 +384,13 @@ def test_shaft_power():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
+    density = Atmosphere(altitude=np.full(NB_POINTS_TEST, 0.0)).density
+    ivc.add_output("density", val=density, units="kg/m**3")
     ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500), units="min**-1")
     ivc.add_output(
         "power_coefficient",
         val=np.array(
-            [0.0658, 0.0661, 0.0662, 0.0671, 0.0672, 0.0675, 0.0677, 0.0678, 0.0681, 0.0689]
+            [0.001, 0.0661, 0.0662, 0.0671, 0.0672, 0.0675, 0.0677, 0.0678, 0.0681, 0.0689]
         ),
     )
 
@@ -397,7 +401,7 @@ def test_shaft_power():
     )
 
     assert problem.get_val("shaft_power_in", units="kW") == pytest.approx(
-        np.array([178.0, 178.8, 179.1, 181.5, 181.8, 182.6, 183.1, 183.4, 184.2, 186.4]),
+        np.array([5.0, 178.8, 179.1, 181.5, 181.8, 182.6, 183.1, 183.4, 184.2, 186.4]),
         rel=1e-2,
     )
 
@@ -506,6 +510,8 @@ def test_propeller_performances():
         __file__,
         XML_FILE,
     )
+    density = Atmosphere(altitude=np.full(NB_POINTS_TEST, 0.0)).density
+    ivc.add_output("density", val=density, units="kg/m**3")
     ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
     ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
