@@ -30,6 +30,9 @@ import fastga_he.api as oad_he
 from fastga_he.models.performances.mission_vector.initialization.initialize_altitude import (
     InitializeAltitude,
 )
+from fastga_he.models.performances.mission_vector.initialization.initialize_density import (
+    InitializeDensity,
+)
 from fastga_he.models.performances.mission_vector.initialization.initialize_climb_airspeed import (
     InitializeClimbAirspeed,
 )
@@ -125,6 +128,96 @@ def test_initialize_altitude():
         ]
     )
     assert np.max(np.abs(problem.get_val("altitude", units="m") - expected_altitude)) <= 1e-1
+
+    problem.check_partials(compact_print=True)
+
+
+def test_initialize_density():
+
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+
+    altitude = np.array(
+        [
+            0.0,
+            270.9,
+            541.9,
+            812.8,
+            1083.7,
+            1354.7,
+            1625.6,
+            1896.5,
+            2167.5,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            1828.8,
+            1219.2,
+            609.6,
+            0.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+        ]
+    )
+    ivc.add_output("altitude", units="m", val=altitude)
+
+    problem = run_system(
+        InitializeDensity(
+            number_of_points_climb=10,
+            number_of_points_cruise=10,
+            number_of_points_descent=5,
+            number_of_points_reserve=5,
+        ),
+        ivc,
+    )
+
+    expected_density = np.array(
+        [
+            1.224,
+            1.193,
+            1.162,
+            1.132,
+            1.102,
+            1.073,
+            1.044,
+            1.016,
+            0.989,
+            0.962,
+            0.962,
+            0.962,
+            0.962,
+            0.962,
+            0.962,
+            0.962,
+            0.962,
+            0.962,
+            0.962,
+            0.962,
+            0.962,
+            1.023,
+            1.087,
+            1.154,
+            1.224,
+            1.111,
+            1.111,
+            1.111,
+            1.111,
+            1.111,
+        ]
+    )
+    assert problem.get_val("density", units="kg/m**3") == pytest.approx(expected_density, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
