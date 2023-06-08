@@ -39,7 +39,7 @@ def power_train_network_viewer(
     net = Network(
         notebook=True,
         cdn_resources="remote",
-        bgcolor="#a9a9a9",
+        bgcolor="#bebebe",
         font_color="white",
         select_menu=True,
         layout=True,
