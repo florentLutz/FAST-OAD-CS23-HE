@@ -10,6 +10,8 @@ import openmdao.api as om
 from ..components.sizing_weight import SizingPropellerWeight
 from ..components.sizing_propeller_depth import SizingPropellerDepth
 from ..components.sizing_propeller_cg import SizingPropellerCG
+from ..components.sizing_propeller_ref_cl import SizingPropellerReferenceCl
+from ..components.sizing_propeller_ref_chord import SizingPropellerReferenceChord
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_advance_ratio import PerformancesAdvanceRatio
 from ..components.perf_tip_mach import PerformancesTipMach
@@ -87,6 +89,56 @@ def test_propeller_cg():
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
+
+
+def test_propeller_ref_cl():
+
+    expected_cg = [1.085, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(SizingPropellerReferenceCl(propeller_id="propeller_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SizingPropellerReferenceCl(propeller_id="propeller_1", position=option), ivc
+        )
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:propeller:propeller_1:cl_clean_ref"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True, step=1e-7)
+
+
+def test_propeller_ref_chord():
+
+    expected_cg = [0.9275, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(SizingPropellerReferenceChord(propeller_id="propeller_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SizingPropellerReferenceChord(propeller_id="propeller_1", position=option), ivc
+        )
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:propeller:propeller_1:wing_chord_ref",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_constraints_torque_enforce():
