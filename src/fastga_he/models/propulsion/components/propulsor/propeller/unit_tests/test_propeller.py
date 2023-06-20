@@ -12,6 +12,8 @@ from ..components.sizing_propeller_depth import SizingPropellerDepth
 from ..components.sizing_propeller_cg import SizingPropellerCG
 from ..components.sizing_propeller_ref_cl import SizingPropellerReferenceCl
 from ..components.sizing_propeller_ref_chord import SizingPropellerReferenceChord
+from ..components.sizing_propeller_radius_to_span_ratio import SizingPropellerDiameterToSpanRatio
+from ..components.sizing_propeller_radius_to_chord_ratio import SizingPropellerDiameterToChordRatio
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_advance_ratio import PerformancesAdvanceRatio
 from ..components.perf_tip_mach import PerformancesTipMach
@@ -116,7 +118,7 @@ def test_propeller_ref_cl():
 
 def test_propeller_ref_chord():
 
-    expected_cg = [0.9275, 0.0]
+    expected_cg = [0.9275, 1.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
 
@@ -139,6 +141,40 @@ def test_propeller_ref_chord():
         )
 
         problem.check_partials(compact_print=True, step=1e-7)
+
+
+def test_diameter_to_span_ratio():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingPropellerDiameterToSpanRatio(propeller_id="propeller_1")),
+        __file__,
+        XML_FILE,
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingPropellerDiameterToSpanRatio(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:diameter_to_span_ratio"
+    ) == pytest.approx(0.312, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_diameter_to_chord_ratio():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingPropellerDiameterToChordRatio(propeller_id="propeller_1")),
+        __file__,
+        XML_FILE,
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingPropellerDiameterToChordRatio(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:diameter_to_chord_ratio"
+    ) == pytest.approx(2.136, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_constraints_torque_enforce():

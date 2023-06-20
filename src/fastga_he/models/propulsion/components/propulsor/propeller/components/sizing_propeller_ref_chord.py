@@ -85,6 +85,12 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
                 method="fd",
                 step=STEP,
             )
+        else:
+            self.declare_partials(
+                of="data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
+                wrt="data:aerodynamics:wing:low_speed:chord_vector",
+                method="exact",
+            )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -114,7 +120,7 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
 
             outputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref"
-            ] = 0.0
+            ] = inputs["data:aerodynamics:wing:low_speed:chord_vector"][0]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -142,3 +148,12 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
             ] = (
                 spline_value * y_ratio / 2.0
             )
+
+        else:
+
+            partial_chord = np.zeros_like(inputs["data:aerodynamics:wing:low_speed:chord_vector"])
+            partial_chord[0] = 1.0
+            partials[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
+                "data:aerodynamics:wing:low_speed:chord_vector",
+            ] = partial_chord
