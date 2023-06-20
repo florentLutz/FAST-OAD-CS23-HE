@@ -1,6 +1,9 @@
 <FASTOAD_model>
     <data>
         <geometry>
+            <flap>
+                <span_ratio>0.45</span_ratio>
+            </flap>
             <wing>
                 <span units="m" is_input="False">12.693930607836878<!--wing span--></span>
                 <MAC>
@@ -24,12 +27,13 @@
             <he_power_train>
                 <propeller>
                     <propeller_1>
+                        <flapped_ratio>0.9</flapped_ratio>
                         <cl_clean_ref>1.085</cl_clean_ref>
                         <wing_chord_ref units="m">0.9275</wing_chord_ref>
                         <diameter_to_span_ratio>0.312</diameter_to_span_ratio>
                         <depth units="m">0.3</depth>
                         <from_LE units="m">0.15</from_LE>
-                        <y_ratio units="m">0.34</y_ratio>
+                        <y_ratio>0.34</y_ratio>
                         <rpm_mission>2500.0</rpm_mission>
                         <solidity>0.2</solidity>
                         <activity_factor>150</activity_factor>

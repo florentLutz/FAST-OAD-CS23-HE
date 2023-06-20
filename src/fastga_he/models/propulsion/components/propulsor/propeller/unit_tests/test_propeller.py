@@ -14,6 +14,7 @@ from ..components.sizing_propeller_ref_cl import SizingPropellerReferenceCl
 from ..components.sizing_propeller_ref_chord import SizingPropellerReferenceChord
 from ..components.sizing_propeller_radius_to_span_ratio import SizingPropellerDiameterToSpanRatio
 from ..components.sizing_propeller_radius_to_chord_ratio import SizingPropellerDiameterToChordRatio
+from ..components.sizing_flapped_span_ratio import SizingPropellerFlappedRatio
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_advance_ratio import PerformancesAdvanceRatio
 from ..components.perf_tip_mach import PerformancesTipMach
@@ -175,6 +176,32 @@ def test_diameter_to_chord_ratio():
     ) == pytest.approx(2.136, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_propeller_flapped_ratio():
+
+    expected_values = [0.9072, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
+
+        ivc = get_indep_var_comp(
+            list_inputs(SizingPropellerFlappedRatio(propeller_id="propeller_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SizingPropellerFlappedRatio(propeller_id="propeller_1", position=option), ivc
+        )
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:propeller:propeller_1:flapped_ratio",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_constraints_torque_enforce():
