@@ -27,6 +27,7 @@ from ..components.perf_shaft_power import PerformancesShaftPower
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.slipstream_thrust_loading import SlipstreamPropellerThrustLoading
+from ..components.slipstream_axial_induction_factor import SlipstreamPropellerAxialInductionFactor
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -642,6 +643,31 @@ def test_thrust_loading():
 
     assert problem.get_val("thrust_loading") == pytest.approx(
         np.array([0.0482, 0.0467, 0.0453, 0.0440, 0.0427, 0.0414, 0.0402, 0.0390, 0.0379, 0.0368]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_axial_induction_factor():
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "thrust_loading",
+        val=np.array(
+            [0.0482, 0.0467, 0.0453, 0.0440, 0.0427, 0.0414, 0.0402, 0.0390, 0.0379, 0.0368]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerAxialInductionFactor(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("axial_induction_factor") == pytest.approx(
+        np.array([0.0298, 0.0289, 0.0281, 0.0273, 0.0265, 0.0257, 0.025, 0.0242, 0.0236, 0.0229]),
         rel=1e-2,
     )
 
