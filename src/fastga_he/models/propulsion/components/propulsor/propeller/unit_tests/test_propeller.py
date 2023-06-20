@@ -26,6 +26,7 @@ from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_shaft_power import PerformancesShaftPower
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.slipstream_thrust_loading import SlipstreamPropellerThrustLoading
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -610,6 +611,39 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_1:rpm_max", units="min**-1"
     ) == pytest.approx(2500.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_thrust_loading():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SlipstreamPropellerThrustLoading(
+                propeller_id="propeller_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    density = Atmosphere(altitude=np.full(NB_POINTS_TEST, 0.0)).density
+    ivc.add_output("density", val=density, units="kg/m**3")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerThrustLoading(
+            propeller_id="propeller_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("thrust_loading") == pytest.approx(
+        np.array([0.0482, 0.0467, 0.0453, 0.0440, 0.0427, 0.0414, 0.0402, 0.0390, 0.0379, 0.0368]),
+        rel=1e-2,
+    )
 
     problem.check_partials(compact_print=True)
 
