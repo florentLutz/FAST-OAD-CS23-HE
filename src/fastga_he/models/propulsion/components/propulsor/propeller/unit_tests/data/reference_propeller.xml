@@ -33,6 +33,7 @@
                         <diameter_to_span_ratio>0.312</diameter_to_span_ratio>
                         <depth units="m">0.3</depth>
                         <from_LE units="m">0.15</from_LE>
+                        <from_wing_AC units="m">0.341</from_wing_AC>
                         <y_ratio>0.34</y_ratio>
                         <rpm_mission>2500.0</rpm_mission>
                         <solidity>0.2</solidity>
