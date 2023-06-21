@@ -32,6 +32,9 @@ from ..components.slipstream_contraction_ratio_squared import (
     SlipstreamPropellerContractionRatioSquared,
 )
 from ..components.slipstream_contraction_ratio import SlipstreamPropellerContractionRatio
+from ..components.slipstream_axial_indution_factor_ac import (
+    SlipstreamPropellerAxialInductionFactorWingAC,
+)
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -732,6 +735,37 @@ def test_contraction_ratio():
 
     assert problem.get_val("contraction_ratio") == pytest.approx(
         np.array([0.9953, 0.9954, 0.9956, 0.9957, 0.9958, 0.9959, 0.996, 0.9962, 0.9963, 0.9964]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_axial_induction_factor_ac():
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "axial_induction_factor",
+        val=np.array(
+            [0.0298, 0.0289, 0.0281, 0.0273, 0.0265, 0.0257, 0.025, 0.0242, 0.0236, 0.0229]
+        ),
+    )
+    ivc.add_output(
+        "contraction_ratio_squared",
+        val=np.array(
+            [0.9907, 0.9909, 0.9912, 0.9914, 0.9917, 0.9919, 0.9921, 0.9924, 0.9926, 0.9928]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerAxialInductionFactorWingAC(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("axial_induction_factor_wing_ac") == pytest.approx(
+        np.array([0.0394, 0.0383, 0.0372, 0.0362, 0.0350, 0.0340, 0.0331, 0.0320, 0.0312, 0.0303]),
         rel=1e-2,
     )
 
