@@ -37,7 +37,7 @@ class SizingPropellerWingACDistance(om.ExplicitComponent):
 
         self.add_output(
             name="data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_AC",
-            val=np.nan,
+            val=0.5,
             units="m",
             desc="Distance between the propeller and the wing aerodynamic center",
         )

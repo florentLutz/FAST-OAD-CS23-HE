@@ -28,6 +28,10 @@ from ..components.perf_torque import PerformancesTorque
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.slipstream_thrust_loading import SlipstreamPropellerThrustLoading
 from ..components.slipstream_axial_induction_factor import SlipstreamPropellerAxialInductionFactor
+from ..components.slipstream_contraction_ratio_squared import (
+    SlipstreamPropellerContractionRatioSquared,
+)
+from ..components.slipstream_contraction_ratio import SlipstreamPropellerContractionRatio
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -668,6 +672,66 @@ def test_axial_induction_factor():
 
     assert problem.get_val("axial_induction_factor") == pytest.approx(
         np.array([0.0298, 0.0289, 0.0281, 0.0273, 0.0265, 0.0257, 0.025, 0.0242, 0.0236, 0.0229]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_contraction_ratio_square():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SlipstreamPropellerContractionRatioSquared(
+                propeller_id="propeller_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    ivc.add_output(
+        "axial_induction_factor",
+        val=np.array(
+            [0.0298, 0.0289, 0.0281, 0.0273, 0.0265, 0.0257, 0.025, 0.0242, 0.0236, 0.0229]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerContractionRatioSquared(
+            propeller_id="propeller_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("contraction_ratio_squared") == pytest.approx(
+        np.array([0.9907, 0.9909, 0.9912, 0.9914, 0.9917, 0.9919, 0.9921, 0.9924, 0.9926, 0.9928]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_contraction_ratio():
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "contraction_ratio_squared",
+        val=np.array(
+            [0.9907, 0.9909, 0.9912, 0.9914, 0.9917, 0.9919, 0.9921, 0.9924, 0.9926, 0.9928]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerContractionRatio(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("contraction_ratio") == pytest.approx(
+        np.array([0.9953, 0.9954, 0.9956, 0.9957, 0.9958, 0.9959, 0.996, 0.9962, 0.9963, 0.9964]),
         rel=1e-2,
     )
 

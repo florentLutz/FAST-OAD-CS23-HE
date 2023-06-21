@@ -24,7 +24,7 @@ class SlipstreamPropellerAxialInductionFactor(om.ExplicitComponent):
 
         self.add_input("thrust_loading", val=np.nan, shape=number_of_points)
 
-        self.add_output("axial_induction_factor", val=np.nan, shape=number_of_points)
+        self.add_output("axial_induction_factor", val=0.1, shape=number_of_points)
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
