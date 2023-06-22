@@ -16,6 +16,7 @@ from ..components.sizing_propeller_radius_to_span_ratio import SizingPropellerDi
 from ..components.sizing_propeller_radius_to_chord_ratio import SizingPropellerDiameterToChordRatio
 from ..components.sizing_flapped_span_ratio import SizingPropellerFlappedRatio
 from ..components.sizing_propeller_wing_ac_distance import SizingPropellerWingACDistance
+from ..components.sizing_propeller_wing_le_distance_ratio import SizingPropellerWingLEDistanceRatio
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_advance_ratio import PerformancesAdvanceRatio
 from ..components.perf_tip_mach import PerformancesTipMach
@@ -32,9 +33,16 @@ from ..components.slipstream_contraction_ratio_squared import (
     SlipstreamPropellerContractionRatioSquared,
 )
 from ..components.slipstream_contraction_ratio import SlipstreamPropellerContractionRatio
-from ..components.slipstream_axial_indution_factor_ac import (
+from ..components.slipstream_axial_induction_factor_ac import (
     SlipstreamPropellerAxialInductionFactorWingAC,
 )
+from ..components.slipstream_axial_induction_factor_downstream import (
+    SlipstreamPropellerVelocityRatioDownstream,
+)
+from ..components.slipstream_height_impact_coefficients import (
+    SlipstreamPropellerHeightImpactCoefficients,
+)
+from ..components.slipstream_height_impact import SlipstreamPropellerHeightImpact
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -233,6 +241,34 @@ def test_propeller_distance_from_wing_ac():
         assert (
             problem.get_val(
                 "data:propulsion:he_power_train:propeller:propeller_1:from_wing_AC",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
+
+
+def test_propeller_distance_from_wing_le_ratio():
+
+    expected_values = [0.1617, 2.9]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
+
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingPropellerWingLEDistanceRatio(propeller_id="propeller_1", position=option)
+            ),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SizingPropellerWingLEDistanceRatio(propeller_id="propeller_1", position=option), ivc
+        )
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:propeller:propeller_1:from_wing_LE_ratio",
             )
             == pytest.approx(expected_value, rel=1e-2)
         )
@@ -770,6 +806,200 @@ def test_axial_induction_factor_ac():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_velocity_ratio_downstream():
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "axial_induction_factor",
+        val=np.array(
+            [0.0298, 0.0289, 0.0281, 0.0273, 0.0265, 0.0257, 0.025, 0.0242, 0.0236, 0.0229]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerVelocityRatioDownstream(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("velocity_ratio_downstream") == pytest.approx(
+        np.array([1.0596, 1.0578, 1.0562, 1.0546, 1.053, 1.0514, 1.05, 1.0484, 1.0472, 1.0458]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_height_impact_coefficients():
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:propeller:propeller_1:from_wing_LE_ratio", val=0.5
+    )
+    ivc.add_output(
+        "velocity_ratio_downstream",
+        val=np.linspace(1.2, 2.3, NB_POINTS_TEST),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerHeightImpactCoefficients(
+            propeller_id="propeller_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("f_0") == pytest.approx(
+        np.array([0.4648, 0.4494, 0.4228, 0.3958, 0.3684, 0.3404, 0.3121, 0.2833, 0.254, 0.2365]),
+        rel=1e-2,
+    )
+    assert problem.get_val("f_1") == pytest.approx(
+        np.array([1.461, 1.431, 1.387, 1.348, 1.314, 1.287, 1.266, 1.251, 1.241, 1.239]),
+        rel=1e-2,
+    )
+    assert problem.get_val("f_2") == pytest.approx(
+        np.array(
+            [-1.23, -1.1911, -1.1254, -1.0599, -0.9947, -0.9297, -0.865, -0.8005, -0.7363, -0.6985]
+        ),
+        rel=1e-2,
+    )
+    assert problem.get_val("f_3") == pytest.approx(
+        np.array([0.4196, 0.4043, 0.377, 0.348, 0.3173, 0.2849, 0.2507, 0.2149, 0.1773, 0.1543]),
+        rel=1e-2,
+    )
+    assert problem.get_val("f_4") == pytest.approx(
+        np.array(
+            [
+                -0.0515,
+                -0.0494,
+                -0.0457,
+                -0.0415,
+                -0.037,
+                -0.0321,
+                -0.0268,
+                -0.0212,
+                -0.0152,
+                -0.0115,
+            ]
+        ),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_height_impact():
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:propeller:propeller_1:diameter_to_chord_ratio",
+        val=1.1,
+    )
+    ivc.add_output(
+        "f_0",
+        val=np.array(
+            [0.4648, 0.4494, 0.4228, 0.3958, 0.3684, 0.3404, 0.3121, 0.2833, 0.254, 0.2365]
+        ),
+    )
+    ivc.add_output(
+        "f_1",
+        val=np.array([1.461, 1.431, 1.387, 1.348, 1.314, 1.287, 1.266, 1.251, 1.241, 1.239]),
+    )
+    ivc.add_output(
+        "f_2",
+        val=np.array(
+            [-1.23, -1.1911, -1.1254, -1.0599, -0.9947, -0.9297, -0.865, -0.8005, -0.7363, -0.6985]
+        ),
+    )
+    ivc.add_output(
+        "f_3",
+        val=np.array(
+            [0.4196, 0.4043, 0.377, 0.348, 0.3173, 0.2849, 0.2507, 0.2149, 0.1773, 0.1543]
+        ),
+    )
+    ivc.add_output(
+        "f_4",
+        val=np.array(
+            [
+                -0.0515,
+                -0.0494,
+                -0.0457,
+                -0.0415,
+                -0.037,
+                -0.0321,
+                -0.0268,
+                -0.0212,
+                -0.0152,
+                -0.0115,
+            ]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerHeightImpact(
+            propeller_id="propeller_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+    assert problem.get_val("beta") == pytest.approx(
+        np.array([0.96, 0.94, 0.9, 0.87, 0.84, 0.81, 0.79, 0.76, 0.74, 0.73]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_verification_height_impact_overflow():
+    """
+    Verification of the implementation of the height impact effect with data from OVERFLOW
+    reported in :cite:`patterson:2016`
+    """
+
+    problem = om.Problem()
+    model = problem.model
+
+    model.add_subsystem(
+        name="coefficients",
+        subsys=SlipstreamPropellerHeightImpactCoefficients(
+            propeller_id="propeller_1", number_of_points=1
+        ),
+        promotes=["*"],
+    )
+    model.add_subsystem(
+        name="height_impact",
+        subsys=SlipstreamPropellerHeightImpact(propeller_id="propeller_1", number_of_points=1),
+        promotes=["*"],
+    )
+    model.nonlinear_solver = om.NonlinearBlockGS()
+    model.linear_solver = om.DirectSolver()
+
+    problem.setup()
+    problem.set_val("velocity_ratio_downstream", val=2.0)
+
+    radius_ratios = np.array([0.35, 0.4, 0.6, 0.8, 0.7, 0.5])
+    distance_ratios = np.array([0.35, 0.8, 0.6, 0.8, 0.75, 0.75])
+
+    expected_betas = np.array([0.6114, 0.7161, 0.8095, 0.9149, 0.8646, 0.7721])
+
+    for radius_ratio, distance_ratio, beta in zip(radius_ratios, distance_ratios, expected_betas):
+        problem.set_val(
+            "data:propulsion:he_power_train:propeller:propeller_1:diameter_to_chord_ratio",
+            val=2.0 * radius_ratio,
+        )
+        problem.set_val(
+            "data:propulsion:he_power_train:propeller:propeller_1:from_wing_LE_ratio",
+            val=distance_ratio,
+        )
+
+        problem.run_model()
+
+        assert problem.get_val("beta") == pytest.approx(beta, rel=2e-2)
 
 
 def test_sizing_propeller():

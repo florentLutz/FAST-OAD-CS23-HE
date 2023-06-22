@@ -37,7 +37,7 @@ class SlipstreamPropellerAxialInductionFactorWingAC(om.ExplicitComponent):
             desc="Value of the axial induction factor at the wing aerodynamic chord",
         )
 
-        self.declare_partials(of="*", wrt="*")
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
