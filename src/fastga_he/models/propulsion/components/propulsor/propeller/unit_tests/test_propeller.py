@@ -49,6 +49,7 @@ from ..components.slipstream_section_lift import SlipstreamPropellerSectionLift
 from ..components.slipstream_delta_cl_2d import SlipstreamPropellerDeltaCl2D
 from ..components.slipstream_blown_area_ratio import SlipstreamPropellerBlownAreaRatio
 from ..components.slipstream_delta_cl import SlipstreamPropellerDeltaCl
+from ..components.slipstream_delta_cd0 import SlipstreamPropellerDeltaCD0
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -1193,6 +1194,48 @@ def test_blown_wing_lift_increase():
     assert problem.get_val("delta_Cl") * 1000.0 == pytest.approx(expected_value, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_blown_wing_profile_drag_increase():
+    flaps_positions = ["cruise", "landing", "takeoff"]
+    expected_values = (
+        np.array([1.436, 1.357, 1.28, 1.212, 1.133, 1.069, 1.013, 0.947, 0.9, 0.849]),
+        np.array([4.379, 4.138, 3.903, 3.696, 3.455, 3.261, 3.09, 2.888, 2.746, 2.59]),
+        np.array([2.051, 1.938, 1.828, 1.731, 1.618, 1.527, 1.447, 1.353, 1.286, 1.213]),
+    )
+
+    for flaps_position, expected_value in zip(flaps_positions, expected_values):
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SlipstreamPropellerDeltaCD0(
+                    number_of_points=NB_POINTS_TEST,
+                    propeller_id="propeller_1",
+                    flaps_position=flaps_position,
+                )
+            ),
+            __file__,
+            XML_FILE,
+        )
+        ivc.add_output(
+            "axial_induction_factor_wing_ac",
+            val=np.array(
+                [0.0394, 0.0383, 0.0372, 0.0362, 0.0350, 0.0340, 0.0331, 0.0320, 0.0312, 0.0303]
+            ),
+        )
+
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SlipstreamPropellerDeltaCD0(
+                number_of_points=NB_POINTS_TEST,
+                propeller_id="propeller_1",
+                flaps_position=flaps_position,
+            ),
+            ivc,
+        )
+
+        assert problem.get_val("delta_Cd") * 1e6 == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
 
 
 def test_sizing_propeller():

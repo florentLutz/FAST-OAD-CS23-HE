@@ -6,7 +6,8 @@
             </flap>
             <wing>
                 <span units="m" is_input="False">12.693930607836878<!--wing span--></span>
-                <area units="m**2" is_input="False">12.693930607836878<!--wing span--></area>
+                <area units="m**2" is_input="False">12.693930607836878<!--wing area--></area>
+                <wet_area units="m**2" is_input="False">26.657254276457444<!--wing wet area--></wet_area>
                 <MAC>
                   <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
                   <at25percent>
@@ -18,6 +19,7 @@
         <aerodynamics>
             <wing>
                 <cruise>
+                  <CD0 is_input="False">0.006225770501969716<!--profile drag coefficient for wing in cruise conditions--></CD0>
                   <CL0_clean is_input="True">0.2501539747371489<!--wing lift coefficient at zero aircraft angle of attack in cruise conditions and with no flaps deployed--></CL0_clean>
                   <CL_alpha units="1/rad" is_input="True">4.620008812204601<!--wing lift coefficient slope with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
                 </cruise>
@@ -30,9 +32,13 @@
             </wing>
             <flaps>
                 <landing>
+                  <CD_2D is_input="False">0.006750898684227176<!--airfoil additional drag coefficient due to flaps deployment in landing configuration--></CD_2D>
+                  <CL is_input="False">0.6086692724761249<!--lift coefficient increment due to flaps deployment in landing configuration--></CL>
                   <CL_2D is_input="False">0.8989947516346022<!--airfoil additional lift coefficient due to flaps deployment in landing configuration--></CL_2D>
                 </landing>
                 <takeoff>
+                  <CD_2D is_input="False">0.0014100990110413683<!--airfoil additional drag coefficient due to flaps deployment in takeoff configuration--></CD_2D>
+                  <CL is_input="False">0.3003423647177516<!--lift coefficient increment due to flaps deployment in takeoff configuration--></CL>
                   <CL_2D is_input="False">0.4436008548228057<!--airfoil additional lift coefficient due to flaps deployment in takeoff configuration--></CL_2D>
                 </takeoff>
             </flaps>
