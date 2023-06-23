@@ -47,6 +47,7 @@ from ..components.slipstream_lift_increase_ratio import SlipstreamPropellerLiftI
 from ..components.slipstream_clean_wing_lift import SlipstreamPropellerCleanWingLift
 from ..components.slipstream_section_lift import SlipstreamPropellerSectionLift
 from ..components.slipstream_delta_cl_2d import SlipstreamPropellerDeltaCl2D
+from ..components.slipstream_blown_area_ratio import SlipstreamPropellerBlownAreaRatio
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -1101,6 +1102,42 @@ def test_section_lift():
         assert problem.get_val("unblown_section_lift") == pytest.approx(expected_value, rel=1e-3)
 
         problem.check_partials(compact_print=True)
+
+
+def test_blown_area_ratio():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SlipstreamPropellerBlownAreaRatio(
+                number_of_points=NB_POINTS_TEST,
+                propeller_id="propeller_1",
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "contraction_ratio",
+        val=np.array(
+            [0.9953, 0.9954, 0.9956, 0.9957, 0.9958, 0.9959, 0.996, 0.9962, 0.9963, 0.9964]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerBlownAreaRatio(
+            number_of_points=NB_POINTS_TEST,
+            propeller_id="propeller_1",
+        ),
+        ivc,
+    )
+
+    expected_value = np.array(
+        [0.1441, 0.1441, 0.1441, 0.1441, 0.1442, 0.1442, 0.1442, 0.1442, 0.1442, 0.1442]
+    )
+    assert problem.get_val("blown_area_ratio") == pytest.approx(expected_value, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_blown_section_lift():

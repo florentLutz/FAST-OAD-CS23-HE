@@ -6,6 +6,7 @@
             </flap>
             <wing>
                 <span units="m" is_input="False">12.693930607836878<!--wing span--></span>
+                <area units="m**2" is_input="False">12.693930607836878<!--wing span--></area>
                 <MAC>
                   <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
                   <at25percent>
