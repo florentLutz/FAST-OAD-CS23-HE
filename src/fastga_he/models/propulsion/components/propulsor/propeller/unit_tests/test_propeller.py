@@ -43,6 +43,7 @@ from ..components.slipstream_height_impact_coefficients import (
     SlipstreamPropellerHeightImpactCoefficients,
 )
 from ..components.slipstream_height_impact import SlipstreamPropellerHeightImpact
+from ..components.slipstream_lift_increase_ratio import SlipstreamPropellerLiftIncreaseRatio
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -1000,6 +1001,42 @@ def test_verification_height_impact_overflow():
         problem.run_model()
 
         assert problem.get_val("beta") == pytest.approx(beta, rel=2e-2)
+
+
+def test_lift_increase_ratio():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SlipstreamPropellerLiftIncreaseRatio(
+                propeller_id="propeller_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "axial_induction_factor_wing_ac",
+        val=np.array(
+            [0.0394, 0.0383, 0.0372, 0.0362, 0.0350, 0.0340, 0.0331, 0.0320, 0.0312, 0.0303]
+        ),
+    )
+    ivc.add_output(
+        "beta", val=np.array([0.96, 0.94, 0.9, 0.87, 0.84, 0.81, 0.79, 0.76, 0.74, 0.73])
+    )
+    ivc.add_output("alpha", val=np.full(NB_POINTS_TEST, 5.0), units="deg")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerLiftIncreaseRatio(
+            propeller_id="propeller_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    expected_value = np.array([2.18, 2.08, 1.94, 1.83, 1.71, 1.6, 1.52, 1.42, 1.35, 1.29])
+    assert problem.get_val("lift_increase_ratio") * 100.0 == pytest.approx(expected_value, rel=2e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_sizing_propeller():

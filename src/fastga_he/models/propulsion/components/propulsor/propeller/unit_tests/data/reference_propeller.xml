@@ -27,6 +27,7 @@
             <he_power_train>
                 <propeller>
                     <propeller_1>
+                        <installation_angle units="deg">2.0</installation_angle>
                         <flapped_ratio>0.9</flapped_ratio>
                         <cl_clean_ref>1.085</cl_clean_ref>
                         <wing_chord_ref units="m">0.9275</wing_chord_ref>
