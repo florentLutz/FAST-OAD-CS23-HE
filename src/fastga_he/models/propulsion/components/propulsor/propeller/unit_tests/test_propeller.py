@@ -48,6 +48,7 @@ from ..components.slipstream_clean_wing_lift import SlipstreamPropellerCleanWing
 from ..components.slipstream_section_lift import SlipstreamPropellerSectionLift
 from ..components.slipstream_delta_cl_2d import SlipstreamPropellerDeltaCl2D
 from ..components.slipstream_blown_area_ratio import SlipstreamPropellerBlownAreaRatio
+from ..components.slipstream_delta_cl import SlipstreamPropellerDeltaCl
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -1104,6 +1105,30 @@ def test_section_lift():
         problem.check_partials(compact_print=True)
 
 
+def test_blown_section_lift():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("unblown_section_lift", val=np.full(NB_POINTS_TEST, 0.7157))
+    ivc.add_output(
+        "lift_increase_ratio",
+        np.array([2.18, 2.08, 1.94, 1.83, 1.71, 1.6, 1.52, 1.42, 1.35, 1.29]) / 100.0,
+    )
+
+    problem = run_system(
+        SlipstreamPropellerDeltaCl2D(
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("delta_Cl_2D") == pytest.approx(
+        np.array([0.0156, 0.0149, 0.0139, 0.0131, 0.0122, 0.0115, 0.0109, 0.0102, 0.0097, 0.0092]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_blown_area_ratio():
 
     ivc = get_indep_var_comp(
@@ -1140,26 +1165,32 @@ def test_blown_area_ratio():
     problem.check_partials(compact_print=True)
 
 
-def test_blown_section_lift():
+def test_blown_wing_lift_increase():
 
     ivc = om.IndepVarComp()
-    ivc.add_output("unblown_section_lift", val=np.full(NB_POINTS_TEST, 0.7157))
     ivc.add_output(
-        "lift_increase_ratio",
-        np.array([2.18, 2.08, 1.94, 1.83, 1.71, 1.6, 1.52, 1.42, 1.35, 1.29]) / 100.0,
+        "blown_area_ratio",
+        val=np.array(
+            [0.1441, 0.1441, 0.1441, 0.1441, 0.1442, 0.1442, 0.1442, 0.1442, 0.1442, 0.1442]
+        ),
+    )
+    ivc.add_output(
+        "delta_Cl_2D",
+        val=np.array(
+            [0.0156, 0.0149, 0.0139, 0.0131, 0.0122, 0.0115, 0.0109, 0.0102, 0.0097, 0.0092]
+        ),
     )
 
+    # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        SlipstreamPropellerDeltaCl2D(
+        SlipstreamPropellerDeltaCl(
             number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
 
-    assert problem.get_val("delta_Cl_2D") == pytest.approx(
-        np.array([0.0156, 0.0149, 0.0139, 0.0131, 0.0122, 0.0115, 0.0109, 0.0102, 0.0097, 0.0092]),
-        rel=1e-2,
-    )
+    expected_value = np.array([2.25, 2.15, 2.0, 1.89, 1.76, 1.66, 1.57, 1.47, 1.4, 1.33])
+    assert problem.get_val("delta_Cl") * 1000.0 == pytest.approx(expected_value, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
