@@ -14,7 +14,7 @@ from ..components.sizing_propeller_ref_cl import SizingPropellerReferenceCl
 from ..components.sizing_propeller_ref_chord import SizingPropellerReferenceChord
 from ..components.sizing_propeller_radius_to_span_ratio import SizingPropellerDiameterToSpanRatio
 from ..components.sizing_propeller_radius_to_chord_ratio import SizingPropellerDiameterToChordRatio
-from ..components.sizing_flapped_span_ratio import SizingPropellerFlappedRatio
+from ..components.sizing_propeller_flapped_span_ratio import SizingPropellerFlappedRatio
 from ..components.sizing_propeller_wing_ac_distance import SizingPropellerWingACDistance
 from ..components.sizing_propeller_wing_le_distance_ratio import SizingPropellerWingLEDistanceRatio
 from ..components.perf_mission_rpm import PerformancesRPMMission
@@ -44,6 +44,9 @@ from ..components.slipstream_height_impact_coefficients import (
 )
 from ..components.slipstream_height_impact import SlipstreamPropellerHeightImpact
 from ..components.slipstream_lift_increase_ratio import SlipstreamPropellerLiftIncreaseRatio
+from ..components.slipstream_clean_wing_lift import SlipstreamPropellerCleanWingLift
+from ..components.slipstream_section_lift import SlipstreamPropellerSectionLift
+from ..components.slipstream_delta_cl_2d import SlipstreamPropellerDeltaCl2D
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -1035,6 +1038,91 @@ def test_lift_increase_ratio():
 
     expected_value = np.array([2.18, 2.08, 1.94, 1.83, 1.71, 1.6, 1.52, 1.42, 1.35, 1.29])
     assert problem.get_val("lift_increase_ratio") * 100.0 == pytest.approx(expected_value, rel=2e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_clean_lift_wing():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SlipstreamPropellerCleanWingLift(number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output("alpha", val=np.full(NB_POINTS_TEST, 5.0), units="deg")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerCleanWingLift(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("cl_wing_clean") == pytest.approx(
+        np.full(NB_POINTS_TEST, 0.6533), rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_section_lift():
+
+    flaps_positions = ["cruise", "landing", "takeoff"]
+    expected_values = (
+        np.full(NB_POINTS_TEST, 0.7157),
+        np.full(NB_POINTS_TEST, 1.524),
+        np.full(NB_POINTS_TEST, 1.115),
+    )
+
+    for flaps_position, expected_value in zip(flaps_positions, expected_values):
+
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SlipstreamPropellerSectionLift(
+                    number_of_points=NB_POINTS_TEST,
+                    propeller_id="propeller_1",
+                    flaps_position=flaps_position,
+                )
+            ),
+            __file__,
+            XML_FILE,
+        )
+        ivc.add_output("cl_wing_clean", val=np.full(NB_POINTS_TEST, 0.6533), units="deg")
+
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SlipstreamPropellerSectionLift(
+                number_of_points=NB_POINTS_TEST,
+                propeller_id="propeller_1",
+                flaps_position=flaps_position,
+            ),
+            ivc,
+        )
+
+        assert problem.get_val("unblown_section_lift") == pytest.approx(expected_value, rel=1e-3)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_blown_section_lift():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("unblown_section_lift", val=np.full(NB_POINTS_TEST, 0.7157))
+    ivc.add_output(
+        "lift_increase_ratio",
+        np.array([2.18, 2.08, 1.94, 1.83, 1.71, 1.6, 1.52, 1.42, 1.35, 1.29]) / 100.0,
+    )
+
+    problem = run_system(
+        SlipstreamPropellerDeltaCl2D(
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("delta_Cl_2D") == pytest.approx(
+        np.array([0.0156, 0.0149, 0.0139, 0.0131, 0.0122, 0.0115, 0.0109, 0.0102, 0.0097, 0.0092]),
+        rel=1e-2,
+    )
 
     problem.check_partials(compact_print=True)
 
