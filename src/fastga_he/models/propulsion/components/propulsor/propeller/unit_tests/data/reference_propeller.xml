@@ -22,6 +22,7 @@
                   <CD0 is_input="False">0.006225770501969716<!--profile drag coefficient for wing in cruise conditions--></CD0>
                   <CL0_clean is_input="True">0.2501539747371489<!--wing lift coefficient at zero aircraft angle of attack in cruise conditions and with no flaps deployed--></CL0_clean>
                   <CL_alpha units="1/rad" is_input="True">4.620008812204601<!--wing lift coefficient slope with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
+                  <CM0_clean is_input="False">-0.015672163858931134<!--wing pitching moment coefficient in cruise conditions and with no flaps deployed--></CM0_clean>
                 </cruise>
                 <low_speed>
                     <CL_ref is_input="False">0.9903832267850955</CL_ref>
@@ -35,14 +36,26 @@
                   <CD_2D is_input="False">0.006750898684227176<!--airfoil additional drag coefficient due to flaps deployment in landing configuration--></CD_2D>
                   <CL is_input="False">0.6086692724761249<!--lift coefficient increment due to flaps deployment in landing configuration--></CL>
                   <CL_2D is_input="False">0.8989947516346022<!--airfoil additional lift coefficient due to flaps deployment in landing configuration--></CL_2D>
+                  <CM_2D is_input="False">-0.17979895032692045<!--airfoil additional pitching moment coefficient due to flaps deployment in landing configuration--></CM_2D>
                 </landing>
                 <takeoff>
                   <CD_2D is_input="False">0.0014100990110413683<!--airfoil additional drag coefficient due to flaps deployment in takeoff configuration--></CD_2D>
                   <CL is_input="False">0.3003423647177516<!--lift coefficient increment due to flaps deployment in takeoff configuration--></CL>
                   <CL_2D is_input="False">0.4436008548228057<!--airfoil additional lift coefficient due to flaps deployment in takeoff configuration--></CL_2D>
+                  <CM_2D is_input="False">-0.08872017096456114<!--airfoil additional pitching moment coefficient due to flaps deployment in takeoff configuration--></CM_2D>
                 </takeoff>
             </flaps>
         </aerodynamics>
+        <mission>
+            <sizing>
+                <landing>
+                  <flap_angle units="deg" is_input="True">19.0<!--position of the flaps during landing--></flap_angle>
+                </landing>
+                <takeoff>
+                  <flap_angle units="deg" is_input="True">9.0<!--position of the flaps during takeoff--></flap_angle>
+                </takeoff>
+            </sizing>
+        </mission>
         <propulsion>
             <he_power_train>
                 <propeller>

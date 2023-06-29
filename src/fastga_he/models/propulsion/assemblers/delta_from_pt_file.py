@@ -47,6 +47,7 @@ class AerodynamicDeltasFromPTFile(om.Group):
         )
 
     # TODO: Promote cl_wing_clean for everyone !
+    # TODO: Add the thrust distributor ! All "propulsor" should need it
 
 
 class SlipstreamAirframeLiftClean(om.ExplicitComponent):

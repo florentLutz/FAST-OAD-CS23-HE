@@ -49,6 +49,10 @@ from ..components.slipstream_delta_cl_2d import SlipstreamPropellerDeltaCl2D
 from ..components.slipstream_blown_area_ratio import SlipstreamPropellerBlownAreaRatio
 from ..components.slipstream_delta_cl import SlipstreamPropellerDeltaCl
 from ..components.slipstream_delta_cd0 import SlipstreamPropellerDeltaCD0
+from ..components.slipstream_delta_cm0 import SlipstreamPropellerDeltaCM0
+from ..components.slipstream_delta_cm_alpha import SlipstreamPropellerDeltaCMAlpha
+from ..components.slipstream_delta_cm import SlipstreamPropellerDeltaCM
+from ..components.slipstream_propeller import SlipstreamPropeller
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
@@ -1213,6 +1217,205 @@ def test_blown_wing_profile_drag_increase():
         assert problem.get_val("delta_Cd") * 1e6 == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
+
+
+def test_blown_wing_pitching_moment_increase():
+
+    flaps_positions = ["cruise", "landing", "takeoff"]
+    expected_values = (
+        np.array([-7.591, -7.173, -6.767, -6.408, -5.99, -5.653, -5.357, -5.007, -4.76, -4.489]),
+        np.array([-85.97, -81.23, -76.63, -72.57, -67.84, -64.02, -60.67, -56.71, -53.91, -50.84]),
+        np.array([-46.26, -43.72, -41.24, -39.05, -36.51, -34.45, -32.65, -30.52, -29.01, -27.36]),
+    )
+
+    for flaps_position, expected_value in zip(flaps_positions, expected_values):
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SlipstreamPropellerDeltaCM0(
+                    number_of_points=NB_POINTS_TEST,
+                    propeller_id="propeller_1",
+                    flaps_position=flaps_position,
+                )
+            ),
+            __file__,
+            XML_FILE,
+        )
+        ivc.add_output(
+            "axial_induction_factor_wing_ac",
+            val=np.array(
+                [0.0394, 0.0383, 0.0372, 0.0362, 0.0350, 0.0340, 0.0331, 0.0320, 0.0312, 0.0303]
+            ),
+        )
+
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SlipstreamPropellerDeltaCM0(
+                number_of_points=NB_POINTS_TEST,
+                propeller_id="propeller_1",
+                flaps_position=flaps_position,
+            ),
+            ivc,
+        )
+
+        assert problem.get_val("delta_Cm0") * 1e6 == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_blown_wing_delta_cm_alpha():
+
+    flaps_positions = ["cruise", "landing", "takeoff"]
+    expected_values = (
+        np.zeros(NB_POINTS_TEST),
+        np.linspace(-0.00221667, -0.00158333, NB_POINTS_TEST),
+        np.linspace(-0.00105, -0.00075, NB_POINTS_TEST),
+    )
+
+    for flaps_position, expected_value in zip(flaps_positions, expected_values):
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SlipstreamPropellerDeltaCMAlpha(
+                    number_of_points=NB_POINTS_TEST,
+                    flaps_position=flaps_position,
+                )
+            ),
+            __file__,
+            XML_FILE,
+        )
+        ivc.add_output(
+            "delta_Cl",
+            val=np.linspace(0.15, 0.12, NB_POINTS_TEST),
+        )
+        ivc.add_output(
+            "delta_Cl_AOA_0",
+            val=np.linspace(0.08, 0.07, NB_POINTS_TEST),
+        )
+
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SlipstreamPropellerDeltaCMAlpha(
+                number_of_points=NB_POINTS_TEST,
+                flaps_position=flaps_position,
+            ),
+            ivc,
+        )
+
+        assert problem.get_val("delta_Cm_alpha") == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_blown_wing_delta_cm():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "delta_Cm0",
+        val=np.array(
+            [-46.26, -43.72, -41.24, -39.05, -36.51, -34.45, -32.65, -30.52, -29.01, -27.36]
+        )
+        * 1e-6,
+    )
+    ivc.add_output(
+        "delta_Cm_alpha",
+        val=np.linspace(-0.00105, -0.00075, NB_POINTS_TEST),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPropellerDeltaCM(
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    expected_value = np.array(
+        [
+            -0.00109626,
+            -0.00106039,
+            -0.00102457,
+            -0.00098905,
+            -0.00095318,
+            -0.00091778,
+            -0.00088265,
+            -0.00084719,
+            -0.00081234,
+            -0.00077736,
+        ]
+    )
+    assert problem.get_val("delta_Cm") == pytest.approx(expected_value, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_slipstream_propeller():
+
+    flaps_positions = ["cruise", "landing"]
+    expected_delta_cds = (
+        np.array([1.4415, 1.358, 1.2798, 1.2066, 1.138, 1.0736, 1.0132, 0.9565, 0.9033, 0.8533])
+        * 1e-6,
+        np.array([4.3958, 4.1411, 3.9027, 3.6794, 3.4701, 3.2738, 3.0897, 2.9169, 2.7546, 2.6022])
+        * 1e-6,
+    )
+    expected_delta_cls = (
+        np.array([1.0172, 0.9865, 0.9569, 0.9284, 0.9009, 0.8744, 0.8488, 0.8242, 0.8004, 0.7774])
+        * 1e-3,
+        np.array([2.1672, 2.1017, 2.0386, 1.9779, 1.9193, 1.8629, 1.8084, 1.7559, 1.7052, 1.6563])
+        * 1e-3,
+    )
+    expected_delta_cms = (
+        np.array(
+            [
+                -7.6204,
+                -7.1789,
+                -6.7656,
+                -6.3784,
+                -6.0156,
+                -5.6754,
+                -5.3562,
+                -5.0566,
+                -4.7753,
+                -4.5111,
+            ]
+        )
+        * 1e-6,
+        np.array([-86.3, -81.3, -76.62, -72.24, -68.13, -64.28, -60.66, -57.27, -54.08, -51.09])
+        * 1e-6,
+    )
+
+    for flaps_position, expected_delta_cd, expected_delta_cl, expected_delta_cm in zip(
+        flaps_positions, expected_delta_cds, expected_delta_cls, expected_delta_cms
+    ):
+
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SlipstreamPropeller(
+                    number_of_points=NB_POINTS_TEST,
+                    propeller_id="propeller_1",
+                    flaps_position=flaps_position,
+                )
+            ),
+            __file__,
+            XML_FILE,
+        )
+
+        density = Atmosphere(altitude=np.full(NB_POINTS_TEST, 0.0)).density
+        ivc.add_output("density", val=density, units="kg/m**3")
+        ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+        ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+        ivc.add_output("cl_wing_clean", val=np.full(NB_POINTS_TEST, 0.6533), units="deg")
+
+        problem = run_system(
+            SlipstreamPropeller(
+                number_of_points=NB_POINTS_TEST,
+                propeller_id="propeller_1",
+                flaps_position=flaps_position,
+            ),
+            ivc,
+        )
+
+        assert problem.get_val("delta_Cd") == pytest.approx(expected_delta_cd, rel=1e-2)
+        assert problem.get_val("delta_Cl") == pytest.approx(expected_delta_cl, rel=1e-2)
+        assert problem.get_val("delta_Cm") == pytest.approx(expected_delta_cm, rel=1e-2)
 
 
 def test_sizing_propeller():
