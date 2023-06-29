@@ -44,7 +44,6 @@ from ..components.slipstream_height_impact_coefficients import (
 )
 from ..components.slipstream_height_impact import SlipstreamPropellerHeightImpact
 from ..components.slipstream_lift_increase_ratio import SlipstreamPropellerLiftIncreaseRatio
-from ..components.slipstream_clean_wing_lift import SlipstreamPropellerCleanWingLift
 from ..components.slipstream_section_lift import SlipstreamPropellerSectionLift
 from ..components.slipstream_delta_cl_2d import SlipstreamPropellerDeltaCl2D
 from ..components.slipstream_blown_area_ratio import SlipstreamPropellerBlownAreaRatio
@@ -1041,28 +1040,6 @@ def test_lift_increase_ratio():
 
     expected_value = np.array([2.18, 2.08, 1.94, 1.83, 1.71, 1.6, 1.52, 1.42, 1.35, 1.29])
     assert problem.get_val("lift_increase_ratio") * 100.0 == pytest.approx(expected_value, rel=2e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_clean_lift_wing():
-
-    ivc = get_indep_var_comp(
-        list_inputs(SlipstreamPropellerCleanWingLift(number_of_points=NB_POINTS_TEST)),
-        __file__,
-        XML_FILE,
-    )
-    ivc.add_output("alpha", val=np.full(NB_POINTS_TEST, 5.0), units="deg")
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        SlipstreamPropellerCleanWingLift(number_of_points=NB_POINTS_TEST),
-        ivc,
-    )
-
-    assert problem.get_val("cl_wing_clean") == pytest.approx(
-        np.full(NB_POINTS_TEST, 0.6533), rel=1e-3
-    )
 
     problem.check_partials(compact_print=True)
 
