@@ -8,6 +8,13 @@ from .sizing_weight import SizingPropellerWeight
 from .sizing_propeller_depth import SizingPropellerDepth
 from .sizing_propeller_cg import SizingPropellerCG
 from .sizing_propeller_drag import SizingPropellerDrag
+from ..components.sizing_propeller_ref_cl import SizingPropellerReferenceCl
+from ..components.sizing_propeller_ref_chord import SizingPropellerReferenceChord
+from ..components.sizing_propeller_radius_to_span_ratio import SizingPropellerDiameterToSpanRatio
+from ..components.sizing_propeller_radius_to_chord_ratio import SizingPropellerDiameterToChordRatio
+from ..components.sizing_propeller_flapped_span_ratio import SizingPropellerFlappedRatio
+from ..components.sizing_propeller_wing_ac_distance import SizingPropellerWingACDistance
+from ..components.sizing_propeller_wing_le_distance_ratio import SizingPropellerWingLEDistanceRatio
 
 from .cstr_propeller import ConstraintsPropeller
 
@@ -56,6 +63,41 @@ class SizingPropeller(om.Group):
         self.add_subsystem(
             "propeller_CG",
             SizingPropellerCG(propeller_id=propeller_id, position=position),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "ref_cl",
+            SizingPropellerReferenceCl(propeller_id=propeller_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "ref_chord",
+            SizingPropellerReferenceChord(propeller_id=propeller_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "d_to_b_ratio",
+            SizingPropellerDiameterToSpanRatio(propeller_id=propeller_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "d_to_c_ratio",
+            SizingPropellerDiameterToChordRatio(propeller_id=propeller_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "flapped_ratio",
+            SizingPropellerFlappedRatio(propeller_id=propeller_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "prop_to_ac_distance",
+            SizingPropellerWingACDistance(propeller_id=propeller_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "prop_to_le_distance",
+            SizingPropellerWingLEDistanceRatio(propeller_id=propeller_id),
             promotes=["data:*"],
         )
 

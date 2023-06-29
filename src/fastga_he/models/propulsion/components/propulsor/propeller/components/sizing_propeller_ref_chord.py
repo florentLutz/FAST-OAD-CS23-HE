@@ -60,6 +60,15 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
             copy_shape="data:aerodynamics:wing:low_speed:Y_vector",
         )
 
+        # This add_input is needed because in the other module, the shape of this vector is
+        # copied based on the Y_vector and not having it here would cause the code to crash.
+        self.add_input(
+            "data:aerodynamics:wing:low_speed:CL_vector",
+            val=np.nan,
+            shape_by_conn=True,
+            copy_shape="data:aerodynamics:wing:low_speed:Y_vector",
+        )
+
         self.add_output(
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
             val=0.0,

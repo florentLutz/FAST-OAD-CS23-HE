@@ -1444,7 +1444,7 @@ def test_sizing_propeller():
         "data:propulsion:he_power_train:propeller:propeller_1:low_speed:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
 
-    problem.check_partials(compact_print=True)
+    problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_propeller_performances():
