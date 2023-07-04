@@ -4,3 +4,4 @@
 
 from .components.sizing_dc_dc_converter import SizingDCDCConverter
 from .components.perf_dc_dc_converter import PerformancesDCDCConverter
+from .components.slipstream_dc_dc_converter import SlipstreamDCDCConverter

@@ -4,3 +4,4 @@
 
 from .components.sizing_rectifier import SizingRectifier
 from .components.perf_rectifier import PerformancesRectifier
+from .components.slipstream_rectifier import SlipstreamRectifier

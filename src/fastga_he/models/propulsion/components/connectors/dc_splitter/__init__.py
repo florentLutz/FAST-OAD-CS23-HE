@@ -4,3 +4,4 @@
 
 from .components.perf_dc_splitter import PerformancesDCSplitter
 from .components.sizing_dc_splitter import SizingDCSplitter
+from .components.slipstream_dc_splitter import SlipstreamDCSplitter

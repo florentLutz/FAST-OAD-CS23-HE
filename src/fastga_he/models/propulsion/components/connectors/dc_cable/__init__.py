@@ -4,3 +4,4 @@
 
 from .components.perf_harness import PerformancesHarness
 from .components.sizing_harness import SizingHarness
+from .components.slipstream_harness import SlipstreamHarness
