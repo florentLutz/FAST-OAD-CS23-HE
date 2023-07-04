@@ -97,6 +97,10 @@ class FASTGAHEPowerTrainConfigurator:
         # modules for the code to work
         self._components_promotes = None
 
+        # Contains a list with, for each component, a tuple telling whether or not the component
+        # needs the flaps position for the computation of the slipstream effects
+        self._components_slipstream_flaps = None
+
         # Contains a basic list of the connections in the power train, with no processing whatsoever
         self._connection_list = None
 
@@ -180,6 +184,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_promote_list = []
         components_type_class_list = []
         components_perf_watchers_list = []
+        components_slipstream_needs_flaps = []
 
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
@@ -218,6 +223,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_promote_list.append(resources.DICTIONARY_PT[component_id])
             components_type_class_list.append(resources.DICTIONARY_CTC[component_id])
             components_perf_watchers_list.append(resources.DICTIONARY_MP[component_id])
+            components_slipstream_needs_flaps.append(resources.DICTIONARY_SFR[component_id])
 
             if "options" in component.keys():
 
@@ -256,6 +262,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_promotes = components_promote_list
         self._components_type_class = components_type_class_list
         self._components_perf_watchers = components_perf_watchers_list
+        self._components_slipstream_flaps = components_slipstream_needs_flaps
 
     def _get_connections(self):
         """
@@ -535,6 +542,22 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_promotes,
             self._sspc_list,
             self._sspc_default_state,
+        )
+
+    def get_slipstream_element_lists(self) -> tuple:
+        """
+        Returns the list of parameters necessary to create the slipstream group based on what is
+        inside the power train file.
+        """
+
+        self._get_components()
+
+        return (
+            self._components_name,
+            self._components_name_id,
+            self._components_type,
+            self._components_om_type,
+            self._components_slipstream_flaps,
         )
 
     @staticmethod

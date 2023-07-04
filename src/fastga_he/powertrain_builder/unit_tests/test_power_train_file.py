@@ -77,6 +77,29 @@ def test_power_train_file_components_performances():
     assert sspc_default_state
 
 
+def test_power_train_file_components_slipstream():
+
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    (
+        components_name,
+        components_name_id,
+        components_type,
+        components_om_type,
+        components_slipstream_flaps,
+    ) = power_train_configurator.get_slipstream_element_lists()
+
+    # Check that they are not empty
+    assert components_name
+    assert components_name_id
+    assert components_type
+    assert components_om_type
+    assert components_slipstream_flaps
+
+
 def test_power_train_file_components_performances_sspc_last():
 
     sample_power_train_file_path = pth.join(
