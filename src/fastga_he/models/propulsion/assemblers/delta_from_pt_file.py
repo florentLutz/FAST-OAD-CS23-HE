@@ -25,7 +25,12 @@ from fastga_he.models.propulsion.components import (
     SlipstreamICE,
 )
 
-from .constants import SUBMODEL_THRUST_DISTRIBUTOR
+from .constants import (
+    SUBMODEL_THRUST_DISTRIBUTOR,
+    SUBMODEL_POWER_TRAIN_DELTA_CL,
+    SUBMODEL_POWER_TRAIN_DELTA_CM,
+    SUBMODEL_POWER_TRAIN_DELTA_CD,
+)
 
 
 class AerodynamicDeltasFromPTFile(om.Group):
@@ -88,6 +93,7 @@ class AerodynamicDeltasFromPTFile(om.Group):
             components_om_type,
             components_slipstream_promotes,
             components_slipstream_flap,
+            components_slipstream_wing_lift,
         ) = self.configurator.get_slipstream_element_lists()
 
         options = {
@@ -135,6 +141,47 @@ class AerodynamicDeltasFromPTFile(om.Group):
         for propulsor_name in propulsor_names:
             self.connect(
                 "thrust_splitter." + propulsor_name + "_thrust", propulsor_name + ".thrust"
+            )
+
+        self.add_subsystem(
+            name="delta_cls_summer",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_POWER_TRAIN_DELTA_CL, options=options
+            ),
+            promotes=["delta_Cl_wing", "delta_Cl"],
+        )
+        self.add_subsystem(
+            name="delta_cms_summer",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_POWER_TRAIN_DELTA_CM, options=options
+            ),
+            promotes=["delta_Cm"],
+        )
+        self.add_subsystem(
+            name="delta_cdi",
+            subsys=SlipstreamDeltaCdi(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="delta_cds_summer",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_POWER_TRAIN_DELTA_CD, options=options
+            ),
+            promotes=["delta_Cdi", "delta_Cd"],
+        )
+
+        for component_name in components_name:
+            self.connect(
+                component_name + ".delta_Cl",
+                "delta_cls_summer." + component_name + "_delta_Cl",
+            )
+            self.connect(
+                component_name + ".delta_Cm",
+                "delta_cms_summer." + component_name + "_delta_Cm",
+            )
+            self.connect(
+                component_name + ".delta_Cd",
+                "delta_cds_summer." + component_name + "_delta_Cd",
             )
 
 
@@ -253,3 +300,51 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
             partials["cl_airframe", "data:aerodynamics:flaps:landing:CL"] = np.ones(
                 number_of_points
             )
+
+
+class SlipstreamDeltaCdi(om.ExplicitComponent):
+    """
+    Computation of the increase in lift induced drag coefficient. Is computed based on the
+    delta_Cl on the wing and base on the airframe lift coefficient computed beforehand. Computed
+    according to the formula in :cite:`de:2019`
+    """
+
+    def initialize(self):
+
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+
+    def setup(self):
+
+        number_of_points = self.options["number_of_points"]
+
+        self.add_input(name="cl_airframe", val=np.full(number_of_points, np.nan))
+        self.add_input(name="delta_Cl_wing", val=np.full(number_of_points, np.nan))
+        self.add_input(name="data:aerodynamics:wing:cruise:induced_drag_coefficient", val=np.nan)
+
+        self.add_output(name="delta_Cdi", val=0.0, shape=number_of_points)
+
+        self.declare_partials(of="*", wrt="*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        cl_airframe = inputs["cl_airframe"]
+        delta_cl_wing = inputs["delta_Cl_wing"]
+        k = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
+
+        delta_cdi = k * (delta_cl_wing ** 2.0 + 2.0 * cl_airframe * delta_cl_wing)
+
+        outputs["delta_Cdi"] = delta_cdi
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+
+        cl_airframe = inputs["cl_airframe"]
+        delta_cl_wing = inputs["delta_Cl_wing"]
+        k = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
+
+        partials["delta_Cdi", "cl_airframe"] = np.diag(2.0 * k * delta_cl_wing)
+        partials["delta_Cdi", "delta_Cl_wing"] = np.diag(2.0 * k * (delta_cl_wing + cl_airframe))
+        partials["delta_Cdi", "data:aerodynamics:wing:cruise:induced_drag_coefficient"] = (
+            delta_cl_wing ** 2.0 + 2.0 * cl_airframe * delta_cl_wing
+        )

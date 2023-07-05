@@ -22,4 +22,5 @@ from .registered_components import (
     DICTIONARY_IO_INDEP_V,
     DICTIONARY_V_TO_SET,
     DICTIONARY_SFR,
+    DICTIONARY_SWL,
 )

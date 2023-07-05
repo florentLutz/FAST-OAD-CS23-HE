@@ -448,15 +448,15 @@ def test_slipstream_from_pt_file():
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
-    assert problem.get_val("propeller_1.delta_Cl") * 1e6 == pytest.approx(
+    assert problem.get_val("delta_Cl") * 1e6 == pytest.approx(
         np.array([1602.8, 1660.5, 1713.5, 1762.2, 1806.9, 1847.6, 1884.8, 1918.5, 1949.0, 1976.4]),
         rel=1e-3,
     )
-    assert problem.get_val("propeller_1.delta_Cd") * 1e9 == pytest.approx(
-        np.array([309.8, 291.8, 275.0, 259.3, 244.5, 230.7, 217.7, 205.5, 194.1, 183.4]),
+    assert problem.get_val("delta_Cd") * 1e6 == pytest.approx(
+        np.array([75.14, 83.13, 91.24, 99.45, 107.72, 116.05, 124.39, 132.73, 141.06, 149.36]),
         rel=1e-3,
     )
-    assert problem.get_val("propeller_1.delta_Cm") * 1e9 == pytest.approx(
+    assert problem.get_val("delta_Cm") * 1e9 == pytest.approx(
         np.array(
             [
                 -2925.3,

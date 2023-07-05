@@ -101,9 +101,13 @@ class FASTGAHEPowerTrainConfigurator:
         # modules for the code to work
         self._components_slipstream_promotes = None
 
-        # Contains a list with, for each component, a tuple telling whether or not the component
+        # Contains a list with, for each component, a boolean telling whether or not the component
         # needs the flaps position for the computation of the slipstream effects
         self._components_slipstream_flaps = None
+
+        # Contains a list with, for each component, a boolean telling whether or not the component
+        # lift increase is added to the wing. Will be used for the increase in induced drag
+        self._components_slipstream_wing_lift = None
 
         # Contains a basic list of the connections in the power train, with no processing whatsoever
         self._connection_list = None
@@ -190,6 +194,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_type_class_list = []
         components_perf_watchers_list = []
         components_slipstream_needs_flaps = []
+        components_slipstream_wing_lift = []
 
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
@@ -230,6 +235,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_type_class_list.append(resources.DICTIONARY_CTC[component_id])
             components_perf_watchers_list.append(resources.DICTIONARY_MP[component_id])
             components_slipstream_needs_flaps.append(resources.DICTIONARY_SFR[component_id])
+            components_slipstream_wing_lift.append(resources.DICTIONARY_SWL[component_id])
 
             if "options" in component.keys():
 
@@ -270,6 +276,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_type_class = components_type_class_list
         self._components_perf_watchers = components_perf_watchers_list
         self._components_slipstream_flaps = components_slipstream_needs_flaps
+        self._components_slipstream_wing_lift = components_slipstream_wing_lift
 
     def _get_connections(self):
         """
@@ -566,6 +573,7 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_om_type,
             self._components_slipstream_promotes,
             self._components_slipstream_flaps,
+            self._components_slipstream_wing_lift,
         )
 
     @staticmethod

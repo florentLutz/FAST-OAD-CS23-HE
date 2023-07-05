@@ -89,6 +89,7 @@ def test_power_train_file_components_slipstream():
         components_om_type,
         components_slipstream_promotes,
         components_slipstream_flaps,
+        components_slipstream_wing_lift,
     ) = power_train_configurator.get_slipstream_element_lists()
 
     # Check that they are not empty
@@ -98,6 +99,7 @@ def test_power_train_file_components_slipstream():
     assert components_om_type
     assert components_slipstream_promotes
     assert components_slipstream_flaps
+    assert components_slipstream_wing_lift
 
 
 def test_power_train_file_components_performances_sspc_last():
