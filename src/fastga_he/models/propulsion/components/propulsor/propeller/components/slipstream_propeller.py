@@ -53,13 +53,15 @@ class SlipstreamPropeller(om.Group):
         self.add_subsystem(
             name="delta_cd0",
             subsys=SlipstreamPropellerDeltaCD0(
-                propeller_id="propeller_1",
+                propeller_id=propeller_id,
                 number_of_points=number_of_points,
                 flaps_position=flaps_position,
             ),
             promotes=["*"],
         )
 
+        # TODO: Doing things this way works but the setup takes a loooooooong time for some reasons,
+        # TODO: should find a way to do things differently
         ivc = om.IndepVarComp()
         ivc.add_output(name="alpha_0", val=0.0, units="deg")
         self.add_subsystem(name="nil_AOA", subsys=ivc, promotes=[])
@@ -88,7 +90,7 @@ class SlipstreamPropeller(om.Group):
         self.add_subsystem(
             name="delta_cm0",
             subsys=SlipstreamPropellerDeltaCM0(
-                propeller_id="propeller_1",
+                propeller_id=propeller_id,
                 number_of_points=number_of_points,
                 flaps_position=flaps_position,
             ),

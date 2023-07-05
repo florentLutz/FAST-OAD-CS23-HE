@@ -10,6 +10,7 @@ from .registered_components import (
     DICTIONARY_CT,
     DICTIONARY_ATT,
     DICTIONARY_PT,
+    DICTIONARY_SPT,
     DICTIONARY_IN,
     DICTIONARY_OUT,
     DICTIONARY_CTC,

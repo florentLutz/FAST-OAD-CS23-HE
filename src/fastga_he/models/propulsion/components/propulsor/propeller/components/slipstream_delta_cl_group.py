@@ -91,28 +91,28 @@ class SlipstreamPropellerDeltaClGroup(om.Group):
         self.add_subsystem(
             name="height_impact_coefficient",
             subsys=SlipstreamPropellerHeightImpactCoefficients(
-                propeller_id="propeller_1", number_of_points=number_of_points
+                propeller_id=propeller_id, number_of_points=number_of_points
             ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="height_impact",
             subsys=SlipstreamPropellerHeightImpact(
-                propeller_id="propeller_1", number_of_points=number_of_points
+                propeller_id=propeller_id, number_of_points=number_of_points
             ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="lift_increase_ratio",
             subsys=SlipstreamPropellerLiftIncreaseRatio(
-                propeller_id="propeller_1", number_of_points=number_of_points
+                propeller_id=propeller_id, number_of_points=number_of_points
             ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="section_lift",
             subsys=SlipstreamPropellerSectionLift(
-                propeller_id="propeller_1",
+                propeller_id=propeller_id,
                 number_of_points=number_of_points,
                 flaps_position=flaps_position,
             ),
@@ -126,7 +126,7 @@ class SlipstreamPropellerDeltaClGroup(om.Group):
         self.add_subsystem(
             name="blown_area_ratio",
             subsys=SlipstreamPropellerBlownAreaRatio(
-                propeller_id="propeller_1", number_of_points=number_of_points
+                propeller_id=propeller_id, number_of_points=number_of_points
             ),
             promotes=["*"],
         )

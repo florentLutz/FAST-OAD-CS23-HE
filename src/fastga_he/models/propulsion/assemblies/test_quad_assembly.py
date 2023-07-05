@@ -15,6 +15,7 @@ from utils.filter_residuals import filter_residuals
 from fastga_he.models.propulsion.assemblers.performances_from_pt_file import (
     PowerTrainPerformancesFromFile,
 )
+from fastga_he.models.propulsion.assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
 
 from ..components.loads.pmsm import PerformancesPMSM
 from ..components.propulsor.propeller import PerformancesPropeller
@@ -820,3 +821,220 @@ def test_power_rate():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_slipstream_from_pt_file():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly.yml")
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            AerodynamicDeltasFromPTFile(
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("alpha", val=np.linspace(5.0, 10.0, NB_POINTS_TEST), units="deg")
+    ivc.add_output("thrust", val=np.linspace(500, 550, NB_POINTS_TEST) * 4.0, units="N")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        AerodynamicDeltasFromPTFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    assert problem.get_val("propeller_1.delta_Cl") * 1e6 == pytest.approx(
+        np.array(
+            [
+                201.2,
+                203.3,
+                205.3,
+                207.4,
+                209.4,
+                211.4,
+                213.5,
+                215.5,
+                217.5,
+                219.5,
+                221.4,
+                223.4,
+                225.4,
+                227.3,
+                229.3,
+                231.2,
+                233.1,
+                235.1,
+                237.0,
+                238.9,
+                240.8,
+                242.7,
+                244.5,
+                246.4,
+                248.3,
+                250.1,
+                252.0,
+                253.8,
+                255.6,
+                257.5,
+                259.3,
+                261.1,
+                262.9,
+                264.7,
+                266.4,
+                268.2,
+                270.0,
+                271.8,
+                273.5,
+                275.2,
+                277.0,
+                278.7,
+                280.4,
+                282.2,
+                283.9,
+                285.6,
+                287.3,
+                288.9,
+                290.6,
+                292.3,
+            ]
+        ),
+        rel=1e-3,
+    )
+    assert problem.get_val("propeller_1.delta_Cd") * 1e9 == pytest.approx(
+        np.array(
+            [
+                59.9,
+                59.6,
+                59.3,
+                59.1,
+                58.8,
+                58.5,
+                58.3,
+                58.0,
+                57.8,
+                57.5,
+                57.2,
+                57.0,
+                56.7,
+                56.5,
+                56.2,
+                56.0,
+                55.7,
+                55.5,
+                55.3,
+                55.0,
+                54.8,
+                54.5,
+                54.3,
+                54.1,
+                53.8,
+                53.6,
+                53.4,
+                53.1,
+                52.9,
+                52.7,
+                52.5,
+                52.2,
+                52.0,
+                51.8,
+                51.6,
+                51.4,
+                51.1,
+                50.9,
+                50.7,
+                50.5,
+                50.3,
+                50.1,
+                49.9,
+                49.7,
+                49.5,
+                49.3,
+                49.1,
+                48.9,
+                48.7,
+                48.5,
+            ]
+        ),
+        rel=1e-3,
+    )
+    assert problem.get_val("propeller_1.delta_Cm") * 1e9 == pytest.approx(
+        np.array(
+            [
+                -316.6,
+                -315.1,
+                -313.7,
+                -312.3,
+                -310.9,
+                -309.5,
+                -308.1,
+                -306.7,
+                -305.3,
+                -304.0,
+                -302.6,
+                -301.3,
+                -299.9,
+                -298.6,
+                -297.3,
+                -296.0,
+                -294.7,
+                -293.4,
+                -292.1,
+                -290.8,
+                -289.6,
+                -288.3,
+                -287.1,
+                -285.8,
+                -284.6,
+                -283.4,
+                -282.1,
+                -280.9,
+                -279.7,
+                -278.5,
+                -277.4,
+                -276.2,
+                -275.0,
+                -273.8,
+                -272.7,
+                -271.5,
+                -270.4,
+                -269.2,
+                -268.1,
+                -267.0,
+                -265.9,
+                -264.8,
+                -263.7,
+                -262.6,
+                -261.5,
+                -260.4,
+                -259.3,
+                -258.3,
+                -257.2,
+                -256.2,
+            ]
+        ),
+        rel=1e-3,
+    )
+    assert problem.get_val("propeller_1.delta_Cl") == pytest.approx(
+        problem.get_val("propeller_4.delta_Cl"),
+        rel=1e-6,
+    )
+    assert problem.get_val("propeller_2.delta_Cl") == pytest.approx(
+        problem.get_val("propeller_3.delta_Cl"),
+        rel=1e-6,
+    )
+    assert all(problem.get_val("propeller_1.delta_Cl") != problem.get_val("propeller_2.delta_Cl"))
+
+    # om.n2(problem)

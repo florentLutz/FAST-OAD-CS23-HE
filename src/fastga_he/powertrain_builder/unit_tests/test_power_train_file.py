@@ -10,8 +10,6 @@ import pytest
 import networkx as nx
 import matplotlib.pyplot as plt
 
-import openmdao.api as om
-
 from ..powertrain import FASTGAHEPowerTrainConfigurator
 from ..exceptions import FASTGAHESingleSSPCAtEndOfLine
 
@@ -89,6 +87,7 @@ def test_power_train_file_components_slipstream():
         components_name_id,
         components_type,
         components_om_type,
+        components_slipstream_promotes,
         components_slipstream_flaps,
     ) = power_train_configurator.get_slipstream_element_lists()
 
@@ -97,6 +96,7 @@ def test_power_train_file_components_slipstream():
     assert components_name_id
     assert components_type
     assert components_om_type
+    assert components_slipstream_promotes
     assert components_slipstream_flaps
 
 

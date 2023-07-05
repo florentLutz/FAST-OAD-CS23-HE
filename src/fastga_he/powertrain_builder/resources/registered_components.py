@@ -19,9 +19,12 @@ ATT = "attributes"
 # input/output is an openmdao input the other if the opposite
 IN = "inputs"
 OUT = "outputs"
-# The PT field contains the variables that must be promoted from aircraft level for the component
-# to work
+# The PT field contains the variables that must be promoted from aircraft level for the components
+# performances group to work
 PT = "promoted_variables"
+# The SPT field contains the variables that must be promoted from aircraft level for the components
+# slipstream group to work
+SPT = "slipstream_promoted_variables"
 # The MP field will contain the variables that will be of interest for the analysis of the
 # mission performances and that will be registered in the power train performances CSV file
 MP = "mission_performances_watcher"
@@ -53,6 +56,7 @@ PROPELLER = {
     CT: "propeller",
     ATT: None,
     PT: ["true_airspeed", "altitude", "density"],
+    SPT: ["data:*", "true_airspeed", "cl_wing_clean", "density"],
     IN: [(None, "rpm"), (None, "shaft_power_in")],
     OUT: None,
     CTC: "propulsor",
@@ -82,6 +86,7 @@ PMSM = {
     CT: "PMSM",
     ATT: None,
     PT: ["settings:*"],
+    SPT: [],
     IN: [
         (None, "ac_current_rms_in_one_phase"),
         (None, "ac_voltage_peak_in"),
@@ -110,6 +115,7 @@ INVERTER = {
     CT: "inverter",
     ATT: None,
     PT: ["settings:*"],
+    SPT: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [
         ("ac_current_rms_out_one_phase", None),
@@ -145,6 +151,7 @@ DC_BUS = {
     CT: "DC_bus",
     ATT: ["number_of_inputs", "number_of_outputs"],
     PT: [],
+    SPT: [],
     IN: [(None, "dc_voltage"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out_", None)],
     CTC: "connector",
@@ -164,6 +171,7 @@ DC_LINE = {
     CT: "DC_cable_harness",
     ATT: None,
     PT: ["exterior_temperature", "settings:*", "time_step"],
+    SPT: [],
     IN: [("dc_voltage_in", None), (None, "dc_current")],
     OUT: [("dc_voltage_out", None), (None, "dc_current")],
     CTC: "connector",
@@ -183,6 +191,7 @@ DC_DC_CONVERTER = {
     CT: "DC_DC_converter",
     ATT: None,
     PT: [],
+    SPT: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [("dc_voltage_out", None), (None, "dc_current_out")],
     CTC: "connector",
@@ -207,6 +216,7 @@ BATTERY_PACK = {
     CT: "battery_pack",
     ATT: None,
     PT: ["time_step"],
+    SPT: [],
     IN: None,
     OUT: [(None, "voltage_out"), ("dc_current_out", None)],
     CTC: "source",
@@ -234,6 +244,7 @@ DC_SSPC = {
     CT: "DC_SSPC",
     ATT: ["closed_by_default"],
     PT: [],
+    SPT: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [(None, "dc_voltage_out"), ("dc_current_out", None)],
     CTC: "connector",
@@ -258,6 +269,7 @@ DC_SPLITTER = {
     CT: "DC_splitter",
     ATT: ["splitter_mode"],
     PT: [],
+    SPT: [],
     IN: [(None, "dc_voltage_in_"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out", None)],
     CTC: "connector",
@@ -277,6 +289,7 @@ RECTIFIER = {
     CT: "rectifier",
     ATT: None,
     PT: [],
+    SPT: [],
     IN: [
         (None, "ac_current_rms_in_one_phase"),
         ("ac_voltage_rms_in", None),
@@ -305,6 +318,7 @@ GENERATOR = {
     CT: "generator",
     ATT: None,
     PT: [],
+    SPT: [],
     IN: [(None, "rpm"), (None, "shaft_power_in")],
     OUT: [
         ("ac_current_rms_out_one_phase", None),
@@ -336,6 +350,7 @@ ICE = {
     CT: "ICE",
     ATT: None,
     PT: ["time_step", "density", "settings:*"],
+    SPT: [],
     IN: None,
     OUT: [("rpm", None), ("shaft_power_out", None)],
     CTC: ["source", "propulsive_load"],
@@ -377,6 +392,7 @@ DICTIONARY_CN_ID = {}
 DICTIONARY_CT = {}
 DICTIONARY_ATT = {}
 DICTIONARY_PT = {}
+DICTIONARY_SPT = {}
 DICTIONARY_IN = {}
 DICTIONARY_OUT = {}
 DICTIONARY_CTC = {}
@@ -396,6 +412,7 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_CT[known_component[ID]] = known_component[CT]
     DICTIONARY_ATT[known_component[ID]] = known_component[ATT]
     DICTIONARY_PT[known_component[ID]] = known_component[PT]
+    DICTIONARY_SPT[known_component[ID]] = known_component[SPT]
     DICTIONARY_IN[known_component[ID]] = known_component[IN]
     DICTIONARY_OUT[known_component[ID]] = known_component[OUT]
     DICTIONARY_CTC[known_component[ID]] = known_component[CTC]

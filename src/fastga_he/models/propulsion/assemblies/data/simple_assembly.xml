@@ -17,6 +17,17 @@
                   <CD0 is_input="False">0.012114342193164637<!--profile drag coefficient for fuselage in low speed conditions--></CD0>
                 </low_speed>
             </fuselage>
+            <wing>
+                <low_speed>
+                    <CL_ref is_input="False">0.9903832267850955</CL_ref>
+                </low_speed>
+                <cruise>
+                  <CD0 is_input="False">0.006225770501969716<!--profile drag coefficient for wing in cruise conditions--></CD0>
+                  <CL0_clean is_input="True">0.2501539747371489<!--wing lift coefficient at zero aircraft angle of attack in cruise conditions and with no flaps deployed--></CL0_clean>
+                  <CL_alpha units="1/rad" is_input="True">4.620008812204601<!--wing lift coefficient slope with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
+                  <CM0_clean is_input="False">-0.015672163858931134<!--wing pitching moment coefficient in cruise conditions and with no flaps deployed--></CM0_clean>
+                </cruise>
+            </wing>
         </aerodynamics>
         <geometry>
             <cabin>
@@ -29,6 +40,7 @@
                 <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
             </fuselage>
             <wing>
+                <wet_area units="m**2" is_input="False">26.657254276457444<!--wing wet area--></wet_area>
                 <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
                 <MAC>
                   <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
@@ -456,6 +468,12 @@
                         <cruise>
                             <CD0>0.0</CD0>
                         </cruise>
+                        <flapped_ratio>1.0</flapped_ratio>
+                        <cl_clean_ref>1.0</cl_clean_ref>
+                        <wing_chord_ref>1.0</wing_chord_ref>
+                        <from_wing_AC units="m">0.5</from_wing_AC>
+                        <from_wing_LE_ratio units="m">0.1</from_wing_LE_ratio>
+                        <installation_angle units="deg">0.0</installation_angle>
                         <from_LE units="m">0.15</from_LE>
                         <mass units="kg">36.35</mass>
                         <rpm_mission>2000.0</rpm_mission>

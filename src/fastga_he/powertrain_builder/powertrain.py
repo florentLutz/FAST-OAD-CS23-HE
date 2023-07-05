@@ -97,6 +97,10 @@ class FASTGAHEPowerTrainConfigurator:
         # modules for the code to work
         self._components_promotes = None
 
+        # Contains the list of aircraft inputs that are necessary to promote in the slipstream
+        # modules for the code to work
+        self._components_slipstream_promotes = None
+
         # Contains a list with, for each component, a tuple telling whether or not the component
         # needs the flaps position for the computation of the slipstream effects
         self._components_slipstream_flaps = None
@@ -182,6 +186,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_om_type_list = []
         components_options_list = []
         components_promote_list = []
+        components_slip_promote_list = []
         components_type_class_list = []
         components_perf_watchers_list = []
         components_slipstream_needs_flaps = []
@@ -221,6 +226,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_type_list.append(resources.DICTIONARY_CT[component_id])
             components_om_type_list.append(resources.DICTIONARY_CN[component_id])
             components_promote_list.append(resources.DICTIONARY_PT[component_id])
+            components_slip_promote_list.append(resources.DICTIONARY_SPT[component_id])
             components_type_class_list.append(resources.DICTIONARY_CTC[component_id])
             components_perf_watchers_list.append(resources.DICTIONARY_MP[component_id])
             components_slipstream_needs_flaps.append(resources.DICTIONARY_SFR[component_id])
@@ -260,6 +266,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_om_type = components_om_type_list
         self._components_options = components_options_list
         self._components_promotes = components_promote_list
+        self._components_slipstream_promotes = components_slip_promote_list
         self._components_type_class = components_type_class_list
         self._components_perf_watchers = components_perf_watchers_list
         self._components_slipstream_flaps = components_slipstream_needs_flaps
@@ -557,6 +564,7 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_name_id,
             self._components_type,
             self._components_om_type,
+            self._components_slipstream_promotes,
             self._components_slipstream_flaps,
         )
 

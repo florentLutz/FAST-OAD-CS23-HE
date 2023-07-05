@@ -2,18 +2,22 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-from .connectors.dc_bus import SizingDCBus, PerformancesDCBus
-from .connectors.dc_cable import SizingHarness, PerformancesHarness
-from .connectors.dc_dc_converter import SizingDCDCConverter, PerformancesDCDCConverter
-from .connectors.inverter import SizingInverter, PerformancesInverter
-from .connectors.dc_sspc import SizingDCSSPC, PerformancesDCSSPC
-from .connectors.dc_splitter import SizingDCSplitter, PerformancesDCSplitter
-from .connectors.rectifier import SizingRectifier, PerformancesRectifier
+from .connectors.dc_bus import SizingDCBus, PerformancesDCBus, SlipstreamDCBus
+from .connectors.dc_cable import SizingHarness, PerformancesHarness, SlipstreamHarness
+from .connectors.dc_dc_converter import (
+    SizingDCDCConverter,
+    PerformancesDCDCConverter,
+    SlipstreamDCDCConverter,
+)
+from .connectors.inverter import SizingInverter, PerformancesInverter, SlipstreamInverter
+from .connectors.dc_sspc import SizingDCSSPC, PerformancesDCSSPC, SlipstreamDCSSPC
+from .connectors.dc_splitter import SizingDCSplitter, PerformancesDCSplitter, SlipstreamDCSplitter
+from .connectors.rectifier import SizingRectifier, PerformancesRectifier, SlipstreamRectifier
 
-from .loads.pmsm import SizingPMSM, PerformancesPMSM
+from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM
 
-from .propulsor.propeller import SizingPropeller, PerformancesPropeller
+from .propulsor.propeller import SizingPropeller, PerformancesPropeller, SlipstreamPropeller
 
-from .source.battery import SizingBatteryPack, PerformancesBatteryPack
-from .source.generator import SizingGenerator, PerformancesGenerator
-from .source.ice import SizingICE, PerformancesICE
+from .source.battery import SizingBatteryPack, PerformancesBatteryPack, SlipstreamBatteryPack
+from .source.generator import SizingGenerator, PerformancesGenerator, SlipstreamGenerator
+from .source.ice import SizingICE, PerformancesICE, SlipstreamICE

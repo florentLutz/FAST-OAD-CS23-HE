@@ -1,5 +1,34 @@
 <FASTOAD_model>
     <data>
+        <geometry>
+            <flap>
+                <span_ratio>0.45</span_ratio>
+            </flap>
+            <wing>
+                <span units="m" is_input="False">12.693930607836878<!--wing span--></span>
+                <area units="m**2" is_input="False">12.693930607836878<!--wing area--></area>
+                <wet_area units="m**2" is_input="False">26.657254276457444<!--wing wet area--></wet_area>
+                <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <aerodynamics>
+            <wing>
+                <low_speed>
+                    <CL_ref is_input="False">0.9903832267850955</CL_ref>
+                </low_speed>
+                <cruise>
+                  <CD0 is_input="False">0.006225770501969716<!--profile drag coefficient for wing in cruise conditions--></CD0>
+                  <CL0_clean is_input="True">0.2501539747371489<!--wing lift coefficient at zero aircraft angle of attack in cruise conditions and with no flaps deployed--></CL0_clean>
+                  <CL_alpha units="1/rad" is_input="True">4.620008812204601<!--wing lift coefficient slope with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
+                  <CM0_clean is_input="False">-0.015672163858931134<!--wing pitching moment coefficient in cruise conditions and with no flaps deployed--></CM0_clean>
+                </cruise>
+            </wing>
+        </aerodynamics>
         <propulsion>
             <he_power_train>
                 <thrust_distribution>[1.0, 1.0, 1.0, 1.0]</thrust_distribution>
@@ -824,6 +853,12 @@
                 </PMSM>
                 <propeller>
                     <propeller_1>
+                        <flapped_ratio>0.5</flapped_ratio>
+                        <cl_clean_ref>0.7</cl_clean_ref>
+                        <wing_chord_ref>1.0</wing_chord_ref>
+                        <from_wing_AC units="m">0.5</from_wing_AC>
+                        <from_wing_LE_ratio units="m">0.1</from_wing_LE_ratio>
+                        <installation_angle units="deg">0.0</installation_angle>
                         <from_LE units="m">0.15</from_LE>
                         <rpm_mission>2000.0</rpm_mission>
                         <solidity>0.2</solidity>
@@ -837,6 +872,12 @@
                         </torque>
                     </propeller_1>
                     <propeller_2>
+                        <flapped_ratio>1.0</flapped_ratio>
+                        <cl_clean_ref>0.95</cl_clean_ref>
+                        <wing_chord_ref>1.0</wing_chord_ref>
+                        <from_wing_AC units="m">0.5</from_wing_AC>
+                        <from_wing_LE_ratio units="m">0.1</from_wing_LE_ratio>
+                        <installation_angle units="deg">0.0</installation_angle>
                         <from_LE units="m">0.15</from_LE>
                         <rpm_mission>2000.0</rpm_mission>
                         <solidity>0.2</solidity>
@@ -850,6 +891,12 @@
                         </torque>
                     </propeller_2>
                     <propeller_3>
+                        <flapped_ratio>1.0</flapped_ratio>
+                        <cl_clean_ref>0.95</cl_clean_ref>
+                        <wing_chord_ref>1.0</wing_chord_ref>
+                        <from_wing_AC units="m">0.5</from_wing_AC>
+                        <from_wing_LE_ratio units="m">0.1</from_wing_LE_ratio>
+                        <installation_angle units="deg">0.0</installation_angle>
                         <from_LE units="m">0.15</from_LE>
                         <rpm_mission>2000.0</rpm_mission>
                         <solidity>0.2</solidity>
@@ -863,6 +910,12 @@
                         </torque>
                     </propeller_3>
                     <propeller_4>
+                        <flapped_ratio>0.5</flapped_ratio>
+                        <cl_clean_ref>0.7</cl_clean_ref>
+                        <wing_chord_ref>1.0</wing_chord_ref>
+                        <from_wing_AC units="m">0.5</from_wing_AC>
+                        <from_wing_LE_ratio units="m">0.1</from_wing_LE_ratio>
+                        <installation_angle units="deg">0.0</installation_angle>
                         <from_LE units="m">0.15</from_LE>
                         <rpm_mission>2000.0</rpm_mission>
                         <solidity>0.2</solidity>
