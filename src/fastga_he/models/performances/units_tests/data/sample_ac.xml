@@ -95,6 +95,9 @@
           </pilot>
         </seats>
       </cabin>
+      <flap>
+        <span_ratio>0.5</span_ratio>
+      </flap>
       <horizontal_tail>
         <MAC>
           <at25percent>
@@ -704,6 +707,8 @@
         </inverter>
         <propeller>
           <propeller_1>
+            <y_ratio>0.34</y_ratio>
+            <from_LE units="m">0.15</from_LE>
             <activity_factor is_input="True">125.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">1.3005732143013895<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">20.5<!--Twist between the propeller blade root and tip--></blade_twist>

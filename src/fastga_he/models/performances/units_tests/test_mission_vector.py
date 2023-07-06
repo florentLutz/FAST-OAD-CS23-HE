@@ -1447,7 +1447,7 @@ def test_recording():
     problem.run_model()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(20.18, abs=1e-2)
+    assert sizing_fuel == pytest.approx(20.116, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")

@@ -19,6 +19,9 @@
             </fuselage>
         </aerodynamics>
         <geometry>
+            <flap>
+                <span_ratio>0.5</span_ratio>
+            </flap>
             <cabin>
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
             </cabin>
@@ -645,6 +648,8 @@
                 </PMSM>
                 <propeller>
                     <propeller_1>
+                        <y_ratio>0.34</y_ratio>
+                        <from_LE units="m">0.15</from_LE>
                         <CG>
                             <x units="m">2.2</x>
                         </CG>
