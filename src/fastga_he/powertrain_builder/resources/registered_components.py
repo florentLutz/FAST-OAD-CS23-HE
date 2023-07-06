@@ -60,7 +60,7 @@ PROPELLER = {
     CT: "propeller",
     ATT: None,
     PT: ["true_airspeed", "altitude", "density"],
-    SPT: ["data:*", "true_airspeed", "cl_wing_clean", "density"],
+    SPT: ["data:*", "true_airspeed", "cl_wing_clean", "density", "alpha"],
     IN: [(None, "rpm"), (None, "shaft_power_in")],
     OUT: None,
     CTC: "propulsor",

@@ -20,6 +20,9 @@
             <wing>
                 <low_speed>
                     <CL_ref is_input="False">0.9903832267850955</CL_ref>
+                    <Y_vector units="m" is_input="False">[0.11547445976593405, 0.34642337929780215, 0.5773722988296702, 1.0361325274187763, 1.7227040650651202, 2.4092756027114643, 3.0958471403578085, 3.782418678004152, 4.468990215650496, 5.1555617532968405, 5.5594273636770435, 5.6805870467911035, 5.801746729905164, 5.922906413019226, 6.044066096133287, 6.165225779247348, 6.286385462361408, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing station along the wing span at which chord_vector and Cl_vector are sampled--></Y_vector>
+                    <chord_vector units="m" is_input="False">[1.      , 0.984375, 0.96875 , 0.953125, 0.9375  , 0.921875, 0.90625 , 0.890625, 0.875   , 0.859375, 0.84375 , 0.828125, 0.8125  , 0.796875, 0.78125 , 0.765625, 0.75    , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing chord length at the station along the wing span in Y_vector--></chord_vector>
+                    <CL_vector is_input="False">[1.1017227197335075, 1.1013013453498266, 1.10038811694889, 1.098403873777725, 1.0918579844211873, 1.080610615570361, 1.0628034699038733, 1.0347815173407644, 0.9892716074062258, 0.9114284949703251, 0.8359515927452368, 0.7818631930166186, 0.7254369570766273, 0.660566179673128, 0.5814473768423762, 0.4785864136757275, 0.32879610850232355, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing at the station along the wing span in Y_vector, the total corresponding wing lift coefficient is equal to CL0_clean--></CL_vector>
                 </low_speed>
                 <cruise>
                   <induced_drag_coefficient is_input="False">0.03568699629812989<!--coefficient to multiply by the lift coefficient squared to get wing induced drag in cruise conditions--></induced_drag_coefficient>
@@ -34,6 +37,9 @@
             <cabin>
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
             </cabin>
+            <flap>
+                <span_ratio>0.45</span_ratio>
+            </flap>
             <fuselage>
                 <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
                 <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
@@ -469,6 +475,7 @@
                         <cruise>
                             <CD0>0.0</CD0>
                         </cruise>
+                        <y_ratio>0.34</y_ratio>
                         <flapped_ratio>1.0</flapped_ratio>
                         <cl_clean_ref>1.0</cl_clean_ref>
                         <wing_chord_ref>1.0</wing_chord_ref>

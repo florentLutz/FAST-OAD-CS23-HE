@@ -9,11 +9,21 @@
         <mach is_input="True">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
         <unit_reynolds units="1/m" is_input="True">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
       </low_speed>
+      <wing>
+        <low_speed>
+          <CL_vector is_input="True">[1.1017227197335075, 1.1013013453498266, 1.10038811694889, 1.098403873777725, 1.0918579844211873, 1.080610615570361, 1.0628034699038733, 1.0347815173407644, 0.9892716074062258, 0.9114284949703251, 0.8359515927452368, 0.7818631930166186, 0.7254369570766273, 0.660566179673128, 0.5814473768423762, 0.4785864136757275, 0.32879610850232355, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing at the station along the wing span in Y_vector, the total corresponding wing lift coefficient is equal to CL0_clean--></CL_vector>
+          <Y_vector units="m" is_input="True">[0.11547445976593405, 0.34642337929780215, 0.5773722988296702, 1.0361325274187763, 1.7227040650651202, 2.4092756027114643, 3.0958471403578085, 3.782418678004152, 4.468990215650496, 5.1555617532968405, 5.5594273636770435, 5.6805870467911035, 5.801746729905164, 5.922906413019226, 6.044066096133287, 6.165225779247348, 6.286385462361408, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing station along the wing span at which chord_vector and Cl_vector are sampled--></Y_vector>
+          <chord_vector units="m" is_input="True">[1.0, 0.984375, 0.96875, 0.953125, 0.9375, 0.921875, 0.90625, 0.890625, 0.875, 0.859375, 0.84375, 0.828125, 0.8125, 0.796875, 0.78125, 0.765625, 0.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing chord length at the station along the wing span in Y_vector--></chord_vector>
+        </low_speed>
+      </wing>
     </aerodynamics>
     <geometry>
       <cabin>
         <length units="m" is_input="True">1.477417183742213<!--cabin length--></length>
       </cabin>
+      <flap>
+        <span_ratio is_input="True">nan<!--flap span as a percentage of the wing span--></span_ratio>
+      </flap>
       <fuselage>
         <front_length units="m" is_input="True">0.5<!--length of the front cone of the aircraft--></front_length>
       </fuselage>
@@ -640,15 +650,23 @@
         </inverter>
         <propeller>
           <propeller_1>
+            <cl_clean_ref is_input="False">nan<!--Value of the clean lift coefficient of the section behind the propeller for reference wing lift coefficient--></cl_clean_ref>
             <depth units="cm" is_input="False">29.718<!--Depth of the propeller--></depth>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
+            <diameter_to_chord_ratio is_input="False">nan<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
+            <diameter_to_span_ratio is_input="False">0.42894892632195925<!--Diameter of the propeller as a ratio of the wing half span--></diameter_to_span_ratio>
+            <flapped_ratio is_input="False">nan<!--Portion of the span, downstream of the propeller, which has flaps--></flapped_ratio>
             <from_LE units="m" is_input="True">0.15<!--Distance between the propeller and the leading edge--></from_LE>
+            <from_wing_AC units="m" is_input="False">0.34180779449381654<!--Distance between the propeller and the wing aerodynamic center--></from_wing_AC>
+            <from_wing_LE_ratio is_input="False">nan<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
             <mass units="kg" is_input="False">36.35029687821805</mass>
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <torque_max units="N*m" is_input="True">817.0<!--Maximum value of the propeller torque during performances assessment--></torque_max>
             <torque_rating units="N*m" is_input="False">817.0<!--Maximum value of the propeller torque used for the sizing--></torque_rating>
+            <wing_chord_ref units="m" is_input="False">nan<!--Value of the wing chord behind the propeller--></wing_chord_ref>
+            <y_ratio is_input="True">nan<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
             <CG>
               <x units="m" is_input="False">2.202458712937498<!--X position of the propeller center of gravity--></x>
             </CG>

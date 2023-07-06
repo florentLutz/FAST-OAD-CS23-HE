@@ -30,8 +30,8 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input(name="alpha", val=np.full(number_of_points, 5.0), units="rad")
-        self.add_input(name="beta", val=1.0, shape=number_of_points, desc="Height impact factor")
+        self.add_input(name="alpha", val=np.nan, shape=number_of_points, units="rad")
+        self.add_input(name="beta", val=np.nan, shape=number_of_points, desc="Height impact factor")
         self.add_input(
             name="axial_induction_factor_wing_ac",
             val=np.nan,
@@ -66,9 +66,10 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
 
         # Applying the "is that a division by zero ? Actually it's divided by 0.5!" algorithm
         alpha_untreated = inputs["alpha"]
-        alpha = np.where(
-            np.abs(alpha_untreated) < MIN_AOA, np.sign(alpha_untreated) * MIN_AOA, alpha_untreated
+        sign_alpha = np.where(
+            alpha_untreated != 0.0, np.sign(alpha_untreated), np.ones_like(alpha_untreated)
         )
+        alpha = np.where(np.abs(alpha_untreated) < MIN_AOA, sign_alpha * MIN_AOA, alpha_untreated)
 
         lift_increase_ratio = (1.0 - beta * a_p * np.sin(i_p) / np.sin(alpha)) * np.sqrt(
             1.0 + 2.0 * beta * a_p * np.cos(alpha + i_p) + (a_p * beta) ** 2.0

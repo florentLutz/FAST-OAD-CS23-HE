@@ -1,0 +1,39 @@
+<FASTOAD_model>
+    <data>
+        <aerodynamics>
+            <wing>
+                <low_speed>
+                    <CL_ref is_input="False">0.4</CL_ref>
+                </low_speed>
+                <cruise>
+                    <induced_drag_coefficient is_input="False">0.03568699629812989<!--coefficient to multiply by the lift coefficient squared to get wing induced drag in cruise conditions--></induced_drag_coefficient>
+                    <CD0 is_input="False">0.006225770501969716<!--profile drag coefficient for wing in cruise conditions--></CD0>
+                    <CM0_clean is_input="False">-0.015672163858931134<!--profile drag coefficient for wing in cruise conditions--></CM0_clean>
+                    <CL0_clean is_input="False">0.28</CL0_clean>
+                    <CL_alpha units="rad**-1" is_input="False">6.3</CL_alpha>
+                </cruise>
+            </wing>
+        </aerodynamics>
+        <geometry>
+            <wing>
+                <wet_area units="m**2" is_input="False">0.0700<!--wing wet area--></wet_area>
+                <area units="m**2" is_input="False">0.147<!--wing area--></area>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <propeller>
+                    <propeller_1>
+                        <diameter units="m">0.237</diameter>
+                        <from_wing_AC units="m">0.164</from_wing_AC>
+                        <from_wing_LE_ratio>0.4345</from_wing_LE_ratio>
+                        <wing_chord_ref>0.240</wing_chord_ref>
+                        <flapped_ratio>0.0</flapped_ratio>
+                        <cl_clean_ref>0.4</cl_clean_ref>
+                        <installation_angle units="deg">-2.0</installation_angle>
+                    </propeller_1>
+                </propeller>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>

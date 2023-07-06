@@ -9,9 +9,8 @@ import numpy as np
 class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
     """
     Adaptation of the formula taken from :cite:`de:2019` for the computation of the slipstream
-    contraction ratio which we will adapt to quantify at the aerodynamic center rather than the
-    leading edge. Also, we will first compute the square value to make it simpler for the rest of
-    the computation.
+    contraction ratio. Also, we will first compute the square value to make it simpler for the
+    rest of the computation.
     """
 
     def initialize(self):
@@ -30,10 +29,16 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
 
         self.add_input("axial_induction_factor", val=np.nan, shape=number_of_points)
         self.add_input(
-            name="data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_AC",
+            name="data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
+            val=np.nan,
+            desc="Distance between the propeller and the wing leading edge as a ratio of the "
+            "reference chord behind the propeller",
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
             val=np.nan,
             units="m",
-            desc="Distance between the propeller and the wing aerodynamic center",
+            desc="Value of the wing chord behind the propeller",
         )
         self.add_input(
             name="data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
@@ -58,15 +63,18 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
         prop_rad = (
             inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"] / 2.0
         )
-        prop_dist_from_ac = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_AC"
+        prop_dist_from_le_ratio_chord = inputs[
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio"
         ]
-        prop_dist_from_ac_ratio = prop_dist_from_ac / prop_rad
+        ref_chord = inputs[
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref"
+        ]
+        prop_dist_from_le_ratio = prop_dist_from_le_ratio_chord * ref_chord / prop_rad
         a_p = inputs["axial_induction_factor"]
 
         sigma_2 = (1.0 + a_p) / (
             1.0
-            + a_p * (1.0 + prop_dist_from_ac_ratio / np.sqrt(prop_dist_from_ac_ratio ** 2.0 + 1.0))
+            + a_p * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0))
         )
 
         outputs["contraction_ratio_squared"] = sigma_2
@@ -78,15 +86,18 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
         prop_rad = (
             inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"] / 2.0
         )
-        prop_dist_from_ac = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_AC"
+        prop_dist_from_le_ratio_chord = inputs[
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio"
         ]
-        prop_dist_from_ac_ratio = prop_dist_from_ac / prop_rad
+        ref_chord = inputs[
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref"
+        ]
+        prop_dist_from_le_ratio = prop_dist_from_le_ratio_chord * ref_chord / prop_rad
         a_p = inputs["axial_induction_factor"]
 
         sigma_2 = (1.0 + a_p) / (
             1.0
-            + a_p * (1.0 + prop_dist_from_ac_ratio / np.sqrt(prop_dist_from_ac_ratio ** 2.0 + 1.0))
+            + a_p * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0))
         )
 
         d_sigma_2_d_ratio = (
@@ -95,30 +106,36 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
             / (
                 1.0
                 + a_p
-                * (1.0 + prop_dist_from_ac_ratio / np.sqrt(prop_dist_from_ac_ratio ** 2.0 + 1.0))
+                * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0))
             )
-            / (prop_dist_from_ac_ratio ** 2.0 + 1.0) ** 1.5
+            / (prop_dist_from_le_ratio ** 2.0 + 1.0) ** 1.5
         )
 
         partials[
             "contraction_ratio_squared",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
         ] = (
-            -d_sigma_2_d_ratio * prop_dist_from_ac / prop_rad ** 2.0 / 2.0
+            -d_sigma_2_d_ratio * prop_dist_from_le_ratio_chord * ref_chord / prop_rad ** 2.0 / 2.0
         )
         partials[
             "contraction_ratio_squared",
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_AC",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
         ] = (
-            d_sigma_2_d_ratio / prop_rad
+            d_sigma_2_d_ratio * ref_chord / prop_rad
+        )
+        partials[
+            "contraction_ratio_squared",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
+        ] = (
+            d_sigma_2_d_ratio * prop_dist_from_le_ratio_chord / prop_rad
         )
         partials["contraction_ratio_squared", "axial_induction_factor"] = -np.diag(
-            prop_dist_from_ac_ratio
-            / np.sqrt(prop_dist_from_ac_ratio ** 2.0 + 1.0)
+            prop_dist_from_le_ratio
+            / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0)
             / (
                 1.0
                 + a_p
-                * (1.0 + prop_dist_from_ac_ratio / np.sqrt(prop_dist_from_ac_ratio ** 2.0 + 1.0))
+                * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0))
             )
             ** 2.0
         )
