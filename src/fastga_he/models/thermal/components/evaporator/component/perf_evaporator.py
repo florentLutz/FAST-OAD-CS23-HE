@@ -114,7 +114,7 @@ def setup(self):
         self.add_input(
             name="settings:thermal:evaporator:tube:thickness",
             units="m",
-            val=0.0001,
+            val=0.003,
             desc="evaporator tube thickness",
         )
         self.add_input(
@@ -253,7 +253,7 @@ def setup(self):
             "settings:thermal:evaporator:liquid_side:flow_surface_to_frontal_surface_area_ratio"
         ]
         A_flow_liquid = inputs["settings:thermal:evaporator:tube:flow_section"]
-        t_tube = t_fin  # assuming tube thickness same as fin thickness
+        t_tube = inputs["settings:thermal:evaporator:tube:thickness"]
 
         tube_height = inputs["settings:thermal:evaporator:tube:height"]
         tube_length = inputs["settings:thermal:evaporator:tube:length"]
@@ -418,7 +418,17 @@ def setup(self):
             S_liquid = alpha_liquid * length * height * width
             no_liquid = 1
 
-            UA_new = 1 / (1 / (h_gas * S_gas * no_gas) + 1 / (h_liquid * S_liquid * no_liquid))
+            UA_new = 1 / (
+                1 / (h_gas * S_gas * no_gas) + 1 / (h_liquid * S_liquid * no_liquid)
+            )  # without thermal wall resistance
+
+            h_wall = t_tube / lambda_material
+
+            UA_new = 1 / (
+                1 / (h_gas * S_gas * no_gas)
+                + 1 / (h_wall * alpha_liquid * length * height * width)
+                + 1 / (h_liquid * S_liquid * no_liquid)
+            )  # with thermal wall resistance
 
             return abs(UA_new - UA)
 
