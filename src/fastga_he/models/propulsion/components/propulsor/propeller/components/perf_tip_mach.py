@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-from stdatm import Atmosphere
+from stdatm import AtmosphereWithPartials
 
 
 class PerformancesTipMach(om.ExplicitComponent):
@@ -42,24 +42,7 @@ class PerformancesTipMach(om.ExplicitComponent):
             desc="Squared mach  number at the tip of the blades",
         )
 
-        self.declare_partials(
-            of="tip_mach",
-            wrt=[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-                "rpm",
-                "true_airspeed",
-            ],
-            method="exact",
-        )
-        self.declare_partials(
-            of="tip_mach",
-            wrt="altitude",
-            method="fd",
-            form="central",
-            step=1.0e2,
-            rows=np.arange(number_of_points),
-            cols=np.arange(number_of_points),
-        )
+        self.declare_partials(of="tip_mach", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -68,7 +51,7 @@ class PerformancesTipMach(om.ExplicitComponent):
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
         true_airspeed = inputs["true_airspeed"]
 
-        sos = Atmosphere(inputs["altitude"], altitude_in_feet=False).speed_of_sound
+        sos = AtmosphereWithPartials(inputs["altitude"], altitude_in_feet=False).speed_of_sound
         omega = inputs["rpm"] * 2.0 * np.pi / 60.0
 
         tip_airspeed = true_airspeed ** 2.0 + (omega * diameter / 2.0) ** 2.0
@@ -82,7 +65,9 @@ class PerformancesTipMach(om.ExplicitComponent):
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
         true_airspeed = inputs["true_airspeed"]
 
-        sos = Atmosphere(inputs["altitude"], altitude_in_feet=False).speed_of_sound
+        atm = AtmosphereWithPartials(inputs["altitude"], altitude_in_feet=False)
+        sos = atm.speed_of_sound
+        d_sos_d_altitude = atm.partial_speed_of_sound_altitude
         omega = inputs["rpm"] * 2.0 * np.pi / 60.0
 
         partials["tip_mach", "true_airspeed"] = np.diag(2.0 * true_airspeed / sos ** 2.0)
@@ -92,3 +77,8 @@ class PerformancesTipMach(om.ExplicitComponent):
         partials[
             "tip_mach", "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"
         ] = (2.0 * diameter * (omega / 2.0) ** 2.0 / sos ** 2.0)
+
+        tip_airspeed = true_airspeed ** 2.0 + (omega * diameter / 2.0) ** 2.0
+        partials["tip_mach", "altitude"] = np.diag(
+            -2.0 * tip_airspeed / sos ** 3.0 * d_sos_d_altitude
+        )
