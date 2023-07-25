@@ -142,6 +142,7 @@ class DEPEquilibrium(om.Group):
             options_dep = {
                 "number_of_points": number_of_points,
                 "flaps_position": self.options["flaps_position"],
+                "power_train_file_path": self.options["power_train_file_path"],
             }
             self.add_subsystem(
                 "compute_dep_effect",
@@ -198,11 +199,12 @@ class DEPEquilibrium(om.Group):
             options_dep = {
                 "number_of_points": number_of_points,
                 "flaps_position": self.options["flaps_position"],
+                "power_train_file_path": self.options["power_train_file_path"],
             }
             self.add_subsystem(
                 "compute_dep_effect",
                 oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
-                promotes_inputs=["data:*", "alpha", "thrust", "altitude", "true_airspeed"],
+                promotes_inputs=["data:*", "alpha", "thrust", "density", "true_airspeed"],
                 promotes_outputs=["delta_Cl", "delta_Cd", "delta_Cm"],
             )
             options_propulsion = {

@@ -22,7 +22,7 @@
         <length units="m" is_input="True">1.477417183742213<!--cabin length--></length>
       </cabin>
       <flap>
-        <span_ratio is_input="True">nan<!--flap span as a percentage of the wing span--></span_ratio>
+        <span_ratio is_input="True">0.45<!--flap span as a percentage of the wing span--></span_ratio>
       </flap>
       <fuselage>
         <front_length units="m" is_input="True">0.5<!--length of the front cone of the aircraft--></front_length>
@@ -650,23 +650,23 @@
         </inverter>
         <propeller>
           <propeller_1>
-            <cl_clean_ref is_input="False">nan<!--Value of the clean lift coefficient of the section behind the propeller for reference wing lift coefficient--></cl_clean_ref>
+            <cl_clean_ref is_input="False">1.0937051849039765<!--Value of the clean lift coefficient of the section behind the propeller for reference wing lift coefficient--></cl_clean_ref>
             <depth units="cm" is_input="False">29.718<!--Depth of the propeller--></depth>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
-            <diameter_to_chord_ratio is_input="False">nan<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
+            <diameter_to_chord_ratio is_input="False">2.105493944867921<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
             <diameter_to_span_ratio is_input="False">0.42894892632195925<!--Diameter of the propeller as a ratio of the wing half span--></diameter_to_span_ratio>
-            <flapped_ratio is_input="False">nan<!--Portion of the span, downstream of the propeller, which has flaps--></flapped_ratio>
+            <flapped_ratio is_input="False">0.8115793059875369<!--Portion of the span, downstream of the propeller, which has flaps--></flapped_ratio>
             <from_LE units="m" is_input="True">0.15<!--Distance between the propeller and the leading edge--></from_LE>
             <from_wing_AC units="m" is_input="False">0.34180779449381654<!--Distance between the propeller and the wing aerodynamic center--></from_wing_AC>
-            <from_wing_LE_ratio is_input="False">nan<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
+            <from_wing_LE_ratio is_input="False">0.15941050460841313<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
             <mass units="kg" is_input="False">36.35029687821805</mass>
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <torque_max units="N*m" is_input="True">817.0<!--Maximum value of the propeller torque during performances assessment--></torque_max>
             <torque_rating units="N*m" is_input="False">817.0<!--Maximum value of the propeller torque used for the sizing--></torque_rating>
-            <wing_chord_ref units="m" is_input="False">nan<!--Value of the wing chord behind the propeller--></wing_chord_ref>
-            <y_ratio is_input="True">nan<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
+            <wing_chord_ref units="m" is_input="False">0.9409668476269506<!--Value of the wing chord behind the propeller--></wing_chord_ref>
+            <y_ratio is_input="True">0.34<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
             <CG>
               <x units="m" is_input="False">2.202458712937498<!--X position of the propeller center of gravity--></x>
             </CG>

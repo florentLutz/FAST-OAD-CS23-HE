@@ -89,9 +89,10 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
 
         # Applying the "is that a division by zero ? Actually it's divided by 0.5!" algorithm
         alpha_untreated = inputs["alpha"]
-        alpha = np.where(
-            np.abs(alpha_untreated) < MIN_AOA, np.sign(alpha_untreated) * MIN_AOA, alpha_untreated
+        sign_alpha = np.where(
+            alpha_untreated != 0.0, np.sign(alpha_untreated), np.ones_like(alpha_untreated)
         )
+        alpha = np.where(np.abs(alpha_untreated) < MIN_AOA, sign_alpha * MIN_AOA, alpha_untreated)
 
         inside_square = 1.0 + 2.0 * beta * a_p * np.cos(alpha + i_p) + (a_p * beta) ** 2.0
 
@@ -122,7 +123,7 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
             * d_inside_square_d_alpha
         )
         partials["lift_increase_ratio", "alpha"] = np.diag(
-            np.where(alpha == alpha_untreated, partials_alpha, 0.0)
+            np.where(alpha == alpha_untreated, partials_alpha, 1e-6)
         )
         partials[
             "lift_increase_ratio",

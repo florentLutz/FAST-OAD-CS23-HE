@@ -51,7 +51,7 @@ class PowerTrainDeltaCdFromFile(om.ExplicitComponent):
 
         self.add_output("delta_Cd", val=0.0, shape=number_of_points)
 
-        self.declare_partials(of="delta_Cd", wrt="delta_Cdi", val=1.0)
+        self.declare_partials(of="delta_Cd", wrt="delta_Cdi", val=np.eye(number_of_points))
 
         for component_name in components_name:
 
@@ -59,7 +59,9 @@ class PowerTrainDeltaCdFromFile(om.ExplicitComponent):
 
             self.add_input(component_delta_cd, val=np.full(number_of_points, np.nan))
 
-            self.declare_partials(of="delta_Cd", wrt=component_delta_cd, val=1.0)
+            self.declare_partials(
+                of="delta_Cd", wrt=component_delta_cd, val=np.eye(number_of_points)
+            )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -73,7 +75,7 @@ class PowerTrainDeltaCdFromFile(om.ExplicitComponent):
             _,
         ) = self.configurator.get_slipstream_element_lists()
 
-        total_cd = inputs["delta_Cdi"]
+        total_cd = 0.0 + inputs["delta_Cdi"]
 
         for component_name in components_name:
 

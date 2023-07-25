@@ -55,7 +55,9 @@ class PowerTrainDeltaCmFromFile(om.ExplicitComponent):
 
             self.add_input(component_delta_cm, val=np.full(number_of_points, np.nan))
 
-            self.declare_partials(of="delta_Cm", wrt=component_delta_cm, val=1.0)
+            self.declare_partials(
+                of="delta_Cm", wrt=component_delta_cm, val=np.eye(number_of_points)
+            )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

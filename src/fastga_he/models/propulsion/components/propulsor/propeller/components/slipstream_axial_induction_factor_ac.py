@@ -32,7 +32,7 @@ class SlipstreamPropellerAxialInductionFactorWingAC(om.ExplicitComponent):
 
         self.add_output(
             "axial_induction_factor_wing_ac",
-            val=np.nan,
+            val=1.1,
             shape=number_of_points,
             desc="Value of the axial induction factor at the wing aerodynamic chord",
         )

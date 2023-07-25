@@ -8,11 +8,14 @@ import numpy as np
 import pytest
 
 import fastoad.api as oad
+import openmdao.api as om
 from stdatm import Atmosphere
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
 from utils.filter_residuals import filter_residuals
+
+from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 from .simple_assembly.performances_simple_assembly import PerformancesAssembly
 from .simple_assembly.sizing_simple_assembly import SizingAssembly
@@ -24,6 +27,9 @@ from ..assemblers.mass_from_pt_file import PowerTrainMassFromFile
 from ..assemblers.cg_from_pt_file import PowerTrainCGFromFile
 from ..assemblers.drag_from_pt_file import PowerTrainDragFromFile
 from ..assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
+from ..assemblers.delta_cl_from_pt_file import PowerTrainDeltaClFromFile
+from ..assemblers.delta_cd_from_pt_file import PowerTrainDeltaCdFromFile
+from ..assemblers.delta_cm_from_pt_file import PowerTrainDeltaCmFromFile
 
 from . import outputs
 
@@ -507,6 +513,104 @@ def test_drag_from_pt_file():
     assert problem.get_val("data:propulsion:he_power_train:cruise:CD0") == pytest.approx(
         0.000352, rel=1e-2
     )
+    problem.check_partials(compact_print=True)
+
+
+def test_delta_cls_summer():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    ivc = om.IndepVarComp()
+    configurator = FASTGAHEPowerTrainConfigurator()
+    configurator.load(pt_file_path)
+
+    (
+        components_name,
+        _,
+        _,
+        _,
+        _,
+        _,
+        _,
+    ) = configurator.get_slipstream_element_lists()
+
+    for name in components_name:
+        ivc.add_output(name=name + "_delta_Cl", val=np.random.random(NB_POINTS_TEST))
+
+    problem = run_system(
+        PowerTrainDeltaClFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_delta_cds_summer():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    ivc = om.IndepVarComp()
+    configurator = FASTGAHEPowerTrainConfigurator()
+    configurator.load(pt_file_path)
+
+    (
+        components_name,
+        _,
+        _,
+        _,
+        _,
+        _,
+        _,
+    ) = configurator.get_slipstream_element_lists()
+
+    for name in components_name:
+        ivc.add_output(name=name + "_delta_Cd", val=np.random.random(NB_POINTS_TEST))
+
+    ivc.add_output(name="delta_Cdi", val=np.random.random(NB_POINTS_TEST))
+
+    problem = run_system(
+        PowerTrainDeltaCdFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_delta_cms_summer():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    ivc = om.IndepVarComp()
+    configurator = FASTGAHEPowerTrainConfigurator()
+    configurator.load(pt_file_path)
+
+    (
+        components_name,
+        _,
+        _,
+        _,
+        _,
+        _,
+        _,
+    ) = configurator.get_slipstream_element_lists()
+
+    for name in components_name:
+        ivc.add_output(name=name + "_delta_Cm", val=np.random.random(NB_POINTS_TEST))
+
+    problem = run_system(
+        PowerTrainDeltaCmFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
     problem.check_partials(compact_print=True)
 
 
