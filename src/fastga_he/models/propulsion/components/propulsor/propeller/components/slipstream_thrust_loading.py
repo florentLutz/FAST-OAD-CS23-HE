@@ -33,8 +33,8 @@ class SlipstreamPropellerThrustLoading(om.ExplicitComponent):
             units="m",
             desc="Diameter of the propeller",
         )
-        self.add_input("thrust", units="N", val=1500, shape=number_of_points)
-        self.add_input("true_airspeed", units="m/s", val=50.0, shape=number_of_points)
+        self.add_input("thrust", units="N", val=np.nan, shape=number_of_points)
+        self.add_input("true_airspeed", units="m/s", val=np.nan, shape=number_of_points)
         self.add_input("density", units="kg/m**3", val=np.nan, shape=number_of_points)
 
         self.add_output("thrust_loading", val=0.01, shape=number_of_points)

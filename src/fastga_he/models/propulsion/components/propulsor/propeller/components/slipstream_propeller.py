@@ -59,36 +59,6 @@ class SlipstreamPropeller(om.Group):
             ),
             promotes=["*"],
         )
-
-        # TODO: Doing things this way works but the setup takes a loooooooong time for some reasons,
-        # TODO: should find a way to do things differently
-        ivc = om.IndepVarComp()
-        ivc.add_output(name="alpha_0", val=0.0, units="deg", shape=number_of_points)
-        self.add_subsystem(name="nil_AOA", subsys=ivc, promotes=[])
-
-        # We remove the AOA from the list of inputs so that we can connect the 0 by hand
-        inputs_list = list_inputs(
-            SlipstreamPropellerDeltaClGroup(
-                propeller_id=propeller_id,
-                number_of_points=number_of_points,
-                flaps_position=flaps_position,
-            )
-        )
-        inputs_list.remove("alpha")
-
-        self.add_subsystem(
-            name="delta_cl_at_0",
-            subsys=SlipstreamPropellerDeltaClGroup(
-                propeller_id=propeller_id,
-                number_of_points=number_of_points,
-                flaps_position=flaps_position,
-            ),
-            promotes_inputs=inputs_list,
-            promotes_outputs=[("delta_Cl", "delta_Cl_AOA_0")],
-        )
-
-        self.connect("nil_AOA.alpha_0", "delta_cl_at_0.alpha")
-
         self.add_subsystem(
             name="delta_cm0",
             subsys=SlipstreamPropellerDeltaCM0(

@@ -29,6 +29,12 @@ class SlipstreamPropellerDeltaCl(om.ExplicitComponent):
             desc="Increase in the section lift downstream of the propeller",
         )
         self.add_input(
+            "delta_Cl_2D_AOA_0",
+            val=np.nan,
+            shape=number_of_points,
+            desc="Increase in the section lift downstream of the propeller for a nil AOA",
+        )
+        self.add_input(
             "blown_area_ratio",
             val=np.nan,
             shape=number_of_points,
@@ -41,14 +47,29 @@ class SlipstreamPropellerDeltaCl(om.ExplicitComponent):
             shape=number_of_points,
             desc="Increase in the lift coefficient downstream of the propeller",
         )
+        self.add_output(
+            "delta_Cl_AOA_0",
+            val=0.01,
+            shape=number_of_points,
+            desc="Increase in the lift coefficient downstream of the propeller for a nil AOA",
+        )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="delta_Cl", wrt=["blown_area_ratio", "delta_Cl_2D"], method="exact"
+        )
+        self.declare_partials(
+            of="delta_Cl_AOA_0", wrt=["blown_area_ratio", "delta_Cl_2D_AOA_0"], method="exact"
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         outputs["delta_Cl"] = inputs["delta_Cl_2D"] * inputs["blown_area_ratio"]
+        outputs["delta_Cl_AOA_0"] = inputs["delta_Cl_2D_AOA_0"] * inputs["blown_area_ratio"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         partials["delta_Cl", "delta_Cl_2D"] = np.diag(inputs["blown_area_ratio"])
         partials["delta_Cl", "blown_area_ratio"] = np.diag(inputs["delta_Cl_2D"])
+
+        partials["delta_Cl_AOA_0", "delta_Cl_2D_AOA_0"] = np.diag(inputs["blown_area_ratio"])
+        partials["delta_Cl_AOA_0", "blown_area_ratio"] = np.diag(inputs["delta_Cl_2D_AOA_0"])

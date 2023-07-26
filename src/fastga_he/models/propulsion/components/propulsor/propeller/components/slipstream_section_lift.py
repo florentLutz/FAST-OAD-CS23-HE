@@ -35,22 +35,32 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
         flaps_position = self.options["flaps_position"]
 
         self.add_input(name="cl_wing_clean", val=np.nan, shape=number_of_points)
+        self.add_input(name="data:aerodynamics:wing:cruise:CL0_clean", val=np.nan)
+
         self.add_input(name="data:aerodynamics:wing:low_speed:CL_ref", val=np.nan)
         self.add_input(
             name="data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
             val=np.nan,
             desc="Portion of the span, downstream of the propeller, which has flaps",
         )
+
+        shared_inputs = [
+            "data:aerodynamics:wing:low_speed:CL_ref",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+        ]
+
         if flaps_position == "takeoff":
             self.add_input("data:aerodynamics:flaps:takeoff:CL_2D", val=np.nan)
+            shared_inputs += ["data:aerodynamics:flaps:takeoff:CL_2D"]
 
         elif flaps_position == "landing":
             self.add_input("data:aerodynamics:flaps:landing:CL_2D", val=np.nan)
+            shared_inputs += ["data:aerodynamics:flaps:landing:CL_2D"]
 
         self.add_output(
             "unblown_section_lift",
@@ -58,8 +68,21 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
             desc="Value of the unblown lift downstream of the propeller",
             shape=number_of_points,
         )
+        self.add_output(
+            "unblown_section_lift_AOA_0",
+            val=0.1,
+            desc="Value of the unblown lift downstream of the propeller for a nil AOA",
+            shape=number_of_points,
+        )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="unblown_section_lift", wrt=shared_inputs + ["cl_wing_clean"], method="exact"
+        )
+        self.declare_partials(
+            of="unblown_section_lift_AOA_0",
+            wrt=shared_inputs + ["data:aerodynamics:wing:cruise:CL0_clean"],
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -71,6 +94,8 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
         cl_section_ref = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref"
         ]
+
+        cl0 = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
 
         flapped_ratio = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio"
@@ -84,8 +109,10 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
             delta_cl_flaps = 0.0
 
         cl_section = cl_section_ref * cl_wing_clean / cl_wing_ref + delta_cl_flaps * flapped_ratio
+        cl_section_0 = cl_section_ref * cl0 / cl_wing_ref + delta_cl_flaps * flapped_ratio
 
         outputs["unblown_section_lift"] = cl_section
+        outputs["unblown_section_lift_AOA_0"] = cl_section_0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -99,6 +126,8 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref"
         ]
 
+        cl0 = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
+
         flapped_ratio = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio"
         ]
@@ -106,14 +135,28 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
         partials["unblown_section_lift", "cl_wing_clean"] = (
             np.eye(number_of_points) * cl_section_ref / cl_wing_ref
         )
+        partials["unblown_section_lift_AOA_0", "data:aerodynamics:wing:cruise:CL0_clean"] = np.full(
+            number_of_points, cl_section_ref / cl_wing_ref
+        )
+
         partials["unblown_section_lift", "data:aerodynamics:wing:low_speed:CL_ref"] = (
             -cl_wing_clean * cl_section_ref / cl_wing_ref ** 2.0
         )
+        partials["unblown_section_lift_AOA_0", "data:aerodynamics:wing:low_speed:CL_ref"] = (
+            -cl0 * cl_section_ref / cl_wing_ref ** 2.0
+        )
+
         partials[
             "unblown_section_lift",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
         ] = (
             cl_wing_clean / cl_wing_ref
+        )
+        partials[
+            "unblown_section_lift_AOA_0",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
+        ] = (
+            cl0 / cl_wing_ref
         )
 
         if flaps_position == "takeoff":
@@ -121,15 +164,25 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
             partials["unblown_section_lift", "data:aerodynamics:flaps:takeoff:CL_2D"] = np.full(
                 number_of_points, flapped_ratio
             )
+            partials[
+                "unblown_section_lift_AOA_0", "data:aerodynamics:flaps:takeoff:CL_2D"
+            ] = np.full(number_of_points, flapped_ratio)
         elif flaps_position == "landing":
             delta_cl_flaps = inputs["data:aerodynamics:flaps:landing:CL_2D"]
             partials["unblown_section_lift", "data:aerodynamics:flaps:landing:CL_2D"] = np.full(
                 number_of_points, flapped_ratio
             )
+            partials[
+                "unblown_section_lift_AOA_0", "data:aerodynamics:flaps:landing:CL_2D"
+            ] = np.full(number_of_points, flapped_ratio)
         else:
             delta_cl_flaps = 0.0
 
         partials[
             "unblown_section_lift",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+        ] = np.full(number_of_points, delta_cl_flaps)
+        partials[
+            "unblown_section_lift_AOA_0",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
         ] = np.full(number_of_points, delta_cl_flaps)

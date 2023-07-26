@@ -29,6 +29,12 @@ class SlipstreamPropellerDeltaCl2D(om.ExplicitComponent):
             shape=number_of_points,
         )
         self.add_input(
+            "unblown_section_lift_AOA_0",
+            val=np.nan,
+            desc="Value of the unblown lift downstream of the propeller for a nil AOA",
+            shape=number_of_points,
+        )
+        self.add_input(
             "lift_increase_ratio",
             val=np.nan,
             shape=number_of_points,
@@ -41,14 +47,37 @@ class SlipstreamPropellerDeltaCl2D(om.ExplicitComponent):
             desc="Increase in the section lift downstream of the propeller",
             shape=number_of_points,
         )
+        self.add_output(
+            "delta_Cl_2D_AOA_0",
+            val=0.3,
+            desc="Increase in the section lift downstream of the propeller for a nil AOA",
+            shape=number_of_points,
+        )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="delta_Cl_2D", wrt=["unblown_section_lift", "lift_increase_ratio"], method="exact"
+        )
+        self.declare_partials(
+            of="delta_Cl_2D_AOA_0",
+            wrt=["unblown_section_lift_AOA_0", "lift_increase_ratio"],
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         outputs["delta_Cl_2D"] = inputs["unblown_section_lift"] * inputs["lift_increase_ratio"]
+        outputs["delta_Cl_2D_AOA_0"] = (
+            inputs["unblown_section_lift_AOA_0"] * inputs["lift_increase_ratio"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         partials["delta_Cl_2D", "unblown_section_lift"] = np.diag(inputs["lift_increase_ratio"])
         partials["delta_Cl_2D", "lift_increase_ratio"] = np.diag(inputs["unblown_section_lift"])
+
+        partials["delta_Cl_2D_AOA_0", "unblown_section_lift_AOA_0"] = np.diag(
+            inputs["lift_increase_ratio"]
+        )
+        partials["delta_Cl_2D_AOA_0", "lift_increase_ratio"] = np.diag(
+            inputs["unblown_section_lift_AOA_0"]
+        )
