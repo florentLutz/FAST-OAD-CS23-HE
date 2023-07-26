@@ -1258,7 +1258,7 @@ def test_mission_vector_from_yml_fuel():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(34.18, abs=1e-2)
+    assert sizing_fuel == pytest.approx(34.14, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1292,7 +1292,7 @@ def test_mission_vector_from_yml_two_fuel():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(33.30, abs=1e-2)
+    assert sizing_fuel == pytest.approx(33.26, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1326,7 +1326,7 @@ def test_mission_vector_from_yml_fuel_turbo():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(39.18, rel=1e-2)
+    assert sizing_fuel == pytest.approx(38.86, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1360,13 +1360,13 @@ def test_mission_vector_from_yml_fuel_and_battery():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(20.12, abs=1e-2)
+    assert sizing_fuel == pytest.approx(20.096, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(74.724, abs=1e-2)
+    assert sizing_energy == pytest.approx(74.648, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.05860841716480536, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.0596, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -1393,6 +1393,9 @@ def test_recording():
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.generator.rpm"
     ] = "fastga_he.submodel.propulsion.constraints.generator.rpm.ensure"
+    oad.RegisterSubmodel.active_models[
+        "submodel.performances_he.dep_effect"
+    ] = "fastga_he.submodel.performances.dep_effect.from_pt_file"
 
     # Define used files depending on options
     xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
@@ -1447,7 +1450,7 @@ def test_recording():
     problem.run_model()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(20.116, abs=1e-2)
+    assert sizing_fuel == pytest.approx(20.096, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -1513,10 +1516,10 @@ def test_mission_criss_cross():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(25.79, abs=1e-2)
+    assert sizing_fuel == pytest.approx(25.76, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(50.243, abs=1e-2)
+    assert sizing_energy == pytest.approx(50.181, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.0603, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.0601, abs=1e-2)
