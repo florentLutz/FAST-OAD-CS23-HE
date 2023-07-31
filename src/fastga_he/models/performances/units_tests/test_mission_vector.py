@@ -54,6 +54,9 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_airs
 from fastga_he.models.performances.mission_vector.initialization.initialize_time_and_distance import (
     InitializeTimeAndDistance,
 )
+from fastga_he.models.performances.mission_vector.initialization.initialize_time_step import (
+    InitializeTimeStep,
+)
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
 from fastga_he.models.propulsion.assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
@@ -1094,6 +1097,97 @@ def test_initialize_time_and_position():
     problem.check_partials(compact_print=True)
 
 
+def test_initialize_time_step():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "time",
+        units="min",
+        val=np.array(
+            [
+                0.0,
+                0.758,
+                1.554,
+                2.392,
+                3.276,
+                4.212,
+                5.205,
+                6.265,
+                7.4,
+                8.621,
+                11.018,
+                13.415,
+                15.812,
+                18.209,
+                20.606,
+                23.003,
+                25.4,
+                27.797,
+                30.194,
+                32.591,
+                34.988,
+                41.654,
+                48.321,
+                54.988,
+                61.654,
+                70.654,
+                79.654,
+                88.654,
+                97.654,
+                106.654,
+            ]
+        ),
+    )
+
+    problem = run_system(
+        InitializeTimeStep(
+            number_of_points_climb=10,
+            number_of_points_cruise=10,
+            number_of_points_descent=5,
+            number_of_points_reserve=5,
+        ),
+        ivc,
+    )
+
+    expected_time_step = np.array(
+        [
+            0.758,
+            0.796,
+            0.838,
+            0.884,
+            0.936,
+            0.993,
+            1.06,
+            1.135,
+            1.221,
+            1.221,
+            2.397,
+            2.397,
+            2.397,
+            2.397,
+            2.397,
+            2.397,
+            2.397,
+            2.397,
+            2.397,
+            2.397,
+            6.666,
+            6.667,
+            6.667,
+            6.666,
+            6.666,
+            9.0,
+            9.0,
+            9.0,
+            9.0,
+            9.0,
+        ]
+    )
+    assert problem.get_val("time_step", units="min") == pytest.approx(expected_time_step, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_initialize_cog():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -1222,11 +1316,11 @@ def test_mission_vector_from_yml():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(149.66, abs=1e-2)
+    assert sizing_energy == pytest.approx(150.01, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.055, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.0546, abs=1e-2)
 
 
 def test_mission_vector_from_yml_fuel():

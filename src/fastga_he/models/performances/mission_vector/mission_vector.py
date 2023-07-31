@@ -177,10 +177,14 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_time_and_distance.time",
             [
-                "solve_equilibrium.compute_time_step.time",
                 "solve_equilibrium.performance_per_phase.time",
                 "to_csv.time",
             ],
+        )
+
+        self.connect(
+            "initialization.initialize_time_step.time_step",
+            ["to_csv.time_step", "solve_equilibrium.time_step"],
         )
 
         self.connect(
@@ -275,8 +279,6 @@ class MissionVector(om.Group):
                 "solve_equilibrium.compute_dep_equilibrium.altitude",
             ],
         )
-
-        self.connect("solve_equilibrium.time_step", "to_csv.time_step")
 
         # Add the powertrain watcher here to avoid opening and closing csv all the time. We will
         # add here a check to ensure that the module that computes the performances base on the

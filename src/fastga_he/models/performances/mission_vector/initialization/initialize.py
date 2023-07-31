@@ -21,6 +21,7 @@ from ..initialization.initialize_temperature import InitializeTemperature
 from ..initialization.initialize_gamma import InitializeGamma
 from ..initialization.initialize_horizontal_speed import InitializeHorizontalSpeed
 from ..initialization.initialize_time_and_distance import InitializeTimeAndDistance
+from ..initialization.initialize_time_step import InitializeTimeStep
 
 
 class Initialize(om.Group):
@@ -178,6 +179,17 @@ class Initialize(om.Group):
             promotes_outputs=[],
         )
         self.add_subsystem(
+            "initialize_time_step",
+            InitializeTimeStep(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+                number_of_points_reserve=number_of_points_reserve,
+            ),
+            promotes_inputs=[],
+            promotes_outputs=[],
+        )
+        self.add_subsystem(
             "initialize_airspeed_time_derivatives",
             InitializeAirspeedDerivatives(
                 number_of_points_climb=number_of_points_climb,
@@ -223,3 +235,5 @@ class Initialize(om.Group):
             "initialize_gamma.gamma",
             ["initialize_airspeed_time_derivatives.gamma", "initialize_horizontal_speed.gamma"],
         )
+
+        self.connect("initialize_time_and_distance.time", "initialize_time_step.time")
