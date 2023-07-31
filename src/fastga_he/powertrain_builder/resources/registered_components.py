@@ -28,6 +28,9 @@ SPT = "slipstream_promoted_variables"
 # The MP field will contain the variables that will be of interest for the analysis of the
 # mission performances and that will be registered in the power train performances CSV file
 MP = "mission_performances_watcher"
+# The MP field will contain the variables that will be of interest for the analysis of the
+# slipstream effects and that will be registered in the power train performances CSV file
+SMP = "slipstream_mission_performances_watcher"
 # ICON contains the name of the icon used to represent this component when displaying the graph
 ICON = "icon_for_network_graph"
 # ICON_SIZE contains the size of th icon used to represent this component when displaying the graph
@@ -75,6 +78,11 @@ PROPELLER = {
         {"thrust_coefficient": None},
         {"power_coefficient": None},
     ],
+    SMP: [
+        {"delta_Cd": None},
+        {"delta_Cl": None},
+        {"delta_Cm": None},
+    ],
     ICON: "propeller",
     ICON_SIZE: 30,
     RSD: ["thrust_coefficient", "power_coefficient"],
@@ -104,6 +112,9 @@ PMSM = {
         {"torque_out": "N*m"},
         {"ac_current_rms_in": "A"},
         {"ac_voltage_rms_in": "V"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
     ],
     ICON: "e_motor",
     ICON_SIZE: 40,
@@ -142,6 +153,9 @@ INVERTER = {
         {"conduction_losses_IGBT": "W"},
         {"conduction_losses_diode": "W"},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "inverter",
     ICON_SIZE: 30,
     RSD: ["modulation_index", "dc_current_in"],
@@ -163,6 +177,9 @@ DC_BUS = {
     OUT: [(None, "dc_voltage"), ("dc_current_out_", None)],
     CTC: "connector",
     MP: [{"dc_voltage": "V"}],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "bus_bar",
     ICON_SIZE: 20,
     RSD: ["dc_voltage"],
@@ -184,6 +201,9 @@ DC_LINE = {
     OUT: [("dc_voltage_out", None), (None, "dc_current")],
     CTC: "connector",
     MP: [{"dc_current": "A"}, {"cable_temperature": "degK"}, {"conduction_losses": "W"}],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "cable",
     ICON_SIZE: 30,
     RSD: ["dc_current"],
@@ -209,6 +229,9 @@ DC_DC_CONVERTER = {
         {"duty_cycle": None},
         {"dc_current_in": "A"},
         {"dc_current_out": "A"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
     ],
     ICON: "dc_converter",
     ICON_SIZE: 30,
@@ -239,6 +262,9 @@ BATTERY_PACK = {
         {"efficiency": None},
         {"relative_capacity": None},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "battery",
     ICON_SIZE: 40,
     RSD: ["voltage_out", "state_of_charge", "c_rate"],
@@ -265,6 +291,9 @@ DC_SSPC = {
         {"power_losses": "W"},
         {"dc_voltage_out": "V"},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "switch",
     ICON_SIZE: 2,
     RSD: ["dc_voltage_out", "dc_current_in"],
@@ -286,6 +315,9 @@ DC_SPLITTER = {
     OUT: [(None, "dc_voltage"), ("dc_current_out", None)],
     CTC: "connector",
     MP: [{"dc_voltage": "V"}, {"power_split": "percent"}],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "splitter",
     ICON_SIZE: 20,
     RSD: ["power_split", "dc_voltage"],
@@ -315,6 +347,9 @@ RECTIFIER = {
         {"modulation_index": None},
         {"ac_current_rms_in_one_phase": "A"},
         {"dc_current_out": "A"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
     ],
     ICON: "rectifier",
     ICON_SIZE: 30,
@@ -349,6 +384,9 @@ GENERATOR = {
         {"ac_voltage_rms_out": "V"},
         {"ac_voltage_peak_out": "V"},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "generator",
     ICON_SIZE: 30,
     RSD: ["shaft_power_in", "ac_voltage_rms_out", "efficiency"],
@@ -375,6 +413,9 @@ ICE = {
         {"mean_effective_pressure": "bar"},
         {"fuel_consumption": "kg/h"},
         {"fuel_consumed_t": "kg"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
     ],
     ICON: "ice",
     ICON_SIZE: 40,
@@ -413,6 +454,7 @@ DICTIONARY_IN = {}
 DICTIONARY_OUT = {}
 DICTIONARY_CTC = {}
 DICTIONARY_MP = {}
+DICTIONARY_SMP = {}
 DICTIONARY_ICON = {}
 DICTIONARY_ICON_SIZE = {}
 DICTIONARY_RSD = {}
@@ -434,6 +476,7 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_OUT[known_component[ID]] = known_component[OUT]
     DICTIONARY_CTC[known_component[ID]] = known_component[CTC]
     DICTIONARY_MP[known_component[ID]] = known_component[MP]
+    DICTIONARY_SMP[known_component[ID]] = known_component[SMP]
     DICTIONARY_ICON[known_component[ID]] = known_component[ICON]
     DICTIONARY_ICON_SIZE[known_component[ID]] = known_component[ICON_SIZE]
     DICTIONARY_RSD[known_component[ID]] = known_component[RSD]

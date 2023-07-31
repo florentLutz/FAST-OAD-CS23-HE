@@ -33,10 +33,10 @@ from .constants import (
 )
 from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_DEP_EFFECT
 
+DEP_EFFECT_FROM_PT_FILE = "fastga_he.submodel.performances.dep_effect.from_pt_file"
 
-@oad.RegisterSubmodel(
-    HE_SUBMODEL_DEP_EFFECT, "fastga_he.submodel.performances.dep_effect.from_pt_file"
-)
+
+@oad.RegisterSubmodel(HE_SUBMODEL_DEP_EFFECT, DEP_EFFECT_FROM_PT_FILE)
 class AerodynamicDeltasFromPTFile(om.Group):
     """
     Groups that regroups the different computation of aerodynamic deltas and sums them. Also

@@ -15,6 +15,7 @@ from .registered_components import (
     DICTIONARY_OUT,
     DICTIONARY_CTC,
     DICTIONARY_MP,
+    DICTIONARY_SMP,
     DICTIONARY_ICON,
     DICTIONARY_ICON_SIZE,
     DICTIONARY_RSD,

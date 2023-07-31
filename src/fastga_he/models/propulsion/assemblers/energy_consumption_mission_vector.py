@@ -18,10 +18,7 @@ from fastga_he.models.propulsion.assemblers.constants import (
 ENERGY_CONSUMPTION_FROM_PT_FILE = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
 
 
-@oad.RegisterSubmodel(
-    HE_SUBMODEL_ENERGY_CONSUMPTION,
-    ENERGY_CONSUMPTION_FROM_PT_FILE,
-)
+@oad.RegisterSubmodel(HE_SUBMODEL_ENERGY_CONSUMPTION, ENERGY_CONSUMPTION_FROM_PT_FILE)
 class PowerTrainPerformancesFromFileWithInterface(om.Group):
     """
     This group is solely meant to be used as an interface with the vector mission, if the user
