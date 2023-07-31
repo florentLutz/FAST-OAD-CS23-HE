@@ -77,6 +77,7 @@ submodels:
   submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
   submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
   submodel.propulsion.dc_dc_converter.inductor.inductance: null
+  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
 
 optimization: # This section is needed only if optimization process is run
   design_variables:

@@ -47,12 +47,7 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 
-        self.add_input(
-            name="data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
-            val=np.nan,
-            desc="Location of the propeller along the span as a fraction of the span",
-        )
-        self.add_input("data:geometry:wing:span", val=np.nan, units="m")
+        # We leave those inputs here in case there is a weird bug with the copying of shapes
         self.add_input(
             "data:aerodynamics:wing:low_speed:Y_vector",
             val=np.nan,
@@ -74,6 +69,14 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
+
+            self.add_input(
+                name="data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                val=np.nan,
+                desc="Location of the propeller along the span as a fraction of the span",
+            )
+            self.add_input("data:geometry:wing:span", val=np.nan, units="m")
+
             self.declare_partials(
                 of="data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
                 wrt=[
@@ -118,6 +121,7 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
 
         else:
 
+            # "Cheap" way to turn off slipstream effects in case the propeller is not on the wing
             outputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref"
             ] = 0.0

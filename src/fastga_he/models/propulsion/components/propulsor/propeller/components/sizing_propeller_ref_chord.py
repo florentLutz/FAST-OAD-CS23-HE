@@ -42,12 +42,6 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
         position = self.options["position"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
-            val=np.nan,
-            desc="Location of the propeller along the span as a fraction of the span",
-        )
-        self.add_input("data:geometry:wing:span", val=np.nan, units="m")
-        self.add_input(
             "data:aerodynamics:wing:low_speed:Y_vector",
             val=np.nan,
             shape_by_conn=True,
@@ -77,6 +71,14 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
+
+            self.add_input(
+                name="data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                val=np.nan,
+                desc="Location of the propeller along the span as a fraction of the span",
+            )
+            self.add_input("data:geometry:wing:span", val=np.nan, units="m")
+
             self.declare_partials(
                 of="data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
                 wrt=[

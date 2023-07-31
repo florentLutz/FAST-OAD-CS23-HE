@@ -125,9 +125,9 @@ def test_propeller_cg():
 
 def test_propeller_ref_cl():
 
-    expected_cg = [1.085, 0.0]
+    expected_cl = [1.085, 0.0]
 
-    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cl):
 
         ivc = get_indep_var_comp(
             list_inputs(SizingPropellerReferenceCl(propeller_id="propeller_1", position=option)),
@@ -148,9 +148,9 @@ def test_propeller_ref_cl():
 
 def test_propeller_ref_chord():
 
-    expected_cg = [0.9275, 1.0]
+    expected_chords = [0.9275, 1.0]
 
-    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_chords):
 
         ivc = get_indep_var_comp(
             list_inputs(SizingPropellerReferenceChord(propeller_id="propeller_1", position=option)),

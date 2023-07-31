@@ -33,18 +33,7 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
 
         propeller_id = self.options["propeller_id"]
 
-        self.add_input(
-            name="data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
-            val=np.nan,
-            desc="Location of the propeller along the span as a fraction of the span",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:propeller:"
-            + propeller_id
-            + ":diameter_to_span_ratio",
-            val=np.nan,
-            desc="Diameter of the propeller as a ratio of the wing half span",
-        )
+        # Leaving an unused inputs for test, because test can't run without at least an input
         self.add_input("data:geometry:flap:span_ratio", val=np.nan)
 
         self.add_output(
@@ -53,21 +42,39 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
             desc="Portion of the span, downstream of the propeller, which has flaps",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        if self.options["position"] == "on_the_wing":
+
+            self.add_input(
+                name="data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                val=np.nan,
+                desc="Location of the propeller along the span as a fraction of the span",
+            )
+            self.add_input(
+                name="data:propulsion:he_power_train:propeller:"
+                + propeller_id
+                + ":diameter_to_span_ratio",
+                val=np.nan,
+                desc="Diameter of the propeller as a ratio of the wing half span",
+            )
+
+            self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         propeller_id = self.options["propeller_id"]
 
-        flap_span_ratio = inputs["data:geometry:flap:span_ratio"]
-        prop_y_ratio = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio"
-        ]
-        prop_span_to_dia_ratio = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter_to_span_ratio"
-        ]
-
         if self.options["position"] == "on_the_wing":
+
+            flap_span_ratio = inputs["data:geometry:flap:span_ratio"]
+            prop_y_ratio = inputs[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio"
+            ]
+            prop_span_to_dia_ratio = inputs[
+                "data:propulsion:he_power_train:propeller:"
+                + propeller_id
+                + ":diameter_to_span_ratio"
+            ]
+
             flapped_ratio = np.clip(
                 flap_span_ratio / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio), 0.0, 1.0
             )
@@ -82,49 +89,53 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
 
         propeller_id = self.options["propeller_id"]
 
-        flap_span_ratio = inputs["data:geometry:flap:span_ratio"]
-        prop_y_ratio = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio"
-        ]
-        prop_span_to_dia_ratio = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter_to_span_ratio"
-        ]
+        if self.options["position"] == "on_the_wing":
 
-        if (
-            abs(prop_y_ratio - flap_span_ratio) > 0.5 * prop_span_to_dia_ratio
-            or self.options["position"] != "on_the_wing"
-        ):
-            partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
-                "data:geometry:flap:span_ratio",
-            ] = 0.0
-            partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
-            ] = 0.0
-            partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+            flap_span_ratio = inputs["data:geometry:flap:span_ratio"]
+            prop_y_ratio = inputs[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio"
+            ]
+            prop_span_to_dia_ratio = inputs[
                 "data:propulsion:he_power_train:propeller:"
                 + propeller_id
-                + ":diameter_to_span_ratio",
-            ] = 0.0
-        else:
+                + ":diameter_to_span_ratio"
+            ]
 
-            partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
-                "data:geometry:flap:span_ratio",
-            ] = 1.0 / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio)
-            partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
-            ] = (
-                -flap_span_ratio / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio) ** 2.0
-            )
-            partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
-                "data:propulsion:he_power_train:propeller:"
-                + propeller_id
-                + ":diameter_to_span_ratio",
-            ] = (
-                -flap_span_ratio / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio) ** 2.0 * 0.5
-            )
+            if (
+                abs(prop_y_ratio - flap_span_ratio) > 0.5 * prop_span_to_dia_ratio
+                or self.options["position"] != "on_the_wing"
+            ):
+                partials[
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+                    "data:geometry:flap:span_ratio",
+                ] = 0.0
+                partials[
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                ] = 0.0
+                partials[
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+                    "data:propulsion:he_power_train:propeller:"
+                    + propeller_id
+                    + ":diameter_to_span_ratio",
+                ] = 0.0
+            else:
+
+                partials[
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+                    "data:geometry:flap:span_ratio",
+                ] = 1.0 / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio)
+                partials[
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                ] = (
+                    -flap_span_ratio / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio) ** 2.0
+                )
+                partials[
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+                    "data:propulsion:he_power_train:propeller:"
+                    + propeller_id
+                    + ":diameter_to_span_ratio",
+                ] = (
+                    -flap_span_ratio / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio) ** 2.0 * 0.5
+                )

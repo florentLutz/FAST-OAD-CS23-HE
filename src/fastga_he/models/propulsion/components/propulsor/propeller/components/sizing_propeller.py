@@ -67,12 +67,12 @@ class SizingPropeller(om.Group):
         )
         self.add_subsystem(
             "ref_cl",
-            SizingPropellerReferenceCl(propeller_id=propeller_id),
+            SizingPropellerReferenceCl(propeller_id=propeller_id, position=position),
             promotes=["*"],
         )
         self.add_subsystem(
             "ref_chord",
-            SizingPropellerReferenceChord(propeller_id=propeller_id),
+            SizingPropellerReferenceChord(propeller_id=propeller_id, position=position),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -87,17 +87,17 @@ class SizingPropeller(om.Group):
         )
         self.add_subsystem(
             "flapped_ratio",
-            SizingPropellerFlappedRatio(propeller_id=propeller_id),
+            SizingPropellerFlappedRatio(propeller_id=propeller_id, position=position),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "prop_to_ac_distance",
-            SizingPropellerWingACDistance(propeller_id=propeller_id),
+            SizingPropellerWingACDistance(propeller_id=propeller_id, position=position),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "prop_to_le_distance",
-            SizingPropellerWingLEDistanceRatio(propeller_id=propeller_id),
+            SizingPropellerWingLEDistanceRatio(propeller_id=propeller_id, position=position),
             promotes=["data:*"],
         )
 
