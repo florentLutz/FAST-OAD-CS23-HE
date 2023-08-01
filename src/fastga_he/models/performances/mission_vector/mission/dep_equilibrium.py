@@ -25,7 +25,7 @@ class DEPEquilibrium(om.Group):
 
         # Solvers setup and configuration
         self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        self.nonlinear_solver.options["iprint"] = 0
+        self.nonlinear_solver.options["iprint"] = 2
         self.nonlinear_solver.options["maxiter"] = 30
         self.nonlinear_solver.options["rtol"] = 1e-6
         self.nonlinear_solver.options["atol"] = 1e-6

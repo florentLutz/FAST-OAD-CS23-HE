@@ -277,17 +277,11 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path) -> float:
     )
     model.add_subsystem("thrust_rate_id", _IDThrustRate(), promotes=["*"])
 
-    model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-    model.nonlinear_solver.options["iprint"] = 0
-    model.nonlinear_solver.options["maxiter"] = 100
-    model.nonlinear_solver.options["rtol"] = 1e-6
-    model.linear_solver = om.DirectSolver()
-
     # SLSQP uses gradient ?
     problem.driver = om.ScipyOptimizeDriver()
     problem.driver.options["optimizer"] = "SLSQP"
     problem.driver.options["maxiter"] = 100
-    problem.driver.options["tol"] = 1e-6
+    problem.driver.options["tol"] = 1e-4
 
     problem.model.add_design_var(
         name="data:geometry:wing:area",
