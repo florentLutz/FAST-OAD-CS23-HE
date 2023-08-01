@@ -14,7 +14,10 @@ test module for wing area computation.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
 import os.path as pth
+import time
+
 import fastoad.api as oad
 
 from numpy.testing import assert_allclose
@@ -23,10 +26,12 @@ from ..wing_area_component.wing_area_cl_dep_equilibrium import (
     UpdateWingAreaLiftDEPEquilibrium,
     ConstraintWingAreaLiftDEPEquilibrium,
 )
+from ..update_wing_area_group import UpdateWingAreaGroupDEP
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
+RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
 
 def test_advanced_cl():
@@ -198,5 +203,80 @@ def test_advanced_cl_octo_propulsion():
     assert_allclose(
         problem_cons.get_val("data:constraints:wing:additional_CL_capacity"),
         0.126,
+        atol=1e-2,
+    )
+
+
+def test_advanced_cl_group():
+
+    xml_file = "pipistrel_like.xml"
+    propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    oad.RegisterSubmodel.active_models[
+        "submodel.performances_he.energy_consumption"
+    ] = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+    oad.RegisterSubmodel.active_models[
+        "submodel.performances_he.dep_effect"
+    ] = "fastga_he.submodel.performances.dep_effect.from_pt_file"
+
+    inputs_list = list_inputs(
+        UpdateWingAreaGroupDEP(
+            propulsion_id="",
+            power_train_file_path=propulsion_file,
+        )
+    )
+    # Research independent input value in .xml file
+    ivc_loop = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(
+        UpdateWingAreaGroupDEP(
+            propulsion_id="",
+            power_train_file_path=propulsion_file,
+        ),
+        ivc_loop,
+    )
+    assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 10.01, atol=1e-2)
+    assert_allclose(problem.get_val("data:constraints:wing:additional_CL_capacity"), 0.0, atol=1e-2)
+    assert_allclose(
+        problem.get_val("data:constraints:wing:additional_fuel_capacity", units="kg"),
+        218.45,
+        atol=1e-2,
+    )
+
+
+def test_advanced_cl_group_from_yml():
+
+    # Define used files depending on options
+    xml_file_name = "pipistrel_like.xml"
+    process_file_name = "update_wing_area.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+    configurator.write_needed_inputs(ref_inputs)
+
+    # Create problems with inputs
+    problem = configurator.get_problem(read_inputs=True)
+    problem.setup()
+
+    # om.n2(problem)
+
+    problem.run_model()
+    problem.write_outputs()
+
+    if not pth.exists(RESULTS_FOLDER_PATH):
+        os.mkdir(RESULTS_FOLDER_PATH)
+
+    assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 10.01, atol=1e-2)
+    assert_allclose(problem.get_val("data:constraints:wing:additional_CL_capacity"), 0.0, atol=1e-2)
+    assert_allclose(
+        problem.get_val("data:constraints:wing:additional_fuel_capacity", units="kg"),
+        218.45,
         atol=1e-2,
     )

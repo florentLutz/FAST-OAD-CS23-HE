@@ -33,8 +33,6 @@ from fastga_he.command.api import list_inputs_metadata
 
 from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_EQUILIBRIUM
 
-from utils.filter_residuals import filter_residuals
-
 _LOGGER = logging.getLogger(__name__)
 
 
