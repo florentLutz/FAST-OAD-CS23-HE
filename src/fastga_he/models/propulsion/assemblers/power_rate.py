@@ -69,7 +69,7 @@ class PowerRate(om.ExplicitComponent):
                 + propulsive_load_type
                 + ":"
                 + propulsive_load_name
-                + ":shaft_power_max",
+                + ":shaft_power_rating",
                 units="W",
                 val=np.nan,
             )
@@ -86,7 +86,7 @@ class PowerRate(om.ExplicitComponent):
                     + propulsive_load_type
                     + ":"
                     + propulsive_load_name
-                    + ":shaft_power_max",
+                    + ":shaft_power_rating",
                     propulsive_load_name + "_shaft_power_out",
                 ],
                 method="exact",
@@ -113,7 +113,7 @@ class PowerRate(om.ExplicitComponent):
                 + propulsive_load_type
                 + ":"
                 + propulsive_load_name
-                + ":shaft_power_max"
+                + ":shaft_power_rating"
             ]
             mission_power += inputs[propulsive_load_name + "_shaft_power_out"]
 
@@ -140,7 +140,7 @@ class PowerRate(om.ExplicitComponent):
                 + propulsive_load_type
                 + ":"
                 + propulsive_load_name
-                + ":shaft_power_max"
+                + ":shaft_power_rating"
             ]
             mission_power += inputs[propulsive_load_name + "_shaft_power_out"]
 
@@ -158,7 +158,7 @@ class PowerRate(om.ExplicitComponent):
                 + propulsive_load_type
                 + ":"
                 + propulsive_load_name
-                + ":shaft_power_max",
+                + ":shaft_power_rating",
             ] = (
                 -mission_power / max_power ** 2.0
             )

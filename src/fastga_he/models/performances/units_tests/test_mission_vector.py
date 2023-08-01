@@ -1352,7 +1352,7 @@ def test_mission_vector_from_yml_fuel():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(34.14, abs=1e-2)
+    assert sizing_fuel == pytest.approx(34.21, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1420,7 +1420,7 @@ def test_mission_vector_from_yml_fuel_turbo():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(38.86, abs=1e-2)
+    assert sizing_fuel == pytest.approx(38.95, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1454,13 +1454,13 @@ def test_mission_vector_from_yml_fuel_and_battery():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(20.096, abs=1e-2)
+    assert sizing_fuel == pytest.approx(20.135, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(74.648, abs=1e-2)
+    assert sizing_energy == pytest.approx(74.816, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.0596, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.0575, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -1544,7 +1544,7 @@ def test_recording():
     problem.run_model()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(20.096, abs=1e-2)
+    assert sizing_fuel == pytest.approx(20.135, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")

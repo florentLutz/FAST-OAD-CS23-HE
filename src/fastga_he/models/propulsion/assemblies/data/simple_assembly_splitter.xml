@@ -703,6 +703,7 @@
                         <cruise>
                             <CD0>0.000352</CD0>
                         </cruise>
+                        <shaft_power_max units="kW">12.0</shaft_power_max>
                         <from_LE units="m">0.15</from_LE>
                         <mass units="kg">16.19</mass>
                         <torque_constant units="N*m/A">1.46</torque_constant>
