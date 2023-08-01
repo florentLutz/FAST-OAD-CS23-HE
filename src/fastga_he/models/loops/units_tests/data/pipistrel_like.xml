@@ -716,6 +716,7 @@
             <rpm_max units="1/min" is_input="False">2300.0<!--Maximum value of the motor rpm--></rpm_max>
             <rpm_rating units="1/min" is_input="True">4500.0<!--Max continuous rpm of the motor--></rpm_rating>
             <shaft_power_max units="W" is_input="False">51673.31683761364</shaft_power_max>
+            <shaft_power_rating units="W" is_input="False">51673.31683761364</shaft_power_rating>
             <torque_constant units="N*m/A" is_input="False">1.4584389692483237</torque_constant>
             <torque_max units="N*m" is_input="False">214.54079479982286<!--Maximum value of the torque the motor has to provide--></torque_max>
             <torque_rating units="N*m" is_input="False">214.54079479982286<!--Max continuous torque of the motor--></torque_rating>

@@ -137,3 +137,66 @@ def test_advanced_cl_with_proper_submodels():
         0.0,
         atol=1e-2,
     )
+
+
+def test_advanced_cl_octo_propulsion():
+
+    xml_file = "octo_assembly.xml"
+    propulsion_file = pth.join(DATA_FOLDER_PATH, "octo_assembly.yml")
+
+    oad.RegisterSubmodel.active_models[
+        "submodel.performances_he.energy_consumption"
+    ] = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+    oad.RegisterSubmodel.active_models[
+        "submodel.performances_he.dep_effect"
+    ] = "fastga_he.submodel.performances.dep_effect.from_pt_file"
+
+    inputs_list = list_inputs(
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            power_train_file_path=propulsion_file,
+        )
+    )
+    # Research independent input value in .xml file
+    ivc_loop = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        xml_file,
+    )
+
+    problem_loop = run_system(
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            power_train_file_path=propulsion_file,
+        ),
+        ivc_loop,
+    )
+    assert_allclose(problem_loop["wing_area"], 9.36, atol=1e-2)
+
+    inputs_list = list_inputs(
+        ConstraintWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            power_train_file_path=propulsion_file,
+        )
+    )
+
+    inputs_list.remove("data:geometry:wing:area")
+    # Research independent input value in .xml file
+    ivc_cons = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        xml_file,
+    )
+    ivc_cons.add_output("data:geometry:wing:area", val=10.01, units="m**2")
+    problem_cons = run_system(
+        ConstraintWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            power_train_file_path=propulsion_file,
+        ),
+        ivc_cons,
+    )
+    assert_allclose(
+        problem_cons.get_val("data:constraints:wing:additional_CL_capacity"),
+        0.126,
+        atol=1e-2,
+    )

@@ -307,6 +307,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path) -> float:
     problem["data:geometry:wing:area"] = wing_area_landing_init_guess
     problem["delta_m"] = np.array(0.9 * min_elevator_angle)
     problem["alpha"] = np.array(0.9 * alpha_max)
+    problem["thrust"] = np.array(mlw / 1.3)
 
     problem.run_driver()
 
