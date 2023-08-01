@@ -17,6 +17,7 @@ from ..components.cstr_ensure import (
     ConstraintsRPMEnsure,
     ConstraintsVoltageEnsure,
 )
+from ..components.cstr_generator import ConstraintGeneratorPowerRateMission
 
 from ..components.sizing_diameter_scaling import SizingGeneratorDiameterScaling
 from ..components.sizing_diameter import SizingGeneratorDiameter
@@ -40,11 +41,9 @@ from ..components.perf_shaft_power_in import PerformancesShaftPowerIn
 from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_active_power import PerformancesActivePower
 from ..components.perf_apparent_power import PerformancesApparentPower
-from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
 
-from ..components.perf_generator import PerformancesGenerator
 from ..components.sizing_generator import SizingGenerator
 
 from ..constants import POSSIBLE_POSITION
@@ -677,5 +676,21 @@ def test_constraints_voltage_ensure():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:generator:generator_1:voltage_caliber", units="V"
     ) == pytest.approx(-0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_power_for_power_rate():
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintGeneratorPowerRateMission(generator_id="generator_1")),
+        __file__,
+        XML_FILE,
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintGeneratorPowerRateMission(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:shaft_power_rating", units="kW"
+    ) == pytest.approx(91.1, rel=1e-2)
 
     problem.check_partials(compact_print=True)

@@ -13,6 +13,7 @@ from stdatm import Atmosphere
 
 from ..components.cstr_enforce import ConstraintsSeaLevelPowerEnforce
 from ..components.cstr_ensure import ConstraintsSeaLevelPowerEnsure
+from ..components.cstr_ice import ConstraintICEPowerRateMission
 
 from ..components.sizing_displacement_volume import SizingICEDisplacementVolume
 from ..components.sizing_ice_uninstalled_weight import SizingICEUninstalledWeight
@@ -71,6 +72,22 @@ def test_constraint_power_ensure():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:ICE:ice_1:power_rating_SL", units="kW"
     ) == pytest.approx(-5.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_power_for_power_rate():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintICEPowerRateMission(ice_id="ice_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintICEPowerRateMission(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:shaft_power_rating", units="kW"
+    ) == pytest.approx(250.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

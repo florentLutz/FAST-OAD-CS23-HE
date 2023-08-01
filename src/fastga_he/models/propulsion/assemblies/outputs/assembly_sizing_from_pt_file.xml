@@ -415,6 +415,7 @@
             <power_max_SL units="kW" is_input="True">245.0<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
             <power_rating_SL units="kW" is_input="False">245.0<!--Maximum power the motor can provide at Sea Level--></power_rating_SL>
             <rpm_max units="1/min" is_input="True">2700.0<!--Maximum RPM on the shaft of the engine--></rpm_max>
+            <shaft_power_rating units="kW" is_input="False">245.0<!--Value of the maximum power the motor can provide at Sea Level used for sizing--></shaft_power_rating>
             <strokes_number is_input="True">4.0</strokes_number>
             <uninstalled_mass units="lbm" is_input="False">556.6642889769583<!--Uninstalled weight of the ICE engine--></uninstalled_mass>
             <CG>
@@ -533,6 +534,8 @@
             <phase_resistance units="ohm" is_input="False">0.10492789102414854</phase_resistance>
             <rpm_max units="1/min" is_input="True">2500.0<!--Maximum value of the generator rpm during the mission--></rpm_max>
             <rpm_rating units="1/min" is_input="False">2500.0<!--Max continuous rpm of the generator--></rpm_rating>
+            <shaft_power_max units="W" is_input="True">103715.3273374457</shaft_power_max>
+            <shaft_power_rating units="kW" is_input="False">103.71532733744571<!--Value of the maximum power the generator can provide, used for sizing--></shaft_power_rating>
             <torque_constant units="N*m/A" is_input="False">8.895244105697092</torque_constant>
             <torque_max units="N*m" is_input="True">396.16336848356326<!--Maximum value of the torque the generator receives--></torque_max>
             <torque_rating units="N*m" is_input="False">396.16336848356326<!--Max continuous torque of the generator--></torque_rating>
