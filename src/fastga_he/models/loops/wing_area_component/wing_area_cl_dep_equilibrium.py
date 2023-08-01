@@ -25,11 +25,15 @@ import fastoad.api as oad
 from fastoad.openmdao.problem import AutoUnitsDefaultGroup
 from fastoad.constants import EngineSetting
 
-from fastga.command.api import list_inputs_metadata
-
-from fastga.models.performances.mission_vector.constants import SUBMODEL_EQUILIBRIUM
-
 from fastga.models.loops.constants import SUBMODEL_WING_AREA_AERO_LOOP, SUBMODEL_WING_AREA_AERO_CONS
+
+from stdatm import Atmosphere
+
+from fastga_he.command.api import list_inputs_metadata
+
+from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_EQUILIBRIUM
+
+from utils.filter_residuals import filter_residuals
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,6 +48,11 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare("propulsion_id", default=None, types=str, allow_none=True)
+        self.options.declare(
+            name="power_train_file_path",
+            default="",
+            desc="Path to the file containing the description of the power",
+        )
 
     def setup(self):
 
@@ -51,7 +60,9 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         self.add_input("data:weight:aircraft:MLW", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:CG:fwd:x", val=np.nan, units="m")
 
-        input_zip = zip_equilibrium_input(self.options["propulsion_id"])
+        input_zip = zip_equilibrium_input(
+            self.options["propulsion_id"], self.options["power_train_file_path"]
+        )
         for var_names, var_unit, var_shape, var_shape_by_conn, var_copy_shape in input_zip:
             if var_names[:5] == "data:" and var_names != "data:geometry:wing:area":
                 if var_shape_by_conn:
@@ -92,10 +103,12 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
 
         wing_area_landing_init_guess = 2 * mlw * g / (stall_speed ** 2) / (1.225 * max_cl)
 
-        wing_area_approach = compute_wing_area(inputs, self.options["propulsion_id"])
+        wing_area_approach = compute_wing_area(
+            inputs, self.options["propulsion_id"], self.options["power_train_file_path"]
+        )
 
         if wing_area_approach > 1.2 * wing_area_landing_init_guess:
-            print("Vrai valeur", wing_area_approach)
+
             wing_area_approach = wing_area_landing_init_guess
             _LOGGER.info(
                 "Wing area too far from potential data, taking backup value for this iteration"
@@ -118,6 +131,11 @@ class ConstraintWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare("propulsion_id", default=None, types=str, allow_none=True)
+        self.options.declare(
+            name="power_train_file_path",
+            default="",
+            desc="Path to the file containing the description of the power",
+        )
 
     def setup(self):
 
@@ -125,7 +143,9 @@ class ConstraintWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         self.add_input("data:weight:aircraft:MLW", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:CG:fwd:x", val=np.nan, units="m")
 
-        input_zip = zip_equilibrium_input(self.options["propulsion_id"])
+        input_zip = zip_equilibrium_input(
+            self.options["propulsion_id"], self.options["power_train_file_path"]
+        )
         for var_names, var_unit, var_shape, var_shape_by_conn, var_copy_shape in input_zip:
             if var_names[:5] == "data:" and var_names != "data:geometry:wing:area":
                 if var_shape_by_conn:
@@ -160,7 +180,9 @@ class ConstraintWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         mlw = inputs["data:weight:aircraft:MLW"]
         wing_area_actual = inputs["data:geometry:wing:area"]
 
-        wing_area_constraint = compute_wing_area(inputs, self.options["propulsion_id"])
+        wing_area_constraint = compute_wing_area(
+            inputs, self.options["propulsion_id"], self.options["power_train_file_path"]
+        )
 
         additional_cl = (
             (2.0 * mlw * g)
@@ -176,11 +198,18 @@ class _IDThrustRate(om.ExplicitComponent):
         self.add_input("thrust_rate_t_econ", shape=3, val=np.full(3, np.nan))
         self.add_output("thrust_rate", shape=1)
 
+        self.declare_partials(of="*", wrt="*", method="exact")
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["thrust_rate"] = inputs["thrust_rate_t_econ"][1]
 
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-def compute_wing_area(inputs, propulsion_id):
+        d_t_r_econ_d_t_r = np.array([1, 0, 1])
+        partials["thrust_rate", "thrust_rate_t_econ"] = d_t_r_econ_d_t_r
+
+
+def compute_wing_area(inputs, propulsion_id, pt_file_path) -> float:
 
     # First, setup an initial guess
     stall_speed = inputs["data:TLAR:v_approach"] / 1.3
@@ -205,7 +234,7 @@ def compute_wing_area(inputs, propulsion_id):
 
     wing_area_landing_init_guess = 2 * mlw * g / (stall_speed ** 2) / (1.225 * max_cl)
 
-    input_zip = zip_equilibrium_input(propulsion_id)
+    input_zip = zip_equilibrium_input(propulsion_id, pt_file_path)
 
     ivc = om.IndepVarComp()
     for var_names, var_unit, _, _, _ in input_zip:
@@ -223,6 +252,7 @@ def compute_wing_area(inputs, propulsion_id):
     ivc.add_output(name="x_cg", val=np.array([cg_max_fwd]), units="m")
     ivc.add_output(name="gamma", val=np.array([0.0]), units=None)
     ivc.add_output(name="altitude", val=np.array([0.0]), units="m")
+    ivc.add_output(name="exterior_temperature", val=Atmosphere(0.0).temperature, units="degK")
     # Time step is not important since we don't care about the fuel consumption
     ivc.add_output(name="time_step", val=np.array([0.1]), units="s")
     ivc.add_output(name="true_airspeed", val=np.array([stall_speed]), units="m/s")
@@ -237,26 +267,27 @@ def compute_wing_area(inputs, propulsion_id):
         "number_of_points": 1,
         "promotes_all_variables": True,
         "propulsion_id": propulsion_id,
+        "power_train_file_path": pt_file_path,
         "flaps_position": "landing",
     }
     model.add_subsystem(
         "Equilibrium",
-        oad.RegisterSubmodel.get_submodel(SUBMODEL_EQUILIBRIUM, options=option_equilibrium),
+        oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_EQUILIBRIUM, options=option_equilibrium),
         promotes=["*"],
     )
     model.add_subsystem("thrust_rate_id", _IDThrustRate(), promotes=["*"])
 
     model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-    model.nonlinear_solver.options["iprint"] = 2
+    model.nonlinear_solver.options["iprint"] = 0
     model.nonlinear_solver.options["maxiter"] = 100
-    model.nonlinear_solver.options["rtol"] = 1e-4
+    model.nonlinear_solver.options["rtol"] = 1e-6
     model.linear_solver = om.DirectSolver()
 
     # SLSQP uses gradient ?
     problem.driver = om.ScipyOptimizeDriver()
     problem.driver.options["optimizer"] = "SLSQP"
     problem.driver.options["maxiter"] = 100
-    problem.driver.options["tol"] = 1e-4
+    problem.driver.options["tol"] = 1e-6
 
     problem.model.add_design_var(
         name="data:geometry:wing:area",
@@ -267,14 +298,12 @@ def compute_wing_area(inputs, propulsion_id):
 
     problem.model.add_objective(name="data:geometry:wing:area", units="m**2")
 
-    problem.model.add_constraint(
-        name="alpha", units="deg", lower=[0.0, 0.0], upper=[alpha_max, alpha_max]
-    )
-    problem.model.add_constraint(name="thrust_rate", lower=[0.0, 0.0], upper=[1.0, 1.0])
+    problem.model.add_constraint(name="alpha", units="deg", lower=0.0, upper=alpha_max)
+    problem.model.add_constraint(name="thrust_rate", lower=0.0, upper=1.0)
     problem.model.add_constraint(
         name="delta_m",
-        lower=[min_elevator_angle, min_elevator_angle],
-        upper=[abs(min_elevator_angle), abs(min_elevator_angle)],
+        lower=min_elevator_angle,
+        upper=abs(min_elevator_angle),
     )
 
     problem.model.approx_totals()
@@ -282,25 +311,27 @@ def compute_wing_area(inputs, propulsion_id):
     problem.setup()
 
     problem["data:geometry:wing:area"] = wing_area_landing_init_guess
-    problem["delta_m"] = np.array([0.9 * min_elevator_angle, 0.9 * min_elevator_angle])
-    problem["alpha"] = np.array([0.9 * alpha_max, 0.9 * alpha_max])
+    problem["delta_m"] = np.array(0.9 * min_elevator_angle)
+    problem["alpha"] = np.array(0.9 * alpha_max)
 
     problem.run_driver()
 
     print(problem["delta_m"])
     print(problem["alpha"])
+    print(problem["thrust_rate"])
 
     wing_area_approach = problem.get_val("data:geometry:wing:area", units="m**2")
 
     return wing_area_approach
 
 
-def zip_equilibrium_input(propulsion_id):
+def zip_equilibrium_input(propulsion_id, pt_file_path):
     """
     Returns a list of the variables needed for the computation of the equilibrium. Based on
     the submodel currently registered and the propulsion_id required.
 
     :param propulsion_id: ID of propulsion wrapped to be used for computation of equilibrium.
+    :param pt_file_path: Path to the powertrain file.
     :return inputs_zip: a zip containing a list of name, a list of units, a list of shapes,
     a list of shape_by_conn boolean and a list of copy_shape str.
     """
@@ -309,11 +340,12 @@ def zip_equilibrium_input(propulsion_id):
         "number_of_points": 1,
         "promotes_all_variables": True,
         "propulsion_id": propulsion_id,
+        "power_train_file_path": pt_file_path,
         "flaps_position": "landing",
     }
     new_component.add_subsystem(
         "system",
-        oad.RegisterSubmodel.get_submodel(SUBMODEL_EQUILIBRIUM, options=option_equilibrium),
+        oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_EQUILIBRIUM, options=option_equilibrium),
         promotes=["*"],
     )
 

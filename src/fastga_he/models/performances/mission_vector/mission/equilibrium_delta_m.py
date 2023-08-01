@@ -4,8 +4,6 @@
 
 import numpy as np
 import openmdao.api as om
-from scipy.constants import g
-from stdatm import Atmosphere
 
 
 class EquilibriumDeltaM(om.ImplicitComponent):
@@ -107,19 +105,16 @@ class EquilibriumDeltaM(om.ImplicitComponent):
         delta_m = outputs["delta_m"] * np.pi / 180.0
 
         if self.options["flaps_position"] == "takeoff":
-            delta_cl_flaps = inputs["data:aerodynamics:flaps:takeoff:CL"]
             delta_cm_flaps = inputs["data:aerodynamics:flaps:takeoff:CM"]
         elif self.options["flaps_position"] == "landing":
-            delta_cl_flaps = inputs["data:aerodynamics:flaps:landing:CL"]
             delta_cm_flaps = inputs["data:aerodynamics:flaps:landing:CM"]
         else:  # Cruise conditions
-            delta_cl_flaps = 0.0
             delta_cm_flaps = 0.0
 
         delta_cl = inputs["delta_Cl"]
         delta_cm = inputs["delta_Cm"]
 
-        cl_wing = cl0_wing + cl_alpha_wing * alpha + delta_cl + delta_cl_flaps
+        cl_wing_slip = cl0_wing + cl_alpha_wing * alpha + delta_cl
         cl_htp = cl0_htp + cl_alpha_htp * alpha + cl_delta_m * delta_m
 
         # ------------------ Derivatives wrt delta_m residuals ------------------ #
@@ -150,10 +145,10 @@ class EquilibriumDeltaM(om.ImplicitComponent):
         partials["delta_m", "delta_m"] = (
             np.eye(number_of_points) * (x_cg - x_htp) * cl_delta_m * np.pi / 180.0
         )
-        partials["delta_m", "x_cg"] = (cl_wing + cl_htp) * np.eye(number_of_points)
-        partials["delta_m", "data:geometry:wing:MAC:at25percent:x"] = -(cl_wing + cl_htp) * np.ones(
-            number_of_points
-        )
+        partials["delta_m", "x_cg"] = (cl_wing_slip + cl_htp) * np.eye(number_of_points)
+        partials["delta_m", "data:geometry:wing:MAC:at25percent:x"] = -(
+            cl_wing_slip + cl_htp
+        ) * np.ones(number_of_points)
         partials[
             "delta_m", "data:geometry:horizontal_tail:MAC:at25percent:x:from_wingMAC25"
         ] = -cl_htp
