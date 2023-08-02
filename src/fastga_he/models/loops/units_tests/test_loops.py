@@ -52,7 +52,7 @@ def test_advanced_cl():
         UpdateWingAreaLiftDEPEquilibrium(propulsion_id="fastga.wrapper.propulsion.basicIC_engine"),
         ivc_loop,
     )
-    assert_allclose(problem_loop["wing_area"], 10.01, atol=1e-2)
+    assert_allclose(problem_loop["wing_area"], 9.97, atol=1e-2)
 
     inputs_list = list_inputs(
         ConstraintWingAreaLiftDEPEquilibrium(
@@ -67,7 +67,8 @@ def test_advanced_cl():
         __file__,
         xml_file,
     )
-    ivc_cons.add_output("data:geometry:wing:area", val=10.01, units="m**2")
+    ivc_cons.add_output("data:geometry:wing:area", val=9.97, units="m**2")
+    ivc_cons.add_output("wing_area:aerodynamic", val=9.97, units="m**2")
     problem_cons = run_system(
         ConstraintWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine"
@@ -113,7 +114,7 @@ def test_advanced_cl_with_proper_submodels():
         ),
         ivc_loop,
     )
-    assert_allclose(problem_loop["wing_area"], 10.01, atol=1e-2)
+    assert_allclose(problem_loop["wing_area"], 9.97, atol=1e-2)
 
     inputs_list = list_inputs(
         ConstraintWingAreaLiftDEPEquilibrium(
@@ -129,7 +130,8 @@ def test_advanced_cl_with_proper_submodels():
         __file__,
         xml_file,
     )
-    ivc_cons.add_output("data:geometry:wing:area", val=10.01, units="m**2")
+    ivc_cons.add_output("data:geometry:wing:area", val=9.97, units="m**2")
+    ivc_cons.add_output("wing_area:aerodynamic", val=9.97, units="m**2")
     problem_cons = run_system(
         ConstraintWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
@@ -176,7 +178,7 @@ def test_advanced_cl_octo_propulsion():
         ),
         ivc_loop,
     )
-    assert_allclose(problem_loop["wing_area"], 9.36, atol=1e-2)
+    assert_allclose(problem_loop["wing_area"], 9.32, atol=1e-2)
 
     inputs_list = list_inputs(
         ConstraintWingAreaLiftDEPEquilibrium(
@@ -193,6 +195,7 @@ def test_advanced_cl_octo_propulsion():
         xml_file,
     )
     ivc_cons.add_output("data:geometry:wing:area", val=10.01, units="m**2")
+    ivc_cons.add_output("wing_area:aerodynamic", val=9.32, units="m**2")
     problem_cons = run_system(
         ConstraintWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
@@ -239,7 +242,7 @@ def test_advanced_cl_group():
         ),
         ivc_loop,
     )
-    assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 10.01, atol=1e-2)
+    assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 9.97, atol=1e-2)
     assert_allclose(problem.get_val("data:constraints:wing:additional_CL_capacity"), 0.0, atol=1e-2)
     assert_allclose(
         problem.get_val("data:constraints:wing:additional_fuel_capacity", units="kg"),
@@ -273,7 +276,7 @@ def test_advanced_cl_group_from_yml():
     if not pth.exists(RESULTS_FOLDER_PATH):
         os.mkdir(RESULTS_FOLDER_PATH)
 
-    assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 10.01, atol=1e-2)
+    assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 9.97, atol=1e-2)
     assert_allclose(problem.get_val("data:constraints:wing:additional_CL_capacity"), 0.0, atol=1e-2)
     assert_allclose(
         problem.get_val("data:constraints:wing:additional_fuel_capacity", units="kg"),

@@ -85,9 +85,17 @@ class UpdateWingAreaGroupDEP(om.Group):
                 propulsion_id=self.options["propulsion_id"],
                 power_train_file_path=self.options["power_train_file_path"],
             ),
-            promotes_inputs=["*"],
+            promotes_inputs=["data:*"],
             promotes_outputs=["*"],
         )
 
         self.connect("loop_wing_area_geom.wing_area", "update_wing_area.wing_area:geometric")
-        self.connect("loop_wing_area_aero.wing_area", "update_wing_area.wing_area:aerodynamic")
+        # We can fford to do the connection since we are not using a submodel so we know we will
+        # always use a component that has this specific inputs
+        self.connect(
+            "loop_wing_area_aero.wing_area",
+            [
+                "update_wing_area.wing_area:aerodynamic",
+                "constraint_wing_area_aero.wing_area:aerodynamic",
+            ],
+        )

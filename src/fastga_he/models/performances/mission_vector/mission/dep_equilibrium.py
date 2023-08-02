@@ -36,7 +36,7 @@ class DEPEquilibrium(om.Group):
     def initialize(self):
 
         # We have to declare them even if not used to preserve compatibility
-        self.options.declare("propulsion_id", default="", types=str)
+        self.options.declare("propulsion_id", default="", types=str, allow_none=True)
         self.options.declare(
             name="power_train_file_path",
             default="",
