@@ -65,7 +65,14 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         input_zip = zip_equilibrium_input(
             self.options["propulsion_id"], self.options["power_train_file_path"]
         )
-        for var_names, var_unit, var_shape, var_shape_by_conn, var_copy_shape in input_zip:
+        for (
+            var_names,
+            var_unit,
+            var_value,
+            var_shape,
+            var_shape_by_conn,
+            var_copy_shape,
+        ) in input_zip:
             if (
                 var_names[:5] == "data:"
                 and var_names != "data:geometry:wing:area"
@@ -82,7 +89,7 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
                 else:
                     self.add_input(
                         name=var_names,
-                        val=np.nan,
+                        val=var_value,
                         units=var_unit,
                         shape=var_shape,
                     )
@@ -125,7 +132,10 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         # we must also filter out unreasonably low wing area, which is iffy. Indeed DEP can bring
         # significant gain but it might gain so much that it goes below the threshold for
         # unreasonably low values
-        if 1.2 * wing_area_landing_init_guess < wing_area_approach < 1.1 * MIN_WING_AREA:
+        if (
+            wing_area_approach > 1.2 * wing_area_landing_init_guess
+            or wing_area_approach < 1.1 * MIN_WING_AREA
+        ):
 
             wing_area_approach = wing_area_landing_init_guess
             _LOGGER.info(
@@ -243,7 +253,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path) -> float:
         input_zip = zip_equilibrium_input(propulsion_id, pt_file_path)
 
         ivc = om.IndepVarComp()
-        for var_names, var_unit, _, _, _ in input_zip:
+        for var_names, var_unit, _, _, _, _ in input_zip:
             if var_names[:5] == "data:" and var_names != "data:geometry:wing:area":
                 ivc.add_output(
                     name=var_names,
@@ -359,7 +369,7 @@ def zip_equilibrium_input(propulsion_id, pt_file_path):
         promotes=["*"],
     )
 
-    name, unit, shape, shape_by_conn, copy_shape = list_inputs_metadata(new_component)
-    inputs_zip = zip(name, unit, shape, shape_by_conn, copy_shape)
+    name, unit, value, shape, shape_by_conn, copy_shape = list_inputs_metadata(new_component)
+    inputs_zip = zip(name, unit, value, shape, shape_by_conn, copy_shape)
 
     return inputs_zip

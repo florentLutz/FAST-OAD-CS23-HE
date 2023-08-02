@@ -53,6 +53,7 @@
         <type>0.0<!--0=non-retractable / 1=retractable--></type>
       </landing_gear>
       <propeller>
+        <installation_angle unnits="deg">0.0</installation_angle>
         <average_rpm units="rpm">2500.0</average_rpm>
         <blades_number>3.0<!--number of blades on the propeller--></blades_number>
         <chord_vect units="m">[0.11163526, 0.15856474, 0.16254664, 0.21189369, 0.18558474, 0.11163526, 0.11163526]<!--blade chord at the station along the radius stored in radius_ratio_vect--></chord_vect>
@@ -139,6 +140,7 @@
         </ICE>
         <propeller>
           <propeller_1>
+            <installation_angle units="deg">0.0</installation_angle>
             <activity_factor is_input="True">129.9145 <!--Activity factor of the propeller--></activity_factor>
             <blade_twist units="deg" is_input="True">17.8<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>

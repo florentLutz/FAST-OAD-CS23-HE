@@ -74,6 +74,7 @@ def list_inputs_metadata(component: Union[om.ExplicitComponent, om.Group]) -> tu
 
     var_inputs = []
     var_units = []
+    var_value = []
     var_shape = []
     var_shape_by_conn = []
     var_copy_shape = []
@@ -87,8 +88,9 @@ def list_inputs_metadata(component: Union[om.ExplicitComponent, om.Group]) -> tu
         if var_prom_name not in var_inputs and var_prom_name not in var_outputs:
             var_inputs.append(variable["prom_name"])
             var_units.append(variable["units"])
+            var_value.append(prob_copy.get_val(variable_name, variable["units"]))
             var_shape.append(variable["shape"])
             var_shape_by_conn.append(variable["shape_by_conn"])
             var_copy_shape.append(variable["copy_shape"])
 
-    return var_inputs, var_units, var_shape, var_shape_by_conn, var_copy_shape
+    return var_inputs, var_units, var_value, var_shape, var_shape_by_conn, var_copy_shape
