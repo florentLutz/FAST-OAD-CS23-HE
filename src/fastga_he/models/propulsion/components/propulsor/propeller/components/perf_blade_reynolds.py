@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-from stdatm import Atmosphere
+from stdatm import AtmosphereWithPartials
 
 
 class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
@@ -37,24 +37,7 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
 
         self.add_output("reynolds_D", val=2e7, shape=number_of_points)
 
-        self.declare_partials(
-            of="reynolds_D",
-            wrt=[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-                "rpm",
-                "true_airspeed",
-            ],
-            method="exact",
-        )
-        self.declare_partials(
-            of="reynolds_D",
-            wrt="altitude",
-            method="fd",
-            form="central",
-            step=1.0e2,
-            rows=np.arange(number_of_points),
-            cols=np.arange(number_of_points),
-        )
+        self.declare_partials(of="reynolds_D", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -63,7 +46,9 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
         true_airspeed = inputs["true_airspeed"]
 
-        viscosity = Atmosphere(inputs["altitude"], altitude_in_feet=False).kinematic_viscosity
+        viscosity = AtmosphereWithPartials(
+            inputs["altitude"], altitude_in_feet=False
+        ).kinematic_viscosity
         omega = inputs["rpm"] * 2.0 * np.pi / 60.0
 
         outputs["reynolds_D"] = (
@@ -77,7 +62,10 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
         true_airspeed = inputs["true_airspeed"]
 
-        viscosity = Atmosphere(inputs["altitude"], altitude_in_feet=False).kinematic_viscosity
+        atm = AtmosphereWithPartials(inputs["altitude"], altitude_in_feet=False)
+        viscosity = atm.kinematic_viscosity
+        d_viscosity_d_altitude = atm.partial_kinematic_viscosity_altitude
+
         omega = inputs["rpm"] * 2.0 * np.pi / 60.0
 
         partials["reynolds_D", "true_airspeed"] = np.diag(
@@ -100,4 +88,12 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
             / np.sqrt((true_airspeed * diameter) ** 2.0 + (omega * diameter ** 2.0 / 2.0) ** 2.0)
             * (2.0 * true_airspeed ** 2.0 * diameter + 4.0 * (omega / 2.0) ** 2.0 * diameter ** 3.0)
             / 2.0
+        )
+        partials["reynolds_D", "altitude"] = np.diag(
+            -(
+                np.sqrt(true_airspeed ** 2.0 + (omega * diameter / 2.0) ** 2.0)
+                * diameter
+                / viscosity ** 2.0
+            )
+            * d_viscosity_d_altitude
         )

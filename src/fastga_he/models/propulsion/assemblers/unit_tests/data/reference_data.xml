@@ -1,0 +1,47 @@
+<FASTOAD_model>
+    <data>
+        <geometry>
+            <flap>
+                <span_ratio>0.45</span_ratio>
+            </flap>
+            <wing>
+                <span units="m" is_input="False">12.693930607836878<!--wing span--></span>
+                <area units="m**2" is_input="False">12.693930607836878<!--wing area--></area>
+                <wet_area units="m**2" is_input="False">26.657254276457444<!--wing wet area--></wet_area>
+                <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <aerodynamics>
+            <wing>
+                <cruise>
+                  <CD0 is_input="False">0.006225770501969716<!--profile drag coefficient for wing in cruise conditions--></CD0>
+                  <CL0_clean is_input="True">0.2501539747371489<!--wing lift coefficient at zero aircraft angle of attack in cruise conditions and with no flaps deployed--></CL0_clean>
+                  <CL_alpha units="1/rad" is_input="True">4.620008812204601<!--wing lift coefficient slope with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
+                </cruise>
+                <low_speed>
+                    <CL_ref is_input="False">0.9903832267850955</CL_ref>
+                    <Y_vector units="m" is_input="False">[0.11547445976593405, 0.34642337929780215, 0.5773722988296702, 1.0361325274187763, 1.7227040650651202, 2.4092756027114643, 3.0958471403578085, 3.782418678004152, 4.468990215650496, 5.1555617532968405, 5.5594273636770435, 5.6805870467911035, 5.801746729905164, 5.922906413019226, 6.044066096133287, 6.165225779247348, 6.286385462361408, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing station along the wing span at which chord_vector and Cl_vector are sampled--></Y_vector>
+                    <chord_vector units="m" is_input="False">[1.      , 0.984375, 0.96875 , 0.953125, 0.9375  , 0.921875, 0.90625 , 0.890625, 0.875   , 0.859375, 0.84375 , 0.828125, 0.8125  , 0.796875, 0.78125 , 0.765625, 0.75    , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing chord length at the station along the wing span in Y_vector--></chord_vector>
+                    <CL_vector is_input="False">[1.1017227197335075, 1.1013013453498266, 1.10038811694889, 1.098403873777725, 1.0918579844211873, 1.080610615570361, 1.0628034699038733, 1.0347815173407644, 0.9892716074062258, 0.9114284949703251, 0.8359515927452368, 0.7818631930166186, 0.7254369570766273, 0.660566179673128, 0.5814473768423762, 0.4785864136757275, 0.32879610850232355, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing at the station along the wing span in Y_vector, the total corresponding wing lift coefficient is equal to CL0_clean--></CL_vector>
+                </low_speed>
+            </wing>
+            <flaps>
+                <landing>
+                  <CD_2D is_input="False">0.006750898684227176<!--airfoil additional drag coefficient due to flaps deployment in landing configuration--></CD_2D>
+                  <CL is_input="False">0.6086692724761249<!--lift coefficient increment due to flaps deployment in landing configuration--></CL>
+                  <CL_2D is_input="False">0.8989947516346022<!--airfoil additional lift coefficient due to flaps deployment in landing configuration--></CL_2D>
+                </landing>
+                <takeoff>
+                  <CD_2D is_input="False">0.0014100990110413683<!--airfoil additional drag coefficient due to flaps deployment in takeoff configuration--></CD_2D>
+                  <CL is_input="False">0.3003423647177516<!--lift coefficient increment due to flaps deployment in takeoff configuration--></CL>
+                  <CL_2D is_input="False">0.4436008548228057<!--airfoil additional lift coefficient due to flaps deployment in takeoff configuration--></CL_2D>
+                </takeoff>
+            </flaps>
+        </aerodynamics>
+    </data>
+</FASTOAD_model>

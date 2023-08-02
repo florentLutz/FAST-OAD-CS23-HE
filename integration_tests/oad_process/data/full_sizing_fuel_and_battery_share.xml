@@ -436,6 +436,7 @@
         </inverter>
         <propeller>
           <propeller_1>
+            <installation_angle units="deg">0.0</installation_angle>
             <activity_factor is_input="True">125.0<!--Activity factor of the propeller--></activity_factor>
             <blade_twist units="deg" is_input="True">20.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>

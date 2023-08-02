@@ -6,6 +6,45 @@ import numpy as np
 
 import plotly.graph_objects as go
 
+
+def ocv(soc):
+
+    dod = 100.0 - soc
+
+    ocv = (
+        -9.65121262e-10 * dod ** 5.0
+        + 1.81419058e-07 * dod ** 4.0
+        - 1.11814100e-05 * dod ** 3.0
+        + 2.26114438e-04 * dod ** 2.0
+        - 8.54619953e-03 * dod
+        + 4.12
+    )
+    return ocv
+
+
+def r_int(soc):
+
+    dod = 100.0 - soc
+
+    internal_resistance = (
+        2.62771800e-11 * dod ** 5.0
+        - 1.48987233e-08 * dod ** 4.0
+        + 2.03615618e-06 * dod ** 3.0
+        - 1.06451730e-04 * dod ** 2.0
+        + 2.13818712e-03 * dod
+        + 3.90444549e-02
+    )
+
+    return internal_resistance
+
+
+def v_out(soc, c_rate):
+
+    current = c_rate * 3.35
+
+    return ocv(soc) - r_int(soc) * current
+
+
 if __name__ == "__main__":
 
     soc_c_rate_1 = np.array(
@@ -553,35 +592,35 @@ if __name__ == "__main__":
 
     scatter_025 = go.Scatter(
         x=soc_c_rate_025,
-        y=voltage_c_rate_025,
+        y=v_out(soc_c_rate_025, 0.25),
         mode="lines+markers",
         name="0.25 C",
     )
     fig.add_trace(scatter_025)
     scatter_05 = go.Scatter(
         x=soc_c_rate_05,
-        y=voltage_c_rate_05,
+        y=v_out(soc_c_rate_05, 0.5),
         mode="lines+markers",
         name="0.5 C",
     )
     fig.add_trace(scatter_05)
     scatter_1 = go.Scatter(
         x=soc_c_rate_1,
-        y=voltage_c_rate_1,
+        y=v_out(soc_c_rate_1, 1.0),
         mode="lines+markers",
         name="1 C",
     )
     fig.add_trace(scatter_1)
     scatter_2 = go.Scatter(
         x=soc_c_rate_2,
-        y=voltage_c_rate_2,
+        y=v_out(soc_c_rate_2, 2),
         mode="lines+markers",
         name="2 C",
     )
     fig.add_trace(scatter_2)
     scatter_4 = go.Scatter(
         x=soc_c_rate_4,
-        y=voltage_c_rate_4,
+        y=v_out(soc_c_rate_4, 4),
         mode="lines+markers",
         name="4 C",
     )

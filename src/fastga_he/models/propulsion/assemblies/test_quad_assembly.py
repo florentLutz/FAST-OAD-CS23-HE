@@ -15,6 +15,7 @@ from utils.filter_residuals import filter_residuals
 from fastga_he.models.propulsion.assemblers.performances_from_pt_file import (
     PowerTrainPerformancesFromFile,
 )
+from fastga_he.models.propulsion.assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
 
 from ..components.loads.pmsm import PerformancesPMSM
 from ..components.propulsor.propeller import PerformancesPropeller
@@ -820,3 +821,304 @@ def test_power_rate():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_slipstream_from_pt_file():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly.yml")
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            AerodynamicDeltasFromPTFile(
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("alpha", val=np.linspace(5.0, 10.0, NB_POINTS_TEST), units="deg")
+    ivc.add_output("thrust", val=np.linspace(500, 550, NB_POINTS_TEST) * 4.0, units="N")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        AerodynamicDeltasFromPTFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    assert problem.get_val("propeller_1.delta_Cl") * 1e6 == pytest.approx(
+        np.array(
+            [
+                528.6,
+                534.0,
+                539.3,
+                544.6,
+                549.9,
+                555.1,
+                560.4,
+                565.6,
+                570.7,
+                575.9,
+                581.0,
+                586.0,
+                591.1,
+                596.1,
+                601.1,
+                606.1,
+                611.1,
+                616.0,
+                620.9,
+                625.8,
+                630.6,
+                635.4,
+                640.2,
+                645.0,
+                649.7,
+                654.4,
+                659.1,
+                663.8,
+                668.4,
+                673.1,
+                677.7,
+                682.2,
+                686.8,
+                691.3,
+                695.8,
+                700.2,
+                704.7,
+                709.1,
+                713.5,
+                717.9,
+                722.2,
+                726.6,
+                730.9,
+                735.1,
+                739.4,
+                743.6,
+                747.8,
+                752.0,
+                756.2,
+                760.3,
+            ]
+        ),
+        rel=1e-3,
+    )
+    assert problem.get_val("propeller_1.delta_Cd") * 1e9 == pytest.approx(
+        np.array(
+            [
+                34.462,
+                34.305,
+                34.150,
+                33.996,
+                33.842,
+                33.690,
+                33.539,
+                33.388,
+                33.239,
+                33.091,
+                32.944,
+                32.797,
+                32.652,
+                32.508,
+                32.364,
+                32.222,
+                32.080,
+                31.940,
+                31.800,
+                31.661,
+                31.523,
+                31.386,
+                31.250,
+                31.115,
+                30.981,
+                30.847,
+                30.715,
+                30.583,
+                30.452,
+                30.322,
+                30.193,
+                30.064,
+                29.937,
+                29.810,
+                29.684,
+                29.559,
+                29.434,
+                29.311,
+                29.188,
+                29.066,
+                28.945,
+                28.824,
+                28.704,
+                28.585,
+                28.467,
+                28.349,
+                28.232,
+                28.116,
+                28.001,
+                27.886,
+            ]
+        ),
+        rel=1e-3,
+    )
+    assert problem.get_val("propeller_1.delta_Cm") * 1e9 == pytest.approx(
+        np.array(
+            [
+                -182.17,
+                -181.35,
+                -180.53,
+                -179.71,
+                -178.90,
+                -178.09,
+                -177.29,
+                -176.50,
+                -175.71,
+                -174.93,
+                -174.15,
+                -173.38,
+                -172.61,
+                -171.84,
+                -171.09,
+                -170.33,
+                -169.58,
+                -168.84,
+                -168.10,
+                -167.37,
+                -166.64,
+                -165.92,
+                -165.20,
+                -164.48,
+                -163.77,
+                -163.07,
+                -162.37,
+                -161.67,
+                -160.98,
+                -160.29,
+                -159.61,
+                -158.93,
+                -158.25,
+                -157.58,
+                -156.92,
+                -156.26,
+                -155.60,
+                -154.94,
+                -154.30,
+                -153.65,
+                -153.01,
+                -152.37,
+                -151.74,
+                -151.11,
+                -150.48,
+                -149.86,
+                -149.24,
+                -148.63,
+                -148.02,
+                -147.41,
+            ]
+        ),
+        rel=1e-3,
+    )
+    assert problem.get_val("propeller_1.delta_Cl") == pytest.approx(
+        problem.get_val("propeller_4.delta_Cl"),
+        rel=1e-6,
+    )
+    assert problem.get_val("propeller_2.delta_Cl") == pytest.approx(
+        problem.get_val("propeller_3.delta_Cl"),
+        rel=1e-6,
+    )
+    assert all(problem.get_val("propeller_1.delta_Cl") != problem.get_val("propeller_2.delta_Cl"))
+
+    assert problem.get_val("delta_Cl") == pytest.approx(
+        problem.get_val("propeller_1.delta_Cl")
+        + problem.get_val("propeller_2.delta_Cl")
+        + problem.get_val("propeller_3.delta_Cl")
+        + problem.get_val("propeller_4.delta_Cl"),
+        rel=1e-6,
+    )
+    assert problem.get_val("delta_Cm") == pytest.approx(
+        problem.get_val("propeller_1.delta_Cm")
+        + problem.get_val("propeller_2.delta_Cm")
+        + problem.get_val("propeller_3.delta_Cm")
+        + problem.get_val("propeller_4.delta_Cm"),
+        rel=1e-6,
+    )
+    delta_Cdi = (
+        np.array(
+            [
+                116.44,
+                119.1,
+                121.79,
+                124.49,
+                127.22,
+                129.98,
+                132.75,
+                135.55,
+                138.37,
+                141.21,
+                144.08,
+                146.96,
+                149.87,
+                152.8,
+                155.75,
+                158.72,
+                161.71,
+                164.72,
+                167.75,
+                170.8,
+                173.87,
+                176.96,
+                180.07,
+                183.2,
+                186.35,
+                189.52,
+                192.7,
+                195.91,
+                199.13,
+                202.37,
+                205.63,
+                208.91,
+                212.2,
+                215.52,
+                218.85,
+                222.19,
+                225.56,
+                228.94,
+                232.33,
+                235.75,
+                239.18,
+                242.62,
+                246.09,
+                249.56,
+                253.06,
+                256.57,
+                260.09,
+                263.63,
+                267.19,
+                270.75,
+            ]
+        )
+        * 1e-6
+    )
+    assert problem.get_val("delta_Cdi") == pytest.approx(
+        delta_Cdi,
+        rel=1e-3,
+    )
+    assert problem.get_val("delta_Cd") == pytest.approx(
+        problem.get_val("propeller_1.delta_Cd")
+        + problem.get_val("propeller_2.delta_Cd")
+        + problem.get_val("propeller_3.delta_Cd")
+        + problem.get_val("propeller_4.delta_Cd")
+        + delta_Cdi,
+        rel=1e-3,
+    )
+
+    # om.n2(problem)

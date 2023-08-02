@@ -4,3 +4,4 @@
 
 from .components.sizing_generator import SizingGenerator
 from .components.perf_generator import PerformancesGenerator
+from .components.slipstream_generator import SlipstreamGenerator

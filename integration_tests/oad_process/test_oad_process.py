@@ -21,10 +21,12 @@ def cleanup():
     rmtree("D:/tmp", ignore_errors=True)
 
 
-def test_pipistrel_like():
+def test_pipistrel_like(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     # Define used files depending on options
     xml_file_name = "full_sizing.xml"
@@ -53,10 +55,12 @@ def test_pipistrel_like():
     )
 
 
-def test_fuel_and_battery():
+def test_fuel_and_battery(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     # Define used files depending on options
     xml_file_name = "full_sizing_fuel_and_battery.xml"
@@ -96,6 +100,8 @@ def test_sizing_sr22(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     # Define used files depending on options
     xml_file_name = "input_sr22.xml"
@@ -130,10 +136,12 @@ def test_sizing_sr22(cleanup):
     )
 
 
-def test_sizing_fuel_and_battery_share():
+def test_sizing_fuel_and_battery_share(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     # Define used files depending on options
     xml_file_name = "full_sizing_fuel_and_battery_share.xml"
@@ -163,9 +171,9 @@ def test_sizing_fuel_and_battery_share():
     problem.write_outputs()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(23.36, abs=1e-2)
+    assert sizing_fuel == pytest.approx(23.38, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(32.407, abs=1e-2)
+    assert sizing_energy == pytest.approx(32.320, abs=1e-2)
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        817.96, rel=1e-2
+        817.27, rel=1e-2
     )

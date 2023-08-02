@@ -97,6 +97,18 @@ class FASTGAHEPowerTrainConfigurator:
         # modules for the code to work
         self._components_promotes = None
 
+        # Contains the list of aircraft inputs that are necessary to promote in the slipstream
+        # modules for the code to work
+        self._components_slipstream_promotes = None
+
+        # Contains a list with, for each component, a boolean telling whether or not the component
+        # needs the flaps position for the computation of the slipstream effects
+        self._components_slipstream_flaps = None
+
+        # Contains a list with, for each component, a boolean telling whether or not the component
+        # lift increase is added to the wing. Will be used for the increase in induced drag
+        self._components_slipstream_wing_lift = None
+
         # Contains a basic list of the connections in the power train, with no processing whatsoever
         self._connection_list = None
 
@@ -111,6 +123,11 @@ class FASTGAHEPowerTrainConfigurator:
         # Contains a list, for each component, of all the variables that will be monitored in the
         # performances watcher of the power train, meaning this should be a list of list
         self._components_perf_watchers = None
+
+        # Contains a list, for each component, of all the variables in the slipstream computation
+        # that will be monitored in the performances watcher of the power train, meaning this
+        # should be a list of list
+        self._components_slipstream_perf_watchers = None
 
         # Because of their very peculiar role, we will scan the architecture for any SSPC defined
         # by the user and whether or not they are at the output of a bus, because a specific
@@ -168,6 +185,15 @@ class FASTGAHEPowerTrainConfigurator:
 
     def _get_components(self):
 
+        # We will work under the assumption that is one list is empty, all are hence only one if
+        # statement. This allows us to know whether or not retriggering the identification of
+        # components is necessary
+
+        if self._components_id is None:
+            self._generate_components_list()
+
+    def _generate_components_list(self):
+
         components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
 
         components_id = []
@@ -178,8 +204,12 @@ class FASTGAHEPowerTrainConfigurator:
         components_om_type_list = []
         components_options_list = []
         components_promote_list = []
+        components_slip_promote_list = []
         components_type_class_list = []
         components_perf_watchers_list = []
+        components_slipstream_perf_watchers_list = []
+        components_slipstream_needs_flaps = []
+        components_slipstream_wing_lift = []
 
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
@@ -216,8 +246,12 @@ class FASTGAHEPowerTrainConfigurator:
             components_type_list.append(resources.DICTIONARY_CT[component_id])
             components_om_type_list.append(resources.DICTIONARY_CN[component_id])
             components_promote_list.append(resources.DICTIONARY_PT[component_id])
+            components_slip_promote_list.append(resources.DICTIONARY_SPT[component_id])
             components_type_class_list.append(resources.DICTIONARY_CTC[component_id])
             components_perf_watchers_list.append(resources.DICTIONARY_MP[component_id])
+            components_slipstream_perf_watchers_list.append(resources.DICTIONARY_SMP[component_id])
+            components_slipstream_needs_flaps.append(resources.DICTIONARY_SFR[component_id])
+            components_slipstream_wing_lift.append(resources.DICTIONARY_SWL[component_id])
 
             if "options" in component.keys():
 
@@ -254,8 +288,12 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_om_type = components_om_type_list
         self._components_options = components_options_list
         self._components_promotes = components_promote_list
+        self._components_slipstream_promotes = components_slip_promote_list
         self._components_type_class = components_type_class_list
         self._components_perf_watchers = components_perf_watchers_list
+        self._components_slipstream_perf_watchers = components_slipstream_perf_watchers_list
+        self._components_slipstream_flaps = components_slipstream_needs_flaps
+        self._components_slipstream_wing_lift = components_slipstream_wing_lift
 
     def _get_connections(self):
         """
@@ -537,6 +575,24 @@ class FASTGAHEPowerTrainConfigurator:
             self._sspc_default_state,
         )
 
+    def get_slipstream_element_lists(self) -> tuple:
+        """
+        Returns the list of parameters necessary to create the slipstream group based on what is
+        inside the power train file.
+        """
+
+        self._get_components()
+
+        return (
+            self._components_name,
+            self._components_name_id,
+            self._components_type,
+            self._components_om_type,
+            self._components_slipstream_promotes,
+            self._components_slipstream_flaps,
+            self._components_slipstream_wing_lift,
+        )
+
     @staticmethod
     def enforce_sspc_last(
         components_name: list,
@@ -766,6 +822,32 @@ class FASTGAHEPowerTrainConfigurator:
             components_name_organised_list,
             components_perf_watchers_name_organised_list,
             components_perf_watchers_unit_organised_list,
+        )
+
+    def get_slipstream_performance_watcher_elements_list(self) -> tuple:
+        """
+        Returns the list of OpenMDAO variables used in the computation of the slipstream effects
+        that are to be registered by the performances watcher.
+        """
+
+        self._get_components()
+        components_slip_perf_watchers_name_organised_list = []
+        components_slip_perf_watchers_unit_organised_list = []
+        components_slip_name_organised_list = []
+
+        for component_name, components_slip_perf_watchers in zip(
+            self._components_name, self._components_slipstream_perf_watchers
+        ):
+            for components_perf_watcher in components_slip_perf_watchers:
+                key, value = list(components_perf_watcher.items())[0]
+                components_slip_name_organised_list.append(component_name)
+                components_slip_perf_watchers_name_organised_list.append(key)
+                components_slip_perf_watchers_unit_organised_list.append(value)
+
+        return (
+            components_slip_name_organised_list,
+            components_slip_perf_watchers_name_organised_list,
+            components_slip_perf_watchers_unit_organised_list,
         )
 
     def get_graphs_connected_voltage(self) -> list:

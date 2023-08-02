@@ -4,3 +4,4 @@
 
 from .components.sizing_battery_pack import SizingBatteryPack
 from .components.perf_battery_pack import PerformancesBatteryPack
+from .components.slipstream_battery_pack import SlipstreamBatteryPack

@@ -31,12 +31,14 @@ class PerformancesBatteryPack(om.Group):
         super().__init__(**kwargs)
 
         # Solvers setup
-        self.nonlinear_solver = om.NonlinearBlockGS()
+        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
         self.nonlinear_solver.options["iprint"] = 0
         self.nonlinear_solver.options["maxiter"] = 200
         self.nonlinear_solver.options["rtol"] = 1e-5
         self.nonlinear_solver.options["atol"] = 1e-5
-        self.linear_solver = om.LinearBlockGS()
+        self.nonlinear_solver.options["stall_limit"] = 20
+        self.nonlinear_solver.options["stall_tol"] = 1e-5
+        self.linear_solver = om.DirectSolver()
 
     def initialize(self):
 

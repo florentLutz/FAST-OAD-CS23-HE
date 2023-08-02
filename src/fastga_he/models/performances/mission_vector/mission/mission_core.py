@@ -8,7 +8,6 @@ import openmdao.api as om
 import fastoad.api as oad
 
 from ..constants import HE_SUBMODEL_EQUILIBRIUM
-from ..mission.compute_time_step import ComputeTimeStep
 from ..mission.performance_per_phase import PerformancePerPhase
 from ..mission.sizing_energy import SizingEnergy
 from ..mission.thrust_taxi import ThrustTaxi
@@ -79,17 +78,8 @@ class MissionCore(om.Group):
             ThrustTaxi(),
             promotes=["*"],
         )
-        self.add_subsystem(
-            "compute_time_step",
-            ComputeTimeStep(number_of_points=number_of_points),
-            promotes_inputs=[],
-            promotes_outputs=["time_step"],
-        )
         options_equilibrium = {
-            "number_of_points_climb": number_of_points_climb,
-            "number_of_points_cruise": number_of_points_cruise,
-            "number_of_points_descent": number_of_points_descent,
-            "number_of_points_reserve": number_of_points_reserve,
+            "number_of_points": number_of_points,
             "propulsion_id": self.options["propulsion_id"],
             "power_train_file_path": self.options["power_train_file_path"],
             "use_linesearch": self.options["use_linesearch"],

@@ -1,0 +1,13 @@
+title: Sample power train file for verification purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+
+component_connections:
+  - source: propeller_1
+    target: motor_1
+
+watcher_file_path:

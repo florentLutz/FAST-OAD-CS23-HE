@@ -247,7 +247,7 @@ class EquilibriumThrust(om.ImplicitComponent):
             + delta_cd_flaps
             + coeff_k_wing * cl_wing_flaps ** 2.0
             + coeff_k_htp * cl_htp ** 2.0
-            + (cd_delta_m * delta_m ** 2.0)
+            + cd_delta_m * delta_m ** 2.0
         )
 
         residuals["thrust"] = (

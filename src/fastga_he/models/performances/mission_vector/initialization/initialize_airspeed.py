@@ -264,16 +264,24 @@ class InitializeAirspeed(om.ExplicitComponent):
             number_of_points_descent,
         ).astype(int)
 
-        partials["true_airspeed", "data:TLAR:v_cruise"] = np.put(
-            np.zeros(number_of_points), cruise_idx, np.ones_like(cruise_idx)
-        )
-        partials["true_airspeed", "data:mission:sizing:main_route:reserve:v_tas"] = np.put(
-            np.zeros(number_of_points), reserve_idx, np.ones_like(reserve_idx)
-        )
+        partials_tas_v_cruise = np.zeros(number_of_points)
+        np.put(partials_tas_v_cruise, cruise_idx, np.ones_like(cruise_idx))
+        partials["true_airspeed", "data:TLAR:v_cruise"] = partials_tas_v_cruise
 
-        partials["equivalent_airspeed", "data:mission:sizing:main_route:climb:v_eas"] = np.put(
-            np.zeros(number_of_points), climb_idx, np.ones_like(climb_idx)
-        )
-        partials["equivalent_airspeed", "data:mission:sizing:main_route:descent:v_eas"] = np.put(
-            np.zeros(number_of_points), descent_idx, np.ones_like(descent_idx)
-        )
+        partials_tas_v_reserve = np.zeros(number_of_points)
+        np.put(partials_tas_v_reserve, reserve_idx, np.ones_like(reserve_idx))
+        partials[
+            "true_airspeed", "data:mission:sizing:main_route:reserve:v_tas"
+        ] = partials_tas_v_reserve
+
+        partials_eas_v_climb = np.zeros(number_of_points)
+        np.put(partials_eas_v_climb, climb_idx, np.ones_like(climb_idx))
+        partials[
+            "equivalent_airspeed", "data:mission:sizing:main_route:climb:v_eas"
+        ] = partials_eas_v_climb
+
+        partials_eas_v_descent = np.zeros(number_of_points)
+        np.put(partials_eas_v_descent, descent_idx, np.ones_like(descent_idx))
+        partials[
+            "equivalent_airspeed", "data:mission:sizing:main_route:descent:v_eas"
+        ] = partials_eas_v_descent

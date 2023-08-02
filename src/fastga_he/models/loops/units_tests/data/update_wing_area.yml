@@ -1,0 +1,21 @@
+title: Sample OAD Process
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders: D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he
+
+# Input and output files
+input_file: ../results/oad_process_inputs.xml
+output_file: ../results/oad_process_outputs.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+model:
+  update_wing_area:
+    id: fastga_he.loop.wing_area
+    propulsion_id: ""
+    power_train_file_path: simple_assembly.yml
+
+submodels:
+  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
+  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file

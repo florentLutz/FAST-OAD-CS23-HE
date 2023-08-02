@@ -4,3 +4,4 @@
 
 from .components.sizing_ice import SizingICE
 from .components.perf_ice import PerformancesICE
+from .components.slipstream_ice import SlipstreamICE

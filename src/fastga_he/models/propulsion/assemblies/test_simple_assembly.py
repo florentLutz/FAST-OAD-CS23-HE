@@ -8,11 +8,14 @@ import numpy as np
 import pytest
 
 import fastoad.api as oad
+import openmdao.api as om
 from stdatm import Atmosphere
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
 from utils.filter_residuals import filter_residuals
+
+from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 from .simple_assembly.performances_simple_assembly import PerformancesAssembly
 from .simple_assembly.sizing_simple_assembly import SizingAssembly
@@ -23,6 +26,10 @@ from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFil
 from ..assemblers.mass_from_pt_file import PowerTrainMassFromFile
 from ..assemblers.cg_from_pt_file import PowerTrainCGFromFile
 from ..assemblers.drag_from_pt_file import PowerTrainDragFromFile
+from ..assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
+from ..assemblers.delta_cl_from_pt_file import PowerTrainDeltaClFromFile
+from ..assemblers.delta_cd_from_pt_file import PowerTrainDeltaCdFromFile
+from ..assemblers.delta_cm_from_pt_file import PowerTrainDeltaCmFromFile
 
 from . import outputs
 
@@ -507,3 +514,161 @@ def test_drag_from_pt_file():
         0.000352, rel=1e-2
     )
     problem.check_partials(compact_print=True)
+
+
+def test_delta_cls_summer():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    ivc = om.IndepVarComp()
+    configurator = FASTGAHEPowerTrainConfigurator()
+    configurator.load(pt_file_path)
+
+    (
+        components_name,
+        _,
+        _,
+        _,
+        _,
+        _,
+        _,
+    ) = configurator.get_slipstream_element_lists()
+
+    for name in components_name:
+        ivc.add_output(name=name + "_delta_Cl", val=np.random.random(NB_POINTS_TEST))
+
+    problem = run_system(
+        PowerTrainDeltaClFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_delta_cds_summer():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    ivc = om.IndepVarComp()
+    configurator = FASTGAHEPowerTrainConfigurator()
+    configurator.load(pt_file_path)
+
+    (
+        components_name,
+        _,
+        _,
+        _,
+        _,
+        _,
+        _,
+    ) = configurator.get_slipstream_element_lists()
+
+    for name in components_name:
+        ivc.add_output(name=name + "_delta_Cd", val=np.random.random(NB_POINTS_TEST))
+
+    ivc.add_output(name="delta_Cdi", val=np.random.random(NB_POINTS_TEST))
+
+    problem = run_system(
+        PowerTrainDeltaCdFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_delta_cms_summer():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    ivc = om.IndepVarComp()
+    configurator = FASTGAHEPowerTrainConfigurator()
+    configurator.load(pt_file_path)
+
+    (
+        components_name,
+        _,
+        _,
+        _,
+        _,
+        _,
+        _,
+    ) = configurator.get_slipstream_element_lists()
+
+    for name in components_name:
+        ivc.add_output(name=name + "_delta_Cm", val=np.random.random(NB_POINTS_TEST))
+
+    problem = run_system(
+        PowerTrainDeltaCmFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_slipstream_from_pt_file():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            AerodynamicDeltasFromPTFile(
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("alpha", val=np.linspace(5.0, 10.0, NB_POINTS_TEST), units="deg")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        AerodynamicDeltasFromPTFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    assert problem.get_val("delta_Cl") * 1e6 == pytest.approx(
+        np.array([4097.7, 4246.4, 4382.8, 4507.5, 4621.1, 4724.3, 4817.5, 4901.4, 4976.2, 5042.6]),
+        rel=1e-3,
+    )
+    assert problem.get_val("delta_Cd") * 1e6 == pytest.approx(
+        np.array([191.86, 212.4, 233.24, 254.3, 275.49, 296.75, 318.02, 339.23, 360.32, 381.26]),
+        rel=1e-3,
+    )
+    assert problem.get_val("delta_Cm") * 1e9 == pytest.approx(
+        np.array(
+            [
+                -1683.5,
+                -1585.9,
+                -1494.6,
+                -1409.1,
+                -1328.9,
+                -1253.8,
+                -1183.3,
+                -1117.1,
+                -1054.9,
+                -996.6,
+            ]
+        ),
+        rel=1e-3,
+    )

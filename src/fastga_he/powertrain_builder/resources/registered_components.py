@@ -19,12 +19,18 @@ ATT = "attributes"
 # input/output is an openmdao input the other if the opposite
 IN = "inputs"
 OUT = "outputs"
-# The PT field contains the variables that must be promoted from aircraft level for the component
-# to work
+# The PT field contains the variables that must be promoted from aircraft level for the components
+# performances group to work
 PT = "promoted_variables"
+# The SPT field contains the variables that must be promoted from aircraft level for the components
+# slipstream group to work
+SPT = "slipstream_promoted_variables"
 # The MP field will contain the variables that will be of interest for the analysis of the
 # mission performances and that will be registered in the power train performances CSV file
 MP = "mission_performances_watcher"
+# The MP field will contain the variables that will be of interest for the analysis of the
+# slipstream effects and that will be registered in the power train performances CSV file
+SMP = "slipstream_mission_performances_watcher"
 # ICON contains the name of the icon used to represent this component when displaying the graph
 ICON = "icon_for_network_graph"
 # ICON_SIZE contains the size of th icon used to represent this component when displaying the graph
@@ -42,6 +48,13 @@ IO_INDEP_V = "input_output_voltage_independant"
 # V_TO_SET contains a list, for each type of components of their voltage caracteristic that can
 # be set
 V_TO_SET = "voltage_to_precondition"
+# SFR contains a boolean which tells whether or not this components requires the position of
+# flaps for the computation of the slipstream effects.
+SFR = "slipstream_flaps_required"
+# SWL contains a boolean which tells whether or not this components increase in lift coefficient
+# contributes to the wing lift. The reason being the computation of the induced drag need the
+# square of the increase in lift coefficient hence they must be summed beforehand
+SWL = "slipstream_contributes_to_wing_lift"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -50,6 +63,7 @@ PROPELLER = {
     CT: "propeller",
     ATT: None,
     PT: ["true_airspeed", "altitude", "density"],
+    SPT: ["data:*", "true_airspeed", "cl_wing_clean", "density", "alpha"],
     IN: [(None, "rpm"), (None, "shaft_power_in")],
     OUT: None,
     CTC: "propulsor",
@@ -64,12 +78,19 @@ PROPELLER = {
         {"thrust_coefficient": None},
         {"power_coefficient": None},
     ],
+    SMP: [
+        {"delta_Cd": None},
+        {"delta_Cl": None},
+        {"delta_Cm": None},
+    ],
     ICON: "propeller",
     ICON_SIZE: 30,
     RSD: ["thrust_coefficient", "power_coefficient"],
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    SFR: True,
+    SWL: True,
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -78,6 +99,7 @@ PMSM = {
     CT: "PMSM",
     ATT: None,
     PT: ["settings:*"],
+    SPT: [],
     IN: [
         (None, "ac_current_rms_in_one_phase"),
         (None, "ac_voltage_peak_in"),
@@ -91,12 +113,17 @@ PMSM = {
         {"ac_current_rms_in": "A"},
         {"ac_voltage_rms_in": "V"},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "e_motor",
     ICON_SIZE: 40,
     RSD: ["ac_current_rms_in", "ac_voltage_rms_in"],
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["ac_voltage_rms_in", "ac_voltage_peak_in"],
+    SFR: False,
+    SWL: False,
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -105,6 +132,7 @@ INVERTER = {
     CT: "inverter",
     ATT: None,
     PT: ["settings:*"],
+    SPT: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [
         ("ac_current_rms_out_one_phase", None),
@@ -125,12 +153,17 @@ INVERTER = {
         {"conduction_losses_IGBT": "W"},
         {"conduction_losses_diode": "W"},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "inverter",
     ICON_SIZE: 30,
     RSD: ["modulation_index", "dc_current_in"],
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    SFR: False,
+    SWL: False,
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -139,16 +172,22 @@ DC_BUS = {
     CT: "DC_bus",
     ATT: ["number_of_inputs", "number_of_outputs"],
     PT: [],
+    SPT: [],
     IN: [(None, "dc_voltage"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out_", None)],
     CTC: "connector",
     MP: [{"dc_voltage": "V"}],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "bus_bar",
     ICON_SIZE: 20,
     RSD: ["dc_voltage"],
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage"],
+    SFR: False,
+    SWL: False,
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -157,16 +196,22 @@ DC_LINE = {
     CT: "DC_cable_harness",
     ATT: None,
     PT: ["exterior_temperature", "settings:*", "time_step"],
+    SPT: [],
     IN: [("dc_voltage_in", None), (None, "dc_current")],
     OUT: [("dc_voltage_out", None), (None, "dc_current")],
     CTC: "connector",
     MP: [{"dc_current": "A"}, {"cable_temperature": "degK"}, {"conduction_losses": "W"}],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "cable",
     ICON_SIZE: 30,
     RSD: ["dc_current"],
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    SFR: False,
+    SWL: False,
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -175,6 +220,7 @@ DC_DC_CONVERTER = {
     CT: "DC_DC_converter",
     ATT: None,
     PT: [],
+    SPT: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [("dc_voltage_out", None), (None, "dc_current_out")],
     CTC: "connector",
@@ -184,12 +230,17 @@ DC_DC_CONVERTER = {
         {"dc_current_in": "A"},
         {"dc_current_out": "A"},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "dc_converter",
     ICON_SIZE: 30,
     RSD: ["dc_current_in", "dc_current_out", "duty_cycle"],
     SETS_V: True,
     IO_INDEP_V: True,
     V_TO_SET: [],  # It is a bit paradoxical but you cant set a setter's voltage :p
+    SFR: False,
+    SWL: False,
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -198,6 +249,7 @@ BATTERY_PACK = {
     CT: "battery_pack",
     ATT: None,
     PT: ["time_step"],
+    SPT: [],
     IN: None,
     OUT: [(None, "voltage_out"), ("dc_current_out", None)],
     CTC: "source",
@@ -210,12 +262,17 @@ BATTERY_PACK = {
         {"efficiency": None},
         {"relative_capacity": None},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "battery",
     ICON_SIZE: 40,
     RSD: ["voltage_out", "state_of_charge", "c_rate"],
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    SFR: False,
+    SWL: False,
 }
 DC_SSPC = {
     ID: "fastga_he.pt_component.dc_sspc",
@@ -224,6 +281,7 @@ DC_SSPC = {
     CT: "DC_SSPC",
     ATT: ["closed_by_default"],
     PT: [],
+    SPT: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [(None, "dc_voltage_out"), ("dc_current_out", None)],
     CTC: "connector",
@@ -233,12 +291,17 @@ DC_SSPC = {
         {"power_losses": "W"},
         {"dc_voltage_out": "V"},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "switch",
     ICON_SIZE: 2,
     RSD: ["dc_voltage_out", "dc_current_in"],
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage_out"],
+    SFR: False,
+    SWL: False,
 }
 DC_SPLITTER = {
     ID: "fastga_he.pt_component.dc_splitter",
@@ -247,16 +310,22 @@ DC_SPLITTER = {
     CT: "DC_splitter",
     ATT: ["splitter_mode"],
     PT: [],
+    SPT: [],
     IN: [(None, "dc_voltage_in_"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out", None)],
     CTC: "connector",
     MP: [{"dc_voltage": "V"}, {"power_split": "percent"}],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "splitter",
     ICON_SIZE: 20,
     RSD: ["power_split", "dc_voltage"],
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage", "dc_voltage_in_1", "dc_voltage_in_2"],
+    SFR: False,
+    SWL: False,
 }
 RECTIFIER = {
     ID: "fastga_he.pt_component.rectifier",
@@ -265,6 +334,7 @@ RECTIFIER = {
     CT: "rectifier",
     ATT: None,
     PT: [],
+    SPT: [],
     IN: [
         (None, "ac_current_rms_in_one_phase"),
         ("ac_voltage_rms_in", None),
@@ -278,12 +348,17 @@ RECTIFIER = {
         {"ac_current_rms_in_one_phase": "A"},
         {"dc_current_out": "A"},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "rectifier",
     ICON_SIZE: 30,
     RSD: ["dc_current_out", "modulation_index", "ac_current_rms_in_one_phase"],
     SETS_V: True,
     IO_INDEP_V: True,
     V_TO_SET: [],
+    SFR: False,
+    SWL: False,
 }
 GENERATOR = {
     ID: "fastga_he.pt_component.generator",
@@ -292,6 +367,7 @@ GENERATOR = {
     CT: "generator",
     ATT: None,
     PT: [],
+    SPT: [],
     IN: [(None, "rpm"), (None, "shaft_power_in")],
     OUT: [
         ("ac_current_rms_out_one_phase", None),
@@ -308,12 +384,17 @@ GENERATOR = {
         {"ac_voltage_rms_out": "V"},
         {"ac_voltage_peak_out": "V"},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "generator",
     ICON_SIZE: 30,
     RSD: ["shaft_power_in", "ac_voltage_rms_out", "efficiency"],
     SETS_V: True,
     IO_INDEP_V: False,
     V_TO_SET: ["ac_voltage_rms_out", "ac_voltage_peak_out"],
+    SFR: False,
+    SWL: False,
 }
 ICE = {
     ID: "fastga_he.pt_component.internal_combustion_engine",
@@ -322,6 +403,7 @@ ICE = {
     CT: "ICE",
     ATT: None,
     PT: ["time_step", "density", "settings:*"],
+    SPT: [],
     IN: None,
     OUT: [("rpm", None), ("shaft_power_out", None)],
     CTC: ["source", "propulsive_load"],
@@ -332,12 +414,17 @@ ICE = {
         {"fuel_consumption": "kg/h"},
         {"fuel_consumed_t": "kg"},
     ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
     ICON: "ice",
     ICON_SIZE: 40,
     RSD: ["fuel_consumption", "mean_effective_pressure", "torque_out"],
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    SFR: False,
+    SWL: False,
 }
 
 KNOWN_COMPONENTS = [
@@ -362,16 +449,20 @@ DICTIONARY_CN_ID = {}
 DICTIONARY_CT = {}
 DICTIONARY_ATT = {}
 DICTIONARY_PT = {}
+DICTIONARY_SPT = {}
 DICTIONARY_IN = {}
 DICTIONARY_OUT = {}
 DICTIONARY_CTC = {}
 DICTIONARY_MP = {}
+DICTIONARY_SMP = {}
 DICTIONARY_ICON = {}
 DICTIONARY_ICON_SIZE = {}
 DICTIONARY_RSD = {}
 DICTIONARY_SETS_V = {}
 DICTIONARY_IO_INDEP_V = {}
 DICTIONARY_V_TO_SET = {}
+DICTIONARY_SFR = {}
+DICTIONARY_SWL = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -380,13 +471,17 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_CT[known_component[ID]] = known_component[CT]
     DICTIONARY_ATT[known_component[ID]] = known_component[ATT]
     DICTIONARY_PT[known_component[ID]] = known_component[PT]
+    DICTIONARY_SPT[known_component[ID]] = known_component[SPT]
     DICTIONARY_IN[known_component[ID]] = known_component[IN]
     DICTIONARY_OUT[known_component[ID]] = known_component[OUT]
     DICTIONARY_CTC[known_component[ID]] = known_component[CTC]
     DICTIONARY_MP[known_component[ID]] = known_component[MP]
+    DICTIONARY_SMP[known_component[ID]] = known_component[SMP]
     DICTIONARY_ICON[known_component[ID]] = known_component[ICON]
     DICTIONARY_ICON_SIZE[known_component[ID]] = known_component[ICON_SIZE]
     DICTIONARY_RSD[known_component[ID]] = known_component[RSD]
     DICTIONARY_SETS_V[known_component[ID]] = known_component[SETS_V]
     DICTIONARY_IO_INDEP_V[known_component[ID]] = known_component[IO_INDEP_V]
     DICTIONARY_V_TO_SET[known_component[ID]] = known_component[V_TO_SET]
+    DICTIONARY_SFR[known_component[ID]] = known_component[SFR]
+    DICTIONARY_SWL[known_component[ID]] = known_component[SWL]

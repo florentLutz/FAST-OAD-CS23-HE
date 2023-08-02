@@ -4,3 +4,4 @@
 
 from .components.sizing_propeller import SizingPropeller
 from .components.perf_propeller import PerformancesPropeller
+from .components.slipstream_propeller import SlipstreamPropeller

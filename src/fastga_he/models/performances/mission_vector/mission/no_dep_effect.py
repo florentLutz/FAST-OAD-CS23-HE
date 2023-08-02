@@ -8,6 +8,10 @@ import fastoad.api as oad
 
 from ..constants import HE_SUBMODEL_DEP_EFFECT
 
+oad.RegisterSubmodel.active_models[
+    HE_SUBMODEL_DEP_EFFECT
+] = "fastga_he.submodel.performances.dep_effect.none"
+
 
 @oad.RegisterSubmodel(HE_SUBMODEL_DEP_EFFECT, "fastga_he.submodel.performances.dep_effect.none")
 class NoDEPEffect(om.ExplicitComponent):
@@ -19,6 +23,12 @@ class NoDEPEffect(om.ExplicitComponent):
 
     def initialize(self):
 
+        self.options.declare(
+            name="power_train_file_path",
+            default=None,
+            desc="Path to the file containing the description of the power",
+            allow_none=False,
+        )
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -70,7 +80,7 @@ class NoDEPEffect(om.ExplicitComponent):
         self.add_input("data:aerodynamics:wing:cruise:CM0_clean", val=np.nan)
         self.add_input("data:aerodynamics:wing:cruise:CD0", val=np.nan)
 
-        self.add_input("altitude", val=np.full(number_of_points, np.nan), units="m")
+        self.add_input("density", val=np.full(number_of_points, np.nan), units="kg/m**3")
         self.add_input("true_airspeed", val=np.full(number_of_points, np.nan), units="m/s")
 
         self.add_input("alpha", val=np.full(number_of_points, np.nan), units="deg")

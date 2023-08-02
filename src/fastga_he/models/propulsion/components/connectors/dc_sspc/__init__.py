@@ -4,3 +4,4 @@
 
 from .components.perf_dc_sspc import PerformancesDCSSPC
 from .components.sizing_dc_sspc import SizingDCSSPC
+from .components.slipstream_dc_sspc import SlipstreamDCSSPC

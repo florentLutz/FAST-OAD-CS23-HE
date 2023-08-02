@@ -19,10 +19,14 @@ from fastga_he.models.propulsion.assemblers.performances_watcher import (
     PowerTrainPerformancesWatcher,
 )
 
-from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_ENERGY_CONSUMPTION
+from fastga_he.models.performances.mission_vector.constants import (
+    HE_SUBMODEL_ENERGY_CONSUMPTION,
+    HE_SUBMODEL_DEP_EFFECT,
+)
 from fastga_he.models.propulsion.assemblers.energy_consumption_mission_vector import (
     ENERGY_CONSUMPTION_FROM_PT_FILE,
 )
+from fastga_he.models.propulsion.assemblers.delta_from_pt_file import DEP_EFFECT_FROM_PT_FILE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -173,10 +177,14 @@ class MissionVector(om.Group):
         self.connect(
             "initialization.initialize_time_and_distance.time",
             [
-                "solve_equilibrium.compute_time_step.time",
                 "solve_equilibrium.performance_per_phase.time",
                 "to_csv.time",
             ],
+        )
+
+        self.connect(
+            "initialization.initialize_time_step.time_step",
+            ["to_csv.time_step", "solve_equilibrium.time_step"],
         )
 
         self.connect(
@@ -272,8 +280,6 @@ class MissionVector(om.Group):
             ],
         )
 
-        self.connect("solve_equilibrium.time_step", "to_csv.time_step")
-
         # Add the powertrain watcher here to avoid opening and closing csv all the time. We will
         # add here a check to ensure that the module that computes the performances base on the
         # powertrain builder is used. Because if it is not used, no pt file will be provided
@@ -307,12 +313,11 @@ class MissionVector(om.Group):
                 (
                     components_name,
                     components_performances_watchers_names,
-                    components_performances_watchers_units,
+                    _,
                 ) = self.configurator.get_performance_watcher_elements_list()
 
-                for (component_name, component_performances_watcher_name,) in zip(
-                    components_name,
-                    components_performances_watchers_names,
+                for (component_name, component_performances_watcher_name) in zip(
+                    components_name, components_performances_watchers_names
                 ):
 
                     self.connect(
@@ -326,6 +331,37 @@ class MissionVector(om.Group):
                         + "_"
                         + component_performances_watcher_name,
                     )
+
+                # This is starting to become confusing: The next bit should only be executed if
+                # the right model for the computation of slipstream effect is used. BUT we want
+                # to be able to "turn off" the slipstream effects and still register results in
+                # the powertrain watcher ...
+
+                if (
+                    oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT]
+                    == DEP_EFFECT_FROM_PT_FILE
+                ):
+
+                    (
+                        components_slip_name,
+                        components_slip_performances_watchers_names,
+                        _,
+                    ) = self.configurator.get_slipstream_performance_watcher_elements_list()
+
+                    for (component_slip_name, component_slip_performances_watcher_name) in zip(
+                        components_slip_name, components_slip_performances_watchers_names
+                    ):
+                        self.connect(
+                            "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect."
+                            + component_slip_name
+                            + "."
+                            + component_slip_performances_watcher_name,
+                            "performances_watcher"
+                            + "."
+                            + component_slip_name
+                            + "_"
+                            + component_slip_performances_watcher_name,
+                        )
 
                 self.connect(
                     "solve_equilibrium.compute_dep_equilibrium.thrust_econ",

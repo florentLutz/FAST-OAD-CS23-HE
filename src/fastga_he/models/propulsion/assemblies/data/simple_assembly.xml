@@ -17,11 +17,29 @@
                   <CD0 is_input="False">0.012114342193164637<!--profile drag coefficient for fuselage in low speed conditions--></CD0>
                 </low_speed>
             </fuselage>
+            <wing>
+                <low_speed>
+                    <CL_ref is_input="False">0.9903832267850955</CL_ref>
+                    <Y_vector units="m" is_input="False">[0.11547445976593405, 0.34642337929780215, 0.5773722988296702, 1.0361325274187763, 1.7227040650651202, 2.4092756027114643, 3.0958471403578085, 3.782418678004152, 4.468990215650496, 5.1555617532968405, 5.5594273636770435, 5.6805870467911035, 5.801746729905164, 5.922906413019226, 6.044066096133287, 6.165225779247348, 6.286385462361408, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing station along the wing span at which chord_vector and Cl_vector are sampled--></Y_vector>
+                    <chord_vector units="m" is_input="False">[1.      , 0.984375, 0.96875 , 0.953125, 0.9375  , 0.921875, 0.90625 , 0.890625, 0.875   , 0.859375, 0.84375 , 0.828125, 0.8125  , 0.796875, 0.78125 , 0.765625, 0.75    , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing chord length at the station along the wing span in Y_vector--></chord_vector>
+                    <CL_vector is_input="False">[1.1017227197335075, 1.1013013453498266, 1.10038811694889, 1.098403873777725, 1.0918579844211873, 1.080610615570361, 1.0628034699038733, 1.0347815173407644, 0.9892716074062258, 0.9114284949703251, 0.8359515927452368, 0.7818631930166186, 0.7254369570766273, 0.660566179673128, 0.5814473768423762, 0.4785864136757275, 0.32879610850232355, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing at the station along the wing span in Y_vector, the total corresponding wing lift coefficient is equal to CL0_clean--></CL_vector>
+                </low_speed>
+                <cruise>
+                  <induced_drag_coefficient is_input="False">0.03568699629812989<!--coefficient to multiply by the lift coefficient squared to get wing induced drag in cruise conditions--></induced_drag_coefficient>
+                  <CD0 is_input="False">0.006225770501969716<!--profile drag coefficient for wing in cruise conditions--></CD0>
+                  <CL0_clean is_input="True">0.2501539747371489<!--wing lift coefficient at zero aircraft angle of attack in cruise conditions and with no flaps deployed--></CL0_clean>
+                  <CL_alpha units="1/rad" is_input="True">4.620008812204601<!--wing lift coefficient slope with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
+                  <CM0_clean is_input="False">-0.015672163858931134<!--wing pitching moment coefficient in cruise conditions and with no flaps deployed--></CM0_clean>
+                </cruise>
+            </wing>
         </aerodynamics>
         <geometry>
             <cabin>
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
             </cabin>
+            <flap>
+                <span_ratio>0.45</span_ratio>
+            </flap>
             <fuselage>
                 <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
                 <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
@@ -29,6 +47,7 @@
                 <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
             </fuselage>
             <wing>
+                <wet_area units="m**2" is_input="False">26.657254276457444<!--wing wet area--></wet_area>
                 <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
                 <MAC>
                   <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
@@ -426,6 +445,7 @@
                         <torque_constant units="N*m/A">1.46</torque_constant>
                         <torque_max units="N*m">150.0</torque_max>
                         <torque_rating units="N*m">150.0</torque_rating>
+                        <shaft_power_max units="kW">150.0</shaft_power_max>
                         <voltage_caliber units="V">700.0</voltage_caliber>
                         <rpm_rating units="min**-1">5000.0</rpm_rating>
                         <rpm_max units="min**-1">4500.0</rpm_max>
@@ -456,6 +476,13 @@
                         <cruise>
                             <CD0>0.0</CD0>
                         </cruise>
+                        <y_ratio>0.34</y_ratio>
+                        <flapped_ratio>1.0</flapped_ratio>
+                        <cl_clean_ref>1.0</cl_clean_ref>
+                        <wing_chord_ref>1.0</wing_chord_ref>
+                        <from_wing_AC units="m">0.5</from_wing_AC>
+                        <from_wing_LE_ratio units="m">0.1</from_wing_LE_ratio>
+                        <installation_angle units="deg">0.0</installation_angle>
                         <from_LE units="m">0.15</from_LE>
                         <mass units="kg">36.35</mass>
                         <rpm_mission>2000.0</rpm_mission>

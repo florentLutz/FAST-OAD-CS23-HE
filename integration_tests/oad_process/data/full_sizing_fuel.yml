@@ -54,7 +54,8 @@ model:
   wing_position:
     id: fastga.loop.wing_position
   wing_area:
-    id: fastga.loop.wing_area
+    id: fastga_he.loop.wing_area
+    power_train_file_path: ./fuel_propulsion.yml
 
 submodels:
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
@@ -74,6 +75,7 @@ submodels:
   submodel.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
   submodel.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
   submodel.weight.mass.system.power_system: null
+  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
 
 optimization: # This section is needed only if optimization process is run
   design_variables:

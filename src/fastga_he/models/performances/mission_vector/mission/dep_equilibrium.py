@@ -36,29 +36,14 @@ class DEPEquilibrium(om.Group):
     def initialize(self):
 
         # We have to declare them even if not used to preserve compatibility
-        self.options.declare("propulsion_id", default="", types=str)
+        self.options.declare("propulsion_id", default="", types=str, allow_none=True)
         self.options.declare(
             name="power_train_file_path",
             default="",
             desc="Path to the file containing the description of the power",
         )
         self.options.declare(
-            "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
-        )
-        self.options.declare(
-            "number_of_points_cruise",
-            default=1,
-            desc="number of equilibrium to be treated in cruise",
-        )
-        self.options.declare(
-            "number_of_points_descent",
-            default=1,
-            desc="number of equilibrium to be treated in descent",
-        )
-        self.options.declare(
-            "number_of_points_reserve",
-            default=1,
-            desc="number of equilibrium to be treated in reserve",
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
             "promotes_all_variables",
@@ -88,64 +73,47 @@ class DEPEquilibrium(om.Group):
 
     def setup(self):
 
-        number_of_points_climb = self.options["number_of_points_climb"]
-        number_of_points_cruise = self.options["number_of_points_cruise"]
-        number_of_points_descent = self.options["number_of_points_descent"]
-        number_of_points_reserve = self.options["number_of_points_reserve"]
-
-        number_of_points = (
-            number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-            + number_of_points_reserve
-        )
+        number_of_points = self.options["number_of_points"]
 
         if self.options["use_linesearch"]:
             self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
 
         if self.options["promotes_all_variables"]:
             self.add_subsystem(
-                "preparation_for_energy_consumption",
-                PrepareForEnergyConsumption(
-                    number_of_points_climb=number_of_points_climb,
-                    number_of_points_cruise=number_of_points_cruise,
-                    number_of_points_descent=number_of_points_descent,
-                    number_of_points_reserve=number_of_points_reserve,
-                ),
-                promotes_inputs=["*"],
-                promotes_outputs=["*"],
-            )
-            self.add_subsystem(
                 "compute_equilibrium_alpha",
                 EquilibriumAlpha(
                     number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
                 ),
-                promotes_inputs=["*"],
-                promotes_outputs=[],
+                promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_thrust",
                 EquilibriumThrust(
                     number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
                 ),
-                promotes_inputs=["*"],
-                promotes_outputs=[],
+                promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
                 EquilibriumDeltaM(
                     number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
                 ),
-                promotes_inputs=["*"],
-                promotes_outputs=[],
+                promotes=["*"],
             )
             options_dep = {
                 "number_of_points": number_of_points,
                 "flaps_position": self.options["flaps_position"],
+                "power_train_file_path": self.options["power_train_file_path"],
             }
             self.add_subsystem(
                 "compute_dep_effect",
                 oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
+                promotes_inputs=["*"],
+                promotes_outputs=["*"],
+            )
+            self.add_subsystem(
+                "preparation_for_energy_consumption",
+                PrepareForEnergyConsumption(number_of_points=number_of_points),
                 promotes_inputs=["*"],
                 promotes_outputs=["*"],
             )
@@ -165,16 +133,6 @@ class DEPEquilibrium(om.Group):
             )
         else:
             self.add_subsystem(
-                "preparation_for_energy_consumption",
-                PrepareForEnergyConsumption(
-                    number_of_points_climb=number_of_points_climb,
-                    number_of_points_cruise=number_of_points_cruise,
-                    number_of_points_descent=number_of_points_descent,
-                    number_of_points_reserve=number_of_points_reserve,
-                ),
-                promotes=["*"],
-            )
-            self.add_subsystem(
                 "compute_equilibrium_alpha",
                 EquilibriumAlpha(
                     number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
@@ -198,12 +156,18 @@ class DEPEquilibrium(om.Group):
             options_dep = {
                 "number_of_points": number_of_points,
                 "flaps_position": self.options["flaps_position"],
+                "power_train_file_path": self.options["power_train_file_path"],
             }
             self.add_subsystem(
                 "compute_dep_effect",
                 oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
-                promotes_inputs=["data:*", "alpha", "thrust", "altitude", "true_airspeed"],
+                promotes_inputs=["data:*", "alpha", "thrust", "density", "true_airspeed"],
                 promotes_outputs=["delta_Cl", "delta_Cd", "delta_Cm"],
+            )
+            self.add_subsystem(
+                "preparation_for_energy_consumption",
+                PrepareForEnergyConsumption(number_of_points=number_of_points),
+                promotes=["*"],
             )
             options_propulsion = {
                 "number_of_points": number_of_points,

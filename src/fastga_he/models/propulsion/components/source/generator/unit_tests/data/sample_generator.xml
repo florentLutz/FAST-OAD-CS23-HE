@@ -31,6 +31,7 @@
                         <rpm_rating units="min**-1">2500.0</rpm_rating>
                         <voltage_caliber units="V">400.0</voltage_caliber>
                         <voltage_ac_max units="V">400.0</voltage_ac_max>
+                        <shaft_power_max units="kW">91.1</shaft_power_max>
                         <loss_coefficient>
                             <alpha units="W/N**2/m**2">0.025</alpha>
                             <beta units="W*s/rad">3.38</beta>
