@@ -31,6 +31,7 @@ from ..components.perf_temperature_derivative import PerformancesTemperatureDeri
 from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
 from ..components.perf_temperature_from_increase import PerformancesTemperatureFromIncrease
 from ..components.perf_temperature import PerformancesTemperature
+from ..components.perf_temperature_constant import PerformancesTemperatureConstant
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_resistance_no_loop import PerformancesResistanceNoLoop
 from ..components.perf_maximum import PerformancesMaximum
@@ -604,6 +605,46 @@ def test_perf_temperature_profile_steady_state():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_cable_temperature_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable_temperature_mission",
+        val=275.0,
+        units="degK",
+    )
+
+    problem = run_system(
+        PerformancesTemperatureConstant(harness_id="harness_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("cable_temperature", units="degK") == pytest.approx(
+        np.full(NB_POINTS_TEST, 275.0), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable_temperature_mission",
+        val=[275.0, 276.0, 278.0, 279.0, 300.0, 301.0, 300.0, 245.0, 249.0, 260.0],
+        units="degK",
+    )
+
+    problem3 = run_system(
+        PerformancesTemperatureConstant(harness_id="harness_1", number_of_points=NB_POINTS_TEST),
+        ivc3,
+    )
+
+    assert problem3.get_val("cable_temperature", units="degK") == pytest.approx(
+        np.array([275.0, 276.0, 278.0, 279.0, 300.0, 301.0, 300.0, 245.0, 249.0, 260.0]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
 
 
 def test_resistance_profile():

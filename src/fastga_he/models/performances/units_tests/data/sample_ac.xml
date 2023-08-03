@@ -439,6 +439,7 @@
             <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
             <number_cables is_input="True">1.0</number_cables>
             <temperature_max units="degK" is_input="False">291.08095668732506</temperature_max>
+            <cable_temperature_mission units="degK" is_input="False">283.15</cable_temperature_mission>
             <voltage_caliber units="V" is_input="False">500.0</voltage_caliber>
             <voltage_max units="V" is_input="False">500.0</voltage_max>
             <CG>
