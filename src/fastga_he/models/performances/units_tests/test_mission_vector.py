@@ -1323,11 +1323,14 @@ def test_mission_vector_from_yml():
     assert mission_end_soc == pytest.approx(0.0546, abs=1e-2)
 
 
-def test_mission_vector_from_yml_constant_cable_temp():
+def test_mission_vector_from_yml_simplified_models():
 
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.performances.dc_line.temperature_profile"
     ] = "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.constant"
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.dc_dc_converter.efficiency"
+    ] = "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.fixed"
 
     # Define used files depending on options
     xml_file_name = "sample_ac.xml"
@@ -1358,11 +1361,11 @@ def test_mission_vector_from_yml_constant_cable_temp():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(150.01, abs=1e-2)
+    assert sizing_energy == pytest.approx(150.52, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.0546, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.036, abs=1e-2)
 
 
 def test_mission_vector_from_yml_fuel():

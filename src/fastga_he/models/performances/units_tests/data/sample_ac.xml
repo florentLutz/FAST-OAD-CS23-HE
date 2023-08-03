@@ -225,6 +225,7 @@
         </DC_SSPC>
         <DC_DC_converter>
           <dc_dc_converter_1>
+            <efficiency_mission>0.97</efficiency_mission>
             <current_in_caliber units="A" is_input="False">857.1338875860579</current_in_caliber>
             <current_in_max units="A" is_input="False">861.2621260856213</current_in_max>
             <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
@@ -325,6 +326,7 @@
             </scaling>
           </dc_dc_converter_1>
           <dc_dc_converter_2>
+            <efficiency_mission>0.97</efficiency_mission>
             <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <power_density units="W/kg" is_input="True">4000.0<!--Power density of the converter--></power_density>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>

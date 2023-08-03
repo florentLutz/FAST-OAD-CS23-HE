@@ -4,6 +4,8 @@
 
 import openmdao.api as om
 
+import fastoad.api as oad
+
 from .perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from .perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from .perf_converter_relations import PerformancesConverterRelations
@@ -16,6 +18,8 @@ from .perf_conduction_losses import PerformancesConductionLosses
 from .perf_total_losses import PerformancesLosses
 from .perf_efficiency import PerformancesEfficiency
 from .perf_maximum import PerformancesMaximum
+
+from ..constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
 
 
 class PerformancesDCDCConverter(om.Group):
@@ -87,9 +91,15 @@ class PerformancesDCDCConverter(om.Group):
             PerformancesLosses(number_of_points=number_of_points),
             promotes=["*"],
         )
+        option_efficiency = {
+            "number_of_points": number_of_points,
+            "dc_dc_converter_id": dc_dc_converter_id,
+        }
         self.add_subsystem(
             "efficiency",
-            PerformancesEfficiency(number_of_points=number_of_points),
+            oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_DC_DC_CONVERTER_EFFICIENCY, options=option_efficiency
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
