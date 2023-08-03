@@ -16,7 +16,9 @@ from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_total_loss import PerformancesLosses
 from ..components.perf_casing_temperature import PerformancesCasingTemperature
 from ..components.perf_junction_temperature import PerformancesJunctionTemperature
+from ..components.perf_junction_temperature_fixed import PerformancesJunctionTemperatureMission
 from ..components.perf_efficiency import PerformancesEfficiency
+from ..components.perf_efficiency_fixed import PerformancesEfficiencyMission
 from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.sizing_energy_coefficient_scaling import SizingRectifierEnergyCoefficientScaling
@@ -490,6 +492,57 @@ def test_perf_junction_temperature():
     problem.check_partials(compact_print=True)
 
 
+def test_perf_junction_temperature_constant():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:junction_temperature_mission",
+        val=288.15,
+        units="degK",
+    )
+
+    problem = run_system(
+        PerformancesJunctionTemperatureMission(
+            rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("diode_temperature", units="degK") == pytest.approx(
+        np.full(NB_POINTS_TEST, 288.15), rel=1e-2
+    )
+    assert problem.get_val("IGBT_temperature", units="degK") == pytest.approx(
+        np.full(NB_POINTS_TEST, 288.15), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:junction_temperature_mission",
+        val=[288.15, 298.15, 308.15, 318.15, 328.15, 338.15, 348.15, 358.15, 368.15, 378.15],
+        units="degK",
+    )
+
+    problem3 = run_system(
+        PerformancesJunctionTemperatureMission(
+            rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc3,
+    )
+
+    assert problem3.get_val("diode_temperature", units="degK") == pytest.approx(
+        np.array([288.15, 298.15, 308.15, 318.15, 328.15, 338.15, 348.15, 358.15, 368.15, 378.15]),
+        rel=1e-2,
+    )
+    assert problem3.get_val("IGBT_temperature", units="degK") == pytest.approx(
+        np.array([288.15, 298.15, 308.15, 318.15, 328.15, 338.15, 348.15, 358.15, 368.15, 378.15]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
+
+
 def test_efficiency():
     # Will eventually disappear
 
@@ -515,6 +568,42 @@ def test_efficiency():
     assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_efficiency_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:efficiency_mission",
+        val=0.98,
+    )
+
+    problem = run_system(
+        PerformancesEfficiencyMission(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("efficiency") == pytest.approx(np.full(NB_POINTS_TEST, 0.98), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:efficiency_mission",
+        val=[0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.91, 0.9],
+    )
+
+    problem3 = run_system(
+        PerformancesEfficiencyMission(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
+        ivc3,
+    )
+
+    assert problem3.get_val("efficiency") == pytest.approx(
+        np.array([0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.91, 0.9]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
 
 
 def test_maximum():
@@ -1199,4 +1288,4 @@ def test_performances_rectifier():
         PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    om.n2(problem, show_browser=False)
+    om.n2(problem, show_browser=True)

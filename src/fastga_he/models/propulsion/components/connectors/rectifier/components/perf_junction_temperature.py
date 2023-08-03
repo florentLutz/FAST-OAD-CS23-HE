@@ -5,7 +5,19 @@
 import openmdao.api as om
 import numpy as np
 
+import fastoad.api as oad
 
+from ..constants import SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE
+
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE
+] = "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE,
+    "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses",
+)
 class PerformancesJunctionTemperature(om.ExplicitComponent):
     """
     Computation of the junction temperature in the diode and igbt module based on the losses on

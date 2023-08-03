@@ -847,6 +847,8 @@
         </ICE>
         <rectifier>
             <rectifier_1>
+              <junction_temperature_mission units="degK">288.15</junction_temperature_mission>
+              <efficiency_mission>0.95</efficiency_mission>
                 <capacitor>
                   <aspect_ratio is_input="False">2.0<!--Mass of the capacitor--></aspect_ratio>
                 </capacitor>

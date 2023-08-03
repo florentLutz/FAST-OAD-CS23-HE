@@ -5,7 +5,18 @@
 import numpy as np
 import openmdao.api as om
 
+import fastoad.api as oad
 
+from ..constants import SUBMODEL_RECTIFIER_EFFICIENCY
+
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_RECTIFIER_EFFICIENCY
+] = "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_RECTIFIER_EFFICIENCY, "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
+)
 class PerformancesEfficiency(om.ExplicitComponent):
     """Computation of the efficiency of the rectifier."""
 
@@ -13,6 +24,12 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            name="rectifier_id",
+            default=None,
+            desc="Identifier of the rectifier",
+            allow_none=False,
         )
 
     def setup(self):
