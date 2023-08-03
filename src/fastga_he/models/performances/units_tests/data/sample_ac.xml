@@ -580,6 +580,8 @@
         </battery_pack>
         <inverter>
           <inverter_1>
+            <junction_temperature_mission units="degK">288.15</junction_temperature_mission>
+            <efficiency_mission>0.95</efficiency_mission>
             <current_ac_max units="A" is_input="False">1104.0708332817255<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">953.2636562296287<!--Current caliber of one arm of the inverter--></current_caliber>
             <current_dc_max units="A" is_input="False">636.6645016040591<!--Maximum value of the current at the input of the inverter--></current_dc_max>

@@ -7,4 +7,7 @@ SUBMODEL_CONSTRAINTS_INVERTER_VOLTAGE = "submodel.propulsion.constraints.inverte
 SUBMODEL_CONSTRAINTS_INVERTER_LOSSES = "submodel.propulsion.constraints.inverter.losses"
 SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY = "submodel.propulsion.constraints.inverter.frequency"
 
+SUBMODEL_INVERTER_JUNCTION_TEMPERATURE = "submodel.propulsion.inverter.junction_temperature"
+SUBMODEL_INVERTER_EFFICIENCY = "submodel.propulsion.inverter.efficiency"
+
 POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]
