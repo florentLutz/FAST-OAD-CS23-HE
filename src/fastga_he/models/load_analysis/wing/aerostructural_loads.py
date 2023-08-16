@@ -140,6 +140,48 @@ class AerostructuralLoadHE(om.ExplicitComponent):
 
         self.add_input("settings:geometry:fuel_tanks:depth", val=np.nan)
 
+        # Here we add all the inputs necessary for the addition of the distributed mass other
+        # than the fuel (batteries for instance), this input will later be an output of the
+        # powertrain sizing but their default value will be set at 0 so that it is used the same
+        # way as before even when not using the pt file. Note that setting the inputs like that
+        # imposes that they are provided as inputs somewhere else as it cannot take default value
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:y_ratio_start",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the starting positions of all distributed mass on the wing",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:y_ratio_end",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the end positions of all distributed mass on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:start_chord",
+            shape_by_conn=True,
+            val=0.0,
+            units="m",
+            desc="Array containing the value of the wing chord at the beginning of the distributed mass",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:chord_slope",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the value of the chord slope for the distributed mass. Mass is assumed to vary with chord only (not thickness)",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:mass",
+            shape_by_conn=True,
+            val=0.0,
+            units="kg",
+            desc="Array containing the value of masses that are distributed on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+
         self.add_output("data:loads:max_shear:mass", units="kg")
         self.add_output("data:loads:max_shear:load_factor")
         self.add_output("data:loads:max_shear:lift_shear", units="N", shape=SPAN_MESH_POINT_LOADS)
@@ -413,7 +455,9 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         return lift_chord
 
     @staticmethod
-    def compute_relief_force(inputs, y_vector, chord_vector, wing_mass, fuel_mass, point_mass=True):
+    def compute_relief_force(
+        inputs, y_vector, chord_vector, wing_mass, fuel_mass, point_mass=True, distributed_mass=True
+    ):
         """
         Function that computes the baseline weight distribution and modify the y_vector to
         account for point masses. We chose to represent point masses as linear masses on finite
@@ -427,6 +471,8 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         @param fuel_mass: a float containing the mass of the fuel
         @param point_mass: a boolean, if it's FALSE all point mass will be equal to zero used in the
         post-processing
+        @param distributed_mass: a boolean, if it's FALSE all distributed mass except fuel will be
+        equal to zero used in the post-processing
         @return: y_vector an array containing the position of the wing span at which the wing mass
         are sampled
         @return: weight_array an array containing linear masses of all structural components on the
@@ -481,14 +527,23 @@ class AerostructuralLoadHE(om.ExplicitComponent):
                     y_vector, chord_vector, point_mass_array, y_eng, single_engine_mass, inputs
                 )
 
-        if len(y_ratio_punctual_mass) > 1 or (
-            len(y_ratio_punctual_mass) == 1 and punctual_mass_array != 0
-        ):
-            for y_ratio_punctual, punctual_mass in zip(y_ratio_punctual_mass, punctual_mass_array):
-                y_punctual_mass = y_ratio_punctual * semi_span
-                y_vector, chord_vector, point_mass_array = AerostructuralLoadHE.add_point_mass(
-                    y_vector, chord_vector, point_mass_array, y_punctual_mass, punctual_mass, inputs
-                )
+        # Only adding point masses when we really want them
+        if point_mass:
+            if len(y_ratio_punctual_mass) > 1 or (
+                len(y_ratio_punctual_mass) == 1 and punctual_mass_array != 0
+            ):
+                for y_ratio_punctual, punctual_mass in zip(
+                    y_ratio_punctual_mass, punctual_mass_array
+                ):
+                    y_punctual_mass = y_ratio_punctual * semi_span
+                    y_vector, chord_vector, point_mass_array = AerostructuralLoadHE.add_point_mass(
+                        y_vector,
+                        chord_vector,
+                        point_mass_array,
+                        y_punctual_mass,
+                        punctual_mass,
+                        inputs,
+                    )
 
         # Adding the LG weight
         y_vector, chord_vector, point_mass_array = AerostructuralLoadHE.add_point_mass(
@@ -513,6 +568,28 @@ class AerostructuralLoadHE(om.ExplicitComponent):
 
         fuel_weight_distribution = tank_volume_distribution(inputs, y_vector)
 
+        # Here starts the part where we add all the distributed mass from the powertrain (mainly
+        # batteries)
+        y_ratios_start = inputs["data:weight:airframe:wing:distributed_mass:y_ratio_start"]
+        y_ratios_end = inputs["data:weight:airframe:wing:distributed_mass:y_ratio_end"]
+        chords_start = inputs["data:weight:airframe:wing:distributed_mass:start_chord"]
+        chord_slopes = inputs["data:weight:airframe:wing:distributed_mass:chord_slope"]
+        masses = inputs["data:weight:airframe:wing:distributed_mass:mass"]
+
+        distributed_mass_array = np.zeros_like(y_vector)
+
+        if distributed_mass:
+            for y_ratio_start, y_ratio_end, chord_start, chord_slope, mass in zip(
+                y_ratios_start, y_ratios_end, chords_start, chord_slopes, masses
+            ):
+                # If mass is nil, then do nothing
+                if mass != 0:
+                    y_start = y_ratio_start * semi_span
+                    y_end = y_ratio_end * semi_span
+                    distributed_mass_array += AerostructuralLoadHE.distributed_mass_distribution(
+                        y_start, y_end, chord_start, chord_slope, mass, y_vector
+                    )
+
         readjust_fuel = trapz(fuel_weight_distribution, y_vector)
 
         # We readjust to make sure that the integration of the mass distribution gives the actual
@@ -521,7 +598,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         fuel_mass_array = fuel_mass * fuel_weight_distribution / (2.0 * readjust_fuel)
 
         # STEP 4/XX - WE CAN NOW ADD ALL THE MASS TOGETHER AND RETURN ALL VALUES
-        mass_array = wing_mass_array + fuel_mass_array + point_mass_array
+        mass_array = wing_mass_array + fuel_mass_array + point_mass_array + distributed_mass_array
         weight_array = -mass_array * g
 
         return y_vector, weight_array
@@ -659,3 +736,36 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         chord_vector_new = chord_vector
 
         return y_vector_new, chord_vector_new, point_mass_array_new
+
+    @staticmethod
+    def distributed_mass_distribution(y_start, y_end, chord_start, chord_slope, mass, y_array_orig):
+        """
+        Computes the value of the linear weight at each point of the y vector to represent the
+        component as a distributed mass. This method ensure that integrating the resulting array
+        on the original vector, gives the actual mass value. This method assumes the height of
+        the distributed mass is constant though its chord can vary.
+
+        :param y_start: span at which the distributed mass starts
+        :param y_end: span at which the distributed mass ends
+        :param chord_start: chord occupied by the distributed mass
+        :param chord_slope: chord slope along the width of the distributed mass, assumed linear
+        :param mass: mass of the distributed mass
+        :param y_array_orig: the original y_vector
+        """
+
+        # Create the array which will contain the tank cross section area at each section
+        y_array = y_array_orig.flatten()
+
+        y_in_index = np.where((y_array >= y_start) & (y_array <= y_end))[0]
+        y_in_array = y_array[y_in_index]
+
+        chord_in_array = chord_start + y_in_array * chord_slope
+        chord_array = np.zeros_like(y_array)
+
+        chord_array[y_in_index] = chord_in_array
+
+        prop_coeff = mass / trapz(chord_array, y_array_orig)
+
+        linear_mass_array = prop_coeff * chord_array
+
+        return linear_mass_array

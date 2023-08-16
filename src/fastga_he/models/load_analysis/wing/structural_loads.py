@@ -102,6 +102,48 @@ class StructuralLoadsHE(om.ExplicitComponent):
 
         self.add_input("settings:geometry:fuel_tanks:depth", val=np.nan)
 
+        # Here we add all the inputs necessary for the addition of the distributed mass other
+        # than the fuel (batteries for instance), this input will later be an output of the
+        # powertrain sizing but their default value will be set at 0 so that it is used the same
+        # way as before even when not using the pt file. Note that setting the inputs like that
+        # imposes that they are provided as inputs somewhere else as it cannot take default value
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:y_ratio_start",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the starting positions of all distributed mass on the wing",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:y_ratio_end",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the end positions of all distributed mass on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:start_chord",
+            shape_by_conn=True,
+            val=0.0,
+            units="m",
+            desc="Array containing the value of the wing chord at the beginning of the distributed mass",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:chord_slope",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the value of the chord slope for the distributed mass. Mass is assumed to vary with chord only (not thickness)",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:mass",
+            shape_by_conn=True,
+            val=0.0,
+            units="kg",
+            desc="Array containing the value of masses that are distributed on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+
         self.add_output(
             "data:loads:structure:ultimate:force_distribution:wing",
             units="N/m",
@@ -117,6 +159,11 @@ class StructuralLoadsHE(om.ExplicitComponent):
             units="N/m",
             shape=SPAN_MESH_POINT_LOADS,
         )
+        self.add_output(
+            "data:loads:structure:ultimate:force_distribution:distributed_mass",
+            units="N/m",
+            shape=SPAN_MESH_POINT_LOADS,
+        )
 
         self.add_output(
             "data:loads:structure:ultimate:shear:wing", units="N", shape=SPAN_MESH_POINT_LOADS
@@ -126,6 +173,11 @@ class StructuralLoadsHE(om.ExplicitComponent):
         )
         self.add_output(
             "data:loads:structure:ultimate:shear:point_mass", units="N", shape=SPAN_MESH_POINT_LOADS
+        )
+        self.add_output(
+            "data:loads:structure:ultimate:shear:distributed_mass",
+            units="N",
+            shape=SPAN_MESH_POINT_LOADS,
         )
 
         self.add_output(
@@ -140,6 +192,11 @@ class StructuralLoadsHE(om.ExplicitComponent):
         )
         self.add_output(
             "data:loads:structure:ultimate:root_bending:point_mass",
+            units="N*m",
+            shape=SPAN_MESH_POINT_LOADS,
+        )
+        self.add_output(
+            "data:loads:structure:ultimate:root_bending:distributed_mass",
             units="N*m",
             shape=SPAN_MESH_POINT_LOADS,
         )
@@ -176,29 +233,39 @@ class StructuralLoadsHE(om.ExplicitComponent):
         # THE MOST CONSTRAINING CASE IDENTIFIED IN  THE AEROSTRUCTURAL ANALYSIS
 
         y_vector, point_mass_array_orig = AerostructuralLoadHE.compute_relief_force(
-            inputs, y_vector_orig, chord_vector_orig, 0.0, 0.0
+            inputs, y_vector_orig, chord_vector_orig, 0.0, 0.0, True, False
         )
         _, wing_mass_array_orig = AerostructuralLoadHE.compute_relief_force(
-            inputs, y_vector_orig, chord_vector_orig, wing_mass, 0.0, False
+            inputs, y_vector_orig, chord_vector_orig, wing_mass, 0.0, False, False
         )
         _, fuel_mass_array_orig = AerostructuralLoadHE.compute_relief_force(
-            inputs, y_vector_orig, chord_vector_orig, 0.0, fuel_mass, False
+            inputs, y_vector_orig, chord_vector_orig, 0.0, fuel_mass, False, False
+        )
+        _, distributed_mass_array_orig = AerostructuralLoadHE.compute_relief_force(
+            inputs, y_vector_orig, chord_vector_orig, 0.0, 0.0, False, True
         )
 
         point_mass_array = max(load_factor_shear, load_factor_rbm) * point_mass_array_orig
         wing_mass_array = max(load_factor_shear, load_factor_rbm) * wing_mass_array_orig
         fuel_mass_array = max(load_factor_shear, load_factor_rbm) * fuel_mass_array_orig
+        distributed_mass_array = (
+            max(load_factor_shear, load_factor_rbm) * distributed_mass_array_orig
+        )
 
         additional_zeros = np.zeros(SPAN_MESH_POINT_LOADS - len(y_vector))
         point_mass_array_outputs = np.concatenate([point_mass_array, additional_zeros])
         wing_mass_array_outputs = np.concatenate([wing_mass_array, additional_zeros])
         fuel_mass_array_outputs = np.concatenate([fuel_mass_array, additional_zeros])
+        distributed_mass_array_outputs = np.concatenate([distributed_mass_array, additional_zeros])
 
         outputs["data:loads:structure:ultimate:force_distribution:wing"] = wing_mass_array_outputs
         outputs["data:loads:structure:ultimate:force_distribution:fuel"] = fuel_mass_array_outputs
         outputs[
             "data:loads:structure:ultimate:force_distribution:point_mass"
         ] = point_mass_array_outputs
+        outputs[
+            "data:loads:structure:ultimate:force_distribution:distributed_mass"
+        ] = distributed_mass_array_outputs
 
         point_shear_array = AerostructuralLoadHE.compute_shear_diagram(
             y_vector, load_factor_shear * point_mass_array_orig
@@ -209,6 +276,9 @@ class StructuralLoadsHE(om.ExplicitComponent):
         fuel_shear_array = AerostructuralLoadHE.compute_shear_diagram(
             y_vector, load_factor_shear * fuel_mass_array_orig
         )
+        distributed_shear_array = AerostructuralLoadHE.compute_shear_diagram(
+            y_vector, load_factor_shear * distributed_mass_array_orig
+        )
 
         # STEP 4/XX - WE ADD ZEROS AT THE END OF THE RESULT LIFT DISTRIBUTION TO FIT THE FORMAT
         # IMPOSED BY OPENMDAO
@@ -216,10 +286,12 @@ class StructuralLoadsHE(om.ExplicitComponent):
         point_shear_array = np.concatenate([point_shear_array, additional_zeros])
         wing_shear_array = np.concatenate([wing_shear_array, additional_zeros])
         fuel_shear_array = np.concatenate([fuel_shear_array, additional_zeros])
+        distributed_shear_array = np.concatenate([distributed_shear_array, additional_zeros])
 
         outputs["data:loads:structure:ultimate:shear:wing"] = wing_shear_array
         outputs["data:loads:structure:ultimate:shear:fuel"] = fuel_shear_array
         outputs["data:loads:structure:ultimate:shear:point_mass"] = point_shear_array
+        outputs["data:loads:structure:ultimate:shear:distributed_mass"] = distributed_shear_array
 
         point_root_bending_array = AerostructuralLoadHE.compute_bending_moment_diagram(
             y_vector, load_factor_rbm * point_mass_array_orig
@@ -230,6 +302,9 @@ class StructuralLoadsHE(om.ExplicitComponent):
         fuel_root_bending_array = AerostructuralLoadHE.compute_bending_moment_diagram(
             y_vector, load_factor_rbm * fuel_mass_array_orig
         )
+        distributed_root_bending_array = AerostructuralLoadHE.compute_bending_moment_diagram(
+            y_vector, load_factor_rbm * distributed_mass_array_orig
+        )
 
         # STEP 4/XX - WE ADD ZEROS AT THE END OF THE RESULT LIFT DISTRIBUTION TO FIT THE FORMAT
         # IMPOSED BY OPENMDAO
@@ -237,7 +312,13 @@ class StructuralLoadsHE(om.ExplicitComponent):
         point_root_bending_array = np.concatenate([point_root_bending_array, additional_zeros])
         wing_root_bending_array = np.concatenate([wing_root_bending_array, additional_zeros])
         fuel_root_bending_array = np.concatenate([fuel_root_bending_array, additional_zeros])
+        distributed_root_bending_array = np.concatenate(
+            [distributed_root_bending_array, additional_zeros]
+        )
 
         outputs["data:loads:structure:ultimate:root_bending:wing"] = wing_root_bending_array
         outputs["data:loads:structure:ultimate:root_bending:fuel"] = fuel_root_bending_array
         outputs["data:loads:structure:ultimate:root_bending:point_mass"] = point_root_bending_array
+        outputs[
+            "data:loads:structure:ultimate:root_bending:distributed_mass"
+        ] = distributed_root_bending_array

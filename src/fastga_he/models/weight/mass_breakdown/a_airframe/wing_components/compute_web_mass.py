@@ -113,6 +113,47 @@ class ComputeWebMass(om.ExplicitComponent):
             units="kg",
             val=0.0,
         )
+        # Here we add all the inputs necessary for the addition of the distributed mass other
+        # than the fuel (batteries for instance), this input will later be an output of the
+        # powertrain sizing but their default value will be set at 0 so that it is used the same
+        # way as before even when not using the pt file. Note that setting the inputs like that
+        # imposes that they are provided as inputs somewhere else as it cannot take default value
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:y_ratio_start",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the starting positions of all distributed mass on the wing",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:y_ratio_end",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the end positions of all distributed mass on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:start_chord",
+            shape_by_conn=True,
+            val=0.0,
+            units="m",
+            desc="Array containing the value of the wing chord at the beginning of the distributed mass",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:chord_slope",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the value of the chord slope for the distributed mass. Mass is assumed to vary with chord only (not thickness)",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:mass",
+            shape_by_conn=True,
+            val=0.0,
+            units="kg",
+            desc="Array containing the value of masses that are distributed on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
 
         self.add_input("data:mission:sizing:cs23:safety_factor", val=np.nan)
 

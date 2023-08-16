@@ -96,6 +96,13 @@
                         <mass>0.0</mass>
                         <y_ratio>0.0</y_ratio>
                     </punctual_mass>
+                    <distributed_mass>
+                        <y_ratio_start>0.15</y_ratio_start>
+                        <y_ratio_end>0.9</y_ratio_end>
+                        <start_chord units="m">1.4773522068702496</start_chord>
+                        <chord_slope>0.0</chord_slope>
+                        <mass units="kg">75.0</mass>
+                    </distributed_mass>
                 </wing>
                 <landing_gear>
                     <main>

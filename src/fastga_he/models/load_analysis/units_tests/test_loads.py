@@ -549,6 +549,12 @@ def test_compute_mass_distribution():
 
     assert np.max(np.abs(fuel_mass_result - fuel_mass_array)) <= 1e-1
 
+    distributed_mass_array = problem.get_val(
+        "data:loads:structure:ultimate:force_distribution:distributed_mass", units="N/m"
+    )
+    distributed_mass_result = np.zeros_like(distributed_mass_array)
+    assert np.max(np.abs(distributed_mass_result - distributed_mass_array)) <= 1e-1
+
 
 def test_compute_structure_shear():
     # Research independent input value in .xml file
@@ -804,6 +810,12 @@ def test_compute_structure_shear():
     )
 
     assert np.max(np.abs(fuel_mass_result - fuel_mass_array)) <= 1e-1
+
+    distributed_mass_array = problem.get_val(
+        "data:loads:structure:ultimate:shear:distributed_mass", units="N"
+    )
+    distributed_mass_result = np.zeros_like(distributed_mass_array)
+    assert np.max(np.abs(distributed_mass_result - distributed_mass_array)) <= 1e-1
 
 
 def test_compute_structure_bending():
@@ -1065,6 +1077,298 @@ def test_compute_structure_bending():
     )
 
     assert np.max(np.abs(fuel_mass_result - fuel_mass_array)) <= 1e-1
+
+    distributed_mass_array = problem.get_val(
+        "data:loads:structure:ultimate:root_bending:distributed_mass", units="N*m"
+    )
+    distributed_mass_result = np.zeros_like(distributed_mass_array)
+    assert np.max(np.abs(distributed_mass_result - distributed_mass_array)) <= 1e-1
+
+
+def test_non_nil_distributed_masses():
+    # Research independent input value in .xml file
+    input_list = list_inputs(StructuralLoadsHE())
+    input_list.remove("data:weight:airframe:wing:distributed_mass:y_ratio_start")
+    input_list.remove("data:weight:airframe:wing:distributed_mass:y_ratio_end")
+    input_list.remove("data:weight:airframe:wing:distributed_mass:start_chord")
+    input_list.remove("data:weight:airframe:wing:distributed_mass:chord_slope")
+    input_list.remove("data:weight:airframe:wing:distributed_mass:mass")
+
+    ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
+    ivc.add_output("data:loads:max_shear:load_factor", 4.0)
+    ivc.add_output("data:loads:max_rbm:load_factor", 4.0)
+
+    # We add two distributed mass, one going from 0.15 to 0.3, without slope and weighing 50 kg,
+    # and one going from 0.45 to 0.6, with a slight negative slope and weighing 30 kg
+    ivc.add_output("data:weight:airframe:wing:distributed_mass:y_ratio_start", val=[0.15, 0.45])
+    ivc.add_output("data:weight:airframe:wing:distributed_mass:y_ratio_end", val=[0.45, 0.6])
+    ivc.add_output(
+        "data:weight:airframe:wing:distributed_mass:start_chord",
+        val=[1.4541595355959134, 1.4541595355959134],
+        units="m",
+    )
+    ivc.add_output(
+        "data:weight:airframe:wing:distributed_mass:chord_slope",
+        val=[0.0, -0.1],
+    )
+    ivc.add_output("data:weight:airframe:wing:distributed_mass:mass", val=[50.0, 30.0], units="kg")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(StructuralLoadsHE(), ivc)
+
+    distributed_mass_array = problem.get_val(
+        "data:loads:structure:ultimate:force_distribution:distributed_mass", units="N/m"
+    )
+    distributed_mass_result = np.array(
+        [
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -1057.86090204,
+            -1057.86090204,
+            -1057.86090204,
+            -1057.86090204,
+            -1057.86090204,
+            -1057.86090204,
+            -1057.86090204,
+            -1057.86090204,
+            -1057.86090204,
+            -1057.86090204,
+            -1057.86090204,
+            -2354.03817813,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            -0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ]
+    )
+    assert distributed_mass_array == pytest.approx(distributed_mass_result, rel=1e-2)
+
+    distributed_mass_shear_array = problem.get_val(
+        "data:loads:structure:ultimate:shear:distributed_mass", units="N"
+    )
+    distributed_mass_shear_result = np.array(
+        [
+            -3139.2,
+            -3139.2,
+            -3139.2,
+            -3139.2,
+            -3139.2,
+            -3139.2,
+            -3139.2,
+            -3139.2,
+            -3139.2,
+            -3139.2,
+            -3139.2,
+            -3028.74112158,
+            -2499.72937256,
+            -2050.85129358,
+            -2049.79343268,
+            -2037.5162722,
+            -2025.23911173,
+            -2012.96195126,
+            -2000.68479079,
+            -1999.62692988,
+            -1970.71762354,
+            -1441.70587451,
+            -588.6,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ]
+    )
+    assert distributed_mass_shear_array == pytest.approx(distributed_mass_shear_result, rel=1e-2)
+
+    distributed_mass_bending_array = problem.get_val(
+        "data:loads:structure:ultimate:root_bending:distributed_mass", units="N*m"
+    )
+    distributed_mass_bending_result = np.array(
+        [
+            -7157.66709014,
+            -6752.54952209,
+            -5942.31438601,
+            -5132.07924992,
+            -4749.62222585,
+            -4746.48302585,
+            -4710.05057799,
+            -4673.61813014,
+            -4637.18568228,
+            -4600.75323442,
+            -4597.61403442,
+            -3942.04105605,
+            -2559.71099739,
+            -1594.24573456,
+            -1592.1954122,
+            -1568.47747487,
+            -1544.90202194,
+            -1521.4690534,
+            -1498.17856926,
+            -1496.1784134,
+            -1441.9274685,
+            -588.69046937,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ]
+    )
+    assert distributed_mass_bending_array == pytest.approx(
+        distributed_mass_bending_result, rel=1e-2
+    )
 
 
 def test_compute_lift_distribution():

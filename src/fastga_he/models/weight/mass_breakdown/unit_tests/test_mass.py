@@ -31,4 +31,4 @@ def test_compute_wing_mass_analytical():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(ComputeWingMassAnalytical(), ivc)
-    assert problem["data:weight:airframe:wing:mass"] == pytest.approx(177.99, abs=1e-2)
+    assert problem["data:weight:airframe:wing:mass"] == pytest.approx(172.0, abs=1e-2)

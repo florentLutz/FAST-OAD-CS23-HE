@@ -116,6 +116,10 @@ class AerodynamicLoadsHE(om.ExplicitComponent):
         self.add_input("data:geometry:propulsion:tank:LE_chord_percentage", val=np.nan)
         self.add_input("data:geometry:propulsion:tank:TE_chord_percentage", val=np.nan)
 
+        # These are not used as the output of the method from AerostructuralLoadsHe which
+        # requires them is not registered.
+        # TODO: make the y_vector an input and pass it instead of using the method from
+        #  AerostructuralLoadsHe
         self.add_input(
             "data:weight:airframe:wing:punctual_mass:y_ratio",
             shape_by_conn=True,
@@ -127,6 +131,42 @@ class AerodynamicLoadsHE(om.ExplicitComponent):
             copy_shape="data:weight:airframe:wing:punctual_mass:y_ratio",
             units="kg",
             val=0.0,
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:y_ratio_start",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the starting positions of all distributed mass on the wing",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:y_ratio_end",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the end positions of all distributed mass on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:start_chord",
+            shape_by_conn=True,
+            val=0.0,
+            units="m",
+            desc="Array containing the value of the wing chord at the beginning of the distributed mass",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:chord_slope",
+            shape_by_conn=True,
+            val=0.0,
+            desc="Array containing the value of the chord slope for the distributed mass. Mass is assumed to vary with chord only (not thickness)",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_mass:mass",
+            shape_by_conn=True,
+            val=0.0,
+            units="kg",
+            desc="Array containing the value of masses that are distributed on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
         )
 
         self.add_input("data:weight:propulsion:engine:mass", val=np.nan, units="kg")
