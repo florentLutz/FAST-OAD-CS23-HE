@@ -5,5 +5,143 @@
                 <mass units="kg">320.0</mass>
             </he_power_train>
         </propulsion>
+        <aerodynamics>
+            <wing>
+                <low_speed>
+                    <CL_vector is_input="False">[1.1827045237379625, 1.1808931940829142, 1.1770141732872452, 1.1692763699881141, 1.1479928452119557, 1.1192692158713313, 1.0839735203155303, 1.0416484067124405, 0.9907976398428839, 0.929186819802388, 0.8718774872234732, 0.8231443977937813, 0.7693543519665905, 0.705956909442278, 0.6273159530508378, 0.5230447022006252, 0.36637760745202075, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing at the station along the wing span in Y_vector, the total corresponding wing lift coefficient is equal to CL0_clean--></CL_vector>
+                    <Y_vector units="m" is_input="False">[0.12905121306167766, 0.38715363918503304, 0.6452560653083884, 1.02434570402847, 1.524422555345278, 2.024499406662086, 2.524576257978893, 3.0246531092957007, 3.524729960612509, 4.0248068119293166, 4.382004562869894, 4.59632321343424, 4.810641863998586, 5.024960514562932, 5.239279165127278, 5.453597815691625, 5.667916466255972, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing station along the wing span at which chord_vector and Cl_vector are sampled--></Y_vector>
+                    <chord_vector units="m" is_input="False">[1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 1.4472060622824567, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing chord length at the station along the wing span in Y_vector--></chord_vector>
+                    <CL_ref is_input="False">0.9800762733550564</CL_ref>
+                </low_speed>
+            </wing>
+            <slipstream>
+                <wing>
+                    <cruise>
+                         <only_prop>
+                           <CL_vector is_input="True">[0.0071, -0.0013, -0.0014, -0.0015, -0.0016, -0.0017, -0.0018, -0.0019, -0.0021, -0.0023, -0.0025, -0.0027, -0.0029, -0.0032, -0.004, -0.0695, -0.0038, -0.0031, -0.0028, -0.0025, -0.0022, -0.002, -0.0018, -0.0016, -0.0014, -0.0012, -0.0011, -0.0009, -0.0008, -0.0007, -0.0006, -0.0005, -0.0004, -0.0003, -0.0002, -0.0001, 0.0, 0.0002, 0.0011, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</CL_vector>
+                         </only_prop>
+                         <prop_on>
+                           <Y_vector units="m" is_input="True">[0.04278, 0.12834, 0.21389, 0.29945, 0.38501, 0.47056, 0.55612, 0.68025, 0.84345, 1.00758, 1.17252, 1.3382, 1.50449, 1.67131, 1.83856, 2.00613, 2.17391, 2.3418, 2.5097, 2.6775, 2.8451, 3.0124, 3.17928, 3.34566, 3.51142, 3.67647, 3.84071, 4.00405, 4.16638, 4.32763, 4.4877, 4.64651, 4.80397, 4.96, 5.11453, 5.26748, 5.41878, 5.56838, 5.71619, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</Y_vector>
+                           <velocity units="m/s" is_input="True">84.88333333333334</velocity>
+                         </prop_on>
+                    </cruise>
+                </wing>
+            </slipstream>
+            <aircraft>
+                <mach_interpolation>
+                    <CL_alpha_vector units="1/rad" is_input="True">[5.294593216877855, 5.318789341752116, 5.392679249322227, 5.52033773670861, 5.709162599509186, 5.970933471512065]</CL_alpha_vector>
+                    <mach_vector is_input="True">[0.0, 0.0795450917214566, 0.1590901834429132, 0.2386352751643698, 0.3181803668858264, 0.39772545860728303]</mach_vector>
+                </mach_interpolation>
+            </aircraft>
+        </aerodynamics>
+        <geometry>
+            <wing>
+                <span units="m" is_input="False">11.579326405279367<!--wing span--></span>
+                <area units="m**2" is_input="False">16.8<!--wing reference area--></area>
+                <thickness_ratio is_input="True">0.15<!--mean thickness ratio of wing--></thickness_ratio>
+                <sweep_25 units="deg" is_input="True">0.0<!--sweep angle at 25% chord of wing--></sweep_25>
+                <taper_ratio is_input="True">0.96<!--taper ratio of wing--></taper_ratio>
+                <aileron>
+                    <chord_ratio is_input="True">0.26</chord_ratio>
+                    <max_deflection units="deg" is_input="True">20.0</max_deflection>
+                    <span_ratio is_input="True">0.32</span_ratio>
+                </aileron>
+                <root>
+                    <chord units="m" is_input="False">1.4773522068702496<!--chord length at wing root--></chord>
+                    <thickness_ratio is_input="False">0.15<!--thickness ratio at wing root--></thickness_ratio>
+                    <y units="m" is_input="False">0.5989<!--Y-position of wing root--></y>
+                </root>
+                <tip>
+                    <chord units="m" is_input="False">1.4182581185954395<!--chord length at wing tip--></chord>
+                    <thickness_ratio is_input="False">0.15<!--thickness ratio at wing tip--></thickness_ratio>
+                    <y units="m" is_input="False">5.802823626795493<!--Y-position of wing tip--></y>
+                </tip>
+            </wing>
+            <fuselage>
+                <maximum_height units="m" is_input="False">1.3378<!--maximum fuselage height--></maximum_height>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum fuselage width--></maximum_width>
+            </fuselage>
+            <flap>
+                <chord_ratio is_input="True">0.1<!--mean value of (flap chord)/(section chord)--></chord_ratio>
+            </flap>
+            <landing_gear>
+                <type is_input="True">1.0<!--0=non-retractable / 1=retractable--></type>
+                <y units="m" is_input="False">4.63<!--height of landing gear--></y>
+            </landing_gear>
+            <propulsion>
+                <engine>
+                    <count is_input="True">2.0<!--number of engines--></count>
+                    <layout is_input="True">1.0<!--position of engines (1=under the wing / 2=rear fuselage)--></layout>
+                    <y_ratio is_input="True">0.34<!--engine position with respect to total span--></y_ratio>
+                </engine>
+                <tank>
+                    <LE_chord_percentage>0.1</LE_chord_percentage>
+                    <TE_chord_percentage>0.1</TE_chord_percentage>
+                    <y_ratio_tank_beginning>0.0</y_ratio_tank_beginning>
+                    <y_ratio_tank_end>1.0</y_ratio_tank_end>
+                </tank>
+                <nacelle>
+                    <width units="m" is_input="False">0.9291288709126333<!--width of the nacelle--></width>
+                </nacelle>
+            </propulsion>
+        </geometry>
+        <weight>
+            <aircraft>
+                <MTOW units="kg" is_input="True">1769.0<!--maximum takeoff weight--></MTOW>
+                <MZFW units="kg" is_input="True">1381.7<!--maximum zero fuel weight--></MZFW>
+            </aircraft>
+            <airframe>
+                <wing>
+                    <punctual_mass>
+                        <mass>0.0</mass>
+                        <y_ratio>0.0</y_ratio>
+                    </punctual_mass>
+                </wing>
+                <landing_gear>
+                    <main>
+                        <mass units="kg" is_input="True">55.34<!--main landing gear (A51): mass--></mass>
+                    </main>
+                </landing_gear>
+            </airframe>
+            <propulsion>
+                <engine>
+                    <mass units="kg" is_input="True">351.84<!--engine (B1): mass--></mass>
+                </engine>
+            </propulsion>
+        </weight>
+        <mission>
+            <sizing>
+                <main_route>
+                    <cruise>
+                        <altitude units="ft" is_input="True">8000.0<!--altitude during cruise phase in sizing mission--></altitude>
+                    </cruise>
+                </main_route>
+                <cs23>
+                    <safety_factor>1.5</safety_factor>
+                    <characteristic_speed>
+                        <va units="m/s">64.75</va>
+                        <vc units="m/s">78.63</vc>
+                        <vd units="m/s">110.0</vd>
+                    </characteristic_speed>
+                    <sizing_factor>
+                        <ultimate_mtow>
+                            <negative>-2.28</negative>
+                            <positive>5.7</positive>
+                        </ultimate_mtow>
+                        <ultimate_mzfw>
+                            <negative>-2.28</negative>
+                            <positive>5.7</positive>
+                        </ultimate_mzfw>
+                    </sizing_factor>
+                </cs23>
+            </sizing>
+        </mission>
     </data>
+    <settings>
+        <geometry>
+            <fuel_tanks>
+                <depth>0.4</depth>
+            </fuel_tanks>
+        </geometry>
+    </settings>
 </FAST_OAD>
