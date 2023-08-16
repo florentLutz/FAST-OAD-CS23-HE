@@ -43,11 +43,7 @@ SPAN_MESH_POINT_LOADS = int(1.5 * SPAN_MESH_POINT)
 class AerostructuralLoadHE(om.ExplicitComponent):
     def setup(self):
 
-        self.add_input("data:TLAR:category", val=3.0)
-        self.add_input("data:TLAR:level", val=2.0)
-        self.add_input("data:TLAR:v_max_sl", val=np.nan, units="kn")
         self.add_input("data:TLAR:v_cruise", val=np.nan, units="m/s")
-        self.add_input("data:TLAR:v_approach", val=np.nan, units="m/s")
 
         self.add_input(
             "data:aerodynamics:wing:low_speed:Y_vector",
@@ -84,39 +80,12 @@ class AerostructuralLoadHE(om.ExplicitComponent):
             "data:aerodynamics:slipstream:wing:cruise:prop_on:velocity", val=np.nan, units="m/s"
         )
         self.add_input("data:aerodynamics:wing:low_speed:CL_ref", val=np.nan)
-        self.add_input("data:aerodynamics:wing:cruise:CM0_clean", val=np.nan)
-        self.add_input("data:aerodynamics:horizontal_tail:efficiency", val=np.nan)
-        self.add_input("data:aerodynamics:aircraft:landing:CL_max", val=np.nan)
-        self.add_input("data:aerodynamics:wing:low_speed:CL_max_clean", val=np.nan)
-        self.add_input("data:aerodynamics:wing:low_speed:CL_min_clean", val=np.nan)
-        self.add_input("data:aerodynamics:wing:low_speed:CL_alpha", val=np.nan, units="rad**-1")
-        self.add_input("data:aerodynamics:wing:cruise:CL_alpha", val=np.nan, units="rad**-1")
-        self.add_input(
-            "data:aerodynamics:horizontal_tail:low_speed:CL_alpha", val=np.nan, units="rad**-1"
-        )
-        self.add_input(
-            "data:aerodynamics:horizontal_tail:cruise:CL_alpha", val=np.nan, units="rad**-1"
-        )
-        self.add_input(
-            "data:aerodynamics:aircraft:mach_interpolation:CL_alpha_vector",
-            val=np.nan,
-            units="rad**-1",
-            shape_by_conn=True,
-            copy_shape="data:aerodynamics:aircraft:mach_interpolation:mach_vector",
-        )
-        self.add_input(
-            "data:aerodynamics:aircraft:mach_interpolation:mach_vector",
-            val=np.nan,
-            shape_by_conn=True,
-        )
 
         self.add_input("data:weight:aircraft:MZFW", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:MTOW", val=np.nan, units="kg")
         self.add_input("data:weight:propulsion:engine:mass", val=np.nan, units="kg")
         self.add_input("data:weight:airframe:landing_gear:main:mass", val=np.nan, units="kg")
         self.add_input("data:weight:airframe:wing:mass", val=np.nan, units="kg")
-        self.add_input("data:weight:aircraft:CG:aft:x", val=np.nan, units="m")
-        self.add_input("data:weight:aircraft:CG:fwd:x", val=np.nan, units="m")
 
         self.add_input("data:geometry:wing:root:virtual_chord", val=np.nan, units="m")
         self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
@@ -127,12 +96,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         self.add_input("data:geometry:wing:tip:thickness_ratio", val=np.nan)
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
-        self.add_input("data:geometry:wing:MAC:leading_edge:x:local", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
-        self.add_input(
-            "data:geometry:horizontal_tail:MAC:at25percent:x:from_wingMAC25", val=np.nan, units="m"
-        )
+
         self.add_input("data:geometry:flap:chord_ratio", val=np.nan)
         self.add_input("data:geometry:wing:aileron:chord_ratio", val=np.nan)
         self.add_input("data:geometry:fuselage:length", val=np.nan, units="m")
@@ -260,10 +224,10 @@ class AerostructuralLoadHE(om.ExplicitComponent):
             y_vector_slip_orig, y_vector_orig, y_vector, cl_vector_slip, chord_vector
         )
 
-        lift_shear_diagram = np.full(len(y_vector), 0.0)
-        lift_bending_diagram = np.full(len(y_vector), 0.0)
-        weight_shear_diagram = np.full(len(y_vector), 0.0)
-        weight_bending_diagram = np.full(len(y_vector), 0.0)
+        lift_shear_diagram = np.zeros_like(y_vector)
+        lift_bending_diagram = np.zeros_like(y_vector)
+        weight_shear_diagram = np.zeros_like(y_vector)
+        weight_bending_diagram = np.zeros_like(y_vector)
 
         # STEP 4/XX - WE INITIALIZE THE LOOPS ON THE DIFFERENT SIZING CASE THAT WE DEFINED AND
         # THEN LAUNCH THEM
@@ -509,6 +473,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         point_mass_array = np.zeros(len(y_vector))
 
         # Adding the motor weight
+        # TODO: Will disappear eventually because all component will be taken as punctual masses
         if engine_config == 1.0:
             for y_ratio_mot in y_ratio:
                 y_eng = y_ratio_mot * semi_span
@@ -519,12 +484,8 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         if len(y_ratio_punctual_mass) > 1 or (
             len(y_ratio_punctual_mass) == 1 and punctual_mass_array != 0
         ):
-            # TODO: Can be done as a zip
-            for y_ratio_punctual in y_ratio_punctual_mass:
+            for y_ratio_punctual, punctual_mass in zip(y_ratio_punctual_mass, punctual_mass_array):
                 y_punctual_mass = y_ratio_punctual * semi_span
-                punctual_mass = punctual_mass_array[
-                    np.where(y_ratio_punctual_mass == y_ratio_punctual)[0]
-                ]
                 y_vector, chord_vector, point_mass_array = AerostructuralLoadHE.add_point_mass(
                     y_vector, chord_vector, point_mass_array, y_punctual_mass, punctual_mass, inputs
                 )
