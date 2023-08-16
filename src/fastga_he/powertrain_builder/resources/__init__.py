@@ -24,4 +24,5 @@ from .registered_components import (
     DICTIONARY_V_TO_SET,
     DICTIONARY_SFR,
     DICTIONARY_SWL,
+    DICTIONARY_DST,
 )

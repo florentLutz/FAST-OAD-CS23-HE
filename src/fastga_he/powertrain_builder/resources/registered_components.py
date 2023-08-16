@@ -55,6 +55,9 @@ SFR = "slipstream_flaps_required"
 # contributes to the wing lift. The reason being the computation of the induced drag need the
 # square of the increase in lift coefficient hence they must be summed beforehand
 SWL = "slipstream_contributes_to_wing_lift"
+# DST contains a boolean which tells whether or not this components can be represented as a
+# punctual or whether or not he should be represented as a distributed mass
+DST = "distributed"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -91,6 +94,7 @@ PROPELLER = {
     V_TO_SET: [],
     SFR: True,
     SWL: True,
+    DST: False,
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -124,6 +128,7 @@ PMSM = {
     V_TO_SET: ["ac_voltage_rms_in", "ac_voltage_peak_in"],
     SFR: False,
     SWL: False,
+    DST: False,
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -164,6 +169,7 @@ INVERTER = {
     V_TO_SET: [],
     SFR: False,
     SWL: False,
+    DST: False,
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -188,6 +194,7 @@ DC_BUS = {
     V_TO_SET: ["dc_voltage"],
     SFR: False,
     SWL: False,
+    DST: True,
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -212,6 +219,7 @@ DC_LINE = {
     V_TO_SET: [],
     SFR: False,
     SWL: False,
+    DST: False,
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -241,6 +249,7 @@ DC_DC_CONVERTER = {
     V_TO_SET: [],  # It is a bit paradoxical but you cant set a setter's voltage :p
     SFR: False,
     SWL: False,
+    DST: False,
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -273,6 +282,7 @@ BATTERY_PACK = {
     V_TO_SET: [],
     SFR: False,
     SWL: False,
+    DST: True,
 }
 DC_SSPC = {
     ID: "fastga_he.pt_component.dc_sspc",
@@ -302,6 +312,7 @@ DC_SSPC = {
     V_TO_SET: ["dc_voltage_out"],
     SFR: False,
     SWL: False,
+    DST: False,
 }
 DC_SPLITTER = {
     ID: "fastga_he.pt_component.dc_splitter",
@@ -326,6 +337,7 @@ DC_SPLITTER = {
     V_TO_SET: ["dc_voltage", "dc_voltage_in_1", "dc_voltage_in_2"],
     SFR: False,
     SWL: False,
+    DST: False,
 }
 RECTIFIER = {
     ID: "fastga_he.pt_component.rectifier",
@@ -359,6 +371,7 @@ RECTIFIER = {
     V_TO_SET: [],
     SFR: False,
     SWL: False,
+    DST: False,
 }
 GENERATOR = {
     ID: "fastga_he.pt_component.generator",
@@ -395,6 +408,7 @@ GENERATOR = {
     V_TO_SET: ["ac_voltage_rms_out", "ac_voltage_peak_out"],
     SFR: False,
     SWL: False,
+    DST: False,
 }
 ICE = {
     ID: "fastga_he.pt_component.internal_combustion_engine",
@@ -425,6 +439,7 @@ ICE = {
     V_TO_SET: [],
     SFR: False,
     SWL: False,
+    DST: False,
 }
 
 KNOWN_COMPONENTS = [
@@ -463,6 +478,7 @@ DICTIONARY_IO_INDEP_V = {}
 DICTIONARY_V_TO_SET = {}
 DICTIONARY_SFR = {}
 DICTIONARY_SWL = {}
+DICTIONARY_DST = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -485,3 +501,4 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_V_TO_SET[known_component[ID]] = known_component[V_TO_SET]
     DICTIONARY_SFR[known_component[ID]] = known_component[SFR]
     DICTIONARY_SWL[known_component[ID]] = known_component[SWL]
+    DICTIONARY_DST[known_component[ID]] = known_component[DST]
