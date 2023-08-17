@@ -194,7 +194,7 @@ DC_BUS = {
     V_TO_SET: ["dc_voltage"],
     SFR: False,
     SWL: False,
-    DST: True,
+    DST: False,
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
