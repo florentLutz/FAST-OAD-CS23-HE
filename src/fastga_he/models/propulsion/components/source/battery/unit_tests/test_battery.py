@@ -10,7 +10,8 @@ import numpy as np
 from ..components.sizing_module_weight import SizingBatteryModuleWeight
 from ..components.sizing_battery_weight import SizingBatteryWeight
 from ..components.sizing_number_cells import SizingBatteryNumberCells
-from ..components.sizing_battery_cg import SizingBatteryCG
+from ..components.sizing_battery_cg_x import SizingBatteryCGX
+from ..components.sizing_battery_cg_y import SizingBatteryCGY
 from ..components.sizing_module_volume import SizingBatteryModuleVolume
 from ..components.sizing_battery_volume import SizingBatteryVolume
 from ..components.sizing_battery_dimensions import SizingBatteryDimensions
@@ -188,25 +189,49 @@ def test_battery_dimensions():
         problem.check_partials(compact_print=True)
 
 
-def test_battery_cg():
+def test_battery_cg_x():
 
     expected_values = [2.88, 2.88, 0.095, 2.38, 1.24]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingBatteryCG(battery_pack_id="battery_pack_1", position=option)),
+            list_inputs(SizingBatteryCGX(battery_pack_id="battery_pack_1", position=option)),
             __file__,
             XML_FILE,
         )
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
-            SizingBatteryCG(battery_pack_id="battery_pack_1", position=option),
+            SizingBatteryCGX(battery_pack_id="battery_pack_1", position=option),
             ivc,
         )
         assert problem.get_val(
             "data:propulsion:he_power_train:battery_pack:battery_pack_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_battery_cg_y():
+
+    expected_values = [1.57, 1.57, 0.0, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(SizingBatteryCGY(battery_pack_id="battery_pack_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SizingBatteryCGY(battery_pack_id="battery_pack_1", position=option),
+            ivc,
+        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:CG:y", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -411,6 +436,9 @@ def test_battery_pack_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:CG:x", units="m"
     ) == pytest.approx(2.88, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:CG:y", units="m"
+    ) == pytest.approx(1.57, rel=1e-2)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:battery_pack:battery_pack_1:low_speed:CD0",

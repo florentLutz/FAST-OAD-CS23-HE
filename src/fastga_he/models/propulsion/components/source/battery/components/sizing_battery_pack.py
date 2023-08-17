@@ -10,7 +10,8 @@ from .sizing_number_cells import SizingBatteryNumberCells
 from .sizing_module_volume import SizingBatteryModuleVolume
 from .sizing_battery_volume import SizingBatteryVolume
 from .sizing_battery_dimensions import SizingBatteryDimensions
-from .sizing_battery_cg import SizingBatteryCG
+from .sizing_battery_cg_x import SizingBatteryCGX
+from .sizing_battery_cg_y import SizingBatteryCGY
 from .sizing_battery_drag import SizingBatteryDrag
 from .sizing_battery_prep_for_loads import SizingBatteryPreparationForLoads
 
@@ -85,8 +86,13 @@ class SizingBatteryPack(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            name="battery_CG",
-            subsys=SizingBatteryCG(battery_pack_id=battery_pack_id, position=position),
+            name="battery_CG_x",
+            subsys=SizingBatteryCGX(battery_pack_id=battery_pack_id, position=position),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="battery_CG_y",
+            subsys=SizingBatteryCGY(battery_pack_id=battery_pack_id, position=position),
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:
