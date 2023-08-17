@@ -23,6 +23,7 @@ from ..components.sizing_contactor_weight import SizingInverterContactorWeight
 from ..components.sizing_inverter_weight import SizingInverterWeight
 from ..components.sizing_inverter_power_density import SizingInverterPowerDensity
 from ..components.sizing_inverter_cg_x import SizingInverterCGX
+from ..components.sizing_inverter_cg_y import SizingInverterCGY
 from ..components.sizing_inverter import SizingInverter
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
@@ -516,6 +517,31 @@ def test_inverter_cg_x():
         problem.check_partials(compact_print=True)
 
 
+def test_inverter_cg_y():
+
+    expected_cg = [2.5, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(SizingInverterCGY(inverter_id="inverter_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(SizingInverterCGY(inverter_id="inverter_1", position=option), ivc)
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:inverter:inverter_1:CG:y",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
+
+
 def test_inverter_sizing():
 
     # Research independent input value in .xml file
@@ -547,13 +573,12 @@ def test_inverter_sizing():
         )
         == pytest.approx(0.0, rel=1e-2)
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:inverter:inverter_1:CG:x",
-            units="m",
-        )
-        == pytest.approx(2.69, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:CG:x", units="m"
+    ) == pytest.approx(2.69, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:CG:y", units="m"
+    ) == pytest.approx(2.5, rel=1e-2)
 
 
 def test_constraints_enforce_current():

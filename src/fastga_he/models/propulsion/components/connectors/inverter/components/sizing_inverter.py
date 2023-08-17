@@ -22,6 +22,7 @@ from .sizing_contactor_weight import SizingInverterContactorWeight
 from .sizing_inverter_weight import SizingInverterWeight
 from .sizing_inverter_power_density import SizingInverterPowerDensity
 from .sizing_inverter_cg_x import SizingInverterCGX
+from .sizing_inverter_cg_y import SizingInverterCGY
 from .sizing_inverter_drag import SizingInverterDrag
 
 from fastga_he.models.propulsion.sub_components import (
@@ -169,8 +170,13 @@ class SizingInverter(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            name="inverter_CG",
+            name="inverter_CG_x",
             subsys=SizingInverterCGX(inverter_id=inverter_id, position=position),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="inverter_CG_y",
+            subsys=SizingInverterCGY(inverter_id=inverter_id, position=position),
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:
