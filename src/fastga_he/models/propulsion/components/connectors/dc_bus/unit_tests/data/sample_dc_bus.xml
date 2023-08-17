@@ -16,6 +16,7 @@
                     <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
                   </at25percent>
                 </MAC>
+                <span units="m">12.0</span>
             </wing>
         </geometry>
         <propulsion>
@@ -37,6 +38,9 @@
                         <insulation>
                             <thickness units="cm">0.111</thickness>
                         </insulation>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
                     </dc_bus_1>
                 </DC_bus>
             </he_power_train>
