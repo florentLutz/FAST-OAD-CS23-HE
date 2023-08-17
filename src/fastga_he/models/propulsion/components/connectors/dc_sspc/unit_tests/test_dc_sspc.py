@@ -10,7 +10,7 @@ from ..components.sizing_resistance_scaling import SizingDCSSPCResistanceScaling
 from ..components.sizing_reference_resistance import SizingDCSSPCResistances
 from ..components.sizing_efficiency import SizingDCSSPCEfficiency
 from ..components.sizing_weight import SizingDCSSPCWeight
-from ..components.sizing_dc_sspc_cg import SizingDCSSPCCGX
+from ..components.sizing_dc_sspc_cg_x import SizingDCSSPCCGX
 from ..components.perf_current import PerformancesDCSSPCCurrent
 from ..components.perf_voltage_out import PerformancesDCSSPCVoltageOut
 from ..components.perf_losses import PerformancesDCSSPCLosses

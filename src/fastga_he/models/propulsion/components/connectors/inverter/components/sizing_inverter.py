@@ -21,7 +21,7 @@ from .sizing_inductor_current_caliber import SizingInverterInductorCurrentCalibe
 from .sizing_contactor_weight import SizingInverterContactorWeight
 from .sizing_inverter_weight import SizingInverterWeight
 from .sizing_inverter_power_density import SizingInverterPowerDensity
-from .sizing_inverter_cg import SizingInverterCGX
+from .sizing_inverter_cg_x import SizingInverterCGX
 from .sizing_inverter_drag import SizingInverterDrag
 
 from fastga_he.models.propulsion.sub_components import (

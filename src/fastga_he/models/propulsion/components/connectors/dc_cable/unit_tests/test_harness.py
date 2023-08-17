@@ -24,7 +24,7 @@ from ..components.sizing_reference_resistance import SizingReferenceResistance
 from ..components.sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
 from ..components.sizing_heat_capacity import SizingHeatCapacityCable
 from ..components.sizing_cable_radius import SizingCableRadius
-from ..components.sizing_harness_cg import SizingHarnessCGX
+from ..components.sizing_harness_cg_x import SizingHarnessCGX
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from ..components.perf_losses_one_cable import PerformancesLossesOneCable
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative

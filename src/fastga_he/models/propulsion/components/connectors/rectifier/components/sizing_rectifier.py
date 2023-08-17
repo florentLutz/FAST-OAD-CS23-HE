@@ -18,7 +18,7 @@ from .sizing_dimension_module import SizingRectifierModuleDimension
 from .sizing_inductor_current_caliber import SizingRectifierInductorCurrentCaliber
 from .sizing_weight_casing import SizingRectifierCasingsWeight
 from .sizing_contactor_weight import SizingRectifierContactorWeight
-from .sizing_rectifier_cg import SizingRectifierCGX
+from .sizing_rectifier_cg_x import SizingRectifierCGX
 from .sizing_rectifier_drag import SizingRectifierDrag
 
 from .cstr_rectifier import ConstraintsRectifier

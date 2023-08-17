@@ -15,7 +15,7 @@ from .sizing_torque_constant_scaling import SizingMotorTorqueConstantScaling
 from .sizing_torque_constant import SizingMotorTorqueConstant
 from .sizing_loss_coefficient_scaling import SizingMotorLossCoefficientScaling
 from .sizing_loss_coefficient import SizingMotorLossCoefficient
-from .sizing_pmsm_cg import SizingPMSMCGX
+from .sizing_pmsm_cg_x import SizingPMSMCGX
 from .sizing_pmsm_drag import SizingPMSMDrag
 from .cstr_pmsm import ConstraintsPMSM
 

@@ -22,7 +22,7 @@ from ..components.sizing_inductor_current_caliber import SizingInverterInductorC
 from ..components.sizing_contactor_weight import SizingInverterContactorWeight
 from ..components.sizing_inverter_weight import SizingInverterWeight
 from ..components.sizing_inverter_power_density import SizingInverterPowerDensity
-from ..components.sizing_inverter_cg import SizingInverterCGX
+from ..components.sizing_inverter_cg_x import SizingInverterCGX
 from ..components.sizing_inverter import SizingInverter
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission

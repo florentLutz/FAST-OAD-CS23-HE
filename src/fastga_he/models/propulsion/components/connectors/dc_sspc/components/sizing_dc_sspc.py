@@ -10,7 +10,7 @@ from .sizing_resistance_scaling import SizingDCSSPCResistanceScaling
 from .sizing_reference_resistance import SizingDCSSPCResistances
 from .sizing_efficiency import SizingDCSSPCEfficiency
 from .sizing_weight import SizingDCSSPCWeight
-from .sizing_dc_sspc_cg import SizingDCSSPCCGX
+from .sizing_dc_sspc_cg_x import SizingDCSSPCCGX
 from .sizing_dc_sspc_drag import SizingDCSSPCDrag
 
 from ..constants import POSSIBLE_POSITION

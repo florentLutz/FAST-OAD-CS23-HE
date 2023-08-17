@@ -13,7 +13,7 @@ from ..components.sizing_dc_splitter_cross_section_dimensions import (
 from ..components.sizing_dc_splitter_insulation_thickness import SizingDCSplitterInsulationThickness
 from ..components.sizing_dc_splitter_dimensions import SizingDCSplitterDimensions
 from ..components.sizing_dc_splitter_weight import SizingDCSplitterWeight
-from ..components.sizing_dc_splitter_cg import SizingDCSplitterCGX
+from ..components.sizing_dc_splitter_cg_x import SizingDCSplitterCGX
 from ..components.perf_mission_power_split import PerformancesMissionPowerSplit
 from ..components.perf_mission_power_share import PerformancesMissionPowerShare
 from ..components.perf_maximum import PerformancesMaximum

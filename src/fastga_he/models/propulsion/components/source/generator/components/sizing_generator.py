@@ -18,7 +18,7 @@ from .sizing_resistance import SizingGeneratorPhaseResistance
 from .sizing_torque_constant_scaling import SizingGeneratorTorqueConstantScaling
 from .sizing_torque_constant import SizingGeneratorTorqueConstant
 from .sizing_weight import SizingGeneratorWeight
-from .sizing_generator_cg import SizingGeneratorCGX
+from .sizing_generator_cg_x import SizingGeneratorCGX
 from .sizing_generator_drag import SizingGeneratorDrag
 
 from ..constants import POSSIBLE_POSITION

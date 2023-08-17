@@ -11,7 +11,7 @@ from .sizing_bus_dimensions import SizingBusBarDimensions
 from .sizing_bus_bar_weight import SizingBusBarWeight
 from .sizing_conductor_self_inductance import SizingBusBarSelfInductance
 from .sizing_conductor_mutual_inductance import SizingBusBarMutualInductance
-from .sizing_dc_bus_cg import SizingDCBusCGX
+from .sizing_dc_bus_cg_x import SizingDCBusCGX
 from .sizing_dc_bus_drag import SizingDCBusDrag
 
 from .cstr_dc_bus import ConstraintsDCBus

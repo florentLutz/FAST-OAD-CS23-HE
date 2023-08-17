@@ -30,7 +30,7 @@ from ..components.sizing_resistance import SizingGeneratorPhaseResistance
 from ..components.sizing_torque_constant_scaling import SizingGeneratorTorqueConstantScaling
 from ..components.sizing_torque_constant import SizingGeneratorTorqueConstant
 from ..components.sizing_weight import SizingGeneratorWeight
-from ..components.sizing_generator_cg import SizingGeneratorCGX
+from ..components.sizing_generator_cg_x import SizingGeneratorCGX
 
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission

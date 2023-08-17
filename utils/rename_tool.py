@@ -18,8 +18,8 @@ def rename_classes_in_file(file_path, pattern, replacement):
 
 def main():
     directory = "D:/fl.lutz/FAST/FAST-OAD/FAST-OAD-CS23-HE/src/fastga_he/models"
-    pattern = r"\bSizing.*?CG\b"
-    replacement = r"\g<0>X"
+    pattern = r"\bsizing.*?_cg\b"
+    replacement = r"\g<0>_x"
 
     for root, _, files in os.walk(directory):
         for filename in files:

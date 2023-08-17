@@ -11,7 +11,7 @@ from ..components.sizing_ice_dimensions_scaling import SizingICEDimensionsScalin
 from ..components.sizing_ice_dimensions import SizingICEDimensions
 from ..components.sizing_ice_nacelle_dimensions import SizingICENacelleDimensions
 from ..components.sizing_ice_nacelle_wet_area import SizingICENacelleWetArea
-from ..components.sizing_ice_cg import SizingICECGX
+from ..components.sizing_ice_cg_x import SizingICECGX
 from ..components.sizing_ice_drag import SizingICEDrag
 
 from ..components.cstr_ice import ConstraintsICE

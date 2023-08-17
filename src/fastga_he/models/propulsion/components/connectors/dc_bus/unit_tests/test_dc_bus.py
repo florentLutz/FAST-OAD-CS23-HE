@@ -14,7 +14,7 @@ from ..components.sizing_bus_dimensions import SizingBusBarDimensions
 from ..components.sizing_bus_bar_weight import SizingBusBarWeight
 from ..components.sizing_conductor_self_inductance import SizingBusBarSelfInductance
 from ..components.sizing_conductor_mutual_inductance import SizingBusBarMutualInductance
-from ..components.sizing_dc_bus_cg import SizingDCBusCGX
+from ..components.sizing_dc_bus_cg_x import SizingDCBusCGX
 from ..components.sizing_dc_bus import SizingDCBus
 
 from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce

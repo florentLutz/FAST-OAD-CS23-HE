@@ -9,7 +9,7 @@ from .sizing_dc_splitter_cross_section_dimensions import SizingSplitterCrossSect
 from .sizing_dc_splitter_insulation_thickness import SizingDCSplitterInsulationThickness
 from .sizing_dc_splitter_dimensions import SizingDCSplitterDimensions
 from .sizing_dc_splitter_weight import SizingDCSplitterWeight
-from .sizing_dc_splitter_cg import SizingDCSplitterCGX
+from .sizing_dc_splitter_cg_x import SizingDCSplitterCGX
 from .sizing_dc_splitter_drag import SizingDCSplitterDrag
 
 from .cstr_dc_splitter import ConstraintsDCSplitter

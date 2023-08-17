@@ -18,7 +18,7 @@ from ..components.sizing_torque_constant_scaling import SizingMotorTorqueConstan
 from ..components.sizing_torque_constant import SizingMotorTorqueConstant
 from ..components.sizing_loss_coefficient_scaling import SizingMotorLossCoefficientScaling
 from ..components.sizing_loss_coefficient import SizingMotorLossCoefficient
-from ..components.sizing_pmsm_cg import SizingPMSMCGX
+from ..components.sizing_pmsm_cg_x import SizingPMSMCGX
 from ..components.sizing_pmsm_drag import SizingPMSMDrag
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_losses import PerformancesLosses

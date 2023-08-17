@@ -18,7 +18,7 @@ from .sizing_reference_resistance import SizingReferenceResistance
 from .sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
 from .sizing_heat_capacity import SizingHeatCapacityCable
 from .sizing_cable_radius import SizingCableRadius
-from .sizing_harness_cg import SizingHarnessCGX
+from .sizing_harness_cg_x import SizingHarnessCGX
 from .sizing_harness_drag import SizingHarnessDrag
 
 from .cstr_harness import ConstraintsHarness

@@ -9,7 +9,7 @@ import openmdao.api as om
 
 from ..components.sizing_weight import SizingPropellerWeight
 from ..components.sizing_propeller_depth import SizingPropellerDepth
-from ..components.sizing_propeller_cg import SizingPropellerCGX
+from ..components.sizing_propeller_cg_x import SizingPropellerCGX
 from ..components.sizing_propeller_ref_cl import SizingPropellerReferenceCl
 from ..components.sizing_propeller_ref_chord import SizingPropellerReferenceChord
 from ..components.sizing_propeller_radius_to_span_ratio import SizingPropellerDiameterToSpanRatio

@@ -23,7 +23,7 @@ from ..components.sizing_ice_dimensions import SizingICEDimensions
 from ..components.sizing_ice_nacelle_dimensions import SizingICENacelleDimensions
 from ..components.sizing_ice_nacelle_wet_area import SizingICENacelleWetArea
 from ..components.sizing_ice_drag import SizingICEDrag
-from ..components.sizing_ice_cg import SizingICECGX
+from ..components.sizing_ice_cg_x import SizingICECGX
 
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower

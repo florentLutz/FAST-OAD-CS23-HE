@@ -16,7 +16,7 @@ from .sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from .sizing_module_mass import SizingDCDCConverterCasingWeight
 from .sizing_dimension_module import SizingDCDCConverterModuleDimension
 from .sizing_contactor_weight import SizingDCDCConverterContactorWeight
-from .sizing_dc_dc_converter_cg import SizingDCDCConverterCGX
+from .sizing_dc_dc_converter_cg_x import SizingDCDCConverterCGX
 from .sizing_dc_dc_converter_drag import SizingDCDCConverterDrag
 
 from .cstr_dc_dc_converter import ConstraintsDCDCConverter

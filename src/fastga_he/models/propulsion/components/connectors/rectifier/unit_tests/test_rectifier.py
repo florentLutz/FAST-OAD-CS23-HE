@@ -35,7 +35,7 @@ from ..components.sizing_inductor_current_caliber import SizingRectifierInductor
 from ..components.sizing_weight_casing import SizingRectifierCasingsWeight
 from ..components.sizing_contactor_weight import SizingRectifierContactorWeight
 from ..components.sizing_rectifier_weight import SizingRectifierWeight, SizingRectifierWeightBySum
-from ..components.sizing_rectifier_cg import SizingRectifierCGX
+from ..components.sizing_rectifier_cg_x import SizingRectifierCGX
 
 from ..components.sizing_rectifier import SizingRectifier
 from ..components.perf_rectifier import PerformancesRectifier

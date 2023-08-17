@@ -18,7 +18,7 @@ from ..components.sizing_module_mass import SizingDCDCConverterCasingWeight
 from ..components.sizing_dimension_module import SizingDCDCConverterModuleDimension
 from ..components.sizing_contactor_weight import SizingDCDCConverterContactorWeight
 from ..components.sizing_weight import SizingDCDCConverterWeight, SizingDCDCConverterWeightBySum
-from ..components.sizing_dc_dc_converter_cg import SizingDCDCConverterCGX
+from ..components.sizing_dc_dc_converter_cg_x import SizingDCDCConverterCGX
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_efficiency_fixed import PerformancesEfficiencyMission
