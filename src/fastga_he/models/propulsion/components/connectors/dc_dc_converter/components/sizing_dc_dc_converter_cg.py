@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingDCDCConverterCG(om.ExplicitComponent):
+class SizingDCDCConverterCGX(om.ExplicitComponent):
     """
     Class that computes the CG of the DC/DC converter based on its position. Will be based on simple
     geometric ratios, no consideration of volume will be implemented for now.

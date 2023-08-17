@@ -9,7 +9,7 @@ import openmdao.api as om
 
 from ..components.sizing_weight import SizingPropellerWeight
 from ..components.sizing_propeller_depth import SizingPropellerDepth
-from ..components.sizing_propeller_cg import SizingPropellerCG
+from ..components.sizing_propeller_cg import SizingPropellerCGX
 from ..components.sizing_propeller_ref_cl import SizingPropellerReferenceCl
 from ..components.sizing_propeller_ref_chord import SizingPropellerReferenceChord
 from ..components.sizing_propeller_radius_to_span_ratio import SizingPropellerDiameterToSpanRatio
@@ -109,12 +109,12 @@ def test_propeller_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
 
         ivc = get_indep_var_comp(
-            list_inputs(SizingPropellerCG(propeller_id="propeller_1", position=option)),
+            list_inputs(SizingPropellerCGX(propeller_id="propeller_1", position=option)),
             __file__,
             XML_FILE,
         )
         # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingPropellerCG(propeller_id="propeller_1", position=option), ivc)
+        problem = run_system(SizingPropellerCGX(propeller_id="propeller_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:propeller:propeller_1:CG:x", units="m"

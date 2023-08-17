@@ -18,7 +18,7 @@ from .sizing_resistance import SizingGeneratorPhaseResistance
 from .sizing_torque_constant_scaling import SizingGeneratorTorqueConstantScaling
 from .sizing_torque_constant import SizingGeneratorTorqueConstant
 from .sizing_weight import SizingGeneratorWeight
-from .sizing_generator_cg import SizingGeneratorCG
+from .sizing_generator_cg import SizingGeneratorCGX
 from .sizing_generator_drag import SizingGeneratorDrag
 
 from ..constants import POSSIBLE_POSITION
@@ -107,7 +107,7 @@ class SizingGenerator(om.Group):
 
         self.add_subsystem(
             "generator_cg",
-            SizingGeneratorCG(generator_id=generator_id, position=position),
+            SizingGeneratorCGX(generator_id=generator_id, position=position),
             promotes=["data:*"],
         )
         for low_speed_aero in [True, False]:

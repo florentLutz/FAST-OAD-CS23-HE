@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingRectifierCG(om.ExplicitComponent):
+class SizingRectifierCGX(om.ExplicitComponent):
     """
     Class that computes the CG of the rectifier based on its position. Will be based on simple
     geometric ratios, no consideration of volume will be implemented for now.

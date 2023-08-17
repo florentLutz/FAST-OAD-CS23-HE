@@ -18,7 +18,7 @@ from ..components.sizing_module_mass import SizingDCDCConverterCasingWeight
 from ..components.sizing_dimension_module import SizingDCDCConverterModuleDimension
 from ..components.sizing_contactor_weight import SizingDCDCConverterContactorWeight
 from ..components.sizing_weight import SizingDCDCConverterWeight, SizingDCDCConverterWeightBySum
-from ..components.sizing_dc_dc_converter_cg import SizingDCDCConverterCG
+from ..components.sizing_dc_dc_converter_cg import SizingDCDCConverterCGX
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_efficiency_fixed import PerformancesEfficiencyMission
@@ -470,14 +470,14 @@ def test_converter_cg_x():
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
             list_inputs(
-                SizingDCDCConverterCG(dc_dc_converter_id="dc_dc_converter_1", position=option)
+                SizingDCDCConverterCGX(dc_dc_converter_id="dc_dc_converter_1", position=option)
             ),
             __file__,
             XML_FILE,
         )
 
         problem = run_system(
-            SizingDCDCConverterCG(dc_dc_converter_id="dc_dc_converter_1", position=option), ivc
+            SizingDCDCConverterCGX(dc_dc_converter_id="dc_dc_converter_1", position=option), ivc
         )
 
         assert (

@@ -14,7 +14,7 @@ from ..components.sizing_bus_dimensions import SizingBusBarDimensions
 from ..components.sizing_bus_bar_weight import SizingBusBarWeight
 from ..components.sizing_conductor_self_inductance import SizingBusBarSelfInductance
 from ..components.sizing_conductor_mutual_inductance import SizingBusBarMutualInductance
-from ..components.sizing_dc_bus_cg import SizingDCBusCG
+from ..components.sizing_dc_bus_cg import SizingDCBusCGX
 from ..components.sizing_dc_bus import SizingDCBus
 
 from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
@@ -203,12 +203,12 @@ def test_dc_bus_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingDCBusCG(dc_bus_id="dc_bus_1", position=option)),
+            list_inputs(SizingDCBusCGX(dc_bus_id="dc_bus_1", position=option)),
             __file__,
             XML_FILE,
         )
 
-        problem = run_system(SizingDCBusCG(dc_bus_id="dc_bus_1", position=option), ivc)
+        problem = run_system(SizingDCBusCGX(dc_bus_id="dc_bus_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:DC_bus:dc_bus_1:CG:x", units="m"

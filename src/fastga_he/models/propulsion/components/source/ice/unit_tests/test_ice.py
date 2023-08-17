@@ -23,7 +23,7 @@ from ..components.sizing_ice_dimensions import SizingICEDimensions
 from ..components.sizing_ice_nacelle_dimensions import SizingICENacelleDimensions
 from ..components.sizing_ice_nacelle_wet_area import SizingICENacelleWetArea
 from ..components.sizing_ice_drag import SizingICEDrag
-from ..components.sizing_ice_cg import SizingICECG
+from ..components.sizing_ice_cg import SizingICECGX
 
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
@@ -267,12 +267,12 @@ def test_motor_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
 
         ivc = get_indep_var_comp(
-            list_inputs(SizingICECG(ice_id="ice_1", position=option)),
+            list_inputs(SizingICECGX(ice_id="ice_1", position=option)),
             __file__,
             XML_FILE,
         )
         # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingICECG(ice_id="ice_1", position=option), ivc)
+        problem = run_system(SizingICECGX(ice_id="ice_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:ICE:ice_1:CG:x", units="m"

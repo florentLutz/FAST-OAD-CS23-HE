@@ -21,7 +21,7 @@ from .sizing_inductor_current_caliber import SizingInverterInductorCurrentCalibe
 from .sizing_contactor_weight import SizingInverterContactorWeight
 from .sizing_inverter_weight import SizingInverterWeight
 from .sizing_inverter_power_density import SizingInverterPowerDensity
-from .sizing_inverter_cg import SizingInverterCG
+from .sizing_inverter_cg import SizingInverterCGX
 from .sizing_inverter_drag import SizingInverterDrag
 
 from fastga_he.models.propulsion.sub_components import (
@@ -170,7 +170,7 @@ class SizingInverter(om.Group):
         )
         self.add_subsystem(
             name="inverter_CG",
-            subsys=SizingInverterCG(inverter_id=inverter_id, position=position),
+            subsys=SizingInverterCGX(inverter_id=inverter_id, position=position),
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:

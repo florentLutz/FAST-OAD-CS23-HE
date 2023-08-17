@@ -9,7 +9,7 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingPropellerCG(om.ExplicitComponent):
+class SizingPropellerCGX(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(

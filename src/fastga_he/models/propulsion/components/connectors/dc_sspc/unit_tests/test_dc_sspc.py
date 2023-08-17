@@ -10,7 +10,7 @@ from ..components.sizing_resistance_scaling import SizingDCSSPCResistanceScaling
 from ..components.sizing_reference_resistance import SizingDCSSPCResistances
 from ..components.sizing_efficiency import SizingDCSSPCEfficiency
 from ..components.sizing_weight import SizingDCSSPCWeight
-from ..components.sizing_dc_sspc_cg import SizingDCSSPCCG
+from ..components.sizing_dc_sspc_cg import SizingDCSSPCCGX
 from ..components.perf_current import PerformancesDCSSPCCurrent
 from ..components.perf_voltage_out import PerformancesDCSSPCVoltageOut
 from ..components.perf_losses import PerformancesDCSSPCLosses
@@ -113,12 +113,12 @@ def test_dc_sspc_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingDCSSPCCG(dc_sspc_id="dc_sspc_1", position=option)),
+            list_inputs(SizingDCSSPCCGX(dc_sspc_id="dc_sspc_1", position=option)),
             __file__,
             XML_FILE,
         )
 
-        problem = run_system(SizingDCSSPCCG(dc_sspc_id="dc_sspc_1", position=option), ivc)
+        problem = run_system(SizingDCSSPCCGX(dc_sspc_id="dc_sspc_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:CG:x", units="m"

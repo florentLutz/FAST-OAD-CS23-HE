@@ -35,7 +35,7 @@ from ..components.sizing_inductor_current_caliber import SizingRectifierInductor
 from ..components.sizing_weight_casing import SizingRectifierCasingsWeight
 from ..components.sizing_contactor_weight import SizingRectifierContactorWeight
 from ..components.sizing_rectifier_weight import SizingRectifierWeight, SizingRectifierWeightBySum
-from ..components.sizing_rectifier_cg import SizingRectifierCG
+from ..components.sizing_rectifier_cg import SizingRectifierCGX
 
 from ..components.sizing_rectifier import SizingRectifier
 from ..components.perf_rectifier import PerformancesRectifier
@@ -1224,12 +1224,12 @@ def test_rectifier_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingRectifierCG(rectifier_id="rectifier_1", position=option)),
+            list_inputs(SizingRectifierCGX(rectifier_id="rectifier_1", position=option)),
             __file__,
             XML_FILE,
         )
 
-        problem = run_system(SizingRectifierCG(rectifier_id="rectifier_1", position=option), ivc)
+        problem = run_system(SizingRectifierCGX(rectifier_id="rectifier_1", position=option), ivc)
 
         assert (
             problem.get_val(

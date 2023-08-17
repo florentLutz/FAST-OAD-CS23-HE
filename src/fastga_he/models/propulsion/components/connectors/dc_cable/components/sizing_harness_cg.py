@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingHarnessCG(om.ExplicitComponent):
+class SizingHarnessCGX(om.ExplicitComponent):
     """
     Class that computes the CG of the DC cable based on the position of its source and target.
     Will be based on simple geometric ratios, no consideration of volume will be implemented for

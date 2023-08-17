@@ -18,7 +18,7 @@ from .sizing_dimension_module import SizingRectifierModuleDimension
 from .sizing_inductor_current_caliber import SizingRectifierInductorCurrentCaliber
 from .sizing_weight_casing import SizingRectifierCasingsWeight
 from .sizing_contactor_weight import SizingRectifierContactorWeight
-from .sizing_rectifier_cg import SizingRectifierCG
+from .sizing_rectifier_cg import SizingRectifierCGX
 from .sizing_rectifier_drag import SizingRectifierDrag
 
 from .cstr_rectifier import ConstraintsRectifier
@@ -164,7 +164,7 @@ class SizingRectifier(om.Group):
         )
         self.add_subsystem(
             name="rectifier_CG",
-            subsys=SizingRectifierCG(rectifier_id=rectifier_id, position=position),
+            subsys=SizingRectifierCGX(rectifier_id=rectifier_id, position=position),
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:

@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingICECG(om.ExplicitComponent):
+class SizingICECGX(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
             name="ice_id",

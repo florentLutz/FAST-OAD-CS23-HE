@@ -22,7 +22,7 @@ from ..components.sizing_inductor_current_caliber import SizingInverterInductorC
 from ..components.sizing_contactor_weight import SizingInverterContactorWeight
 from ..components.sizing_inverter_weight import SizingInverterWeight
 from ..components.sizing_inverter_power_density import SizingInverterPowerDensity
-from ..components.sizing_inverter_cg import SizingInverterCG
+from ..components.sizing_inverter_cg import SizingInverterCGX
 from ..components.sizing_inverter import SizingInverter
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
@@ -498,12 +498,12 @@ def test_inverter_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingInverterCG(inverter_id="inverter_1", position=option)),
+            list_inputs(SizingInverterCGX(inverter_id="inverter_1", position=option)),
             __file__,
             XML_FILE,
         )
 
-        problem = run_system(SizingInverterCG(inverter_id="inverter_1", position=option), ivc)
+        problem = run_system(SizingInverterCGX(inverter_id="inverter_1", position=option), ivc)
 
         assert (
             problem.get_val(

@@ -18,7 +18,7 @@ from .sizing_reference_resistance import SizingReferenceResistance
 from .sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
 from .sizing_heat_capacity import SizingHeatCapacityCable
 from .sizing_cable_radius import SizingCableRadius
-from .sizing_harness_cg import SizingHarnessCG
+from .sizing_harness_cg import SizingHarnessCGX
 from .sizing_harness_drag import SizingHarnessDrag
 
 from .cstr_harness import ConstraintsHarness
@@ -121,7 +121,7 @@ class SizingHarness(om.Group):
         )
         self.add_subsystem(
             name="harness_CG",
-            subsys=SizingHarnessCG(harness_id=harness_id, position=position),
+            subsys=SizingHarnessCGX(harness_id=harness_id, position=position),
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:

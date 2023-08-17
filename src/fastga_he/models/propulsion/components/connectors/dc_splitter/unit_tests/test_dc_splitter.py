@@ -13,7 +13,7 @@ from ..components.sizing_dc_splitter_cross_section_dimensions import (
 from ..components.sizing_dc_splitter_insulation_thickness import SizingDCSplitterInsulationThickness
 from ..components.sizing_dc_splitter_dimensions import SizingDCSplitterDimensions
 from ..components.sizing_dc_splitter_weight import SizingDCSplitterWeight
-from ..components.sizing_dc_splitter_cg import SizingDCSplitterCG
+from ..components.sizing_dc_splitter_cg import SizingDCSplitterCGX
 from ..components.perf_mission_power_split import PerformancesMissionPowerSplit
 from ..components.perf_mission_power_share import PerformancesMissionPowerShare
 from ..components.perf_maximum import PerformancesMaximum
@@ -144,13 +144,13 @@ def test_dc_sspc_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingDCSplitterCG(dc_splitter_id="dc_splitter_1", position=option)),
+            list_inputs(SizingDCSplitterCGX(dc_splitter_id="dc_splitter_1", position=option)),
             __file__,
             XML_FILE,
         )
 
         problem = run_system(
-            SizingDCSplitterCG(dc_splitter_id="dc_splitter_1", position=option), ivc
+            SizingDCSplitterCGX(dc_splitter_id="dc_splitter_1", position=option), ivc
         )
 
         assert problem.get_val(

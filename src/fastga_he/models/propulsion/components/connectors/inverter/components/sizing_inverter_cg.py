@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingInverterCG(om.ExplicitComponent):
+class SizingInverterCGX(om.ExplicitComponent):
     """
     Class that computes the CG of the inverter based on its position. Will be based on simple
     geometric ratios, no consideration of volume will be implemented for now.

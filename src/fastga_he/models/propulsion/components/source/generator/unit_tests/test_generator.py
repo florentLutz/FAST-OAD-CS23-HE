@@ -30,7 +30,7 @@ from ..components.sizing_resistance import SizingGeneratorPhaseResistance
 from ..components.sizing_torque_constant_scaling import SizingGeneratorTorqueConstantScaling
 from ..components.sizing_torque_constant import SizingGeneratorTorqueConstant
 from ..components.sizing_weight import SizingGeneratorWeight
-from ..components.sizing_generator_cg import SizingGeneratorCG
+from ..components.sizing_generator_cg import SizingGeneratorCGX
 
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
@@ -273,12 +273,12 @@ def test_motor_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
 
         ivc = get_indep_var_comp(
-            list_inputs(SizingGeneratorCG(generator_id="generator_1", position=option)),
+            list_inputs(SizingGeneratorCGX(generator_id="generator_1", position=option)),
             __file__,
             XML_FILE,
         )
         # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingGeneratorCG(generator_id="generator_1", position=option), ivc)
+        problem = run_system(SizingGeneratorCGX(generator_id="generator_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:generator:generator_1:CG:x", units="m"

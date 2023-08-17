@@ -24,7 +24,7 @@ from ..components.sizing_reference_resistance import SizingReferenceResistance
 from ..components.sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
 from ..components.sizing_heat_capacity import SizingHeatCapacityCable
 from ..components.sizing_cable_radius import SizingCableRadius
-from ..components.sizing_harness_cg import SizingHarnessCG
+from ..components.sizing_harness_cg import SizingHarnessCGX
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from ..components.perf_losses_one_cable import PerformancesLossesOneCable
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
@@ -342,12 +342,12 @@ def test_harness_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingHarnessCG(harness_id="harness_1", position=option)),
+            list_inputs(SizingHarnessCGX(harness_id="harness_1", position=option)),
             __file__,
             XML_FILE,
         )
 
-        problem = run_system(SizingHarnessCG(harness_id="harness_1", position=option), ivc)
+        problem = run_system(SizingHarnessCGX(harness_id="harness_1", position=option), ivc)
 
         assert (
             problem.get_val(
@@ -615,6 +615,13 @@ def test_cable_temperature_mission():
         val=275.0,
         units="degK",
     )
+    # Needed for compatibility
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 300.0))
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=np.full(NB_POINTS_TEST, 288.15),
+    )
 
     problem = run_system(
         PerformancesTemperatureConstant(harness_id="harness_1", number_of_points=NB_POINTS_TEST),
@@ -632,6 +639,12 @@ def test_cable_temperature_mission():
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable_temperature_mission",
         val=[275.0, 276.0, 278.0, 279.0, 300.0, 301.0, 300.0, 245.0, 249.0, 260.0],
         units="degK",
+    )
+    ivc3.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 300.0))
+    ivc3.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=np.full(NB_POINTS_TEST, 288.15),
     )
 
     problem3 = run_system(

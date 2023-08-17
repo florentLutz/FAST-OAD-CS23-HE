@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingGeneratorCG(om.ExplicitComponent):
+class SizingGeneratorCGX(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
             name="generator_id", default=None, desc="Identifier of the generator", allow_none=False

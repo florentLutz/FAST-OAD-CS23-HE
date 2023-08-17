@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingPMSMCG(om.ExplicitComponent):
+class SizingPMSMCGX(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
