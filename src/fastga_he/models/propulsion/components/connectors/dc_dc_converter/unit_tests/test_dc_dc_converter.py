@@ -19,6 +19,7 @@ from ..components.sizing_dimension_module import SizingDCDCConverterModuleDimens
 from ..components.sizing_contactor_weight import SizingDCDCConverterContactorWeight
 from ..components.sizing_weight import SizingDCDCConverterWeight, SizingDCDCConverterWeightBySum
 from ..components.sizing_dc_dc_converter_cg_x import SizingDCDCConverterCGX
+from ..components.sizing_dc_dc_converter_cg_y import SizingDCDCConverterCGY
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_efficiency_fixed import PerformancesEfficiencyMission
@@ -491,6 +492,35 @@ def test_converter_cg_x():
         problem.check_partials(compact_print=True)
 
 
+def test_converter_cg_y():
+
+    expected_cg = [2.21, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingDCDCConverterCGY(dc_dc_converter_id="dc_dc_converter_1", position=option)
+            ),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(
+            SizingDCDCConverterCGY(dc_dc_converter_id="dc_dc_converter_1", position=option), ivc
+        )
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:y",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
+
+
 def test_constraints_current_capacitor_enforce():
 
     # Research independent input value in .xml file
@@ -897,13 +927,12 @@ def test_dc_dc_converter_sizing():
         )
         == pytest.approx(0.002157, rel=1e-2)
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:x",
-            units="m",
-        )
-        == pytest.approx(2.69, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:x", units="m"
+    ) == pytest.approx(2.69, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:y", units="m"
+    ) == pytest.approx(2.21, rel=1e-2)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:low_speed:CD0",
