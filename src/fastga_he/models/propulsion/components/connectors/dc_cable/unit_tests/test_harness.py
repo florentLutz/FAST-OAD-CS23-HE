@@ -335,7 +335,7 @@ def test_cable_mass():
     problem.check_partials(compact_print=True)
 
 
-def test_harness_cg():
+def test_harness_cg_x():
 
     expected_cg = [2.69, 1.24, 2.45, 1.96, 0.98, 0.25, 1.345]
 

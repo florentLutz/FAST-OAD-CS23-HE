@@ -491,7 +491,7 @@ def test_inverter_power_density():
     problem.check_partials(compact_print=True)
 
 
-def test_inverter_cg():
+def test_inverter_cg_x():
 
     expected_cg = [2.69, 0.45, 2.54]
 

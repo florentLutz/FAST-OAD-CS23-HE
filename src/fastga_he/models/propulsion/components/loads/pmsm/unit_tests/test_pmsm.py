@@ -227,7 +227,7 @@ def test_loss_coefficient():
     problem.check_partials(compact_print=True)
 
 
-def test_motor_cg():
+def test_motor_cg_x():
 
     expected_cg = [2.39, 0.25]
 

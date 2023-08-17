@@ -260,7 +260,7 @@ def test_nacelle_drag():
             problem.check_partials(compact_print=True)
 
 
-def test_motor_cg():
+def test_motor_cg_x():
 
     expected_cg = [3.03, 1.03, 3.00]
 

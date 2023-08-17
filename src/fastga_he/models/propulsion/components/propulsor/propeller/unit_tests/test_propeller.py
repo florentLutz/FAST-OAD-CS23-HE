@@ -102,7 +102,7 @@ def test_depth():
     problem.check_partials(compact_print=True)
 
 
-def test_propeller_cg():
+def test_propeller_cg_x():
 
     expected_cg = [2.2, 0.15]
 

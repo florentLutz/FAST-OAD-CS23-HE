@@ -196,7 +196,7 @@ def test_bus_bar_mutual_inductance():
     problem.check_partials(compact_print=True)
 
 
-def test_dc_bus_cg():
+def test_dc_bus_cg_x():
 
     expected_cg = [2.69, 0.45, 2.54]
 

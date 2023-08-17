@@ -266,7 +266,7 @@ def test_weight():
     problem.check_partials(compact_print=True)
 
 
-def test_motor_cg():
+def test_motor_cg_x():
 
     expected_cg = [0.48, 1.99]
 

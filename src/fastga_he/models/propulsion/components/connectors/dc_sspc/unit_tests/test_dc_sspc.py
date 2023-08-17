@@ -106,7 +106,7 @@ def test_weight():
     problem.check_partials(compact_print=True)
 
 
-def test_dc_sspc_cg():
+def test_dc_sspc_cg_x():
 
     expected_cg = [2.69, 0.45, 2.54]
 
