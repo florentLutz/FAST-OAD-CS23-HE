@@ -15,6 +15,7 @@ from ..components.sizing_module_volume import SizingBatteryModuleVolume
 from ..components.sizing_battery_volume import SizingBatteryVolume
 from ..components.sizing_battery_dimensions import SizingBatteryDimensions
 from ..components.sizing_battery_drag import SizingBatteryDrag
+from ..components.sizing_battery_prep_for_loads import SizingBatteryPreparationForLoads
 from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
 from ..components.perf_module_current import PerformancesModuleCurrent
 from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
@@ -255,6 +256,50 @@ def test_battery_drag():
                 )
 
             problem.check_partials(compact_print=True)
+
+
+def test_battery_prep_for_loads():
+
+    expected_y_ratios_start = [0.216]
+    expected_y_ratios_end = [0.463]
+    expected_chords_start = [0.767]
+    possible_positions = ["inside_the_wing"]
+
+    for option, expected_y_ratio_start, expected_y_ratio_end, expected_chord_start in zip(
+        possible_positions, expected_y_ratios_start, expected_y_ratios_end, expected_chords_start
+    ):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingBatteryPreparationForLoads(battery_pack_id="battery_pack_1", position=option)
+            ),
+            __file__,
+            XML_FILE,
+        )
+
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SizingBatteryPreparationForLoads(battery_pack_id="battery_pack_1", position=option),
+            ivc,
+        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:distributed_mass:y_ratio_start"
+        ) == pytest.approx(expected_y_ratio_start, rel=1e-2)
+        assert problem.get_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:distributed_mass:y_ratio_end"
+        ) == pytest.approx(expected_y_ratio_end, rel=1e-2)
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:battery_pack:battery_pack_1:distributed_mass:start_chord",
+                units="m",
+            )
+            == pytest.approx(expected_chord_start, rel=1e-2)
+        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:distributed_mass:chord_slope"
+        ) == pytest.approx(0.0, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
 
 
 def test_constraints_enforce_soc():

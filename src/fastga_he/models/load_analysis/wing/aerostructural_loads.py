@@ -570,8 +570,12 @@ class AerostructuralLoadHE(om.ExplicitComponent):
 
         # Here starts the part where we add all the distributed mass from the powertrain (mainly
         # batteries)
-        y_ratios_start = inputs["data:weight:airframe:wing:distributed_mass:y_ratio_start"]
-        y_ratios_end = inputs["data:weight:airframe:wing:distributed_mass:y_ratio_end"]
+        y_ratios_start = np.clip(
+            inputs["data:weight:airframe:wing:distributed_mass:y_ratio_start"], 0.0, 1.0
+        )
+        y_ratios_end = np.clip(
+            inputs["data:weight:airframe:wing:distributed_mass:y_ratio_end"], 0.0, 1.0
+        )
         chords_start = inputs["data:weight:airframe:wing:distributed_mass:start_chord"]
         chord_slopes = inputs["data:weight:airframe:wing:distributed_mass:chord_slope"]
         masses = inputs["data:weight:airframe:wing:distributed_mass:mass"]

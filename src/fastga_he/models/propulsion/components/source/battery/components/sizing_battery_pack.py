@@ -12,6 +12,7 @@ from .sizing_battery_volume import SizingBatteryVolume
 from .sizing_battery_dimensions import SizingBatteryDimensions
 from .sizing_battery_cg import SizingBatteryCG
 from .sizing_battery_drag import SizingBatteryDrag
+from .sizing_battery_prep_for_loads import SizingBatteryPreparationForLoads
 
 
 from .cstr_battery_pack import ConstraintsBattery
@@ -96,6 +97,17 @@ class SizingBatteryPack(om.Group):
                     battery_pack_id=battery_pack_id,
                     position=position,
                     low_speed_aero=low_speed_aero,
+                ),
+                promotes=["*"],
+            )
+
+        if position == "inside_the_wing":
+
+            self.add_subsystem(
+                name="preparation_for_loads",
+                subsys=SizingBatteryPreparationForLoads(
+                    battery_pack_id=battery_pack_id,
+                    position=position,
                 ),
                 promotes=["*"],
             )

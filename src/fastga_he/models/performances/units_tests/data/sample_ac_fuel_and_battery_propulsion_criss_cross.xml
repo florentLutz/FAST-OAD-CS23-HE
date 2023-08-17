@@ -979,6 +979,7 @@
             <volume units="L" is_input="False">388.64263438396716<!--Volume of the battery pack--></volume>
             <CG>
               <x units="m" is_input="False">3.818621385069883<!--X position of the battery center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <cell>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
