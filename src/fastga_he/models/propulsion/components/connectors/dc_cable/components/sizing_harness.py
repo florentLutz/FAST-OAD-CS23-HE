@@ -19,6 +19,7 @@ from .sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
 from .sizing_heat_capacity import SizingHeatCapacityCable
 from .sizing_cable_radius import SizingCableRadius
 from .sizing_harness_cg_x import SizingHarnessCGX
+from .sizing_harness_cg_y import SizingHarnessCGY
 from .sizing_harness_drag import SizingHarnessDrag
 
 from .cstr_harness import ConstraintsHarness
@@ -120,8 +121,13 @@ class SizingHarness(om.Group):
             "heat_capacity", SizingHeatCapacityCable(harness_id=harness_id), promotes=["data:*"]
         )
         self.add_subsystem(
-            name="harness_CG",
+            name="harness_CG_x",
             subsys=SizingHarnessCGX(harness_id=harness_id, position=position),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="harness_CG_y",
+            subsys=SizingHarnessCGY(harness_id=harness_id, position=position),
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:

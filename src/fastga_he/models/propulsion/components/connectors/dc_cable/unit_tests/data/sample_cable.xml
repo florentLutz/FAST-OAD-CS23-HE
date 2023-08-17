@@ -59,6 +59,9 @@
                             <density units="kg/m**3">8960.0</density>
                             <specific_heat units="J/kg/degK">386.0</specific_heat>
                         </properties>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
                     </harness_1>
                 </DC_cable_harness>
             </he_power_train>
