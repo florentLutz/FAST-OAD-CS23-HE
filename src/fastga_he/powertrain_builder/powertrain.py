@@ -850,6 +850,42 @@ class FASTGAHEPowerTrainConfigurator:
             components_slip_perf_watchers_unit_organised_list,
         )
 
+    def get_wing_punctual_mass_element_list(self) -> list:
+        """
+        This function returns a list of the components that are to be considered as punctual
+        masses acting on the wing due to their positions as defined in the powertrain file
+        """
+
+        self._get_components()
+
+        punctual_mass_names = []
+
+        for component_id, component_name, component_position in zip(
+            self._components_id, self._components_name, self._components_position
+        ):
+            if component_position in resources.DICTIONARY_PCT_W[component_id]:
+                punctual_mass_names.append(component_name)
+
+        return punctual_mass_names
+
+    def get_wing_distributed_mass_element_list(self) -> list:
+        """
+        This function returns a list of the components that are to be considered as distributed
+        masses acting on the wing due to their positions as defined in the powertrain file
+        """
+
+        self._get_components()
+
+        distributed_mass_names = []
+
+        for component_id, component_name, component_position in zip(
+            self._components_id, self._components_name, self._components_position
+        ):
+            if component_position in resources.DICTIONARY_DST_W[component_id]:
+                distributed_mass_names.append(component_name)
+
+        return distributed_mass_names
+
     def get_graphs_connected_voltage(self) -> list:
         """
         This function returns a list of graphs of connected PT components that have more or less

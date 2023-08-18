@@ -309,3 +309,47 @@ def test_voltage_setter_list():
     assert [] in voltage_setter_list
     assert ["dc_dc_converter_1_out", "rectifier_1_out"] in voltage_setter_list
     assert ["generator_1_out"] in voltage_setter_list
+
+
+def test_wing_punctual_mass_identification():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter_position.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    wing_punctual_mass_list = power_train_configurator.get_wing_punctual_mass_element_list()
+
+    assert "dc_dc_converter_1" in wing_punctual_mass_list
+    assert "rectifier_1" in wing_punctual_mass_list
+    assert "generator_1" in wing_punctual_mass_list
+    assert "ice_1" in wing_punctual_mass_list
+
+    assert not ("battery_pack_1" in wing_punctual_mass_list)
+
+    assert not ("propeller_1" in wing_punctual_mass_list)
+    assert not ("motor_1" in wing_punctual_mass_list)
+    assert not ("inverter_1" in wing_punctual_mass_list)
+    assert not ("dc_sspc_1" in wing_punctual_mass_list)
+    assert not ("dc_bus_1" in wing_punctual_mass_list)
+    assert not ("dc_sspc_2" in wing_punctual_mass_list)
+    assert not ("dc_line_1" in wing_punctual_mass_list)
+    assert not ("dc_sspc_3" in wing_punctual_mass_list)
+    assert not ("dc_splitter_1" in wing_punctual_mass_list)
+
+
+def test_wing_distributed_mass_identification():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter_position.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    wing_distributed_mass_list = power_train_configurator.get_wing_distributed_mass_element_list()
+
+    assert len(wing_distributed_mass_list) == 1
+    assert "battery_pack_1" in wing_distributed_mass_list
