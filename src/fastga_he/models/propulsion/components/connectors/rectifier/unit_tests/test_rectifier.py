@@ -36,6 +36,7 @@ from ..components.sizing_weight_casing import SizingRectifierCasingsWeight
 from ..components.sizing_contactor_weight import SizingRectifierContactorWeight
 from ..components.sizing_rectifier_weight import SizingRectifierWeight, SizingRectifierWeightBySum
 from ..components.sizing_rectifier_cg_x import SizingRectifierCGX
+from ..components.sizing_rectifier_cg_y import SizingRectifierCGY
 
 from ..components.sizing_rectifier import SizingRectifier
 from ..components.perf_rectifier import PerformancesRectifier
@@ -1242,6 +1243,31 @@ def test_rectifier_cg_x():
         problem.check_partials(compact_print=True)
 
 
+def test_rectifier_cg_y():
+
+    expected_cg = [2.34, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(SizingRectifierCGY(rectifier_id="rectifier_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(SizingRectifierCGY(rectifier_id="rectifier_1", position=option), ivc)
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:rectifier:rectifier_1:CG:y",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
+
+
 def test_sizing_rectifier():
 
     # Research independent input value in .xml file
@@ -1259,6 +1285,9 @@ def test_sizing_rectifier():
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:CG:x", units="m"
     ) == pytest.approx(2.69, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:CG:y", units="m"
+    ) == pytest.approx(2.34, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:low_speed:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
@@ -1288,4 +1317,4 @@ def test_performances_rectifier():
         PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    om.n2(problem, show_browser=True)
+    om.n2(problem, show_browser=False)
