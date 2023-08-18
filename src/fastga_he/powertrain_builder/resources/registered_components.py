@@ -55,9 +55,12 @@ SFR = "slipstream_flaps_required"
 # contributes to the wing lift. The reason being the computation of the induced drag need the
 # square of the increase in lift coefficient hence they must be summed beforehand
 SWL = "slipstream_contributes_to_wing_lift"
-# DST contains a boolean which tells whether or not this components can be represented as a
-# punctual or whether or not he should be represented as a distributed mass
-DST = "distributed"
+# DST_W contains a list of position for which the component should be considered as a distributed
+# load that acts on the wing
+DST_W = "distributed_wing"
+# PCT_W contains a list of position for which the component should be considered as a punctual
+# load that acts on the wing
+PCT_W = "punctual_wing"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -94,7 +97,8 @@ PROPELLER = {
     V_TO_SET: [],
     SFR: True,
     SWL: True,
-    DST: False,
+    DST_W: [],
+    PCT_W: ["on_the_wing"],
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -128,7 +132,8 @@ PMSM = {
     V_TO_SET: ["ac_voltage_rms_in", "ac_voltage_peak_in"],
     SFR: False,
     SWL: False,
-    DST: False,
+    DST_W: [],
+    PCT_W: ["on_the_wing"],
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -169,7 +174,8 @@ INVERTER = {
     V_TO_SET: [],
     SFR: False,
     SWL: False,
-    DST: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -194,7 +200,8 @@ DC_BUS = {
     V_TO_SET: ["dc_voltage"],
     SFR: False,
     SWL: False,
-    DST: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -219,7 +226,8 @@ DC_LINE = {
     V_TO_SET: [],
     SFR: False,
     SWL: False,
-    DST: False,
+    DST_W: [],
+    PCT_W: [],
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -249,7 +257,8 @@ DC_DC_CONVERTER = {
     V_TO_SET: [],  # It is a bit paradoxical but you cant set a setter's voltage :p
     SFR: False,
     SWL: False,
-    DST: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -282,7 +291,8 @@ BATTERY_PACK = {
     V_TO_SET: [],
     SFR: False,
     SWL: False,
-    DST: True,
+    DST_W: ["inside_the_wing"],
+    PCT_W: ["wing_pod"],
 }
 DC_SSPC = {
     ID: "fastga_he.pt_component.dc_sspc",
@@ -312,7 +322,8 @@ DC_SSPC = {
     V_TO_SET: ["dc_voltage_out"],
     SFR: False,
     SWL: False,
-    DST: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
 }
 DC_SPLITTER = {
     ID: "fastga_he.pt_component.dc_splitter",
@@ -337,7 +348,8 @@ DC_SPLITTER = {
     V_TO_SET: ["dc_voltage", "dc_voltage_in_1", "dc_voltage_in_2"],
     SFR: False,
     SWL: False,
-    DST: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
 }
 RECTIFIER = {
     ID: "fastga_he.pt_component.rectifier",
@@ -371,7 +383,8 @@ RECTIFIER = {
     V_TO_SET: [],
     SFR: False,
     SWL: False,
-    DST: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
 }
 GENERATOR = {
     ID: "fastga_he.pt_component.generator",
@@ -408,7 +421,8 @@ GENERATOR = {
     V_TO_SET: ["ac_voltage_rms_out", "ac_voltage_peak_out"],
     SFR: False,
     SWL: False,
-    DST: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
 }
 ICE = {
     ID: "fastga_he.pt_component.internal_combustion_engine",
@@ -439,7 +453,8 @@ ICE = {
     V_TO_SET: [],
     SFR: False,
     SWL: False,
-    DST: False,
+    DST_W: [],
+    PCT_W: ["on_the_wing"],
 }
 
 KNOWN_COMPONENTS = [
@@ -478,7 +493,8 @@ DICTIONARY_IO_INDEP_V = {}
 DICTIONARY_V_TO_SET = {}
 DICTIONARY_SFR = {}
 DICTIONARY_SWL = {}
-DICTIONARY_DST = {}
+DICTIONARY_DST_W = {}
+DICTIONARY_PCT_W = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -501,4 +517,5 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_V_TO_SET[known_component[ID]] = known_component[V_TO_SET]
     DICTIONARY_SFR[known_component[ID]] = known_component[SFR]
     DICTIONARY_SWL[known_component[ID]] = known_component[SWL]
-    DICTIONARY_DST[known_component[ID]] = known_component[DST]
+    DICTIONARY_DST_W[known_component[ID]] = known_component[DST_W]
+    DICTIONARY_PCT_W[known_component[ID]] = known_component[PCT_W]

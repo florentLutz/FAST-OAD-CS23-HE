@@ -2,6 +2,10 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
+# noinspection PyUnresolvedReferences
 from .registered_components import (
     KNOWN_ID,
     KNOWN_COMPONENTS,
@@ -24,5 +28,6 @@ from .registered_components import (
     DICTIONARY_V_TO_SET,
     DICTIONARY_SFR,
     DICTIONARY_SWL,
-    DICTIONARY_DST,
+    DICTIONARY_DST_W,
+    DICTIONARY_PCT_W,
 )
