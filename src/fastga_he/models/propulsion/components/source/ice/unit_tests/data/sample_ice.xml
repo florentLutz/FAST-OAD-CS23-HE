@@ -22,6 +22,7 @@
             </fuselage>
             <wing>
                 <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
+                <span units="m" is_input="False">10.0<!--wing area--></span>
                 <MAC>
                   <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
                   <at25percent>
@@ -55,6 +56,9 @@
                             <width units="m">1.15</width>
                             <wet_area units="m**2">7.92688</wet_area>
                         </nacelle>
+                        <CG>
+                            <y_ratio>0.4</y_ratio>
+                        </CG>
                     </ice_1>
                 </ICE>
             </he_power_train>

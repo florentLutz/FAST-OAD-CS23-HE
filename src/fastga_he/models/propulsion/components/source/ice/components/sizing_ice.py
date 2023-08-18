@@ -12,6 +12,7 @@ from ..components.sizing_ice_dimensions import SizingICEDimensions
 from ..components.sizing_ice_nacelle_dimensions import SizingICENacelleDimensions
 from ..components.sizing_ice_nacelle_wet_area import SizingICENacelleWetArea
 from ..components.sizing_ice_cg_x import SizingICECGX
+from ..components.sizing_ice_cg_y import SizingICECGY
 from ..components.sizing_ice_drag import SizingICEDrag
 
 from ..components.cstr_ice import ConstraintsICE
@@ -84,8 +85,13 @@ class SizingICE(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            name="ice_cg",
+            name="ice_cg_x",
             subsys=SizingICECGX(ice_id=ice_id, position=position),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="ice_cg_y",
+            subsys=SizingICECGY(ice_id=ice_id, position=position),
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:
