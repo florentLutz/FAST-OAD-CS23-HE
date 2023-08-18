@@ -129,6 +129,12 @@ class FASTGAHEPowerTrainConfigurator:
         # should be a list of list
         self._components_slipstream_perf_watchers = None
 
+        # Contains a list of all pair of components which are symmetrical on the y axis with
+        # respect to the fuselage center line. This is for now intended for the computation of the
+        # loads on the wing to avoid accounting twice for the components as the wing mass will be
+        # computed as twice the weight of a half-wing
+        self._components_symmetrical_pairs = None
+
         # Because of their very peculiar role, we will scan the architecture for any SSPC defined
         # by the user and whether or not they are at the output of a bus, because a specific
         # option needs to be turned on in this was
@@ -210,6 +216,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_slipstream_perf_watchers_list = []
         components_slipstream_needs_flaps = []
         components_slipstream_wing_lift = []
+        components_symmetrical_pairs = []
 
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
@@ -224,6 +231,20 @@ class FASTGAHEPowerTrainConfigurator:
                 components_position.append(component_position)
             else:
                 components_position.append("")
+
+            if "symmetrical" in component:
+                component_symmetrical = component["symmetrical"]
+
+                # We sort the pair to ensure that if the pair is already there because the
+                # symmetrical tag is defined twice (propeller1 is symmetrical to propeller2 and
+                # propeller2 is symmetrical to propeller1) it will have the same name and we
+                # don't have to register it twice.
+                sorted_pair = sorted([component_name, component_symmetrical])
+
+                if sorted_pair not in components_symmetrical_pairs:
+                    components_symmetrical_pairs.append(sorted_pair)
+                    # We don't put an else because as opposed to options, we don't expected all
+                    # components to have symmetrical tag
 
             if component_id == "fastga_he.pt_component.dc_sspc":
                 # Create a dictionary with SSPC name and a tag to see if they are at bus output
@@ -294,6 +315,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_slipstream_perf_watchers = components_slipstream_perf_watchers_list
         self._components_slipstream_flaps = components_slipstream_needs_flaps
         self._components_slipstream_wing_lift = components_slipstream_wing_lift
+        self._components_symmetrical_pairs = components_symmetrical_pairs
 
     def _get_connections(self):
         """
@@ -850,7 +872,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_slip_perf_watchers_unit_organised_list,
         )
 
-    def get_wing_punctual_mass_element_list(self) -> list:
+    def get_wing_punctual_mass_element_list(self) -> Tuple[list, list]:
         """
         This function returns a list of the components that are to be considered as punctual
         masses acting on the wing due to their positions as defined in the powertrain file
@@ -859,6 +881,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._get_components()
 
         punctual_mass_names = []
+        component_pairs = copy.deepcopy(self._components_symmetrical_pairs)
 
         for component_id, component_name, component_position in zip(
             self._components_id, self._components_name, self._components_position
@@ -866,9 +889,21 @@ class FASTGAHEPowerTrainConfigurator:
             if component_position in resources.DICTIONARY_PCT_W[component_id]:
                 punctual_mass_names.append(component_name)
 
-        return punctual_mass_names
+        # TODO: improve the way this is done, as I'm not satisfied with it
+        for component_pair in self._components_symmetrical_pairs:
 
-    def get_wing_distributed_mass_element_list(self) -> list:
+            if component_pair[0] in punctual_mass_names:
+                continue
+
+            elif component_pair[1] in punctual_mass_names:
+                continue
+
+            else:
+                component_pairs.remove(component_pair)
+
+        return punctual_mass_names, component_pairs
+
+    def get_wing_distributed_mass_element_list(self) -> Tuple[list, list]:
         """
         This function returns a list of the components that are to be considered as distributed
         masses acting on the wing due to their positions as defined in the powertrain file
@@ -877,6 +912,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._get_components()
 
         distributed_mass_names = []
+        component_pairs = copy.deepcopy(self._components_symmetrical_pairs)
 
         for component_id, component_name, component_position in zip(
             self._components_id, self._components_name, self._components_position
@@ -884,7 +920,19 @@ class FASTGAHEPowerTrainConfigurator:
             if component_position in resources.DICTIONARY_DST_W[component_id]:
                 distributed_mass_names.append(component_name)
 
-        return distributed_mass_names
+        # TODO: improve the way this is done, as I'm not satisfied with it
+        for component_pair in self._components_symmetrical_pairs:
+
+            if component_pair[0] in distributed_mass_names:
+                continue
+
+            elif component_pair[1] in distributed_mass_names:
+                continue
+
+            else:
+                component_pairs.remove(component_pair)
+
+        return distributed_mass_names, component_pairs
 
     def get_graphs_connected_voltage(self) -> list:
         """
@@ -909,7 +957,6 @@ class FASTGAHEPowerTrainConfigurator:
             )
 
             if not resources.DICTIONARY_IO_INDEP_V[component_id]:
-
                 graph.add_edge(
                     component_name + "_out",
                     component_name + "_in",
@@ -1097,7 +1144,6 @@ class FASTGAHEPowerTrainConfigurator:
                 voltages_to_set = resources.DICTIONARY_V_TO_SET[component_id]
 
                 for voltage_to_set in voltages_to_set:
-
                     variable_name = component_name + "." + voltage_to_set
                     voltage_dict_subgraph[variable_name] = reference_voltage
 

@@ -1,0 +1,82 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+    symmetrical: propeller_2
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_sspc_1:
+    id : fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+    position: inside_the_wing # "inside_the_wing", "in_the_front", "in_the_back"
+
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+    symmetrical: propeller_1
+  motor_2:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+    symmetrical: motor_1
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    symmetrical: inverter_1
+  dc_sspc_2:
+    id: fastga_he.pt_component.dc_sspc
+    closed_by_default: True
+    position: inside_the_wing # "inside_the_wing", "in_the_front", "in_the_back"
+    symmetrical: dc_sspc_1
+    
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 2
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
+
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
+  battery_pack_1:
+    id: fastga_he.pt_component.battery_pack
+    position: underbelly  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"  
+
+component_connections:
+  - source: propeller_1
+    target: motor_1
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: inverter_1
+    target: dc_sspc_1
+
+  - source: dc_sspc_1
+    target: [dc_bus_1, 1]
+
+  - source: propeller_2
+    target: motor_2
+
+  - source: motor_2
+    target: inverter_2
+
+  - source: inverter_2
+    target: dc_sspc_2
+
+  - source: dc_sspc_2
+    target: [ dc_bus_1, 2 ]
+
+  - source: [dc_bus_1, 1]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: battery_pack_1
+
+watcher_file_path:

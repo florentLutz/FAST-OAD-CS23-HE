@@ -320,7 +320,7 @@ def test_wing_punctual_mass_identification():
         power_train_file_path=sample_power_train_file_path
     )
 
-    wing_punctual_mass_list = power_train_configurator.get_wing_punctual_mass_element_list()
+    wing_punctual_mass_list, _ = power_train_configurator.get_wing_punctual_mass_element_list()
 
     assert "dc_dc_converter_1" in wing_punctual_mass_list
     assert "rectifier_1" in wing_punctual_mass_list
@@ -349,7 +349,74 @@ def test_wing_distributed_mass_identification():
         power_train_file_path=sample_power_train_file_path
     )
 
-    wing_distributed_mass_list = power_train_configurator.get_wing_distributed_mass_element_list()
+    (
+        wing_distributed_mass_list,
+        _,
+    ) = power_train_configurator.get_wing_distributed_mass_element_list()
 
     assert len(wing_distributed_mass_list) == 1
     assert "battery_pack_1" in wing_distributed_mass_list
+
+
+def test_no_distributed_mass():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_propeller_symmetrical.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    (
+        wing_distributed_mass_list,
+        pairs_list,
+    ) = power_train_configurator.get_wing_distributed_mass_element_list()
+
+    assert not wing_distributed_mass_list
+    assert not pairs_list
+
+
+def test_wing_punctual_mass_symmetrical():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_propeller_symmetrical.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    (
+        wing_punctual_mass_list,
+        symmetrical_pair_list,
+    ) = power_train_configurator.get_wing_punctual_mass_element_list()
+
+    assert "propeller_1" in wing_punctual_mass_list
+    assert "propeller_2" in wing_punctual_mass_list
+
+    assert ["propeller_1", "propeller_2"] in symmetrical_pair_list
+    assert ["propeller_2", "propeller_1"] not in symmetrical_pair_list
+
+
+def test_wing_distributed_mass_symmetrical():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_battery_symmetrical.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    (
+        wing_distributed_mass_list,
+        symmetrical_pair_list,
+    ) = power_train_configurator.get_wing_distributed_mass_element_list()
+
+    assert "propeller_1" not in wing_distributed_mass_list
+    assert "propeller_2" not in wing_distributed_mass_list
+
+    assert "battery_pack_1" in wing_distributed_mass_list
+    assert "battery_pack_2" in wing_distributed_mass_list
+
+    assert ["propeller_1", "propeller_2"] not in symmetrical_pair_list
+    assert ["battery_pack_1", "battery_pack_2"] in symmetrical_pair_list
+    assert ["battery_pack_2", "battery_pack_1"] not in symmetrical_pair_list
