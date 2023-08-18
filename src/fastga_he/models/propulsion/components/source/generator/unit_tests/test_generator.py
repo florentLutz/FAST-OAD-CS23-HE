@@ -266,9 +266,9 @@ def test_weight():
     problem.check_partials(compact_print=True)
 
 
-def test_motor_cg_x():
+def test_generator_cg_x():
 
-    expected_cg = [0.48, 1.99]
+    expected_cg = [2.69, 0.48, 1.99]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
 
