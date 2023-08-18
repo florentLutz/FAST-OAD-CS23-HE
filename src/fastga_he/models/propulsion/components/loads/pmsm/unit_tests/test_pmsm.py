@@ -19,6 +19,7 @@ from ..components.sizing_torque_constant import SizingMotorTorqueConstant
 from ..components.sizing_loss_coefficient_scaling import SizingMotorLossCoefficientScaling
 from ..components.sizing_loss_coefficient import SizingMotorLossCoefficient
 from ..components.sizing_pmsm_cg_x import SizingPMSMCGX
+from ..components.sizing_pmsm_cg_y import SizingPMSMCGY
 from ..components.sizing_pmsm_drag import SizingPMSMDrag
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_losses import PerformancesLosses
@@ -243,6 +244,27 @@ def test_motor_cg_x():
 
         assert problem.get_val(
             "data:propulsion:he_power_train:PMSM:motor_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_motor_cg_y():
+
+    expected_cg = [1.5, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(SizingPMSMCGY(motor_id="motor_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(SizingPMSMCGY(motor_id="motor_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:PMSM:motor_1:CG:y", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -700,6 +722,9 @@ def test_sizing_pmsm():
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:CG:x", units="m"
     ) == pytest.approx(2.39, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:CG:y", units="m"
+    ) == pytest.approx(1.5, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

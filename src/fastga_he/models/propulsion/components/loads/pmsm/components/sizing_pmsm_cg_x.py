@@ -9,7 +9,13 @@ from ..constants import POSSIBLE_POSITION
 
 
 class SizingPMSMCGX(om.ExplicitComponent):
+    """
+    Class that computes the X-CG of the PMSM based on its position. Will be based on simple
+    geometric ratios and geometric considerations.
+    """
+
     def initialize(self):
+
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
