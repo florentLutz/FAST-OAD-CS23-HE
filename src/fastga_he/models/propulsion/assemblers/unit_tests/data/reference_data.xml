@@ -61,6 +61,17 @@
                         </CG>
                     </dc_dc_converter_1>
                 </DC_DC_converter>
+                <battery_pack>
+                    <battery_pack_1>
+                        <distributed_mass>
+                            <y_ratio_start>0.3</y_ratio_start>
+                            <y_ratio_end>0.6</y_ratio_end>
+                            <start_chord units="m">0.7</start_chord>
+                            <chord_slope>0.0</chord_slope>
+                        </distributed_mass>
+                        <mass units="kg">120.</mass>
+                    </battery_pack_1>
+                </battery_pack>
             </he_power_train>
         </propulsion>
     </data>

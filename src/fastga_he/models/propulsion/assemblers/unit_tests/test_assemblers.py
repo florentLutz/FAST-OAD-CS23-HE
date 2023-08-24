@@ -9,6 +9,7 @@ import pytest
 
 from ..delta_from_pt_file import SlipstreamAirframeLiftClean, SlipstreamAirframeLift
 from ..wing_punctual_loads_from_pt_file import PowerTrainPunctualLoadsFromFile
+from ..wing_distributed_loads_from_pt_file import PowerTrainDistributedLoadsFromFile
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -97,5 +98,41 @@ def test_punctual_mass_assembler():
     assert problem.get_val(
         "data:weight:airframe:wing:punctual_mass:mass", units="kg"
     ) == pytest.approx(np.array([15.0, 10.0]), rel=1e-6)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_distributed_mass_assembler():
+
+    pt_file_path = pth.join(pth.dirname(__file__), PROPULSION_FILE)
+
+    print(list_inputs(PowerTrainDistributedLoadsFromFile(power_train_file_path=pt_file_path)))
+
+    ivc = get_indep_var_comp(
+        list_inputs(PowerTrainDistributedLoadsFromFile(power_train_file_path=pt_file_path)),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        PowerTrainDistributedLoadsFromFile(power_train_file_path=pt_file_path),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:weight:airframe:wing:distributed_mass:y_ratio_start"
+    ) == pytest.approx(0.3, rel=1e-6)
+    assert problem.get_val(
+        "data:weight:airframe:wing:distributed_mass:y_ratio_end"
+    ) == pytest.approx(0.6, rel=1e-6)
+    assert problem.get_val(
+        "data:weight:airframe:wing:distributed_mass:start_chord"
+    ) == pytest.approx(0.7, rel=1e-6)
+    assert problem.get_val(
+        "data:weight:airframe:wing:distributed_mass:chord_slope"
+    ) == pytest.approx(0.0, rel=1e-6)
+    assert problem.get_val("data:weight:airframe:wing:distributed_mass:mass") == pytest.approx(
+        120.0, rel=1e-6
+    )
 
     problem.check_partials(compact_print=True)
