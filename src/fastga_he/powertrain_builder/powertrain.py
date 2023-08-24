@@ -27,6 +27,7 @@ from .exceptions import (
     FASTGAHEComponentsNotIdentified,
     FASTGAHESingleSSPCAtEndOfLine,
     FASTGAHEIncoherentVoltage,
+    FASTGAHEImpossiblePair,
 )
 
 from . import resources
@@ -204,7 +205,6 @@ class FASTGAHEPowerTrainConfigurator:
 
         components_id = []
         components_position = []
-        components_name_list = []
         components_name_id_list = []
         components_type_list = []
         components_om_type_list = []
@@ -217,6 +217,10 @@ class FASTGAHEPowerTrainConfigurator:
         components_slipstream_needs_flaps = []
         components_slipstream_wing_lift = []
         components_symmetrical_pairs = []
+
+        # Doing it like that allows us to have the names of the components before we start the
+        # loop, which I'm gonna use to check if the pairs are valid
+        components_name_list = list(components_list.keys())
 
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
@@ -234,6 +238,20 @@ class FASTGAHEPowerTrainConfigurator:
 
             if "symmetrical" in component:
                 component_symmetrical = component["symmetrical"]
+
+                if component_symmetrical not in components_name_list:
+
+                    raise FASTGAHEImpossiblePair(
+                        "Cannot pair "
+                        + component_name
+                        + " with "
+                        + component_symmetrical
+                        + " because "
+                        + component_symmetrical
+                        + " does not exist. Valid pair choice are among the following list: "
+                        + ", ".join(components_name_list)
+                        + ". \nBest regards."
+                    )
 
                 # We sort the pair to ensure that if the pair is already there because the
                 # symmetrical tag is defined twice (propeller1 is symmetrical to propeller2 and
@@ -262,7 +280,6 @@ class FASTGAHEPowerTrainConfigurator:
                 else:
                     self._sspc_default_state[component_name] = True
 
-            components_name_list.append(component_name)
             components_name_id_list.append(resources.DICTIONARY_CN_ID[component_id])
             components_type_list.append(resources.DICTIONARY_CT[component_id])
             components_om_type_list.append(resources.DICTIONARY_CN[component_id])
@@ -872,7 +889,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_slip_perf_watchers_unit_organised_list,
         )
 
-    def get_wing_punctual_mass_element_list(self) -> Tuple[list, list]:
+    def get_wing_punctual_mass_element_list(self) -> Tuple[list, list, list]:
         """
         This function returns a list of the components that are to be considered as punctual
         masses acting on the wing due to their positions as defined in the powertrain file
@@ -881,13 +898,18 @@ class FASTGAHEPowerTrainConfigurator:
         self._get_components()
 
         punctual_mass_names = []
+        punctual_mass_types = []
         component_pairs = copy.deepcopy(self._components_symmetrical_pairs)
 
-        for component_id, component_name, component_position in zip(
-            self._components_id, self._components_name, self._components_position
+        for component_id, component_name, component_position, component_type in zip(
+            self._components_id,
+            self._components_name,
+            self._components_position,
+            self._components_type,
         ):
             if component_position in resources.DICTIONARY_PCT_W[component_id]:
                 punctual_mass_names.append(component_name)
+                punctual_mass_types.append(component_type)
 
         # TODO: improve the way this is done, as I'm not satisfied with it
         for component_pair in self._components_symmetrical_pairs:
@@ -901,9 +923,9 @@ class FASTGAHEPowerTrainConfigurator:
             else:
                 component_pairs.remove(component_pair)
 
-        return punctual_mass_names, component_pairs
+        return punctual_mass_names, punctual_mass_types, component_pairs
 
-    def get_wing_distributed_mass_element_list(self) -> Tuple[list, list]:
+    def get_wing_distributed_mass_element_list(self) -> Tuple[list, list, list]:
         """
         This function returns a list of the components that are to be considered as distributed
         masses acting on the wing due to their positions as defined in the powertrain file
@@ -912,13 +934,18 @@ class FASTGAHEPowerTrainConfigurator:
         self._get_components()
 
         distributed_mass_names = []
+        distributed_mass_types = []
         component_pairs = copy.deepcopy(self._components_symmetrical_pairs)
 
-        for component_id, component_name, component_position in zip(
-            self._components_id, self._components_name, self._components_position
+        for component_id, component_name, component_position, component_type in zip(
+            self._components_id,
+            self._components_name,
+            self._components_position,
+            self._components_type,
         ):
             if component_position in resources.DICTIONARY_DST_W[component_id]:
                 distributed_mass_names.append(component_name)
+                distributed_mass_types.append(component_type)
 
         # TODO: improve the way this is done, as I'm not satisfied with it
         for component_pair in self._components_symmetrical_pairs:
@@ -932,7 +959,7 @@ class FASTGAHEPowerTrainConfigurator:
             else:
                 component_pairs.remove(component_pair)
 
-        return distributed_mass_names, component_pairs
+        return distributed_mass_names, distributed_mass_types, component_pairs
 
     def get_graphs_connected_voltage(self) -> list:
         """

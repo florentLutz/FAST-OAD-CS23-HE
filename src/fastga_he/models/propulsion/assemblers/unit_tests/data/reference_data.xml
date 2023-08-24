@@ -43,5 +43,25 @@
                 </takeoff>
             </flaps>
         </aerodynamics>
+        <propulsion>
+            <he_power_train>
+                <DC_bus>
+                    <dc_bus_21>
+                        <mass units="kg">15.0</mass>
+                        <CG>
+                            <y_ratio>0.8</y_ratio>
+                        </CG>
+                    </dc_bus_21>
+                </DC_bus>
+                <DC_DC_converter>
+                    <dc_dc_converter_1><!-- No need for the weight of the second converter since it is declared symmetrical -->
+                        <mass units="kg">10.0</mass>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                    </dc_dc_converter_1>
+                </DC_DC_converter>
+            </he_power_train>
+        </propulsion>
     </data>
 </FASTOAD_model>

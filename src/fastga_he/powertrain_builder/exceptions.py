@@ -41,3 +41,9 @@ class FASTGAHEIncoherentVoltage(FastError):
     OpenMDAO level, but from experience, it will not converge, so we will make it fail as soon as
     possible.
     """
+
+
+class FASTGAHEImpossiblePair(FastError):
+    """
+    Class for managing errors that result from trying to pair with a component that does not exist.
+    """
