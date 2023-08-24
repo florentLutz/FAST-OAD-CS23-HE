@@ -25,7 +25,13 @@ from fastga_he.models.propulsion.components import (
     SizingICE,
 )
 
-from .constants import SUBMODEL_POWER_TRAIN_MASS, SUBMODEL_POWER_TRAIN_CG, SUBMODEL_POWER_TRAIN_DRAG
+from .constants import (
+    SUBMODEL_POWER_TRAIN_MASS,
+    SUBMODEL_POWER_TRAIN_CG,
+    SUBMODEL_POWER_TRAIN_DRAG,
+    SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_LOADS,
+    SUBMODEL_POWER_TRAIN_WING_DISTRIBUTED_LOADS,
+)
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.power_train.sizing", domain=ModelDomain.OTHER)
@@ -97,6 +103,20 @@ class PowerTrainSizingFromFile(om.Group):
             name="power_train_drag",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_POWER_TRAIN_DRAG, options=option_pt_file
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="punctual_loads_prep",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_LOADS, options=option_pt_file
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="distributed_load_prep",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_POWER_TRAIN_WING_DISTRIBUTED_LOADS, options=option_pt_file
             ),
             promotes=["*"],
         )

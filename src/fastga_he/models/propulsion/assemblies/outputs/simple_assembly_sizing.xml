@@ -64,6 +64,8 @@
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC/DC converter center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--Y position of the DC DC converter center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <capacitor>
               <aspect_ratio units="A" is_input="True">2.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
@@ -199,6 +201,8 @@
             <voltage_max units="V" is_input="True">850.0000000000001<!--Maximum voltage flowing through the SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC SSPC center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--Y position of the DC SSPC center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
@@ -228,6 +232,8 @@
             <voltage_max units="V" is_input="True">846.7684101430876<!--Maximum voltage flowing through the SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC SSPC center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--Y position of the DC SSPC center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
@@ -257,6 +263,8 @@
             <voltage_max units="V" is_input="True">847.5972788599612<!--Maximum voltage flowing through the SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC SSPC center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--Y position of the DC SSPC center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
@@ -286,6 +294,8 @@
             <voltage_max units="V" is_input="True">849.1711312831264<!--Maximum voltage flowing through the SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC SSPC center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--Y position of the DC SSPC center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
@@ -318,6 +328,8 @@
             <width units="m" is_input="False">0.05913182514458949</width>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC bus center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--X position of the DC bus center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <conductor>
               <mutual_inductance units="H" is_input="False">1.2733228650923893e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
@@ -352,6 +364,8 @@
             <width units="m" is_input="False">0.05913182514458949</width>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC bus center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--X position of the DC bus center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <conductor>
               <mutual_inductance units="H" is_input="False">1.2733228650923893e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
@@ -388,6 +402,7 @@
             <voltage_max units="V" is_input="True">800.0</voltage_max>
             <CG>
               <x units="m" is_input="False">1.2387085918711065<!--X position of the DC cable center of gravity--></x>
+              <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
             </CG>
             <cable>
               <current_caliber units="A" is_input="False">750.0<!--Maximum current flowing in one cable of the harness--></current_caliber>
@@ -444,6 +459,8 @@
             <voltage_caliber units="V" is_input="True">700.0<!--Max voltage of the motor--></voltage_caliber>
             <CG>
               <x units="m" is_input="False">2.385173712937498<!--X position of the PMSM center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--Y position of the PMSM center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0003524184026434314</CD0>
@@ -483,6 +500,8 @@
             <volume units="L" is_input="False">661.1249999999999<!--Volume of the battery pack--></volume>
             <CG>
               <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the battery center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--X position of the battery center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <cell>
               <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
@@ -496,6 +515,12 @@
               <length units="m" is_input="False">0.5114874519835109<!--Length of the battery, as in the size of the battery along the X-axis--></length>
               <width units="m" is_input="False">3.6949853531288834<!--Width of the battery, as in the size of the battery along the Y-axis--></width>
             </dimension>
+            <distributed_mass>
+              <chord_slope is_input="False">0.0<!--When battery is considered as a distributed mass, the rate at which the chord varies--></chord_slope>
+              <start_chord units="m" is_input="False">0.7672311779752663<!--When battery is considered as a distributed mass, the chord at the start--></start_chord>
+              <y_ratio_end is_input="False">0.74<!--When battery is considered as a distributed mass, the position of the end as a ratio of the half-span--></y_ratio_end>
+              <y_ratio_start is_input="False">-0.06<!--When battery is considered as a distributed mass, the position of the start as a ratio of the half-span--></y_ratio_start>
+            </distributed_mass>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
@@ -525,6 +550,8 @@
             <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the inverter center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--Y position of the inverter center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <capacitor>
               <aspect_ratio units="kg" is_input="True">2.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
@@ -671,6 +698,8 @@
             <y_ratio is_input="True">0.34<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
             <CG>
               <x units="m" is_input="False">2.202458712937498<!--X position of the propeller center of gravity--></x>
+              <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
+              <y_ratio is_input="True">0.34<!--Y position of the propeller center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
