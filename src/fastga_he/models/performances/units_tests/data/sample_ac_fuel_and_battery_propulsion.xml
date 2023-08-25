@@ -283,6 +283,7 @@
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
             <CG>
               <x units="m" is_input="False">3.4550815011709046<!--X position of the DC/DC converter center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <heat_sink>
                     <temperature_rating units="degK">373.15</temperature_rating>
@@ -429,6 +430,7 @@
             <width units="m" is_input="False">0.052974946375362056</width>
             <CG>
               <x units="m" is_input="False">3.4550815011709046<!--X position of the DC bus center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <conductor>
               <mutual_inductance units="H" is_input="False">1.2732772553183625e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
@@ -564,6 +566,9 @@
             <module>
               <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
+            <CG>
+              <y_ratio>0.5</y_ratio>
+            </CG>
           </battery_pack_2>
           <battery_pack_1>
             <SOC_min units="percent" is_input="False">4.226387822069779e-17<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
@@ -578,6 +583,7 @@
             <volume units="L" is_input="False">388.64263438396716<!--Volume of the battery pack--></volume>
             <CG>
               <x units="m" is_input="False">3.818621385069883<!--X position of the battery center of gravity--></x>
+              <y_ratio>0.5</y_ratio>
             </CG>
             <cell>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>

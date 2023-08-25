@@ -50,7 +50,6 @@ class SizingRectifierCGY(om.ExplicitComponent):
 
             self.add_input(
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":CG:y_ratio",
-                units="m",
                 val=np.nan,
                 desc="Y position of the rectifier center of gravity as a ratio of the wing half-span",
             )

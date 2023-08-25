@@ -51,7 +51,6 @@ class SizingICECGY(om.ExplicitComponent):
 
             self.add_input(
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":CG:y_ratio",
-                units="m",
                 val=np.nan,
                 desc="Y position of the ICE center of gravity as a ratio of the wing half-span",
             )

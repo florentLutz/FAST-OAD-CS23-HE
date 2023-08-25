@@ -50,7 +50,6 @@ class SizingDCSplitterCGY(om.ExplicitComponent):
 
             self.add_input(
                 "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:y_ratio",
-                units="m",
                 val=np.nan,
                 desc="Y position of the DC DC converter center of gravity as a ratio of the wing half-span",
             )

@@ -196,6 +196,9 @@
             <igbt>
               <resistance units="ohm">1e-3</resistance>
             </igbt>
+            <CG>
+              <y_ratio>0.34</y_ratio>
+            </CG>
           </dc_sspc_1>
           <dc_sspc_2>
             <low_speed>
@@ -206,6 +209,7 @@
             </cruise>
             <CG>
                 <x units="m">2.69</x>
+                <y_ratio>0.34</y_ratio>
             </CG>
             <mass units="kg">10.0</mass>
             <current_caliber units="A">800.0</current_caliber>
@@ -242,6 +246,7 @@
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
             <CG>
               <x units="m" is_input="False">3.4550815011709046<!--X position of the DC/DC converter center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <capacitor>
               <capacity units="F" is_input="False">0.0015124177077996525<!--Capacity of the capacitor--></capacity>
@@ -326,6 +331,9 @@
             </scaling>
           </dc_dc_converter_1>
           <dc_dc_converter_2>
+            <CG>
+              <y_ratio>0.34</y_ratio>
+            </CG>
             <efficiency_mission>0.97</efficiency_mission>
             <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <power_density units="W/kg" is_input="True">4000.0<!--Power density of the converter--></power_density>
@@ -428,6 +436,9 @@
         <DC_splitter>
           <dc_splitter_1>
             <power_split units="percent">50.0</power_split>
+            <CG>
+              <y_ratio>0.34</y_ratio>
+            </CG>
           </dc_splitter_1>
         </DC_splitter>
         <DC_cable_harness>
@@ -537,6 +548,9 @@
             <module>
               <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
+            <CG>
+              <y_ratio>0.5</y_ratio>
+            </CG>
           </battery_pack_2>
           <battery_pack_1>
             <SOC_min units="percent" is_input="False">4.226387822069779e-17<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
@@ -551,6 +565,7 @@
             <volume units="L" is_input="False">388.64263438396716<!--Volume of the battery pack--></volume>
             <CG>
               <x units="m" is_input="False">3.818621385069883<!--X position of the battery center of gravity--></x>
+              <y_ratio>0.5</y_ratio>
             </CG>
             <cell>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>

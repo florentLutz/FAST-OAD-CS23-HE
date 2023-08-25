@@ -56,7 +56,6 @@ class SizingBatteryPreparationForLoads(om.ExplicitComponent):
             )
             self.add_input(
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:y_ratio",
-                units="m",
                 val=np.nan,
                 desc="X position of the battery center of gravity as a ratio of the wing half-span",
             )

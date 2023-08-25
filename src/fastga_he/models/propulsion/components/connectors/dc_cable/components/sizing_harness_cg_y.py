@@ -51,7 +51,6 @@ class SizingHarnessCGY(om.ExplicitComponent):
 
             self.add_input(
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:y_ratio",
-                units="m",
                 val=np.nan,
                 desc="X position of the DC bus center of gravity as a ratio of the wing half-span",
             )

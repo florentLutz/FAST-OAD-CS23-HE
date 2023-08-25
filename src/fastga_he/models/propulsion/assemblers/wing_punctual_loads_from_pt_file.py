@@ -77,7 +77,7 @@ class PowerTrainPunctualLoadsFromFile(om.ExplicitComponent):
             )
             mass_name = PT_DATA_PREFIX + punctual_mass_type + ":" + punctual_mass_name + ":mass"
 
-            self.add_input(y_ratio_name, val=0.0)
+            self.add_input(y_ratio_name, val=np.nan)
             self.add_input(mass_name, val=0.0, units="kg")
 
             self.declare_partials(

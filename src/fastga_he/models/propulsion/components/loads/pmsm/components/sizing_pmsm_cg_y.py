@@ -48,7 +48,6 @@ class SizingPMSMCGY(om.ExplicitComponent):
 
             self.add_input(
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:y_ratio",
-                units="m",
                 val=np.nan,
                 desc="Y position of the PMSM center of gravity as a ratio of the wing half-span",
             )

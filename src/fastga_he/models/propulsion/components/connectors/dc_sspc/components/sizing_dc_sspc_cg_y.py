@@ -50,7 +50,6 @@ class SizingDCSSPCCGY(om.ExplicitComponent):
 
             self.add_input(
                 "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:y_ratio",
-                units="m",
                 val=np.nan,
                 desc="Y position of the DC SSPC center of gravity as a ratio of the wing half-span",
             )

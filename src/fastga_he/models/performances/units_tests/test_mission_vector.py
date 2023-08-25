@@ -17,6 +17,7 @@ Test mission vector module.
 import os
 import os.path as pth
 import pytest
+import copy
 
 import numpy as np
 import openmdao.api as om
@@ -1325,6 +1326,8 @@ def test_mission_vector_from_yml():
 
 def test_mission_vector_from_yml_simplified_models():
 
+    previously_active_models = copy.deepcopy(oad.RegisterSubmodel.active_models)
+
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.performances.dc_line.temperature_profile"
     ] = "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.constant"
@@ -1367,11 +1370,24 @@ def test_mission_vector_from_yml_simplified_models():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(159.56, abs=1e-2)
+    assert sizing_energy == pytest.approx(149.56, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
     assert mission_end_soc == pytest.approx(0.0387, abs=1e-2)
+
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.performances.dc_line.temperature_profile"
+    ] = previously_active_models["submodel.propulsion.performances.dc_line.temperature_profile"]
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.dc_dc_converter.efficiency"
+    ] = previously_active_models["submodel.propulsion.dc_dc_converter.efficiency"]
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.inverter.junction_temperature"
+    ] = previously_active_models["submodel.propulsion.inverter.junction_temperature"]
+    oad.RegisterSubmodel.active_models[
+        "submodel.propulsion.inverter.efficiency"
+    ] = previously_active_models["submodel.propulsion.inverter.efficiency"]
 
 
 def test_mission_vector_from_yml_fuel():
@@ -1593,6 +1609,8 @@ def test_recording():
     solver.recording_options["record_solver_residuals"] = True
 
     problem.run_model()
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(20.135, abs=1e-2)
