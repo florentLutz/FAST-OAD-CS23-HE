@@ -165,7 +165,7 @@ class ConstraintsSOCCRate(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
-            + "cell:c_rate_caliber",
+            + ":cell:c_rate_caliber",
             val=2.4,
             units="h**-1",
             desc="Maximum C-rate that the battery reference cell can provide",
@@ -188,7 +188,9 @@ class ConstraintsSOCCRate(om.ExplicitComponent):
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max"
         ]
         c_rate_caliber = inputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + "cell:c_rate_caliber"
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":cell:c_rate_caliber"
         ]
 
         multiplicative_factor = max_c_rate / c_rate_caliber
@@ -205,7 +207,9 @@ class ConstraintsSOCCRate(om.ExplicitComponent):
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max"
         ]
         c_rate_caliber = inputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + "cell:c_rate_caliber"
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":cell:c_rate_caliber"
         ]
 
         partials[

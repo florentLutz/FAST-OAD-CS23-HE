@@ -23,6 +23,7 @@ class UpdateWingMass(om.ExplicitComponent):
     def setup(self):
         self.add_input("data:weight:airframe:wing:primary_structure:mass", val=np.nan, units="kg")
         self.add_input("data:weight:airframe:wing:secondary_structure:mass", val=np.nan, units="kg")
+        self.add_input("data:weight:airframe:wing:k_factor", val=1.0)
 
         self.add_output("data:weight:airframe:wing:mass", val=100.0, units="kg")
 
@@ -33,4 +34,6 @@ class UpdateWingMass(om.ExplicitComponent):
 
         wing_mass = primary_structure_mass + secondary_structure_mass
 
-        outputs["data:weight:airframe:wing:mass"] = wing_mass
+        outputs["data:weight:airframe:wing:mass"] = (
+            wing_mass * inputs["data:weight:airframe:wing:k_factor"]
+        )

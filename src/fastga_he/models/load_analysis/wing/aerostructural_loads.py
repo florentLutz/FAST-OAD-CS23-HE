@@ -623,8 +623,9 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         tmp_array = np.append(array, element)
         final_array = np.sort(tmp_array)
         index = np.where(final_array == element)
+        # In the unlikely event that it matches two values, we return it like this
 
-        return final_array, index
+        return final_array, [min(index[0])]
 
     @staticmethod
     def delete_additional_zeros(array, length: int = None):
