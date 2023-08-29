@@ -42,14 +42,14 @@ power_train_components:
 
   dc_dc_converter_1:
     id: fastga_he.pt_component.dc_dc_converter
-    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
   rectifier_1:
     id: fastga_he.pt_component.rectifier
     position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
 
   battery_pack_1:
     id: fastga_he.pt_component.battery_pack
-    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
+    position: in_the_front  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
   generator_1:
     id: fastga_he.pt_component.generator
     position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"

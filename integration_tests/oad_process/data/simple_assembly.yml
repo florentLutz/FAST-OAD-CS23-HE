@@ -28,25 +28,25 @@ power_train_components:
     id: fastga_he.pt_component.dc_sspc
     options:
       closed_by_default: True
-    position: inside_the_wing
+    position: in_the_front
   dc_dc_converter_1:
     id: fastga_he.pt_component.dc_dc_converter
-    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
   battery_pack_1:
     id: fastga_he.pt_component.battery_pack
-    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
+    position: in_the_front  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
 
   dc_sspc_2:
     id: fastga_he.pt_component.dc_sspc
     options:
       closed_by_default: True
-    position: inside_the_wing
+    position: in_the_back
   dc_dc_converter_2:
     id: fastga_he.pt_component.dc_dc_converter
-    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
   battery_pack_2:
     id: fastga_he.pt_component.battery_pack
-    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
+    position: in_the_back  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
 
 component_connections:
   - source: propeller_1

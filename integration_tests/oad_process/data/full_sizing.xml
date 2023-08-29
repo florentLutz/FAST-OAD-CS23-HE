@@ -69,6 +69,11 @@
         </rudder>
       </vertical_tail>
       <wing>
+        <aileron>
+          <chord_ratio is_input="True">0.2<!--mean value of (flap chord)/(section chord)--></chord_ratio>
+          <span_ratio is_input="True">0.2<!--ratio (width of flaps)/(total span)--></span_ratio>
+          <max_deflection units="deg">15.0</max_deflection>
+        </aileron>
         <aspect_ratio is_input="True">12.04<!--wing aspect ratio--></aspect_ratio>
         <sweep_25 units="deg" is_input="True">0.0<!--sweep angle at 25% chord of wing--></sweep_25>
         <dihedral units="deg" is_input="True">0.0<!--sweep angle at 25% chord of wing--></dihedral>
@@ -92,12 +97,19 @@
           <wet_area units="m**2" is_input="True">1.09<!--nacelle wet area--></wet_area>
           <width units="m" is_input="True">0.9291288709126333<!--width of the nacelle--></width>
         </nacelle>
+        <tank>
+          <LE_chord_percentage>0.2</LE_chord_percentage>
+          <TE_chord_percentage>0.8</TE_chord_percentage>
+          <y_ratio_tank_beginning>0.4</y_ratio_tank_beginning>
+          <y_ratio_tank_end>0.6</y_ratio_tank_end>
+        </tank>
       </propulsion>
     </geometry>
     <propulsion>
       <fuel_type is_input="True">1.0<!--engine fuel type (1.0 - gasoline, 2.0 - gasoil)--></fuel_type>
+      <max_rpm units="1/min">5800.0</max_rpm>
       <IC_engine>
-        <max_power units="W" is_input="True">130000.0<!--maximum power of the engine--></max_power>
+        <max_power units="kW" is_input="True">60.0<!--maximum power of the engine--></max_power>
         <strokes_nb is_input="True">4.0<!--number of strokes on the engine--></strokes_nb>
       </IC_engine>
       <he_power_train>
@@ -127,6 +139,9 @@
               <inductance units="uH">75.0</inductance>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
+            <CG>
+              <y_ratio>0.34</y_ratio>
+            </CG>
           </dc_dc_converter_1>
           <dc_dc_converter_2>
             <current_ripple is_input="True">0.4<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
@@ -152,6 +167,9 @@
               <air_gap units="mm">2.7</air_gap>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
+            <CG>
+              <y_ratio>0.34</y_ratio>
+            </CG>
           </dc_dc_converter_2>
         </DC_DC_converter>
         <DC_SSPC>
@@ -164,6 +182,7 @@
             </cruise>
             <CG>
                 <x units="m">2.69</x>
+                <y_ratio>0.34</y_ratio>
             </CG>
             <mass units="kg">10.0</mass>
             <current_caliber units="A">800.0</current_caliber>
@@ -189,6 +208,7 @@
             </cruise>
             <CG>
                 <x units="m">2.69</x>
+                <y_ratio>0.34</y_ratio>
             </CG>
             <mass units="kg">10.0</mass>
             <current_caliber units="A">800.0</current_caliber>
@@ -209,6 +229,9 @@
         <DC_splitter>
           <dc_splitter_1>
             <power_split>50.0</power_split>
+            <CG>
+              <y_ratio>0.34</y_ratio>
+            </CG>
           </dc_splitter_1>
         </DC_splitter>
         <DC_bus>
@@ -261,6 +284,9 @@
             <module>
               <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
+            <CG>
+              <y_ratio>0.5</y_ratio>
+            </CG>
           </battery_pack_1>
           <battery_pack_2>
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
@@ -271,6 +297,9 @@
             <module>
               <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
+            <CG>
+              <y_ratio>0.5</y_ratio>
+            </CG>
           </battery_pack_2>
         </battery_pack>
         <inverter>
@@ -445,6 +474,19 @@
           <thrust_limit units="N" is_input="True">[4232.24869825669, 4675.807054723695, 5017.410358731326, 5307.969328239218, 5571.20112011273, 5821.982703144951, 6074.726893728504, 6337.371791985532, 6616.053232440212, 6920.433019818882]<!--maximum thrust output of the propeller at sea level for varying velocities--></thrust_limit>
         </sea_level>
       </propeller>
+      <slipstream>
+        <wing>
+          <cruise>
+            <prop_on>
+              <Y_vector units="m" is_input="True">[0.055575258464038636, 0.16672577539211592, 0.2778633013761857, 0.38901381830426296, 0.5001643352323403, 0.61130186121641, 0.7224523781444873, 0.8567917301259327, 1.0147746002010083, 1.1736538454126009, 1.3333255382086504, 1.4936987419811039, 1.6546825201219095, 1.8161729450790076, 1.9780660893003374, 2.140271016177847, 2.302696789103484, 2.465213498637173, 2.6277561900588777, 2.790181962984515, 2.9524258626940467, 3.1143709706914064, 3.2759263503685423, 3.436975083229385, 3.5974392236098915, 3.7572148439580006, 3.916198016721653, 4.074310796236803, 4.2314622458954, 4.38756142908939, 4.542504418266713, 4.69623924965134, 4.84866199569121, 4.999707701666287, 5.149285430968517, 5.297356210765878, 5.443816113506312, 5.588626166357793, 5.731721414600286, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing station along the wing span at which chord_vector and Cl_vector are sampled--></Y_vector>
+              <velocity units="knot" is_input="True">93.0</velocity>
+            </prop_on>
+            <only_prop>
+              <CL_vector is_input="True">[0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</CL_vector>
+            </only_prop>
+          </cruise>
+        </wing>
+      </slipstream>
     </aerodynamics>
     <mission>
       <sizing>
@@ -476,8 +518,22 @@
         </taxi_out>
         <cs23>
           <sizing_factor>
-            <ultimate_aircraft is_input="True">7.5<!--ultimate load factor that the aircraft will experience (default value is 5.7)--></ultimate_aircraft>
+            <ultimate_aircraft is_input="True">6.0<!--ultimate load factor that the aircraft will experience (default value is 5.7)--></ultimate_aircraft>
+            <ultimate_mtow>
+              <negative>-3.0</negative>
+              <positive>6.0</positive>
+            </ultimate_mtow>
+            <ultimate_mzfw>
+              <negative>-3.0</negative>
+              <positive>6.0</positive>
+            </ultimate_mzfw>
           </sizing_factor>
+          <safety_factor>1.5</safety_factor>
+          <characteristic_speed>
+            <va units="knot">86.0</va>
+            <vc units="knot">93.0</vc>
+            <vd units="knot">135.0</vd>
+          </characteristic_speed>
         </cs23>
         <main_route>
           <climb>
@@ -504,6 +560,11 @@
     </mission>
   </data>
   <settings>
+    <geometry>
+      <fuel_tanks>
+        <depth>0.5</depth>
+      </fuel_tanks>
+    </geometry>
     <handling_qualities>
       <rudder>
         <safety_margin is_input="True">0.2<!--Ratio of the total rudder deflection not used in the computation of the VT area to leave a safety margin--></safety_margin>
@@ -584,5 +645,10 @@
         </tank>
       </propulsion>
     </weight>
+    <wing>
+      <structure>
+        <F_COMP>1.0</F_COMP>
+      </structure>
+    </wing>
   </settings>
 </FASTOAD_model>
