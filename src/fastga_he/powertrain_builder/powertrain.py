@@ -1219,6 +1219,72 @@ class FASTGAHEPowerTrainConfigurator:
             icons_size,
         )
 
+    def produce_simplified_pt_file_copy(self):
+        """
+        This function was created after the observation that the more components there are in the
+        powertrain, the longer it takes to run (duh). It is even more striking when running the
+        optimization to find a new wing area (it can takes minutes). However, for that particular
+        observation the whole propulsion chain is not needed. We indeed only need the propulsors
+        to compute the slipstream effect and the propulsive load to check that the power rate is
+        below 1. Consequently, and only for that particular application, we will produce a
+        simplified powertrain file which contains only the required elements.
+        """
+
+        simplified_serializer = copy.deepcopy(self._serializer)
+
+        self._get_components()
+
+        retained_components = []
+
+        # First, we pop all the components that we don't need
+        for component_name, component_type_class in zip(
+            self._components_name, self._components_type_class
+        ):
+            if (
+                "propulsor" not in component_type_class
+                and "propulsive_load" not in component_type_class
+            ):
+                simplified_serializer.data[KEY_PT_COMPONENTS].pop(component_name)
+            else:
+                retained_components.append(component_name)
+
+        # Then we pop all the connections that don't involve the components we have
+        self._get_connections()
+
+        cured_connection_list = copy.deepcopy(self._connection_list)
+
+        for connection in self._connection_list:
+
+            if type(connection["source"]) is str:
+                if connection["source"] not in retained_components:
+                    cured_connection_list.remove(connection)
+                else:
+                    if type(connection["target"]) is str:
+                        if connection["target"] not in retained_components:
+                            cured_connection_list.remove(connection)
+                    else:
+                        if connection["target"][0] not in retained_components:
+                            cured_connection_list.remove(connection)
+
+            else:
+                if connection["source"][0] not in retained_components:
+                    cured_connection_list.remove(connection)
+                else:
+                    if type(connection["target"]) is str:
+                        if connection["target"] not in retained_components:
+                            cured_connection_list.remove(connection)
+                    else:
+                        if connection["target"][0] not in retained_components:
+                            cured_connection_list.remove(connection)
+
+        simplified_serializer.data[KEY_PT_CONNECTIONS] = cured_connection_list
+
+        pt_file_copy_path = self._power_train_file.replace(".yml", "_temp_copy.yml")
+
+        simplified_serializer.write(pt_file_copy_path)
+
+        return pt_file_copy_path
+
 
 class _YAMLSerializer(ABC):
     """YAML-format serializer."""
