@@ -105,7 +105,10 @@ def power_train_network_viewer(
     graph_name = os.path.basename(network_file_path)
     old_working_directory = os.getcwd()
 
-    # Set the new working directory
+    # Set the new working directory and create it if it doesn't exist
+    if not os.path.exists(directory_to_save_graph):
+        os.makedirs(directory_to_save_graph)
+
     os.chdir(directory_to_save_graph)
 
     net.from_nx(graph)

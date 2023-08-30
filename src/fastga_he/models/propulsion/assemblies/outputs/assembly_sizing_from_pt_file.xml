@@ -755,7 +755,6 @@
             <torque_max units="N*m" is_input="True">817.0<!--Maximum value of the propeller torque during performances assessment--></torque_max>
             <torque_rating units="N*m" is_input="False">817.0<!--Maximum value of the propeller torque used for the sizing--></torque_rating>
             <wing_chord_ref units="m" is_input="False">0.9409668476269506<!--Value of the wing chord behind the propeller--></wing_chord_ref>
-            <y_ratio is_input="True">0.34<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
             <CG>
               <x units="m" is_input="False">2.202458712937498<!--X position of the propeller center of gravity--></x>
               <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>

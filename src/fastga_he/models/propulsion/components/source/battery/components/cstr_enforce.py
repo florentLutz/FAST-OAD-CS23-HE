@@ -222,7 +222,7 @@ class ConstraintsSOCCRate(om.ExplicitComponent):
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_multiplier",
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
-            + "cell:c_rate_caliber",
+            + ":cell:c_rate_caliber",
         ] = (
             -max_c_rate / c_rate_caliber ** 2.0
         )

@@ -45,7 +45,7 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
         if self.options["position"] == "on_the_wing":
 
             self.add_input(
-                name="data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                name="data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
                 val=np.nan,
                 desc="Location of the propeller along the span as a fraction of the span",
             )
@@ -67,7 +67,7 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
 
             flap_span_ratio = inputs["data:geometry:flap:span_ratio"]
             prop_y_ratio = inputs[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio"
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio"
             ]
             prop_span_to_dia_ratio = inputs[
                 "data:propulsion:he_power_train:propeller:"
@@ -93,7 +93,7 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
 
             flap_span_ratio = inputs["data:geometry:flap:span_ratio"]
             prop_y_ratio = inputs[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio"
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio"
             ]
             prop_span_to_dia_ratio = inputs[
                 "data:propulsion:he_power_train:propeller:"
@@ -111,7 +111,7 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
                 ] = 0.0
                 partials[
                     "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
-                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
                 ] = 0.0
                 partials[
                     "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
@@ -127,7 +127,7 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
                 ] = 1.0 / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio)
                 partials[
                     "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
-                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
                 ] = (
                     -flap_span_ratio / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio) ** 2.0
                 )

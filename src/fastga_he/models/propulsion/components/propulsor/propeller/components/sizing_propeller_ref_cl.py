@@ -71,7 +71,7 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
         if position == "on_the_wing":
 
             self.add_input(
-                name="data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                name="data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
                 val=np.nan,
                 desc="Location of the propeller along the span as a fraction of the span",
             )
@@ -80,7 +80,7 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
             self.declare_partials(
                 of="data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
                 wrt=[
-                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
                     "data:geometry:wing:span",
                 ],
                 method="exact",
@@ -103,7 +103,7 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
         if position == "on_the_wing":
 
             y_ratio = inputs[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio"
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio"
             ]
             half_span = inputs["data:geometry:wing:span"] / 2.0
             y_vector = inputs["data:aerodynamics:wing:low_speed:Y_vector"]
@@ -134,7 +134,7 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
         if position == "on_the_wing":
 
             y_ratio = inputs[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio"
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio"
             ]
             half_span = inputs["data:geometry:wing:span"] / 2.0
 
@@ -142,7 +142,7 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
 
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":y_ratio",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
             ] = (
                 spline_value * half_span
             )

@@ -147,7 +147,7 @@ def test_propeller_cg_y():
 
 def test_propeller_ref_cl():
 
-    expected_cl = [1.085, 0.0]
+    expected_cl = [1.011, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cl):
 
@@ -170,7 +170,7 @@ def test_propeller_ref_cl():
 
 def test_propeller_ref_chord():
 
-    expected_chords = [0.9275, 1.0]
+    expected_chords = [0.88, 1.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_chords):
 
@@ -231,7 +231,7 @@ def test_diameter_to_chord_ratio():
 
 def test_propeller_flapped_ratio():
 
-    expected_values = [0.9072, 0.0]
+    expected_values = [0.5514, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
 

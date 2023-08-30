@@ -514,8 +514,20 @@ class FASTGAHEPowerTrainConfigurator:
         connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
 
         for component_name in self._components_name:
+
+            # When there are two separate sub propulsion chain in the same propulsion file,
+            # these line will cause an issue because, as it will browse all propulsive load he
+            # will attempt to reach loads he is not connected to and therefore not in
+            # connections_length_between_nodes. So first we must make sure to only browse
+            # connected loads.
+
+            connected_components = list(connections_length_between_nodes[component_name].keys())
+            connected_propulsive_loads = list(
+                set(propulsive_load_names) & set(connected_components)
+            )
+
             min_distance = np.inf
-            for prop_load in propulsive_load_names:
+            for prop_load in connected_propulsive_loads:
                 distance_to_load = connections_length_between_nodes[component_name][prop_load]
                 if distance_to_load < min_distance:
                     min_distance = distance_to_load
