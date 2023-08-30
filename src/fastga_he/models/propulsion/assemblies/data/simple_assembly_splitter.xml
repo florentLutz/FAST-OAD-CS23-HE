@@ -89,6 +89,9 @@
                             <width units="m">1.15</width>
                             <wet_area units="m**2">7.92688</wet_area>
                         </nacelle>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
                     </ice_1>
                 </ICE>
                 <rectifier>
@@ -153,6 +156,9 @@
                                 <Prandtl_number>39.5</Prandtl_number>
                             </coolant>
                         </heat_sink>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
                     </rectifier_1>
                 </rectifier>
                 <generator>
@@ -183,6 +189,9 @@
                         </scaling>
                         <diameter units="m">0.4824</diameter>
                         <length units="m">0.03667</length>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
                     </generator_1>
                 </generator>
                 <battery_pack>
@@ -190,6 +199,7 @@
                         <c_rate_max units="h**-1">0.7</c_rate_max>
                         <CG>
                             <x units="m">2.88</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -216,6 +226,7 @@
                     <battery_pack_2>
                         <CG>
                             <x units="m">2.88</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -244,6 +255,7 @@
                     <dc_dc_converter_1>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -321,6 +333,7 @@
                     <dc_dc_converter_2>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -396,6 +409,7 @@
                         </cruise>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <mass units="kg">10.0</mass>
                         <current_caliber units="A">400.0</current_caliber>
@@ -422,6 +436,7 @@
                         </cruise>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <mass units="kg">10.0</mass>
                         <current_caliber units="A">400.0</current_caliber>
@@ -448,6 +463,7 @@
                         </cruise>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <mass units="kg">10.0</mass>
                         <current_caliber units="A">400.0</current_caliber>
@@ -474,6 +490,7 @@
                         </cruise>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <mass units="kg">10.0</mass>
                         <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
@@ -500,6 +517,7 @@
                         </cruise>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <mass units="kg">10.0</mass>
                         <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
@@ -526,6 +544,7 @@
                         </cruise>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <mass units="kg">10.0</mass>
                         <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
@@ -547,6 +566,7 @@
                     <harness_1>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -597,6 +617,7 @@
                     <inverter_1>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -696,6 +717,7 @@
                         <voltage_ac_max units="V" is_input="False">414.83894592299646<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
                         <CG>
                             <x units="m">2.39</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.000357</CD0>
@@ -733,6 +755,7 @@
                         <y_ratio>0.34</y_ratio>
                         <CG>
                             <x units="m">2.2</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -765,12 +788,16 @@
                     <power_split units="percent" is_input="True">50.0<!--Percent of the power going to the first (primary) input, in %--></power_split>
                     <power_share units="kW" is_input="True">150.0<!--Power threshold for how much power is going into the primary input--></power_share>
                     <voltage_max units="V" is_input="False">850.0</voltage_max>
+                    <CG>
+                        <y_ratio>0.34</y_ratio>
+                    </CG>
                   </dc_splitter_1>
                 </DC_splitter>
                 <DC_bus>
                     <dc_bus_2>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -798,6 +825,7 @@
                     <dc_bus_1>
                         <CG>
                             <x units="m">2.39</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>

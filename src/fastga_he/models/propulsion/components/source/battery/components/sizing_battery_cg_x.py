@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingBatteryCG(om.ExplicitComponent):
+class SizingBatteryCGX(om.ExplicitComponent):
     """Class that computes the CG of the battery according to the position given in the options."""
 
     def initialize(self):

@@ -71,6 +71,9 @@
                             <mass units="g">496.0</mass>
                             <volume units="mL">155.0</volume>
                         </cell>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
                     </battery_pack_1>
                 </battery_pack>
             </he_power_train>

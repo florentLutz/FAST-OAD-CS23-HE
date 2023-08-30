@@ -245,6 +245,7 @@ def test_performances_sizing_assembly_battery_enforce():
     problem.run_model()
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
 
     write_outputs(
         pth.join(outputs.__path__[0], "full_assembly_sizing_battery_enforce.xml"),

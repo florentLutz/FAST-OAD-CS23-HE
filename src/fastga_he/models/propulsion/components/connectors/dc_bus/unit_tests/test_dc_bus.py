@@ -14,7 +14,8 @@ from ..components.sizing_bus_dimensions import SizingBusBarDimensions
 from ..components.sizing_bus_bar_weight import SizingBusBarWeight
 from ..components.sizing_conductor_self_inductance import SizingBusBarSelfInductance
 from ..components.sizing_conductor_mutual_inductance import SizingBusBarMutualInductance
-from ..components.sizing_dc_bus_cg import SizingDCBusCG
+from ..components.sizing_dc_bus_cg_x import SizingDCBusCGX
+from ..components.sizing_dc_bus_cg_y import SizingDCBusCGY
 from ..components.sizing_dc_bus import SizingDCBus
 
 from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
@@ -196,22 +197,43 @@ def test_bus_bar_mutual_inductance():
     problem.check_partials(compact_print=True)
 
 
-def test_dc_bus_cg():
+def test_dc_bus_cg_x():
 
     expected_cg = [2.69, 0.45, 2.54]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingDCBusCG(dc_bus_id="dc_bus_1", position=option)),
+            list_inputs(SizingDCBusCGX(dc_bus_id="dc_bus_1", position=option)),
             __file__,
             XML_FILE,
         )
 
-        problem = run_system(SizingDCBusCG(dc_bus_id="dc_bus_1", position=option), ivc)
+        problem = run_system(SizingDCBusCGX(dc_bus_id="dc_bus_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:DC_bus:dc_bus_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_dc_bus_cg_y():
+
+    expected_cg = [2.04, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(SizingDCBusCGY(dc_bus_id="dc_bus_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(SizingDCBusCGY(dc_bus_id="dc_bus_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:DC_bus:dc_bus_1:CG:y", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -236,6 +258,9 @@ def test_dc_bus_bar_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_bus:dc_bus_1:CG:x", units="m"
     ) == pytest.approx(2.69, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_bus:dc_bus_1:CG:y", units="m"
+    ) == pytest.approx(2.04, rel=1e-2)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_bus:dc_bus_1:low_speed:CD0",

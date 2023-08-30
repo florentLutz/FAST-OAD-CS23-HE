@@ -4,6 +4,7 @@
 
 import pytest
 
+from ..a_airframe.a1_wing_weight_analytical import ComputeWingMassAnalytical
 from ..b_propulsion.b1_power_train_mass import PowerTrainMass
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -22,3 +23,12 @@ def test_propulsion_weight():
     assert weight_b == pytest.approx(320.00, abs=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_compute_wing_mass_analytical():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(list_inputs(ComputeWingMassAnalytical()), __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ComputeWingMassAnalytical(), ivc)
+    assert problem["data:weight:airframe:wing:mass"] == pytest.approx(172.0, abs=1e-2)

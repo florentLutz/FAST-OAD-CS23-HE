@@ -79,6 +79,9 @@
                         <material>0.0</material>
                         <torque_rating units="N*m">817.0</torque_rating>
                         <torque_max units="N*m">817.0</torque_max>
+                        <CG>
+                            <y_ratio>0.66</y_ratio>
+                        </CG>
                     </propeller_1>
                 </propeller>
             </he_power_train>

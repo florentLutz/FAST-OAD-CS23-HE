@@ -8,6 +8,8 @@ import pytest
 import fastoad.api as oad
 import openmdao.api as om
 
+from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
+
 from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
@@ -88,12 +90,12 @@ def test_fuel_and_battery(cleanup):
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        757.0, rel=1e-2
+        744.0, rel=1e-2
     )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(24.86, rel=1e-2)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(24.46, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(128.36, rel=1e-2)
+    ) == pytest.approx(128.0, rel=1e-2)
 
 
 def test_sizing_sr22(cleanup):
@@ -171,9 +173,50 @@ def test_sizing_fuel_and_battery_share(cleanup):
     problem.write_outputs()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(23.38, abs=1e-2)
+    assert sizing_fuel == pytest.approx(23.33, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(32.320, abs=1e-2)
+    assert sizing_energy == pytest.approx(31.984, abs=1e-2)
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        817.27, rel=1e-2
+        802.404, rel=1e-2
+    )
+
+
+def test_dep_aircraft(cleanup):
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "dep_assembly.yml")
+    network_file_path = pth.join(RESULTS_FOLDER_PATH, "dep_assembly.html")
+
+    if not os.path.exists(network_file_path):
+        power_train_network_viewer(pt_file_path, network_file_path)
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "full_sizing_dep_ac.xml"
+    process_file_name = "full_sizing_dep_ac.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    configurator.write_needed_inputs(ref_inputs)
+
+    # Create problems with inputs
+    problem = configurator.get_problem(read_inputs=True)
+    problem.setup()
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=1000.0)
+    problem.set_val("data:geometry:wing:area", units="m**2", val=12.0)
+    problem.set_val("data:propulsion:he_power_train:mass", units="kg", val=500.0)
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        1422.0, rel=1e-2
     )

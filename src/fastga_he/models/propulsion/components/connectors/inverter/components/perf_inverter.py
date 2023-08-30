@@ -4,6 +4,8 @@
 
 import openmdao.api as om
 
+import fastoad.api as oad
+
 from .perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from .perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
 from .perf_modulation_index import PerformancesModulationIndex
@@ -13,10 +15,13 @@ from .perf_conduction_loss import PerformancesConductionLosses
 from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_total_loss import PerformancesLosses
 from .perf_casing_temperature import PerformancesCasingTemperature
-from .perf_junction_temperature import PerformancesJunctionTemperature
 from .perf_efficiency import PerformancesEfficiency
 from .perf_dc_current import PerformancesDCCurrent
 from .perf_maximum import PerformancesMaximum
+
+from .perf_junction_temperature_fixed import SUBMODEL_INVERTER_JUNCTION_TEMPERATURE_FIXED
+
+from ..constants import SUBMODEL_INVERTER_JUNCTION_TEMPERATURE, SUBMODEL_INVERTER_EFFICIENCY
 
 
 class PerformancesInverter(om.Group):
@@ -70,8 +75,16 @@ class PerformancesInverter(om.Group):
             ),
             promotes=["*"],
         )
+        option_efficiency = {
+            "inverter_id": inverter_id,
+            "number_of_points": number_of_points,
+        }
         self.add_subsystem(
-            "efficiency", PerformancesEfficiency(number_of_points=number_of_points), promotes=["*"]
+            "efficiency",
+            oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_INVERTER_EFFICIENCY, options=option_efficiency
+            ),
+            promotes=["*"],
         )
         self.add_subsystem(
             "dc_side_current",
@@ -89,15 +102,19 @@ class PerformancesInverterTemperature(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        # Solvers setup
-        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
-        self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 50
-        self.nonlinear_solver.options["rtol"] = 1e-5
-        self.nonlinear_solver.options["stall_limit"] = 20
-        self.nonlinear_solver.options["stall_tol"] = 1e-5
-        self.linear_solver = om.DirectSolver()
+        # Solvers setup, if temperature is fixed, there is no loop so we can omit it
+        if (
+            oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE]
+            != SUBMODEL_INVERTER_JUNCTION_TEMPERATURE_FIXED
+        ):
+            self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+            self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
+            self.nonlinear_solver.options["iprint"] = 0
+            self.nonlinear_solver.options["maxiter"] = 50
+            self.nonlinear_solver.options["rtol"] = 1e-5
+            self.nonlinear_solver.options["stall_limit"] = 20
+            self.nonlinear_solver.options["stall_tol"] = 1e-5
+            self.linear_solver = om.DirectSolver()
 
     def initialize(self):
 
@@ -116,6 +133,18 @@ class PerformancesInverterTemperature(om.Group):
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
+        junction_temperature_option = {
+            "inverter_id": inverter_id,
+            "number_of_points": number_of_points,
+        }
+
+        self.add_subsystem(
+            "temperature_junction",
+            oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_INVERTER_JUNCTION_TEMPERATURE, options=junction_temperature_option
+            ),
+            promotes=["*"],
+        )
         self.add_subsystem(
             "resistance",
             PerformancesResistance(inverter_id=inverter_id, number_of_points=number_of_points),
@@ -141,13 +170,6 @@ class PerformancesInverterTemperature(om.Group):
         self.add_subsystem(
             "temperature_casing",
             PerformancesCasingTemperature(
-                inverter_id=inverter_id, number_of_points=number_of_points
-            ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            "temperature_junction",
-            PerformancesJunctionTemperature(
                 inverter_id=inverter_id, number_of_points=number_of_points
             ),
             promotes=["*"],

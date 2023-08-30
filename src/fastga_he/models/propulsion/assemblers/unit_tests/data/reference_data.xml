@@ -43,5 +43,36 @@
                 </takeoff>
             </flaps>
         </aerodynamics>
+        <propulsion>
+            <he_power_train>
+                <DC_bus>
+                    <dc_bus_21>
+                        <mass units="kg">15.0</mass>
+                        <CG>
+                            <y_ratio>0.8</y_ratio>
+                        </CG>
+                    </dc_bus_21>
+                </DC_bus>
+                <DC_DC_converter>
+                    <dc_dc_converter_1><!-- No need for the weight of the second converter since it is declared symmetrical -->
+                        <mass units="kg">10.0</mass>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                    </dc_dc_converter_1>
+                </DC_DC_converter>
+                <battery_pack>
+                    <battery_pack_1>
+                        <distributed_mass>
+                            <y_ratio_start>0.3</y_ratio_start>
+                            <y_ratio_end>0.6</y_ratio_end>
+                            <start_chord units="m">0.7</start_chord>
+                            <chord_slope>0.0</chord_slope>
+                        </distributed_mass>
+                        <mass units="kg">120.</mass>
+                    </battery_pack_1>
+                </battery_pack>
+            </he_power_train>
+        </propulsion>
     </data>
 </FASTOAD_model>

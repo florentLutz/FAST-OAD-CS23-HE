@@ -5,7 +5,22 @@
 import openmdao.api as om
 import numpy as np
 
+import fastoad.api as oad
 
+from ..constants import SUBMODEL_INVERTER_JUNCTION_TEMPERATURE
+
+SUBMODEL_INVERTER_JUNCTION_TEMPERATURE_FROM_LOSSES = (
+    "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
+)
+
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE
+] = SUBMODEL_INVERTER_JUNCTION_TEMPERATURE_FROM_LOSSES
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE, SUBMODEL_INVERTER_JUNCTION_TEMPERATURE_FROM_LOSSES
+)
 class PerformancesJunctionTemperature(om.ExplicitComponent):
     """
     Computation of the junction temperature in the diode and igbt module based on the losses on

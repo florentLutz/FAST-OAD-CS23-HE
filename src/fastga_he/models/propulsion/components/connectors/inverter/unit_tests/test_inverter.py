@@ -22,7 +22,8 @@ from ..components.sizing_inductor_current_caliber import SizingInverterInductorC
 from ..components.sizing_contactor_weight import SizingInverterContactorWeight
 from ..components.sizing_inverter_weight import SizingInverterWeight
 from ..components.sizing_inverter_power_density import SizingInverterPowerDensity
-from ..components.sizing_inverter_cg import SizingInverterCG
+from ..components.sizing_inverter_cg_x import SizingInverterCGX
+from ..components.sizing_inverter_cg_y import SizingInverterCGY
 from ..components.sizing_inverter import SizingInverter
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_heat_sink_temperature import PerformancesHeatSinkTemperatureMission
@@ -40,7 +41,9 @@ from fastga_he.models.propulsion.components.connectors.inverter.components.stale
 )
 from ..components.perf_casing_temperature import PerformancesCasingTemperature
 from ..components.perf_junction_temperature import PerformancesJunctionTemperature
+from ..components.perf_junction_temperature_fixed import PerformancesJunctionTemperatureMission
 from ..components.perf_efficiency import PerformancesEfficiency
+from ..components.perf_efficiency_fixed import PerformancesEfficiencyMission
 from ..components.perf_dc_current import PerformancesDCCurrent
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_inverter import PerformancesInverter
@@ -489,23 +492,48 @@ def test_inverter_power_density():
     problem.check_partials(compact_print=True)
 
 
-def test_inverter_cg():
+def test_inverter_cg_x():
 
     expected_cg = [2.69, 0.45, 2.54]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingInverterCG(inverter_id="inverter_1", position=option)),
+            list_inputs(SizingInverterCGX(inverter_id="inverter_1", position=option)),
             __file__,
             XML_FILE,
         )
 
-        problem = run_system(SizingInverterCG(inverter_id="inverter_1", position=option), ivc)
+        problem = run_system(SizingInverterCGX(inverter_id="inverter_1", position=option), ivc)
 
         assert (
             problem.get_val(
                 "data:propulsion:he_power_train:inverter:inverter_1:CG:x",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
+
+
+def test_inverter_cg_y():
+
+    expected_cg = [2.5, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(SizingInverterCGY(inverter_id="inverter_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(SizingInverterCGY(inverter_id="inverter_1", position=option), ivc)
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:inverter:inverter_1:CG:y",
                 units="m",
             )
             == pytest.approx(expected_value, rel=1e-2)
@@ -545,13 +573,12 @@ def test_inverter_sizing():
         )
         == pytest.approx(0.0, rel=1e-2)
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:inverter:inverter_1:CG:x",
-            units="m",
-        )
-        == pytest.approx(2.69, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:CG:x", units="m"
+    ) == pytest.approx(2.69, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:CG:y", units="m"
+    ) == pytest.approx(2.5, rel=1e-2)
 
 
 def test_constraints_enforce_current():
@@ -1209,6 +1236,57 @@ def test_perf_junction_temperature():
     problem.check_partials(compact_print=True)
 
 
+def test_perf_junction_temperature_constant():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:inverter:inverter_1:junction_temperature_mission",
+        val=288.15,
+        units="degK",
+    )
+
+    problem = run_system(
+        PerformancesJunctionTemperatureMission(
+            inverter_id="inverter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("diode_temperature", units="degK") == pytest.approx(
+        np.full(NB_POINTS_TEST, 288.15), rel=1e-2
+    )
+    assert problem.get_val("IGBT_temperature", units="degK") == pytest.approx(
+        np.full(NB_POINTS_TEST, 288.15), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:inverter:inverter_1:junction_temperature_mission",
+        val=[288.15, 298.15, 308.15, 318.15, 328.15, 338.15, 348.15, 358.15, 368.15, 378.15],
+        units="degK",
+    )
+
+    problem3 = run_system(
+        PerformancesJunctionTemperatureMission(
+            inverter_id="inverter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc3,
+    )
+
+    assert problem3.get_val("diode_temperature", units="degK") == pytest.approx(
+        np.array([288.15, 298.15, 308.15, 318.15, 328.15, 338.15, 348.15, 358.15, 368.15, 378.15]),
+        rel=1e-2,
+    )
+    assert problem3.get_val("IGBT_temperature", units="degK") == pytest.approx(
+        np.array([288.15, 298.15, 308.15, 318.15, 328.15, 338.15, 348.15, 358.15, 368.15, 378.15]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
+
+
 def test_inverter_efficiency():
 
     ivc = om.IndepVarComp()
@@ -1241,6 +1319,42 @@ def test_inverter_efficiency():
     assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_efficiency_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:inverter:inverter_1:efficiency_mission",
+        val=0.98,
+    )
+
+    problem = run_system(
+        PerformancesEfficiencyMission(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("efficiency") == pytest.approx(np.full(NB_POINTS_TEST, 0.98), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:inverter:inverter_1:efficiency_mission",
+        val=[0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.91, 0.9],
+    )
+
+    problem3 = run_system(
+        PerformancesEfficiencyMission(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST),
+        ivc3,
+    )
+
+    assert problem3.get_val("efficiency") == pytest.approx(
+        np.array([0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.91, 0.9]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
 
 
 def test_dc_current():

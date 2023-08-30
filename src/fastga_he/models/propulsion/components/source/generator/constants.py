@@ -6,4 +6,4 @@ SUBMODEL_CONSTRAINTS_GENERATOR_TORQUE = "submodel.propulsion.constraints.generat
 SUBMODEL_CONSTRAINTS_GENERATOR_RPM = "submodel.propulsion.constraints.generator.rpm"
 SUBMODEL_CONSTRAINTS_GENERATOR_VOLTAGE = "submodel.propulsion.constraints.generator.voltage"
 
-POSSIBLE_POSITION = ["in_the_nose", "in_the_back"]
+POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]

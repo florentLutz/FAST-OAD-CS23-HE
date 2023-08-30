@@ -11,7 +11,8 @@ from .sizing_bus_dimensions import SizingBusBarDimensions
 from .sizing_bus_bar_weight import SizingBusBarWeight
 from .sizing_conductor_self_inductance import SizingBusBarSelfInductance
 from .sizing_conductor_mutual_inductance import SizingBusBarMutualInductance
-from .sizing_dc_bus_cg import SizingDCBusCG
+from .sizing_dc_bus_cg_x import SizingDCBusCGX
+from .sizing_dc_bus_cg_y import SizingDCBusCGY
 from .sizing_dc_bus_drag import SizingDCBusDrag
 
 from .cstr_dc_bus import ConstraintsDCBus
@@ -88,8 +89,13 @@ class SizingDCBus(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            name="bus_CG",
-            subsys=SizingDCBusCG(dc_bus_id=dc_bus_id, position=position),
+            name="bus_CG_x",
+            subsys=SizingDCBusCGX(dc_bus_id=dc_bus_id, position=position),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="bus_CG_y",
+            subsys=SizingDCBusCGY(dc_bus_id=dc_bus_id, position=position),
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:

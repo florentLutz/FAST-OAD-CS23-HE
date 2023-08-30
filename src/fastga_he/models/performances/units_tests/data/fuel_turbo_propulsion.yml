@@ -44,7 +44,7 @@ power_train_components:
     position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
   generator_1:
     id: fastga_he.pt_component.generator
-    position: in_the_back  # "in_the_front", "in_the_back"
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
   ice_1:
     id: fastga_he.pt_component.internal_combustion_engine
     position: in_the_back  # "on_the_wing", "in_the_front", "in_the_back"

@@ -10,7 +10,7 @@ from ..constants import POSSIBLE_POSITION
 class SizingGeneratorDrag(om.ExplicitComponent):
     """
     Class that computes the drag coefficient of the generator based on its position. Will be 0.0
-    all the time as we wil make the assumption that the generator is "inside" the fuselage or
+    all the time as we wil make the assumption that the generator is "inside" the fuselage/wing or
     when in the nose, it will be computed as not contributing, just like we did it for ICE,
     turboprop.
     """

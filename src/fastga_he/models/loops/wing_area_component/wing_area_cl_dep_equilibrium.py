@@ -15,6 +15,7 @@ Computation of wing area update and constraints based on the equilibrium of the 
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
+import os
 
 import numpy as np
 import openmdao.api as om
@@ -24,6 +25,8 @@ from scipy.constants import g
 import fastoad.api as oad
 from fastoad.openmdao.problem import AutoUnitsDefaultGroup
 from fastoad.constants import EngineSetting
+
+from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 from fastga.models.loops.constants import SUBMODEL_WING_AREA_AERO_LOOP, SUBMODEL_WING_AREA_AERO_CONS
 
@@ -46,6 +49,13 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
     Computes needed wing area to reach an equilibrium at required approach speed.
     """
 
+    def __init__(self, **kwargs):
+
+        super().__init__(**kwargs)
+
+        self.configurator = FASTGAHEPowerTrainConfigurator()
+        self.simplified_file_path = None
+
     def initialize(self):
         self.options.declare("propulsion_id", default=None, types=str, allow_none=True)
         self.options.declare(
@@ -56,15 +66,17 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
 
     def setup(self):
 
+        if self.options["power_train_file_path"]:
+            self.configurator.load(self.options["power_train_file_path"])
+            self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
+
         self.add_input("data:TLAR:v_approach", val=np.nan, units="m/s")
         self.add_input("data:weight:aircraft:MLW", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:CG:fwd:x", val=np.nan, units="m")
 
         self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
 
-        input_zip = zip_equilibrium_input(
-            self.options["propulsion_id"], self.options["power_train_file_path"]
-        )
+        input_zip = zip_equilibrium_input(self.options["propulsion_id"], self.simplified_file_path)
         for (
             var_names,
             var_unit,
@@ -113,7 +125,13 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             method="fd",
         )
 
+        if self.options["power_train_file_path"]:
+            os.remove(self.simplified_file_path)
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        if self.options["power_train_file_path"]:
+            self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
 
         # First, compute a failsafe value, in case the computation crashes because of the wrong
         # initial guesses of the problem
@@ -124,7 +142,7 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         wing_area_landing_init_guess = 2 * mlw * g / (stall_speed ** 2) / (1.225 * max_cl)
 
         wing_area_approach = compute_wing_area(
-            inputs, self.options["propulsion_id"], self.options["power_train_file_path"]
+            inputs, self.options["propulsion_id"], self.simplified_file_path
         )
 
         # Again with the damned optimizer. It can sometimes happen that he simply does not care
@@ -143,6 +161,10 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             )
 
         outputs["wing_area"] = wing_area_approach
+
+        if self.options["power_train_file_path"]:
+            # We can now delete the temp .yml we created, just to avoid over-clogging the repo
+            os.remove(self.simplified_file_path)
 
 
 @oad.RegisterSubmodel(

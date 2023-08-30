@@ -18,9 +18,11 @@ from ..components.sizing_module_mass import SizingDCDCConverterCasingWeight
 from ..components.sizing_dimension_module import SizingDCDCConverterModuleDimension
 from ..components.sizing_contactor_weight import SizingDCDCConverterContactorWeight
 from ..components.sizing_weight import SizingDCDCConverterWeight, SizingDCDCConverterWeightBySum
-from ..components.sizing_dc_dc_converter_cg import SizingDCDCConverterCG
+from ..components.sizing_dc_dc_converter_cg_x import SizingDCDCConverterCGX
+from ..components.sizing_dc_dc_converter_cg_y import SizingDCDCConverterCGY
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
+from ..components.perf_efficiency_fixed import PerformancesEfficiencyMission
 from ..components.perf_load_side import PerformancesConverterLoadSide
 from ..components.perf_duty_cycle import PerformancesDutyCycle
 from ..components.perf_currents import PerformancesCurrents
@@ -461,7 +463,7 @@ def test_converter_weight_by_sum():
     problem.check_partials(compact_print=True)
 
 
-def test_converter_cg():
+def test_converter_cg_x():
 
     expected_cg = [2.69, 0.45, 2.54]
 
@@ -469,19 +471,48 @@ def test_converter_cg():
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
             list_inputs(
-                SizingDCDCConverterCG(dc_dc_converter_id="dc_dc_converter_1", position=option)
+                SizingDCDCConverterCGX(dc_dc_converter_id="dc_dc_converter_1", position=option)
             ),
             __file__,
             XML_FILE,
         )
 
         problem = run_system(
-            SizingDCDCConverterCG(dc_dc_converter_id="dc_dc_converter_1", position=option), ivc
+            SizingDCDCConverterCGX(dc_dc_converter_id="dc_dc_converter_1", position=option), ivc
         )
 
         assert (
             problem.get_val(
                 "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:x",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
+
+
+def test_converter_cg_y():
+
+    expected_cg = [2.21, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingDCDCConverterCGY(dc_dc_converter_id="dc_dc_converter_1", position=option)
+            ),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(
+            SizingDCDCConverterCGY(dc_dc_converter_id="dc_dc_converter_1", position=option), ivc
+        )
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:y",
                 units="m",
             )
             == pytest.approx(expected_value, rel=1e-2)
@@ -896,13 +927,12 @@ def test_dc_dc_converter_sizing():
         )
         == pytest.approx(0.002157, rel=1e-2)
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:x",
-            units="m",
-        )
-        == pytest.approx(2.69, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:x", units="m"
+    ) == pytest.approx(2.69, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:CG:y", units="m"
+    ) == pytest.approx(2.21, rel=1e-2)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:low_speed:CD0",
@@ -1009,6 +1039,46 @@ def test_voltage_out_target_mission():
 
     assert problem3.get_val("voltage_out_target", units="V") == pytest.approx(
         np.array([850.0, 800.0, 700.0, 850.0, 800.0, 700.0, 850.0, 800.0, 700.0, 420.0]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
+
+
+def test_fixed_efficiency_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:efficiency_mission",
+        val=0.97,
+    )
+
+    problem = run_system(
+        PerformancesEfficiencyMission(
+            dc_dc_converter_id="dc_dc_converter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("efficiency") == pytest.approx(np.full(NB_POINTS_TEST, 0.97), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:efficiency_mission",
+        val=[0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.91, 0.9],
+    )
+
+    problem3 = run_system(
+        PerformancesEfficiencyMission(
+            dc_dc_converter_id="dc_dc_converter_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc3,
+    )
+
+    assert problem3.get_val("efficiency") == pytest.approx(
+        np.array([0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.91, 0.9]),
         rel=1e-2,
     )
 

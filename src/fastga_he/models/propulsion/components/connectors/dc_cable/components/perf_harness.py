@@ -13,6 +13,7 @@ from ..constants import (
     SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
     SUBMODEL_DC_LINE_PERFORMANCES_RESISTANCE_PROFILE,
 )
+from ..components.perf_temperature_constant import SUBMODEL_DC_LINE_TEMPERATURE_CONSTANT
 
 
 class PerformancesHarness(om.Group):
@@ -60,15 +61,23 @@ class PerformancesHarnessTemperature(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        # Solvers setup
-        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
-        self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 50
-        self.nonlinear_solver.options["rtol"] = 1e-5
-        self.nonlinear_solver.options["stall_limit"] = 20
-        self.nonlinear_solver.options["stall_tol"] = 1e-5
-        self.linear_solver = om.DirectSolver()
+        # In case the temperature is constant we don't need this solver hence this check. It must
+        # be noted however that it does not appear to significantly reduce computation time,
+        # quite the contrary ...
+        if (
+            oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE]
+            != SUBMODEL_DC_LINE_TEMPERATURE_CONSTANT
+        ):
+
+            # Solvers setup
+            self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+            self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
+            self.nonlinear_solver.options["iprint"] = 0
+            self.nonlinear_solver.options["maxiter"] = 50
+            self.nonlinear_solver.options["rtol"] = 1e-5
+            self.nonlinear_solver.options["stall_limit"] = 20
+            self.nonlinear_solver.options["stall_tol"] = 1e-5
+            self.linear_solver = om.DirectSolver()
 
     def initialize(self):
 
@@ -89,6 +98,17 @@ class PerformancesHarnessTemperature(om.Group):
 
         options_dict = {"harness_id": harness_id, "number_of_points": number_of_points}
 
+        # Change of plans, we put the component that outputs the temperature at the very
+        # beginning, this way when the temperature is fixed, it does not do an unnecessary loop
+        # and when it is not it does not increase too much the time it takes to run
+        self.add_subsystem(
+            "temperature",
+            oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE, options=options_dict
+            ),
+            promotes=["*"],
+        )
+
         self.add_subsystem(
             "resistance",
             oad.RegisterSubmodel.get_submodel(
@@ -104,13 +124,5 @@ class PerformancesHarnessTemperature(om.Group):
         self.add_subsystem(
             "losses_one_cable",
             PerformancesLossesOneCable(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "temperature",
-            oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE, options=options_dict
-            ),
             promotes=["*"],
         )

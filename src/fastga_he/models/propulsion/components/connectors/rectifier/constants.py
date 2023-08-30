@@ -12,5 +12,7 @@ SUBMODEL_CONSTRAINTS_RECTIFIER_LOSSES = "submodel.propulsion.constraints.rectifi
 SUBMODEL_CONSTRAINTS_RECTIFIER_FREQUENCY = "submodel.propulsion.constraints.rectifier.frequency"
 
 SUBMODEL_CONSTRAINTS_RECTIFIER_WEIGHT = "submodel.propulsion.rectifier.weight"
+SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE = "submodel.propulsion.rectifier.junction_temperature"
+SUBMODEL_RECTIFIER_EFFICIENCY = "submodel.propulsion.rectifier.efficiency"
 
 POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]

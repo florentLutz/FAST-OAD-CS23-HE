@@ -6,7 +6,8 @@ import openmdao.api as om
 
 from .sizing_weight import SizingPropellerWeight
 from .sizing_propeller_depth import SizingPropellerDepth
-from .sizing_propeller_cg import SizingPropellerCG
+from .sizing_propeller_cg_x import SizingPropellerCGX
+from .sizing_propeller_cg_y import SizingPropellerCGY
 from .sizing_propeller_drag import SizingPropellerDrag
 from ..components.sizing_propeller_ref_cl import SizingPropellerReferenceCl
 from ..components.sizing_propeller_ref_chord import SizingPropellerReferenceChord
@@ -61,8 +62,13 @@ class SizingPropeller(om.Group):
             promotes=["data:*"],
         )
         self.add_subsystem(
-            "propeller_CG",
-            SizingPropellerCG(propeller_id=propeller_id, position=position),
+            "propeller_CG_x",
+            SizingPropellerCGX(propeller_id=propeller_id, position=position),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "propeller_CG_y",
+            SizingPropellerCGY(propeller_id=propeller_id, position=position),
             promotes=["data:*"],
         )
         self.add_subsystem(

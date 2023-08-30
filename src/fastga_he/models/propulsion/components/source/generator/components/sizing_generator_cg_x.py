@@ -8,7 +8,12 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingGeneratorCG(om.ExplicitComponent):
+class SizingGeneratorCGX(om.ExplicitComponent):
+    """
+    Computation of the position, along the x-axis of the CG of the generator. If the generator is
+    inside the wing we will consider it at the quarter chord
+    """
+
     def initialize(self):
         self.options.declare(
             name="generator_id", default=None, desc="Identifier of the generator", allow_none=False
@@ -28,23 +33,35 @@ class SizingGeneratorCG(om.ExplicitComponent):
         generator_id = self.options["generator_id"]
         position = self.options["position"]
 
-        self.add_input(
-            name="data:propulsion:he_power_train:generator:" + generator_id + ":length",
-            val=np.nan,
-            units="m",
-        )
-        self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
-
-        if position == "in_the_back":
-
-            self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
-
         self.add_output(
             "data:propulsion:he_power_train:generator:" + generator_id + ":CG:x",
             units="m",
             val=2.5,
             desc="X position of the generator center of gravity",
         )
+
+        if position == "inside_the_wing":
+
+            self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
+
+        elif position == "in_the_front":
+
+            self.add_input(
+                name="data:propulsion:he_power_train:generator:" + generator_id + ":length",
+                val=np.nan,
+                units="m",
+            )
+            self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
+
+        else:
+
+            self.add_input(
+                name="data:propulsion:he_power_train:generator:" + generator_id + ":length",
+                val=np.nan,
+                units="m",
+            )
+            self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
+            self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
@@ -53,23 +70,33 @@ class SizingGeneratorCG(om.ExplicitComponent):
         generator_id = self.options["generator_id"]
         position = self.options["position"]
 
-        lav = inputs["data:geometry:fuselage:front_length"]
-        generator_length = inputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":length"
-        ]
+        if position == "inside_the_wing":
 
-        if position == "in_the_back":
+            outputs["data:propulsion:he_power_train:generator:" + generator_id + ":CG:x"] = inputs[
+                "data:geometry:wing:MAC:at25percent:x"
+            ]
 
-            cabin_length = inputs["data:geometry:cabin:length"]
+        elif position == "in_the_front":
+
+            lav = inputs["data:geometry:fuselage:front_length"]
+            generator_length = inputs[
+                "data:propulsion:he_power_train:generator:" + generator_id + ":length"
+            ]
 
             outputs["data:propulsion:he_power_train:generator:" + generator_id + ":CG:x"] = (
-                lav + cabin_length + generator_length / 2.0
+                lav - generator_length / 2.0
             )
 
         else:
 
+            cabin_length = inputs["data:geometry:cabin:length"]
+            lav = inputs["data:geometry:fuselage:front_length"]
+            generator_length = inputs[
+                "data:propulsion:he_power_train:generator:" + generator_id + ":length"
+            ]
+
             outputs["data:propulsion:he_power_train:generator:" + generator_id + ":CG:x"] = (
-                lav - generator_length / 2.0
+                lav + cabin_length + generator_length / 2.0
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -77,8 +104,27 @@ class SizingGeneratorCG(om.ExplicitComponent):
         generator_id = self.options["generator_id"]
         position = self.options["position"]
 
-        if position == "in_the_back":
+        if position == "inside_the_wing":
 
+            partials[
+                "data:propulsion:he_power_train:generator:" + generator_id + ":CG:x",
+                "data:geometry:wing:MAC:at25percent:x",
+            ] = 1.0
+
+        elif position == "in_the_front":
+
+            partials[
+                "data:propulsion:he_power_train:generator:" + generator_id + ":CG:x",
+                "data:propulsion:he_power_train:generator:" + generator_id + ":length",
+            ] = (
+                -1.0 / 2.0
+            )
+            partials[
+                "data:propulsion:he_power_train:generator:" + generator_id + ":CG:x",
+                "data:geometry:fuselage:front_length",
+            ] = 1.0
+
+        else:
             partials[
                 "data:propulsion:he_power_train:generator:" + generator_id + ":CG:x",
                 "data:propulsion:he_power_train:generator:" + generator_id + ":length",
@@ -92,17 +138,4 @@ class SizingGeneratorCG(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:generator:" + generator_id + ":CG:x",
                 "data:geometry:cabin:length",
-            ] = 1.0
-
-        else:
-
-            partials[
-                "data:propulsion:he_power_train:generator:" + generator_id + ":CG:x",
-                "data:propulsion:he_power_train:generator:" + generator_id + ":length",
-            ] = (
-                -1.0 / 2.0
-            )
-            partials[
-                "data:propulsion:he_power_train:generator:" + generator_id + ":CG:x",
-                "data:geometry:fuselage:front_length",
             ] = 1.0

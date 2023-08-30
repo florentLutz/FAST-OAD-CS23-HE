@@ -9,7 +9,8 @@ import openmdao.api as om
 
 from ..components.sizing_weight import SizingPropellerWeight
 from ..components.sizing_propeller_depth import SizingPropellerDepth
-from ..components.sizing_propeller_cg import SizingPropellerCG
+from ..components.sizing_propeller_cg_x import SizingPropellerCGX
+from ..components.sizing_propeller_cg_y import SizingPropellerCGY
 from ..components.sizing_propeller_ref_cl import SizingPropellerReferenceCl
 from ..components.sizing_propeller_ref_chord import SizingPropellerReferenceChord
 from ..components.sizing_propeller_radius_to_span_ratio import SizingPropellerDiameterToSpanRatio
@@ -102,19 +103,19 @@ def test_depth():
     problem.check_partials(compact_print=True)
 
 
-def test_propeller_cg():
+def test_propeller_cg_x():
 
     expected_cg = [2.2, 0.15]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
 
         ivc = get_indep_var_comp(
-            list_inputs(SizingPropellerCG(propeller_id="propeller_1", position=option)),
+            list_inputs(SizingPropellerCGX(propeller_id="propeller_1", position=option)),
             __file__,
             XML_FILE,
         )
         # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingPropellerCG(propeller_id="propeller_1", position=option), ivc)
+        problem = run_system(SizingPropellerCGX(propeller_id="propeller_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:propeller:propeller_1:CG:x", units="m"
@@ -123,9 +124,30 @@ def test_propeller_cg():
         problem.check_partials(compact_print=True)
 
 
+def test_propeller_cg_y():
+
+    expected_cg = [4.19, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(SizingPropellerCGY(propeller_id="propeller_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(SizingPropellerCGY(propeller_id="propeller_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:propeller:propeller_1:CG:y", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
 def test_propeller_ref_cl():
 
-    expected_cl = [1.085, 0.0]
+    expected_cl = [1.011, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cl):
 
@@ -148,7 +170,7 @@ def test_propeller_ref_cl():
 
 def test_propeller_ref_chord():
 
-    expected_chords = [0.9275, 1.0]
+    expected_chords = [0.88, 1.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_chords):
 
@@ -209,7 +231,7 @@ def test_diameter_to_chord_ratio():
 
 def test_propeller_flapped_ratio():
 
-    expected_values = [0.9072, 0.0]
+    expected_values = [0.5514, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
 
@@ -1522,6 +1544,9 @@ def test_sizing_propeller():
     assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_1:CG:x", units="m"
     ) == pytest.approx(2.2, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:CG:y", units="m"
+    ) == pytest.approx(4.19, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_1:low_speed:CD0"
     ) == pytest.approx(0.0, rel=1e-2)

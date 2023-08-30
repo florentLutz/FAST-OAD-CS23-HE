@@ -141,6 +141,6 @@ class PerformancesTemperature(om.ExplicitComponent):
             -q_c / (2.0 * np.pi * cable_radius * cable_length * h ** 2.0)
         )
         partials["cable_temperature", "conduction_losses"] = np.diag(
-            1.0 / (2.0 * np.pi * cable_radius * cable_length * h ** 2.0)
+            1.0 / (2.0 * np.pi * cable_radius * cable_length * h)
         )
         partials["cable_temperature", "exterior_temperature"] = np.eye(number_of_points)

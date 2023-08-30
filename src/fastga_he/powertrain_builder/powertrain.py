@@ -27,6 +27,7 @@ from .exceptions import (
     FASTGAHEComponentsNotIdentified,
     FASTGAHESingleSSPCAtEndOfLine,
     FASTGAHEIncoherentVoltage,
+    FASTGAHEImpossiblePair,
 )
 
 from . import resources
@@ -129,6 +130,12 @@ class FASTGAHEPowerTrainConfigurator:
         # should be a list of list
         self._components_slipstream_perf_watchers = None
 
+        # Contains a list of all pair of components which are symmetrical on the y axis with
+        # respect to the fuselage center line. This is for now intended for the computation of the
+        # loads on the wing to avoid accounting twice for the components as the wing mass will be
+        # computed as twice the weight of a half-wing
+        self._components_symmetrical_pairs = None
+
         # Because of their very peculiar role, we will scan the architecture for any SSPC defined
         # by the user and whether or not they are at the output of a bus, because a specific
         # option needs to be turned on in this was
@@ -198,7 +205,6 @@ class FASTGAHEPowerTrainConfigurator:
 
         components_id = []
         components_position = []
-        components_name_list = []
         components_name_id_list = []
         components_type_list = []
         components_om_type_list = []
@@ -210,6 +216,11 @@ class FASTGAHEPowerTrainConfigurator:
         components_slipstream_perf_watchers_list = []
         components_slipstream_needs_flaps = []
         components_slipstream_wing_lift = []
+        components_symmetrical_pairs = []
+
+        # Doing it like that allows us to have the names of the components before we start the
+        # loop, which I'm gonna use to check if the pairs are valid
+        components_name_list = list(components_list.keys())
 
         for component_name in components_list:
             component = copy.deepcopy(components_list[component_name])
@@ -224,6 +235,34 @@ class FASTGAHEPowerTrainConfigurator:
                 components_position.append(component_position)
             else:
                 components_position.append("")
+
+            if "symmetrical" in component:
+                component_symmetrical = component["symmetrical"]
+
+                if component_symmetrical not in components_name_list:
+
+                    raise FASTGAHEImpossiblePair(
+                        "Cannot pair "
+                        + component_name
+                        + " with "
+                        + component_symmetrical
+                        + " because "
+                        + component_symmetrical
+                        + " does not exist. Valid pair choice are among the following list: "
+                        + ", ".join(components_name_list)
+                        + ". \nBest regards."
+                    )
+
+                # We sort the pair to ensure that if the pair is already there because the
+                # symmetrical tag is defined twice (propeller1 is symmetrical to propeller2 and
+                # propeller2 is symmetrical to propeller1) it will have the same name and we
+                # don't have to register it twice.
+                sorted_pair = sorted([component_name, component_symmetrical])
+
+                if sorted_pair not in components_symmetrical_pairs:
+                    components_symmetrical_pairs.append(sorted_pair)
+                    # We don't put an else because as opposed to options, we don't expected all
+                    # components to have symmetrical tag
 
             if component_id == "fastga_he.pt_component.dc_sspc":
                 # Create a dictionary with SSPC name and a tag to see if they are at bus output
@@ -241,7 +280,6 @@ class FASTGAHEPowerTrainConfigurator:
                 else:
                     self._sspc_default_state[component_name] = True
 
-            components_name_list.append(component_name)
             components_name_id_list.append(resources.DICTIONARY_CN_ID[component_id])
             components_type_list.append(resources.DICTIONARY_CT[component_id])
             components_om_type_list.append(resources.DICTIONARY_CN[component_id])
@@ -294,6 +332,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_slipstream_perf_watchers = components_slipstream_perf_watchers_list
         self._components_slipstream_flaps = components_slipstream_needs_flaps
         self._components_slipstream_wing_lift = components_slipstream_wing_lift
+        self._components_symmetrical_pairs = components_symmetrical_pairs
 
     def _get_connections(self):
         """
@@ -475,8 +514,20 @@ class FASTGAHEPowerTrainConfigurator:
         connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
 
         for component_name in self._components_name:
+
+            # When there are two separate sub propulsion chain in the same propulsion file,
+            # these line will cause an issue because, as it will browse all propulsive load he
+            # will attempt to reach loads he is not connected to and therefore not in
+            # connections_length_between_nodes. So first we must make sure to only browse
+            # connected loads.
+
+            connected_components = list(connections_length_between_nodes[component_name].keys())
+            connected_propulsive_loads = list(
+                set(propulsive_load_names) & set(connected_components)
+            )
+
             min_distance = np.inf
-            for prop_load in propulsive_load_names:
+            for prop_load in connected_propulsive_loads:
                 distance_to_load = connections_length_between_nodes[component_name][prop_load]
                 if distance_to_load < min_distance:
                     min_distance = distance_to_load
@@ -850,6 +901,78 @@ class FASTGAHEPowerTrainConfigurator:
             components_slip_perf_watchers_unit_organised_list,
         )
 
+    def get_wing_punctual_mass_element_list(self) -> Tuple[list, list, list]:
+        """
+        This function returns a list of the components that are to be considered as punctual
+        masses acting on the wing due to their positions as defined in the powertrain file
+        """
+
+        self._get_components()
+
+        punctual_mass_names = []
+        punctual_mass_types = []
+        component_pairs = copy.deepcopy(self._components_symmetrical_pairs)
+
+        for component_id, component_name, component_position, component_type in zip(
+            self._components_id,
+            self._components_name,
+            self._components_position,
+            self._components_type,
+        ):
+            if component_position in resources.DICTIONARY_PCT_W[component_id]:
+                punctual_mass_names.append(component_name)
+                punctual_mass_types.append(component_type)
+
+        # TODO: improve the way this is done, as I'm not satisfied with it
+        for component_pair in self._components_symmetrical_pairs:
+
+            if component_pair[0] in punctual_mass_names:
+                continue
+
+            elif component_pair[1] in punctual_mass_names:
+                continue
+
+            else:
+                component_pairs.remove(component_pair)
+
+        return punctual_mass_names, punctual_mass_types, component_pairs
+
+    def get_wing_distributed_mass_element_list(self) -> Tuple[list, list, list]:
+        """
+        This function returns a list of the components that are to be considered as distributed
+        masses acting on the wing due to their positions as defined in the powertrain file
+        """
+
+        self._get_components()
+
+        distributed_mass_names = []
+        distributed_mass_types = []
+        component_pairs = copy.deepcopy(self._components_symmetrical_pairs)
+
+        for component_id, component_name, component_position, component_type in zip(
+            self._components_id,
+            self._components_name,
+            self._components_position,
+            self._components_type,
+        ):
+            if component_position in resources.DICTIONARY_DST_W[component_id]:
+                distributed_mass_names.append(component_name)
+                distributed_mass_types.append(component_type)
+
+        # TODO: improve the way this is done, as I'm not satisfied with it
+        for component_pair in self._components_symmetrical_pairs:
+
+            if component_pair[0] in distributed_mass_names:
+                continue
+
+            elif component_pair[1] in distributed_mass_names:
+                continue
+
+            else:
+                component_pairs.remove(component_pair)
+
+        return distributed_mass_names, distributed_mass_types, component_pairs
+
     def get_graphs_connected_voltage(self) -> list:
         """
         This function returns a list of graphs of connected PT components that have more or less
@@ -873,7 +996,6 @@ class FASTGAHEPowerTrainConfigurator:
             )
 
             if not resources.DICTIONARY_IO_INDEP_V[component_id]:
-
                 graph.add_edge(
                     component_name + "_out",
                     component_name + "_in",
@@ -1061,7 +1183,6 @@ class FASTGAHEPowerTrainConfigurator:
                 voltages_to_set = resources.DICTIONARY_V_TO_SET[component_id]
 
                 for voltage_to_set in voltages_to_set:
-
                     variable_name = component_name + "." + voltage_to_set
                     voltage_dict_subgraph[variable_name] = reference_voltage
 
@@ -1097,6 +1218,72 @@ class FASTGAHEPowerTrainConfigurator:
             icons_name,
             icons_size,
         )
+
+    def produce_simplified_pt_file_copy(self):
+        """
+        This function was created after the observation that the more components there are in the
+        powertrain, the longer it takes to run (duh). It is even more striking when running the
+        optimization to find a new wing area (it can takes minutes). However, for that particular
+        observation the whole propulsion chain is not needed. We indeed only need the propulsors
+        to compute the slipstream effect and the propulsive load to check that the power rate is
+        below 1. Consequently, and only for that particular application, we will produce a
+        simplified powertrain file which contains only the required elements.
+        """
+
+        simplified_serializer = copy.deepcopy(self._serializer)
+
+        self._get_components()
+
+        retained_components = []
+
+        # First, we pop all the components that we don't need
+        for component_name, component_type_class in zip(
+            self._components_name, self._components_type_class
+        ):
+            if (
+                "propulsor" not in component_type_class
+                and "propulsive_load" not in component_type_class
+            ):
+                simplified_serializer.data[KEY_PT_COMPONENTS].pop(component_name)
+            else:
+                retained_components.append(component_name)
+
+        # Then we pop all the connections that don't involve the components we have
+        self._get_connections()
+
+        cured_connection_list = copy.deepcopy(self._connection_list)
+
+        for connection in self._connection_list:
+
+            if type(connection["source"]) is str:
+                if connection["source"] not in retained_components:
+                    cured_connection_list.remove(connection)
+                else:
+                    if type(connection["target"]) is str:
+                        if connection["target"] not in retained_components:
+                            cured_connection_list.remove(connection)
+                    else:
+                        if connection["target"][0] not in retained_components:
+                            cured_connection_list.remove(connection)
+
+            else:
+                if connection["source"][0] not in retained_components:
+                    cured_connection_list.remove(connection)
+                else:
+                    if type(connection["target"]) is str:
+                        if connection["target"] not in retained_components:
+                            cured_connection_list.remove(connection)
+                    else:
+                        if connection["target"][0] not in retained_components:
+                            cured_connection_list.remove(connection)
+
+        simplified_serializer.data[KEY_PT_CONNECTIONS] = cured_connection_list
+
+        pt_file_copy_path = self._power_train_file.replace(".yml", "_temp_copy.yml")
+
+        simplified_serializer.write(pt_file_copy_path)
+
+        return pt_file_copy_path
 
 
 class _YAMLSerializer(ABC):

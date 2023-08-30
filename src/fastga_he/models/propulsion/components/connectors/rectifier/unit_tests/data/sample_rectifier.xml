@@ -16,6 +16,7 @@
                     <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
                   </at25percent>
                 </MAC>
+                <span units="m">13.37</span>
             </wing>
         </geometry>
         <propulsion>
@@ -97,6 +98,9 @@
                         <contactor>
                             <mass units="kg">2.34</mass>
                         </contactor>
+                        <CG>
+                            <y_ratio>0.35</y_ratio>
+                        </CG>
                     </rectifier_1>
                 </rectifier>
             </he_power_train>

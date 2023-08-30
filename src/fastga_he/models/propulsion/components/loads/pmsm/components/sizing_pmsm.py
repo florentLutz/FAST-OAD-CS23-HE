@@ -15,7 +15,8 @@ from .sizing_torque_constant_scaling import SizingMotorTorqueConstantScaling
 from .sizing_torque_constant import SizingMotorTorqueConstant
 from .sizing_loss_coefficient_scaling import SizingMotorLossCoefficientScaling
 from .sizing_loss_coefficient import SizingMotorLossCoefficient
-from .sizing_pmsm_cg import SizingPMSMCG
+from .sizing_pmsm_cg_x import SizingPMSMCGX
+from .sizing_pmsm_cg_y import SizingPMSMCGY
 from .sizing_pmsm_drag import SizingPMSMDrag
 from .cstr_pmsm import ConstraintsPMSM
 
@@ -87,7 +88,10 @@ class SizingPMSM(om.Group):
             "loss_coefficients", SizingMotorLossCoefficient(motor_id=motor_id), promotes=["data:*"]
         )
         self.add_subsystem(
-            "pmsm_cg", SizingPMSMCG(motor_id=motor_id, position=position), promotes=["data:*"]
+            "pmsm_cg_x", SizingPMSMCGX(motor_id=motor_id, position=position), promotes=["data:*"]
+        )
+        self.add_subsystem(
+            "pmsm_cg_y", SizingPMSMCGY(motor_id=motor_id, position=position), promotes=["data:*"]
         )
         for low_speed_aero in [True, False]:
             system_name = "pmsm_drag_ls" if low_speed_aero else "pmsm_drag_cruise"

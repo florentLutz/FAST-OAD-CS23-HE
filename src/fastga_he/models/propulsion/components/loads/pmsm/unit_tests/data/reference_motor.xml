@@ -16,6 +16,7 @@
             </fuselage>
             <wing>
                 <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
+                <span units="m">9.0</span>
                 <MAC>
                   <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
                   <at25percent>
@@ -54,6 +55,9 @@
                             <beta>0.51</beta>
                             <gamma>0.55</gamma>
                         </scaling>
+                        <CG>
+                            <y_ratio>0.333</y_ratio>
+                        </CG>
                     </motor_1>
                 </PMSM>
             </he_power_train>

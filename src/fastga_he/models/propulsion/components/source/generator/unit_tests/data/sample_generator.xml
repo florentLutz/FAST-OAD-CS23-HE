@@ -11,6 +11,7 @@
                 <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
             </fuselage>
             <wing>
+                <span units="m">8.0</span>
                 <MAC>
                   <at25percent>
                     <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
@@ -48,6 +49,9 @@
                         </scaling>
                         <diameter units="m">0.4824</diameter>
                         <length units="m">0.03667</length>
+                        <CG>
+                            <y_ratio>0.25</y_ratio>
+                        </CG>
                     </generator_1>
                 </generator>
             </he_power_train>

@@ -68,6 +68,9 @@
             <he_power_train>
                 <battery_pack>
                     <battery_pack_1>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
                         <c_rate_max units="h**-1">0.7</c_rate_max>
                         <CG>
                             <x units="m">2.88</x>
@@ -100,6 +103,7 @@
                         <losses_max units="W" is_input="True">1958.0316619368884</losses_max>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -185,6 +189,7 @@
                         </cruise>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <mass units="kg">10.0</mass>
                         <current_caliber units="A">400.0</current_caliber>
@@ -211,6 +216,7 @@
                         </cruise>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <mass units="kg">10.0</mass>
                         <current_caliber units="A">400.0</current_caliber>
@@ -237,6 +243,7 @@
                         </cruise>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <mass units="kg">10.0</mass>
                         <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
@@ -263,6 +270,7 @@
                         </cruise>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <mass units="kg">10.0</mass>
                         <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
@@ -284,6 +292,7 @@
                     <harness_1>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -334,6 +343,7 @@
                     <inverter_1>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -433,6 +443,7 @@
                         <voltage_ac_max units="V" is_input="True">414.83894592299646<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
                         <CG>
                             <x units="m">2.39</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.000357</CD0>
@@ -469,6 +480,7 @@
                     <propeller_1>
                         <CG>
                             <x units="m">2.2</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -500,6 +512,7 @@
                     <dc_bus_2>
                         <CG>
                             <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -527,6 +540,7 @@
                     <dc_bus_1>
                         <CG>
                             <x units="m">2.39</x>
+                            <y_ratio>0.34</y_ratio>
                         </CG>
                         <low_speed>
                             <CD0>0.0</CD0>

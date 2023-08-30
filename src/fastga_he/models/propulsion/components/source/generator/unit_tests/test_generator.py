@@ -30,7 +30,8 @@ from ..components.sizing_resistance import SizingGeneratorPhaseResistance
 from ..components.sizing_torque_constant_scaling import SizingGeneratorTorqueConstantScaling
 from ..components.sizing_torque_constant import SizingGeneratorTorqueConstant
 from ..components.sizing_weight import SizingGeneratorWeight
-from ..components.sizing_generator_cg import SizingGeneratorCG
+from ..components.sizing_generator_cg_x import SizingGeneratorCGX
+from ..components.sizing_generator_cg_y import SizingGeneratorCGY
 
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
@@ -266,22 +267,43 @@ def test_weight():
     problem.check_partials(compact_print=True)
 
 
-def test_motor_cg():
+def test_generator_cg_x():
 
-    expected_cg = [0.48, 1.99]
+    expected_cg = [2.69, 0.48, 1.99]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
 
         ivc = get_indep_var_comp(
-            list_inputs(SizingGeneratorCG(generator_id="generator_1", position=option)),
+            list_inputs(SizingGeneratorCGX(generator_id="generator_1", position=option)),
             __file__,
             XML_FILE,
         )
         # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingGeneratorCG(generator_id="generator_1", position=option), ivc)
+        problem = run_system(SizingGeneratorCGX(generator_id="generator_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:generator:generator_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_generator_cg_y():
+
+    expected_cg = [1.0, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(SizingGeneratorCGY(generator_id="generator_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(SizingGeneratorCGY(generator_id="generator_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:generator:generator_1:CG:y", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -302,6 +324,9 @@ def test_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:generator:generator_1:CG:x", units="m"
     ) == pytest.approx(1.99, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:CG:y", units="m"
+    ) == pytest.approx(0.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:generator:generator_1:low_speed:CD0"
     ) == pytest.approx(0.0, rel=1e-2)

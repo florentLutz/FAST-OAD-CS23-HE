@@ -1,0 +1,16 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    symmetrical: propeller_3
+
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+
+component_connections:
+  - source: propeller_1
+    target: propeller_2
+
+watcher_file_path:
+

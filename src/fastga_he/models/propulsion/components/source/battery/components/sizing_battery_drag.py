@@ -86,6 +86,8 @@ class SizingBatteryDrag(om.ExplicitComponent):
             val=0.0,
         )
 
+        # Should not work but actually does. I expected the value to be zero everywhere but it
+        # seems like this value is overwritten by the compute_partials function
         self.declare_partials(of="*", wrt="*", val=0.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

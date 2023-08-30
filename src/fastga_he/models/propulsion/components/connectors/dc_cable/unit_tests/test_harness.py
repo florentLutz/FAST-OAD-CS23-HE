@@ -24,13 +24,15 @@ from ..components.sizing_reference_resistance import SizingReferenceResistance
 from ..components.sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
 from ..components.sizing_heat_capacity import SizingHeatCapacityCable
 from ..components.sizing_cable_radius import SizingCableRadius
-from ..components.sizing_harness_cg import SizingHarnessCG
+from ..components.sizing_harness_cg_x import SizingHarnessCGX
+from ..components.sizing_harness_cg_y import SizingHarnessCGY
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from ..components.perf_losses_one_cable import PerformancesLossesOneCable
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
 from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
 from ..components.perf_temperature_from_increase import PerformancesTemperatureFromIncrease
 from ..components.perf_temperature import PerformancesTemperature
+from ..components.perf_temperature_constant import PerformancesTemperatureConstant
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_resistance_no_loop import PerformancesResistanceNoLoop
 from ..components.perf_maximum import PerformancesMaximum
@@ -334,23 +336,48 @@ def test_cable_mass():
     problem.check_partials(compact_print=True)
 
 
-def test_harness_cg():
+def test_harness_cg_x():
 
     expected_cg = [2.69, 1.24, 2.45, 1.96, 0.98, 0.25, 1.345]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingHarnessCG(harness_id="harness_1", position=option)),
+            list_inputs(SizingHarnessCGX(harness_id="harness_1", position=option)),
             __file__,
             XML_FILE,
         )
 
-        problem = run_system(SizingHarnessCG(harness_id="harness_1", position=option), ivc)
+        problem = run_system(SizingHarnessCGX(harness_id="harness_1", position=option), ivc)
 
         assert (
             problem.get_val(
                 "data:propulsion:he_power_train:DC_cable_harness:harness_1:CG:x",
+                units="m",
+            )
+            == pytest.approx(expected_value, rel=1e-2)
+        )
+
+        problem.check_partials(compact_print=True)
+
+
+def test_harness_cg_y():
+
+    expected_cg = [1.57, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        # Research independent input value in .xml file
+        ivc = get_indep_var_comp(
+            list_inputs(SizingHarnessCGY(harness_id="harness_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(SizingHarnessCGY(harness_id="harness_1", position=option), ivc)
+
+        assert (
+            problem.get_val(
+                "data:propulsion:he_power_train:DC_cable_harness:harness_1:CG:y",
                 units="m",
             )
             == pytest.approx(expected_value, rel=1e-2)
@@ -604,6 +631,59 @@ def test_perf_temperature_profile_steady_state():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_cable_temperature_mission():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable_temperature_mission",
+        val=275.0,
+        units="degK",
+    )
+    # Needed for compatibility
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 300.0))
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=np.full(NB_POINTS_TEST, 288.15),
+    )
+
+    problem = run_system(
+        PerformancesTemperatureConstant(harness_id="harness_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("cable_temperature", units="degK") == pytest.approx(
+        np.full(NB_POINTS_TEST, 275.0), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable_temperature_mission",
+        val=[275.0, 276.0, 278.0, 279.0, 300.0, 301.0, 300.0, 245.0, 249.0, 260.0],
+        units="degK",
+    )
+    ivc3.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 300.0))
+    ivc3.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=np.full(NB_POINTS_TEST, 288.15),
+    )
+
+    problem3 = run_system(
+        PerformancesTemperatureConstant(harness_id="harness_1", number_of_points=NB_POINTS_TEST),
+        ivc3,
+    )
+
+    assert problem3.get_val("cable_temperature", units="degK") == pytest.approx(
+        np.array([275.0, 276.0, 278.0, 279.0, 300.0, 301.0, 300.0, 245.0, 249.0, 260.0]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
 
 
 def test_resistance_profile():
@@ -883,13 +963,12 @@ def test_sizing_harness():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:mass", units="kg"
     ) == pytest.approx(14.32, rel=1e-2)
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:DC_cable_harness:harness_1:CG:x",
-            units="m",
-        )
-        == pytest.approx(1.24, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:CG:x", units="m"
+    ) == pytest.approx(1.24, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:CG:y", units="m"
+    ) == pytest.approx(0.0, rel=1e-2)
     assert (
         problem.get_val(
             "data:propulsion:he_power_train:DC_cable_harness:harness_1:cruise:CD0",
@@ -926,6 +1005,7 @@ def test_sizing_cable():
     )
     ivc.add_output(name="data:geometry:fuselage:front_length", val=0.5, units="m")
     ivc.add_output(name="data:geometry:cabin:length", val=1.47, units="m")
+    ivc.add_output(name="data:geometry:wing:span", val=10.0, units="m")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingHarness(harness_id="harness_1"), ivc)

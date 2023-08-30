@@ -238,6 +238,9 @@
             <igbt>
               <resistance units="ohm">1e-3</resistance>
             </igbt>
+            <CG>
+              <y_ratio>0.34</y_ratio>
+            </CG>
           </dc_sspc_1>
           <dc_sspc_2>
             <low_speed>
@@ -248,6 +251,7 @@
             </cruise>
             <CG>
                 <x units="m">2.69</x>
+                <y_ratio>0.34</y_ratio>
             </CG>
             <mass units="kg">10.0</mass>
             <current_caliber units="A">800.0</current_caliber>
@@ -273,6 +277,7 @@
             </cruise>
             <CG>
                 <x units="m">2.69</x>
+                <y_ratio>0.34</y_ratio>
             </CG>
             <mass units="kg">10.0</mass>
             <current_caliber units="A">800.0</current_caliber>
@@ -298,6 +303,7 @@
             </cruise>
             <CG>
                 <x units="m">2.69</x>
+                <y_ratio>0.34</y_ratio>
             </CG>
             <mass units="kg">10.0</mass>
             <current_caliber units="A">800.0</current_caliber>
@@ -323,6 +329,7 @@
             </cruise>
             <CG>
                 <x units="m">2.69</x>
+                <y_ratio>0.34</y_ratio>
             </CG>
             <mass units="kg">10.0</mass>
             <current_caliber units="A">800.0</current_caliber>
@@ -348,6 +355,7 @@
             </cruise>
             <CG>
                 <x units="m">2.69</x>
+                <y_ratio>0.34</y_ratio>
             </CG>
             <mass units="kg">10.0</mass>
             <current_caliber units="A">800.0</current_caliber>
@@ -398,6 +406,7 @@
             </cruise>
             <CG>
                 <x units="m">2.69</x>
+                <y_ratio>0.34</y_ratio>
             </CG>
             <mass units="kg">10.0</mass>
             <current_caliber units="A">800.0</current_caliber>
@@ -448,6 +457,7 @@
             </cruise>
             <CG>
                 <x units="m">2.69</x>
+                <y_ratio>0.34</y_ratio>
             </CG>
             <mass units="kg">10.0</mass>
             <current_caliber units="A">800.0</current_caliber>
@@ -490,6 +500,7 @@
             </heat_sink>
             <CG>
               <x units="m" is_input="False">3.4550815011709046<!--X position of the DC/DC converter center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <capacitor>
               <aspect_ratio>2.0</aspect_ratio>
@@ -629,6 +640,7 @@
             <width units="m" is_input="False">0.052974946375362056</width>
             <CG>
               <x units="m" is_input="False">3.4550815011709046<!--X position of the DC bus center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <conductor>
               <mutual_inductance units="H" is_input="False">1.2732772553183625e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
@@ -656,9 +668,15 @@
         <DC_splitter>
           <dc_splitter_1>
             <power_split units="percent">66.0</power_split>
+            <CG>
+              <y_ratio>0.34</y_ratio>
+            </CG>
           </dc_splitter_1>
           <dc_splitter_2>
             <power_split units="percent">66.0</power_split>
+            <CG>
+              <y_ratio>0.34</y_ratio>
+            </CG>
           </dc_splitter_2>
         </DC_splitter>
         <DC_cable_harness>
@@ -676,6 +694,7 @@
             <voltage_max units="V" is_input="False">500.0</voltage_max>
             <CG>
               <x units="m" is_input="False">2.9276943341139363<!--X position of the DC cable center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <cable>
               <initial_temperature units="degK" is_input="True">288.15</initial_temperature>
@@ -728,6 +747,7 @@
             <voltage_max units="V" is_input="False">500.0</voltage_max>
             <CG>
               <x units="m" is_input="False">2.9276943341139363<!--X position of the DC cable center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <cable>
               <initial_temperature units="degK" is_input="True">288.15</initial_temperature>
@@ -832,6 +852,7 @@
             <voltage_max units="V" is_input="False">500.0</voltage_max>
             <CG>
               <x units="m" is_input="False">2.9276943341139363<!--X position of the DC cable center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <cable>
               <initial_temperature units="degK" is_input="True">288.15</initial_temperature>
@@ -891,6 +912,7 @@
             <voltage_caliber units="V" is_input="True">700.0<!--Max voltage of the motor--></voltage_caliber>
             <CG>
               <x units="m" is_input="False">0.46823<!--X position of the PMSM center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
@@ -932,6 +954,7 @@
             <voltage_caliber units="V" is_input="True">700.0<!--Max voltage of the motor--></voltage_caliber>
             <CG>
               <x units="m" is_input="False">0.46823<!--X position of the PMSM center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
@@ -979,6 +1002,7 @@
             <volume units="L" is_input="False">388.64263438396716<!--Volume of the battery pack--></volume>
             <CG>
               <x units="m" is_input="False">3.818621385069883<!--X position of the battery center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <cell>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
@@ -1029,6 +1053,7 @@
             <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
             <CG>
               <x units="m" is_input="False">1.685628<!--X position of the inverter center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <capacitor>
               <aspect_ratio>2.0</aspect_ratio>
@@ -1159,6 +1184,7 @@
             <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
             <CG>
               <x units="m" is_input="False">1.685628<!--X position of the inverter center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <capacitor>
               <aspect_ratio>2.0</aspect_ratio>
@@ -1289,6 +1315,7 @@
             <torque_rating units="N*m" is_input="False">1198.7967514384413<!--Maximum value of the propeller torque used for the sizing--></torque_rating>
             <CG>
               <x units="m" is_input="False">0.12382499999999999<!--X position of the propeller center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
@@ -1319,6 +1346,7 @@
             <torque_rating units="N*m" is_input="False">1198.7967514384413<!--Maximum value of the propeller torque used for the sizing--></torque_rating>
             <CG>
               <x units="m" is_input="False">0.12382499999999999<!--X position of the propeller center of gravity--></x>
+              <y_ratio>0.34</y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
@@ -1351,6 +1379,9 @@
                     <width units="m">1.15</width>
                     <wet_area units="m**2">7.92688</wet_area>
                 </nacelle>
+                <CG>
+                  <y_ratio>0.34</y_ratio>
+                </CG>
             </ice_1>
             <ice_2>
                 <from_LE units="m">0.5</from_LE>
@@ -1374,6 +1405,9 @@
                     <width units="m">1.15</width>
                     <wet_area units="m**2">7.92688</wet_area>
                 </nacelle>
+                <CG>
+                  <y_ratio>0.34</y_ratio>
+                </CG>
             </ice_2>
         </ICE>
         <rectifier>

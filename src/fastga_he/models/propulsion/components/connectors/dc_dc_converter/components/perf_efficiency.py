@@ -5,7 +5,19 @@
 import numpy as np
 import openmdao.api as om
 
+import fastoad.api as oad
 
+from ..constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
+
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
+] = "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_DC_DC_CONVERTER_EFFICIENCY,
+    "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses",
+)
 class PerformancesEfficiency(om.ExplicitComponent):
     """Computation of the efficiency of the inverter."""
 
@@ -13,6 +25,13 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        # Needed even if not used because of the other submodel ...
+        self.options.declare(
+            name="dc_dc_converter_id",
+            default=None,
+            desc="Identifier of the DC/DC converter",
+            allow_none=False,
         )
 
     def setup(self):

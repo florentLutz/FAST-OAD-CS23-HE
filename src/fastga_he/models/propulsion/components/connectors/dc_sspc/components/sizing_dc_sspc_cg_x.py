@@ -8,24 +8,24 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingDCSplitterCG(om.ExplicitComponent):
+class SizingDCSSPCCGX(om.ExplicitComponent):
     """
-    Class that computes the CG of the DC splitter based on its position. Will be based on simple
+    Class that computes the CG of the DC SSPC based on its position. Will be based on simple
     geometric ratios, no consideration of volume will be implemented for now.
     """
 
     def initialize(self):
         self.options.declare(
-            name="dc_splitter_id",
+            name="dc_sspc_id",
             default=None,
-            desc="Identifier of the DC splitter",
+            desc="Identifier of the DC SSPC",
             allow_none=False,
         )
         self.options.declare(
             name="position",
             default="inside_the_wing",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the DC splitter, possible position include "
+            desc="Option to give the position of the DC SSPC, possible position include "
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
@@ -33,7 +33,7 @@ class SizingDCSplitterCG(om.ExplicitComponent):
     def setup(self):
 
         position = self.options["position"]
-        dc_splitter_id = self.options["dc_splitter_id"]
+        dc_sspc_id = self.options["dc_sspc_id"]
 
         if position == "inside_the_wing":
 
@@ -42,11 +42,9 @@ class SizingDCSplitterCG(om.ExplicitComponent):
         elif position == "in_the_front":
 
             self.add_input(
-                name="data:propulsion:he_power_train:DC_splitter:"
-                + dc_splitter_id
-                + ":front_length_ratio",
+                name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":front_length_ratio",
                 val=0.9,
-                desc="Location of the DC splitter CG as a ratio of the aircraft front length",
+                desc="Location of the DC SSPC CG as a ratio of the aircraft front length",
             )
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
@@ -56,106 +54,92 @@ class SizingDCSplitterCG(om.ExplicitComponent):
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
             self.add_input("data:geometry:fuselage:rear_length", val=np.nan, units="m")
             self.add_input(
-                name="data:propulsion:he_power_train:DC_splitter:"
-                + dc_splitter_id
-                + ":rear_length_ratio",
+                name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":rear_length_ratio",
                 val=0.1,
-                desc="Location of the DC splitter CG as a ratio of the aircraft rear length",
+                desc="Location of the DC SSPC CG as a ratio of the aircraft rear length",
             )
 
         self.add_output(
-            "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x",
             units="m",
             val=2.5,
-            desc="X position of the DC splitter center of gravity",
+            desc="X position of the DC SSPC center of gravity",
         )
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         position = self.options["position"]
-        dc_splitter_id = self.options["dc_splitter_id"]
+        dc_sspc_id = self.options["dc_sspc_id"]
 
         if position == "inside_the_wing":
 
-            outputs[
-                "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x"
-            ] = inputs["data:geometry:wing:MAC:at25percent:x"]
+            outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x"] = inputs[
+                "data:geometry:wing:MAC:at25percent:x"
+            ]
 
         elif position == "in_the_front":
 
-            outputs["data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x"] = (
+            outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x"] = (
                 inputs[
-                    "data:propulsion:he_power_train:DC_splitter:"
-                    + dc_splitter_id
-                    + ":front_length_ratio"
+                    "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":front_length_ratio"
                 ]
                 * inputs["data:geometry:fuselage:front_length"]
             )
 
         else:
 
-            outputs["data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x"] = (
+            outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + inputs["data:geometry:cabin:length"]
                 + inputs["data:geometry:fuselage:rear_length"]
                 * inputs[
-                    "data:propulsion:he_power_train:DC_splitter:"
-                    + dc_splitter_id
-                    + ":rear_length_ratio"
+                    "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":rear_length_ratio"
                 ]
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         position = self.options["position"]
-        dc_splitter_id = self.options["dc_splitter_id"]
+        dc_sspc_id = self.options["dc_sspc_id"]
 
         if position == "inside_the_wing":
 
             partials[
-                "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
             ] = 1.0
 
         elif position == "in_the_front":
 
             partials[
-                "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
-                "data:propulsion:he_power_train:DC_splitter:"
-                + dc_splitter_id
-                + ":front_length_ratio",
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x",
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":front_length_ratio",
             ] = inputs["data:geometry:fuselage:front_length"]
             partials[
-                "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x",
                 "data:geometry:fuselage:front_length",
             ] = inputs[
-                "data:propulsion:he_power_train:DC_splitter:"
-                + dc_splitter_id
-                + ":front_length_ratio"
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":front_length_ratio"
             ]
 
         else:
 
             partials[
-                "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x",
                 "data:geometry:fuselage:front_length",
             ] = 1.0
             partials[
-                "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x",
                 "data:geometry:cabin:length",
             ] = 1.0
             partials[
-                "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x",
                 "data:geometry:fuselage:rear_length",
             ] = inputs[
-                "data:propulsion:he_power_train:DC_splitter:"
-                + dc_splitter_id
-                + ":rear_length_ratio"
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":rear_length_ratio"
             ]
             partials[
-                "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
-                "data:propulsion:he_power_train:DC_splitter:"
-                + dc_splitter_id
-                + ":rear_length_ratio",
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:x",
+                "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":rear_length_ratio",
             ] = inputs["data:geometry:fuselage:rear_length"]
