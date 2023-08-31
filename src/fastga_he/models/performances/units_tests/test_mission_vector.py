@@ -457,7 +457,7 @@ def test_reserve_speed():
     reserve_tas = problem.get_val("data:mission:sizing:main_route:reserve:v_tas", units="m/s")
     assert reserve_tas == pytest.approx(46.69, rel=1e-3)
 
-    problem.check_partials(compact_print=False)
+    problem.check_partials(compact_print=True)
 
 
 def test_initialize_airspeed():
