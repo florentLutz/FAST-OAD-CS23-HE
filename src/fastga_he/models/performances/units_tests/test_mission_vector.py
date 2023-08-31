@@ -64,6 +64,11 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_time
 from fastga_he.models.performances.mission_vector.initialization.initialize_time_step import (
     InitializeTimeStep,
 )
+
+from fastga_he.models.performances.mission_vector.mission.performance_per_phase import (
+    PerformancePerPhase,
+)
+
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
 from fastga_he.models.propulsion.assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
@@ -1402,6 +1407,134 @@ def test_initialize_cog():
         ]
     )
     assert problem.get_val("x_cg", units="m") == pytest.approx(expected_cog, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_performances_per_phase():
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        name="time",
+        val=np.array(
+            [
+                0.0,
+                0.758,
+                1.554,
+                2.392,
+                3.276,
+                4.212,
+                5.205,
+                6.265,
+                7.4,
+                8.621,
+                11.018,
+                13.415,
+                15.812,
+                18.209,
+                20.606,
+                23.003,
+                25.4,
+                27.797,
+                30.194,
+                32.591,
+                34.988,
+                41.654,
+                48.321,
+                54.988,
+                61.654,
+                70.654,
+                79.654,
+                88.654,
+                97.654,
+                106.654,
+            ]
+        ),
+        units="min",
+    )
+    ivc.add_output(
+        name="position",
+        val=np.array(
+            [
+                0.0,
+                1.087,
+                2.245,
+                3.481,
+                4.804,
+                6.225,
+                7.754,
+                9.408,
+                11.206,
+                13.167,
+                19.559,
+                25.951,
+                32.342,
+                38.734,
+                45.126,
+                51.518,
+                57.91,
+                64.302,
+                70.694,
+                77.085,
+                83.477,
+                96.944,
+                110.011,
+                122.689,
+                134.989,
+                148.792,
+                162.595,
+                176.398,
+                190.2,
+                204.003,
+            ]
+        ),
+        units="nmi",
+    )
+    ivc.add_output(
+        name="fuel_consumed_t_econ",
+        val=np.linspace(1.0, 2.0, 32),
+        units="kg",
+    )
+    ivc.add_output(
+        name="non_consumable_energy_t_econ",
+        val=np.linspace(10.0, 25.0, 32),
+        units="W*h",
+    )
+    ivc.add_output(
+        name="thrust_rate_t_econ",
+        val=np.ones(32),
+    )
+
+    problem = run_system(
+        PerformancePerPhase(
+            number_of_points_climb=10,
+            number_of_points_cruise=10,
+            number_of_points_descent=5,
+            number_of_points_reserve=5,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:mission:sizing:main_route:climb:duration", units="min"
+    ) == pytest.approx(11.018, rel=1e-3)
+    assert problem.get_val(
+        "data:mission:sizing:main_route:cruise:duration", units="min"
+    ) == pytest.approx(23.97, rel=1e-3)
+    assert problem.get_val(
+        "data:mission:sizing:main_route:descent:duration", units="min"
+    ) == pytest.approx(35.666, rel=1e-3)
+
+    assert problem.get_val(
+        "data:mission:sizing:main_route:climb:distance", units="nmi"
+    ) == pytest.approx(19.559, rel=1e-3)
+    assert problem.get_val(
+        "data:mission:sizing:main_route:cruise:distance", units="nmi"
+    ) == pytest.approx(63.918, rel=1e-3)
+    assert problem.get_val(
+        "data:mission:sizing:main_route:descent:distance", units="nmi"
+    ) == pytest.approx(65.315, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

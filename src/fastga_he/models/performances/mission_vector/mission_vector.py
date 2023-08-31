@@ -12,7 +12,7 @@ from fastoad.module_management.constants import ModelDomain
 from .initialization.initialize import Initialize
 from .mission.mission_core import MissionCore
 from .to_csv import ToCSV
-from fastga.models.weight.cg.cg_variation import InFlightCGVariation
+from fastga_he.models.weight.cg.cg_variation import InFlightCGVariation
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from fastga_he.models.propulsion.assemblers.performances_watcher import (
