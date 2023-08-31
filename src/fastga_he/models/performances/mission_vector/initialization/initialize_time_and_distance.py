@@ -13,6 +13,15 @@ _LOGGER = logging.getLogger(__name__)
 class InitializeTimeAndDistance(om.ExplicitComponent):
     """Initializes time and ground distance at each time step."""
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Contains the index of the different flight phases
+        self.climb_idx = None
+        self.cruise_idx = None
+        self.descent_idx = None
+        self.reserve_idx = None
+
     def initialize(self):
 
         self.options.declare(
@@ -48,17 +57,22 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
             + number_of_points_reserve
         )
 
-        descent_idx = np.linspace(
-            number_of_points_climb + number_of_points_cruise,
-            number_of_points_climb + number_of_points_cruise + number_of_points_descent - 1,
-            number_of_points_descent,
+        self.climb_idx = np.linspace(
+            0,
+            number_of_points_climb - 1,
+            number_of_points_climb,
         ).astype(int)
-        cruise_idx = np.linspace(
+        self.cruise_idx = np.linspace(
             number_of_points_climb,
             number_of_points_climb + number_of_points_cruise - 1,
             number_of_points_cruise,
         ).astype(int)
-        reserve_idx = np.linspace(
+        self.descent_idx = np.linspace(
+            number_of_points_climb + number_of_points_cruise,
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent - 1,
+            number_of_points_descent,
+        ).astype(int)
+        self.reserve_idx = np.linspace(
             number_of_points_climb + number_of_points_cruise + number_of_points_descent,
             number_of_points_climb
             + number_of_points_cruise
@@ -132,7 +146,7 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
             of=["time", "position"],
             wrt="data:mission:sizing:main_route:descent:descent_rate",
             method="fd",
-            rows=np.concatenate((cruise_idx, descent_idx, reserve_idx)),
+            rows=np.concatenate((self.cruise_idx, self.descent_idx, self.reserve_idx)),
             cols=np.zeros(
                 number_of_points_cruise + number_of_points_descent + number_of_points_reserve
             ),
@@ -146,9 +160,7 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
-        number_of_points_descent = self.options["number_of_points_descent"]
         number_of_points_reserve = self.options["number_of_points_reserve"]
 
         altitude = inputs["altitude"]
@@ -167,20 +179,10 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
         if descent_rate > 0.0:
             _LOGGER.warning("Descent rate greater than 0.0, please check the inputs")
 
-        altitude_climb = altitude[0:number_of_points_climb]
-        horizontal_speed_climb = horizontal_speed[0:number_of_points_climb]
-        altitude_descent = altitude[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
-        horizontal_speed_descent = horizontal_speed[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
+        altitude_climb = altitude[self.climb_idx]
+        horizontal_speed_climb = horizontal_speed[self.climb_idx]
+        altitude_descent = altitude[self.descent_idx]
+        horizontal_speed_descent = horizontal_speed[self.descent_idx]
 
         # Computing the time evolution during the climb phase, based on the altitude sampling and
         # the desired climb rate
@@ -274,20 +276,10 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
             + number_of_points_reserve
         )
 
-        altitude_climb = altitude[0:number_of_points_climb]
-        horizontal_speed_climb = horizontal_speed[0:number_of_points_climb]
-        altitude_descent = altitude[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
-        horizontal_speed_descent = horizontal_speed[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
+        altitude_climb = altitude[self.climb_idx]
+        horizontal_speed_climb = horizontal_speed[self.climb_idx]
+        altitude_descent = altitude[self.descent_idx]
+        horizontal_speed_descent = horizontal_speed[self.descent_idx]
 
         # Computing the time evolution during the climb phase, based on the altitude sampling and
         # the desired climb rate
