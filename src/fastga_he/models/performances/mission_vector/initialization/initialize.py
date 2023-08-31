@@ -18,6 +18,7 @@ from ..initialization.initialize_airspeed_derivatives import InitializeAirspeedD
 from ..initialization.initialize_altitude import InitializeAltitude
 from ..initialization.initialize_density import InitializeDensity
 from ..initialization.initialize_temperature import InitializeTemperature
+from ..initialization.initialize_vertical_airspeed import InitializeVerticalAirspeed
 from ..initialization.initialize_gamma import InitializeGamma
 from ..initialization.initialize_horizontal_speed import InitializeHorizontalSpeed
 from ..initialization.initialize_time_and_distance import InitializeTimeAndDistance
@@ -146,6 +147,17 @@ class Initialize(om.Group):
             promotes_outputs=[],
         )
         self.add_subsystem(
+            "initialize_vertical_airspeed",
+            InitializeVerticalAirspeed(
+                number_of_points_climb=number_of_points_climb,
+                number_of_points_cruise=number_of_points_cruise,
+                number_of_points_descent=number_of_points_descent,
+                number_of_points_reserve=number_of_points_reserve,
+            ),
+            promotes_inputs=["data:*", "altitude"],
+            promotes_outputs=[],
+        )
+        self.add_subsystem(
             "initialize_gamma",
             InitializeGamma(
                 number_of_points_climb=number_of_points_climb,
@@ -153,7 +165,7 @@ class Initialize(om.Group):
                 number_of_points_descent=number_of_points_descent,
                 number_of_points_reserve=number_of_points_reserve,
             ),
-            promotes_inputs=["data:*", "altitude"],
+            promotes_inputs=[],
             promotes_outputs=[],
         )
         self.add_subsystem(
@@ -237,3 +249,7 @@ class Initialize(om.Group):
         )
 
         self.connect("initialize_time_and_distance.time", "initialize_time_step.time")
+
+        self.connect(
+            "initialize_vertical_airspeed.vertical_speed", "initialize_gamma.vertical_speed"
+        )

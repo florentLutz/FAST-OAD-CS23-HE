@@ -34,6 +34,9 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_alti
 from fastga_he.models.performances.mission_vector.initialization.initialize_density import (
     InitializeDensity,
 )
+from fastga_he.models.performances.mission_vector.initialization.initialize_temperature import (
+    InitializeTemperature,
+)
 from fastga_he.models.performances.mission_vector.initialization.initialize_climb_airspeed import (
     InitializeClimbAirspeed,
 )
@@ -45,6 +48,9 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_rese
 )
 from fastga_he.models.performances.mission_vector.initialization.initialize_airspeed import (
     InitializeAirspeed,
+)
+from fastga_he.models.performances.mission_vector.initialization.initialize_vertical_airspeed import (
+    InitializeVerticalAirspeed,
 )
 from fastga_he.models.performances.mission_vector.initialization.initialize_gamma import (
     InitializeGamma,
@@ -222,6 +228,98 @@ def test_initialize_density():
         ]
     )
     assert problem.get_val("density", units="kg/m**3") == pytest.approx(expected_density, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_initialize_temperature():
+
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+
+    altitude = np.array(
+        [
+            0.0,
+            270.9,
+            541.9,
+            812.8,
+            1083.7,
+            1354.7,
+            1625.6,
+            1896.5,
+            2167.5,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            1828.8,
+            1219.2,
+            609.6,
+            0.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+        ]
+    )
+    ivc.add_output("altitude", units="m", val=altitude)
+
+    problem = run_system(
+        InitializeTemperature(
+            number_of_points_climb=10,
+            number_of_points_cruise=10,
+            number_of_points_descent=5,
+            number_of_points_reserve=5,
+        ),
+        ivc,
+    )
+
+    expected_temperature = np.array(
+        [
+            288.15,
+            286.38,
+            284.62,
+            282.86,
+            281.10,
+            279.34,
+            277.58,
+            275.82,
+            274.06,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            276.26,
+            280.22,
+            284.18,
+            288.15,
+            281.65,
+            281.65,
+            281.65,
+            281.65,
+            281.65,
+        ]
+    )
+    assert problem.get_val("exterior_temperature", units="degK") == pytest.approx(
+        expected_temperature, rel=1e-2
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -705,12 +803,12 @@ def test_initialize_airspeed_derivatives():
     problem.check_partials(compact_print=True)
 
 
-def test_initialize_gamma():
+def test_initialize_vertical_airspeed():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
-            InitializeGamma(
+            InitializeVerticalAirspeed(
                 number_of_points_climb=10,
                 number_of_points_cruise=10,
                 number_of_points_descent=5,
@@ -755,6 +853,100 @@ def test_initialize_gamma():
                 1000.0,
                 1000.0,
                 1000.0,
+            ]
+        ),
+    )
+
+    problem = run_system(
+        InitializeVerticalAirspeed(
+            number_of_points_climb=10,
+            number_of_points_cruise=10,
+            number_of_points_descent=5,
+            number_of_points_reserve=5,
+        ),
+        ivc,
+    )
+
+    expected_vertical_speed = np.array(
+        [
+            6.096,
+            5.813,
+            5.531,
+            5.249,
+            4.967,
+            4.684,
+            4.402,
+            4.120,
+            3.838,
+            3.556,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -1.524,
+            -1.524,
+            -1.524,
+            -1.524,
+            -1.524,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ]
+    )
+    assert problem.get_val("vertical_speed", units="m/s") == pytest.approx(
+        expected_vertical_speed, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_initialize_gamma():
+
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "vertical_speed",
+        units="m/s",
+        val=np.array(
+            [
+                6.096,
+                5.813,
+                5.531,
+                5.249,
+                4.967,
+                4.684,
+                4.402,
+                4.120,
+                3.838,
+                3.556,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -1.524,
+                -1.524,
+                -1.524,
+                -1.524,
+                -1.524,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
             ]
         ),
     )
@@ -807,44 +999,6 @@ def test_initialize_gamma():
         ivc,
     )
 
-    expected_vertical_speed = np.array(
-        [
-            6.096,
-            5.813,
-            5.531,
-            5.249,
-            4.967,
-            4.684,
-            4.402,
-            4.120,
-            3.838,
-            3.556,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            -1.524,
-            -1.524,
-            -1.524,
-            -1.524,
-            -1.524,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-        ]
-    )
-    assert (
-        np.max(np.abs(problem.get_val("vertical_speed", units="m/s") - expected_vertical_speed))
-        <= 1e-1
-    )
     expected_gamma = np.array(
         [
             0.1377,
@@ -879,7 +1033,7 @@ def test_initialize_gamma():
             0.0,
         ]
     )
-    assert np.max(np.abs(problem.get_val("gamma", units="rad") - expected_gamma)) <= 1e-1
+    assert problem.get_val("gamma", units="rad") == pytest.approx(expected_gamma, abs=1e-3)
 
     problem.check_partials(compact_print=True)
 
