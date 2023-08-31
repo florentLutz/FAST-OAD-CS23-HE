@@ -10,6 +10,13 @@ from stdatm import Atmosphere
 class InitializeAirspeedDerivatives(om.ExplicitComponent):
     """Computes the d_vx_dt at each time step."""
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Contains the index of the different flight phases
+        self.climb_idx = None
+        self.descent_idx = None
+
     def initialize(self):
 
         self.options.declare(
@@ -45,17 +52,17 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
             + number_of_points_reserve
         )
 
-        climb_idx = np.linspace(
+        self.climb_idx = np.linspace(
             0,
             number_of_points_climb - 1,
             number_of_points_climb,
         ).astype(int)
-        descent_idx = np.linspace(
+        self.descent_idx = np.linspace(
             number_of_points_climb + number_of_points_cruise,
             number_of_points_climb + number_of_points_cruise + number_of_points_descent - 1,
             number_of_points_descent,
         ).astype(int)
-        non_nul_pd = np.concatenate((climb_idx, descent_idx))
+        non_nul_pd = np.concatenate((self.climb_idx, self.descent_idx))
 
         self.add_input(
             "true_airspeed",
@@ -94,9 +101,7 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
-        number_of_points_descent = self.options["number_of_points_descent"]
         number_of_points_reserve = self.options["number_of_points_reserve"]
 
         true_airspeed = inputs["true_airspeed"]
@@ -104,35 +109,15 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
         altitude = inputs["altitude"]
         gamma = inputs["gamma"]
 
-        altitude_climb = altitude[0:number_of_points_climb]
-        gamma_climb = gamma[0:number_of_points_climb]
-        equivalent_airspeed_climb = equivalent_airspeed[0:number_of_points_climb]
-        true_airspeed_climb = true_airspeed[0:number_of_points_climb]
+        altitude_climb = altitude[self.climb_idx]
+        gamma_climb = gamma[self.climb_idx]
+        equivalent_airspeed_climb = equivalent_airspeed[self.climb_idx]
+        true_airspeed_climb = true_airspeed[self.climb_idx]
 
-        altitude_descent = altitude[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
-        gamma_descent = gamma[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
-        equivalent_airspeed_descent = equivalent_airspeed[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
-        true_airspeed_descent = true_airspeed[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
+        altitude_descent = altitude[self.descent_idx]
+        gamma_descent = gamma[self.descent_idx]
+        equivalent_airspeed_descent = equivalent_airspeed[self.descent_idx]
+        true_airspeed_descent = true_airspeed[self.descent_idx]
 
         atm_climb_plus_1 = Atmosphere(altitude_climb + 1.0, altitude_in_feet=False)
         atm_climb_plus_1.equivalent_airspeed = equivalent_airspeed_climb
@@ -156,9 +141,8 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
         outputs["d_vx_dt"] = d_vx_dt
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        number_of_points_climb = self.options["number_of_points_climb"]
+
         number_of_points_cruise = self.options["number_of_points_cruise"]
-        number_of_points_descent = self.options["number_of_points_descent"]
         number_of_points_reserve = self.options["number_of_points_reserve"]
 
         true_airspeed = inputs["true_airspeed"]
@@ -166,35 +150,15 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
         altitude = inputs["altitude"]
         gamma = inputs["gamma"]
 
-        altitude_climb = altitude[0:number_of_points_climb]
-        gamma_climb = gamma[0:number_of_points_climb]
-        equivalent_airspeed_climb = equivalent_airspeed[0:number_of_points_climb]
-        true_airspeed_climb = true_airspeed[0:number_of_points_climb]
+        altitude_climb = altitude[self.climb_idx]
+        gamma_climb = gamma[self.climb_idx]
+        equivalent_airspeed_climb = equivalent_airspeed[self.climb_idx]
+        true_airspeed_climb = true_airspeed[self.climb_idx]
 
-        altitude_descent = altitude[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
-        gamma_descent = gamma[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
-        equivalent_airspeed_descent = equivalent_airspeed[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
-        true_airspeed_descent = true_airspeed[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
+        altitude_descent = altitude[self.descent_idx]
+        gamma_descent = gamma[self.descent_idx]
+        equivalent_airspeed_descent = equivalent_airspeed[self.descent_idx]
+        true_airspeed_descent = true_airspeed[self.descent_idx]
 
         atm_climb_plus_1 = Atmosphere(altitude_climb + 1.0, altitude_in_feet=False)
         atm_climb_plus_1.equivalent_airspeed = equivalent_airspeed_climb
