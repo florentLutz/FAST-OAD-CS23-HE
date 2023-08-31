@@ -5,11 +5,32 @@
 import numpy as np
 import openmdao.api as om
 
-from stdatm import Atmosphere
+from stdatm import AtmosphereWithPartials
+
+RHO_SL = AtmosphereWithPartials(0.0).density
 
 
 class InitializeAirspeed(om.ExplicitComponent):
     """Initializes the airspeeds at each time step."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Contains the value of equivalent airspeed (eas) and true airspeed (tas), used to avoid
+        # recomputing them in compute_partials
+        self.eas = None
+        self.tas = None
+
+        # Contains the index where the tas is computed from the eas and the eas from the tas
+        # respectively
+        self.tas_via_eas = None
+        self.eas_via_tas = None
+
+        # Contains the index of the different flight phases
+        self.climb_idx = None
+        self.cruise_idx = None
+        self.descent_idx = None
+        self.reserve_idx = None
 
     def initialize(self):
 
@@ -61,12 +82,12 @@ class InitializeAirspeed(om.ExplicitComponent):
 
         # Because of how we do the conversion between TAS and EAS, the partials can't be written
         # explicitly but we can use sparse partials to save computation time
-        cruise_idx = np.linspace(
+        self.cruise_idx = np.linspace(
             number_of_points_climb,
             number_of_points_climb + number_of_points_cruise - 1,
             number_of_points_cruise,
         ).astype(int)
-        reserve_idx = np.linspace(
+        self.reserve_idx = np.linspace(
             number_of_points_climb + number_of_points_cruise + number_of_points_descent,
             number_of_points_climb
             + number_of_points_cruise
@@ -75,136 +96,98 @@ class InitializeAirspeed(om.ExplicitComponent):
             - 1,
             number_of_points_reserve,
         ).astype(int)
-        eas_via_tas = np.concatenate((cruise_idx, reserve_idx))
+        self.eas_via_tas = np.concatenate((self.cruise_idx, self.reserve_idx))
 
-        climb_idx = np.linspace(
+        self.declare_partials(
+            of="equivalent_airspeed",
+            wrt="altitude",
+            method="exact",
+            cols=self.eas_via_tas,
+            rows=self.eas_via_tas,
+        )
+
+        self.climb_idx = np.linspace(
             0,
             number_of_points_climb - 1,
             number_of_points_climb,
         ).astype(int)
-        descent_idx = np.linspace(
+        self.descent_idx = np.linspace(
             number_of_points_climb + number_of_points_cruise,
             number_of_points_climb + number_of_points_cruise + number_of_points_descent - 1,
             number_of_points_descent,
         ).astype(int)
-        tas_via_eas = np.concatenate((climb_idx, descent_idx))
-        self.declare_partials(
-            of="equivalent_airspeed",
-            wrt="altitude",
-            method="fd",
-            cols=eas_via_tas,
-            rows=eas_via_tas,
-        )
+
+        self.tas_via_eas = np.concatenate((self.climb_idx, self.descent_idx))
+
         self.declare_partials(
             of="true_airspeed",
             wrt="altitude",
-            method="fd",
-            cols=tas_via_eas,
-            rows=tas_via_eas,
+            method="exact",
+            cols=self.tas_via_eas,
+            rows=self.tas_via_eas,
         )
 
         self.declare_partials(
-            of="equivalent_airspeed",
-            wrt="data:TLAR:v_cruise",
-            method="fd",
-            rows=cruise_idx,
-            cols=np.zeros_like(cruise_idx),
-        )
-        self.declare_partials(
-            of="true_airspeed",
+            of=["true_airspeed", "equivalent_airspeed"],
             wrt="data:TLAR:v_cruise",
             method="exact",
+            rows=self.cruise_idx,
+            cols=np.zeros_like(self.cruise_idx),
         )
 
         self.declare_partials(
-            of="equivalent_airspeed",
-            wrt="data:mission:sizing:main_route:reserve:v_tas",
-            method="fd",
-            rows=reserve_idx,
-            cols=np.zeros_like(reserve_idx),
-        )
-        self.declare_partials(
-            of="true_airspeed",
+            of=["true_airspeed", "equivalent_airspeed"],
             wrt="data:mission:sizing:main_route:reserve:v_tas",
             method="exact",
+            rows=self.reserve_idx,
+            cols=np.zeros_like(self.reserve_idx),
         )
 
         self.declare_partials(
-            of="equivalent_airspeed",
+            of=["true_airspeed", "equivalent_airspeed"],
             wrt="data:mission:sizing:main_route:climb:v_eas",
             method="exact",
-        )
-        self.declare_partials(
-            of="true_airspeed",
-            wrt="data:mission:sizing:main_route:climb:v_eas",
-            method="fd",
-            rows=climb_idx,
-            cols=np.zeros_like(climb_idx),
+            rows=self.climb_idx,
+            cols=np.zeros_like(self.climb_idx),
         )
 
         self.declare_partials(
-            of="equivalent_airspeed",
+            of=["equivalent_airspeed", "true_airspeed"],
             wrt="data:mission:sizing:main_route:descent:v_eas",
             method="exact",
-        )
-        self.declare_partials(
-            of="true_airspeed",
-            wrt="data:mission:sizing:main_route:descent:v_eas",
-            method="fd",
-            rows=descent_idx,
-            cols=np.zeros_like(descent_idx),
+            rows=self.descent_idx,
+            cols=np.zeros_like(self.descent_idx),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
-        number_of_points_climb = self.options["number_of_points_climb"]
-        number_of_points_cruise = self.options["number_of_points_cruise"]
-        number_of_points_descent = self.options["number_of_points_descent"]
-        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         v_tas_cruise = inputs["data:TLAR:v_cruise"]
         v_tas_reserve = inputs["data:mission:sizing:main_route:reserve:v_tas"]
 
         altitude = inputs["altitude"]
 
-        altitude_climb = altitude[0:number_of_points_climb]
-        altitude_cruise = altitude[
-            number_of_points_climb : number_of_points_climb + number_of_points_cruise
-        ]
-        altitude_descent = altitude[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-        ]
-        altitude_reserve = altitude[
-            number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent : number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-            + number_of_points_reserve
-        ]
+        altitude_climb = altitude[self.climb_idx]
+        altitude_cruise = altitude[self.cruise_idx]
+        altitude_descent = altitude[self.descent_idx]
+        altitude_reserve = altitude[self.reserve_idx]
 
         v_eas_climb = inputs["data:mission:sizing:main_route:climb:v_eas"]
-        atm_climb = Atmosphere(altitude_climb, altitude_in_feet=False)
-
+        atm_climb = AtmosphereWithPartials(altitude_climb, altitude_in_feet=False)
         atm_climb.equivalent_airspeed = np.full_like(altitude_climb, v_eas_climb)
         true_airspeed_climb = atm_climb.true_airspeed
 
-        atm_cruise = Atmosphere(altitude_cruise, altitude_in_feet=False)
+        atm_cruise = AtmosphereWithPartials(altitude_cruise, altitude_in_feet=False)
         true_airspeed_cruise = np.full_like(altitude_cruise, v_tas_cruise)
         atm_cruise.true_airspeed = true_airspeed_cruise
         equivalent_airspeed_cruise = atm_cruise.equivalent_airspeed
 
-        atm_reserve = Atmosphere(altitude_reserve, altitude_in_feet=False)
+        atm_reserve = AtmosphereWithPartials(altitude_reserve, altitude_in_feet=False)
         true_airspeed_reserve = np.full_like(altitude_reserve, v_tas_reserve)
         atm_reserve.true_airspeed = true_airspeed_reserve
         equivalent_airspeed_reserve = atm_reserve.equivalent_airspeed
 
         v_eas_descent = inputs["data:mission:sizing:main_route:descent:v_eas"]
-        atm_descent = Atmosphere(altitude_descent, altitude_in_feet=False)
-
+        atm_descent = AtmosphereWithPartials(altitude_descent, altitude_in_feet=False)
         atm_descent.equivalent_airspeed = np.full_like(altitude_descent, v_eas_descent)
         true_airspeed_descent = atm_descent.true_airspeed
 
@@ -216,6 +199,7 @@ class InitializeAirspeed(om.ExplicitComponent):
                 true_airspeed_reserve,
             )
         )
+        self.tas = outputs["true_airspeed"]
         outputs["equivalent_airspeed"] = np.concatenate(
             (
                 atm_climb.equivalent_airspeed,
@@ -224,64 +208,43 @@ class InitializeAirspeed(om.ExplicitComponent):
                 equivalent_airspeed_reserve,
             )
         )
+        self.eas = outputs["equivalent_airspeed"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        number_of_points_climb = self.options["number_of_points_climb"]
-        number_of_points_cruise = self.options["number_of_points_cruise"]
-        number_of_points_descent = self.options["number_of_points_descent"]
-        number_of_points_reserve = self.options["number_of_points_reserve"]
+        atm = AtmosphereWithPartials(altitude=inputs["altitude"], altitude_in_feet=False)
+        eas_over_tas = np.sqrt(atm.density / RHO_SL)
+        factor_tas_alt = -0.5 / eas_over_tas * 1.0 / atm.density * atm.partial_density_altitude
+        factor_eas_alt = 0.5 / np.sqrt(RHO_SL * atm.density) * atm.partial_density_altitude
 
-        number_of_points = (
-            number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-            + number_of_points_reserve
+        partials["true_airspeed", "data:TLAR:v_cruise"] = np.ones_like(self.cruise_idx)
+        partials["equivalent_airspeed", "data:TLAR:v_cruise"] = eas_over_tas[self.cruise_idx]
+
+        partials["true_airspeed", "data:mission:sizing:main_route:reserve:v_tas"] = np.ones_like(
+            self.reserve_idx
         )
-
-        cruise_idx = np.linspace(
-            number_of_points_climb,
-            number_of_points_climb + number_of_points_cruise - 1,
-            number_of_points_cruise,
-        ).astype(int)
-        reserve_idx = np.linspace(
-            number_of_points_climb + number_of_points_cruise + number_of_points_descent,
-            number_of_points_climb
-            + number_of_points_cruise
-            + number_of_points_descent
-            + number_of_points_reserve
-            - 1,
-            number_of_points_reserve,
-        ).astype(int)
-        climb_idx = np.linspace(
-            0,
-            number_of_points_climb - 1,
-            number_of_points_climb,
-        ).astype(int)
-        descent_idx = np.linspace(
-            number_of_points_climb + number_of_points_cruise,
-            number_of_points_climb + number_of_points_cruise + number_of_points_descent - 1,
-            number_of_points_descent,
-        ).astype(int)
-
-        partials_tas_v_cruise = np.zeros(number_of_points)
-        np.put(partials_tas_v_cruise, cruise_idx, np.ones_like(cruise_idx))
-        partials["true_airspeed", "data:TLAR:v_cruise"] = partials_tas_v_cruise
-
-        partials_tas_v_reserve = np.zeros(number_of_points)
-        np.put(partials_tas_v_reserve, reserve_idx, np.ones_like(reserve_idx))
         partials[
-            "true_airspeed", "data:mission:sizing:main_route:reserve:v_tas"
-        ] = partials_tas_v_reserve
+            "equivalent_airspeed", "data:mission:sizing:main_route:reserve:v_tas"
+        ] = eas_over_tas[self.reserve_idx]
 
-        partials_eas_v_climb = np.zeros(number_of_points)
-        np.put(partials_eas_v_climb, climb_idx, np.ones_like(climb_idx))
         partials[
             "equivalent_airspeed", "data:mission:sizing:main_route:climb:v_eas"
-        ] = partials_eas_v_climb
+        ] = np.ones_like(self.climb_idx)
+        partials["true_airspeed", "data:mission:sizing:main_route:climb:v_eas"] = (
+            1.0 / eas_over_tas[self.climb_idx]
+        )
 
-        partials_eas_v_descent = np.zeros(number_of_points)
-        np.put(partials_eas_v_descent, descent_idx, np.ones_like(descent_idx))
         partials[
             "equivalent_airspeed", "data:mission:sizing:main_route:descent:v_eas"
-        ] = partials_eas_v_descent
+        ] = np.ones_like(self.descent_idx)
+        partials["true_airspeed", "data:mission:sizing:main_route:descent:v_eas"] = (
+            1.0 / eas_over_tas[self.descent_idx]
+        )
+
+        partials["true_airspeed", "altitude"] = (
+            self.eas[self.tas_via_eas] * factor_tas_alt[self.tas_via_eas]
+        )
+
+        partials["equivalent_airspeed", "altitude"] = (
+            self.tas[self.eas_via_tas] * factor_eas_alt[self.eas_via_tas]
+        )

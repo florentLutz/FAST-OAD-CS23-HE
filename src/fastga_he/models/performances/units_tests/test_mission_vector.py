@@ -474,7 +474,6 @@ def test_initialize_airspeed():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("mass", units="kg", val=np.full(30, 1700.0))
     ivc.add_output(
         "altitude",
         units="m",
