@@ -4,6 +4,7 @@
 
 import logging
 
+import numpy as np
 import openmdao.api as om
 
 import fastoad.api as oad
@@ -22,6 +23,7 @@ from fastga_he.models.propulsion.assemblers.performances_watcher import (
 from fastga_he.models.performances.mission_vector.constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
     HE_SUBMODEL_DEP_EFFECT,
+    HE_SUBMODEL_EQUILIBRIUM,
 )
 from fastga_he.models.propulsion.assemblers.energy_consumption_mission_vector import (
     ENERGY_CONSUMPTION_FROM_PT_FILE,
@@ -394,3 +396,144 @@ class MissionVector(om.Group):
                 + HE_SUBMODEL_ENERGY_CONSUMPTION
                 + " service"
             )
+
+    def guess_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
+        """
+        Against my better judgement, I will do the guess_nonlinear at the top most component
+        because for some reasons the guess nonlinear function are first executed from the
+        bottom-most component to the topmost component. Additionally, the variables I'd need (
+        MTOW to get thrust through assumed finesse, cruise TAS for speed) are inputs of component
+        only in the initialization and high level mission component. Consequently we will do
+        everything here. But I'm not happy about it.
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+        number_of_points_total = (
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
+        )
+
+        mtow = inputs["data:weight:aircraft:MTOW"]
+
+        dummy_fuel_consumed = np.linspace(0, 10.0, number_of_points_total)
+
+        outputs["solve_equilibrium.update_mass.mass"] = np.full(
+            number_of_points_total, mtow
+        ) - np.cumsum(dummy_fuel_consumed)
+
+        outputs[
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.alpha"
+        ] = np.concatenate(
+            (
+                np.full(number_of_points_climb, 3.0),
+                np.full(number_of_points_cruise, 2.0),
+                np.full(number_of_points_descent, 1.0),
+                np.full(number_of_points_reserve, 7.0),
+            )
+        )
+        outputs[
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.delta_m"
+        ] = np.concatenate(
+            (
+                np.full(number_of_points_climb, -10.0),
+                np.full(number_of_points_cruise, -2.0),
+                np.full(number_of_points_descent, -5.0),
+                np.full(number_of_points_reserve, -2.0),
+            )
+        )
+        outputs[
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.thrust"
+        ] = np.concatenate(
+            (
+                np.full(number_of_points_climb, 2.0 * mtow),
+                np.full(number_of_points_cruise, mtow / 1.3),
+                np.full(number_of_points_descent, 0.5 * mtow),
+                np.full(number_of_points_reserve, mtow / 1.3),
+            )
+        )
+
+        ###########################################################################################
+        # PT FILE INITIAL GUESS ###################################################################
+        ###########################################################################################
+
+        # This one will be passed in before going into the first pt components
+
+        # Only trigger if we actually have a pt file, don't check for proper submodels because.
+
+        # Let's first check the coherence of the voltage. Have to have the +2 because contrarily
+        # as where it was before where the taxi phases were included here, it is not
+        if self.options["power_train_file_path"]:
+            self.configurator.check_voltage_coherence(
+                inputs=inputs, number_of_points=number_of_points_total + 2
+            )
+
+        # Only trigger if the options is used, if we actually have a pt file and if the right
+        # submodels are used
+
+        if self.options["pre_condition_voltage"] and self.options["power_train_file_path"]:
+
+            # Then we check that there is indeed a powertrain and that the right submodels are used
+
+            voltage_to_set = self.configurator.get_voltage_to_set(
+                inputs=inputs, number_of_points=number_of_points_total + 2
+            )
+
+            # First we pre-condition voltage
+            for sub_graphs in voltage_to_set:
+                for voltage in sub_graphs:
+                    output_name = (
+                        "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances."
+                        + voltage
+                    )
+                    outputs[output_name] = sub_graphs[voltage]
+
+            # Then we compute the propulsive power required that each propulsor has to produce.
+            # We need the true airspeed, and since all propulsor will likely need it and they'll
+            # be the same, we'll take the tas from the first propulsor in the list.
+            propulsor_names = self.configurator.get_thrust_element_list()
+
+            # propulsive_power_dict = get_propulsive_power(
+            #     propulsor_names,
+            #     inputs["data:propulsion:he_power_train:thrust_distribution"],
+            #     inputs["thrust"],
+            #     inputs["energy_consumption.propeller_1.advance_ratio.true_airspeed_econ"],
+            # )
+
+
+def get_propulsive_power(
+    propulsor_names: list,
+    thrust_distributor: np.ndarray,
+    thrust: np.ndarray,
+    true_airspeed: np.ndarray,
+) -> dict:
+    """
+    Returns a dictionary containing the propulsive power, at each point of the flight, that the
+    propulsor will have to produce. Is based on the thrust distributor but unfortunately,
+    since this function is ran BEFORE any subsystems, we must do the computation twice.
+
+    :param propulsor_names: names of the propulsor inside the propulsion chain
+    :param thrust_distributor: array containing the percent repartition of the thrust among each
+    propulsor
+    :param thrust: aircraft level thrust, in N ? (I don't see how to check it)
+    :param true_airspeed: true airspeed, in m/s ?
+    """
+
+    propulsive_power_dict = {}
+
+    normalized_thrust_distribution = thrust_distributor / np.sum(thrust_distributor)
+
+    for propulsor_name in propulsor_names:
+        propulsive_power_dict[propulsor_name] = (
+            thrust
+            * true_airspeed
+            * normalized_thrust_distribution[propulsor_names.index(propulsor_name)]
+        )
+
+    return propulsive_power_dict
