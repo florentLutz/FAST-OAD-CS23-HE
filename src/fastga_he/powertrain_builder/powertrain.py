@@ -136,6 +136,10 @@ class FASTGAHEPowerTrainConfigurator:
         # computed as twice the weight of a half-wing
         self._components_symmetrical_pairs = None
 
+        # Contains the list of all boolean telling whether or not the components will make the
+        # aircraft weight vary during flight
+        self._components_makes_mass_vary = None
+
         # Because of their very peculiar role, we will scan the architecture for any SSPC defined
         # by the user and whether or not they are at the output of a bus, because a specific
         # option needs to be turned on in this was
@@ -217,6 +221,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_slipstream_needs_flaps = []
         components_slipstream_wing_lift = []
         components_symmetrical_pairs = []
+        components_makes_mass_vary = []
 
         # Doing it like that allows us to have the names of the components before we start the
         # loop, which I'm gonna use to check if the pairs are valid
@@ -290,6 +295,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_slipstream_perf_watchers_list.append(resources.DICTIONARY_SMP[component_id])
             components_slipstream_needs_flaps.append(resources.DICTIONARY_SFR[component_id])
             components_slipstream_wing_lift.append(resources.DICTIONARY_SWL[component_id])
+            components_makes_mass_vary.append(resources.DICTIONARY_VARIES_MASS[component_id])
 
             if "options" in component.keys():
 
@@ -333,6 +339,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_slipstream_flaps = components_slipstream_needs_flaps
         self._components_slipstream_wing_lift = components_slipstream_wing_lift
         self._components_symmetrical_pairs = components_symmetrical_pairs
+        self._components_makes_mass_vary = components_makes_mass_vary
 
     def _get_connections(self):
         """
@@ -972,6 +979,17 @@ class FASTGAHEPowerTrainConfigurator:
                 component_pairs.remove(component_pair)
 
         return distributed_mass_names, distributed_mass_types, component_pairs
+
+    def will_aircraft_mass_vary(self):
+        """
+        This function returns a boolean telling whether or not there are components in the
+        powertrain that will make the aircraft mass vary during the flight (like burning fuel or
+        certain types of batteries). For now, will only be used in the initial guess.
+        """
+
+        self._get_components()
+
+        return any(self._components_makes_mass_vary)
 
     def get_graphs_connected_voltage(self) -> list:
         """

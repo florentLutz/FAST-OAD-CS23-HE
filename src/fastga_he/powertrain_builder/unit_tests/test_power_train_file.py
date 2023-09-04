@@ -472,3 +472,26 @@ def test_independent_subgraph():
     sub_graphs = power_train_configurator.get_independent_sub_propulsion_chain()
 
     assert len(sub_graphs) == 2
+
+
+def test_mass_variation_identification():
+
+    # Mass should vary
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    assert power_train_configurator.will_aircraft_mass_vary()
+
+    # Mass shouldn't vary
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    assert not power_train_configurator.will_aircraft_mass_vary()

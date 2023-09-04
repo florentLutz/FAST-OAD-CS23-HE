@@ -23,7 +23,6 @@ from fastga_he.models.propulsion.assemblers.performances_watcher import (
 from fastga_he.models.performances.mission_vector.constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
     HE_SUBMODEL_DEP_EFFECT,
-    HE_SUBMODEL_EQUILIBRIUM,
 )
 from fastga_he.models.propulsion.assemblers.energy_consumption_mission_vector import (
     ENERGY_CONSUMPTION_FROM_PT_FILE,
@@ -420,13 +419,11 @@ class MissionVector(om.Group):
             + number_of_points_reserve
         )
 
+        ###########################################################################################
+        # MISSION INITIAL GUESS, RAN REGARDLESS OF WHETHER WE USE THE PT FILE OR NOT ##############
+        ###########################################################################################
+
         mtow = inputs["data:weight:aircraft:MTOW"]
-
-        dummy_fuel_consumed = np.linspace(0, 10.0, number_of_points_total)
-
-        outputs["solve_equilibrium.update_mass.mass"] = np.full(
-            number_of_points_total, mtow
-        ) - np.cumsum(dummy_fuel_consumed)
 
         outputs[
             "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.alpha"
@@ -458,6 +455,11 @@ class MissionVector(om.Group):
                 np.full(number_of_points_reserve, mtow / 1.3),
             )
         )
+
+        # For the initialization of the fuel consumed we can be smart and set it at 0.0 if we
+        # only have electric components
+
+        self.set_initial_guess_mass(outputs=outputs, mtow=mtow)
 
         ###########################################################################################
         # PT FILE INITIAL GUESS ###################################################################
@@ -505,6 +507,80 @@ class MissionVector(om.Group):
             #     inputs["thrust"],
             #     inputs["energy_consumption.propeller_1.advance_ratio.true_airspeed_econ"],
             # )
+
+    def _get_initial_guess_fuel_consumed(self):
+        """
+        Provides an educated guess of the variation of fuel consumed during the flight. It is a
+        mere initial guess, the end results will still be accurate. Does not set it.
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        # A mere initial_guess
+        fuel_mass_all_flight = 200.0
+
+        # The following fuel repartition will be adopted for now, 15% for climb, 50% for cruise,
+        # 5% for descent, 30% for reserve
+        fuel_climb = np.full(
+            number_of_points_climb, 0.15 * fuel_mass_all_flight / number_of_points_climb
+        )
+        fuel_cruise = np.full(
+            number_of_points_cruise, 0.50 * fuel_mass_all_flight / number_of_points_cruise
+        )
+        fuel_descent = np.full(
+            number_of_points_descent, 0.15 * fuel_mass_all_flight / number_of_points_descent
+        )
+        fuel_reserve = np.full(
+            number_of_points_reserve, 0.20 * fuel_mass_all_flight / number_of_points_reserve
+        )
+
+        dummy_fuel_consumed = np.concatenate((fuel_climb, fuel_cruise, fuel_descent, fuel_reserve))
+
+        return dummy_fuel_consumed
+
+    def set_initial_guess_mass(self, outputs, mtow):
+        """
+        Provides and sets educated guess of the variation of mass during the flight. It is a mere
+        initial guess, the end results will still be accurate.
+
+        :param mtow: mtow of the aircraft at that iteration of the sizing process
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        number_of_points_total = (
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
+        )
+
+        dummy_fuel_consumed = self._get_initial_guess_fuel_consumed()
+
+        if self.options["power_train_file_path"]:
+            if self.configurator.will_aircraft_mass_vary():
+
+                outputs["solve_equilibrium.update_mass.mass"] = np.full(
+                    number_of_points_total, mtow
+                ) - np.cumsum(dummy_fuel_consumed)
+
+            else:
+                outputs["solve_equilibrium.update_mass.mass"] = np.full(
+                    number_of_points_total, mtow
+                )
+        else:
+
+            outputs["solve_equilibrium.update_mass.mass"] = np.full(
+                number_of_points_total, mtow
+            ) - np.cumsum(dummy_fuel_consumed)
 
 
 def get_propulsive_power(

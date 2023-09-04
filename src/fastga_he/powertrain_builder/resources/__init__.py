@@ -30,4 +30,5 @@ from .registered_components import (
     DICTIONARY_SWL,
     DICTIONARY_DST_W,
     DICTIONARY_PCT_W,
+    DICTIONARY_VARIES_MASS,
 )

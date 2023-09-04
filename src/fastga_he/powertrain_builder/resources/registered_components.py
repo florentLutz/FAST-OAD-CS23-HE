@@ -61,6 +61,10 @@ DST_W = "distributed_wing"
 # PCT_W contains a list of position for which the component should be considered as a punctual
 # load that acts on the wing
 PCT_W = "punctual_wing"
+# VARIES_MASS contains a boolean which tells whether or not the components makes the mass of the
+# aircraft vary during the mission. This will help prevent setting a fake initial fuel
+# consumption when the power train is all electric.
+VARIES_MASS = "varies_mass"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -99,6 +103,7 @@ PROPELLER = {
     SWL: True,
     DST_W: [],
     PCT_W: ["on_the_wing"],
+    VARIES_MASS: False,
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -134,6 +139,7 @@ PMSM = {
     SWL: False,
     DST_W: [],
     PCT_W: ["on_the_wing"],
+    VARIES_MASS: False,
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -176,6 +182,7 @@ INVERTER = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -202,6 +209,7 @@ DC_BUS = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -228,6 +236,7 @@ DC_LINE = {
     SWL: False,
     DST_W: [],
     PCT_W: [],
+    VARIES_MASS: False,
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -259,6 +268,7 @@ DC_DC_CONVERTER = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -293,6 +303,7 @@ BATTERY_PACK = {
     SWL: False,
     DST_W: ["inside_the_wing"],
     PCT_W: ["wing_pod"],
+    VARIES_MASS: False,
 }
 DC_SSPC = {
     ID: "fastga_he.pt_component.dc_sspc",
@@ -324,6 +335,7 @@ DC_SSPC = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
 }
 DC_SPLITTER = {
     ID: "fastga_he.pt_component.dc_splitter",
@@ -350,6 +362,7 @@ DC_SPLITTER = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
 }
 RECTIFIER = {
     ID: "fastga_he.pt_component.rectifier",
@@ -385,6 +398,7 @@ RECTIFIER = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
 }
 GENERATOR = {
     ID: "fastga_he.pt_component.generator",
@@ -423,6 +437,7 @@ GENERATOR = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
 }
 ICE = {
     ID: "fastga_he.pt_component.internal_combustion_engine",
@@ -455,6 +470,7 @@ ICE = {
     SWL: False,
     DST_W: [],
     PCT_W: ["on_the_wing"],
+    VARIES_MASS: True,
 }
 
 KNOWN_COMPONENTS = [
@@ -495,6 +511,7 @@ DICTIONARY_SFR = {}
 DICTIONARY_SWL = {}
 DICTIONARY_DST_W = {}
 DICTIONARY_PCT_W = {}
+DICTIONARY_VARIES_MASS = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -519,3 +536,4 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_SWL[known_component[ID]] = known_component[SWL]
     DICTIONARY_DST_W[known_component[ID]] = known_component[DST_W]
     DICTIONARY_PCT_W[known_component[ID]] = known_component[PCT_W]
+    DICTIONARY_VARIES_MASS[known_component[ID]] = known_component[VARIES_MASS]
