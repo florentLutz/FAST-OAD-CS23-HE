@@ -1190,6 +1190,73 @@ class FASTGAHEPowerTrainConfigurator:
 
         return final_list
 
+    def get_independent_sub_propulsion_chain(self):
+        """
+        This function returns a list of graphs of connected PT sub propulsion chain. As a
+        prevision for next step all component will be split between their inputs and outputs to
+        allow to include efficiency.
+        """
+
+        # TODO: very similar to self.get_graphs_connected_voltage(), think of refactoring ?
+
+        self._get_components()
+        self._get_connections()
+
+        graph = nx.Graph()
+
+        for component_name, component_id in zip(self._components_name, self._components_id):
+            graph.add_node(
+                component_name + "_out",
+            )
+            graph.add_node(
+                component_name + "_in",
+            )
+
+            graph.add_edge(
+                component_name + "_out",
+                component_name + "_in",
+            )
+
+        for connection in self._connection_list:
+            # For bus and splitter, we don't really care about what number of input it is
+            # connected to so we do the following
+
+            if type(connection["source"]) is list:
+                source = connection["source"][0]
+            else:
+                source = connection["source"]
+
+            if type(connection["target"]) is list:
+                target = connection["target"][0]
+            else:
+                target = connection["target"]
+
+            graph.add_edge(
+                source + "_in",
+                target + "_out",
+            )
+
+        sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+
+        return sub_graphs
+
+    def get_current_to_set(self, inputs, number_of_points: int) -> List[dict]:
+        """
+        Returns a list of the dict of current variable names and the value they should be set at
+        for each of the subgraph. Dict will be empty if there is no current to set. The current
+        to set are defined in the registered_components.py file. Note that this function was
+        coded based on the assumption that the voltage setter was ran before hand.
+
+        :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
+        voltages to check
+        :param number_of_points: number of points in the data to check
+        """
+
+        # First step is to identify the independent sub-propulsion chain
+        sub_graphs = self.get_independent_sub_propulsion_chain()
+
+        return []
+
     def get_network_elements_list(self) -> tuple:
         """
         Returns the name of the components and their connections for the visualisation of the

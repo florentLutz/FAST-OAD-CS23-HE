@@ -457,3 +457,18 @@ def test_bad_pair():
         e_info.value.args[0]
         == "Cannot pair propeller_1 with propeller_3 because propeller_3 does not exist. Valid pair choice are among the following list: propeller_1, propeller_2. \nBest regards."
     )
+
+
+def test_independent_subgraph():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_two_chainz.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    print("\n")
+    sub_graphs = power_train_configurator.get_independent_sub_propulsion_chain()
+
+    assert len(sub_graphs) == 2
