@@ -423,43 +423,13 @@ class MissionVector(om.Group):
         # MISSION INITIAL GUESS, RAN REGARDLESS OF WHETHER WE USE THE PT FILE OR NOT ##############
         ###########################################################################################
 
-        mtow = inputs["data:weight:aircraft:MTOW"]
-
-        outputs[
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.alpha"
-        ] = np.concatenate(
-            (
-                np.full(number_of_points_climb, 3.0),
-                np.full(number_of_points_cruise, 2.0),
-                np.full(number_of_points_descent, 1.0),
-                np.full(number_of_points_reserve, 7.0),
-            )
-        )
-        outputs[
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.delta_m"
-        ] = np.concatenate(
-            (
-                np.full(number_of_points_climb, -10.0),
-                np.full(number_of_points_cruise, -2.0),
-                np.full(number_of_points_descent, -5.0),
-                np.full(number_of_points_reserve, -2.0),
-            )
-        )
-        outputs[
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.thrust"
-        ] = np.concatenate(
-            (
-                np.full(number_of_points_climb, 2.0 * mtow),
-                np.full(number_of_points_cruise, mtow / 1.3),
-                np.full(number_of_points_descent, 0.5 * mtow),
-                np.full(number_of_points_reserve, mtow / 1.3),
-            )
-        )
-
         # For the initialization of the fuel consumed we can be smart and set it at 0.0 if we
         # only have electric components
 
-        self.set_initial_guess_mass(outputs=outputs, mtow=mtow)
+        self.set_initial_guess_mass(outputs=outputs, inputs=inputs)
+        self.set_initial_guess_thrust(outputs=outputs, inputs=inputs)
+        self.set_initial_guess_alpha(outputs=outputs)
+        self.set_initial_guess_delta_m(outputs=outputs)
 
         ###########################################################################################
         # PT FILE INITIAL GUESS ###################################################################
@@ -508,7 +478,7 @@ class MissionVector(om.Group):
             #     inputs["energy_consumption.propeller_1.advance_ratio.true_airspeed_econ"],
             # )
 
-    def _get_initial_guess_fuel_consumed(self):
+    def _get_initial_guess_fuel_consumed(self) -> np.ndarray:
         """
         Provides an educated guess of the variation of fuel consumed during the flight. It is a
         mere initial guess, the end results will still be accurate. Does not set it.
@@ -541,15 +511,17 @@ class MissionVector(om.Group):
 
         return dummy_fuel_consumed
 
-    def set_initial_guess_mass(self, outputs, mtow):
+    def set_initial_guess_mass(self, inputs, outputs):
         """
         Provides and sets educated guess of the variation of mass during the flight. It is a mere
         initial guess, the end results will still be accurate.
 
-        :param mtow: mtow of the aircraft at that iteration of the sizing process
+        :param inputs: OpenMDAO vector containing the value of inputs
         :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
          guesses)
         """
+
+        mtow = inputs["data:weight:aircraft:MTOW"]
 
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
@@ -581,6 +553,119 @@ class MissionVector(om.Group):
             outputs["solve_equilibrium.update_mass.mass"] = np.full(
                 number_of_points_total, mtow
             ) - np.cumsum(dummy_fuel_consumed)
+
+    def _get_initial_guess_thrust(self, mtow) -> np.ndarray:
+        """
+        Provides an educated guess of the thrust required during the flight. It is a mere initial
+        guess, the end results will still be accurate. Does not set it. Assumes a lift to drag
+        ratio of 13 during cruise and reserve.
+
+        :param mtow: mtow of the aircraft at that iteration of the sizing process
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        thrust_climb = np.full(number_of_points_climb, mtow * 2.0)
+        thrust_cruise = np.full(number_of_points_cruise, mtow / 1.3)
+        thrust_descent = np.full(number_of_points_descent, mtow * 0.5)
+        thrust_reserve = np.full(number_of_points_reserve, mtow / 1.3)
+
+        dummy_thrust = np.concatenate((thrust_climb, thrust_cruise, thrust_descent, thrust_reserve))
+
+        return dummy_thrust
+
+    def set_initial_guess_thrust(self, inputs, outputs):
+        """
+        Provides and sets educated guess of the  thrust required during the flight. It is a mere
+        initial guess, the end results will still be accurate.
+
+        :param inputs: OpenMDAO vector containing the value of inputs
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        mtow = inputs["data:weight:aircraft:MTOW"]
+
+        dummy_thrust = self._get_initial_guess_thrust(mtow=mtow)
+
+        outputs[
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.thrust"
+        ] = dummy_thrust
+
+    def _get_initial_guess_alpha(self) -> np.ndarray:
+        """
+        Provides an educated guess of the AoA required during the flight. It is a mere initial
+        guess, the end results will still be accurate. Does not set it.
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        aoa_climb = np.full(number_of_points_climb, 3.0)
+        aoa_cruise = np.full(number_of_points_cruise, 2.0)
+        aoa_descent = np.full(number_of_points_descent, 1.0)
+        aoa_reserve = np.full(number_of_points_reserve, 7.0)
+
+        dummy_aoa = np.concatenate((aoa_climb, aoa_cruise, aoa_descent, aoa_reserve))
+
+        return dummy_aoa
+
+    def set_initial_guess_alpha(self, outputs):
+        """
+        Provides and sets educated guess of the  aoa required during the flight. It is a mere
+        initial guess, the end results will still be accurate.
+
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        dummy_aoa = self._get_initial_guess_alpha()
+
+        outputs[
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.alpha"
+        ] = dummy_aoa
+
+    def _get_initial_guess_delta_m(self) -> np.ndarray:
+        """
+        Provides an educated guess of the elevator deflection required during the flight. It is a
+        mere initial guess, the end results will still be accurate. Does not set it.
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        delta_m_climb = np.full(number_of_points_climb, -10.0)
+        delta_m_cruise = np.full(number_of_points_cruise, -2.0)
+        delta_m_descent = np.full(number_of_points_descent, -5.0)
+        delta_m_reserve = np.full(number_of_points_reserve, -2.0)
+
+        dummy_delta_m = np.concatenate(
+            (delta_m_climb, delta_m_cruise, delta_m_descent, delta_m_reserve)
+        )
+
+        return dummy_delta_m
+
+    def set_initial_guess_delta_m(self, outputs):
+        """
+        Provides and sets educated guess of the elevator deflection required during the flight.
+        It is a mere initial guess, the end results will still be accurate.
+
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        dummy_delta_m = self._get_initial_guess_delta_m()
+
+        outputs[
+            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.delta_m"
+        ] = dummy_delta_m
 
 
 def get_propulsive_power(
