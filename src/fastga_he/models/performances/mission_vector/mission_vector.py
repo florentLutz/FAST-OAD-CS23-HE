@@ -440,6 +440,7 @@ class MissionVector(om.Group):
         self.set_initial_guess_alpha(outputs=outputs)
         self.set_initial_guess_delta_m(outputs=outputs)
         self.set_initial_guess_speed(inputs=inputs, outputs=outputs)
+        self.set_initial_guess_altitude(inputs=inputs, outputs=outputs)
         self.set_initial_guess_taxi_thrust(inputs=inputs, outputs=outputs)
         self.set_initial_guess_speed_econ(inputs=inputs, outputs=outputs)
         self.set_initial_guess_thrust_econ(inputs=inputs, outputs=outputs)
@@ -915,6 +916,64 @@ class MissionVector(om.Group):
         outputs[
             "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.thrust_econ"
         ] = dummy_thrust_econ
+
+    def _get_initial_guess_altitude(
+        self,
+        cruise_altitude: float,
+        reserve_altitude: float,
+    ) -> np.ndarray:
+        """
+        Provides an educated guess of the elevator deflection required during the flight. It is a
+        mere initial guess, the end results will still be accurate. Does not set it.
+
+        :param cruise_altitude: altitude set for cruise
+        :param reserve_altitude: altitude set for reserve
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        altitude_array_climb = np.linspace(0.0, cruise_altitude, number_of_points_climb)
+        altitude_array_cruise = np.full(number_of_points_cruise, cruise_altitude)
+        altitude_array_descent = np.linspace(cruise_altitude, 0.0, number_of_points_descent)
+        altitude_array_reserve = np.full(number_of_points_reserve, reserve_altitude)
+
+        dummy_altitude = np.concatenate(
+            (
+                altitude_array_climb,
+                altitude_array_cruise,
+                altitude_array_descent,
+                altitude_array_reserve,
+            )
+        )
+
+        return dummy_altitude
+
+    def set_initial_guess_altitude(self, inputs, outputs):
+        """
+        Provides and sets educated guess of the altitude during flight.
+
+        :param inputs: OpenMDAO vector containing the value of inputs
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        dummy_altitude = self._get_initial_guess_altitude(
+            cruise_altitude=float(
+                inputs[
+                    "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
+                ]
+            ),
+            reserve_altitude=float(
+                inputs[
+                    "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
+                ]
+            ),
+        )
+
+        outputs["initialization.initialize_altitude.altitude"] = dummy_altitude
 
 
 def get_propulsive_power(
