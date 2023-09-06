@@ -7,8 +7,12 @@ import logging
 import numpy as np
 import openmdao.api as om
 
+from scipy.constants import g
+
 import fastoad.api as oad
 from fastoad.module_management.constants import ModelDomain
+
+from stdatm import Atmosphere
 
 from .initialization.initialize import Initialize
 from .mission.mission_core import MissionCore
@@ -430,6 +434,7 @@ class MissionVector(om.Group):
         self.set_initial_guess_thrust(outputs=outputs, inputs=inputs)
         self.set_initial_guess_alpha(outputs=outputs)
         self.set_initial_guess_delta_m(outputs=outputs)
+        self.set_initial_guess_speed(inputs=inputs, outputs=outputs)
 
         ###########################################################################################
         # PT FILE INITIAL GUESS ###################################################################
@@ -598,7 +603,8 @@ class MissionVector(om.Group):
     def _get_initial_guess_alpha(self) -> np.ndarray:
         """
         Provides an educated guess of the AoA required during the flight. It is a mere initial
-        guess, the end results will still be accurate. Does not set it.
+        guess, the end results will still be accurate. Does not set it. Could be improved based
+        on the weight, wing area and wing aerodynamics with a simple lift equation.
         """
 
         number_of_points_climb = self.options["number_of_points_climb"]
@@ -666,6 +672,110 @@ class MissionVector(om.Group):
         outputs[
             "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.delta_m"
         ] = dummy_delta_m
+
+    def _get_initial_guess_true_airspeed(
+        self,
+        mass: np.ndarray,
+        wing_area: float,
+        cruise_altitude: float,
+        cl_max_clean: float,
+        cruise_tas: float,
+        reserve_altitude: float,
+    ) -> np.ndarray:
+        """
+        Provides an educated guess of the airspeed during the flight. It is a mere initial guess,
+        the end results will still be accurate. Does not set it. It is a bit redundant since it
+        mostly redoes the computation done in the initialization based on the mass initial guess,
+        but it will allow us to have an initial guess of the propulsive power during flight and
+        also reduce residuals
+
+        :param mass: evolution of mass during the flight
+        :param wing_area: aircraft wing area
+        :param cruise_altitude: altitude set for cruise
+        :param cl_max_clean: maximum lift coefficient in clean configuration
+        :param cruise_tas: cruise true airspeed
+        :param reserve_altitude: reserve_altitude
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        mtow = mass[0]
+
+        density_sl = Atmosphere(0.0).density
+        density_cruise = Atmosphere(cruise_altitude, altitude_in_feet=False).density
+
+        vs1_climb = np.sqrt((mtow * g) / (0.5 * density_sl * wing_area * cl_max_clean))
+        climb_eas = 1.3 * vs1_climb
+        end_of_climb_tas = climb_eas * np.sqrt(density_sl / density_cruise)
+        speed_array_climb = np.linspace(climb_eas, end_of_climb_tas, number_of_points_climb)
+
+        speed_array_cruise = np.full(number_of_points_cruise, cruise_tas)
+
+        mass_end_cruise = mass[number_of_points_climb + number_of_points_cruise - 1]
+        # To check but I assume that since I ask it in m in the initialization, it will be in m here
+        vs1_descent = np.sqrt(
+            (mass_end_cruise * g) / (0.5 * density_cruise * wing_area * cl_max_clean)
+        )
+        descent_eas = 1.3 * vs1_descent
+        start_of_descent_tas = descent_eas * np.sqrt(density_sl / density_cruise)
+        speed_array_descent = np.linspace(
+            start_of_descent_tas, descent_eas, number_of_points_descent
+        )
+
+        mass_start_reserve = mass[
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+        ]
+        # To check but I assume that since I ask it in m in the initialization, it will be in m here
+        density_reserve = Atmosphere(reserve_altitude, altitude_in_feet=False).density
+        vs1_reserve = np.sqrt(
+            (mass_start_reserve * g) / (0.5 * density_reserve * wing_area * cl_max_clean)
+        )
+        speed_array_reserve = np.full(number_of_points_reserve, 1.3 * vs1_reserve)
+
+        dummy_tas_array = np.concatenate(
+            (speed_array_climb, speed_array_cruise, speed_array_descent, speed_array_reserve)
+        )
+
+        return dummy_tas_array
+
+    def set_initial_guess_speed(self, inputs, outputs):
+        """
+        Provides and sets educated guess of the true airspeed during the flight.
+        It is a mere initial guess, the end results will still be computed.
+
+        :param inputs: OpenMDAO vector containing the value of inputs
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        # For mass, the initial guess must have been set beforehand
+        dummy_tas_array = self._get_initial_guess_true_airspeed(
+            mass=outputs["solve_equilibrium.update_mass.mass"],
+            wing_area=float(
+                inputs["initialization.initialize_climb_speed.data:geometry:wing:area"]
+            ),
+            cruise_altitude=float(
+                inputs[
+                    "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
+                ]
+            ),
+            cl_max_clean=float(
+                inputs[
+                    "initialization.initialize_climb_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
+                ]
+            ),
+            cruise_tas=float(inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"]),
+            reserve_altitude=float(
+                inputs[
+                    "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
+                ]
+            ),
+        )
+
+        outputs["initialization.initialize_airspeed.true_airspeed"] = dummy_tas_array
 
 
 def get_propulsive_power(
