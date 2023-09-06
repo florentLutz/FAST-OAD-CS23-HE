@@ -13,6 +13,7 @@ import fastoad.api as oad
 from fastoad.module_management.constants import ModelDomain
 
 from stdatm import Atmosphere
+from typing import Tuple
 
 from .initialization.initialize import Initialize
 from .mission.mission_core import MissionCore
@@ -33,7 +34,11 @@ from fastga_he.models.propulsion.assemblers.energy_consumption_mission_vector im
 )
 from fastga_he.models.propulsion.assemblers.delta_from_pt_file import DEP_EFFECT_FROM_PT_FILE
 
+from fastga_he.models.performances.mission_vector.mission.thrust_taxi import MIN_POWER_TAXI
+
 _LOGGER = logging.getLogger(__name__)
+
+DENSITY_SL = Atmosphere(0.0).density
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.performances.mission_vector", domain=ModelDomain.OTHER)
@@ -435,6 +440,9 @@ class MissionVector(om.Group):
         self.set_initial_guess_alpha(outputs=outputs)
         self.set_initial_guess_delta_m(outputs=outputs)
         self.set_initial_guess_speed(inputs=inputs, outputs=outputs)
+        self.set_initial_guess_taxi_thrust(inputs=inputs, outputs=outputs)
+        self.set_initial_guess_speed_econ(inputs=inputs, outputs=outputs)
+        self.set_initial_guess_thrust_econ(inputs=inputs, outputs=outputs)
 
         ###########################################################################################
         # PT FILE INITIAL GUESS ###################################################################
@@ -704,12 +712,11 @@ class MissionVector(om.Group):
 
         mtow = mass[0]
 
-        density_sl = Atmosphere(0.0).density
         density_cruise = Atmosphere(cruise_altitude, altitude_in_feet=False).density
 
-        vs1_climb = np.sqrt((mtow * g) / (0.5 * density_sl * wing_area * cl_max_clean))
+        vs1_climb = np.sqrt((mtow * g) / (0.5 * DENSITY_SL * wing_area * cl_max_clean))
         climb_eas = 1.3 * vs1_climb
-        end_of_climb_tas = climb_eas * np.sqrt(density_sl / density_cruise)
+        end_of_climb_tas = climb_eas * np.sqrt(DENSITY_SL / density_cruise)
         speed_array_climb = np.linspace(climb_eas, end_of_climb_tas, number_of_points_climb)
 
         speed_array_cruise = np.full(number_of_points_cruise, cruise_tas)
@@ -720,7 +727,7 @@ class MissionVector(om.Group):
             (mass_end_cruise * g) / (0.5 * density_cruise * wing_area * cl_max_clean)
         )
         descent_eas = 1.3 * vs1_descent
-        start_of_descent_tas = descent_eas * np.sqrt(density_sl / density_cruise)
+        start_of_descent_tas = descent_eas * np.sqrt(DENSITY_SL / density_cruise)
         speed_array_descent = np.linspace(
             start_of_descent_tas, descent_eas, number_of_points_descent
         )
@@ -751,11 +758,18 @@ class MissionVector(om.Group):
          guesses)
         """
 
-        # For mass, the initial guess must have been set beforehand
+        # For mass, the initial guess must have been set beforehand. A downside of doing the initial
+        # guess like that to access the data, we need the submodel to actually exist. E.g if the
+        # climb speed submodel is set to null, we won't be able to access the cl_max_clean.
+        # One point to be careful about is that the non_linear guessing is done before any model is
+        # actually ran. Therefore it relies on initial values for other variables and problem
+        # inputs. This should be kept in mind !
         dummy_tas_array = self._get_initial_guess_true_airspeed(
             mass=outputs["solve_equilibrium.update_mass.mass"],
             wing_area=float(
-                inputs["initialization.initialize_climb_speed.data:geometry:wing:area"]
+                inputs[
+                    "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.data:geometry:wing:area"
+                ]
             ),
             cruise_altitude=float(
                 inputs[
@@ -764,7 +778,7 @@ class MissionVector(om.Group):
             ),
             cl_max_clean=float(
                 inputs[
-                    "initialization.initialize_climb_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
+                    "initialization.initialize_reserve_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
                 ]
             ),
             cruise_tas=float(inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"]),
@@ -776,6 +790,131 @@ class MissionVector(om.Group):
         )
 
         outputs["initialization.initialize_airspeed.true_airspeed"] = dummy_tas_array
+
+    @staticmethod
+    def _get_initial_guess_taxi_thrust(
+        speed_to: float,
+        speed_ti: float,
+    ) -> Tuple[float, float]:
+        """
+        Provides an initial guess of the taxi thrust. The scope of this initial guess is reduced
+        due to the fact that I realized it's wiser to only use problem inputs and not results
+        from other module
+
+        :param speed_to: target speed during taxi out
+        :param speed_ti: target speed during taxi in
+        """
+
+        thrust_to = MIN_POWER_TAXI / speed_to
+        thrust_ti = MIN_POWER_TAXI / speed_ti
+
+        return thrust_to, thrust_ti
+
+    def set_initial_guess_taxi_thrust(self, inputs, outputs):
+        """
+        Provides and sets educated guess of the thrust required during taxi. Is actually more
+        than an initial guess.
+
+        :param inputs: OpenMDAO vector containing the value of inputs
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        thrust_to, thrust_ti = self._get_initial_guess_taxi_thrust(
+            speed_to=inputs[
+                "solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_out:speed"
+            ],
+            speed_ti=inputs[
+                "solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_in:speed"
+            ],
+        )
+
+        outputs[
+            "solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_out:thrust"
+        ] = thrust_to
+        outputs[
+            "solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_in:thrust"
+        ] = thrust_ti
+
+    @staticmethod
+    def _get_initial_guess_speed_econ(
+        speed_mission: np.ndarray, speed_to: float, speed_ti: float
+    ) -> np.ndarray:
+        """
+        Provides an initial guess of the speed econ. Basically the same as the component itself,
+        we'll simply concatenate data.
+
+        :param speed_mission: speed during mission
+        :param speed_to: target speed during taxi out
+        :param speed_ti: target speed during taxi in
+        """
+
+        return np.concatenate((speed_to, speed_mission, speed_ti))
+
+    def set_initial_guess_speed_econ(self, inputs, outputs):
+        """
+        Provides and sets educated guess of the speed for energy consumption. Is actually more
+        than an initial guess. Needs to be run after the initialization of TAS
+
+        :param inputs: OpenMDAO vector containing the value of inputs
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        dummy_speed_econ = self._get_initial_guess_speed_econ(
+            speed_mission=outputs["initialization.initialize_airspeed.true_airspeed"],
+            speed_to=inputs[
+                "solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_out:speed"
+            ],
+            speed_ti=inputs[
+                "solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_in:speed"
+            ],
+        )
+
+        outputs[
+            "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.true_airspeed_econ"
+        ] = dummy_speed_econ
+
+    @staticmethod
+    def _get_initial_guess_thrust_econ(
+        thrust_mission: np.ndarray, thrust_to: float, thrust_ti: float
+    ) -> np.ndarray:
+        """
+        Provides an initial guess of the thrust econ. Basically the same as the component itself,
+        we'll simply concatenate data.
+
+        :param thrust_mission: speed during mission
+        :param thrust_to: target speed during taxi out
+        :param thrust_ti: target speed during taxi in
+        """
+
+        return np.concatenate((thrust_to, thrust_mission, thrust_ti))
+
+    def set_initial_guess_thrust_econ(self, inputs, outputs):
+        """
+        Provides and sets educated guess of the thrust for energy consumption. Is actually more
+        than an initial guess. Needs to be run after the initialization of thrust mission and taxi thrust
+
+        :param inputs: OpenMDAO vector containing the value of inputs
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        dummy_thrust_econ = self._get_initial_guess_thrust_econ(
+            thrust_mission=outputs[
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.thrust"
+            ],
+            thrust_to=outputs[
+                "solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_out:thrust"
+            ],
+            thrust_ti=outputs[
+                "solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_in:thrust"
+            ],
+        )
+
+        outputs[
+            "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.thrust_econ"
+        ] = dummy_thrust_econ
 
 
 def get_propulsive_power(
