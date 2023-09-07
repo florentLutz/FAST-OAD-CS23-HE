@@ -140,6 +140,11 @@ class FASTGAHEPowerTrainConfigurator:
         # aircraft weight vary during flight
         self._components_makes_mass_vary = None
 
+        # Contains the list of all boolean telling whether or not the components are energy
+        # sources that do not make the aircraft vary (ergo they will have a non-nil unconsumable
+        # energy)
+        self._source_does_not_make_mass_vary = None
+
         # Because of their very peculiar role, we will scan the architecture for any SSPC defined
         # by the user and whether or not they are at the output of a bus, because a specific
         # option needs to be turned on in this was
@@ -222,6 +227,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_slipstream_wing_lift = []
         components_symmetrical_pairs = []
         components_makes_mass_vary = []
+        source_does_not_make_mass_vary = []
 
         # Doing it like that allows us to have the names of the components before we start the
         # loop, which I'm gonna use to check if the pairs are valid
@@ -296,6 +302,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_slipstream_needs_flaps.append(resources.DICTIONARY_SFR[component_id])
             components_slipstream_wing_lift.append(resources.DICTIONARY_SWL[component_id])
             components_makes_mass_vary.append(resources.DICTIONARY_VARIES_MASS[component_id])
+            source_does_not_make_mass_vary.append(resources.DICTIONARY_VARIESN_T_MASS[component_id])
 
             if "options" in component.keys():
 
@@ -340,6 +347,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_slipstream_wing_lift = components_slipstream_wing_lift
         self._components_symmetrical_pairs = components_symmetrical_pairs
         self._components_makes_mass_vary = components_makes_mass_vary
+        self._source_does_not_make_mass_vary = source_does_not_make_mass_vary
 
     def _get_connections(self):
         """
@@ -990,6 +998,17 @@ class FASTGAHEPowerTrainConfigurator:
         self._get_components()
 
         return any(self._components_makes_mass_vary)
+
+    def has_fuel_non_consumable_energy_source(self):
+        """
+        This function returns a boolean telling whether or not there are energy sources in the
+        powertrain that will not make the aircraft vary (like batteries). For now is only used to
+        provide smart initial guess.
+        """
+
+        self._get_components()
+
+        return any(self._source_does_not_make_mass_vary)
 
     def get_graphs_connected_voltage(self) -> list:
         """

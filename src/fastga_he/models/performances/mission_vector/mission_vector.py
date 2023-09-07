@@ -39,6 +39,8 @@ from fastga_he.models.performances.mission_vector.mission.thrust_taxi import MIN
 _LOGGER = logging.getLogger(__name__)
 
 DENSITY_SL = Atmosphere(0.0).density
+DUMMY_FUEL_CONSUMED = 200.0
+DUMMY_ENERGY_CONSUMED = 200e3
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.performances.mission_vector", domain=ModelDomain.OTHER)
@@ -436,6 +438,7 @@ class MissionVector(om.Group):
         # only have electric components
 
         self.set_initial_guess_mass(outputs=outputs, inputs=inputs)
+        self.set_initial_guess_energies(outputs=outputs)
         self.set_initial_guess_thrust(outputs=outputs, inputs=inputs)
         self.set_initial_guess_alpha(outputs=outputs)
         self.set_initial_guess_delta_m(outputs=outputs)
@@ -505,22 +508,19 @@ class MissionVector(om.Group):
         number_of_points_descent = self.options["number_of_points_descent"]
         number_of_points_reserve = self.options["number_of_points_reserve"]
 
-        # A mere initial_guess
-        fuel_mass_all_flight = 200.0
-
         # The following fuel repartition will be adopted for now, 15% for climb, 50% for cruise,
         # 5% for descent, 30% for reserve
         fuel_climb = np.full(
-            number_of_points_climb, 0.15 * fuel_mass_all_flight / number_of_points_climb
+            number_of_points_climb, 0.15 * DUMMY_FUEL_CONSUMED / number_of_points_climb
         )
         fuel_cruise = np.full(
-            number_of_points_cruise, 0.50 * fuel_mass_all_flight / number_of_points_cruise
+            number_of_points_cruise, 0.50 * DUMMY_FUEL_CONSUMED / number_of_points_cruise
         )
         fuel_descent = np.full(
-            number_of_points_descent, 0.15 * fuel_mass_all_flight / number_of_points_descent
+            number_of_points_descent, 0.15 * DUMMY_FUEL_CONSUMED / number_of_points_descent
         )
         fuel_reserve = np.full(
-            number_of_points_reserve, 0.20 * fuel_mass_all_flight / number_of_points_reserve
+            number_of_points_reserve, 0.20 * DUMMY_FUEL_CONSUMED / number_of_points_reserve
         )
 
         dummy_fuel_consumed = np.concatenate((fuel_climb, fuel_cruise, fuel_descent, fuel_reserve))
@@ -1027,6 +1027,39 @@ class MissionVector(om.Group):
         )
 
         outputs["initialization.initialize_temperature.exterior_temperature"] = dummy_temperature
+
+    def set_initial_guess_energies(self, outputs):
+        """
+        Provides and sets educated guess of the energy consumed during flight, whether it is
+        under the form of fuel or unconsumable energy. Actually, it is only an improvement in the
+        sense that if we do all fuel, unconsumable will be set at zero and vice-versa. Doesn't do
+        much for hybrid.
+
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        if self.options["power_train_file_path"]:
+            if self.configurator.will_aircraft_mass_vary():
+                outputs[
+                    "solve_equilibrium.sizing_fuel.data:mission:sizing:fuel"
+                ] = DUMMY_FUEL_CONSUMED
+
+            else:
+                outputs["solve_equilibrium.sizing_fuel.data:mission:sizing:fuel"] = 0.0
+
+            if self.configurator.has_fuel_non_consumable_energy_source():
+                outputs[
+                    "solve_equilibrium.sizing_fuel.data:mission:sizing:energy"
+                ] = DUMMY_ENERGY_CONSUMED
+
+            else:
+                outputs["solve_equilibrium.sizing_fuel.data:mission:sizing:energy"] = 0.0
+
+        else:
+            # If there are no PT file we assume full fuel
+            outputs["solve_equilibrium.sizing_fuel.data:mission:sizing:fuel"] = DUMMY_FUEL_CONSUMED
+            outputs["solve_equilibrium.sizing_fuel.data:mission:sizing:energy"] = 0.0
 
 
 def get_propulsive_power(

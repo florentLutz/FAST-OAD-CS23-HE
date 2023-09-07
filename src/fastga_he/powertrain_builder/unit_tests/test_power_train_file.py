@@ -495,3 +495,39 @@ def test_mass_variation_identification():
     )
 
     assert not power_train_configurator.will_aircraft_mass_vary()
+
+
+def test_identification_unconsumable_source():
+
+    # Mass should vary but there also is an unconsumable energy source
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    assert power_train_configurator.will_aircraft_mass_vary()
+    assert power_train_configurator.has_fuel_non_consumable_energy_source()
+
+    # Mass shouldn't vary and there is an unconsumable energy source
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    assert not power_train_configurator.will_aircraft_mass_vary()
+    assert power_train_configurator.has_fuel_non_consumable_energy_source()
+
+    # Mass should vary and there is no unconsumable energy sources
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_full_turbo.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    assert power_train_configurator.will_aircraft_mass_vary()
+    assert not power_train_configurator.has_fuel_non_consumable_energy_source()
