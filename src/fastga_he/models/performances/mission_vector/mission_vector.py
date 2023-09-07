@@ -441,9 +441,11 @@ class MissionVector(om.Group):
         self.set_initial_guess_delta_m(outputs=outputs)
         self.set_initial_guess_speed(inputs=inputs, outputs=outputs)
         self.set_initial_guess_altitude(inputs=inputs, outputs=outputs)
+        self.set_initial_guess_density(outputs=outputs)
+        self.set_initial_guess_temperature(outputs=outputs)
         self.set_initial_guess_taxi_thrust(inputs=inputs, outputs=outputs)
         self.set_initial_guess_speed_econ(inputs=inputs, outputs=outputs)
-        self.set_initial_guess_thrust_econ(inputs=inputs, outputs=outputs)
+        self.set_initial_guess_thrust_econ(outputs=outputs)
 
         ###########################################################################################
         # PT FILE INITIAL GUESS ###################################################################
@@ -891,12 +893,11 @@ class MissionVector(om.Group):
 
         return np.concatenate((thrust_to, thrust_mission, thrust_ti))
 
-    def set_initial_guess_thrust_econ(self, inputs, outputs):
+    def set_initial_guess_thrust_econ(self, outputs):
         """
         Provides and sets educated guess of the thrust for energy consumption. Is actually more
         than an initial guess. Needs to be run after the initialization of thrust mission and taxi thrust
 
-        :param inputs: OpenMDAO vector containing the value of inputs
         :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
          guesses)
         """
@@ -923,8 +924,8 @@ class MissionVector(om.Group):
         reserve_altitude: float,
     ) -> np.ndarray:
         """
-        Provides an educated guess of the elevator deflection required during the flight. It is a
-        mere initial guess, the end results will still be accurate. Does not set it.
+        Provides an educated guess of the altitude during the flight. It is a mere initial guess,
+        the end results will still be accurate. Does not set it.
 
         :param cruise_altitude: altitude set for cruise
         :param reserve_altitude: altitude set for reserve
@@ -974,6 +975,58 @@ class MissionVector(om.Group):
         )
 
         outputs["initialization.initialize_altitude.altitude"] = dummy_altitude
+
+    @staticmethod
+    def _get_initial_guess_density(altitude: np.ndarray) -> np.ndarray:
+        """
+        Provides an educated guess of the density during the flight. It is a mere initial guess,
+        the end results will still be accurate. Does not set it. Is based on the initial guess on
+        altitude
+
+        :param altitude: altitude during the flight
+        """
+
+        return Atmosphere(altitude=altitude, altitude_in_feet=False).density
+
+    def set_initial_guess_density(self, outputs):
+        """
+        Provides and sets educated guess of the density during flight.
+
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        dummy_density = self._get_initial_guess_density(
+            altitude=outputs["initialization.initialize_altitude.altitude"]
+        )
+
+        outputs["initialization.initialize_density.density"] = dummy_density
+
+    @staticmethod
+    def _get_initial_guess_temperature(altitude: np.ndarray) -> np.ndarray:
+        """
+        Provides an educated guess of the exterior temperature during the flight. It is a mere
+        initial guess, the end results will still be accurate. Does not set it. Is based on the
+        initial guess on altitude
+
+        :param altitude: altitude during the flight
+        """
+
+        return Atmosphere(altitude=altitude, altitude_in_feet=False).temperature
+
+    def set_initial_guess_temperature(self, outputs):
+        """
+        Provides and sets educated guess of the exterior temperature during flight.
+
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        dummy_temperature = self._get_initial_guess_temperature(
+            altitude=outputs["initialization.initialize_altitude.altitude"]
+        )
+
+        outputs["initialization.initialize_temperature.exterior_temperature"] = dummy_temperature
 
 
 def get_propulsive_power(
