@@ -1277,7 +1277,221 @@ class FASTGAHEPowerTrainConfigurator:
 
         return sub_graphs
 
-    def get_current_to_set(self, inputs, number_of_points: int) -> List[dict]:
+    def get_power_on_each_node(self, graph, inputs, propulsive_power_dict) -> List[dict]:
+        """
+        Returns a dictionary which will contain the power at each node of a graph based on the
+        propulsive power at its propulsor, on the assumed efficiencies of its components and the
+        value of power split on its splitter.
+        """
+
+        copied_graph = copy.deepcopy(graph)
+        name_to_id = dict(zip(self._components_name, self._components_id))
+
+        # For each graph we attribute a priority to the nodes which is going to impose the order
+        # in which we make the computation. Propulsive loads will have the highest priority (0)
+        # and then each neighboring nodes will have the priority just below. Slight detail nodes
+        # with more than one neighbor will have a priority which will be slightly below the
+        # biggest priority among the neighbour. E.g:
+        # Node 1 (0) --- Node 2 (1) --- Node 3 (2) \
+        #                                           Node 6 (3)
+        #                Node 4 (0) --- Node 5 (1) /
+
+        propulsive_loads_proper_name = list(propulsive_power_dict.keys())
+
+        # So we start, for each propulsive load by exploring the branch until someone has more
+        # than two neighbor
+
+        nodes_with_priority = {}
+
+        for propulsive_load_name in propulsive_loads_proper_name:
+            nodes_with_priority[propulsive_load_name] = 0
+
+        problematic_nodes = copy.deepcopy(propulsive_loads_proper_name)
+
+        while problematic_nodes:
+
+            problematic_nodes, copied_graph = self.set_priority_in_graph(
+                copied_graph, nodes_with_priority, problematic_nodes
+            )
+
+            # At this point, we painted the priority as mush as we could but we have encountered
+            # some "problematic nodes" which we must dealt with. They can be of two types: buses
+            # (multiple outputs but one input) or splitter (one output but two inputs)
+
+            new_problematic_nodes = copy.deepcopy(problematic_nodes)
+
+            for problematic_node in problematic_nodes:
+                associated_component_name = problematic_node.replace("_in", "")
+                associated_component_name = associated_component_name.replace("_out", "")
+
+                associated_component_type = name_to_id[associated_component_name]
+
+                # If the associated component is a bus it means it has multiple outputs so we
+                # need to look for their priority take the highest among them and add 1
+                if associated_component_type == "fastga_he.pt_component.dc_bus":
+
+                    problematic_nodes_to_add = []
+
+                    lowest_priority = -1
+                    for neighbor in graph.adj[problematic_node]:
+                        if neighbor in list(nodes_with_priority.keys()):
+                            lowest_priority = max(lowest_priority, nodes_with_priority[neighbor])
+
+                    nodes_with_priority[problematic_node] = lowest_priority + 1
+
+                    # Then we add the bus inputs (there may be more than 1) in the list of
+                    # "problematic nodes" and we add their priority
+                    for neighbor in graph.adj[problematic_node]:
+                        if neighbor not in list(nodes_with_priority.keys()):
+                            nodes_with_priority[neighbor] = lowest_priority + 2
+                            problematic_nodes_to_add.append(neighbor)
+
+                    # Then we add the input as a problematic node
+                    new_problematic_nodes.remove(problematic_node)
+                    new_problematic_nodes += problematic_nodes_to_add
+
+                # Should be a splitter
+                else:
+
+                    problematic_nodes_to_add = []
+
+                    # This node does not have a priority just yet, so we'll first need to take a look at it
+                    priority = None
+
+                    for neighbor in graph.adj[problematic_node]:
+                        if neighbor in list(nodes_with_priority.keys()):
+                            priority = nodes_with_priority[neighbor]
+
+                    for neighbor in graph.adj[problematic_node]:
+
+                        neighbor_counter = 1
+
+                        if neighbor not in list(nodes_with_priority.keys()):
+                            # If we haven't treated the neighbor yet, it means its an input of the
+                            # splitter. We will add a fake input node and do the connection to
+                            # that neighbor. We should also take the opportunity to see whether
+                            # or not this is the splitter "priority" input
+
+                            # First we identify which input of the splitter in matches, first
+                            # find the name of the component
+                            neighbor_components_name = neighbor.replace("_in", "")
+                            neighbor_components_name = neighbor_components_name.replace("_out", "")
+
+                            # Then identify which current output it correspond to. Here if the
+                            # component in question is not an sspc, the following should work.
+                            # Else we will try both way
+
+                            output_name = neighbor_components_name + ".dc_current_out"
+                            if (
+                                name_to_id[neighbor_components_name]
+                                == "fastga_he.pt_component.dc_sspc"
+                            ):
+                                if output_name not in self._components_connection_outputs:
+                                    output_name = neighbor_components_name + ".dc_current_in"
+
+                            # We look at the number of the corresponding splitter input
+                            index = self._components_connection_outputs.index(output_name)
+                            splitter_input_name = self._components_connection_inputs[index]
+
+                            # If it ends with a "1", its the priority input. We add the node as a
+                            # problematic node, we set its priority and we add the node to the
+                            # graph as well as the proper edge.
+                            if splitter_input_name[-1] == "1":
+                                node_name = associated_component_name + "_in_1"
+                                problematic_nodes_to_add.append(node_name)
+                                nodes_with_priority[node_name] = priority + 1
+
+                                copied_graph.add_edge(node_name, neighbor)
+
+                            else:
+                                node_name = (
+                                    associated_component_name + "_in_" + str(neighbor_counter + 1)
+                                )
+                                problematic_nodes_to_add.append(node_name)
+                                nodes_with_priority[node_name] = priority + 1
+
+                                copied_graph.add_edge(node_name, neighbor)
+
+                                neighbor_counter += 1
+
+                    # Now we remove the splitter and instead add its two neighbor, which will
+                    # serve as new branch start
+
+                    new_problematic_nodes.remove(problematic_node)
+                    new_problematic_nodes += problematic_nodes_to_add
+
+                copied_graph.remove_node(problematic_node)
+
+            problematic_nodes = new_problematic_nodes
+
+        return [nodes_with_priority]
+
+    @staticmethod
+    def set_priority_in_graph(
+        graph: nx.Graph, nodes_with_priority: dict, starting_points_name: list
+    ) -> tuple:
+        """
+        Explore a graph and set the priority of its node base on the priority of the starting
+        points.
+        """
+
+        problematic_nodes = []
+        another_copied_graph = copy.deepcopy(graph)
+        sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+
+        # First we must associate each starting point with its subgraphs (To prevent errors in
+        # case one subgraph has multiple starting points or there are multiple subgraphs in,
+        # each with one starting point)
+
+        ordered_sub_graphs = []
+
+        for starting_point in starting_points_name:
+            for subgraph in sub_graphs:
+                if subgraph.has_node(starting_point):
+                    ordered_sub_graphs.append(subgraph)
+                    continue
+
+        for starting_point, subgraph in zip(starting_points_name, ordered_sub_graphs):
+
+            current_node = starting_point
+
+            # The inputs of the end components (usually sources, are not really necessary,
+            # so we will start the number of explored nodes at 1. The other reason for that being
+            # that it crashes if I start at 0
+            node_explored = 1
+
+            initial_number_of_nodes = subgraph.number_of_nodes()
+            # We look at how many neighbor the current node has, and if it more than 2 we stop
+            # exploring :) Also we'll put a failsafe to avoid infinite while
+
+            while len(graph.adj[current_node]) <= 2 and node_explored < initial_number_of_nodes:
+
+                for adj_node in graph.adj[current_node]:
+
+                    # A previously explored neighbor
+                    if adj_node in list(nodes_with_priority.keys()):
+                        nodes_with_priority[current_node] = nodes_with_priority[adj_node] + 1
+
+                    # Not a previously explored neighbor
+                    else:
+                        next_node = adj_node
+                        node_explored += 1
+
+                # When we are done with the node, we remove it :)
+                another_copied_graph.remove_node(current_node)
+
+                current_node = next_node
+
+            if len(graph.adj[current_node]) > 2 and current_node not in problematic_nodes:
+                problematic_nodes.append(current_node)
+
+        graph = another_copied_graph
+
+        return problematic_nodes, graph
+
+    def get_current_to_set(
+        self, inputs, number_of_points: int, propulsive_power_dict: dict
+    ) -> List[dict]:
         """
         Returns a list of the dict of current variable names and the value they should be set at
         for each of the subgraph. Dict will be empty if there is no current to set. The current
@@ -1287,12 +1501,44 @@ class FASTGAHEPowerTrainConfigurator:
         :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
         voltages to check
         :param number_of_points: number of points in the data to check
+        :param propulsive_power_dict: dictionary with the propulsive power of each propulsor
         """
+
+        # We rewrite the propulsive power dict to match the name of the nodes
+        propulsive_loads_name = list(propulsive_power_dict.keys())
+        propulsive_loads_proper_name = []
+        proper_propulsive_power_dict = {}
+
+        for propulsive_load_name in propulsive_loads_name:
+            propulsive_load_proper_name = propulsive_load_name + "_out"
+            propulsive_loads_proper_name.append(propulsive_load_name)
+            proper_propulsive_power_dict[propulsive_load_proper_name] = propulsive_power_dict[
+                propulsive_load_name
+            ]
+
+        power_in_each_subgraph = []
 
         # First step is to identify the independent sub-propulsion chain
         sub_graphs = self.get_independent_sub_propulsion_chain()
 
-        return []
+        # Then for each subgraph we get the power on each node
+        for sub_graph in sub_graphs:
+
+            # First we reconstruct the right propulsive load dict to ensure that we only take the
+            # load we are interested in
+            propulsive_power_dict_this_subgraph = {}
+            for propulsive_load_name in list(proper_propulsive_power_dict.keys()):
+                if propulsive_load_name in sub_graph.nodes:
+                    propulsive_power_dict_this_subgraph[
+                        propulsive_load_name
+                    ] = proper_propulsive_power_dict[propulsive_load_name]
+
+            power_in_this_subgraph = self.get_power_on_each_node(
+                sub_graph, inputs, propulsive_power_dict_this_subgraph
+            )
+            power_in_each_subgraph.append(power_in_this_subgraph)
+
+        return power_in_each_subgraph
 
     def get_network_elements_list(self) -> tuple:
         """

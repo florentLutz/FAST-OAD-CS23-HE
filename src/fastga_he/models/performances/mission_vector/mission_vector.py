@@ -490,12 +490,21 @@ class MissionVector(om.Group):
             # be the same, we'll take the tas from the first propulsor in the list.
             propulsor_names = self.configurator.get_thrust_element_list()
 
-            # propulsive_power_dict = get_propulsive_power(
-            #     propulsor_names,
-            #     inputs["data:propulsion:he_power_train:thrust_distribution"],
-            #     inputs["thrust"],
-            #     inputs["energy_consumption.propeller_1.advance_ratio.true_airspeed_econ"],
-            # )
+            propulsive_power_dict = get_propulsive_power(
+                propulsor_names,
+                inputs[
+                    "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.thrust_splitter.data:propulsion:he_power_train:thrust_distribution"
+                ],
+                outputs[
+                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.thrust_econ"
+                ],
+                outputs[
+                    "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.true_airspeed_econ"
+                ],
+            )
+            power_in_each_graph = self.configurator.get_current_to_set(
+                inputs, number_of_points_total, propulsive_power_dict
+            )
 
     def _get_initial_guess_fuel_consumed(self) -> np.ndarray:
         """

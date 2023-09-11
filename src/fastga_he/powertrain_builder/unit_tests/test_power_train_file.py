@@ -531,3 +531,126 @@ def test_identification_unconsumable_source():
 
     assert power_train_configurator.will_aircraft_mass_vary()
     assert not power_train_configurator.has_fuel_non_consumable_energy_source()
+
+
+def test_get_power_on_each_node():
+
+    # Very simple power train
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {"propeller_1": 50e3}
+
+    power_at_each_node = power_train_configurator.get_current_to_set(
+        inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
+    )[0][0]
+
+    # All values should be unique
+    assert len(power_at_each_node) == len(set(power_at_each_node.values()))
+
+    # With a splitter
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {"propeller_1": 50e3}
+
+    power_at_each_node = power_train_configurator.get_current_to_set(
+        inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
+    )[0][0]
+
+    # Since there is a splitter we will check that the two input are indeed created
+    assert "dc_splitter_1_in_1" in list(power_at_each_node.keys())
+    assert "dc_splitter_1_in_2" in list(power_at_each_node.keys())
+
+    # We will also check that the DC/DC converter has the same value in the dict as the rectifier
+    assert power_at_each_node["dc_dc_converter_1_out"] == power_at_each_node["rectifier_1_out"]
+
+    # Then we try with a bus with uniform input
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {"propeller_1": 50e3, "propeller_2": 25e3, "propeller_3": 25e3}
+
+    power_at_each_node = power_train_configurator.get_current_to_set(
+        inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
+    )[0][0]
+
+    assert power_at_each_node["dc_sspc_3_3_in"] == power_at_each_node["dc_sspc_2_3_in"]
+    assert power_at_each_node["dc_sspc_1_3_in"] == power_at_each_node["dc_sspc_2_3_in"]
+
+    assert power_at_each_node["dc_bus_4_out"] == power_at_each_node["dc_sspc_1_3_in"] + 1
+
+    # Then we try with a bus with a non-uniform input
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_shorter_nose.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {"propeller_1": 50e3, "propeller_2": 25e3, "propeller_3": 25e3}
+
+    power_at_each_node = power_train_configurator.get_current_to_set(
+        inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
+    )[0][0]
+
+    assert power_at_each_node["dc_sspc_3_3_in"] == power_at_each_node["dc_sspc_1_3_in"]
+    assert power_at_each_node["dc_sspc_3_3_in"] < power_at_each_node["dc_sspc_2_3_in"]
+
+    assert power_at_each_node["dc_bus_4_out"] == power_at_each_node["dc_sspc_2_3_in"] + 1
+
+    # Then we try with a bus and a splitter
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_spliter_and_bus.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_at_each_node = power_train_configurator.get_current_to_set(
+        inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
+    )[0][0]
+
+    # Assert that they exist and have the same value
+    assert power_at_each_node["battery_pack_2_out"] == power_at_each_node["battery_pack_1_out"]
+
+    # Assert that they are properly order
+
+    assert power_at_each_node["dc_bus_0_in"] < power_at_each_node["dc_splitter_0_out"]
+
+    # Test with multiple independent power train
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_two_chainz.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+    power_at_each_node = power_train_configurator.get_current_to_set(
+        inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
+    )
+
+    # Two independent subgraph
+    assert len(power_at_each_node) == 2
+
+    first_power_dict = power_at_each_node[0][0]
+    second_power_dict = power_at_each_node[1][0]
+
+    # All values should be unique in the second dict
+    assert len(second_power_dict) == len(set(second_power_dict.values()))
+
+    assert "propeller_1_out" in list(first_power_dict.keys())
+    assert "propeller_3_out" in list(first_power_dict.keys())
+
+    assert "propeller_2_out" in list(second_power_dict.keys())
