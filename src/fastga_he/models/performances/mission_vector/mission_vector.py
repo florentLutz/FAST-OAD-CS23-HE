@@ -502,9 +502,10 @@ class MissionVector(om.Group):
                     "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.true_airspeed_econ"
                 ],
             )
-            power_in_each_graph = self.configurator.get_current_to_set(
+            power_in_each_graph = self.configurator.get_power_to_set(
                 inputs, number_of_points_total, propulsive_power_dict
             )
+            test = 1.0
 
     def _get_initial_guess_fuel_consumed(self) -> np.ndarray:
         """

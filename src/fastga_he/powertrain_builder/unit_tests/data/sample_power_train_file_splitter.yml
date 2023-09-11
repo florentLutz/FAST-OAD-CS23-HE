@@ -25,6 +25,8 @@ power_train_components:
     closed_by_default: True
   dc_splitter_1:
     id: fastga_he.pt_component.dc_splitter
+    options:
+      splitter_mode: power_share # percent_split by default or power_share
 
   dc_dc_converter_1:
     id: fastga_he.pt_component.dc_dc_converter

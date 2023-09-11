@@ -145,6 +145,10 @@ class FASTGAHEPowerTrainConfigurator:
         # energy)
         self._source_does_not_make_mass_vary = None
 
+        # Contains the list of an initial guess of the components efficiency. Is used to compute
+        # the initial of the currents and power of each component
+        self._components_efficiency = None
+
         # Because of their very peculiar role, we will scan the architecture for any SSPC defined
         # by the user and whether or not they are at the output of a bus, because a specific
         # option needs to be turned on in this was
@@ -228,6 +232,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_symmetrical_pairs = []
         components_makes_mass_vary = []
         source_does_not_make_mass_vary = []
+        components_efficiency = []
 
         # Doing it like that allows us to have the names of the components before we start the
         # loop, which I'm gonna use to check if the pairs are valid
@@ -303,6 +308,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_slipstream_wing_lift.append(resources.DICTIONARY_SWL[component_id])
             components_makes_mass_vary.append(resources.DICTIONARY_VARIES_MASS[component_id])
             source_does_not_make_mass_vary.append(resources.DICTIONARY_VARIESN_T_MASS[component_id])
+            components_efficiency.append(resources.DICTIONARY_ETA[component_id])
 
             if "options" in component.keys():
 
@@ -348,6 +354,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_symmetrical_pairs = components_symmetrical_pairs
         self._components_makes_mass_vary = components_makes_mass_vary
         self._source_does_not_make_mass_vary = source_does_not_make_mass_vary
+        self._components_efficiency = components_efficiency
 
     def _get_connections(self):
         """
@@ -1277,7 +1284,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         return sub_graphs
 
-    def get_power_on_each_node(self, graph, inputs, propulsive_power_dict) -> List[dict]:
+    def get_power_on_each_node(self, graph, inputs, propulsive_power_dict) -> dict:
         """
         Returns a dictionary which will contain the power at each node of a graph based on the
         propulsive power at its propulsor, on the assumed efficiencies of its components and the
@@ -1286,6 +1293,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         copied_graph = copy.deepcopy(graph)
         name_to_id = dict(zip(self._components_name, self._components_id))
+        name_to_eta = dict(zip(self._components_name, self._components_efficiency))
 
         # For each graph we attribute a priority to the nodes which is going to impose the order
         # in which we make the computation. Propulsive loads will have the highest priority (0)
@@ -1301,17 +1309,17 @@ class FASTGAHEPowerTrainConfigurator:
         # So we start, for each propulsive load by exploring the branch until someone has more
         # than two neighbor
 
-        nodes_with_priority = {}
+        nodes_with_power = {}
 
         for propulsive_load_name in propulsive_loads_proper_name:
-            nodes_with_priority[propulsive_load_name] = 0
+            nodes_with_power[propulsive_load_name] = propulsive_power_dict[propulsive_load_name]
 
         problematic_nodes = copy.deepcopy(propulsive_loads_proper_name)
 
         while problematic_nodes:
 
             problematic_nodes, copied_graph = self.set_priority_in_graph(
-                copied_graph, nodes_with_priority, problematic_nodes
+                copied_graph, nodes_with_power, problematic_nodes
             )
 
             # At this point, we painted the priority as mush as we could but we have encountered
@@ -1332,18 +1340,21 @@ class FASTGAHEPowerTrainConfigurator:
 
                     problematic_nodes_to_add = []
 
-                    lowest_priority = -1
+                    power = 0
                     for neighbor in graph.adj[problematic_node]:
-                        if neighbor in list(nodes_with_priority.keys()):
-                            lowest_priority = max(lowest_priority, nodes_with_priority[neighbor])
+                        if neighbor in list(nodes_with_power.keys()):
+                            power += nodes_with_power[neighbor]
 
-                    nodes_with_priority[problematic_node] = lowest_priority + 1
+                    nodes_with_power[problematic_node] = power
 
                     # Then we add the bus inputs (there may be more than 1) in the list of
                     # "problematic nodes" and we add their priority
                     for neighbor in graph.adj[problematic_node]:
-                        if neighbor not in list(nodes_with_priority.keys()):
-                            nodes_with_priority[neighbor] = lowest_priority + 2
+                        if neighbor not in list(nodes_with_power.keys()):
+
+                            nodes_with_power[neighbor] = (
+                                power / name_to_eta[associated_component_name]
+                            )
                             problematic_nodes_to_add.append(neighbor)
 
                     # Then we add the input as a problematic node
@@ -1356,17 +1367,17 @@ class FASTGAHEPowerTrainConfigurator:
                     problematic_nodes_to_add = []
 
                     # This node does not have a priority just yet, so we'll first need to take a look at it
-                    priority = None
+                    power = None
 
                     for neighbor in graph.adj[problematic_node]:
-                        if neighbor in list(nodes_with_priority.keys()):
-                            priority = nodes_with_priority[neighbor]
+                        if neighbor in list(nodes_with_power.keys()):
+                            power = nodes_with_power[neighbor]
 
                     for neighbor in graph.adj[problematic_node]:
 
                         neighbor_counter = 1
 
-                        if neighbor not in list(nodes_with_priority.keys()):
+                        if neighbor not in list(nodes_with_power.keys()):
                             # If we haven't treated the neighbor yet, it means its an input of the
                             # splitter. We will add a fake input node and do the connection to
                             # that neighbor. We should also take the opportunity to see whether
@@ -1393,13 +1404,22 @@ class FASTGAHEPowerTrainConfigurator:
                             index = self._components_connection_outputs.index(output_name)
                             splitter_input_name = self._components_connection_inputs[index]
 
+                            (
+                                primary_input_power,
+                                secondary_power_output,
+                            ) = self.splitter_power_inputs(
+                                inputs=inputs,
+                                components_name=associated_component_name,
+                                power_output=power,
+                            )
+
                             # If it ends with a "1", its the priority input. We add the node as a
                             # problematic node, we set its priority and we add the node to the
                             # graph as well as the proper edge.
                             if splitter_input_name[-1] == "1":
                                 node_name = associated_component_name + "_in_1"
                                 problematic_nodes_to_add.append(node_name)
-                                nodes_with_priority[node_name] = priority + 1
+                                nodes_with_power[node_name] = primary_input_power
 
                                 copied_graph.add_edge(node_name, neighbor)
 
@@ -1408,7 +1428,7 @@ class FASTGAHEPowerTrainConfigurator:
                                     associated_component_name + "_in_" + str(neighbor_counter + 1)
                                 )
                                 problematic_nodes_to_add.append(node_name)
-                                nodes_with_priority[node_name] = priority + 1
+                                nodes_with_power[node_name] = secondary_power_output
 
                                 copied_graph.add_edge(node_name, neighbor)
 
@@ -1424,16 +1444,66 @@ class FASTGAHEPowerTrainConfigurator:
 
             problematic_nodes = new_problematic_nodes
 
-        return [nodes_with_priority]
+        return nodes_with_power
 
-    @staticmethod
+    def splitter_power_inputs(
+        self, inputs, components_name: str, power_output: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Computes the power at each input of the splitter, depending on the mode the power at the
+        output
+
+        :param inputs: OpenMDAO vector containing the value of inputs
+        :param components_name: the name of the splitter in question
+        :param power_output: the power at the output of the splitter
+        """
+
+        number_of_points = len(power_output)
+
+        # First we need to search what mode the splitter is in
+        name_to_option = dict(zip(self._components_name, self._components_options))
+
+        # Check that an option is declared, else it means it is in default mode which is
+        # percent_split
+        mode = "percent_split"
+        if name_to_option[components_name]:
+            if "splitter_mode" in list(name_to_option[components_name].keys()):
+                mode = name_to_option[components_name]["splitter_mode"]
+
+        if mode == "percent_split":
+            input_name = (
+                "data:propulsion:he_power_train:DC_splitter:" + components_name + ":power_split"
+            )
+            power_split = inputs[input_name]
+            power_split = format_to_array(power_split, number_of_points)
+
+            # Should be in %
+            primary_input = power_split * power_output / 100.0
+            secondary_output = (100.0 - power_split) * power_output / 100.0
+
+        else:
+
+            input_name = (
+                "data:propulsion:he_power_train:DC_splitter:" + components_name + ":power_share"
+            )
+            power_share = inputs[input_name]
+            power_share = format_to_array(power_share, number_of_points)
+
+            # Should be in W
+            primary_input = np.minimum(power_share, power_output)
+            secondary_output = power_output - primary_input
+
+        return primary_input, secondary_output
+
     def set_priority_in_graph(
-        graph: nx.Graph, nodes_with_priority: dict, starting_points_name: list
+        self, graph: nx.Graph, nodes_with_power: dict, starting_points_name: list
     ) -> tuple:
         """
         Explore a graph and set the priority of its node base on the priority of the starting
         points.
         """
+
+        name_to_eta = dict(zip(self._components_name, self._components_efficiency))
 
         problematic_nodes = []
         another_copied_graph = copy.deepcopy(graph)
@@ -1469,8 +1539,26 @@ class FASTGAHEPowerTrainConfigurator:
                 for adj_node in graph.adj[current_node]:
 
                     # A previously explored neighbor
-                    if adj_node in list(nodes_with_priority.keys()):
-                        nodes_with_priority[current_node] = nodes_with_priority[adj_node] + 1
+                    if adj_node in list(nodes_with_power.keys()):
+
+                        # Here depending on whether we are going from a component's input to
+                        # output or from a component to the other, setting the power will be
+                        # different
+
+                        current_components_name = current_node.replace("_in", "")
+                        current_components_name = current_components_name.replace("_out", "")
+
+                        adj_components_name = adj_node.replace("_in", "")
+                        adj_components_name = adj_components_name.replace("_out", "")
+
+                        # if name is the same, we compute the power below base on the efficiency,
+                        # else its the same power, to refactor, we'll just say the efficiency is 1
+                        if current_components_name == adj_components_name:
+                            eta = name_to_eta[current_components_name]
+                        else:
+                            eta = 1.0
+
+                        nodes_with_power[current_node] = nodes_with_power[adj_node] / eta
 
                     # Not a previously explored neighbor
                     else:
@@ -1489,7 +1577,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         return problematic_nodes, graph
 
-    def get_current_to_set(
+    def get_power_to_set(
         self, inputs, number_of_points: int, propulsive_power_dict: dict
     ) -> List[dict]:
         """
@@ -1634,6 +1722,19 @@ class FASTGAHEPowerTrainConfigurator:
         simplified_serializer.write(pt_file_copy_path)
 
         return pt_file_copy_path
+
+
+def format_to_array(input_array: np.ndarray, number_of_points: int) -> np.ndarray:
+    """
+    Takes an inputs which is either a one-element array or a multi-element array and formats it.
+    """
+
+    if len(input_array):
+        output_array = np.full(number_of_points, input_array[0])
+    else:
+        output_array = input_array
+
+    return output_array
 
 
 class _YAMLSerializer(ABC):
