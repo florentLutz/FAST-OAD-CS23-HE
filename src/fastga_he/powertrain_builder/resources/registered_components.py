@@ -48,6 +48,12 @@ IO_INDEP_V = "input_output_voltage_independant"
 # V_TO_SET contains a list, for each type of components of their voltage caracteristic that can
 # be set
 V_TO_SET = "voltage_to_precondition"
+# P_TO_SET contains a list of tuple with for each type of components of their power characteristic
+# that can be set and whether they are at the input of the component ("in") or at the output (
+# "out"). Since I did not fully do the naming correctly, the name of the OpenMDAO variable which
+# contains the power cannot tell me whether it is at the input or output of the component (
+# "active_power" for the PMSM for instance)
+P_TO_SET = "power_to_precondition"
 # SFR contains a boolean which tells whether or not this components requires the position of
 # flaps for the computation of the slipstream effects.
 SFR = "slipstream_flaps_required"
@@ -105,6 +111,7 @@ PROPELLER = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    P_TO_SET: [("shaft_power_in", "in")],
     SFR: True,
     SWL: True,
     DST_W: [],
@@ -143,6 +150,7 @@ PMSM = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["ac_voltage_rms_in", "ac_voltage_peak_in"],
+    P_TO_SET: [("active_power", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -188,6 +196,7 @@ INVERTER = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    P_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -217,6 +226,7 @@ DC_BUS = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage"],
+    P_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -246,6 +256,7 @@ DC_LINE = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    P_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -280,6 +291,7 @@ DC_DC_CONVERTER = {
     SETS_V: True,
     IO_INDEP_V: True,
     V_TO_SET: [],  # It is a bit paradoxical but you cant set a setter's voltage :p
+    P_TO_SET: [("power_rel", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -317,6 +329,7 @@ BATTERY_PACK = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    P_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: ["inside_the_wing"],
@@ -351,6 +364,7 @@ DC_SSPC = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage_out"],
+    P_TO_SET: [("power_flow", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -380,6 +394,7 @@ DC_SPLITTER = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage", "dc_voltage_in_1", "dc_voltage_in_2"],
+    P_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -418,6 +433,7 @@ RECTIFIER = {
     SETS_V: True,
     IO_INDEP_V: True,
     V_TO_SET: [],
+    P_TO_SET: [("power_rel", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -459,6 +475,7 @@ GENERATOR = {
     SETS_V: True,
     IO_INDEP_V: False,
     V_TO_SET: ["ac_voltage_rms_out", "ac_voltage_peak_out"],
+    P_TO_SET: [("active_power", "out"), ("shaft_power_in", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -494,6 +511,7 @@ ICE = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    P_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -537,6 +555,7 @@ DICTIONARY_RSD = {}
 DICTIONARY_SETS_V = {}
 DICTIONARY_IO_INDEP_V = {}
 DICTIONARY_V_TO_SET = {}
+DICTIONARY_P_TO_SET = {}
 DICTIONARY_SFR = {}
 DICTIONARY_SWL = {}
 DICTIONARY_DST_W = {}
@@ -564,6 +583,7 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_SETS_V[known_component[ID]] = known_component[SETS_V]
     DICTIONARY_IO_INDEP_V[known_component[ID]] = known_component[IO_INDEP_V]
     DICTIONARY_V_TO_SET[known_component[ID]] = known_component[V_TO_SET]
+    DICTIONARY_P_TO_SET[known_component[ID]] = known_component[P_TO_SET]
     DICTIONARY_SFR[known_component[ID]] = known_component[SFR]
     DICTIONARY_SWL[known_component[ID]] = known_component[SWL]
     DICTIONARY_DST_W[known_component[ID]] = known_component[DST_W]
