@@ -1580,17 +1580,16 @@ class FASTGAHEPowerTrainConfigurator:
         return problematic_nodes, graph
 
     def get_power_to_set(
-        self, inputs, number_of_points: int, propulsive_power_dict: dict
-    ) -> List[dict]:
+        self, inputs, propulsive_power_dict: dict
+    ) -> Tuple[List[dict], List[dict]]:
         """
-        Returns a list of the dict of current variable names and the value they should be set at
-        for each of the subgraph. Dict will be empty if there is no current to set. The current
-        to set are defined in the registered_components.py file. Note that this function was
-        coded based on the assumption that the voltage setter was ran before hand.
+        Returns a list of the power at each nodes of each subgraph. Also returns a list of the
+        dict of current variable names and the value they should be set at for each of the
+        subgraph. Dict will be empty if there is no power to set. The power to set are defined in
+        the registered_components.py file.
 
         :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
         voltages to check
-        :param number_of_points: number of points in the data to check
         :param propulsive_power_dict: dictionary with the propulsive power of each propulsor
         """
 
@@ -1607,12 +1606,18 @@ class FASTGAHEPowerTrainConfigurator:
             ]
 
         power_in_each_subgraph = []
+        final_list = []
 
         # First step is to identify the independent sub-propulsion chain
         sub_graphs = self.get_independent_sub_propulsion_chain()
 
+        # Need to be put here else the _get_component hasn't triggered yet
+        name_to_id = dict(zip(self._components_name, self._components_id))
+
         # Then for each subgraph we get the power on each node
         for sub_graph in sub_graphs:
+
+            power_dict_subgraph = {}
 
             # First we reconstruct the right propulsive load dict to ensure that we only take the
             # load we are interested in
@@ -1628,7 +1633,26 @@ class FASTGAHEPowerTrainConfigurator:
             )
             power_in_each_subgraph.append(power_in_this_subgraph)
 
-        return power_in_each_subgraph
+            nodes_list = list(sub_graph.nodes)
+            for node in nodes_list:
+                component_name = node.replace("_in", "").replace("_out", "")
+                component_id = name_to_id[component_name]
+
+                power_to_set = resources.DICTIONARY_P_TO_SET[component_id]
+
+                for power in power_to_set:
+                    # These are tuple which contains the "in" or "out" tag plus the name of the variable
+                    if power[1] == "in" and node.endswith("_in"):
+                        variable_name = component_name + "." + power[0]
+                        power_dict_subgraph[variable_name] = power_in_this_subgraph[node]
+
+                    elif power[1] == "out" and node.endswith("_out"):
+                        variable_name = component_name + "." + power[0]
+                        power_dict_subgraph[variable_name] = power_in_this_subgraph[node]
+
+            final_list.append(power_dict_subgraph)
+
+        return power_in_each_subgraph, final_list
 
     def get_network_elements_list(self) -> tuple:
         """

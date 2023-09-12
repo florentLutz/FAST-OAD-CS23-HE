@@ -549,7 +549,7 @@ def test_get_power_on_each_node():
 
     power_at_each_node = power_train_configurator.get_power_to_set(
         inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
-    )[0]
+    )[0][0]
 
     # Considering the components for the test, the efficiency should be equal to
     # eta = 0.8 * 0.95 * 0.98 * 0.99 * 1.0 * 0.99 * 0.98 * 0.99 * 1.0 * 0.98 = 0.69406061887008
@@ -575,7 +575,7 @@ def test_get_power_on_each_node():
     }
     power_at_each_node = power_train_configurator.get_power_to_set(
         inputs=inputs, number_of_points=10, propulsive_power_dict=propulsive_power_dict
-    )[0]
+    )[0][0]
 
     # Since there is a splitter we will check that the two input are indeed created
     assert "dc_splitter_1_in_1" in list(power_at_each_node.keys())
@@ -603,7 +603,7 @@ def test_get_power_on_each_node():
 
     power_at_each_node = power_train_configurator.get_power_to_set(
         inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
-    )[0]
+    )[0][0]
 
     # Same components so the branch efficiency should be the same, and since we put twice as much
     # power in the middle branch the following should hold
@@ -633,7 +633,7 @@ def test_get_power_on_each_node():
 
     power_at_each_node = power_train_configurator.get_power_to_set(
         inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
-    )[0]
+    )[0][0]
 
     # Less components in the outer branch so better efficiency :)
     assert power_at_each_node["dc_sspc_3_3_in"] == power_at_each_node["dc_sspc_1_3_in"]
@@ -664,7 +664,7 @@ def test_get_power_on_each_node():
 
     power_at_each_node = power_train_configurator.get_power_to_set(
         inputs=inputs, number_of_points=10, propulsive_power_dict=propulsive_power_dict
-    )[0]
+    )[0][0]
 
     # Assert that they exist and have the same value (since we have a 50% split)
     assert power_at_each_node["battery_pack_2_out"] == power_at_each_node["battery_pack_1_out"]
@@ -682,7 +682,7 @@ def test_get_power_on_each_node():
     )
     power_at_each_node = power_train_configurator.get_power_to_set(
         inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
-    )
+    )[0]
 
     # Two independent subgraph
     assert len(power_at_each_node) == 2
@@ -701,3 +701,20 @@ def test_get_power_on_each_node():
         first_power_dict["propeller_3_out"] / first_power_dict["battery_pack_1_out"]
         < second_power_dict["propeller_2_out"] / second_power_dict["battery_pack_2_out"]
     )
+
+
+def test_power_to_set():
+
+    # Very simple power train
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {"propeller_1": np.array([50e3])}
+
+    power_at_each_node = power_train_configurator.get_power_to_set(
+        inputs=None, number_of_points=10, propulsive_power_dict=propulsive_power_dict
+    )[1][0]

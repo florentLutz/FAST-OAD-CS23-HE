@@ -52,9 +52,9 @@ class MissionCore(om.Group):
             "Can be turned off to speed up the process but might not converge.",
         )
         self.options.declare(
-            name="pre_condition_voltage",
+            name="pre_condition_pt",
             default=False,
-            desc="Boolean to pre_condition the voltages of the different components of the PT, "
+            desc="Boolean to pre_condition the different components of the PT, "
             "can save some time in specific cases",
             allow_none=False,
         )
@@ -83,7 +83,7 @@ class MissionCore(om.Group):
             "propulsion_id": self.options["propulsion_id"],
             "power_train_file_path": self.options["power_train_file_path"],
             "use_linesearch": self.options["use_linesearch"],
-            "pre_condition_voltage": self.options["pre_condition_voltage"],
+            "pre_condition_pt": self.options["pre_condition_pt"],
         }
         self.add_subsystem(
             "compute_dep_equilibrium",

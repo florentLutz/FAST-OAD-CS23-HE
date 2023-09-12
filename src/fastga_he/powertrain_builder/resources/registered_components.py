@@ -291,7 +291,7 @@ DC_DC_CONVERTER = {
     SETS_V: True,
     IO_INDEP_V: True,
     V_TO_SET: [],  # It is a bit paradoxical but you cant set a setter's voltage :p
-    P_TO_SET: [("power_rel", "in")],
+    P_TO_SET: [("converter_relation.power_rel", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -433,7 +433,7 @@ RECTIFIER = {
     SETS_V: True,
     IO_INDEP_V: True,
     V_TO_SET: [],
-    P_TO_SET: [("power_rel", "in")],
+    P_TO_SET: [("converter_relation.power_rel", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],

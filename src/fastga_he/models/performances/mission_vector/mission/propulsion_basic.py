@@ -35,9 +35,9 @@ class FuelConsumed(om.ExplicitComponent):
 
         ########## NOT USED BUT NEEDED TO ENSURE COMPATIBILITY #####################################
         self.options.declare(
-            name="pre_condition_voltage",
+            name="pre_condition_pt",
             default=False,
-            desc="Boolean to pre_condition the voltages of the different components of the PT, "
+            desc="Boolean to pre_condition the different components of the PT, "
             "can save some time in specific cases",
             allow_none=False,
         )

@@ -334,7 +334,7 @@ def test_performances_from_pt_file():
             PowerTrainPerformancesFromFile(
                 power_train_file_path=pt_file_path,
                 number_of_points=NB_POINTS_TEST,
-                pre_condition_voltage=True,
+                pre_condition_pt=True,
             )
         ),
         __file__,
@@ -357,7 +357,7 @@ def test_performances_from_pt_file():
         PowerTrainPerformancesFromFile(
             power_train_file_path=pt_file_path,
             number_of_points=NB_POINTS_TEST,
-            pre_condition_voltage=True,
+            pre_condition_pt=True,
         ),
         ivc,
     )
