@@ -502,10 +502,17 @@ class MissionVector(om.Group):
                     "solve_equilibrium.compute_dep_equilibrium.preparation_for_energy_consumption.true_airspeed_econ"
                 ],
             )
-            power_in_each_graph = self.configurator.get_power_to_set(
-                inputs, number_of_points_total, propulsive_power_dict
-            )
-            test = 1.0
+
+            # So that we can set the power
+            power_to_set = self.configurator.get_power_to_set(inputs, propulsive_power_dict)[1]
+
+            for sub_graphs in power_to_set:
+                for power in sub_graphs:
+                    output_name = (
+                        "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances."
+                        + power
+                    )
+            outputs[output_name] = sub_graphs[power]
 
     def _get_initial_guess_fuel_consumed(self) -> np.ndarray:
         """

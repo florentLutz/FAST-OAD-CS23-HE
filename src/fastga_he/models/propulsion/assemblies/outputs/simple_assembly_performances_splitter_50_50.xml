@@ -18,11 +18,11 @@
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
             <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <capacitor>
-              <current_max units="A" is_input="False">158.98797071941524</current_max>
+              <current_max units="A" is_input="False">158.98797071941522</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </capacitor>
             <diode>
-              <current_max units="A" is_input="False">201.07956292984983</current_max>
+              <current_max units="A" is_input="False">201.0795629298498</current_max>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="True">0.002805</resistance>
             </diode>
@@ -46,7 +46,7 @@
               <resistance units="ohm" is_input="True">0.002265</resistance>
             </igbt>
             <inductor>
-              <current_max units="A" is_input="False">328.4325604336971</current_max>
+              <current_max units="A" is_input="False">328.43256043369706</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
           </dc_dc_converter_1>
@@ -93,7 +93,7 @@
         </DC_cable_harness>
         <DC_splitter>
           <dc_splitter_1>
-            <current_max units="A" is_input="False">123.10895903459583</current_max>
+            <current_max units="A" is_input="False">123.10895903459581</current_max>
             <power_split units="percent" is_input="True">50.0<!--Percent of the power going to the first (primary) input, in %--></power_split>
             <voltage_max units="V" is_input="False">850.0</voltage_max>
           </dc_splitter_1>
@@ -101,8 +101,8 @@
         <ICE>
           <ice_1>
             <displacement_volume units="m**3" is_input="True">0.0107</displacement_volume>
-            <power_max_SL units="W" is_input="False">112866.02164084562<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
-            <shaft_power_max units="W" is_input="False">112866.02164084562<!--Maximum power seen during the mission, without accounting for altitude effect, only used for power rate--></shaft_power_max>
+            <power_max_SL units="W" is_input="False">112866.02167207979<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
+            <shaft_power_max units="W" is_input="False">112866.02167207979<!--Maximum power seen during the mission, without accounting for altitude effect, only used for power rate--></shaft_power_max>
             <strokes_number is_input="True">4.0</strokes_number>
           </ice_1>
         </ICE>
@@ -141,12 +141,12 @@
         </battery_pack>
         <generator>
           <generator_1>
-            <current_ac_max units="A" is_input="False">51.579303803702<!--Maximum value of the RMS current flowing through one phase of the generator--></current_ac_max>
-            <losses_max units="W" is_input="False">6096.862767182484</losses_max>
+            <current_ac_max units="A" is_input="False">51.579303817548585<!--Maximum value of the RMS current flowing through one phase of the generator--></current_ac_max>
+            <losses_max units="W" is_input="False">6096.862769754219</losses_max>
             <rpm_max units="1/min" is_input="False">2500.0<!--Maximum value of the generator rpm--></rpm_max>
             <rpm_mission units="1/min" is_input="True">2500.0<!--RPM of the propeller for the points--></rpm_mission>
-            <shaft_power_max units="W" is_input="False">112866.02164084562</shaft_power_max>
-            <torque_max units="N*m" is_input="False">431.1164460301779<!--Maximum value of the torque the generator receives--></torque_max>
+            <shaft_power_max units="W" is_input="False">112866.02167207979</shaft_power_max>
+            <torque_max units="N*m" is_input="False">431.11644614948364<!--Maximum value of the torque the generator receives--></torque_max>
             <voltage_ac_max units="V" is_input="False">845.0739612601964<!--Maximum value of the peak voltage at the output of the generator--></voltage_ac_max>
             <voltage_out_target_mission units="V" is_input="True">690.0<!--Target output voltage of the generator for the points--></voltage_out_target_mission>
             <loss_coefficient>
@@ -226,10 +226,10 @@
         </propeller>
         <rectifier>
           <rectifier_1>
-            <current_ac_max units="A" is_input="False">51.579303803702<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
+            <current_ac_max units="A" is_input="False">51.579303817548585<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
             <current_dc_max units="A" is_input="False">123.1089590345958<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
             <heat_sink_temperature_mission units="degK" is_input="True">12000.0<!--Heat sink temperature of the rectifier for the points--></heat_sink_temperature_mission>
-            <losses_max units="W" is_input="False">2126.5437244762516</losses_max>
+            <losses_max units="W" is_input="False">2126.5437251862536</losses_max>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum value of the switching frequency of the rectifier--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the rectifier for the points--></switching_frequency_mission>

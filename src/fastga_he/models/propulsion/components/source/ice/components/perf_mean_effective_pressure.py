@@ -38,7 +38,7 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
         self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
 
         self.add_output(
-            "mean_effective_pressure", units="Pa", val=15.0e5, shape=number_of_points, lower=0.0
+            "mean_effective_pressure", units="bar", val=15.0, shape=number_of_points, lower=0.0
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -53,7 +53,8 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
 
         mep = 2.0 * np.pi * strokes_nb * torque_out / volume
 
-        outputs["mean_effective_pressure"] = mep
+        # To convert in bar
+        outputs["mean_effective_pressure"] = mep * 1e-5
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -67,13 +68,15 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
         partials[
             "mean_effective_pressure",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume",
-        ] = -(2.0 * np.pi * strokes_nb * torque_out / volume ** 2.0)
+        ] = (
+            -(2.0 * np.pi * strokes_nb * torque_out / volume ** 2.0) * 1e-5
+        )
         partials[
             "mean_effective_pressure",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":strokes_number",
         ] = (
-            2.0 * np.pi * torque_out / volume
+            2.0 * np.pi * torque_out / volume * 1e-5
         )
         partials["mean_effective_pressure", "torque_out"] = (
-            np.eye(number_of_points) * 2.0 * np.pi * strokes_nb / volume
+            np.eye(number_of_points) * 2.0 * np.pi * strokes_nb / volume * 1e-5
         )
