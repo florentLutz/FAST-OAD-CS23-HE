@@ -21,6 +21,8 @@ from ruamel.yaml import YAML
 
 import networkx as nx
 
+from utils.format_to_array import format_to_array
+
 from .exceptions import (
     FASTGAHEUnknownComponentID,
     FASTGAHEUnknownOption,
@@ -1722,19 +1724,6 @@ class FASTGAHEPowerTrainConfigurator:
         simplified_serializer.write(pt_file_copy_path)
 
         return pt_file_copy_path
-
-
-def format_to_array(input_array: np.ndarray, number_of_points: int) -> np.ndarray:
-    """
-    Takes an inputs which is either a one-element array or a multi-element array and formats it.
-    """
-
-    if len(input_array):
-        output_array = np.full(number_of_points, input_array[0])
-    else:
-        output_array = input_array
-
-    return output_array
 
 
 class _YAMLSerializer(ABC):

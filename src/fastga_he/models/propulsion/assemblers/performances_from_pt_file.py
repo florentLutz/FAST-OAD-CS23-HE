@@ -215,3 +215,19 @@ class PowerTrainPerformancesFromFile(om.Group):
 
         # The performances watcher was moved at the same level as the mission performances
         # watcher so that it is not opened as much, they could be merged eventually
+
+    def guess_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
+
+        # We need to reinstate this check on the coherence of voltage because if we run it on its
+        # own we prefer having a warning as well. Though it begs the question of pre
+        # conditioning, voltage power and current here as well even if it is faster at mission
+        # level
+        # TODO: Think about that
+
+        # This one will be passe in before going into the first pt components
+        number_of_points = self.options["number_of_points"]
+
+        # Let's first check the coherence of the voltage
+        self.configurator.check_voltage_coherence(inputs=inputs, number_of_points=number_of_points)
