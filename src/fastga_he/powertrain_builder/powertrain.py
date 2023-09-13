@@ -53,6 +53,8 @@ PROMOTION_FROM_MISSION = {
     "exterior_temperature": "degK",
 }
 
+DEFAULT_VOLTAGE_VALUE = 737.800
+
 
 class FASTGAHEPowerTrainConfigurator:
     """
@@ -165,6 +167,14 @@ class FASTGAHEPowerTrainConfigurator:
         # or check if a propulsor is not connected to a power source, in which case, we should not
         # be able to require thrust from him (will come later)
         self._connection_graph = None
+
+        # Contains the results of the function that sets the power in the graphs, is declared as
+        # an attribute to avoid having to recompute everything
+        self._power_at_each_node = None
+
+        # Contains the results of the function that sets the voltage in the graphs, is declared as
+        # an attribute to avoid having to recompute everything
+        self._voltage_at_each_node = None
 
         if power_train_file_path:
             self.load(power_train_file_path)
@@ -1188,28 +1198,31 @@ class FASTGAHEPowerTrainConfigurator:
         name_to_id = dict(zip(self._components_name, self._components_id))
 
         final_list = []
+        voltage_at_each_node = {}
 
         for sub_graph, sub_graph_voltage_setters in zip(sub_graphs, sub_graphs_voltage_setters):
             # First and foremost, we get the value that will serve as the for the setting of the
             # voltage in this subgraph. If there are not setters in this subgraph we just pass along
 
-            if not sub_graph_voltage_setters:
-                continue
-
             spl = dict(nx.all_pairs_shortest_path_length(sub_graph))
             voltage_dict_subgraph = {}
 
-            voltage_setter = sub_graph_voltage_setters[0]
-            clean_setter_name = voltage_setter.replace("_in", "").replace("_out", "")
-            setter_type = name_to_type[clean_setter_name]
-            input_name = (
-                PT_DATA_PREFIX
-                + setter_type
-                + ":"
-                + clean_setter_name
-                + ":voltage_out_target_mission"
-            )
-            reference_voltage = inputs[input_name]
+            if sub_graph_voltage_setters:
+                voltage_setter = sub_graph_voltage_setters[0]
+                clean_setter_name = voltage_setter.replace("_in", "").replace("_out", "")
+                setter_type = name_to_type[clean_setter_name]
+                input_name = (
+                    PT_DATA_PREFIX
+                    + setter_type
+                    + ":"
+                    + clean_setter_name
+                    + ":voltage_out_target_mission"
+                )
+                reference_voltage = inputs[input_name]
+            else:
+                # We need to use a fake value here, but, a priori, since there are no voltage
+                # setter there won't be any voltage to set so we can put anything there
+                reference_voltage = np.array([DEFAULT_VOLTAGE_VALUE])
 
             # We now transform it in the proper array
             if len(reference_voltage):
@@ -1232,7 +1245,11 @@ class FASTGAHEPowerTrainConfigurator:
                     variable_name = component_name + "." + voltage_to_set
                     voltage_dict_subgraph[variable_name] = reference_voltage
 
+                voltage_at_each_node[node] = reference_voltage
+
             final_list.append(voltage_dict_subgraph)
+
+        self._voltage_at_each_node = voltage_at_each_node
 
         return final_list
 
@@ -1607,6 +1624,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         power_in_each_subgraph = []
         final_list = []
+        power_at_each_node = {}
 
         # First step is to identify the independent sub-propulsion chain
         sub_graphs = self.get_independent_sub_propulsion_chain()
@@ -1651,6 +1669,9 @@ class FASTGAHEPowerTrainConfigurator:
                         power_dict_subgraph[variable_name] = power_in_this_subgraph[node]
 
             final_list.append(power_dict_subgraph)
+            power_at_each_node = dict(power_at_each_node, **power_in_this_subgraph)
+
+        self._power_at_each_node = power_at_each_node
 
         return power_in_each_subgraph, final_list
 
@@ -1748,6 +1769,100 @@ class FASTGAHEPowerTrainConfigurator:
         simplified_serializer.write(pt_file_copy_path)
 
         return pt_file_copy_path
+
+    def get_current_to_set(
+        self, inputs, propulsive_power_dict: dict, number_of_points: int
+    ) -> dict:
+        """
+        Returns a list of the dict of current variable names and the value they should be set at
+        for each of the subgraph. Dict will be empty if there is no current to set. The current to
+        set are defined in the registered_components.py file.
+
+        :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
+        voltages to check
+        :param propulsive_power_dict: dictionary with the propulsive power of each propulsor
+        :param number_of_points: number of points in the data to check
+        """
+
+        # First we get voltage and power at each point but we first check that they are already
+        # registered to avoid redoing unnecessary operations
+        if not self._voltage_at_each_node:
+            _ = self.get_voltage_to_set(inputs, number_of_points)
+
+        if not self._power_at_each_node:
+            _, _ = self.get_power_to_set(inputs, propulsive_power_dict)
+
+        name_to_id = dict(zip(self._components_name, self._components_id))
+
+        all_voltage_dict = copy.deepcopy(self._voltage_at_each_node)
+        all_power_dict = copy.deepcopy(self._power_at_each_node)
+
+        # First step is to remove all the sources inputs from the voltage setter since they won't
+        # appear in the power setter
+        for source in self.get_energy_consumption_list():
+            source_input_name = source + "_in"
+            if source_input_name in all_voltage_dict:
+                all_voltage_dict.pop(source_input_name)
+
+        # Something worth mentioning here. Due to the way the power_at_each_node dict was
+        # constructed, the splitter inputs are doubled, whereas their current aren't, meaning the
+        # power_at_each_node dict will always be longer or at worst the same size. This is the
+        # one we will use to iterate on.
+
+        all_current_dict = {}
+
+        for node in all_power_dict:
+
+            # first a quick check on whether the component is a splitter or not. Since we are
+            # iterating on the nodes in the power dictionary, if a components ends with either
+            # "_in_1" or "_in_2" it is a splitter
+            component_name = (
+                node.replace("_in_1", "")
+                .replace("_in_2", "")
+                .replace("_in", "")
+                .replace("_out", "")
+            )
+            component_id = name_to_id[component_name]
+
+            current_to_set = resources.DICTIONARY_I_TO_SET[component_id]
+
+            for current in current_to_set:
+                # These are tuple which contains the "in" or "out" tag plus the name of the variable
+
+                # Some value have been filled with a default value for voltage because they are
+                # not set, by the code. Turns out some current might be computed base on them so,
+                # instead of using this default value we will use the value on the other side of
+                # the component. E.g for the input of a dc/dc converter we will take its outputs
+                # rather than an arbitrary value.
+                voltage_node = all_voltage_dict[node]
+
+                if voltage_node == np.full(number_of_points, DEFAULT_VOLTAGE_VALUE):
+                    if "_in" in node:
+                        other_side_component = node.replace("_in", "_out")
+                    else:
+                        other_side_component = node.replace("_out", "_in")
+                    voltage_node = all_voltage_dict[other_side_component]
+
+                # Some current correspond correspond to the current in one phase, in which case
+                # we need to divide by three the obtained current
+                if "one_phase" in current[0]:
+                    factor = 3.0
+                else:
+                    factor = 1.0
+
+                if current[1] == "in" and node.endswith("_in"):
+                    variable_name = component_name + "." + current[0]
+
+                    current = all_power_dict[node] / voltage_node / factor
+                    all_current_dict[variable_name] = current
+
+                elif current[1] == "out" and node.endswith("_out"):
+                    variable_name = component_name + "." + current[0]
+
+                    current = all_power_dict[node] / voltage_node / factor
+                    all_current_dict[variable_name] = current
+
+        return all_current_dict
 
 
 class _YAMLSerializer(ABC):

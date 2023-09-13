@@ -54,6 +54,13 @@ V_TO_SET = "voltage_to_precondition"
 # contains the power cannot tell me whether it is at the input or output of the component (
 # "active_power" for the PMSM for instance)
 P_TO_SET = "power_to_precondition"
+# P_TO_SET contains a list of tuple with for each type of components of their power
+# characteristic that can be set and whether they are at the input of the component ("in") or at
+# the output ( "out"). Unlike P_TO_SET I may be able to do with that tag but it doesn't matter
+# too much if it doesn't. Also unlike P_TO_SET we will only be dealing with electric power (
+# though it could be extended with I and V being replace by a quantity of effort and a quantity of
+# flow). Should be very similar to V_TO_SET
+I_TO_SET = "current_to_precondition"
 # SFR contains a boolean which tells whether or not this components requires the position of
 # flaps for the computation of the slipstream effects.
 SFR = "slipstream_flaps_required"
@@ -112,6 +119,7 @@ PROPELLER = {
     IO_INDEP_V: False,
     V_TO_SET: [],
     P_TO_SET: [("shaft_power_in", "in")],
+    I_TO_SET: [],
     SFR: True,
     SWL: True,
     DST_W: [],
@@ -151,6 +159,7 @@ PMSM = {
     IO_INDEP_V: False,
     V_TO_SET: ["ac_voltage_rms_in", "ac_voltage_peak_in"],
     P_TO_SET: [("active_power", "in")],
+    I_TO_SET: [("ac_current_rms_in", "in"), ("ac_current_rms_in_one_phase", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -197,6 +206,7 @@ INVERTER = {
     IO_INDEP_V: False,
     V_TO_SET: [],
     P_TO_SET: [],
+    I_TO_SET: [("dc_current_in", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -227,6 +237,7 @@ DC_BUS = {
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage"],
     P_TO_SET: [],
+    I_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -257,6 +268,7 @@ DC_LINE = {
     IO_INDEP_V: False,
     V_TO_SET: [],
     P_TO_SET: [],
+    I_TO_SET: [("dc_current_one_cable", "out")],  # Could really be "in" or "out" its the same value
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -292,6 +304,7 @@ DC_DC_CONVERTER = {
     IO_INDEP_V: True,
     V_TO_SET: [],  # It is a bit paradoxical but you cant set a setter's voltage :p
     P_TO_SET: [("converter_relation.power_rel", "in")],
+    I_TO_SET: [("dc_current_in", "in"), ("dc_current_out", "out")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -330,6 +343,7 @@ BATTERY_PACK = {
     IO_INDEP_V: False,
     V_TO_SET: [],
     P_TO_SET: [],
+    I_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: ["inside_the_wing"],
@@ -365,6 +379,7 @@ DC_SSPC = {
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage_out"],
     P_TO_SET: [("power_flow", "in")],
+    I_TO_SET: [("dc_current_in", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -395,6 +410,7 @@ DC_SPLITTER = {
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage", "dc_voltage_in_1", "dc_voltage_in_2"],
     P_TO_SET: [],
+    I_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -434,6 +450,7 @@ RECTIFIER = {
     IO_INDEP_V: True,
     V_TO_SET: [],
     P_TO_SET: [("converter_relation.power_rel", "in")],
+    I_TO_SET: [("ac_current_rms_in_one_phase", "in"), ("dc_current_out", "out")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -476,6 +493,7 @@ GENERATOR = {
     IO_INDEP_V: False,
     V_TO_SET: ["ac_voltage_rms_out", "ac_voltage_peak_out"],
     P_TO_SET: [("active_power", "out"), ("shaft_power_in", "in")],
+    I_TO_SET: [("ac_current_rms_out", "out")],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -512,6 +530,7 @@ ICE = {
     IO_INDEP_V: False,
     V_TO_SET: [],
     P_TO_SET: [],
+    I_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
@@ -556,6 +575,7 @@ DICTIONARY_SETS_V = {}
 DICTIONARY_IO_INDEP_V = {}
 DICTIONARY_V_TO_SET = {}
 DICTIONARY_P_TO_SET = {}
+DICTIONARY_I_TO_SET = {}
 DICTIONARY_SFR = {}
 DICTIONARY_SWL = {}
 DICTIONARY_DST_W = {}
@@ -584,6 +604,7 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_IO_INDEP_V[known_component[ID]] = known_component[IO_INDEP_V]
     DICTIONARY_V_TO_SET[known_component[ID]] = known_component[V_TO_SET]
     DICTIONARY_P_TO_SET[known_component[ID]] = known_component[P_TO_SET]
+    DICTIONARY_I_TO_SET[known_component[ID]] = known_component[I_TO_SET]
     DICTIONARY_SFR[known_component[ID]] = known_component[SFR]
     DICTIONARY_SWL[known_component[ID]] = known_component[SWL]
     DICTIONARY_DST_W[known_component[ID]] = known_component[DST_W]

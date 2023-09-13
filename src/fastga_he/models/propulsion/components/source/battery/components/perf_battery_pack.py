@@ -176,3 +176,23 @@ class PerformancesBatteryPack(om.Group):
             fuel_consumed,
             promotes=["*"],
         )
+
+    def guess_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
+
+        number_of_points = self.options["number_of_points"]
+        battery_pack_id = self.options["battery_pack_id"]
+
+        number_of_cells_module = inputs[
+            "module_voltage.data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":module:number_cells"
+        ]
+
+        # Based on the max voltage and cut off voltage of the battery cell
+        fake_cell_voltage = np.linspace(4.2, 2.65, number_of_points)
+        module_voltage = fake_cell_voltage * number_of_cells_module
+
+        outputs["voltage_out"] = module_voltage
+        outputs["module_voltage"] = module_voltage

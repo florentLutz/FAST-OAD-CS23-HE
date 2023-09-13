@@ -59,6 +59,10 @@ class MissionVector(om.Group):
 
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
+        # Will be used to register an large amplitude in the change in mtow which might make it
+        # worth while to rerun the non linear guesses
+        self._last_mtow = 0.0
+
     def initialize(self):
 
         self.options.declare("out_file", default="", types=str)
@@ -419,6 +423,17 @@ class MissionVector(om.Group):
         everything here. But I'm not happy about it.
         """
 
+        mtow = inputs["data:weight:aircraft:MTOW"]
+        run_guesses = False
+
+        if abs(mtow - self._last_mtow) / mtow < 0.1:
+            # They are close enough, no need to rerun everything, we simply save the mtow
+            self._last_mtow = mtow
+        else:
+            # They aren't close enough, we will rerun the initial guess
+            run_guesses = True
+            self._last_mtow = mtow
+
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -436,19 +451,19 @@ class MissionVector(om.Group):
 
         # For the initialization of the fuel consumed we can be smart and set it at 0.0 if we
         # only have electric components
-
-        self.set_initial_guess_mass(outputs=outputs, inputs=inputs)
-        self.set_initial_guess_energies(outputs=outputs)
-        self.set_initial_guess_thrust(outputs=outputs, inputs=inputs)
-        self.set_initial_guess_alpha(outputs=outputs)
-        self.set_initial_guess_delta_m(outputs=outputs)
-        self.set_initial_guess_speed(inputs=inputs, outputs=outputs)
-        self.set_initial_guess_altitude(inputs=inputs, outputs=outputs)
-        self.set_initial_guess_density(outputs=outputs)
-        self.set_initial_guess_temperature(outputs=outputs)
-        self.set_initial_guess_taxi_thrust(inputs=inputs, outputs=outputs)
-        self.set_initial_guess_speed_econ(inputs=inputs, outputs=outputs)
-        self.set_initial_guess_thrust_econ(outputs=outputs)
+        if run_guesses:
+            self.set_initial_guess_mass(outputs=outputs, inputs=inputs)
+            self.set_initial_guess_energies(outputs=outputs)
+            self.set_initial_guess_thrust(outputs=outputs, inputs=inputs)
+            self.set_initial_guess_alpha(outputs=outputs)
+            self.set_initial_guess_delta_m(outputs=outputs)
+            self.set_initial_guess_speed(inputs=inputs, outputs=outputs)
+            self.set_initial_guess_altitude(inputs=inputs, outputs=outputs)
+            self.set_initial_guess_density(outputs=outputs)
+            self.set_initial_guess_temperature(outputs=outputs)
+            self.set_initial_guess_taxi_thrust(inputs=inputs, outputs=outputs)
+            self.set_initial_guess_speed_econ(inputs=inputs, outputs=outputs)
+            self.set_initial_guess_thrust_econ(outputs=outputs)
 
         ###########################################################################################
         # PT FILE INITIAL GUESS ###################################################################
@@ -468,7 +483,11 @@ class MissionVector(om.Group):
         # Only trigger if the options is used, if we actually have a pt file and if the right
         # submodels are used
 
-        if self.options["pre_condition_pt"] and self.options["power_train_file_path"]:
+        if (
+            self.options["pre_condition_pt"]
+            and self.options["power_train_file_path"]
+            and run_guesses
+        ):
 
             # Then we check that there is indeed a powertrain and that the right submodels are used
 
@@ -512,7 +531,19 @@ class MissionVector(om.Group):
                         "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances."
                         + power
                     )
-            outputs[output_name] = sub_graphs[power]
+                    outputs[output_name] = sub_graphs[power]
+
+            # So that we can set the current
+            current_to_set = self.configurator.get_current_to_set(
+                inputs, propulsive_power_dict, number_of_points_total
+            )
+
+            for current in current_to_set:
+                output_name = (
+                    "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances."
+                    + current
+                )
+                outputs[output_name] = current_to_set[current]
 
     def _get_initial_guess_fuel_consumed(self) -> np.ndarray:
         """
