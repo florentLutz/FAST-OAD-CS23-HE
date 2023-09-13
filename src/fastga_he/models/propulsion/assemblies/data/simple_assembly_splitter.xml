@@ -602,7 +602,7 @@
                             <resistance_per_length units="ohm/km">0.397</resistance_per_length>
                             <mass_per_length units="kg/m">0.537</mass_per_length>
                             <current_caliber units="A">800.0</current_caliber>
-                            <radius units="mm">6.47</radius>
+                            <radius units="mm">15.0</radius>
                             <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
                             <heat_capacity units="J/degK">7000.0</heat_capacity>
                         </cable>

@@ -1836,7 +1836,7 @@ class FASTGAHEPowerTrainConfigurator:
                 # rather than an arbitrary value.
                 voltage_node = all_voltage_dict[node]
 
-                if voltage_node == np.full(number_of_points, DEFAULT_VOLTAGE_VALUE):
+                if all(voltage_node == DEFAULT_VOLTAGE_VALUE):
                     if "_in" in node:
                         other_side_component = node.replace("_in", "_out")
                     else:
