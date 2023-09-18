@@ -43,6 +43,7 @@ model:
     out_file: ../results/mission_data_fuel_and_battery.csv
     use_linesearch: False
     pre_condition_pt: True
+    use_apply_nonlinear: False
   mtow:
     id: fastga.loop.mtow
   hq:

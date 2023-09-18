@@ -286,22 +286,7 @@ class ConstraintsSOCPicker(om.ExplicitComponent):
             lower=5.0,
         )
 
-        self.declare_partials(
-            of="*",
-            wrt=[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":c_rate_multiplier",
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":capacity_multiplier",
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":module:number_cells",
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_cells",
-            ],
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -335,8 +320,10 @@ class ConstraintsSOCPicker(om.ExplicitComponent):
         multiplicative_factor = max(multiplicative_factor_capa, multiplicative_factor_c_rate)
 
         # In order to avoid reducing too much the number of cells at one time, (increasing it
-        # should not be an issue), we cap this factor at 2/3 (arbitrary)
-        multiplicative_factor = np.clip(multiplicative_factor, reduction_limiter, None)
+        # should not be an issue, actually it might), we cap this factor at 2/3 (arbitrary)
+        multiplicative_factor = np.clip(
+            multiplicative_factor, reduction_limiter, 1.0 / reduction_limiter
+        )
 
         outputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules"
@@ -360,10 +347,10 @@ class ConstraintsSOCPicker(om.ExplicitComponent):
             + ":number_modules_limiter"
         ]
 
-        multiplicative_factor_capa = inputs[
+        multiplicative_factor_c_rate = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_multiplier"
         ]
-        multiplicative_factor_c_rate = inputs[
+        multiplicative_factor_capa = inputs[
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":capacity_multiplier"
@@ -371,18 +358,27 @@ class ConstraintsSOCPicker(om.ExplicitComponent):
         multiplicative_factor = max(multiplicative_factor_capa, multiplicative_factor_c_rate)
 
         # In order to avoid reducing too much the number of cells at one time, (increasing it
-        # should not be an issue), we cap this factor at 2/3 (arbitrary)
-        multiplicative_factor = np.clip(multiplicative_factor, reduction_limiter, None)
+        # should not be an issue, actually, it might), we cap this factor at 2/3 (arbitrary)
+        multiplicative_factor = np.clip(
+            multiplicative_factor, reduction_limiter, 1.0 / reduction_limiter
+        )
 
         if multiplicative_factor == reduction_limiter:
             partials_capa = 1e-6
             partials_c_rate = 1e-6
+            partials_limiter = number_cells_tot / number_cells_module
+        elif multiplicative_factor == 1.0 / reduction_limiter:
+            partials_capa = 1e-6
+            partials_c_rate = 1e-6
+            partials_limiter = -number_cells_tot / number_cells_module / reduction_limiter ** 2.0
         elif multiplicative_factor_capa > multiplicative_factor_c_rate:
             partials_capa = number_cells_tot / number_cells_module
             partials_c_rate = 1e-6
+            partials_limiter = 1e-6
         else:
             partials_capa = 1e-6
             partials_c_rate = number_cells_tot / number_cells_module
+            partials_limiter = 1e-6
 
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
@@ -408,3 +404,9 @@ class ConstraintsSOCPicker(om.ExplicitComponent):
             + battery_pack_id
             + ":capacity_multiplier",
         ] = partials_capa
+        partials[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
+            "convergence:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":number_modules_limiter",
+        ] = partials_limiter

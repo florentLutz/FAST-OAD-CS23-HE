@@ -37,6 +37,7 @@ model:
     out_file: ../results/mission_data.csv
     use_linesearch: False
     pre_condition_pt: True
+    use_apply_nonlinear: True
   power_train_sizing:
     id: fastga_he.power_train.sizing
     power_train_file_path: ./simple_assembly.yml

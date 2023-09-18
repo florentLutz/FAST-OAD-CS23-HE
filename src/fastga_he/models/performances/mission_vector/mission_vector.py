@@ -55,7 +55,8 @@ class MissionVector(om.Group):
         self.nonlinear_solver.options["iprint"] = 0
         self.nonlinear_solver.options["maxiter"] = 100
         self.nonlinear_solver.options["rtol"] = 1e-5
-        self.nonlinear_solver.options["use_apply_nonlinear"] = True
+        self.nonlinear_solver.options["stall_limit"] = 2
+        self.nonlinear_solver.options["stall_tol"] = 1e-5
         self.linear_solver = om.LinearBlockGS()
 
         self.configurator = FASTGAHEPowerTrainConfigurator()
@@ -107,6 +108,13 @@ class MissionVector(om.Group):
             "can save some time in specific cases",
             allow_none=False,
         )
+        self.options.declare(
+            name="use_apply_nonlinear",
+            default=True,
+            desc="Boolean to declare whether or not the use_apply_nonlinear option of the solver "
+            "is to be used, can reduce time depending on the situation",
+            allow_none=False,
+        )
 
     def setup(self):
 
@@ -116,6 +124,8 @@ class MissionVector(om.Group):
         number_of_points_reserve = self.options["number_of_points_reserve"]
 
         pt_file_path = self.options["power_train_file_path"]
+
+        self.nonlinear_solver.options["use_apply_nonlinear"] = self.options["use_apply_nonlinear"]
 
         self.add_subsystem("in_flight_cg_variation", InFlightCGVariation(), promotes=["*"])
         self.add_subsystem(

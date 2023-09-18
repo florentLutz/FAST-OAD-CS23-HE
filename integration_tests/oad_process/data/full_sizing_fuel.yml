@@ -43,6 +43,7 @@ model:
     out_file: ../results/fuel_propulsion.csv
     use_linesearch: False
     pre_condition_pt: False
+    use_apply_nonlinear: False
   mtow:
     id: fastga.loop.mtow
   hq:
