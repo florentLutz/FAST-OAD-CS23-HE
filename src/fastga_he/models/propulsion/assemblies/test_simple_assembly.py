@@ -254,10 +254,10 @@ def test_performances_sizing_assembly_battery_enforce():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
-    ) == pytest.approx(20.03, rel=1e-2)
+    ) == pytest.approx(19.40, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(2618.90, rel=1e-2)
+    ) == pytest.approx(2591.74, rel=1e-2)
 
 
 def test_performances_sizing_assembly_battery_ensure():

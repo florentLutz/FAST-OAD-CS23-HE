@@ -54,19 +54,19 @@
       <he_power_train>
         <DC_DC_converter>
           <dc_dc_converter_1>
-            <current_in_caliber units="A" is_input="False">418.1286862375702<!--Current caliber of one arm of the DC/DC converter--></current_in_caliber>
-            <current_in_max units="A" is_input="False">418.8950419733111</current_in_max>
+            <current_in_caliber units="A" is_input="False">441.35281788081966<!--Current caliber of one arm of the DC/DC converter--></current_in_caliber>
+            <current_in_max units="A" is_input="False">419.8097602889778</current_in_max>
             <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
-            <dissipable_heat units="W" is_input="False">3363.1858424745747<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
-            <losses_max units="W" is_input="False">3377.219702941967</losses_max>
-            <mass units="kg" is_input="False">574.5959113529068<!--Mass of the converter--></mass>
-            <power_density units="kW/kg" is_input="False">0.44017106413507384<!--Power density of the DC/DC converter--></power_density>
+            <dissipable_heat units="W" is_input="False">3449.0358388294235<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
+            <losses_max units="W" is_input="False">3330.0632847253773</losses_max>
+            <mass units="kg" is_input="False">604.4197009791401<!--Mass of the converter--></mass>
+            <power_density units="kW/kg" is_input="False">0.44006743334497816<!--Power density of the DC/DC converter--></power_density>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT module in the converter--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_caliber units="V" is_input="False">850.0<!--Voltage caliber of the converter--></voltage_caliber>
-            <voltage_in_caliber units="V" is_input="False">604.8867300249486</voltage_in_caliber>
-            <voltage_in_max units="V" is_input="False">604.818313235859</voltage_in_max>
+            <voltage_in_caliber units="V" is_input="False">602.6594046689751</voltage_in_caliber>
+            <voltage_in_max units="V" is_input="False">604.7267989213086</voltage_in_max>
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
             <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
@@ -77,25 +77,25 @@
             </CG>
             <capacitor>
               <aspect_ratio units="A" is_input="True">2.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
-              <capacity units="F" is_input="False">0.00038453454851681754<!--Capacity of the capacitor--></capacity>
-              <current_caliber units="A" is_input="False">313.78019158972313<!--Current caliber of the DC/DC converter--></current_caliber>
-              <current_max units="A" is_input="False">314.0570746302388</current_max>
-              <diameter units="mm" is_input="False">91.61961312544437<!--Diameter of the capacitor--></diameter>
-              <height units="mm" is_input="False">183.23922625088875<!--Diameter of the capacitor--></height>
-              <mass units="kg" is_input="False">1.488520832968326<!--Capacitor's mass--></mass>
-              <resistance units="ohm" is_input="False">0.003812177125985856<!--Capacitor's resistance--></resistance>
-              <thermal_resistance units="degK/W" is_input="False">3.0076920552462503<!--Capacitor's thermal resistance--></thermal_resistance>
+              <capacity units="F" is_input="False">0.00039498737871494245<!--Capacity of the capacitor--></capacity>
+              <current_caliber units="A" is_input="False">322.30970103139305<!--Current caliber of the DC/DC converter--></current_caliber>
+              <current_max units="A" is_input="False">314.4356280297044</current_max>
+              <diameter units="mm" is_input="False">92.44237004080455<!--Diameter of the capacitor--></diameter>
+              <height units="mm" is_input="False">184.8847400816091<!--Diameter of the capacitor--></height>
+              <mass units="kg" is_input="False">1.528983401477197<!--Capacitor's mass--></mass>
+              <resistance units="ohm" is_input="False">0.003744620715388238<!--Capacitor's resistance--></resistance>
+              <thermal_resistance units="degK/W" is_input="False">2.98092295102883<!--Capacitor's thermal resistance--></thermal_resistance>
               <scaling>
-                <capacity is_input="False">0.38453454851681756<!--Scaling factor for the capacitor capacity--></capacity>
-                <diameter is_input="False">0.9161961312544438<!--Scaling factor for the capacitor diameter--></diameter>
-                <height is_input="False">1.1821885564573467<!--Scaling factor for the capacitor height--></height>
-                <mass is_input="False">0.9923472219788839<!--Scaling factor for the capacitor mass--></mass>
-                <resistance is_input="False">1.1913053518705798<!--Scaling factor for the capacitor resistance--></resistance>
-                <thermal_resistance is_input="False">1.0025640184154168<!--Scaling factor for the capacitor thermal resistance--></thermal_resistance>
+                <capacity is_input="False">0.39498737871494244<!--Scaling factor for the capacitor capacity--></capacity>
+                <diameter is_input="False">0.9244237004080454<!--Scaling factor for the capacitor diameter--></diameter>
+                <height is_input="False">1.1928047747200587<!--Scaling factor for the capacitor height--></height>
+                <mass is_input="False">1.0193222676514646<!--Scaling factor for the capacitor mass--></mass>
+                <resistance is_input="False">1.1701939735588243<!--Scaling factor for the capacitor resistance--></resistance>
+                <thermal_resistance is_input="False">0.9936409836762766<!--Scaling factor for the capacitor thermal resistance--></thermal_resistance>
               </scaling>
             </capacitor>
             <contactor>
-              <mass units="kg" is_input="False">1.5780155477468236<!--Mass of the contactor--></mass>
+              <mass units="kg" is_input="False">1.638355997633941<!--Mass of the contactor--></mass>
             </contactor>
             <control_card>
               <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
@@ -104,37 +104,37 @@
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <diode>
-              <current_max units="A" is_input="False">394.87680666675357</current_max>
+              <current_max units="A" is_input="False">395.17794788221084</current_max>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
-              <resistance units="ohm" is_input="False">0.0016265617714411086</resistance>
+              <resistance units="ohm" is_input="False">0.001556637011439253</resistance>
             </diode>
             <energy_off>
-              <a is_input="False">0.013111330114410681</a>
+              <a is_input="False">0.012547683145907918</a>
               <b is_input="False">0.0002539092853205021</b>
-              <c is_input="False">-1.999332762950489e-07</c>
+              <c is_input="False">-2.0891435939828944e-07</c>
             </energy_off>
             <energy_on>
-              <a is_input="False">0.013797816327716308</a>
+              <a is_input="False">0.013204657794050268</a>
               <b is_input="False">3.3256504177779456e-05</b>
-              <c is_input="False">5.9031559363779e-07</c>
+              <c is_input="False">6.168328072894879e-07</c>
             </energy_on>
             <energy_rr>
-              <a is_input="False">0.003695130580178528</a>
+              <a is_input="False">0.003536279484861331</a>
               <b is_input="False">0.00034030311012866587</b>
-              <c is_input="False">-5.186887351360168e-08</c>
+              <c is_input="False">-5.419884415245458e-08</c>
             </energy_rr>
             <heat_sink>
               <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
-              <height units="m" is_input="False">0.004456526406579775<!--Height of the heat sink--></height>
+              <height units="m" is_input="False">0.004452088222941935<!--Height of the heat sink--></height>
               <length units="m" is_input="False">0.07150000000000001<!--Length of the heat sink--></length>
-              <mass units="kg" is_input="False">0.1758836575251627<!--Mass of the heat sink, includes tubes and core--></mass>
+              <mass units="kg" is_input="False">0.17949877278999798<!--Mass of the heat sink, includes tubes and core--></mass>
               <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
-              <width units="m" is_input="False">0.1875515023109886<!--Width of the heat sink--></width>
+              <width units="m" is_input="False">0.1919739833520586<!--Width of the heat sink--></width>
               <coolant>
                 <Prandtl_number is_input="False">39.493034825870645<!--Prandtl number of the coolant--></Prandtl_number>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <max_mass_flow units="m**3/s" is_input="False">3.178225813057859e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
+                <max_mass_flow units="m**3/s" is_input="False">3.259354447408064e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
                 <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
                 <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
@@ -142,57 +142,57 @@
               </coolant>
               <tube>
                 <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
-                <inner_diameter units="m" is_input="False">0.00047101760438651626<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
+                <inner_diameter units="m" is_input="False">0.0004680588152946231<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
                 <length units="m" is_input="False">0.28600000000000003<!--Length of the tube which is useful for the cooling of the inverter--></length>
-                <mass units="kg" is_input="False">0.019880424498721887<!--Wieght of the tube for the cooling of the inverter--></mass>
-                <outer_diameter units="m" is_input="False">0.0029710176043865164<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
+                <mass units="kg" is_input="False">0.019844560150602087<!--Wieght of the tube for the cooling of the inverter--></mass>
+                <outer_diameter units="m" is_input="False">0.002968058815294623<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
                 <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
               </tube>
             </heat_sink>
             <igbt>
-              <current_max units="A" is_input="False">518.0940891933028</current_max>
-              <resistance units="ohm" is_input="False">0.0013134268849604675</resistance>
+              <current_max units="A" is_input="False">519.1141671781127</current_max>
+              <resistance units="ohm" is_input="False">0.0012569635760819639</resistance>
             </igbt>
             <inductor>
               <air_gap units="mm" is_input="True">10.0<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">9.296270057262737<!--Mass of the copper in the inductor--></copper_mass>
-              <core_mass units="kg" is_input="False">280.3376408417223<!--Mass of the E-core in the inductor--></core_mass>
-              <current_caliber units="A" is_input="False">650.6947754486617<!--Current caliber of the DC/DC converter--></current_caliber>
-              <current_max units="A" is_input="False">651.4208913600874</current_max>
-              <inductance units="H" is_input="False">0.0005442900112767381<!--Inductance of the inductor--></inductance>
-              <iron_surface units="m**2" is_input="False">0.05065387704044728<!--Iron surface of the E-core inductor--></iron_surface>
-              <magnetic_energy_rating units="J" is_input="False">115.22719981903386<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
+              <copper_mass units="kg" is_input="False">9.456797440674976<!--Mass of the copper in the inductor--></copper_mass>
+              <core_mass units="kg" is_input="False">295.11241499189777<!--Mass of the E-core in the inductor--></core_mass>
+              <current_caliber units="A" is_input="False">673.3611102950116<!--Current caliber of the DC/DC converter--></current_caliber>
+              <current_max units="A" is_input="False">652.4148442957295</current_max>
+              <inductance units="H" is_input="False">0.0005259684012810003<!--Inductance of the inductor--></inductance>
+              <iron_surface units="m**2" is_input="False">0.05241835676517374<!--Iron surface of the E-core inductor--></iron_surface>
+              <magnetic_energy_rating units="J" is_input="False">119.24102994807494<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
-              <mass units="kg" is_input="False">569.9715517407074<!--Mass of the inductor--></mass>
-              <reluctance units="1/H" is_input="False">89817.2223464518<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.0012455832643635402<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">6.991896521244829<!--Number of turns in the inductor--></turn_number>
+              <mass units="kg" is_input="False">599.6816274244705<!--Mass of the inductor--></mass>
+              <reluctance units="1/H" is_input="False">86793.8412726892<!--Reluctance of the inductor--></reluctance>
+              <resistance units="ohm" is_input="False">0.0011832232602386205<!--Resistance of the inductor--></resistance>
+              <turn_number is_input="False">6.756538902073549<!--Number of turns in the inductor--></turn_number>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
-              <wire_section_area units="m**2" is_input="False">0.00013013895508973234<!--Section area of the copper wire inside the inductor--></wire_section_area>
+              <wire_section_area units="m**2" is_input="False">0.00013467222205900233<!--Section area of the copper wire inside the inductor--></wire_section_area>
               <core_dimension>
-                <B units="m" is_input="False">0.6060277283628737<!--B dimension of the E-core in the inductor--></B>
-                <C units="m" is_input="False">0.2278299730687495<!--C dimension of the E-core in the inductor--></C>
+                <B units="m" is_input="False">0.6164925755446045<!--B dimension of the E-core in the inductor--></B>
+                <C units="m" is_input="False">0.23176412614458813<!--C dimension of the E-core in the inductor--></C>
               </core_dimension>
               <scaling>
-                <core_dimension is_input="False">8.284726293409072<!--Scaling factor for the dimensions of the E-core--></core_dimension>
-                <core_mass is_input="False">568.6361883199236<!--Scaling factor for the mass of the E-core--></core_mass>
+                <core_dimension is_input="False">8.42778640525775<!--Scaling factor for the dimensions of the E-core--></core_dimension>
+                <core_mass is_input="False">598.6053042432003<!--Scaling factor for the mass of the E-core--></core_mass>
               </scaling>
             </inductor>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <module>
-              <current_caliber units="A" is_input="False">517.3489348974703<!--Current caliber of the DC/DC converter--></current_caliber>
+              <current_caliber units="A" is_input="False">540.5884569209596<!--Current caliber of the DC/DC converter--></current_caliber>
               <height units="m" is_input="False">0.021<!--Height of one module--></height>
-              <length units="m" is_input="False">0.17050136573726235<!--Length of one module--></length>
-              <mass units="kg" is_input="False">0.38193957395898814<!--Weight of the diode and IGBT module--></mass>
+              <length units="m" is_input="False">0.17452180304732598<!--Length of one module--></length>
+              <mass units="kg" is_input="False">0.3912353827683839<!--Weight of the diode and IGBT module--></mass>
               <number is_input="True">1.0<!--Number of module to cool down, will depend on the component (3 for inverter/rectifiers, 1 for DC/DC)--></number>
               <width units="m" is_input="False">0.065<!--Width of one module--></width>
             </module>
             <scaling>
-              <a is_input="False">0.8698191291128923</a>
-              <c is_input="False">1.1496642997721562</c>
-              <resistance is_input="False">0.8698191291128923</resistance>
+              <a is_input="False">0.8324262093258038</a>
+              <c is_input="False">1.201307682046577</c>
+              <resistance is_input="False">0.8324262093258038</resistance>
             </scaling>
             <tube>
               <number_of_passes is_input="True">4.0<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
@@ -201,10 +201,10 @@
         </DC_DC_converter>
         <DC_SSPC>
           <dc_sspc_1337>
-            <current_caliber units="A" is_input="False">239.36533107898916<!--Current caliber of the SSPC--></current_caliber>
-            <current_max units="A" is_input="False">239.36550778679302<!--Maximum current flowing through the SSPC--></current_max>
+            <current_caliber units="A" is_input="False">239.36533107908627<!--Current caliber of the SSPC--></current_caliber>
+            <current_max units="A" is_input="False">239.3655077866498<!--Maximum current flowing through the SSPC--></current_max>
             <efficiency is_input="False">0.9956576470588235<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
-            <mass units="kg" is_input="False">6.782017713904693<!--Mass of the SSPC--></mass>
+            <mass units="kg" is_input="False">6.782017713907445<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
             <voltage_caliber units="V" is_input="False">850.0<!--Voltage caliber of the SSPC--></voltage_caliber>
             <voltage_max units="V" is_input="False">850.0<!--Maximum voltage at the terminals SSPC--></voltage_max>
@@ -218,27 +218,27 @@
             </cruise>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
-              <resistance units="ohm" is_input="False">0.0035155467009644345</resistance>
+              <resistance units="ohm" is_input="False">0.0035155467009630077</resistance>
             </diode>
             <igbt>
               <gate_voltage units="V" is_input="True">0.87</gate_voltage>
-              <resistance units="ohm" is_input="False">0.002838756961741335</resistance>
+              <resistance units="ohm" is_input="False">0.002838756961740183</resistance>
             </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <resistance is_input="False">1.8799714978419437</resistance>
+              <resistance is_input="False">1.8799714978411808</resistance>
             </scaling>
           </dc_sspc_1337>
           <dc_sspc_1>
-            <current_caliber units="A" is_input="False">239.36533107898916<!--Current caliber of the SSPC--></current_caliber>
-            <current_max units="A" is_input="False">239.36550778679302<!--Maximum current flowing through the SSPC--></current_max>
-            <efficiency is_input="False">0.9956192215006812<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
-            <mass units="kg" is_input="False">6.722529927423665<!--Mass of the SSPC--></mass>
+            <current_caliber units="A" is_input="False">239.36533107908627<!--Current caliber of the SSPC--></current_caliber>
+            <current_max units="A" is_input="False">239.3655077866498<!--Maximum current flowing through the SSPC--></current_max>
+            <efficiency is_input="False">0.9956192215006798<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+            <mass units="kg" is_input="False">6.722529927424272<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
-            <voltage_caliber units="V" is_input="False">842.544310463064<!--Voltage caliber of the SSPC--></voltage_caliber>
-            <voltage_max units="V" is_input="False">842.5436704648679<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <voltage_caliber units="V" is_input="False">842.5443104627983<!--Voltage caliber of the SSPC--></voltage_caliber>
+            <voltage_max units="V" is_input="False">842.5436704653537<!--Maximum voltage at the terminals SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC SSPC center of gravity--></x>
               <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
@@ -249,24 +249,24 @@
             </cruise>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
-              <resistance units="ohm" is_input="False">0.0035155467009644345</resistance>
+              <resistance units="ohm" is_input="False">0.0035155467009630077</resistance>
             </diode>
             <igbt>
               <gate_voltage units="V" is_input="True">0.87</gate_voltage>
-              <resistance units="ohm" is_input="False">0.002838756961741335</resistance>
+              <resistance units="ohm" is_input="False">0.002838756961740183</resistance>
             </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <resistance is_input="False">1.8799714978419437</resistance>
+              <resistance is_input="False">1.8799714978411808</resistance>
             </scaling>
           </dc_sspc_1>
           <dc_sspc_2>
-            <current_caliber units="A" is_input="False">239.36533005382273<!--Current caliber of the SSPC--></current_caliber>
-            <current_max units="A" is_input="False">239.36550778678875<!--Maximum current flowing through the SSPC--></current_max>
-            <efficiency is_input="False">0.9956387087931241<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
-            <mass units="kg" is_input="False">6.752567770417355<!--Mass of the SSPC--></mass>
+            <current_caliber units="A" is_input="False">239.3653310792401<!--Current caliber of the SSPC--></current_caliber>
+            <current_max units="A" is_input="False">239.36550778673535<!--Maximum current flowing through the SSPC--></current_max>
+            <efficiency is_input="False">0.995638708793124<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+            <mass units="kg" is_input="False">6.752567799344687<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
             <voltage_caliber units="V" is_input="False">846.309<!--Voltage caliber of the SSPC--></voltage_caliber>
             <voltage_max units="V" is_input="False">846.309<!--Maximum voltage at the terminals SSPC--></voltage_max>
@@ -280,27 +280,27 @@
             </cruise>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
-              <resistance units="ohm" is_input="False">0.0035155467160210025</resistance>
+              <resistance units="ohm" is_input="False">0.0035155467009607487</resistance>
             </diode>
             <igbt>
               <gate_voltage units="V" is_input="True">0.87</gate_voltage>
-              <resistance units="ohm" is_input="False">0.0028387569738993128</resistance>
+              <resistance units="ohm" is_input="False">0.0028387569617383587</resistance>
             </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <resistance is_input="False">1.8799715058935844</resistance>
+              <resistance is_input="False">1.8799714978399726</resistance>
             </scaling>
           </dc_sspc_2>
           <dc_sspc_412>
-            <current_caliber units="A" is_input="False">239.36533107898916<!--Current caliber of the SSPC--></current_caliber>
-            <current_max units="A" is_input="False">239.36550778679302<!--Maximum current flowing through the SSPC--></current_max>
-            <efficiency is_input="False">0.9955999457389663<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
-            <mass units="kg" is_input="False">6.693079862193885<!--Mass of the SSPC--></mass>
+            <current_caliber units="A" is_input="False">239.36533107908627<!--Current caliber of the SSPC--></current_caliber>
+            <current_max units="A" is_input="False">239.3655077866498<!--Maximum current flowing through the SSPC--></current_max>
+            <efficiency is_input="False">0.9955999457389649<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+            <mass units="kg" is_input="False">6.693079862194491<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
-            <voltage_caliber units="V" is_input="False">838.8532915802925<!--Voltage caliber of the SSPC--></voltage_caliber>
-            <voltage_max units="V" is_input="False">838.8526732685582<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <voltage_caliber units="V" is_input="False">838.8532915800281<!--Voltage caliber of the SSPC--></voltage_caliber>
+            <voltage_max units="V" is_input="False">838.8526732690408<!--Maximum voltage at the terminals SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC SSPC center of gravity--></x>
               <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
@@ -311,88 +311,88 @@
             </cruise>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
-              <resistance units="ohm" is_input="False">0.0035155467009644345</resistance>
+              <resistance units="ohm" is_input="False">0.0035155467009630077</resistance>
             </diode>
             <igbt>
               <gate_voltage units="V" is_input="True">0.87</gate_voltage>
-              <resistance units="ohm" is_input="False">0.002838756961741335</resistance>
+              <resistance units="ohm" is_input="False">0.002838756961740183</resistance>
             </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <resistance is_input="False">1.8799714978419437</resistance>
+              <resistance is_input="False">1.8799714978411808</resistance>
             </scaling>
           </dc_sspc_412>
         </DC_SSPC>
         <DC_bus>
           <dc_bus_1>
-            <current_caliber units="A" is_input="False">239.36533107898916</current_caliber>
-            <current_max units="A" is_input="False">239.36550778679302</current_max>
-            <height units="m" is_input="False">0.006634633930080864</height>
-            <length units="m" is_input="False">0.3023469650515334</length>
-            <mass units="kg" is_input="False">0.3159065520165624<!--Weight of the bus bar--></mass>
-            <voltage_caliber units="V" is_input="False">838.8532915802925</voltage_caliber>
-            <voltage_max units="V" is_input="False">838.8526732685582</voltage_max>
-            <width units="m" is_input="False">0.033488828579340345</width>
+            <current_caliber units="A" is_input="False">239.36533107908627</current_caliber>
+            <current_max units="A" is_input="False">239.3655077866498</current_max>
+            <height units="m" is_input="False">0.0066346339300813175</height>
+            <length units="m" is_input="False">0.3023469650515333</length>
+            <mass units="kg" is_input="False">0.3159065520166758<!--Weight of the bus bar--></mass>
+            <voltage_caliber units="V" is_input="False">838.8532915800281</voltage_caliber>
+            <voltage_max units="V" is_input="False">838.8526732690408</voltage_max>
+            <width units="m" is_input="False">0.03348882857934655</width>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC bus center of gravity--></x>
               <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
               <y_ratio is_input="True">0.34<!--X position of the DC bus center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <conductor>
-              <mutual_inductance units="H" is_input="False">1.2578067823132316e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
-              <self_inductance units="H" is_input="False">2.060682893598025e-07<!--Self inductance of the bus bar conductor--></self_inductance>
+              <mutual_inductance units="H" is_input="False">1.2578067823132437e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
+              <self_inductance units="H" is_input="False">2.0606828935979064e-07<!--Self inductance of the bus bar conductor--></self_inductance>
             </conductor>
             <cross_section>
-              <area units="cm**2" is_input="False">0.4849078319922747</area>
+              <area units="cm**2" is_input="False">0.4849078319924715</area>
               <density units="kg/m**3" is_input="True">8960.0<!--Density of the conductor, copper is assumed--></density>
               <length units="m" is_input="True">0.3<!--Length of the bus bar conductor--></length>
-              <thickness units="cm" is_input="False">0.15570931763903448</thickness>
+              <thickness units="cm" is_input="False">0.1557093176390661</thickness>
               <w_t_ratio is_input="True">20.0</w_t_ratio>
-              <width units="cm" is_input="False">3.1141863527806897</width>
+              <width units="cm" is_input="False">3.1141863527813216</width>
             </cross_section>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <insulation>
-              <thickness units="m" is_input="False">0.0011734825257667246</thickness>
+              <thickness units="m" is_input="False">0.0011734825257666652</thickness>
             </insulation>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
           </dc_bus_1>
           <dc_bus_2>
-            <current_caliber units="A" is_input="False">239.36533107898916</current_caliber>
-            <current_max units="A" is_input="False">239.36550778679302</current_max>
-            <height units="m" is_input="False">0.006639510560938566</height>
+            <current_caliber units="A" is_input="False">239.36533107908627</current_caliber>
+            <current_max units="A" is_input="False">239.3655077866498</current_max>
+            <height units="m" is_input="False">0.006639510560939192</height>
             <length units="m" is_input="False">0.3023502161387719</length>
-            <mass units="kg" is_input="False">0.31598866027082534<!--Weight of the bus bar--></mass>
+            <mass units="kg" is_input="False">0.3159886602709416<!--Weight of the bus bar--></mass>
             <voltage_caliber units="V" is_input="False">846.309</voltage_caliber>
             <voltage_max units="V" is_input="False">846.309</voltage_max>
-            <width units="m" is_input="False">0.033492079666578814</width>
+            <width units="m" is_input="False">0.03349207966658513</width>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the DC bus center of gravity--></x>
               <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
               <y_ratio is_input="True">0.34<!--X position of the DC bus center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <conductor>
-              <mutual_inductance units="H" is_input="False">1.2574758549682202e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
-              <self_inductance units="H" is_input="False">2.060682893598025e-07<!--Self inductance of the bus bar conductor--></self_inductance>
+              <mutual_inductance units="H" is_input="False">1.2574758549682206e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
+              <self_inductance units="H" is_input="False">2.0606828935979064e-07<!--Self inductance of the bus bar conductor--></self_inductance>
             </conductor>
             <cross_section>
-              <area units="cm**2" is_input="False">0.4849078319922747</area>
+              <area units="cm**2" is_input="False">0.4849078319924715</area>
               <density units="kg/m**3" is_input="True">8960.0<!--Density of the conductor, copper is assumed--></density>
               <length units="m" is_input="True">0.3<!--Length of the bus bar conductor--></length>
-              <thickness units="cm" is_input="False">0.15570931763903448</thickness>
+              <thickness units="cm" is_input="False">0.1557093176390661</thickness>
               <w_t_ratio is_input="True">20.0</w_t_ratio>
-              <width units="cm" is_input="False">3.1141863527806897</width>
+              <width units="cm" is_input="False">3.1141863527813216</width>
             </cross_section>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <insulation>
-              <thickness units="m" is_input="False">0.0011751080693859586</thickness>
+              <thickness units="m" is_input="False">0.0011751080693859566</thickness>
             </insulation>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
@@ -401,43 +401,43 @@
         </DC_bus>
         <DC_cable_harness>
           <harness_1>
-            <current_caliber units="A" is_input="False">239.36533005382273</current_caliber>
-            <current_max units="A" is_input="False">239.36550778678875<!--Maximum current flowing through the harness, all cables included--></current_max>
+            <current_caliber units="A" is_input="False">239.3653310792401</current_caliber>
+            <current_max units="A" is_input="False">239.36550778673535<!--Maximum current flowing through the harness, all cables included--></current_max>
             <length units="m" is_input="False">1.477417183742213<!--Length of the harness--></length>
-            <losses_max units="W" is_input="False">18.515812873750008<!--Maximum losses in one cable of the harness--></losses_max>
-            <mass units="kg" is_input="False">4.016653640171176</mass>
+            <losses_max units="W" is_input="False">18.515812752458835<!--Maximum losses in one cable of the harness--></losses_max>
+            <mass units="kg" is_input="False">4.016653657216825</mass>
             <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
             <number_cables is_input="True">1.0</number_cables>
-            <temperature_max units="degK" is_input="False">292.93321929691433</temperature_max>
+            <temperature_max units="degK" is_input="False">292.9332192548232</temperature_max>
             <voltage_caliber units="V" is_input="False">842.6179999999999</voltage_caliber>
-            <voltage_max units="V" is_input="False">842.618</voltage_max>
+            <voltage_max units="V" is_input="False">842.6179999999999</voltage_max>
             <CG>
               <x units="m" is_input="False">1.2387085918711065<!--X position of the DC cable center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
             </CG>
             <cable>
-              <current_caliber units="A" is_input="False">239.36533005382273<!--Maximum current flowing in one cable of the harness--></current_caliber>
-              <heat_capacity units="J/degK" is_input="False">1138.5455920063423</heat_capacity>
-              <heat_capacity_per_length units="J/degK/m" is_input="False">642.1936902990345</heat_capacity_per_length>
-              <mass_per_length units="kg/m" is_input="False">1.0569685143375018</mass_per_length>
-              <radius units="m" is_input="False">0.00834006570026474</radius>
-              <resistance units="ohm" is_input="False">0.00032343707315502635</resistance>
-              <resistance_per_length units="ohm/km" is_input="False">0.18243384283181885</resistance_per_length>
+              <current_caliber units="A" is_input="False">239.3653310792401<!--Maximum current flowing in one cable of the harness--></current_caliber>
+              <heat_capacity units="J/degK" is_input="False">1138.545597368</heat_capacity>
+              <heat_capacity_per_length units="J/degK/m" is_input="False">642.1936933232638</heat_capacity_per_length>
+              <mass_per_length units="kg/m" is_input="False">1.0569685203577768</mass_per_length>
+              <radius units="m" is_input="False">0.008340065719016155</radius>
+              <resistance units="ohm" is_input="False">0.0003234370710899858</resistance>
+              <resistance_per_length units="ohm/km" is_input="False">0.18243384166703805</resistance_per_length>
             </cable>
             <conductor>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the conducting core--></k_factor_radius>
-              <radius units="mm" is_input="False">5.492145032044191</radius>
-              <section units="mm**2" is_input="False">94.76192340313091</section>
+              <radius units="mm" is_input="False">5.492145049576972</radius>
+              <section units="mm**2" is_input="False">94.76192400815499</section>
             </conductor>
             <contactor>
-              <mass units="kg" is_input="False">2.1427535052631326<!--Mass of all the contactors in the harness--></mass>
+              <mass units="kg" is_input="False">2.1427535116354326<!--Mass of all the contactors in the harness--></mass>
             </contactor>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <insulation>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the insulation--></k_factor_radius>
-              <thickness units="m" is_input="False">0.0011677294541845367</thickness>
+              <thickness units="m" is_input="False">0.0011677294541764431</thickness>
             </insulation>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
@@ -448,7 +448,7 @@
               <specific_heat units="J/degK/kg" is_input="False">386.0<!--1.0 for copper, 0.0 for aluminium--></specific_heat>
             </properties>
             <sheath>
-              <thickness units="m" is_input="False">0.001480191214036011</thickness>
+              <thickness units="m" is_input="False">0.0014801912152627391</thickness>
             </sheath>
           </harness_1>
         </DC_cable_harness>
@@ -502,18 +502,18 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <SOC_min units="percent" is_input="False">20.033444344574576<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <c_rate_max units="1/h" is_input="False">0.7186665605570174<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
-            <c_rate_multiplier is_input="False">0.297389816215723<!--Multiplier for the the number of module if the c-rate of the battery is the active constraint--></c_rate_multiplier>
-            <capacity_multiplier is_input="False">0.9949589265394039<!--Multiplier for the the number of module if the capacity of the battery is the active constraint--></capacity_multiplier>
+            <SOC_min units="percent" is_input="False">19.405040734336723<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <c_rate_max units="1/h" is_input="False">0.7252808687042724<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
+            <c_rate_multiplier is_input="False">0.36596419393102786<!--Multiplier for the the number of module if the c-rate of the battery is the active constraint--></c_rate_multiplier>
+            <capacity_multiplier is_input="False">1.151887972069806<!--Multiplier for the the number of module if the capacity of the battery is the active constraint--></capacity_multiplier>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <mass units="kg" is_input="False">2609.902205854383<!--Mass of the battery pack--></mass>
+            <mass units="kg" is_input="False">2591.747937157064<!--Mass of the battery pack--></mass>
             <min_safe_SOC is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_cells is_input="False">26099.022058543826<!--Total number of cells in the battery pack--></number_cells>
-            <number_modules is_input="False">173.99348039029218<!--Number of modules in parallel inside the battery pack--></number_modules>
-            <volume units="L" is_input="False">575.1571986151595<!--Volume of the battery pack--></volume>
+            <number_cells is_input="False">25917.479371570636<!--Total number of cells in the battery pack--></number_cells>
+            <number_modules is_input="False">172.78319581047091<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <volume units="L" is_input="False">571.1564516509878<!--Volume of the battery pack--></volume>
             <CG>
               <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
               <y units="m" is_input="False">1.5703687750797755<!--Y position of the battery center of gravity--></y>
@@ -522,17 +522,17 @@
             <cell>
               <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">0.34754116425576576<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <losses_max units="W" is_input="False">0.3545385891598305<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
-              <voltage_max units="V" is_input="False">4.03212208823906<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">3.2918015349358742<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <voltage_max units="V" is_input="False">4.031511992808724<!--Maximum voltage needed by the cells during the mission--></voltage_max>
+              <voltage_min units="V" is_input="False">3.2838802153469446<!--Minimum voltage provided by the cells during the mission--></voltage_min>
               <volume units="L" is_input="False">0.01763<!--Volume of the cell used for the assembly of the battery pack--></volume>
             </cell>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <dimension>
-              <height units="m" is_input="False">0.30432585768182213<!--Height of the battery, as in the size of the battery along the Z-axis--></height>
+              <height units="m" is_input="False">0.302208991624732<!--Height of the battery, as in the size of the battery along the Z-axis--></height>
               <length units="m" is_input="False">0.5114874519835109<!--Length of the battery, as in the size of the battery along the X-axis--></length>
               <width units="m" is_input="False">3.6949853531288834<!--Width of the battery, as in the size of the battery along the Y-axis--></width>
             </dimension>
@@ -556,12 +556,12 @@
           <inverter_1>
             <current_ac_max units="A" is_input="False">796.1106848814983<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">796.1106848814983<!--Current caliber of one arm of the inverter--></current_caliber>
-            <current_dc_max units="A" is_input="False">239.36550778679302<!--Maximum value of the current at the input of the inverter--></current_dc_max>
-            <dissipable_heat units="W" is_input="False">18216.230030909603<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
+            <current_dc_max units="A" is_input="False">239.3655077866498<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <dissipable_heat units="W" is_input="False">18216.230030909595<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
-            <losses_max units="W" is_input="False">18216.230017868103</losses_max>
+            <losses_max units="W" is_input="False">18216.230017868118</losses_max>
             <mass units="kg" is_input="False">121.77226033388727<!--Mass of the inverter--></mass>
-            <modulation_idx_max is_input="False">0.11156233932848819<!--Maximum modulation index during the mission--></modulation_idx_max>
+            <modulation_idx_max is_input="False">0.11156233932842143<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_density units="kW/kg" is_input="False">1.8273971811603165<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
@@ -569,7 +569,7 @@
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
             <voltage_ac_max units="V" is_input="False">93.17225586154478<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
             <voltage_caliber units="V" is_input="False">93.17225586154478<!--Voltage caliber of the inverter--></voltage_caliber>
-            <voltage_dc_max units="V" is_input="False">835.1616759891633<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
+            <voltage_dc_max units="V" is_input="False">835.1616759896427<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
             <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
             <CG>
               <x units="m" is_input="False">2.692856507431314<!--X position of the inverter center of gravity--></x>
@@ -597,7 +597,7 @@
             <casing>
               <heat_capacity units="J/degK" is_input="False">296.0665643715596<!--Heat capacity of one casing--></heat_capacity>
               <mass units="kg" is_input="False">1.480332821857798<!--Weight of the casings (3 of them in the inverter)--></mass>
-              <temperature_max units="degK" is_input="False">348.870766726227</temperature_max>
+              <temperature_max units="degK" is_input="False">348.87076672622703</temperature_max>
               <thermal_resistance units="degK/W" is_input="False">0.01<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
             </casing>
             <contactor>
@@ -612,7 +612,7 @@
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="False">0.0010570138248116314</resistance>
-              <temperature_max units="degK" is_input="False">407.0628778261587</temperature_max>
+              <temperature_max units="degK" is_input="False">407.0628778261595</temperature_max>
               <thermal_resistance units="degK/W" is_input="False">0.06048153970847303<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
             </diode>
             <energy_off>
@@ -641,7 +641,7 @@
                 <Prandtl_number is_input="False">39.493034825870645<!--Prandtl number of the coolant--></Prandtl_number>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <max_mass_flow units="m**3/s" is_input="False">0.0001721441966413557<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
+                <max_mass_flow units="m**3/s" is_input="False">0.00017214419664135562<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
                 <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
                 <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
@@ -659,7 +659,7 @@
             <igbt>
               <gate_voltage units="V" is_input="True">0.87</gate_voltage>
               <resistance units="ohm" is_input="False">0.000853524532334526</resistance>
-              <temperature_max units="degK" is_input="False">446.1686120889632</temperature_max>
+              <temperature_max units="degK" is_input="False">446.1686120889626</temperature_max>
               <thermal_resistance units="degK/W" is_input="False">0.046915586876666<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
@@ -768,7 +768,7 @@
         <DC_DC_converter>
           <dc_dc_converter_1>
             <inductor>
-              <air_gap units="m" is_input="False">-0.012849235171026952<!--Constraints on maximum air gap in the inductor, respected if <0--></air_gap>
+              <air_gap units="m" is_input="False">-0.013385907060914587<!--Constraints on maximum air gap in the inductor, respected if <0--></air_gap>
             </inductor>
           </dc_dc_converter_1>
         </DC_DC_converter>
