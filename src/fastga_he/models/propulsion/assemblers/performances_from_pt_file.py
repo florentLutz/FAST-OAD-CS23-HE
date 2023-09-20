@@ -2,6 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
 
@@ -59,9 +60,9 @@ class PowerTrainPerformancesFromFile(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="pre_condition_voltage",
+            name="pre_condition_pt",
             default=False,
-            desc="Boolean to pre_condition the voltages of the different components of the PT, "
+            desc="Boolean to pre_condition the different components of the PT, "
             "can save some time in specific cases",
             allow_none=False,
         )
@@ -219,17 +220,14 @@ class PowerTrainPerformancesFromFile(om.Group):
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
 
+        # We need to reinstate this check on the coherence of voltage because if we run it on its
+        # own we prefer having a warning as well. Though it begs the question of pre
+        # conditioning, voltage power and current here as well even if it is faster at mission
+        # level
+        # TODO: Think about that
+
         # This one will be passe in before going into the first pt components
         number_of_points = self.options["number_of_points"]
 
         # Let's first check the coherence of the voltage
         self.configurator.check_voltage_coherence(inputs=inputs, number_of_points=number_of_points)
-
-        if self.options["pre_condition_voltage"]:
-            voltage_to_set = self.configurator.get_voltage_to_set(
-                inputs=inputs, number_of_points=number_of_points
-            )
-
-            for sub_graphs in voltage_to_set:
-                for voltage in sub_graphs:
-                    outputs[voltage] = sub_graphs[voltage]

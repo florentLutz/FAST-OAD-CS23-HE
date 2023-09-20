@@ -205,12 +205,8 @@ class PerformancePerPhase(om.ExplicitComponent):
         outputs["data:mission:sizing:main_route:climb:energy"] = np.sum(
             non_consumable_energy[1 : number_of_points_climb + 1]
         )
-        outputs["data:mission:sizing:main_route:climb:distance"] = max(
-            position[1 : number_of_points_climb + 1]
-        )
-        outputs["data:mission:sizing:main_route:climb:duration"] = max(
-            time[1 : number_of_points_climb + 1]
-        )
+        outputs["data:mission:sizing:main_route:climb:distance"] = position[number_of_points_climb]
+        outputs["data:mission:sizing:main_route:climb:duration"] = time[number_of_points_climb]
 
         outputs["data:mission:sizing:main_route:cruise:fuel"] = np.sum(
             fuel_consumed_t_econ[
@@ -222,14 +218,13 @@ class PerformancePerPhase(om.ExplicitComponent):
                 number_of_points_climb + 1 : number_of_points_climb + number_of_points_cruise + 1
             ]
         )
-        outputs["data:mission:sizing:main_route:cruise:distance"] = max(
-            position[
-                number_of_points_climb + 1 : number_of_points_climb + number_of_points_cruise + 1
-            ]
-        ) - max(position[1 : number_of_points_climb + 1])
-        outputs["data:mission:sizing:main_route:cruise:duration"] = max(
-            time[number_of_points_climb + 1 : number_of_points_climb + number_of_points_cruise + 1]
-        ) - max(time[1 : number_of_points_climb + 1])
+        outputs["data:mission:sizing:main_route:cruise:distance"] = (
+            position[number_of_points_climb + number_of_points_cruise]
+            - position[number_of_points_climb]
+        )
+        outputs["data:mission:sizing:main_route:cruise:duration"] = (
+            time[number_of_points_climb + number_of_points_cruise] - time[number_of_points_climb]
+        )
 
         outputs["data:mission:sizing:main_route:descent:fuel"] = np.sum(
             fuel_consumed_t_econ[
@@ -251,31 +246,14 @@ class PerformancePerPhase(om.ExplicitComponent):
                 + 1
             ]
         )
-        outputs["data:mission:sizing:main_route:descent:distance"] = max(
-            position[
-                number_of_points_climb
-                + number_of_points_cruise
-                + 1 : number_of_points_climb
-                + number_of_points_cruise
-                + number_of_points_descent
-                + 1
-            ]
-        ) - max(
-            position[
-                number_of_points_climb + 1 : number_of_points_climb + number_of_points_cruise + 1
-            ]
+        outputs["data:mission:sizing:main_route:descent:distance"] = (
+            position[number_of_points_climb + number_of_points_cruise + number_of_points_descent]
+            - position[number_of_points_climb + number_of_points_cruise]
         )
-        outputs["data:mission:sizing:main_route:descent:duration"] = max(
-            time[
-                number_of_points_climb
-                + number_of_points_cruise
-                + 1 : number_of_points_climb
-                + number_of_points_cruise
-                + number_of_points_descent
-                + 1
-            ]
-        ) - max(
-            time[number_of_points_climb + 1 : number_of_points_climb + number_of_points_cruise + 1]
+
+        outputs["data:mission:sizing:main_route:descent:duration"] = (
+            time[number_of_points_climb + number_of_points_cruise + number_of_points_descent]
+            - time[number_of_points_climb + number_of_points_cruise]
         )
 
         outputs["data:mission:sizing:main_route:reserve:fuel"] = np.sum(
@@ -331,7 +309,7 @@ class PerformancePerPhase(om.ExplicitComponent):
         ] = np.concatenate(
             (
                 np.zeros(1),
-                np.full(number_of_points_climb, 1),
+                np.ones(number_of_points_climb),
                 np.zeros(
                     number_of_points_cruise
                     + number_of_points_descent
@@ -345,7 +323,7 @@ class PerformancePerPhase(om.ExplicitComponent):
         ] = np.concatenate(
             (
                 np.zeros(1),
-                np.full(number_of_points_climb, 1),
+                np.ones(number_of_points_climb),
                 np.zeros(
                     number_of_points_cruise
                     + number_of_points_descent
@@ -360,7 +338,7 @@ class PerformancePerPhase(om.ExplicitComponent):
         ] = np.concatenate(
             (
                 np.zeros(number_of_points_climb + 1),
-                np.full(number_of_points_cruise, 1.0),
+                np.ones(number_of_points_cruise),
                 np.zeros(number_of_points_descent + number_of_points_reserve + 1),
             )
         )
@@ -369,7 +347,7 @@ class PerformancePerPhase(om.ExplicitComponent):
         ] = np.concatenate(
             (
                 np.zeros(number_of_points_climb + 1),
-                np.full(number_of_points_cruise, 1.0),
+                np.ones(number_of_points_cruise),
                 np.zeros(number_of_points_descent + number_of_points_reserve + 1),
             )
         )
@@ -379,7 +357,7 @@ class PerformancePerPhase(om.ExplicitComponent):
         ] = np.concatenate(
             (
                 np.zeros(number_of_points_climb + number_of_points_cruise + 1),
-                np.full(number_of_points_descent, 1.0),
+                np.ones(number_of_points_descent),
                 np.zeros(number_of_points_reserve + 1),
             )
         )
@@ -388,7 +366,7 @@ class PerformancePerPhase(om.ExplicitComponent):
         ] = np.concatenate(
             (
                 np.zeros(number_of_points_climb + number_of_points_cruise + 1),
-                np.full(number_of_points_descent, 1.0),
+                np.ones(number_of_points_descent),
                 np.zeros(number_of_points_reserve + 1),
             )
         )
@@ -440,17 +418,19 @@ class PerformancePerPhase(om.ExplicitComponent):
         partials["thrust_rate_t", "thrust_rate_t_econ"] = d_tr_d_tr_t
 
         d_climb_d_d_pos = np.zeros(number_of_points)
-        d_climb_d_d_pos[1:number_of_points_climb] = 1.0
+        d_climb_d_d_pos[number_of_points_climb] = 1.0
         partials["data:mission:sizing:main_route:climb:distance", "position"] = d_climb_d_d_pos
 
         d_cruise_d_d_pos = np.zeros(number_of_points)
-        d_cruise_d_d_pos[1 : number_of_points_climb + number_of_points_cruise] = 1.0
-        d_cruise_d_d_pos[1:number_of_points_climb] = -1.0
+        d_cruise_d_d_pos[number_of_points_climb + number_of_points_cruise] = 1.0
+        d_cruise_d_d_pos[number_of_points_climb] = -1.0
         partials["data:mission:sizing:main_route:cruise:distance", "position"] = d_cruise_d_d_pos
 
         d_descent_d_d_pos = np.zeros(number_of_points)
-        d_descent_d_d_pos[-1] = 1.0
-        d_cruise_d_d_pos[number_of_points_climb + number_of_points_cruise] = -1.0
+        d_descent_d_d_pos[
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent
+        ] = 1.0
+        d_descent_d_d_pos[number_of_points_climb + number_of_points_cruise] = -1.0
         partials["data:mission:sizing:main_route:descent:distance", "position"] = d_descent_d_d_pos
 
         partials["data:mission:sizing:main_route:climb:duration", "time"] = d_climb_d_d_pos

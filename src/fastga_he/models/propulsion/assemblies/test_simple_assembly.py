@@ -254,10 +254,10 @@ def test_performances_sizing_assembly_battery_enforce():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
-    ) == pytest.approx(20.03, rel=1e-2)
+    ) == pytest.approx(19.40, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(2618.90, rel=1e-2)
+    ) == pytest.approx(2591.74, rel=1e-2)
 
 
 def test_performances_sizing_assembly_battery_ensure():
@@ -395,7 +395,7 @@ def test_performances_from_pt_file():
             PowerTrainPerformancesFromFile(
                 power_train_file_path=pt_file_path,
                 number_of_points=NB_POINTS_TEST,
-                pre_condition_voltage=True,
+                pre_condition_pt=True,
             )
         ),
         __file__,
@@ -418,7 +418,7 @@ def test_performances_from_pt_file():
         PowerTrainPerformancesFromFile(
             power_train_file_path=pt_file_path,
             number_of_points=NB_POINTS_TEST,
-            pre_condition_voltage=True,
+            pre_condition_pt=True,
         ),
         ivc,
     )
@@ -434,15 +434,15 @@ def test_performances_from_pt_file():
         np.array(
             [
                 206099.6,
-                207168.0,
-                208211.3,
-                209238.8,
-                210256.5,
-                211266.3,
-                212266.8,
-                213254.0,
-                214223.3,
-                215175.1,
+                207167.3,
+                208210.4,
+                209235.7,
+                210250.4,
+                211259.8,
+                212265.3,
+                213262.8,
+                214231.9,
+                215113.6,
             ]
         ),
         abs=1,

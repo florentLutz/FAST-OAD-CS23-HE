@@ -316,7 +316,7 @@
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_modules>50.0<!--Minimum state-of-charge that the battery can have without degradation--></number_modules>
+            <number_modules>56.0<!--Minimum state-of-charge that the battery can have without degradation--></number_modules>
             <module>
               <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
@@ -329,7 +329,7 @@
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_modules>50.0<!--Minimum state-of-charge that the battery can have without degradation--></number_modules>
+            <number_modules>56.0<!--Minimum state-of-charge that the battery can have without degradation--></number_modules>
             <module>
               <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
@@ -1054,10 +1054,10 @@
       <he_power_train>
         <battery_pack>
           <battery_pack_1>
-            <number_modules_limiter is_input="True">0.5<!--Convergence parameter used the reduction of the amount of cell from one loop to the other--></number_modules_limiter>
+            <number_modules_limiter is_input="True">0.9<!--Convergence parameter used the reduction of the amount of cell from one loop to the other--></number_modules_limiter>
           </battery_pack_1>
           <battery_pack_2>
-            <number_modules_limiter is_input="True">0.5<!--Convergence parameter used the reduction of the amount of cell from one loop to the other--></number_modules_limiter>
+            <number_modules_limiter is_input="True">0.9<!--Convergence parameter used the reduction of the amount of cell from one loop to the other--></number_modules_limiter>
           </battery_pack_2>
         </battery_pack>
       </he_power_train>

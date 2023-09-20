@@ -131,9 +131,9 @@ class EquilibriumDeltaM(om.ImplicitComponent):
             x_cg - x_htp
         ) * np.ones(number_of_points)
         partials["delta_m", "delta_Cl"] = np.diag(x_cg - x_wing)
-        partials["delta_m", "delta_Cm"] = np.diag(l0_wing)
+        partials["delta_m", "delta_Cm"] = l0_wing * np.eye(number_of_points)
         d_delta_m_d_alpha = (
-            (x_cg - x_wing) * cl_alpha_wing + (x_cg - x_htp) * cl_alpha_htp + cm_alpha_fus
+            (x_cg - x_wing) * cl_alpha_wing + (x_cg - x_htp) * cl_alpha_htp + cm_alpha_fus * l0_wing
         )
         partials["delta_m", "alpha"] = np.diag(d_delta_m_d_alpha) * np.pi / 180.0
         partials["delta_m", "data:aerodynamics:horizontal_tail:cruise:CL_alpha"] = alpha * (

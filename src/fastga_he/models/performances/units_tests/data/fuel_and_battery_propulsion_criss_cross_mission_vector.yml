@@ -25,7 +25,7 @@ model:
     power_train_file_path: fuel_and_battery_propulsion_criss_cross.yml
     out_file: ../results/mission_data_fuel_and_battery_criss_cross.csv
     use_linesearch: False
-    pre_condition_voltage: False
+    pre_condition_pt: True
 
 submodels:
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file

@@ -358,13 +358,15 @@ def test_constraints_enforce_soc():
         == pytest.approx(42.66, rel=1e-2)
     )
 
-    # Partials will be hard to justify here since there is a rounding inside the module
+    # The error on the capacity multiplier not retained is due to the fact that I've had bad
+    # experiences with putting 0 in partials do I take something close enough to 0
     problem.check_partials(compact_print=True)
 
+    # We try with a moderate c_rate to check if it works when remaining in the limiter range
     ivc_c_rate_con = copy.deepcopy(ivc_base)
     ivc_c_rate_con.add_output(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:c_rate_max",
-        val=6.2,
+        val=3.0,
         units="h**-1",
     )
 
@@ -377,7 +379,30 @@ def test_constraints_enforce_soc():
         problem.get_val(
             "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
         )
-        == pytest.approx(138.0, rel=1e-2)
+        == pytest.approx(66.67, rel=1e-2)
+    )
+
+    # Partials will be hard to justify here since there is a rounding inside the module
+    problem.check_partials(compact_print=True)
+
+    # We try with a high c_rate to check limiter range
+    ivc_c_rate_con = copy.deepcopy(ivc_base)
+    ivc_c_rate_con.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:c_rate_max",
+        val=6.0,
+        units="h**-1",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        ConstraintsSOCEnforce(battery_pack_id="battery_pack_1"),
+        ivc_c_rate_con,
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
+        )
+        == pytest.approx(80.0, rel=1e-2)
     )
 
     # Partials will be hard to justify here since there is a rounding inside the module

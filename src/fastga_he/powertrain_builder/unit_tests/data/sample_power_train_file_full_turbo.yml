@@ -23,22 +23,17 @@ power_train_components:
   dc_sspc_3:
     id: fastga_he.pt_component.dc_sspc
     closed_by_default: True
-  dc_splitter_1:
-    id: fastga_he.pt_component.dc_splitter
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
     options:
-      splitter_mode: power_share # percent_split by default or power_share
-
-  dc_dc_converter_1:
-    id: fastga_he.pt_component.dc_dc_converter
-  battery_pack_1:
-    id: fastga_he.pt_component.battery_pack
-
+      number_of_inputs: 1
+      number_of_outputs: 1
   rectifier_1:
-    id: fastga_he.pt_component.rectifier
+    id: fastga_he.pt_component.inverter
   generator_1:
     id: fastga_he.pt_component.generator
   ice_1:
-      id: fastga_he.pt_component.internal_combustion_engine
+    id: fastga_he.pt_component.internal_combustion_engine
 
 component_connections:
   - source: propeller_1
@@ -63,18 +58,12 @@ component_connections:
     target: dc_sspc_3
 
   - source: dc_sspc_3
-    target: dc_splitter_1
+    target: [dc_bus_2, 1]
 
-  - source: [dc_splitter_1, 1]
-    target: dc_dc_converter_1
+  - source: [dc_bus_2, 1]
+    target: inverter_1
 
-  - source: dc_dc_converter_1
-    target: battery_pack_1
-
-  - source: [dc_splitter_1, 2]
-    target: rectifier_1
-
-  - source: rectifier_1
+  - source: inverter_1
     target: generator_1
 
   - source: generator_1

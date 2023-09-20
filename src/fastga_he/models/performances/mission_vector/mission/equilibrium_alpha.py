@@ -117,7 +117,9 @@ class EquilibriumAlpha(om.ImplicitComponent):
         partials["alpha", "mass"] = np.diag(d_alpha_d_mass_vector)
         d_alpha_d_thrust_vector = np.sin(alpha) / (dynamic_pressure * wing_area)
         partials["alpha", "thrust"] = np.diag(d_alpha_d_thrust_vector)
-        d_alpha_d_gamma_vector = mass * g * np.sin(gamma) / (dynamic_pressure * wing_area)
+        d_alpha_d_gamma_vector = (
+            mass * g * np.sin(gamma) / (dynamic_pressure * wing_area) / 180.0 * np.pi
+        )
         partials["alpha", "gamma"] = np.diag(d_alpha_d_gamma_vector)
         d_alpha_d_q_vector = -(thrust * np.sin(alpha) - mass * g * np.cos(gamma)) / (
             wing_area * dynamic_pressure ** 2.0

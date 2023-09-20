@@ -48,9 +48,9 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            name="pre_condition_voltage",
+            name="pre_condition_pt",
             default=False,
-            desc="Boolean to pre_condition the voltages of the different components of the PT, "
+            desc="Boolean to pre_condition the different components of the PT, "
             "can save some time in specific cases",
             allow_none=False,
         )
@@ -60,7 +60,7 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
         # Two points for taxi out and taxi in
         number_of_points = self.options["number_of_points"] + 2
         power_train_file_path = self.options["power_train_file_path"]
-        pre_condition_voltage = self.options["pre_condition_voltage"]
+        pre_condition_pt = self.options["pre_condition_pt"]
 
         self.configurator.load(self.options["power_train_file_path"])
 
@@ -73,7 +73,7 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
             "power_train_file_path": power_train_file_path,
             "number_of_points": number_of_points,
             "add_solver": False,
-            "pre_condition_voltage": pre_condition_voltage,
+            "pre_condition_pt": pre_condition_pt,
         }
 
         # For some reasons that I only knew when I coded the mission vector, all flight

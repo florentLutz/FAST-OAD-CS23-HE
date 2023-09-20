@@ -7,6 +7,8 @@ import os.path as pth
 import numpy as np
 import pytest
 
+import openmdao.api as om
+
 import fastoad.api as oad
 from stdatm import Atmosphere
 
@@ -86,16 +88,16 @@ def test_assembly_performances_splitter_50_50():
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                108229.0,
-                108780.0,
-                109323.0,
-                109857.0,
-                110382.0,
-                110898.0,
-                111404.0,
-                111901.0,
-                112388.0,
-                112866.0,
+                108225.3,
+                108777.1,
+                109320.1,
+                109854.0,
+                110378.7,
+                110894.3,
+                111400.5,
+                111897.3,
+                112384.5,
+                112862.1,
             ]
         ),
         abs=1,
@@ -175,16 +177,16 @@ def test_assembly_performances_splitter_60_40():
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                86104.0,
-                86536.0,
-                86962.0,
-                87380.0,
-                87791.0,
-                88195.0,
-                88591.0,
-                88980.0,
-                89362.0,
-                89736.0,
+                86101.5,
+                86533.8,
+                86959.2,
+                87377.3,
+                87788.3,
+                88192.1,
+                88588.4,
+                88977.4,
+                89358.8,
+                89732.6,
             ]
         ),
         abs=1,
@@ -203,11 +205,11 @@ def test_assembly_performances_splitter_60_40():
 
 def test_assembly_performances_splitter_100_0():
 
-    ivc = get_indep_var_comp(
-        list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST)),
-        __file__,
-        XML_FILE,
-    )
+    input_list = list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST))
+    input_list.remove("data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_split")
+
+    ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
+
     altitude = np.full(NB_POINTS_TEST, 0.0)
     ivc.add_output("altitude", val=altitude, units="m")
     ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
@@ -219,6 +221,11 @@ def test_assembly_performances_splitter_100_0():
         val=Atmosphere(altitude, altitude_in_feet=False).temperature,
     )
     ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_split",
+        val=np.array([100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0]),
+        units="percent",
+    )
 
     problem = oad.FASTOADProblem(reports=False)
     model = problem.model
@@ -233,12 +240,6 @@ def test_assembly_performances_splitter_100_0():
         promotes=["*"],
     )
     problem.setup()
-    problem.set_val(
-        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_split",
-        val=100.0,
-        units="percent",
-    )
-    # Run problem and check obtained value(s) is/(are) correct
     problem.run_model()
 
     # om.n2(problem)
@@ -334,7 +335,7 @@ def test_performances_from_pt_file():
             PowerTrainPerformancesFromFile(
                 power_train_file_path=pt_file_path,
                 number_of_points=NB_POINTS_TEST,
-                pre_condition_voltage=True,
+                pre_condition_pt=True,
             )
         ),
         __file__,
@@ -357,7 +358,7 @@ def test_performances_from_pt_file():
         PowerTrainPerformancesFromFile(
             power_train_file_path=pt_file_path,
             number_of_points=NB_POINTS_TEST,
-            pre_condition_voltage=True,
+            pre_condition_pt=True,
         ),
         ivc,
     )

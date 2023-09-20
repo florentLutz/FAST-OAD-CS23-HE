@@ -70,7 +70,7 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
             1e-6,
             -inputs["power"] / inputs["ac_voltage_rms_in"] ** 2 / 3.0,
         )
-        partials["ac_current_rms_in_one_phase", "ac_voltage_rms_in"] = -np.diag(partials_voltage_in)
+        partials["ac_current_rms_in_one_phase", "ac_voltage_rms_in"] = np.diag(partials_voltage_in)
 
         partials_power = np.where(
             inputs["power"] < 10.0,

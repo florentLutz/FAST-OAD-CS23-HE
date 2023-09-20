@@ -48,6 +48,19 @@ IO_INDEP_V = "input_output_voltage_independant"
 # V_TO_SET contains a list, for each type of components of their voltage caracteristic that can
 # be set
 V_TO_SET = "voltage_to_precondition"
+# P_TO_SET contains a list of tuple with for each type of components of their power characteristic
+# that can be set and whether they are at the input of the component ("in") or at the output (
+# "out"). Since I did not fully do the naming correctly, the name of the OpenMDAO variable which
+# contains the power cannot tell me whether it is at the input or output of the component (
+# "active_power" for the PMSM for instance)
+P_TO_SET = "power_to_precondition"
+# P_TO_SET contains a list of tuple with for each type of components of their power
+# characteristic that can be set and whether they are at the input of the component ("in") or at
+# the output ( "out"). Unlike P_TO_SET I may be able to do with that tag but it doesn't matter
+# too much if it doesn't. Also unlike P_TO_SET we will only be dealing with electric power (
+# though it could be extended with I and V being replace by a quantity of effort and a quantity of
+# flow). Should be very similar to V_TO_SET
+I_TO_SET = "current_to_precondition"
 # SFR contains a boolean which tells whether or not this components requires the position of
 # flaps for the computation of the slipstream effects.
 SFR = "slipstream_flaps_required"
@@ -61,6 +74,16 @@ DST_W = "distributed_wing"
 # PCT_W contains a list of position for which the component should be considered as a punctual
 # load that acts on the wing
 PCT_W = "punctual_wing"
+# VARIES_MASS contains a boolean which tells whether or not the components makes the mass of the
+# aircraft vary during the mission. This will help prevent setting a fake initial fuel
+# consumption when the power train is all electric.
+VARIES_MASS = "varies_mass"
+# VARIESN_T_MASS contains a boolean which tells whether or not the component is a source
+# component which does not make the mass of the aircraft
+VARIESN_T_MASS = "unconsumable_source"
+# ETA contains an assumed efficiency for the initial guess of the power and current all along the
+# power train
+ETA = "efficiency"
 
 PROPELLER = {
     ID: "fastga_he.pt_component.propeller",
@@ -95,10 +118,15 @@ PROPELLER = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    P_TO_SET: [("shaft_power_in", "in")],
+    I_TO_SET: [],
     SFR: True,
     SWL: True,
     DST_W: [],
     PCT_W: ["on_the_wing"],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.8,
 }
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
@@ -130,10 +158,15 @@ PMSM = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["ac_voltage_rms_in", "ac_voltage_peak_in"],
+    P_TO_SET: [("active_power", "in")],
+    I_TO_SET: [("ac_current_rms_in", "in"), ("ac_current_rms_in_one_phase", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
     PCT_W: ["on_the_wing"],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.95,
 }
 INVERTER = {
     ID: "fastga_he.pt_component.inverter",
@@ -172,10 +205,15 @@ INVERTER = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    P_TO_SET: [],
+    I_TO_SET: [("dc_current_in", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.98,
 }
 DC_BUS = {
     ID: "fastga_he.pt_component.dc_bus",
@@ -198,10 +236,15 @@ DC_BUS = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage"],
+    P_TO_SET: [],
+    I_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 1.0,
 }
 DC_LINE = {
     ID: "fastga_he.pt_component.dc_line",
@@ -224,10 +267,15 @@ DC_LINE = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    P_TO_SET: [],
+    I_TO_SET: [("dc_current_one_cable", "out")],  # Could really be "in" or "out" its the same value
     SFR: False,
     SWL: False,
     DST_W: [],
     PCT_W: [],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.98,
 }
 DC_DC_CONVERTER = {
     ID: "fastga_he.pt_component.dc_dc_converter",
@@ -255,10 +303,15 @@ DC_DC_CONVERTER = {
     SETS_V: True,
     IO_INDEP_V: True,
     V_TO_SET: [],  # It is a bit paradoxical but you cant set a setter's voltage :p
+    P_TO_SET: [("converter_relation.power_rel", "in")],
+    I_TO_SET: [("dc_current_in", "in"), ("dc_current_out", "out")],
     SFR: False,
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.98,
 }
 BATTERY_PACK = {
     ID: "fastga_he.pt_component.battery_pack",
@@ -289,10 +342,15 @@ BATTERY_PACK = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    P_TO_SET: [],
+    I_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: ["inside_the_wing"],
     PCT_W: ["wing_pod"],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: True,
+    ETA: 0.95,
 }
 DC_SSPC = {
     ID: "fastga_he.pt_component.dc_sspc",
@@ -320,10 +378,15 @@ DC_SSPC = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage_out"],
+    P_TO_SET: [("power_flow", "in")],
+    I_TO_SET: [("dc_current_in", "in")],
     SFR: False,
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.99,
 }
 DC_SPLITTER = {
     ID: "fastga_he.pt_component.dc_splitter",
@@ -346,10 +409,15 @@ DC_SPLITTER = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: ["dc_voltage", "dc_voltage_in_1", "dc_voltage_in_2"],
+    P_TO_SET: [],
+    I_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 1.0,
 }
 RECTIFIER = {
     ID: "fastga_he.pt_component.rectifier",
@@ -381,10 +449,15 @@ RECTIFIER = {
     SETS_V: True,
     IO_INDEP_V: True,
     V_TO_SET: [],
+    P_TO_SET: [("converter_relation.power_rel", "in")],
+    I_TO_SET: [("ac_current_rms_in_one_phase", "in"), ("dc_current_out", "out")],
     SFR: False,
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.98,
 }
 GENERATOR = {
     ID: "fastga_he.pt_component.generator",
@@ -419,10 +492,15 @@ GENERATOR = {
     SETS_V: True,
     IO_INDEP_V: False,
     V_TO_SET: ["ac_voltage_rms_out", "ac_voltage_peak_out"],
+    P_TO_SET: [("active_power", "out"), ("shaft_power_in", "in")],
+    I_TO_SET: [("ac_current_rms_out", "out")],
     SFR: False,
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.95,
 }
 ICE = {
     ID: "fastga_he.pt_component.internal_combustion_engine",
@@ -451,10 +529,15 @@ ICE = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
+    P_TO_SET: [],
+    I_TO_SET: [],
     SFR: False,
     SWL: False,
     DST_W: [],
     PCT_W: ["on_the_wing"],
+    VARIES_MASS: True,
+    VARIESN_T_MASS: False,
+    ETA: 0.4,
 }
 
 KNOWN_COMPONENTS = [
@@ -491,10 +574,15 @@ DICTIONARY_RSD = {}
 DICTIONARY_SETS_V = {}
 DICTIONARY_IO_INDEP_V = {}
 DICTIONARY_V_TO_SET = {}
+DICTIONARY_P_TO_SET = {}
+DICTIONARY_I_TO_SET = {}
 DICTIONARY_SFR = {}
 DICTIONARY_SWL = {}
 DICTIONARY_DST_W = {}
 DICTIONARY_PCT_W = {}
+DICTIONARY_VARIES_MASS = {}
+DICTIONARY_VARIESN_T_MASS = {}
+DICTIONARY_ETA = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
@@ -515,7 +603,12 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_SETS_V[known_component[ID]] = known_component[SETS_V]
     DICTIONARY_IO_INDEP_V[known_component[ID]] = known_component[IO_INDEP_V]
     DICTIONARY_V_TO_SET[known_component[ID]] = known_component[V_TO_SET]
+    DICTIONARY_P_TO_SET[known_component[ID]] = known_component[P_TO_SET]
+    DICTIONARY_I_TO_SET[known_component[ID]] = known_component[I_TO_SET]
     DICTIONARY_SFR[known_component[ID]] = known_component[SFR]
     DICTIONARY_SWL[known_component[ID]] = known_component[SWL]
     DICTIONARY_DST_W[known_component[ID]] = known_component[DST_W]
     DICTIONARY_PCT_W[known_component[ID]] = known_component[PCT_W]
+    DICTIONARY_VARIES_MASS[known_component[ID]] = known_component[VARIES_MASS]
+    DICTIONARY_VARIESN_T_MASS[known_component[ID]] = known_component[VARIESN_T_MASS]
+    DICTIONARY_ETA[known_component[ID]] = known_component[ETA]

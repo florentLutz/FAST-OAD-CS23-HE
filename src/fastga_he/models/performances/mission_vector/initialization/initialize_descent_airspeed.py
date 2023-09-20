@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 from scipy.constants import g
-from stdatm import Atmosphere
+from stdatm import AtmosphereWithPartials
 
 import fastoad.api as oad
 
@@ -19,6 +19,13 @@ from .constants import SUBMODEL_DESCENT_SPEED_VECT
 )
 class InitializeDescentAirspeed(om.ExplicitComponent):
     """Initializes the descent airspeed."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Contains the index of the different flight phases
+        self.vs1 = None
+        self.v_descent = None
 
     def initialize(self):
 
@@ -84,7 +91,7 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
         self.declare_partials(
             of="*",
             wrt="altitude",
-            method="fd",
+            method="exact",
             cols=np.array([number_of_points_climb + number_of_points_cruise]),
             rows=np.array([0]),
         )
@@ -107,11 +114,11 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
         cl_opt = inputs["data:aerodynamics:aircraft:cruise:optimal_CL"]
 
         mass_descent = mass[number_of_points_climb + number_of_points_cruise]
-        density_cruise = Atmosphere(altitude_cruise, altitude_in_feet=False).density
-        v_descent = np.sqrt((mass_descent * g) / (0.5 * density_cruise * wing_area * cl_opt))
-        vs1 = np.sqrt((mass_descent * g) / (0.5 * density_cruise * wing_area * cl_max_clean))
+        atm = AtmosphereWithPartials(altitude_cruise, altitude_in_feet=False)
+        self.v_descent = np.sqrt((mass_descent * g) / (0.5 * atm.density * wing_area * cl_opt))
+        self.vs1 = np.sqrt((mass_descent * g) / (0.5 * atm.density * wing_area * cl_max_clean))
 
-        v_eas_descent = max(v_descent, 1.3 * vs1)
+        v_eas_descent = max(self.v_descent, 1.3 * self.vs1)
 
         outputs["data:mission:sizing:main_route:descent:v_eas"] = v_eas_descent
 
@@ -131,15 +138,13 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
         cl_opt = inputs["data:aerodynamics:aircraft:cruise:optimal_CL"]
 
         mass_descent = mass[number_of_points_climb + number_of_points_cruise]
-        density_cruise = Atmosphere(altitude_cruise, altitude_in_feet=False).density
-
-        v_descent = np.sqrt((mass_descent * g) / (0.5 * density_cruise * wing_area * cl_opt))
-        vs1 = np.sqrt((mass_descent * g) / (0.5 * density_cruise * wing_area * cl_max_clean))
+        atm = AtmosphereWithPartials(altitude_cruise, altitude_in_feet=False)
+        density_cruise = atm.density
 
         mass_partials = np.full_like(mass, np.inf)
         mass_partials[number_of_points_climb + number_of_points_cruise] = mass_descent
 
-        if v_descent > 1.3 * vs1:
+        if self.v_descent > 1.3 * self.vs1:
 
             partials["data:mission:sizing:main_route:descent:v_eas", "mass"] = 0.5 * np.sqrt(
                 g / (0.5 * density_cruise * wing_area * cl_opt * mass_partials)
@@ -162,6 +167,12 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
                 "data:aerodynamics:wing:low_speed:CL_max_clean",
             ] = 0.0
 
+            partials["data:mission:sizing:main_route:descent:v_eas", "altitude"] = (
+                -0.5
+                * np.sqrt((mass_descent * g) / (0.5 * density_cruise ** 3.0 * wing_area * cl_opt))
+                * atm.partial_density_altitude
+            )
+
         else:
 
             partials["data:mission:sizing:main_route:descent:v_eas", "mass"] = 0.65 * np.sqrt(
@@ -183,4 +194,9 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
                 -0.65
                 * np.sqrt(mass_descent * g / (0.5 * density_cruise * wing_area))
                 * cl_max_clean ** (-3.0 / 2.0)
+            )
+            partials["data:mission:sizing:main_route:descent:v_eas", "altitude"] = -0.65 * np.sqrt(
+                (mass_descent * g)
+                / (0.5 * density_cruise ** 3.0 * wing_area * cl_max_clean)
+                * atm.partial_density_altitude
             )

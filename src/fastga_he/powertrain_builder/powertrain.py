@@ -21,6 +21,8 @@ from ruamel.yaml import YAML
 
 import networkx as nx
 
+from utils.format_to_array import format_to_array
+
 from .exceptions import (
     FASTGAHEUnknownComponentID,
     FASTGAHEUnknownOption,
@@ -50,6 +52,8 @@ PROMOTION_FROM_MISSION = {
     "true_airspeed": "m/s",
     "exterior_temperature": "degK",
 }
+
+DEFAULT_VOLTAGE_VALUE = 737.800
 
 
 class FASTGAHEPowerTrainConfigurator:
@@ -136,6 +140,19 @@ class FASTGAHEPowerTrainConfigurator:
         # computed as twice the weight of a half-wing
         self._components_symmetrical_pairs = None
 
+        # Contains the list of all boolean telling whether or not the components will make the
+        # aircraft weight vary during flight
+        self._components_makes_mass_vary = None
+
+        # Contains the list of all boolean telling whether or not the components are energy
+        # sources that do not make the aircraft vary (ergo they will have a non-nil unconsumable
+        # energy)
+        self._source_does_not_make_mass_vary = None
+
+        # Contains the list of an initial guess of the components efficiency. Is used to compute
+        # the initial of the currents and power of each component
+        self._components_efficiency = None
+
         # Because of their very peculiar role, we will scan the architecture for any SSPC defined
         # by the user and whether or not they are at the output of a bus, because a specific
         # option needs to be turned on in this was
@@ -150,6 +167,14 @@ class FASTGAHEPowerTrainConfigurator:
         # or check if a propulsor is not connected to a power source, in which case, we should not
         # be able to require thrust from him (will come later)
         self._connection_graph = None
+
+        # Contains the results of the function that sets the power in the graphs, is declared as
+        # an attribute to avoid having to recompute everything
+        self._power_at_each_node = None
+
+        # Contains the results of the function that sets the voltage in the graphs, is declared as
+        # an attribute to avoid having to recompute everything
+        self._voltage_at_each_node = None
 
         if power_train_file_path:
             self.load(power_train_file_path)
@@ -217,6 +242,9 @@ class FASTGAHEPowerTrainConfigurator:
         components_slipstream_needs_flaps = []
         components_slipstream_wing_lift = []
         components_symmetrical_pairs = []
+        components_makes_mass_vary = []
+        source_does_not_make_mass_vary = []
+        components_efficiency = []
 
         # Doing it like that allows us to have the names of the components before we start the
         # loop, which I'm gonna use to check if the pairs are valid
@@ -290,6 +318,9 @@ class FASTGAHEPowerTrainConfigurator:
             components_slipstream_perf_watchers_list.append(resources.DICTIONARY_SMP[component_id])
             components_slipstream_needs_flaps.append(resources.DICTIONARY_SFR[component_id])
             components_slipstream_wing_lift.append(resources.DICTIONARY_SWL[component_id])
+            components_makes_mass_vary.append(resources.DICTIONARY_VARIES_MASS[component_id])
+            source_does_not_make_mass_vary.append(resources.DICTIONARY_VARIESN_T_MASS[component_id])
+            components_efficiency.append(resources.DICTIONARY_ETA[component_id])
 
             if "options" in component.keys():
 
@@ -333,6 +364,9 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_slipstream_flaps = components_slipstream_needs_flaps
         self._components_slipstream_wing_lift = components_slipstream_wing_lift
         self._components_symmetrical_pairs = components_symmetrical_pairs
+        self._components_makes_mass_vary = components_makes_mass_vary
+        self._source_does_not_make_mass_vary = source_does_not_make_mass_vary
+        self._components_efficiency = components_efficiency
 
     def _get_connections(self):
         """
@@ -973,6 +1007,28 @@ class FASTGAHEPowerTrainConfigurator:
 
         return distributed_mass_names, distributed_mass_types, component_pairs
 
+    def will_aircraft_mass_vary(self):
+        """
+        This function returns a boolean telling whether or not there are components in the
+        powertrain that will make the aircraft mass vary during the flight (like burning fuel or
+        certain types of batteries). For now, will only be used in the initial guess.
+        """
+
+        self._get_components()
+
+        return any(self._components_makes_mass_vary)
+
+    def has_fuel_non_consumable_energy_source(self):
+        """
+        This function returns a boolean telling whether or not there are energy sources in the
+        powertrain that will not make the aircraft vary (like batteries). For now is only used to
+        provide smart initial guess.
+        """
+
+        self._get_components()
+
+        return any(self._source_does_not_make_mass_vary)
+
     def get_graphs_connected_voltage(self) -> list:
         """
         This function returns a list of graphs of connected PT components that have more or less
@@ -1142,28 +1198,31 @@ class FASTGAHEPowerTrainConfigurator:
         name_to_id = dict(zip(self._components_name, self._components_id))
 
         final_list = []
+        voltage_at_each_node = {}
 
         for sub_graph, sub_graph_voltage_setters in zip(sub_graphs, sub_graphs_voltage_setters):
             # First and foremost, we get the value that will serve as the for the setting of the
             # voltage in this subgraph. If there are not setters in this subgraph we just pass along
 
-            if not sub_graph_voltage_setters:
-                continue
-
             spl = dict(nx.all_pairs_shortest_path_length(sub_graph))
             voltage_dict_subgraph = {}
 
-            voltage_setter = sub_graph_voltage_setters[0]
-            clean_setter_name = voltage_setter.replace("_in", "").replace("_out", "")
-            setter_type = name_to_type[clean_setter_name]
-            input_name = (
-                PT_DATA_PREFIX
-                + setter_type
-                + ":"
-                + clean_setter_name
-                + ":voltage_out_target_mission"
-            )
-            reference_voltage = inputs[input_name]
+            if sub_graph_voltage_setters:
+                voltage_setter = sub_graph_voltage_setters[0]
+                clean_setter_name = voltage_setter.replace("_in", "").replace("_out", "")
+                setter_type = name_to_type[clean_setter_name]
+                input_name = (
+                    PT_DATA_PREFIX
+                    + setter_type
+                    + ":"
+                    + clean_setter_name
+                    + ":voltage_out_target_mission"
+                )
+                reference_voltage = inputs[input_name]
+            else:
+                # We need to use a fake value here, but, a priori, since there are no voltage
+                # setter there won't be any voltage to set so we can put anything there
+                reference_voltage = np.array([DEFAULT_VOLTAGE_VALUE])
 
             # We now transform it in the proper array
             if len(reference_voltage):
@@ -1186,9 +1245,435 @@ class FASTGAHEPowerTrainConfigurator:
                     variable_name = component_name + "." + voltage_to_set
                     voltage_dict_subgraph[variable_name] = reference_voltage
 
+                voltage_at_each_node[node] = reference_voltage
+
             final_list.append(voltage_dict_subgraph)
 
+        self._voltage_at_each_node = voltage_at_each_node
+
         return final_list
+
+    def get_independent_sub_propulsion_chain(self):
+        """
+        This function returns a list of graphs of connected PT sub propulsion chain. As a
+        prevision for next step all component will be split between their inputs and outputs to
+        allow to include efficiency.
+        """
+
+        # TODO: very similar to self.get_graphs_connected_voltage(), think of refactoring ?
+
+        self._get_components()
+        self._get_connections()
+
+        graph = nx.Graph()
+
+        for component_name, component_id in zip(self._components_name, self._components_id):
+            graph.add_node(
+                component_name + "_out",
+            )
+            graph.add_node(
+                component_name + "_in",
+            )
+
+            graph.add_edge(
+                component_name + "_out",
+                component_name + "_in",
+            )
+
+        for connection in self._connection_list:
+            # For bus and splitter, we don't really care about what number of input it is
+            # connected to so we do the following
+
+            if type(connection["source"]) is list:
+                source = connection["source"][0]
+            else:
+                source = connection["source"]
+
+            if type(connection["target"]) is list:
+                target = connection["target"][0]
+            else:
+                target = connection["target"]
+
+            graph.add_edge(
+                source + "_in",
+                target + "_out",
+            )
+
+        sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+
+        return sub_graphs
+
+    def get_power_on_each_node(self, graph, inputs, propulsive_power_dict) -> dict:
+        """
+        Returns a dictionary which will contain the power at each node of a graph based on the
+        propulsive power at its propulsor, on the assumed efficiencies of its components and the
+        value of power split on its splitter.
+        """
+
+        copied_graph = copy.deepcopy(graph)
+        name_to_id = dict(zip(self._components_name, self._components_id))
+        name_to_eta = dict(zip(self._components_name, self._components_efficiency))
+
+        # For each graph we attribute a priority to the nodes which is going to impose the order
+        # in which we make the computation. Propulsive loads will have the highest priority (0)
+        # and then each neighboring nodes will have the priority just below. Slight detail nodes
+        # with more than one neighbor will have a priority which will be slightly below the
+        # biggest priority among the neighbour. E.g:
+        # Node 1 (0) --- Node 2 (1) --- Node 3 (2) \
+        #                                           Node 6 (3)
+        #                Node 4 (0) --- Node 5 (1) /
+
+        propulsive_loads_proper_name = list(propulsive_power_dict.keys())
+
+        # So we start, for each propulsive load by exploring the branch until someone has more
+        # than two neighbor
+
+        nodes_with_power = {}
+
+        for propulsive_load_name in propulsive_loads_proper_name:
+            nodes_with_power[propulsive_load_name] = propulsive_power_dict[propulsive_load_name]
+
+        problematic_nodes = copy.deepcopy(propulsive_loads_proper_name)
+
+        while problematic_nodes:
+
+            problematic_nodes, copied_graph = self.set_priority_in_graph(
+                copied_graph, nodes_with_power, problematic_nodes
+            )
+
+            # At this point, we painted the priority as mush as we could but we have encountered
+            # some "problematic nodes" which we must dealt with. They can be of two types: buses
+            # (multiple outputs but one input) or splitter (one output but two inputs)
+
+            new_problematic_nodes = copy.deepcopy(problematic_nodes)
+
+            for problematic_node in problematic_nodes:
+                associated_component_name = problematic_node.replace("_in", "")
+                associated_component_name = associated_component_name.replace("_out", "")
+
+                associated_component_type = name_to_id[associated_component_name]
+
+                # If the associated component is a bus it means it has multiple outputs so we
+                # need to look for their priority take the highest among them and add 1
+                if associated_component_type == "fastga_he.pt_component.dc_bus":
+
+                    problematic_nodes_to_add = []
+
+                    power = 0
+                    for neighbor in graph.adj[problematic_node]:
+                        if neighbor in list(nodes_with_power.keys()):
+                            power += nodes_with_power[neighbor]
+
+                    nodes_with_power[problematic_node] = power
+
+                    # Then we add the bus inputs (there may be more than 1) in the list of
+                    # "problematic nodes" and we add their priority
+                    for neighbor in graph.adj[problematic_node]:
+                        if neighbor not in list(nodes_with_power.keys()):
+
+                            nodes_with_power[neighbor] = (
+                                power / name_to_eta[associated_component_name]
+                            )
+                            problematic_nodes_to_add.append(neighbor)
+
+                    # Then we add the input as a problematic node
+                    new_problematic_nodes.remove(problematic_node)
+                    new_problematic_nodes += problematic_nodes_to_add
+
+                # Should be a splitter
+                else:
+
+                    problematic_nodes_to_add = []
+
+                    # This node does not have a priority just yet, so we'll first need to take a look at it
+                    power = None
+
+                    for neighbor in graph.adj[problematic_node]:
+                        if neighbor in list(nodes_with_power.keys()):
+                            power = nodes_with_power[neighbor]
+
+                    for neighbor in graph.adj[problematic_node]:
+
+                        neighbor_counter = 1
+
+                        if neighbor not in list(nodes_with_power.keys()):
+                            # If we haven't treated the neighbor yet, it means its an input of the
+                            # splitter. We will add a fake input node and do the connection to
+                            # that neighbor. We should also take the opportunity to see whether
+                            # or not this is the splitter "priority" input
+
+                            # First we identify which input of the splitter in matches, first
+                            # find the name of the component
+                            neighbor_components_name = neighbor.replace("_in", "")
+                            neighbor_components_name = neighbor_components_name.replace("_out", "")
+
+                            # Then identify which current output it correspond to. Here if the
+                            # component in question is not an sspc, the following should work.
+                            # Else we will try both way
+
+                            output_name = neighbor_components_name + ".dc_current_out"
+                            if (
+                                name_to_id[neighbor_components_name]
+                                == "fastga_he.pt_component.dc_sspc"
+                            ):
+                                if output_name not in self._components_connection_outputs:
+                                    output_name = neighbor_components_name + ".dc_current_in"
+
+                            # We look at the number of the corresponding splitter input
+                            index = self._components_connection_outputs.index(output_name)
+                            splitter_input_name = self._components_connection_inputs[index]
+
+                            (
+                                primary_input_power,
+                                secondary_power_output,
+                            ) = self.splitter_power_inputs(
+                                inputs=inputs,
+                                components_name=associated_component_name,
+                                power_output=power,
+                            )
+
+                            # If it ends with a "1", its the priority input. We add the node as a
+                            # problematic node, we set its priority and we add the node to the
+                            # graph as well as the proper edge.
+                            if splitter_input_name[-1] == "1":
+                                node_name = associated_component_name + "_in_1"
+                                problematic_nodes_to_add.append(node_name)
+                                nodes_with_power[node_name] = primary_input_power
+
+                                copied_graph.add_edge(node_name, neighbor)
+
+                            else:
+                                node_name = (
+                                    associated_component_name + "_in_" + str(neighbor_counter + 1)
+                                )
+                                problematic_nodes_to_add.append(node_name)
+                                nodes_with_power[node_name] = secondary_power_output
+
+                                copied_graph.add_edge(node_name, neighbor)
+
+                                neighbor_counter += 1
+
+                    # Now we remove the splitter and instead add its two neighbor, which will
+                    # serve as new branch start
+
+                    new_problematic_nodes.remove(problematic_node)
+                    new_problematic_nodes += problematic_nodes_to_add
+
+                copied_graph.remove_node(problematic_node)
+
+            problematic_nodes = new_problematic_nodes
+
+        return nodes_with_power
+
+    def splitter_power_inputs(
+        self, inputs, components_name: str, power_output: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Computes the power at each input of the splitter, depending on the mode the power at the
+        output
+
+        :param inputs: OpenMDAO vector containing the value of inputs
+        :param components_name: the name of the splitter in question
+        :param power_output: the power at the output of the splitter
+        """
+
+        number_of_points = len(power_output)
+
+        # First we need to search what mode the splitter is in
+        name_to_option = dict(zip(self._components_name, self._components_options))
+
+        # Check that an option is declared, else it means it is in default mode which is
+        # percent_split
+        mode = "percent_split"
+        if name_to_option[components_name]:
+            if "splitter_mode" in list(name_to_option[components_name].keys()):
+                mode = name_to_option[components_name]["splitter_mode"]
+
+        if mode == "percent_split":
+            input_name = (
+                "data:propulsion:he_power_train:DC_splitter:" + components_name + ":power_split"
+            )
+            power_split = inputs[input_name]
+            power_split = format_to_array(power_split, number_of_points)
+
+            # Should be in %
+            primary_input = power_split * power_output / 100.0
+            secondary_output = (100.0 - power_split) * power_output / 100.0
+
+        else:
+
+            input_name = (
+                "data:propulsion:he_power_train:DC_splitter:" + components_name + ":power_share"
+            )
+            power_share = inputs[input_name]
+            power_share = format_to_array(power_share, number_of_points)
+
+            # Should be in W
+            primary_input = np.minimum(power_share, power_output)
+            secondary_output = power_output - primary_input
+
+        return primary_input, secondary_output
+
+    def set_priority_in_graph(
+        self, graph: nx.Graph, nodes_with_power: dict, starting_points_name: list
+    ) -> tuple:
+        """
+        Explore a graph and set the priority of its node base on the priority of the starting
+        points.
+        """
+
+        name_to_eta = dict(zip(self._components_name, self._components_efficiency))
+
+        problematic_nodes = []
+        another_copied_graph = copy.deepcopy(graph)
+        sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+
+        # First we must associate each starting point with its subgraphs (To prevent errors in
+        # case one subgraph has multiple starting points or there are multiple subgraphs in,
+        # each with one starting point)
+
+        ordered_sub_graphs = []
+
+        for starting_point in starting_points_name:
+            for subgraph in sub_graphs:
+                if subgraph.has_node(starting_point):
+                    ordered_sub_graphs.append(subgraph)
+                    continue
+
+        for starting_point, subgraph in zip(starting_points_name, ordered_sub_graphs):
+
+            current_node = starting_point
+
+            # The inputs of the end components (usually sources, are not really necessary,
+            # so we will start the number of explored nodes at 1. The other reason for that being
+            # that it crashes if I start at 0
+            node_explored = 1
+
+            initial_number_of_nodes = subgraph.number_of_nodes()
+            # We look at how many neighbor the current node has, and if it more than 2 we stop
+            # exploring :) Also we'll put a failsafe to avoid infinite while
+
+            while len(graph.adj[current_node]) <= 2 and node_explored < initial_number_of_nodes:
+
+                for adj_node in graph.adj[current_node]:
+
+                    # A previously explored neighbor
+                    if adj_node in list(nodes_with_power.keys()):
+
+                        # Here depending on whether we are going from a component's input to
+                        # output or from a component to the other, setting the power will be
+                        # different
+
+                        current_components_name = current_node.replace("_in", "")
+                        current_components_name = current_components_name.replace("_out", "")
+
+                        adj_components_name = adj_node.replace("_in", "")
+                        adj_components_name = adj_components_name.replace("_out", "")
+
+                        # if name is the same, we compute the power below base on the efficiency,
+                        # else its the same power, to refactor, we'll just say the efficiency is 1
+                        if current_components_name == adj_components_name:
+                            eta = name_to_eta[current_components_name]
+                        else:
+                            eta = 1.0
+
+                        nodes_with_power[current_node] = nodes_with_power[adj_node] / eta
+
+                    # Not a previously explored neighbor
+                    else:
+                        next_node = adj_node
+                        node_explored += 1
+
+                # When we are done with the node, we remove it :)
+                another_copied_graph.remove_node(current_node)
+
+                current_node = next_node
+
+            if len(graph.adj[current_node]) > 2 and current_node not in problematic_nodes:
+                problematic_nodes.append(current_node)
+
+        graph = another_copied_graph
+
+        return problematic_nodes, graph
+
+    def get_power_to_set(
+        self, inputs, propulsive_power_dict: dict
+    ) -> Tuple[List[dict], List[dict]]:
+        """
+        Returns a list of the power at each nodes of each subgraph. Also returns a list of the
+        dict of current variable names and the value they should be set at for each of the
+        subgraph. Dict will be empty if there is no power to set. The power to set are defined in
+        the registered_components.py file.
+
+        :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
+        voltages to check
+        :param propulsive_power_dict: dictionary with the propulsive power of each propulsor
+        """
+
+        # We rewrite the propulsive power dict to match the name of the nodes
+        propulsive_loads_name = list(propulsive_power_dict.keys())
+        propulsive_loads_proper_name = []
+        proper_propulsive_power_dict = {}
+
+        for propulsive_load_name in propulsive_loads_name:
+            propulsive_load_proper_name = propulsive_load_name + "_out"
+            propulsive_loads_proper_name.append(propulsive_load_name)
+            proper_propulsive_power_dict[propulsive_load_proper_name] = propulsive_power_dict[
+                propulsive_load_name
+            ]
+
+        power_in_each_subgraph = []
+        final_list = []
+        power_at_each_node = {}
+
+        # First step is to identify the independent sub-propulsion chain
+        sub_graphs = self.get_independent_sub_propulsion_chain()
+
+        # Need to be put here else the _get_component hasn't triggered yet
+        name_to_id = dict(zip(self._components_name, self._components_id))
+
+        # Then for each subgraph we get the power on each node
+        for sub_graph in sub_graphs:
+
+            power_dict_subgraph = {}
+
+            # First we reconstruct the right propulsive load dict to ensure that we only take the
+            # load we are interested in
+            propulsive_power_dict_this_subgraph = {}
+            for propulsive_load_name in list(proper_propulsive_power_dict.keys()):
+                if propulsive_load_name in sub_graph.nodes:
+                    propulsive_power_dict_this_subgraph[
+                        propulsive_load_name
+                    ] = proper_propulsive_power_dict[propulsive_load_name]
+
+            power_in_this_subgraph = self.get_power_on_each_node(
+                sub_graph, inputs, propulsive_power_dict_this_subgraph
+            )
+            power_in_each_subgraph.append(power_in_this_subgraph)
+
+            nodes_list = list(sub_graph.nodes)
+            for node in nodes_list:
+                component_name = node.replace("_in", "").replace("_out", "")
+                component_id = name_to_id[component_name]
+
+                power_to_set = resources.DICTIONARY_P_TO_SET[component_id]
+
+                for power in power_to_set:
+                    # These are tuple which contains the "in" or "out" tag plus the name of the variable
+                    if power[1] == "in" and node.endswith("_in"):
+                        variable_name = component_name + "." + power[0]
+                        power_dict_subgraph[variable_name] = power_in_this_subgraph[node]
+
+                    elif power[1] == "out" and node.endswith("_out"):
+                        variable_name = component_name + "." + power[0]
+                        power_dict_subgraph[variable_name] = power_in_this_subgraph[node]
+
+            final_list.append(power_dict_subgraph)
+            power_at_each_node = dict(power_at_each_node, **power_in_this_subgraph)
+
+        self._power_at_each_node = power_at_each_node
+
+        return power_in_each_subgraph, final_list
 
     def get_network_elements_list(self) -> tuple:
         """
@@ -1284,6 +1769,100 @@ class FASTGAHEPowerTrainConfigurator:
         simplified_serializer.write(pt_file_copy_path)
 
         return pt_file_copy_path
+
+    def get_current_to_set(
+        self, inputs, propulsive_power_dict: dict, number_of_points: int
+    ) -> dict:
+        """
+        Returns a list of the dict of current variable names and the value they should be set at
+        for each of the subgraph. Dict will be empty if there is no current to set. The current to
+        set are defined in the registered_components.py file.
+
+        :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
+        voltages to check
+        :param propulsive_power_dict: dictionary with the propulsive power of each propulsor
+        :param number_of_points: number of points in the data to check
+        """
+
+        # First we get voltage and power at each point but we first check that they are already
+        # registered to avoid redoing unnecessary operations
+        if not self._voltage_at_each_node:
+            _ = self.get_voltage_to_set(inputs, number_of_points)
+
+        if not self._power_at_each_node:
+            _, _ = self.get_power_to_set(inputs, propulsive_power_dict)
+
+        name_to_id = dict(zip(self._components_name, self._components_id))
+
+        all_voltage_dict = copy.deepcopy(self._voltage_at_each_node)
+        all_power_dict = copy.deepcopy(self._power_at_each_node)
+
+        # First step is to remove all the sources inputs from the voltage setter since they won't
+        # appear in the power setter
+        for source in self.get_energy_consumption_list():
+            source_input_name = source + "_in"
+            if source_input_name in all_voltage_dict:
+                all_voltage_dict.pop(source_input_name)
+
+        # Something worth mentioning here. Due to the way the power_at_each_node dict was
+        # constructed, the splitter inputs are doubled, whereas their current aren't, meaning the
+        # power_at_each_node dict will always be longer or at worst the same size. This is the
+        # one we will use to iterate on.
+
+        all_current_dict = {}
+
+        for node in all_power_dict:
+
+            # first a quick check on whether the component is a splitter or not. Since we are
+            # iterating on the nodes in the power dictionary, if a components ends with either
+            # "_in_1" or "_in_2" it is a splitter
+            component_name = (
+                node.replace("_in_1", "")
+                .replace("_in_2", "")
+                .replace("_in", "")
+                .replace("_out", "")
+            )
+            component_id = name_to_id[component_name]
+
+            current_to_set = resources.DICTIONARY_I_TO_SET[component_id]
+
+            for current in current_to_set:
+                # These are tuple which contains the "in" or "out" tag plus the name of the variable
+
+                # Some value have been filled with a default value for voltage because they are
+                # not set, by the code. Turns out some current might be computed base on them so,
+                # instead of using this default value we will use the value on the other side of
+                # the component. E.g for the input of a dc/dc converter we will take its outputs
+                # rather than an arbitrary value.
+                voltage_node = all_voltage_dict[node]
+
+                if all(voltage_node == DEFAULT_VOLTAGE_VALUE):
+                    if "_in" in node:
+                        other_side_component = node.replace("_in", "_out")
+                    else:
+                        other_side_component = node.replace("_out", "_in")
+                    voltage_node = all_voltage_dict[other_side_component]
+
+                # Some current correspond correspond to the current in one phase, in which case
+                # we need to divide by three the obtained current
+                if "one_phase" in current[0]:
+                    factor = 3.0
+                else:
+                    factor = 1.0
+
+                if current[1] == "in" and node.endswith("_in"):
+                    variable_name = component_name + "." + current[0]
+
+                    current = all_power_dict[node] / voltage_node / factor
+                    all_current_dict[variable_name] = current
+
+                elif current[1] == "out" and node.endswith("_out"):
+                    variable_name = component_name + "." + current[0]
+
+                    current = all_power_dict[node] / voltage_node / factor
+                    all_current_dict[variable_name] = current
+
+        return all_current_dict
 
 
 class _YAMLSerializer(ABC):

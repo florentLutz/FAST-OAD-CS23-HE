@@ -7,6 +7,8 @@ import os.path as pth
 
 import pytest
 
+import numpy as np
+
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -457,3 +459,338 @@ def test_bad_pair():
         e_info.value.args[0]
         == "Cannot pair propeller_1 with propeller_3 because propeller_3 does not exist. Valid pair choice are among the following list: propeller_1, propeller_2. \nBest regards."
     )
+
+
+def test_independent_subgraph():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_two_chainz.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    print("\n")
+    sub_graphs = power_train_configurator.get_independent_sub_propulsion_chain()
+
+    assert len(sub_graphs) == 2
+
+
+def test_mass_variation_identification():
+
+    # Mass should vary
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    assert power_train_configurator.will_aircraft_mass_vary()
+
+    # Mass shouldn't vary
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    assert not power_train_configurator.will_aircraft_mass_vary()
+
+
+def test_identification_unconsumable_source():
+
+    # Mass should vary but there also is an unconsumable energy source
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    assert power_train_configurator.will_aircraft_mass_vary()
+    assert power_train_configurator.has_fuel_non_consumable_energy_source()
+
+    # Mass shouldn't vary and there is an unconsumable energy source
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    assert not power_train_configurator.will_aircraft_mass_vary()
+    assert power_train_configurator.has_fuel_non_consumable_energy_source()
+
+    # Mass should vary and there is no unconsumable energy sources
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_full_turbo.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    assert power_train_configurator.will_aircraft_mass_vary()
+    assert not power_train_configurator.has_fuel_non_consumable_energy_source()
+
+
+def test_get_power_on_each_node():
+
+    # Very simple power train
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {"propeller_1": np.array([50e3])}
+
+    power_at_each_node = power_train_configurator.get_power_to_set(
+        inputs=None, propulsive_power_dict=propulsive_power_dict
+    )[0][0]
+
+    # Considering the components for the test, the efficiency should be equal to
+    # eta = 0.8 * 0.95 * 0.98 * 0.99 * 1.0 * 0.99 * 0.98 * 0.99 * 1.0 * 0.98 = 0.69406061887008
+    assert power_at_each_node["propeller_1_out"] / power_at_each_node[
+        "battery_pack_1_out"
+    ] == pytest.approx(0.694, abs=1e-3)
+
+    # With a splitter
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {"propeller_1": np.array([50e3])}
+
+    # Usually the inputs will be a OpenMDAO vector but for the sake of testing we can trick him
+    # to use a plain ol' dictionary
+    # Here the splitter is in power share mode so we have to give a power value
+    inputs = {
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_share": np.array([50e3])
+    }
+    power_at_each_node = power_train_configurator.get_power_to_set(
+        inputs=inputs, propulsive_power_dict=propulsive_power_dict
+    )[0][0]
+
+    # Since there is a splitter we will check that the two input are indeed created
+    assert "dc_splitter_1_in_1" in list(power_at_each_node.keys())
+    assert "dc_splitter_1_in_2" in list(power_at_each_node.keys())
+
+    # We will check that the power we set as power share goes in the right place
+    assert power_at_each_node["dc_splitter_1_in_1"] == pytest.approx(50e3, rel=1e-6)
+    # Also, since the propulsive power is equal to the power, considering efficiencies,
+    # the secondary input should not be empty
+    assert power_at_each_node["dc_splitter_1_in_2"] > 0
+
+    # Then we try with a bus with uniform input
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {
+        "propeller_1": np.array([25e3]),
+        "propeller_2": np.array([50e3]),
+        "propeller_3": np.array([25e3]),
+    }
+
+    power_at_each_node = power_train_configurator.get_power_to_set(
+        inputs=None, propulsive_power_dict=propulsive_power_dict
+    )[0][0]
+
+    # Same components so the branch efficiency should be the same, and since we put twice as much
+    # power in the middle branch the following should hold
+    assert power_at_each_node["dc_sspc_1_3_in"] == power_at_each_node["dc_sspc_3_3_in"]
+    assert power_at_each_node["dc_sspc_1_3_in"] * 2.0 == power_at_each_node["dc_sspc_2_3_in"]
+
+    assert (
+        power_at_each_node["dc_bus_4_out"]
+        == power_at_each_node["dc_sspc_1_3_in"]
+        + power_at_each_node["dc_sspc_2_3_in"]
+        + power_at_each_node["dc_sspc_3_3_in"]
+    )
+
+    # Then we try with a bus with a non-uniform input
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_shorter_nose.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {
+        "propeller_1": np.array([25e3]),
+        "propeller_2": np.array([50e3]),
+        "propeller_3": np.array([25e3]),
+    }
+
+    power_at_each_node = power_train_configurator.get_power_to_set(
+        inputs=None, propulsive_power_dict=propulsive_power_dict
+    )[0][0]
+
+    # Less components in the outer branch so better efficiency :)
+    assert power_at_each_node["dc_sspc_3_3_in"] == power_at_each_node["dc_sspc_1_3_in"]
+    assert (
+        power_at_each_node["propeller_3_out"] / power_at_each_node["dc_sspc_3_3_in"]
+        > power_at_each_node["propeller_2_out"] / power_at_each_node["dc_sspc_2_3_in"]
+    )
+
+    assert (
+        power_at_each_node["dc_bus_4_out"]
+        == power_at_each_node["dc_sspc_1_3_in"]
+        + power_at_each_node["dc_sspc_2_3_in"]
+        + power_at_each_node["dc_sspc_3_3_in"]
+    )
+
+    # Then we try with a bus and a splitter
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter_and_bus.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    # No mode defined in the
+    inputs = {
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_0:power_split": np.array([50.0])
+    }
+
+    power_at_each_node = power_train_configurator.get_power_to_set(
+        inputs=inputs, propulsive_power_dict=propulsive_power_dict
+    )[0][0]
+
+    # Assert that they exist and have the same value (since we have a 50% split)
+    assert power_at_each_node["battery_pack_2_out"] == power_at_each_node["battery_pack_1_out"]
+
+    # Assert that they are properly order
+
+    assert power_at_each_node["dc_bus_0_in"] < power_at_each_node["dc_splitter_0_out"]
+
+    # Test with multiple independent power train
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_two_chainz.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+    power_at_each_node = power_train_configurator.get_power_to_set(
+        inputs=None, propulsive_power_dict=propulsive_power_dict
+    )[0]
+
+    # Two independent subgraph
+    assert len(power_at_each_node) == 2
+
+    first_power_dict = power_at_each_node[0]
+    second_power_dict = power_at_each_node[1]
+
+    assert "propeller_1_out" in list(first_power_dict.keys())
+    assert "propeller_3_out" in list(first_power_dict.keys())
+
+    assert "propeller_2_out" in list(second_power_dict.keys())
+
+    # Efficiency in the first chain should be smaller than the second chain since there are more
+    # components
+    assert (
+        first_power_dict["propeller_3_out"] / first_power_dict["battery_pack_1_out"]
+        < second_power_dict["propeller_2_out"] / second_power_dict["battery_pack_2_out"]
+    )
+
+
+def test_power_to_set():
+
+    # Very simple power train
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {"propeller_1": np.array([50e3])}
+
+    powers_to_set = power_train_configurator.get_power_to_set(
+        inputs=None, propulsive_power_dict=propulsive_power_dict
+    )[1][0]
+
+    assert "propeller_1.shaft_power_in" in list(powers_to_set.keys())
+    assert "motor_1.active_power" in list(powers_to_set.keys())
+    assert "dc_sspc_1.power_flow" in list(powers_to_set.keys())
+    assert "dc_dc_converter_1.converter_relation.power_rel" in list(powers_to_set.keys())
+
+    assert powers_to_set["dc_sspc_1.power_flow"] == pytest.approx(67810.218, abs=1e-3)
+
+
+def test_current_to_set():
+    # Very simple power train
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {"propeller_1": np.array([50e3])}
+    inputs = {
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_out_target_mission": np.array(
+            [400.0]
+        )
+    }
+
+    current_to_set = power_train_configurator.get_current_to_set(
+        inputs=inputs, propulsive_power_dict=propulsive_power_dict, number_of_points=1
+    )
+
+    assert "motor_1.ac_current_rms_in" in current_to_set.keys()
+    assert "motor_1.ac_current_rms_in_one_phase" in current_to_set.keys()
+
+    assert (
+        current_to_set["motor_1.ac_current_rms_in"]
+        == 3.0 * current_to_set["motor_1.ac_current_rms_in_one_phase"]
+    )
+
+    assert "inverter_1.dc_current_in" in current_to_set.keys()
+
+    assert "dc_line_1.dc_current_one_cable" in current_to_set.keys()
+
+    assert "dc_dc_converter_1.dc_current_in" in current_to_set.keys()
+    assert "dc_dc_converter_1.dc_current_out" in current_to_set.keys()
+
+    assert "dc_sspc_1.dc_current_in" in current_to_set.keys()
+    assert "dc_sspc_2.dc_current_in" in current_to_set.keys()
+    assert "dc_sspc_3.dc_current_in" in current_to_set.keys()
+
+    # Then we try with a bus and a splitter
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter_and_bus.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    # No mode defined in the
+    inputs = {
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_0:power_split": np.array([50.0]),
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_out_target_mission": np.array(
+            [400.0]
+        ),
+    }
+
+    propulsive_power_dict = {
+        "propeller_1": np.array([25e3]),
+        "propeller_2": np.array([50e3]),
+        "propeller_3": np.array([25e3]),
+    }
+
+    current_to_set = power_train_configurator.get_current_to_set(
+        inputs=inputs, propulsive_power_dict=propulsive_power_dict, number_of_points=1
+    )
+
+    for current in list(current_to_set.keys()):
+        assert "dc_splitter_1" not in current

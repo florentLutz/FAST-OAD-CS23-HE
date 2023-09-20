@@ -24,6 +24,7 @@ model:
     number_of_points_reserve: 10
     power_train_file_path: two_fuel_propulsion.yml
     use_linesearch: False
+    pre_condition_pt: True
 
 submodels:
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file

@@ -6,6 +6,8 @@ import openmdao.api as om
 
 import fastoad.api as oad
 
+from utils.format_to_array import format_to_array
+
 from .perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from .perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from .perf_converter_relations import PerformancesConverterRelations
@@ -122,3 +124,22 @@ class PerformancesDCDCConverter(om.Group):
         self.connect("converter_relation.power_rel", "load_side.power")
         self.connect("dc_current_out", "converter_relation.dc_current_out")
         self.connect("converter_relation.voltage_out_rel", "generator_side.voltage_target")
+
+    def guess_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
+
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+        number_of_points = self.options["number_of_points"]
+
+        # One easy thing we can do is pre-read the value we will set as a target for the voltage
+        # and set it there
+
+        not_formatted_voltage = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":voltage_out_target_mission"
+        ]
+        formatted_voltage = format_to_array(not_formatted_voltage, number_of_points)
+
+        outputs["voltage_out_target.voltage_out_target"] = formatted_voltage

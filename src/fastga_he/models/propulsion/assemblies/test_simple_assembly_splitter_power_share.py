@@ -276,7 +276,7 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
             PowerTrainPerformancesFromFile(
                 power_train_file_path=pt_file_path,
                 number_of_points=NB_POINTS_TEST,
-                pre_condition_voltage=False,
+                pre_condition_pt=False,
             )
         ),
         __file__,
@@ -298,7 +298,7 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
         PowerTrainPerformancesFromFile(
             power_train_file_path=pt_file_path,
             number_of_points=NB_POINTS_TEST,
-            pre_condition_voltage=False,
+            pre_condition_pt=False,
         ),
         ivc,
     )
@@ -346,7 +346,7 @@ def test_incoherent_voltage():
         PowerTrainPerformancesFromFile(
             power_train_file_path=pt_file_path,
             number_of_points=NB_POINTS_TEST,
-            pre_condition_voltage=True,
+            pre_condition_pt=True,
         )
     )
     input_list.remove(
@@ -383,7 +383,7 @@ def test_incoherent_voltage():
         PowerTrainPerformancesFromFile(
             power_train_file_path=pt_file_path,
             number_of_points=NB_POINTS_TEST,
-            pre_condition_voltage=True,
+            pre_condition_pt=True,
         ),
         ivc_work,
     )
@@ -401,7 +401,7 @@ def test_incoherent_voltage():
             PowerTrainPerformancesFromFile(
                 power_train_file_path=pt_file_path,
                 number_of_points=NB_POINTS_TEST,
-                pre_condition_voltage=True,
+                pre_condition_pt=True,
             ),
             ivc_workn_t,
         )

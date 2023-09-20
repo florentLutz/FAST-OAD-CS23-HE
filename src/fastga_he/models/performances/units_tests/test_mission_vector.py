@@ -34,6 +34,9 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_alti
 from fastga_he.models.performances.mission_vector.initialization.initialize_density import (
     InitializeDensity,
 )
+from fastga_he.models.performances.mission_vector.initialization.initialize_temperature import (
+    InitializeTemperature,
+)
 from fastga_he.models.performances.mission_vector.initialization.initialize_climb_airspeed import (
     InitializeClimbAirspeed,
 )
@@ -45,6 +48,9 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_rese
 )
 from fastga_he.models.performances.mission_vector.initialization.initialize_airspeed import (
     InitializeAirspeed,
+)
+from fastga_he.models.performances.mission_vector.initialization.initialize_vertical_airspeed import (
+    InitializeVerticalAirspeed,
 )
 from fastga_he.models.performances.mission_vector.initialization.initialize_gamma import (
     InitializeGamma,
@@ -58,6 +64,11 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_time
 from fastga_he.models.performances.mission_vector.initialization.initialize_time_step import (
     InitializeTimeStep,
 )
+
+from fastga_he.models.performances.mission_vector.mission.performance_per_phase import (
+    PerformancePerPhase,
+)
+
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
 from fastga_he.models.propulsion.assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
@@ -226,6 +237,98 @@ def test_initialize_density():
     problem.check_partials(compact_print=True)
 
 
+def test_initialize_temperature():
+
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+
+    altitude = np.array(
+        [
+            0.0,
+            270.9,
+            541.9,
+            812.8,
+            1083.7,
+            1354.7,
+            1625.6,
+            1896.5,
+            2167.5,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            2438.4,
+            1828.8,
+            1219.2,
+            609.6,
+            0.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+        ]
+    )
+    ivc.add_output("altitude", units="m", val=altitude)
+
+    problem = run_system(
+        InitializeTemperature(
+            number_of_points_climb=10,
+            number_of_points_cruise=10,
+            number_of_points_descent=5,
+            number_of_points_reserve=5,
+        ),
+        ivc,
+    )
+
+    expected_temperature = np.array(
+        [
+            288.15,
+            286.38,
+            284.62,
+            282.86,
+            281.10,
+            279.34,
+            277.58,
+            275.82,
+            274.06,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            272.30,
+            276.26,
+            280.22,
+            284.18,
+            288.15,
+            281.65,
+            281.65,
+            281.65,
+            281.65,
+            281.65,
+        ]
+    )
+    assert problem.get_val("exterior_temperature", units="degK") == pytest.approx(
+        expected_temperature, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_climb_speed():
 
     # Research independent input value in .xml file
@@ -359,7 +462,7 @@ def test_reserve_speed():
     reserve_tas = problem.get_val("data:mission:sizing:main_route:reserve:v_tas", units="m/s")
     assert reserve_tas == pytest.approx(46.69, rel=1e-3)
 
-    problem.check_partials(compact_print=False)
+    problem.check_partials(compact_print=True)
 
 
 def test_initialize_airspeed():
@@ -376,7 +479,6 @@ def test_initialize_airspeed():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("mass", units="kg", val=np.full(30, 1700.0))
     ivc.add_output(
         "altitude",
         units="m",
@@ -705,12 +807,12 @@ def test_initialize_airspeed_derivatives():
     problem.check_partials(compact_print=True)
 
 
-def test_initialize_gamma():
+def test_initialize_vertical_airspeed():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
-            InitializeGamma(
+            InitializeVerticalAirspeed(
                 number_of_points_climb=10,
                 number_of_points_cruise=10,
                 number_of_points_descent=5,
@@ -755,6 +857,100 @@ def test_initialize_gamma():
                 1000.0,
                 1000.0,
                 1000.0,
+            ]
+        ),
+    )
+
+    problem = run_system(
+        InitializeVerticalAirspeed(
+            number_of_points_climb=10,
+            number_of_points_cruise=10,
+            number_of_points_descent=5,
+            number_of_points_reserve=5,
+        ),
+        ivc,
+    )
+
+    expected_vertical_speed = np.array(
+        [
+            6.096,
+            5.813,
+            5.531,
+            5.249,
+            4.967,
+            4.684,
+            4.402,
+            4.120,
+            3.838,
+            3.556,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -1.524,
+            -1.524,
+            -1.524,
+            -1.524,
+            -1.524,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ]
+    )
+    assert problem.get_val("vertical_speed", units="m/s") == pytest.approx(
+        expected_vertical_speed, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_initialize_gamma():
+
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "vertical_speed",
+        units="m/s",
+        val=np.array(
+            [
+                6.096,
+                5.813,
+                5.531,
+                5.249,
+                4.967,
+                4.684,
+                4.402,
+                4.120,
+                3.838,
+                3.556,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -1.524,
+                -1.524,
+                -1.524,
+                -1.524,
+                -1.524,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
             ]
         ),
     )
@@ -807,44 +1003,6 @@ def test_initialize_gamma():
         ivc,
     )
 
-    expected_vertical_speed = np.array(
-        [
-            6.096,
-            5.813,
-            5.531,
-            5.249,
-            4.967,
-            4.684,
-            4.402,
-            4.120,
-            3.838,
-            3.556,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            -1.524,
-            -1.524,
-            -1.524,
-            -1.524,
-            -1.524,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-        ]
-    )
-    assert (
-        np.max(np.abs(problem.get_val("vertical_speed", units="m/s") - expected_vertical_speed))
-        <= 1e-1
-    )
     expected_gamma = np.array(
         [
             0.1377,
@@ -879,7 +1037,7 @@ def test_initialize_gamma():
             0.0,
         ]
     )
-    assert np.max(np.abs(problem.get_val("gamma", units="rad") - expected_gamma)) <= 1e-1
+    assert problem.get_val("gamma", units="rad") == pytest.approx(expected_gamma, abs=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1253,6 +1411,134 @@ def test_initialize_cog():
     problem.check_partials(compact_print=True)
 
 
+def test_performances_per_phase():
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        name="time",
+        val=np.array(
+            [
+                0.0,
+                0.758,
+                1.554,
+                2.392,
+                3.276,
+                4.212,
+                5.205,
+                6.265,
+                7.4,
+                8.621,
+                11.018,
+                13.415,
+                15.812,
+                18.209,
+                20.606,
+                23.003,
+                25.4,
+                27.797,
+                30.194,
+                32.591,
+                34.988,
+                41.654,
+                48.321,
+                54.988,
+                61.654,
+                70.654,
+                79.654,
+                88.654,
+                97.654,
+                106.654,
+            ]
+        ),
+        units="min",
+    )
+    ivc.add_output(
+        name="position",
+        val=np.array(
+            [
+                0.0,
+                1.087,
+                2.245,
+                3.481,
+                4.804,
+                6.225,
+                7.754,
+                9.408,
+                11.206,
+                13.167,
+                19.559,
+                25.951,
+                32.342,
+                38.734,
+                45.126,
+                51.518,
+                57.91,
+                64.302,
+                70.694,
+                77.085,
+                83.477,
+                96.944,
+                110.011,
+                122.689,
+                134.989,
+                148.792,
+                162.595,
+                176.398,
+                190.2,
+                204.003,
+            ]
+        ),
+        units="nmi",
+    )
+    ivc.add_output(
+        name="fuel_consumed_t_econ",
+        val=np.linspace(1.0, 2.0, 32),
+        units="kg",
+    )
+    ivc.add_output(
+        name="non_consumable_energy_t_econ",
+        val=np.linspace(10.0, 25.0, 32),
+        units="W*h",
+    )
+    ivc.add_output(
+        name="thrust_rate_t_econ",
+        val=np.ones(32),
+    )
+
+    problem = run_system(
+        PerformancePerPhase(
+            number_of_points_climb=10,
+            number_of_points_cruise=10,
+            number_of_points_descent=5,
+            number_of_points_reserve=5,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:mission:sizing:main_route:climb:duration", units="min"
+    ) == pytest.approx(11.018, rel=1e-3)
+    assert problem.get_val(
+        "data:mission:sizing:main_route:cruise:duration", units="min"
+    ) == pytest.approx(23.97, rel=1e-3)
+    assert problem.get_val(
+        "data:mission:sizing:main_route:descent:duration", units="min"
+    ) == pytest.approx(35.666, rel=1e-3)
+
+    assert problem.get_val(
+        "data:mission:sizing:main_route:climb:distance", units="nmi"
+    ) == pytest.approx(19.559, rel=1e-3)
+    assert problem.get_val(
+        "data:mission:sizing:main_route:cruise:distance", units="nmi"
+    ) == pytest.approx(63.918, rel=1e-3)
+    assert problem.get_val(
+        "data:mission:sizing:main_route:descent:distance", units="nmi"
+    ) == pytest.approx(65.315, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_mission_vector():
 
     # Research independent input value in .xml file
@@ -1281,7 +1567,7 @@ def test_mission_vector():
         ivc,
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(45.57, abs=1e-2)
+    assert sizing_fuel == pytest.approx(45.60, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1527,7 +1813,7 @@ def test_mission_vector_from_yml_fuel_and_battery():
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.0575, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.129, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
