@@ -57,3 +57,8 @@ jobs:
         run: |
           poetry run pytest src/fastga_he/gui
         shell: bash
+
+      - name: Powertrain file test
+        run: |
+          poetry run pytest src/fastga_he/powertrain_builder
+        shell: bash
