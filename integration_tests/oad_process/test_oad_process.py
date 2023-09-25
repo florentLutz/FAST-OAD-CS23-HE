@@ -297,35 +297,35 @@ def test_read_case_recorder():
     multiplicative_factor = np.maximum(battery_pack_1_capa_mult, battery_pack_1_c_rate_mult)
     multiplicative_factor = np.clip(multiplicative_factor, 0.9, 1.0 / 0.9)
 
-    # scatter_number_of_battery_module = go.Scatter(
-    #     x=np.arange(1, 50),
-    #     y=battery_pack_1_modules_nb,
-    #     mode="lines+markers",
-    #     name="Number of battery modules",
-    # )
-    # fig.add_trace(scatter_number_of_battery_module)
-    # fig.update_layout(
-    #     title_text="Evolution of the number of battery module during the sizing process",
-    #     title_x=0.5,
-    #     xaxis_title="Number of modules [-]",
-    #     yaxis_title="Number of iteration [-]",
-    #     legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
-    # )
-
-    scatter_multiplicative_factor = go.Scatter(
+    scatter_number_of_battery_module = go.Scatter(
         x=np.arange(1, 50),
-        y=multiplicative_factor,
+        y=battery_pack_1_modules_nb,
         mode="lines+markers",
-        name="Multiplicative factor on the number of modules",
+        name="Number of battery modules",
     )
-    fig.add_trace(scatter_multiplicative_factor)
+    fig.add_trace(scatter_number_of_battery_module)
     fig.update_layout(
-        title_text="Evolution of the multiplicative factor on the number of modules",
+        title_text="Evolution of the number of battery module during the sizing process",
         title_x=0.5,
-        xaxis_title="Multiplicative factor [-]",
+        xaxis_title="Number of modules [-]",
         yaxis_title="Number of iteration [-]",
         legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
     )
+
+    # scatter_multiplicative_factor = go.Scatter(
+    #     x=np.arange(1, 50),
+    #     y=multiplicative_factor,
+    #     mode="lines+markers",
+    #     name="Multiplicative factor on the number of modules",
+    # )
+    # fig.add_trace(scatter_multiplicative_factor)
+    # fig.update_layout(
+    #     title_text="Evolution of the multiplicative factor on the number of modules",
+    #     title_x=0.5,
+    #     xaxis_title="Multiplicative factor [-]",
+    #     yaxis_title="Number of iteration [-]",
+    #     legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
+    # )
 
     fig.show()
 
