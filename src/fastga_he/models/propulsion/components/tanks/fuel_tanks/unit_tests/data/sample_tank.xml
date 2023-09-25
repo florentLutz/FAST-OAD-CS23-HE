@@ -8,6 +8,7 @@
                             <y_ratio_start>0.4</y_ratio_start>
                             <y_ratio_end>0.8</y_ratio_end>
                         </CG>
+                        <fuel_consumed_mission units="kg">140.0</fuel_consumed_mission>
                     </fuel_tank_1>
                 </fuel_tank>
             </he_power_train>
