@@ -6,9 +6,13 @@
                     <fuel_tank_1>
                         <CG>
                             <y_ratio_start>0.4</y_ratio_start>
-                            <y_ratio_end>0.8</y_ratio_end>
                         </CG>
                         <fuel_consumed_mission units="kg">140.0</fuel_consumed_mission>
+                        <unusable_fuel_mission units="kg">1.4</unusable_fuel_mission>
+                        <fuel_total_mission units="kg">141.4</fuel_total_mission>
+                        <capacity units="kg">282.8</capacity>
+                        <volume units="L">393.0</volume>
+                        <fuel_type>1.0</fuel_type>
                     </fuel_tank_1>
                 </fuel_tank>
             </he_power_train>

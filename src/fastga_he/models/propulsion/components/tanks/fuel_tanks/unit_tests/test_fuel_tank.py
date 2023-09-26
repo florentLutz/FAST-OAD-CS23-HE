@@ -7,6 +7,13 @@ import openmdao.api as om
 import pytest
 import numpy as np
 
+from ..components.sizing_tank_unusable_fuel import SizingFuelTankUnusableFuel
+from ..components.sizing_tank_total_fuel_mission import SizingFuelTankTotalFuelMission
+from ..components.sizing_tank_volume import SizingFuelTankVolume
+
+from ..components.cstr_enforce import ConstraintsFuelTankCapacityEnforce
+from ..components.cstr_ensure import ConstraintsFuelTankCapacityEnsure
+
 from ..components.perf_fuel_mission_consumed import PerformancesFuelConsumedMission
 from ..components.perf_fuel_remaining import PerformancesFuelRemainingMission
 
@@ -18,6 +25,111 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "sample_tank.xml"
 NB_POINTS_TEST = 10
+
+
+def test_unusable_fuel_mission():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingFuelTankUnusableFuel(fuel_tank_id="fuel_tank_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingFuelTankUnusableFuel(fuel_tank_id="fuel_tank_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:unusable_fuel_mission", units="kg"
+    ) == pytest.approx(1.4, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_total_fuel_mission():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingFuelTankTotalFuelMission(fuel_tank_id="fuel_tank_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingFuelTankTotalFuelMission(fuel_tank_id="fuel_tank_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_total_mission", units="kg"
+    ) == pytest.approx(141.4, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_volume_fuel_tank():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingFuelTankVolume(fuel_tank_id="fuel_tank_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingFuelTankVolume(fuel_tank_id="fuel_tank_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:volume", units="L"
+    ) == pytest.approx(393.4, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_enforce_tank_capacity():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsFuelTankCapacityEnforce(fuel_tank_id="fuel_tank_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        ConstraintsFuelTankCapacityEnforce(fuel_tank_id="fuel_tank_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:capacity", units="kg"
+    ) == pytest.approx(141.4, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure_tank_capacity():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsFuelTankCapacityEnsure(fuel_tank_id="fuel_tank_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        ConstraintsFuelTankCapacityEnsure(fuel_tank_id="fuel_tank_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:fuel_tank:fuel_tank_1:capacity", units="kg"
+    ) == pytest.approx(-141.4, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_fuel_consumed_mission():
