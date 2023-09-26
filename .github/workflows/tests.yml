@@ -40,25 +40,25 @@ jobs:
 
       - name: Component unit tests
         run: |
-          poetry run pytest src/fastga_he/models/propulsion/components
+          poetry run pytest --no-cov src/fastga_he/models/propulsion/components
         shell: bash
 
       - name: Assembly unit tests
         run: |
-          poetry run pytest src/fastga_he/models/propulsion/assemblies
+          poetry run pytest --no-cov src/fastga_he/models/propulsion/assemblies
         shell: bash
 
       - name: Mission unit tests
         run: |
-          poetry run pytest src/fastga_he/models/performances
+          poetry run pytest --no-cov src/fastga_he/models/performances
         shell: bash
 
       - name: GUI unit tests
         run: |
-          poetry run pytest src/fastga_he/gui
+          poetry run pytest --no-cov src/fastga_he/gui
         shell: bash
 
       - name: Powertrain file test
         run: |
-          poetry run pytest src/fastga_he/powertrain_builder
+          poetry run pytest --no-cov src/fastga_he/powertrain_builder
         shell: bash
