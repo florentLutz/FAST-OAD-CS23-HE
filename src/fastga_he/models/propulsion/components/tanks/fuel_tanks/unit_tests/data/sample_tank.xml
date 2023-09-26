@@ -12,6 +12,7 @@
                 <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
             </fuselage>
             <wing>
+                <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
                 <thickness_ratio>0.15</thickness_ratio>
                 <span units="m" is_input="False">9.237463382822208<!--wing span--></span>
                 <MAC>
@@ -50,6 +51,7 @@
                             <ref_chord units="m">0.946</ref_chord>
                             <length units="m">0.467</length>
                             <height units="m">0.127</height>
+                            <width units="m">0.127</width>
                         </dimension>
                     </fuel_tank_1>
                 </fuel_tank>

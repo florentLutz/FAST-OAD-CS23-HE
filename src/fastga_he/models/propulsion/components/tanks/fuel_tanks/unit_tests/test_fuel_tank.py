@@ -15,6 +15,8 @@ from ..components.sizing_tank_cg_y import SizingFuelTankCGY
 from ..components.sizing_tank_length import SizingFuelTankLength
 from ..components.sizing_tank_height import SizingFuelTankHeight
 from ..components.sizing_tank_width import SizingFuelTankWidth
+from ..components.sizing_tank_weight import SizingFuelTankWeight
+from ..components.sizing_tank_drag import SizingFuelTankDrag
 
 from ..components.cstr_enforce import ConstraintsFuelTankCapacityEnforce
 from ..components.cstr_ensure import ConstraintsFuelTankCapacityEnsure
@@ -22,7 +24,8 @@ from ..components.cstr_ensure import ConstraintsFuelTankCapacityEnsure
 from ..components.perf_fuel_mission_consumed import PerformancesFuelConsumedMission
 from ..components.perf_fuel_remaining import PerformancesFuelRemainingMission
 
-from ..components.perf_fuel_tanks import PerformancesFuelTank
+from ..components.sizing_tank import SizingFuelTank
+from ..components.perf_fuel_tank import PerformancesFuelTank
 
 from ..constants import POSSIBLE_POSITION
 
@@ -216,6 +219,100 @@ def test_tank_width():
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:dimension:width", units="m"
     ) == pytest.approx(6.62, rel=1e-2)
+
+    problem.check_partials(compact_print=True, step=1e-7)
+
+
+def test_fuel_tank_weight():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingFuelTankWeight(fuel_tank_id="fuel_tank_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingFuelTankWeight(fuel_tank_id="fuel_tank_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:mass", units="kg"
+    ) == pytest.approx(1.4, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_fuel_tank_drag():
+
+    expected_ls_drag = [0.0, 0.000178, 0.0]
+    expected_cruise_drag = [0.0, 0.000178, 0.0]
+
+    for option, ls_drag, cruise_drag in zip(
+        POSSIBLE_POSITION, expected_ls_drag, expected_cruise_drag
+    ):
+        # Research independent input value in .xml file
+        for ls_option in [True, False]:
+            ivc = get_indep_var_comp(
+                list_inputs(
+                    SizingFuelTankDrag(
+                        fuel_tank_id="fuel_tank_1", position=option, low_speed_aero=ls_option
+                    )
+                ),
+                __file__,
+                XML_FILE,
+            )
+
+            # Run problem and check obtained value(s) is/(are) correct
+            problem = run_system(
+                SizingFuelTankDrag(
+                    fuel_tank_id="fuel_tank_1", position=option, low_speed_aero=ls_option
+                ),
+                ivc,
+            )
+
+            if ls_option:
+                assert (
+                    problem.get_val(
+                        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:low_speed:CD0",
+                    )
+                    == pytest.approx(ls_drag, rel=1e-2)
+                )
+            else:
+                assert (
+                    problem.get_val(
+                        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:cruise:CD0",
+                    )
+                    == pytest.approx(cruise_drag, rel=1e-2)
+                )
+
+            problem.check_partials(compact_print=True)
+
+
+def test_sizing_tank():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingFuelTank(fuel_tank_id="fuel_tank_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingFuelTank(fuel_tank_id="fuel_tank_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:mass", units="kg"
+    ) == pytest.approx(1.4, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:cruise:CD0"
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:dimension:width", units="m"
+    ) == pytest.approx(3.33, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
 
