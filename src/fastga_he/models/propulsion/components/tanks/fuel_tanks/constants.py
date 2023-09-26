@@ -4,4 +4,4 @@
 
 SUBMODEL_CONSTRAINTS_FUEL_TANK_CAPACITY = "submodel.propulsion.constraints.fuel_tank.capacity"
 
-POSSIBLE_POSITION = ["in_the_wing", "wing_pod", "in_the_fuselage"]
+POSSIBLE_POSITION = ["inside_the_wing", "wing_pod", "in_the_fuselage"]
