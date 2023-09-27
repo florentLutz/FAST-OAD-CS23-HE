@@ -107,6 +107,13 @@ def test_assembly_performances_splitter_50_50():
         np.array([4.07, 4.09, 4.1, 4.11, 4.12, 4.13, 4.14, 4.15, 4.16, 4.17]),
         abs=1e-2,
     )
+    # Only one input and one output to the system so input and output should be equal
+    assert problem.get_val(
+        "performances.fuel_system_1.fuel_consumed_in_t_1", units="kg"
+    ) == pytest.approx(
+        problem.get_val("performances.ice_1.fuel_consumed_t", units="kg"),
+        abs=1e-2,
+    )
     assert problem.get_val(
         "performances.fuel_tank_1.fuel_remaining_t", units="kg"
     ) == pytest.approx(
@@ -215,6 +222,13 @@ def test_assembly_performances_splitter_60_40():
         np.array([3.52, 3.54, 3.55, 3.57, 3.59, 3.6, 3.62, 3.63, 3.65, 3.67]),
         abs=1e-2,
     )
+    # Only one input and one output to the system so input and output should be equal
+    assert problem.get_val(
+        "performances.fuel_system_1.fuel_consumed_in_t_1", units="kg"
+    ) == pytest.approx(
+        problem.get_val("performances.ice_1.fuel_consumed_t", units="kg"),
+        abs=1e-2,
+    )
     assert problem.get_val(
         "performances.fuel_tank_1.fuel_remaining_t", units="kg"
     ) == pytest.approx(
@@ -302,6 +316,13 @@ def test_assembly_performances_splitter_100_0():
 
     assert voltage_out == pytest.approx(voltage_in_2, rel=5e-3)
 
+    # Only one input and one output to the system so input and output should be equal
+    assert problem.get_val(
+        "performances.fuel_system_1.fuel_consumed_in_t_1", units="kg"
+    ) == pytest.approx(
+        problem.get_val("performances.ice_1.fuel_consumed_t", units="kg"),
+        abs=1e-2,
+    )
     # No fuel is used, so no fuel is loaded so there is no fuel remaining
     assert problem.get_val(
         "performances.fuel_tank_1.fuel_remaining_t", units="kg"
@@ -369,6 +390,13 @@ def test_assembly_performances_splitter_100_0_only_part():
 
     assert voltage_out == pytest.approx(voltage_in_2, rel=5e-3)
 
+    # Only one input and one output to the system so input and output should be equal
+    assert problem.get_val(
+        "performances.fuel_system_1.fuel_consumed_in_t_1", units="kg"
+    ) == pytest.approx(
+        problem.get_val("performances.ice_1.fuel_consumed_t", units="kg"),
+        abs=1e-2,
+    )
     assert problem.get_val(
         "performances.fuel_tank_1.fuel_remaining_t", units="kg"
     ) == pytest.approx(

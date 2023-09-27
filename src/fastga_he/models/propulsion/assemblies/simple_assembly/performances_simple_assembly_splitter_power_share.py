@@ -17,6 +17,7 @@ from ...components.connectors.rectifier import PerformancesRectifier
 from ...components.source.generator import PerformancesGenerator
 from ...components.source.ice import PerformancesICE
 from ...components.tanks.fuel_tanks import PerformancesFuelTank
+from ...components.connectors.fuel_system import PerformancesFuelSystem
 
 
 class PerformancesAssemblySplitterPowerShare(om.Group):
@@ -132,6 +133,16 @@ class PerformancesAssemblySplitterPowerShare(om.Group):
             promotes=["data:*", "time_step", "density"],
         )
         self.add_subsystem(
+            "fuel_system_1",
+            PerformancesFuelSystem(
+                fuel_system_id="fuel_system_1",
+                number_of_points=number_of_points,
+                number_of_inputs=1,
+                number_of_outputs=1,
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
             "fuel_tank_1",
             PerformancesFuelTank(
                 fuel_tank_id="fuel_tank_1",
@@ -215,4 +226,6 @@ class PerformancesAssemblySplitterPowerShare(om.Group):
         self.connect("battery_pack_1.voltage_out", "dc_dc_converter_1.dc_voltage_in")
         self.connect("dc_dc_converter_1.dc_current_in", "battery_pack_1.dc_current_out")
 
-        self.connect("ice_1.fuel_consumed_t", "fuel_tank_1.fuel_consumed_t")
+        self.connect("ice_1.fuel_consumed_t", "fuel_system_1.fuel_consumed_out_t_1")
+
+        self.connect("fuel_system_1.fuel_consumed_in_t_1", "fuel_tank_1.fuel_consumed_t")
