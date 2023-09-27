@@ -47,7 +47,7 @@ class SizingFuelTankWidth(om.ExplicitComponent):
 
         self.add_output(
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:width",
-            val=np.nan,
+            val=1.0,
             units="m",
             desc="Value of the length of the tank in the y-direction, computed differently based "
             "on the location of the tank",
