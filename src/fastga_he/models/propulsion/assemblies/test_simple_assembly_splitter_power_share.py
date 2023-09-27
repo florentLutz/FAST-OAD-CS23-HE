@@ -97,7 +97,27 @@ def test_assembly_performances_splitter_150_kw():
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([5.6, 5.6, 5.6, 5.6, 5.6, 5.6, 5.6, 5.6, 5.6, 5.6]),
+        np.full(NB_POINTS_TEST, 5.53),
+        abs=1e-2,
+    )
+
+    assert problem.get_val(
+        "performances.fuel_tank_1.fuel_remaining_t", units="kg"
+    ) == pytest.approx(
+        np.array(
+            [
+                55.31,
+                49.78,
+                44.25,
+                38.72,
+                33.18,
+                27.65,
+                22.12,
+                16.59,
+                11.06,
+                5.531,
+            ]
+        ),
         abs=1e-2,
     )
 
@@ -172,8 +192,33 @@ def test_assembly_performances_splitter_150_kw_low_requirement():
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.72, 3.73, 3.74, 3.75, 3.76, 3.77, 3.78, 3.79, 3.8, 3.81]),
+        np.array([3.704, 3.714, 3.724, 3.734, 3.744, 3.754, 3.763, 3.773, 3.782, 3.791]),
         abs=1e-2,
+    )
+
+    assert problem.get_val(
+        "performances.fuel_tank_1.fuel_remaining_t", units="kg"
+    ) == pytest.approx(
+        np.array(
+            [
+                37.48,
+                33.78,
+                30.06,
+                26.34,
+                22.60,
+                18.86,
+                15.11,
+                11.34,
+                7.573,
+                3.791,
+            ]
+        ),
+        abs=1e-2,
+    )
+
+    write_outputs(
+        pth.join(outputs.__path__[0], "assembly_performances_splitter_power_share_low_req.xml"),
+        problem,
     )
 
     problem.check_partials(compact_print=True)
@@ -242,7 +287,26 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.49, 3.9, 4.22, 4.59, 5.03, 5.57, 5.6, 5.6, 5.6, 5.6]),
+        np.array([3.47, 3.88, 4.2, 4.56, 4.99, 5.51, 5.53, 5.53, 5.53, 5.53]),
+        abs=1e-2,
+    )
+    assert problem.get_val(
+        "performances.fuel_tank_1.fuel_remaining_t", units="kg"
+    ) == pytest.approx(
+        np.array(
+            [
+                48.72,
+                45.25,
+                41.37,
+                37.17,
+                32.61,
+                27.63,
+                22.12,
+                16.59,
+                11.06,
+                5.531,
+            ]
+        ),
         abs=1e-2,
     )
     assert problem.get_val(
@@ -322,7 +386,7 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
     )
 
     assert problem.get_val("component.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.49, 3.9, 4.22, 4.59, 5.03, 5.57, 5.6, 5.6, 5.6, 5.6]),
+        np.array([3.47, 3.88, 4.2, 4.56, 4.99, 5.51, 5.53, 5.53, 5.53, 5.53]),
         abs=1e-2,
     )
     assert problem.get_val(

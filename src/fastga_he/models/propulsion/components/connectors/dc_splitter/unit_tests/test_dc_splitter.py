@@ -1,6 +1,7 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
+import copy
 
 import openmdao.api as om
 import pytest
@@ -17,6 +18,7 @@ from ..components.sizing_dc_splitter_cg_x import SizingDCSplitterCGX
 from ..components.sizing_dc_splitter_cg_y import SizingDCSplitterCGY
 from ..components.perf_mission_power_split import PerformancesMissionPowerSplit
 from ..components.perf_mission_power_share import PerformancesMissionPowerShare
+from ..components.perf_percent_split_equivalent import PerformancesPercentSplitEquivalent
 from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
@@ -340,6 +342,61 @@ def test_perf_power_share_formatting():
     assert power_split_output == pytest.approx(power_split_array, rel=1e-4)
 
     problem.check_partials(compact_print=True)
+
+
+def test_percent_split_equivalent():
+
+    ivc_orig = om.IndepVarComp()
+    ivc_orig.add_output("dc_current_out", val=np.full(NB_POINTS_TEST, 500), units="A")
+    ivc_orig.add_output("dc_voltage", val=np.full(NB_POINTS_TEST, 500), units="V")
+
+    # The requirement for the primary branch is below the output
+    ivc_low_req = copy.deepcopy(ivc_orig)
+    ivc_low_req.add_output("power_share", val=np.full(NB_POINTS_TEST, 200), units="kW")
+
+    problem_low_req = run_system(
+        PerformancesPercentSplitEquivalent(number_of_points=NB_POINTS_TEST),
+        ivc_low_req,
+    )
+
+    assert problem_low_req.get_val("power_split", units="percent") == pytest.approx(
+        np.full(NB_POINTS_TEST, 80.0), rel=1e-4
+    )
+
+    problem_low_req.check_partials(compact_print=True)
+
+    # The requirement for the primary branch is above the output
+    ivc_high_req = copy.deepcopy(ivc_orig)
+    ivc_high_req.add_output("power_share", val=np.full(NB_POINTS_TEST, 300), units="kW")
+
+    problem_high_req = run_system(
+        PerformancesPercentSplitEquivalent(number_of_points=NB_POINTS_TEST),
+        ivc_high_req,
+    )
+
+    assert problem_high_req.get_val("power_split", units="percent") == pytest.approx(
+        np.full(NB_POINTS_TEST, 100.0), rel=1e-4
+    )
+
+    problem_high_req.check_partials(compact_print=True)
+
+    # The requirement for the primary branch is above the output
+    ivc_low_to_high_req = copy.deepcopy(ivc_orig)
+    ivc_low_to_high_req.add_output(
+        "power_share", val=np.linspace(200, 300, NB_POINTS_TEST), units="kW"
+    )
+
+    problem_low_to_high_req = run_system(
+        PerformancesPercentSplitEquivalent(number_of_points=NB_POINTS_TEST),
+        ivc_low_to_high_req,
+    )
+
+    assert problem_low_to_high_req.get_val("power_split", units="percent") == pytest.approx(
+        np.array([80.0, 84.444, 88.888, 93.333, 97.777, 100.0, 100.0, 100.0, 100.0, 100.0]),
+        rel=1e-4,
+    )
+
+    problem_low_to_high_req.check_partials(compact_print=True)
 
 
 def test_perf_maximum():

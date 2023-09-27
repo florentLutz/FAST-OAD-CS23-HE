@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 from ...components.loads.pmsm import PerformancesPMSM
 from ...components.propulsor.propeller import PerformancesPropeller
@@ -17,6 +16,7 @@ from ...components.source.battery import PerformancesBatteryPack
 from ...components.connectors.rectifier import PerformancesRectifier
 from ...components.source.generator import PerformancesGenerator
 from ...components.source.ice import PerformancesICE
+from ...components.tanks.fuel_tanks import PerformancesFuelTank
 
 
 class PerformancesAssemblySplitter(om.Group):
@@ -130,6 +130,14 @@ class PerformancesAssemblySplitter(om.Group):
             ),
             promotes=["data:*", "time_step", "density"],
         )
+        self.add_subsystem(
+            "fuel_tank_1",
+            PerformancesFuelTank(
+                fuel_tank_id="fuel_tank_1",
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*"],
+        )
 
         self.add_subsystem(
             "dc_sspc_412",
@@ -205,3 +213,5 @@ class PerformancesAssemblySplitter(om.Group):
 
         self.connect("generator_1.rpm", "ice_1.rpm")
         self.connect("generator_1.shaft_power_in", "ice_1.shaft_power_out")
+
+        self.connect("ice_1.fuel_consumed_t", "fuel_tank_1.fuel_consumed_t")
