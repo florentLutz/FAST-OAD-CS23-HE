@@ -25,6 +25,7 @@ from fastga_he.models.propulsion.components import (
     SlipstreamRectifier,
     SlipstreamGenerator,
     SlipstreamICE,
+    SlipstreamFuelTank,
 )
 
 from tests.testing_utilities import VariableListLocal

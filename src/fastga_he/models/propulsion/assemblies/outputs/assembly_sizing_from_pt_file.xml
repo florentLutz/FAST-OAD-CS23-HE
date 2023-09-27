@@ -22,6 +22,7 @@
         <length units="m" is_input="True">1.477417183742213<!--cabin length--></length>
       </cabin>
       <flap>
+        <chord_ratio is_input="True">0.2<!--flap chord as a percentage of the wing chord--></chord_ratio>
         <span_ratio is_input="True">0.45<!--flap span as a percentage of the wing span--></span_ratio>
       </flap>
       <fuselage>
@@ -30,6 +31,7 @@
       <wing>
         <area units="m**2" is_input="True">7.105673586278243<!--wing area--></area>
         <span units="m" is_input="True">9.237463382822208<!--wing span--></span>
+        <thickness_ratio is_input="True">0.15<!--mean thickness ratio of wing--></thickness_ratio>
         <MAC>
           <length units="m" is_input="True">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
           <at25percent>
@@ -46,9 +48,9 @@
     </geometry>
     <propulsion>
       <he_power_train>
-        <mass units="kg" is_input="False">2308.8744286705382</mass>
+        <mass units="kg" is_input="False">2309.2868286705384</mass>
         <CG>
-          <x units="m" is_input="False">2.83477206969471</x>
+          <x units="m" is_input="False">2.834780979612835</x>
         </CG>
         <cruise>
           <CD0 is_input="False">0.0056121861665163735</CD0>
@@ -553,6 +555,34 @@
             <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
           </battery_pack_1cell>
         </battery_pack>
+        <fuel_tank>
+          <fuel_tank_1>
+            <capacity units="kg" is_input="False">41.6524<!--Capacity of the tank in terms of weight--></capacity>
+            <fuel_consumed_mission units="kg" is_input="True">41.24<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
+            <fuel_total_mission units="kg" is_input="False">41.6524<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
+            <fuel_type is_input="True">1.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <mass units="kg" is_input="False">0.41240000000000004<!--Weight of the fuel tanks--></mass>
+            <unusable_fuel_mission units="kg" is_input="False">0.41240000000000004<!--Amount of trapped fuel in the tank--></unusable_fuel_mission>
+            <volume units="m**3" is_input="False">0.05793907358464321<!--Capacity of the tank in terms of volume--></volume>
+            <CG>
+              <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
+              <y units="m" is_input="False">1.8474926765644417<!--Y position of the fuel tank center of gravity--></y>
+              <y_ratio is_input="True">0.4<!--X position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <dimension>
+              <height units="m" is_input="False">0.12617910808386587<!--Value of the length of the tank in the z-direction, computed differently based on the location of the tank--></height>
+              <length units="m" is_input="False">0.7009950449103659<!--Value of the length of the tank in the x-direction, computed differently based on the location of the tank--></length>
+              <ref_chord units="m" is_input="False">0.934660059880488<!--Reference wing chord for the tank--></ref_chord>
+              <width units="m" is_input="False">0.6550419977186555<!--Width of the battery, as in the size of the battery along the Y-axis--></width>
+            </dimension>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+          </fuel_tank_1>
+        </fuel_tank>
         <generator>
           <generator_1>
             <diameter units="m" is_input="False">0.4824</diameter>

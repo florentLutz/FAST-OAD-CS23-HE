@@ -468,6 +468,23 @@ def test_performances_from_pt_file():
         np.array([4.07, 4.09, 4.1, 4.11, 4.12, 4.13, 4.14, 4.15, 4.16, 4.17]),
         abs=1e-2,
     )
+    assert problem.get_val("component.fuel_tank_1.fuel_remaining_t", units="kg") == pytest.approx(
+        np.array(
+            [
+                41.24,
+                37.17,
+                33.08,
+                28.98,
+                24.88,
+                20.76,
+                16.63,
+                12.48,
+                8.336,
+                4.173,
+            ]
+        ),
+        abs=1e-2,
+    )
 
     # write_outputs(
     #     pth.join(outputs.__path__[0], "simple_assembly_performances_splitter_50_50_pt_file.xml"),
@@ -535,6 +552,9 @@ def test_assembly_sizing_from_pt_file():
     assert problem.get_val(
         "data:propulsion:he_power_train:ICE:ice_1:mass", units="kg"
     ) == pytest.approx(363.50, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:mass", units="kg"
+    ) == pytest.approx(0.4124, rel=1e-2)
 
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
         2308.87, rel=1e-2

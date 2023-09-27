@@ -21,3 +21,5 @@ from .propulsor.propeller import SizingPropeller, PerformancesPropeller, Slipstr
 from .source.battery import SizingBatteryPack, PerformancesBatteryPack, SlipstreamBatteryPack
 from .source.generator import SizingGenerator, PerformancesGenerator, SlipstreamGenerator
 from .source.ice import SizingICE, PerformancesICE, SlipstreamICE
+
+from .tanks.fuel_tanks import SizingFuelTank, PerformancesFuelTank, SlipstreamFuelTank

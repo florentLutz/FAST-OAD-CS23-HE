@@ -27,6 +27,7 @@ from fastga_he.models.propulsion.components import (
     PerformancesRectifier,
     PerformancesGenerator,
     PerformancesICE,
+    PerformancesFuelTank,
 )
 
 from tests.testing_utilities import VariableListLocal
@@ -133,3 +134,13 @@ def test_all_components_output_required_value():
                 "non_consumable_energy_t" in output_value
                 or "non_consumable_energy_t" in input_value
             )
+
+        if "tank" in component_type:
+
+            output_value = []
+
+            for var in variables:
+                if not var.is_input:
+                    output_value.append(var.name)
+
+            assert "fuel_remaining_t" in output_value

@@ -389,6 +389,24 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
         np.array([3.47, 3.88, 4.2, 4.56, 4.99, 5.51, 5.53, 5.53, 5.53, 5.53]),
         abs=1e-2,
     )
+    assert problem.get_val("component.fuel_tank_1.fuel_remaining_t", units="kg") == pytest.approx(
+        np.array(
+            [
+                48.72,
+                45.25,
+                41.37,
+                37.17,
+                32.61,
+                27.63,
+                22.12,
+                16.59,
+                11.06,
+                5.531,
+            ]
+        ),
+        abs=1e-2,
+    )
+
     assert problem.get_val(
         "component.battery_pack_1.state_of_charge", units="percent"
     ) == pytest.approx(

@@ -510,7 +510,7 @@ ICE = {
     ATT: None,
     PT: ["time_step", "density", "settings:*"],
     SPT: [],
-    IN: None,
+    IN: [(None, "fuel_consumed_t")],
     OUT: [("rpm", None), ("shaft_power_out", None)],
     CTC: ["source", "propulsive_load"],
     MP: [
@@ -539,6 +539,39 @@ ICE = {
     VARIESN_T_MASS: False,
     ETA: 0.4,
 }
+FUEL_TANK = {
+    ID: "fastga_he.pt_component.fuel_tank",
+    CN: "FuelTank",
+    CN_ID: "fuel_tank_id",
+    CT: "fuel_tank",
+    ATT: None,
+    PT: [],
+    SPT: [],
+    IN: None,
+    OUT: [("fuel_consumed_t", None)],
+    CTC: "tank",
+    MP: [
+        {"fuel_remaining_t": "kg"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
+    ICON: "fuel_tank",
+    ICON_SIZE: 30,
+    RSD: ["fuel_remaining_t"],
+    SETS_V: False,
+    IO_INDEP_V: False,
+    V_TO_SET: [],
+    P_TO_SET: [],
+    I_TO_SET: [],
+    SFR: False,
+    SWL: False,
+    DST_W: [],
+    PCT_W: [],
+    VARIES_MASS: False,  # Seems weird but the ICE already does the job so we won't double up
+    VARIESN_T_MASS: True,
+    ETA: 1.0,
+}
 
 KNOWN_COMPONENTS = [
     PROPELLER,
@@ -553,6 +586,7 @@ KNOWN_COMPONENTS = [
     RECTIFIER,
     GENERATOR,
     ICE,
+    FUEL_TANK,
 ]
 
 KNOWN_ID = []

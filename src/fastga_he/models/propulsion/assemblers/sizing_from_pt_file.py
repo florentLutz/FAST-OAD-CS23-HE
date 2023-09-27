@@ -23,6 +23,7 @@ from fastga_he.models.propulsion.components import (
     SizingRectifier,
     SizingGenerator,
     SizingICE,
+    SizingFuelTank,
 )
 
 from .constants import (
