@@ -32,7 +32,7 @@ class PerformancesFuelInput(om.ExplicitComponent):
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            name="number_of_inputs",
+            name="number_of_tanks",
             default=1,
             types=int,
             desc="Number of connections at the input of the fuel system, should always be tanks",
@@ -43,7 +43,7 @@ class PerformancesFuelInput(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
         fuel_system_id = self.options["fuel_system_id"]
-        number_of_inputs = self.options["number_of_inputs"]
+        number_of_tanks = self.options["number_of_tanks"]
 
         self.add_input(
             name="fuel_flowing_t",
@@ -54,10 +54,10 @@ class PerformancesFuelInput(om.ExplicitComponent):
         )
         self.add_input(
             "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":fuel_distribution",
-            val=np.ones(number_of_inputs),
+            val=np.ones(number_of_tanks),
         )
 
-        for i in range(number_of_inputs):
+        for i in range(number_of_tanks):
 
             self.add_output(
                 name="fuel_consumed_in_t_" + str(i + 1),
@@ -72,7 +72,7 @@ class PerformancesFuelInput(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         fuel_system_id = self.options["fuel_system_id"]
-        number_of_inputs = self.options["number_of_inputs"]
+        number_of_tanks = self.options["number_of_tanks"]
 
         #  First we rescale the distribution so that at all point it is between 0 and 1
         self.fuel_distribution = inputs[
@@ -87,13 +87,13 @@ class PerformancesFuelInput(om.ExplicitComponent):
 
         fuel_flow = inputs["fuel_flowing_t"]
 
-        for i in range(number_of_inputs):
+        for i in range(number_of_tanks):
             outputs["fuel_consumed_in_t_" + str(i + 1)] = fuel_flow * self.fuel_distribution[i]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         fuel_system_id = self.options["fuel_system_id"]
-        number_of_inputs = self.options["number_of_inputs"]
+        number_of_tanks = self.options["number_of_tanks"]
         number_of_points = self.options["number_of_points"]
 
         fuel_flow = inputs["fuel_flowing_t"]
@@ -105,14 +105,14 @@ class PerformancesFuelInput(om.ExplicitComponent):
             ]
         )
 
-        for i in range(number_of_inputs):
+        for i in range(number_of_tanks):
 
             partials["fuel_consumed_in_t_" + str(i + 1), "fuel_flowing_t"] = self.fuel_distribution[
                 i
             ] * np.eye(number_of_points)
 
             base_partials = (
-                (-np.tile(fuel_flow, (number_of_inputs, 1)))
+                (-np.tile(fuel_flow, (number_of_tanks, 1)))
                 * self.fuel_distribution[i]
                 / scale_factor
             )

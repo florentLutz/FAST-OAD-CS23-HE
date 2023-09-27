@@ -137,8 +137,8 @@ class PerformancesAssemblySplitterPowerShare(om.Group):
             PerformancesFuelSystem(
                 fuel_system_id="fuel_system_1",
                 number_of_points=number_of_points,
-                number_of_inputs=1,
-                number_of_outputs=1,
+                number_of_tanks=1,
+                number_of_engines=1,
             ),
             promotes=["data:*"],
         )

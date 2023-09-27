@@ -576,7 +576,7 @@
               <height units="m" is_input="False">0.12617910808386587<!--Value of the length of the tank in the z-direction, computed differently based on the location of the tank--></height>
               <length units="m" is_input="False">0.7009950449103659<!--Value of the length of the tank in the x-direction, computed differently based on the location of the tank--></length>
               <ref_chord units="m" is_input="False">0.934660059880488<!--Reference wing chord for the tank--></ref_chord>
-              <width units="m" is_input="False">0.6550419977186555<!--Width of the battery, as in the size of the battery along the Y-axis--></width>
+              <width units="m" is_input="False">0.6550419977186555<!--Value of the length of the tank in the y-direction, computed differently based on the location of the tank--></width>
             </dimension>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>

@@ -27,14 +27,14 @@ class PerformancesFuelSystem(om.Group):
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            name="number_of_inputs",
+            name="number_of_tanks",
             default=1,
             types=int,
             desc="Number of connections at the input of the fuel system, should always be tanks",
             allow_none=False,
         )
         self.options.declare(
-            name="number_of_outputs",
+            name="number_of_engines",
             default=1,
             types=int,
             desc="Number of connections at the output of the fuel system, should always be engine",
@@ -45,13 +45,13 @@ class PerformancesFuelSystem(om.Group):
 
         fuel_system_id = self.options["fuel_system_id"]
         number_of_points = self.options["number_of_points"]
-        number_of_inputs = self.options["number_of_inputs"]
-        number_of_outputs = self.options["number_of_outputs"]
+        number_of_tanks = self.options["number_of_tanks"]
+        number_of_engines = self.options["number_of_engines"]
 
         self.add_subsystem(
             name="fuel_flow_out",
             subsys=PerformancesFuelOutput(
-                number_of_points=number_of_points, number_of_outputs=number_of_outputs
+                number_of_points=number_of_points, number_of_engines=number_of_engines
             ),
             promotes=["*"],
         )
@@ -59,7 +59,7 @@ class PerformancesFuelSystem(om.Group):
             name="fuel_flow_in",
             subsys=PerformancesFuelInput(
                 number_of_points=number_of_points,
-                number_of_inputs=number_of_inputs,
+                number_of_tanks=number_of_tanks,
                 fuel_system_id=fuel_system_id,
             ),
             promotes=["*"],
@@ -78,7 +78,7 @@ class PerformancesFuelSystem(om.Group):
         ivc = om.IndepVarComp()
         ivc.add_output(
             name="data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":number_engine",
-            val=number_of_outputs,
+            val=number_of_engines,
             desc="Number of engine connected to this fuel system",
         )
 

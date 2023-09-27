@@ -18,7 +18,7 @@ class PerformancesFuelOutput(om.ExplicitComponent):
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            name="number_of_outputs",
+            name="number_of_engines",
             default=1,
             types=int,
             desc="Number of connections at the output of the fuel system, should always be engine",
@@ -37,7 +37,7 @@ class PerformancesFuelOutput(om.ExplicitComponent):
             desc="Fuel flowing through the fuel system at each time step",
         )
 
-        for i in range(self.options["number_of_outputs"]):
+        for i in range(self.options["number_of_engines"]):
             # Choice was made to start current numbering at 1 to be consistent with what is done
             # on electrical node (which coincidentally should irritate programmer)
             self.add_input(
@@ -58,7 +58,7 @@ class PerformancesFuelOutput(om.ExplicitComponent):
 
         fuel_output = np.zeros(number_of_points)
 
-        for i in range(self.options["number_of_outputs"]):
+        for i in range(self.options["number_of_engines"]):
             fuel_output += inputs["fuel_consumed_out_t_" + str(i + 1)]
 
         outputs["fuel_flowing_t"] = fuel_output
