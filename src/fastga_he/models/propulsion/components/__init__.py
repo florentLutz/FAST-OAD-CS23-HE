@@ -13,6 +13,7 @@ from .connectors.inverter import SizingInverter, PerformancesInverter, Slipstrea
 from .connectors.dc_sspc import SizingDCSSPC, PerformancesDCSSPC, SlipstreamDCSSPC
 from .connectors.dc_splitter import SizingDCSplitter, PerformancesDCSplitter, SlipstreamDCSplitter
 from .connectors.rectifier import SizingRectifier, PerformancesRectifier, SlipstreamRectifier
+from .connectors.fuel_system import SizingFuelSystem, PerformancesFuelSystem, SlipstreamFuelSystem
 
 from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM
 
