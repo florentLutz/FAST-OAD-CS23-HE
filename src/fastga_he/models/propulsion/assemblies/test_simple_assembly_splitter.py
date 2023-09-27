@@ -496,6 +496,13 @@ def test_performances_from_pt_file():
         np.array([4.07, 4.09, 4.1, 4.11, 4.12, 4.13, 4.14, 4.15, 4.16, 4.17]),
         abs=1e-2,
     )
+    # Only one input and one output to the system so input and output should be equal
+    assert problem.get_val(
+        "component.fuel_system_1.fuel_consumed_in_t_1", units="kg"
+    ) == pytest.approx(
+        problem.get_val("component.ice_1.fuel_consumed_t", units="kg"),
+        abs=1e-2,
+    )
     assert problem.get_val("component.fuel_tank_1.fuel_remaining_t", units="kg") == pytest.approx(
         np.array(
             [

@@ -115,12 +115,18 @@ def test_fuel_output():
     ivc.add_output("fuel_consumed_out_t_2", val=np.linspace(4.0, 2.0, NB_POINTS_TEST), units="kg")
 
     problem = run_system(
-        PerformancesFuelOutput(number_of_points=NB_POINTS_TEST, number_of_engines=2), ivc
+        PerformancesFuelOutput(
+            fuel_system_id="fuel_system_1", number_of_points=NB_POINTS_TEST, number_of_engines=2
+        ),
+        ivc,
     )
 
     assert problem.get_val("fuel_flowing_t", units="kg") == pytest.approx(
         np.linspace(5.0, 4.0, NB_POINTS_TEST), rel=1e-2
     )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_system:fuel_system_1:number_engine"
+    ) == pytest.approx(2, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

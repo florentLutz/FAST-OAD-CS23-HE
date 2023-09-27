@@ -142,7 +142,7 @@
         <fuel_system>
           <fuel_system_1>
             <fuel_distribution is_input="True">1.0</fuel_distribution>
-            <number_engine is_input="True">1.0<!--Number of engine connected to this fuel system--></number_engine>
+            <number_engine is_input="False">1.0<!--Number of engine connected to this fuel system--></number_engine>
             <total_fuel_flowed units="kg" is_input="False">35.931468990645946<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
           </fuel_system_1>
         </fuel_system>

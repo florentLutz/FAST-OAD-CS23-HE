@@ -15,6 +15,13 @@ class PerformancesFuelOutput(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(
+            name="fuel_system_id",
+            default=None,
+            desc="Identifier of the fuel system",
+            types=str,
+            allow_none=False,
+        )
+        self.options.declare(
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
         self.options.declare(
@@ -28,6 +35,7 @@ class PerformancesFuelOutput(om.ExplicitComponent):
     def setup(self):
 
         number_of_points = self.options["number_of_points"]
+        fuel_system_id = self.options["fuel_system_id"]
 
         self.add_output(
             name="fuel_flowing_t",
@@ -35,6 +43,12 @@ class PerformancesFuelOutput(om.ExplicitComponent):
             val=np.full(number_of_points, 5.0),
             shape=number_of_points,
             desc="Fuel flowing through the fuel system at each time step",
+        )
+
+        self.add_output(
+            name="data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":number_engine",
+            val=self.options["number_of_engines"],
+            desc="Number of engine connected to this fuel system",
         )
 
         for i in range(self.options["number_of_engines"]):
@@ -49,7 +63,9 @@ class PerformancesFuelOutput(om.ExplicitComponent):
             )
 
             self.declare_partials(
-                of="*", wrt="fuel_consumed_out_t_" + str(i + 1), val=np.eye(number_of_points)
+                of="fuel_flowing_t",
+                wrt="fuel_consumed_out_t_" + str(i + 1),
+                val=np.eye(number_of_points),
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

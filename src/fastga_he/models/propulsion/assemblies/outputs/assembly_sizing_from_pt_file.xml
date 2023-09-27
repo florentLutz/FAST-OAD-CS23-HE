@@ -48,9 +48,9 @@
     </geometry>
     <propulsion>
       <he_power_train>
-        <mass units="kg" is_input="False">2309.2868286705384</mass>
+        <mass units="kg" is_input="False">2321.545637246881</mass>
         <CG>
-          <x units="m" is_input="False">2.834780979612835</x>
+          <x units="m" is_input="False">2.83403155435543</x>
         </CG>
         <cruise>
           <CD0 is_input="False">0.0056121861665163735</CD0>
@@ -555,6 +555,26 @@
             <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
           </battery_pack_1cell>
         </battery_pack>
+        <fuel_system>
+          <fuel_system_1>
+            <connected_volume units="m**3" is_input="False">0.057365419390735854<!--Capacity of the connected tank in terms of volume--></connected_volume>
+            <fuel_type is_input="True">1.0<!--Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <mass units="kg" is_input="False">12.258808576342691<!--Weight of the fuel system--></mass>
+            <number_engine is_input="True">1.0<!--Number of engine connected to this fuel system--></number_engine>
+            <total_fuel_flowed units="kg" is_input="True">41.24<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
+            <CG>
+              <x units="m" is_input="False">2.692856507431314<!--X position of the fuel system center of gravity--></x>
+              <y units="m" is_input="False">1.8474926765644417<!--Y position of the ICE center of gravity--></y>
+              <y_ratio is_input="True">0.4<!--Y position of the ICE center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+          </fuel_system_1>
+        </fuel_system>
         <fuel_tank>
           <fuel_tank_1>
             <capacity units="kg" is_input="False">41.6524<!--Capacity of the tank in terms of weight--></capacity>

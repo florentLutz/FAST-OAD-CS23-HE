@@ -51,7 +51,9 @@ class PerformancesFuelSystem(om.Group):
         self.add_subsystem(
             name="fuel_flow_out",
             subsys=PerformancesFuelOutput(
-                number_of_points=number_of_points, number_of_engines=number_of_engines
+                number_of_points=number_of_points,
+                number_of_engines=number_of_engines,
+                fuel_system_id=fuel_system_id,
             ),
             promotes=["*"],
         )
@@ -73,17 +75,4 @@ class PerformancesFuelSystem(om.Group):
         )
 
         # Because I don't want to have to give the option on the number of engine to the sizing
-        # group, I'll create here and ivc that output the number of engine connected whose value
-        # will be equal to the number of output
-        ivc = om.IndepVarComp()
-        ivc.add_output(
-            name="data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":number_engine",
-            val=number_of_engines,
-            desc="Number of engine connected to this fuel system",
-        )
-
-        self.add_subsystem(
-            name="number_of_connected_engine",
-            subsys=ivc,
-            promotes=["*"],
-        )
+        # group, I'll make it an output of one of those component. It was initially anivc but since ivc output appear as input of the problem (???) I have to do it someway else

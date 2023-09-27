@@ -28,6 +28,7 @@ from fastga_he.models.propulsion.components import (
     PerformancesGenerator,
     PerformancesICE,
     PerformancesFuelTank,
+    PerformancesFuelSystem,
 )
 
 from tests.testing_utilities import VariableListLocal
