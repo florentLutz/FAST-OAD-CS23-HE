@@ -147,9 +147,6 @@ def test_sizing_sr22(cleanup):
 
 def test_sizing_fuel_and_battery_share(cleanup):
 
-    # TODO: I used to be able to run this without linesearch, why did it change when adding fuel
-    #  system ?
-
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
