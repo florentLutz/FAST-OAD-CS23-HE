@@ -72,6 +72,18 @@
                         <mass units="kg">120.</mass>
                     </battery_pack_1>
                 </battery_pack>
+                <fuel_tank>
+                    <fuel_tank_1>
+                        <CG>
+                            <x units="m">3.0</x>
+                        </CG>
+                    </fuel_tank_1>
+                    <fuel_tank_2>
+                        <CG>
+                            <x units="m">3.5</x>
+                        </CG>
+                    </fuel_tank_2>
+                </fuel_tank>
             </he_power_train>
         </propulsion>
     </data>

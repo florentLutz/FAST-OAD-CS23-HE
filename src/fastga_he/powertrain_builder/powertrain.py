@@ -865,6 +865,25 @@ class FASTGAHEPowerTrainConfigurator:
 
         return components_names
 
+    def get_fuel_tank_list(self) -> Tuple[list, list]:
+        """
+        Returns the list of components inside the power train which may cause the CG to shift
+        during flight because of a varying mass (but a constant position)
+        """
+
+        self._get_components()
+        components_names = []
+        component_types = []
+
+        for component_type_class, component_name, component_type in zip(
+            self._components_type_class, self._components_name, self._components_type
+        ):
+            if "tank" in component_type_class:
+                components_names.append(component_name)
+                component_types.append(component_type)
+
+        return components_names, component_types
+
     def get_residuals_watcher_elements_list(self) -> tuple:
         """
         Returns the list of OpenMDAO variables that are interesting to monitor in the residuals

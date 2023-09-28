@@ -10,6 +10,7 @@ import pytest
 from ..delta_from_pt_file import SlipstreamAirframeLiftClean, SlipstreamAirframeLift
 from ..wing_punctual_loads_from_pt_file import PowerTrainPunctualLoadsFromFile
 from ..wing_distributed_loads_from_pt_file import PowerTrainDistributedLoadsFromFile
+from ..fuel_cg_from_pt_file import FuelCGFromPTFile
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -106,8 +107,6 @@ def test_distributed_mass_assembler():
 
     pt_file_path = pth.join(pth.dirname(__file__), PROPULSION_FILE)
 
-    print(list_inputs(PowerTrainDistributedLoadsFromFile(power_train_file_path=pt_file_path)))
-
     ivc = get_indep_var_comp(
         list_inputs(PowerTrainDistributedLoadsFromFile(power_train_file_path=pt_file_path)),
         __file__,
@@ -133,6 +132,39 @@ def test_distributed_mass_assembler():
     ) == pytest.approx(0.0, rel=1e-6)
     assert problem.get_val("data:weight:airframe:wing:distributed_mass:mass") == pytest.approx(
         120.0, rel=1e-6
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_fuel_cg_from_pt_file():
+
+    pt_file_path = pth.join(pth.dirname(__file__), pth.join("data", "sample_fuel_propulsion.yml"))
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            FuelCGFromPTFile(power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "fuel_tank_1_fuel_remaining_t", units="kg", val=np.linspace(60.0, 0.0, NB_POINTS_TEST)
+    )
+    ivc.add_output(
+        "fuel_tank_2_fuel_remaining_t", units="kg", val=np.linspace(15.0, 0.0, NB_POINTS_TEST)
+    )
+
+    problem = run_system(
+        FuelCGFromPTFile(power_train_file_path=pt_file_path, number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("fuel_lever_arm") == pytest.approx(
+        np.linspace(232.5, 0, NB_POINTS_TEST), rel=1e-6
+    )
+    assert problem.get_val("fuel_mass") == pytest.approx(
+        np.linspace(75.0, 0, NB_POINTS_TEST), rel=1e-6
     )
 
     problem.check_partials(compact_print=True)
