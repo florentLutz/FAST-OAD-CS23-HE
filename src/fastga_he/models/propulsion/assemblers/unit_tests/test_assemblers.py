@@ -160,10 +160,10 @@ def test_fuel_cg_from_pt_file():
         ivc,
     )
 
-    assert problem.get_val("fuel_lever_arm") == pytest.approx(
+    assert problem.get_val("fuel_lever_arm_t_econ") == pytest.approx(
         np.linspace(232.5, 0, NB_POINTS_TEST), rel=1e-6
     )
-    assert problem.get_val("fuel_mass") == pytest.approx(
+    assert problem.get_val("fuel_mass_t_econ") == pytest.approx(
         np.linspace(75.0, 0, NB_POINTS_TEST), rel=1e-6
     )
 

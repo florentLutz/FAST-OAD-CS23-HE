@@ -44,13 +44,13 @@ class FuelCGFromPTFile(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_output(
-            "fuel_lever_arm",
+            "fuel_lever_arm_t_econ",
             val=np.linspace(600.0, 0.0, number_of_points),
             desc="lever arm of the fuel in the various tanks",
             units="kg*m",
         )
         self.add_output(
-            "fuel_mass",
+            "fuel_mass_t_econ",
             val=np.linspace(200.0, 0.0, number_of_points),
             desc="mass of the fuel in the various tanks",
             units="kg",
@@ -64,12 +64,12 @@ class FuelCGFromPTFile(om.ExplicitComponent):
                 val=np.full(number_of_points, np.nan),
             )
             self.declare_partials(
-                of="fuel_mass",
+                of="fuel_mass_t_econ",
                 wrt=tank_name + "_fuel_remaining_t",
                 val=np.eye(number_of_points),
             )
             self.declare_partials(
-                of="fuel_lever_arm",
+                of="fuel_lever_arm_t_econ",
                 wrt=tank_name + "_fuel_remaining_t",
                 method="exact",
             )
@@ -80,7 +80,7 @@ class FuelCGFromPTFile(om.ExplicitComponent):
                 val=np.nan,
             )
             self.declare_partials(
-                of="fuel_lever_arm",
+                of="fuel_lever_arm_t_econ",
                 wrt=PT_DATA_PREFIX + tank_type + ":" + tank_name + ":CG:x",
                 method="exact",
             )
@@ -89,19 +89,19 @@ class FuelCGFromPTFile(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
-        fuel_mass = np.zeros(number_of_points)
-        fuel_lever_arm = np.zeros(number_of_points)
+        fuel_mass_t_econ = np.zeros(number_of_points)
+        fuel_lever_arm_t_econ = np.zeros(number_of_points)
 
         for tank_name, tank_type in zip(self._tank_names, self._tank_types):
 
-            fuel_mass += inputs[tank_name + "_fuel_remaining_t"]
-            fuel_lever_arm += (
+            fuel_mass_t_econ += inputs[tank_name + "_fuel_remaining_t"]
+            fuel_lever_arm_t_econ += (
                 inputs[tank_name + "_fuel_remaining_t"]
                 * inputs[PT_DATA_PREFIX + tank_type + ":" + tank_name + ":CG:x"]
             )
 
-        outputs["fuel_mass"] = fuel_mass
-        outputs["fuel_lever_arm"] = fuel_lever_arm
+        outputs["fuel_mass_t_econ"] = fuel_mass_t_econ
+        outputs["fuel_lever_arm_t_econ"] = fuel_lever_arm_t_econ
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -109,10 +109,10 @@ class FuelCGFromPTFile(om.ExplicitComponent):
 
         for tank_name, tank_type in zip(self._tank_names, self._tank_types):
 
-            partials["fuel_lever_arm", tank_name + "_fuel_remaining_t"] = (
+            partials["fuel_lever_arm_t_econ", tank_name + "_fuel_remaining_t"] = (
                 np.eye(number_of_points)
                 * inputs[PT_DATA_PREFIX + tank_type + ":" + tank_name + ":CG:x"]
             )
             partials[
-                "fuel_lever_arm", PT_DATA_PREFIX + tank_type + ":" + tank_name + ":CG:x"
+                "fuel_lever_arm_t_econ", PT_DATA_PREFIX + tank_type + ":" + tank_name + ":CG:x"
             ] = inputs[tank_name + "_fuel_remaining_t"]
