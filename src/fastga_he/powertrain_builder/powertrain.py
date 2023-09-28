@@ -1380,12 +1380,13 @@ class FASTGAHEPowerTrainConfigurator:
                     new_problematic_nodes.remove(problematic_node)
                     new_problematic_nodes += problematic_nodes_to_add
 
-                # Should be a splitter
-                else:
+                # If it is a splitter
+                elif associated_component_type == "fastga_he.pt_component.dc_splitter":
 
                     problematic_nodes_to_add = []
 
-                    # This node does not have a priority just yet, so we'll first need to take a look at it
+                    # This node does not have a priority just yet, so we'll first need to take a
+                    # look at it
                     power = None
 
                     for neighbor in graph.adj[problematic_node]:
@@ -1459,11 +1460,112 @@ class FASTGAHEPowerTrainConfigurator:
                     new_problematic_nodes.remove(problematic_node)
                     new_problematic_nodes += problematic_nodes_to_add
 
+                # Should be a fuel system. They are a bit specific because they can have multiple
+                # inputs and multiple outputs
+                elif associated_component_type == "fastga_he.pt_component.fuel_system":
+
+                    problematic_nodes_to_add = []
+
+                    # This node does not have a priority just yet, so we'll first need to take a
+                    # look at it. Fuel system can have multiple output, so we'll simply sum the
+                    # one whose power we know
+                    power = 0.0
+                    neighbor_counter = 0
+
+                    for neighbor in graph.adj[problematic_node]:
+                        if neighbor in list(nodes_with_power.keys()):
+                            power += nodes_with_power[neighbor]
+                            neighbor_counter += 1
+
+                    input_power_dict = self.fuel_system_power_inputs(
+                        inputs=inputs,
+                        components_name=associated_component_name,
+                        power_output=power,
+                    )
+
+                    # Once we have the power at the output, not that, we check how many engine we
+                    # had at the output, it there was only one, the code can proceed. Else,
+                    # we need to move to the input of the fuel system and then we can proceed
+                    if neighbor_counter > 1:
+                        # We add the out not to the list of stuff to remove and move the
+                        # problematic node to the input.
+                        nodes_with_power[problematic_node] = power
+                        fuel_system_input_name = problematic_node.replace("out", "in")
+
+                        new_problematic_nodes.remove(problematic_node)
+
+                        problematic_node = fuel_system_input_name
+
+                        new_problematic_nodes.append(problematic_node)
+
+                    for neighbor in graph.adj[problematic_node]:
+
+                        if neighbor not in list(nodes_with_power.keys()):
+                            # If we haven't treated the neighbor yet, it means its an input of the
+                            # fuel system. We will add a fake input node and do the connection to
+                            # that neighbor.
+
+                            # First we identify which input of the fuel system it matches, first
+                            # find the name of the component
+                            neighbor_components_name = neighbor.replace("_in", "")
+                            neighbor_components_name = neighbor_components_name.replace("_out", "")
+
+                            # Then we check among the connected tanks component, which inputs
+                            # number it correspond to
+
+                            tank_output_name = neighbor_components_name + ".fuel_consumed_t"
+                            index = self._components_connection_inputs.index(tank_output_name)
+                            corresponding_fs_input = self._components_connection_outputs[index]
+
+                            node_number = corresponding_fs_input[-1]
+
+                            # From the way we built the dict, we should have the power like this
+                            neighbor_power = input_power_dict[corresponding_fs_input.split(".")[-1]]
+
+                            node_name = associated_component_name + "_in_" + node_number
+                            problematic_nodes_to_add.append(node_name)
+                            nodes_with_power[node_name] = neighbor_power
+
+                            copied_graph.add_edge(node_name, neighbor)
+
+                    # Now we remove the fuel system and instead add its neighbors, which will
+                    # serve as new branch start
+
+                    new_problematic_nodes.remove(problematic_node)
+                    new_problematic_nodes += problematic_nodes_to_add
+
                 copied_graph.remove_node(problematic_node)
 
             problematic_nodes = new_problematic_nodes
 
         return nodes_with_power
+
+    @staticmethod
+    def fuel_system_power_inputs(inputs, components_name: str, power_output: np.ndarray) -> dict:
+        """
+        Computes the power at each input of the fuel system, depending on the mode the power at the
+        output and the splitting decided
+
+        :param inputs: OpenMDAO vector containing the value of inputs
+        :param components_name: the name of the fuel system in question
+        :param power_output: the power at the output of the fuel system
+        """
+
+        output_dict = {}
+
+        # First, we will get the amount of connected fuel tanks, which should correspond to the
+        # length of the distributor
+        input_name = (
+            "data:propulsion:he_power_train:fuel_system:" + components_name + ":fuel_distribution"
+        )
+        distributor = inputs[input_name] / sum(inputs[input_name])
+
+        for idx, value in enumerate(distributor):
+
+            # Because we start at one :)
+            output_dict["fuel_consumed_in_t_" + str(idx + 1)] = value * power_output
+
+        return output_dict
 
     def splitter_power_inputs(
         self, inputs, components_name: str, power_output: np.ndarray
