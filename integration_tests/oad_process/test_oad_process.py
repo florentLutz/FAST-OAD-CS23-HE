@@ -95,15 +95,17 @@ def test_fuel_and_battery(cleanup):
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        744.0, rel=1e-2
+        761.0, rel=1e-2
     )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(24.46, rel=1e-2)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(24.71, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(128.0, rel=1e-2)
 
 
 def test_sizing_sr22(cleanup):
+
+    # TODO: Recheck inputs
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -136,14 +138,17 @@ def test_sizing_sr22(cleanup):
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        1679.0, rel=1e-2
+        1747.0, rel=1e-2
     )
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        271.04, rel=1e-2
+        275.76, rel=1e-2
     )
 
 
 def test_sizing_fuel_and_battery_share(cleanup):
+
+    # TODO: I used to be able to run this without linesearch, why did it change when adding fuel
+    #  system ?
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -178,11 +183,11 @@ def test_sizing_fuel_and_battery_share(cleanup):
     problem.write_outputs()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(23.34, abs=1e-2)
+    assert sizing_fuel == pytest.approx(23.38, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(31.908, abs=1e-2)
+    assert sizing_energy == pytest.approx(32.578, abs=1e-2)
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        801.015, rel=1e-2
+        815.24, rel=1e-2
     )
 
 

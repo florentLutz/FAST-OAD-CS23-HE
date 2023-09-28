@@ -41,7 +41,7 @@ model:
     number_of_points_reserve: 10
     power_train_file_path: ./fuel_and_battery_propulsion_share.yml
     out_file: ../results/mission_data_fuel_and_battery_share.csv
-    use_linesearch: False
+    use_linesearch: True
     pre_condition_pt: True
     use_apply_nonlinear: False
   mtow:
