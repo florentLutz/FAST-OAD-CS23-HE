@@ -1942,6 +1942,28 @@ def test_case_reader():
     fig.show()
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_case_analyzer():
+
+    cr = om.CaseReader("results/cases.sql")
+
+    solver_case = cr.get_cases("root.nonlinear_solver")
+    for case in solver_case:
+
+        residuals_dict = {}
+
+        for residual in case.residuals:
+
+            residuals_dict[residual] = sum(np.square(case.residuals[residual]))
+
+        top_residuals = max(residuals_dict, key=residuals_dict.get)
+
+        # print the result
+        print(
+            f"The top residuals is {top_residuals} with a score of {residuals_dict[top_residuals]}."
+        )
+
+
 def test_criss_cross_network_viewer():
 
     # Define used files depending on options

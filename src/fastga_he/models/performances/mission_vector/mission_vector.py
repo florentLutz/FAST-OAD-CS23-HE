@@ -613,7 +613,6 @@ class MissionVector(om.Group):
         )
 
         dummy_fuel_consumed = self._get_initial_guess_fuel_consumed()
-        dummy_fuel_consumed_econ = np.concatenate((np.zeros(1), dummy_fuel_consumed, np.zeros(1)))
 
         if self.options["power_train_file_path"]:
             if self.configurator.will_aircraft_mass_vary():
@@ -621,9 +620,6 @@ class MissionVector(om.Group):
                 outputs[
                     "solve_equilibrium.performance_per_phase.fuel_consumed_t"
                 ] = dummy_fuel_consumed
-                outputs[
-                    "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.energy_consumption.fuel_consumed_t_econ"
-                ] = dummy_fuel_consumed_econ
 
             else:
 
@@ -633,19 +629,10 @@ class MissionVector(om.Group):
                 outputs["solve_equilibrium.performance_per_phase.fuel_mass_t"] = np.zeros(
                     number_of_points_total
                 )
-                outputs[
-                    "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.energy_consumption.fuel_consumed_t_econ"
-                ] = np.zeros(number_of_points_total + 2)
-                outputs[
-                    "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.tank_and_fuel_CG.fuel_mass_t_econ"
-                ] = np.zeros(number_of_points_total + 2)
 
         else:
 
             outputs["solve_equilibrium.performance_per_phase.fuel_consumed_t"] = dummy_fuel_consumed
-            outputs[
-                "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.energy_consumption.fuel_consumed_t_econ"
-            ] = dummy_fuel_consumed_econ
 
     def set_initial_guess_mass(self, inputs, outputs):
         """
@@ -1235,9 +1222,6 @@ class MissionVector(om.Group):
         )
 
         dummy_energy_consumed = self._get_initial_guess_fuel_consumed()
-        dummy_energy_consumed_econ = np.concatenate(
-            (np.zeros(1), dummy_energy_consumed, np.zeros(1))
-        )
 
         if self.options["power_train_file_path"]:
             if self.configurator.has_fuel_non_consumable_energy_source():
@@ -1245,18 +1229,12 @@ class MissionVector(om.Group):
                 outputs[
                     "solve_equilibrium.performance_per_phase.non_consumable_energy_t"
                 ] = dummy_energy_consumed
-                outputs[
-                    "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.energy_consumption.non_consumable_energy_t_econ"
-                ] = dummy_energy_consumed_econ
 
             else:
 
                 outputs[
                     "solve_equilibrium.performance_per_phase.non_consumable_energy_t"
                 ] = np.zeros(number_of_points_total)
-                outputs[
-                    "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.energy_consumption.non_consumable_energy_t_econ"
-                ] = np.zeros(number_of_points_total + 2)
 
         else:
 
@@ -1264,9 +1242,6 @@ class MissionVector(om.Group):
             outputs["solve_equilibrium.performance_per_phase.non_consumable_energy_t"] = np.zeros(
                 number_of_points_total
             )
-            outputs[
-                "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.energy_consumption.non_consumable_energy_t_econ"
-            ] = np.zeros(number_of_points_total + 2)
 
 
 def get_propulsive_power(
