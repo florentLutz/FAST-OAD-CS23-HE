@@ -273,12 +273,14 @@ class MissionVector(om.Group):
             ],
         )
 
+        self.connect("solve_equilibrium.fuel_consumed_t", "to_csv.fuel_consumed_t")
         self.connect(
-            "solve_equilibrium.fuel_consumed_t",
-            [
-                "to_csv.fuel_consumed_t",
-                "initialization.initialize_center_of_gravity.fuel_consumed_t",
-            ],
+            "solve_equilibrium.fuel_mass_t",
+            "initialization.initialize_center_of_gravity.fuel_mass_t",
+        )
+        self.connect(
+            "solve_equilibrium.fuel_lever_arm_t",
+            "initialization.initialize_center_of_gravity.fuel_lever_arm_t",
         )
 
         self.connect(
