@@ -193,5 +193,7 @@ class DEPEquilibrium(om.Group):
                     "density_econ",
                     "thrust_econ",
                     "engine_setting_econ",
+                    "fuel_lever_arm_t_econ",
+                    "fuel_mass_t_econ",
                 ],
             )

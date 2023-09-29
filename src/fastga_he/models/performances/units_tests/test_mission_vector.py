@@ -1497,6 +1497,16 @@ def test_performances_per_phase():
         units="kg",
     )
     ivc.add_output(
+        name="fuel_mass_t_econ",
+        val=np.linspace(48.0, 2.0, 32),
+        units="kg",
+    )
+    ivc.add_output(
+        name="fuel_lever_arm_t_econ",
+        val=np.linspace(144.0, 6.0, 32),
+        units="kg*m",
+    )
+    ivc.add_output(
         name="non_consumable_energy_t_econ",
         val=np.linspace(10.0, 25.0, 32),
         units="W*h",
@@ -1570,6 +1580,11 @@ def test_mission_vector():
     assert sizing_fuel == pytest.approx(45.60, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    test = 1.0
 
 
 def test_mission_vector_from_yml():

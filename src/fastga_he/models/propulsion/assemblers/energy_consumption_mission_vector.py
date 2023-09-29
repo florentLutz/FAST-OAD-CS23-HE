@@ -135,14 +135,14 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
             ],
         )
 
-        if tank_names:
-            self.add_subsystem(
-                "tank_and_fuel_CG",
-                subsys=FuelCGFromPTFile(
-                    power_train_file_path=power_train_file_path, number_of_points=number_of_points
-                ),
-                promotes=["data:*"],
-            )
+        self.add_subsystem(
+            "tank_and_fuel_CG",
+            subsys=FuelCGFromPTFile(
+                power_train_file_path=power_train_file_path, number_of_points=number_of_points
+            ),
+            promotes_inputs=["data:*"],
+            promotes_outputs=["*"],
+        )
 
         for propulsive_load_name in propulsive_load_names:
             self.connect(

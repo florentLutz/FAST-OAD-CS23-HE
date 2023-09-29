@@ -43,6 +43,9 @@ class FuelCGFromPTFile(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
+        # Need an input in case there is no tank, this one seems like the most appropriate one
+        self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
+
         self.add_output(
             "fuel_lever_arm_t_econ",
             val=np.linspace(600.0, 0.0, number_of_points),
