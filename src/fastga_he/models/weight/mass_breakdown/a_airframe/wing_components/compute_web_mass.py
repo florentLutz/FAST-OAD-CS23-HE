@@ -113,6 +113,20 @@ class ComputeWebMass(om.ExplicitComponent):
             units="kg",
             val=0.0,
         )
+        # Same as with punctual loads expect here, we will have a tag to "turn it off" when at MZFW
+        self.add_input(
+            "data:weight:airframe:wing:punctual_tanks:y_ratio",
+            shape_by_conn=True,
+            val=0.0,
+        )
+        self.add_input(
+            "data:weight:airframe:wing:punctual_tanks:fuel_inside",
+            shape_by_conn=True,
+            copy_shape="data:weight:airframe:wing:punctual_tanks:y_ratio",
+            units="kg",
+            val=0.0,
+        )
+
         # Here we add all the inputs necessary for the addition of the distributed mass other
         # than the fuel (batteries for instance), this input will later be an output of the
         # powertrain sizing but their default value will be set at 0 so that it is used the same
@@ -153,6 +167,43 @@ class ComputeWebMass(om.ExplicitComponent):
             units="kg",
             desc="Array containing the value of masses that are distributed on the wing",
             copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        # Here we add all the inputs necessary for the addition of the distributed tanks
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the starting positions of all distributed tanks on the wing",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:y_ratio_end",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the end positions of all distributed tanks on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:start_chord",
+            shape_by_conn=True,
+            val=np.nan,
+            units="m",
+            desc="Array containing the value of the wing chord at the beginning of the distributed tanks",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:chord_slope",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the value of the chord slope for the distributed tanks. Fuel mass is assumed to vary with chord only (not thickness)",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:fuel_inside",
+            shape_by_conn=True,
+            val=np.nan,
+            units="kg",
+            desc="Array containing the value of fuel inside the tanks that are distributed on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
         )
 
         self.add_input("data:mission:sizing:cs23:safety_factor", val=np.nan)
@@ -211,6 +262,7 @@ class ComputeWebMass(om.ExplicitComponent):
             load_factor_neg = inputs[
                 "data:mission:sizing:cs23:sizing_factor:ultimate_mtow:negative"
             ]
+            fuel_tag = 1.0
         else:
             mass = inputs["data:weight:aircraft:MZFW"]
             load_factor_pos = inputs[
@@ -219,9 +271,8 @@ class ComputeWebMass(om.ExplicitComponent):
             load_factor_neg = inputs[
                 "data:mission:sizing:cs23:sizing_factor:ultimate_mzfw:negative"
             ]
+            fuel_tag = 0.0
 
-        mzfw = inputs["data:weight:aircraft:MZFW"]
-        fuel_mass = max(0, mass - mzfw)
         load_factor = max(load_factor_pos, abs(load_factor_neg))
 
         fus_width = inputs["data:geometry:fuselage:maximum_width"]
@@ -296,7 +347,7 @@ class ComputeWebMass(om.ExplicitComponent):
         dynamic_pressure = 1.0 / 2.0 * atm.density * v_c_tas ** 2.0
 
         y_vector, weight_array_orig = AerostructuralLoadHE.compute_relief_force(
-            inputs, y_vector_orig, chord_vector_orig, wing_mass, fuel_mass
+            inputs, y_vector_orig, chord_vector_orig, wing_mass, fuel_tag
         )
         cl_s = AerostructuralLoadHE.compute_cl_s(
             y_vector_orig, y_vector_orig, y_vector, cl_vector_orig, chord_vector_orig

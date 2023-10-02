@@ -379,7 +379,7 @@ def test_compute_mass_distribution():
             0.0,
         ]
     )
-    assert np.max(np.abs(point_mass_array - point_mass_result)) <= 1e-1
+    assert point_mass_array == pytest.approx(point_mass_result, abs=1e-1)
     wing_mass_array = problem.get_val(
         "data:loads:structure:ultimate:force_distribution:wing", units="N/m"
     )
@@ -463,7 +463,7 @@ def test_compute_mass_distribution():
         ]
     )
 
-    assert np.max(np.abs(wing_mass_result - wing_mass_array)) <= 1e-1
+    assert wing_mass_array == pytest.approx(wing_mass_result, abs=1e-1)
     fuel_mass_array = problem.get_val(
         "data:loads:structure:ultimate:force_distribution:fuel", units="N/m"
     )
@@ -490,15 +490,15 @@ def test_compute_mass_distribution():
             -0.0,
             -0.0,
             -0.0,
-            -1675.7088186,
-            -1617.74357122,
-            -1559.77832384,
-            -1501.81307645,
-            -1460.40932832,
-            -1435.56707944,
-            -1410.72483057,
-            -1385.88258169,
-            -1361.04033281,
+            -1312.61537039,
+            -1268.00134823,
+            -1223.38732608,
+            -1178.77330392,
+            -1146.90614523,
+            -1127.78585002,
+            -1108.66555481,
+            -1089.5452596,
+            -1070.42496439,
             -0.0,
             -0.0,
             -0.0,
@@ -547,7 +547,7 @@ def test_compute_mass_distribution():
         ]
     )
 
-    assert np.max(np.abs(fuel_mass_result - fuel_mass_array)) <= 1e-1
+    assert fuel_mass_array == pytest.approx(fuel_mass_result, abs=1e-1)
 
     distributed_mass_array = problem.get_val(
         "data:loads:structure:ultimate:force_distribution:distributed_mass", units="N/m"
@@ -645,7 +645,7 @@ def test_compute_structure_shear():
         ]
     )
 
-    assert np.max(np.abs(point_mass_array - point_mass_result)) <= 1e-1
+    assert point_mass_array == pytest.approx(point_mass_result, abs=1e-1)
     wing_mass_array = problem.get_val("data:loads:structure:ultimate:shear:wing", units="N")
     wing_mass_result = np.array(
         [
@@ -727,40 +727,40 @@ def test_compute_structure_shear():
         ]
     )
 
-    assert np.max(np.abs(wing_mass_result - wing_mass_array)) <= 1e-1
+    assert wing_mass_array == pytest.approx(wing_mass_result, abs=1e-1)
     fuel_mass_array = problem.get_val("data:loads:structure:ultimate:shear:fuel", units="N")
     fuel_mass_result = np.array(
         [
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4686.77563342,
-            -4267.78403856,
-            -3444.29438802,
-            -2649.79181589,
-            -1884.27632215,
-            -1355.22673176,
-            -1044.89585387,
-            -739.88913324,
-            -440.20656987,
-            -145.84816375,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3677.53356,
+            -3349.32927929,
+            -2704.07593774,
+            -2081.13303591,
+            -1480.50057381,
+            -1065.13683949,
+            -821.38238005,
+            -581.72575648,
+            -346.16696878,
+            -114.70601695,
             0.0,
             0.0,
             0.0,
@@ -809,7 +809,7 @@ def test_compute_structure_shear():
         ]
     )
 
-    assert np.max(np.abs(fuel_mass_result - fuel_mass_array)) <= 1e-1
+    assert fuel_mass_array == pytest.approx(fuel_mass_result, abs=1e-1)
 
     distributed_mass_array = problem.get_val(
         "data:loads:structure:ultimate:shear:distributed_mass", units="N"
@@ -908,7 +908,7 @@ def test_compute_structure_bending():
             0.0,
         ]
     )
-    assert np.max(np.abs(point_mass_array - point_mass_result)) <= 1e-1
+    assert point_mass_array == pytest.approx(point_mass_result, abs=1e-1)
     wing_mass_array = problem.get_val(
         "data:loads:structure:ultimate:root_bending:wing", units="N*m"
     )
@@ -992,41 +992,41 @@ def test_compute_structure_bending():
         ]
     )
 
-    assert np.max(np.abs(wing_mass_result - wing_mass_array)) <= 1e-1
+    assert wing_mass_array == pytest.approx(wing_mass_result, abs=1e-1)
     fuel_mass_array = problem.get_val(
         "data:loads:structure:ultimate:root_bending:fuel", units="N*m"
     )
     fuel_mass_result = np.array(
         [
-            -17620.83481194,
-            -17016.0007311,
-            -15806.33256942,
-            -14596.66440774,
-            -14025.66215837,
-            -14020.97538273,
-            -13966.58231798,
-            -13912.18925322,
-            -13857.79618846,
-            -13803.4031237,
-            -13798.71634807,
-            -12819.9563261,
-            -10476.20832451,
-            -8487.4867082,
-            -8482.79993256,
-            -8428.40686781,
-            -8374.01380305,
-            -8319.62073829,
-            -8265.22767353,
-            -8260.5408979,
-            -8132.46032292,
-            -5788.71232133,
-            -3864.02031472,
-            -2343.88853619,
-            -1213.82121885,
-            -636.57029481,
-            -379.66004449,
-            -188.68895605,
-            -62.51596328,
+            -13830.5481984,
+            -13355.95803141,
+            -12406.77769742,
+            -11457.59736344,
+            -11009.55374046,
+            -11005.8762069,
+            -10963.19604964,
+            -10920.51589238,
+            -10877.83573511,
+            -10835.15557785,
+            -10831.47804429,
+            -10063.4824948,
+            -8224.4330915,
+            -6663.95931218,
+            -6660.28177862,
+            -6617.60162136,
+            -6574.9214641,
+            -6532.24130684,
+            -6489.56114958,
+            -6485.88361602,
+            -6385.3836882,
+            -4546.33428491,
+            -3035.53960818,
+            -1841.84272357,
+            -954.08669664,
+            -500.45520182,
+            -298.51663578,
+            -148.38007524,
+            -49.16727753,
             0.0,
             0.0,
             0.0,
@@ -1076,7 +1076,7 @@ def test_compute_structure_bending():
         ]
     )
 
-    assert np.max(np.abs(fuel_mass_result - fuel_mass_array)) <= 1e-1
+    assert fuel_mass_array == pytest.approx(fuel_mass_result, abs=1e-1)
 
     distributed_mass_array = problem.get_val(
         "data:loads:structure:ultimate:root_bending:distributed_mass", units="N*m"

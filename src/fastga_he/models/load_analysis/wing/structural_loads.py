@@ -97,6 +97,19 @@ class StructuralLoadsHE(om.ExplicitComponent):
             units="kg",
             val=0.0,
         )
+        # Same as with punctual loads expect here, we will have a tag to "turn it off" when at MZFW
+        self.add_input(
+            "data:weight:airframe:wing:punctual_tanks:y_ratio",
+            shape_by_conn=True,
+            val=0.0,
+        )
+        self.add_input(
+            "data:weight:airframe:wing:punctual_tanks:fuel_inside",
+            shape_by_conn=True,
+            copy_shape="data:weight:airframe:wing:punctual_tanks:y_ratio",
+            units="kg",
+            val=0.0,
+        )
 
         self.add_input("data:mission:sizing:fuel", val=np.nan, units="kg")
 
@@ -142,6 +155,43 @@ class StructuralLoadsHE(om.ExplicitComponent):
             units="kg",
             desc="Array containing the value of masses that are distributed on the wing",
             copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        # Here we add all the inputs necessary for the addition of the distributed tanks
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the starting positions of all distributed tanks on the wing",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:y_ratio_end",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the end positions of all distributed tanks on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:start_chord",
+            shape_by_conn=True,
+            val=np.nan,
+            units="m",
+            desc="Array containing the value of the wing chord at the beginning of the distributed tanks",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:chord_slope",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the value of the chord slope for the distributed tanks. Fuel mass is assumed to vary with chord only (not thickness)",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:fuel_inside",
+            shape_by_conn=True,
+            val=np.nan,
+            units="kg",
+            desc="Array containing the value of fuel inside the tanks that are distributed on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
         )
 
         self.add_output(
@@ -215,7 +265,6 @@ class StructuralLoadsHE(om.ExplicitComponent):
         load_factor_shear = float(inputs["data:loads:max_shear:load_factor"])
         load_factor_rbm = float(inputs["data:loads:max_rbm:load_factor"])
         wing_mass = inputs["data:weight:airframe:wing:mass"]
-        fuel_mass = inputs["data:mission:sizing:fuel"]
 
         # STEP 2/XX - DELETE THE ADDITIONAL ZEROS WE HAD TO PUT TO FIT OPENMDAO AND ADD A POINT
         # AT THE ROOT (Y=0) AND AT THE VERY TIP (Y=SPAN/2) TO GET THE WHOLE SPAN OF THE WING IN
@@ -239,7 +288,7 @@ class StructuralLoadsHE(om.ExplicitComponent):
             inputs, y_vector_orig, chord_vector_orig, wing_mass, 0.0, False, False
         )
         _, fuel_mass_array_orig = AerostructuralLoadHE.compute_relief_force(
-            inputs, y_vector_orig, chord_vector_orig, 0.0, fuel_mass, False, False
+            inputs, y_vector_orig, chord_vector_orig, 0.0, 1.0, False, False
         )
         _, distributed_mass_array_orig = AerostructuralLoadHE.compute_relief_force(
             inputs, y_vector_orig, chord_vector_orig, 0.0, 0.0, False, True
