@@ -247,8 +247,8 @@ def test_fuel_tank_weight():
 
 def test_fuel_tank_drag():
 
-    expected_ls_drag = [0.0, 0.000178, 0.0]
-    expected_cruise_drag = [0.0, 0.000178, 0.0]
+    expected_ls_drag = [0.0, 0.00421, 0.0]
+    expected_cruise_drag = [0.0, 0.00421, 0.0]
 
     for option, ls_drag, cruise_drag in zip(
         POSSIBLE_POSITION, expected_ls_drag, expected_cruise_drag

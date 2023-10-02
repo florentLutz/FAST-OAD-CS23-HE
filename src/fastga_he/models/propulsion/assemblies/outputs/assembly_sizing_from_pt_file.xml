@@ -587,7 +587,7 @@
             <CG>
               <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
               <y units="m" is_input="False">1.8474926765644417<!--Y position of the fuel tank center of gravity--></y>
-              <y_ratio is_input="True">0.4<!--X position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y_ratio is_input="True">0.4<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
@@ -598,6 +598,12 @@
               <ref_chord units="m" is_input="False">0.934660059880488<!--Reference wing chord for the tank--></ref_chord>
               <width units="m" is_input="False">0.6550419977186555<!--Value of the length of the tank in the y-direction, computed differently based on the location of the tank--></width>
             </dimension>
+            <distributed_tanks>
+              <chord_slope is_input="False">0.0<!--When tank is considered as a distributed mass, the rate at which the chord varies--></chord_slope>
+              <start_chord units="m" is_input="False">0.7672311779752663<!--When tank is considered as a distributed mass, the chord at the start--></start_chord>
+              <y_ratio_end is_input="False">0.47091145811054125<!--When tank is considered as a distributed mass, the position of the end as a ratio of the half-span--></y_ratio_end>
+              <y_ratio_start is_input="False">0.3290885418894588<!--When tank is considered as a distributed mass, the position of the start as a ratio of the half-span--></y_ratio_start>
+            </distributed_tanks>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
@@ -972,10 +978,21 @@
             <y_ratio_end is_input="False">[]</y_ratio_end>
             <y_ratio_start is_input="False">[]</y_ratio_start>
           </distributed_mass>
+          <distributed_tanks>
+            <chord_slope is_input="False">[]</chord_slope>
+            <fuel_inside units="kg" is_input="False">[]</fuel_inside>
+            <start_chord units="m" is_input="False">[]</start_chord>
+            <y_ratio_end is_input="False">[]</y_ratio_end>
+            <y_ratio_start is_input="False">[]</y_ratio_start>
+          </distributed_tanks>
           <punctual_mass>
             <mass units="kg" is_input="False">[]<!--mass of the punctual masses on the wing used for wing load computation--></mass>
             <y_ratio is_input="False">[]<!--position (as a percent of wing semi-span) of the punctual masses on the wing used for wing load computation, only positive ratio will be considered--></y_ratio>
           </punctual_mass>
+          <punctual_tanks>
+            <fuel_inside units="kg" is_input="False">[]</fuel_inside>
+            <y_ratio is_input="False">[]</y_ratio>
+          </punctual_tanks>
         </wing>
       </airframe>
     </weight>
