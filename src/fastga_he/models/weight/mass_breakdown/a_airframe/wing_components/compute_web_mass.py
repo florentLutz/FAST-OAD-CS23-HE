@@ -37,17 +37,6 @@ class ComputeWebMass(om.ExplicitComponent):
         self.add_input("data:geometry:fuselage:maximum_height", val=np.nan, units="m")
         self.add_input("data:geometry:landing_gear:y", val=np.nan, units="m")
         self.add_input("data:geometry:landing_gear:type", val=np.nan)
-        self.add_input("data:geometry:propulsion:engine:layout", val=np.nan)
-        self.add_input("data:geometry:propulsion:engine:count", val=np.nan)
-        self.add_input(
-            "data:geometry:propulsion:engine:y_ratio",
-            shape_by_conn=True,
-        )
-        self.add_input("data:geometry:propulsion:tank:y_ratio_tank_end", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:y_ratio_tank_beginning", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:LE_chord_percentage", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:TE_chord_percentage", val=np.nan)
-        self.add_input("data:geometry:propulsion:nacelle:width", val=np.nan, units="m")
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
         self.add_input("data:geometry:wing:thickness_ratio", val=np.nan)
@@ -99,7 +88,6 @@ class ComputeWebMass(om.ExplicitComponent):
             "data:aerodynamics:slipstream:wing:cruise:prop_on:velocity", val=np.nan, units="m/s"
         )
 
-        self.add_input("data:weight:propulsion:engine:mass", val=np.nan, units="kg")
         self.add_input("data:weight:airframe:landing_gear:main:mass", val=np.nan, units="kg")
         self.add_input(
             "data:weight:airframe:wing:punctual_mass:y_ratio",
@@ -367,7 +355,8 @@ class ComputeWebMass(om.ExplicitComponent):
         web_surface = shear_vector / max_shear_stress
         web_mass = abs(2.0 * rho_m / np.cos(sweep_e) * trapz(web_surface, y_vector))
 
-        if inputs["data:geometry:propulsion:engine:count"] > 4:
+        # If there are enough punctual mass on the wing, we add some weight
+        if len(inputs["data:weight:airframe:wing:punctual_mass:mass"]) > 4:
             web_mass *= 1.1
 
         if not self.options["min_fuel_in_wing"]:

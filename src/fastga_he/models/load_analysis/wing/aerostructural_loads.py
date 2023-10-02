@@ -80,37 +80,14 @@ class AerostructuralLoadHE(om.ExplicitComponent):
 
         self.add_input("data:weight:aircraft:MZFW", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:MTOW", val=np.nan, units="kg")
-        self.add_input("data:weight:propulsion:engine:mass", val=np.nan, units="kg")
         self.add_input("data:weight:airframe:landing_gear:main:mass", val=np.nan, units="kg")
         self.add_input("data:weight:airframe:wing:mass", val=np.nan, units="kg")
 
-        self.add_input("data:geometry:wing:root:virtual_chord", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:root:y", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:tip:y", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:root:thickness_ratio", val=np.nan)
-        self.add_input("data:geometry:wing:tip:thickness_ratio", val=np.nan)
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
-        self.add_input("data:geometry:flap:chord_ratio", val=np.nan)
-        self.add_input("data:geometry:wing:aileron:chord_ratio", val=np.nan)
-        self.add_input("data:geometry:fuselage:length", val=np.nan, units="m")
-        self.add_input("data:geometry:fuselage:maximum_width", val=np.nan, units="m")
         self.add_input("data:geometry:landing_gear:y", val=np.nan, units="m")
         self.add_input("data:geometry:landing_gear:type", val=np.nan)
-        self.add_input("data:geometry:propulsion:engine:layout", val=np.nan)
-        self.add_input("data:geometry:propulsion:engine:count", val=np.nan)
-        self.add_input(
-            "data:geometry:propulsion:engine:y_ratio",
-            shape_by_conn=True,
-        )
-        self.add_input("data:geometry:propulsion:nacelle:width", val=np.nan, units="m")
-        self.add_input("data:geometry:propulsion:tank:y_ratio_tank_end", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:y_ratio_tank_beginning", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:LE_chord_percentage", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:TE_chord_percentage", val=np.nan)
 
         self.add_input(
             "data:weight:airframe:wing:punctual_mass:y_ratio",
@@ -148,8 +125,6 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         self.add_input("data:mission:sizing:cs23:sizing_factor:ultimate_mtow:negative", val=np.nan)
         self.add_input("data:mission:sizing:cs23:sizing_factor:ultimate_mzfw:positive", val=np.nan)
         self.add_input("data:mission:sizing:cs23:sizing_factor:ultimate_mzfw:negative", val=np.nan)
-
-        self.add_input("settings:geometry:fuel_tanks:depth", val=np.nan)
 
         # Here we add all the inputs necessary for the addition of the distributed mass other
         # than the fuel (batteries for instance), this input will later be an output of the
@@ -536,20 +511,14 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         # separately, to do this we chose to render this function able to set each mass to 0 to
         # nullify its influence
         if point_mass:
-            tot_engine_mass = inputs["data:weight:propulsion:engine:mass"]
             tot_lg_mass = inputs["data:weight:airframe:landing_gear:main:mass"]
+            point_mass_tag = 1.0
         else:
-            tot_engine_mass = 0.0
+            point_mass_tag = 0.0
             tot_lg_mass = 0.0
 
-        engine_config = inputs["data:geometry:propulsion:engine:layout"]
-        engine_count = inputs["data:geometry:propulsion:engine:count"]
         semi_span = inputs["data:geometry:wing:span"] / 2.0
         y_lg = inputs["data:geometry:landing_gear:y"]
-        if engine_config != 1.0:
-            y_ratio = 0.0
-        else:
-            y_ratio = inputs["data:geometry:propulsion:engine:y_ratio"]
 
         y_ratio_punctual_mass = inputs["data:weight:airframe:wing:punctual_mass:y_ratio"]
         punctual_mass_array = inputs["data:weight:airframe:wing:punctual_mass:mass"]
@@ -561,8 +530,6 @@ class AerostructuralLoadHE(om.ExplicitComponent):
 
         # STEP 2/XX - REARRANGE THE DATA TO FIT ON ONE WING AS WE ASSUME SYMMETRICAL LOADING
 
-        # Computing the mass of the components for one wing
-        single_engine_mass = tot_engine_mass / engine_count
         single_lg_mass = tot_lg_mass / 2.0  # We assume 2 MLG
 
         # STEP 3/XX - AS MENTIONED BEFORE, ADDING POINT MASS WILL ADD Y STATIONS TO THE Y VECTOR
@@ -572,32 +539,20 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         # distributed mass over a small finite interval
         point_mass_array = np.zeros(len(y_vector))
 
-        # Adding the motor weight
-        # TODO: Will disappear eventually because all component will be taken as punctual masses
-        if engine_config == 1.0:
-            for y_ratio_mot in y_ratio:
-                y_eng = y_ratio_mot * semi_span
-                y_vector, chord_vector, point_mass_array = AerostructuralLoadHE.add_point_mass(
-                    y_vector, chord_vector, point_mass_array, y_eng, single_engine_mass, inputs
-                )
-
         # Only adding point masses when we really want them
-        if point_mass:
-            if len(y_ratio_punctual_mass) > 1 or (
-                len(y_ratio_punctual_mass) == 1 and punctual_mass_array != 0
-            ):
-                for y_ratio_punctual, punctual_mass in zip(
-                    y_ratio_punctual_mass, punctual_mass_array
-                ):
-                    y_punctual_mass = y_ratio_punctual * semi_span
-                    y_vector, chord_vector, point_mass_array = AerostructuralLoadHE.add_point_mass(
-                        y_vector,
-                        chord_vector,
-                        point_mass_array,
-                        y_punctual_mass,
-                        punctual_mass,
-                        inputs,
-                    )
+        if len(y_ratio_punctual_mass) > 1 or (
+            len(y_ratio_punctual_mass) == 1 and punctual_mass_array != 0
+        ):
+            for y_ratio_punctual, punctual_mass in zip(y_ratio_punctual_mass, punctual_mass_array):
+                y_punctual_mass = y_ratio_punctual * semi_span
+                y_vector, chord_vector, point_mass_array = AerostructuralLoadHE.add_point_mass(
+                    y_vector,
+                    chord_vector,
+                    point_mass_array,
+                    y_punctual_mass,
+                    punctual_mass * point_mass_tag,
+                    inputs,
+                )
 
         # Adding the LG weight
         y_vector, chord_vector, point_mass_array = AerostructuralLoadHE.add_point_mass(

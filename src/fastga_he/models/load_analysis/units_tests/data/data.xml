@@ -737,8 +737,8 @@
             <x units="m" is_input="False">3.3384540687818585<!--X-position of center of gravity of the wing--></x>
           </CG>
           <punctual_mass>
-            <mass>0.0</mass>
-            <y_ratio>0.0</y_ratio>
+            <mass units="lbm">387.844</mass>
+            <y_ratio>0.34</y_ratio>
           </punctual_mass>
           <punctual_tanks>
             <fuel_inside>0.0</fuel_inside>
