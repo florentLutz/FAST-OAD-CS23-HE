@@ -14,6 +14,7 @@ from .sizing_tank_height import SizingFuelTankHeight
 from .sizing_tank_width import SizingFuelTankWidth
 from .sizing_tank_weight import SizingFuelTankWeight
 from .sizing_tank_drag import SizingFuelTankDrag
+from .sizing_tank_prep_for_loads import SizingFuelTankPreparationForLoads
 
 from .cstr_fuel_tank import ConstraintsFuelTank
 
@@ -109,6 +110,17 @@ class SizingFuelTank(om.Group):
                     fuel_tank_id=fuel_tank_id,
                     position=position,
                     low_speed_aero=low_speed_aero,
+                ),
+                promotes=["*"],
+            )
+
+        if position == "inside_the_wing":
+
+            self.add_subsystem(
+                name="preparation_for_loads",
+                subsys=SizingFuelTankPreparationForLoads(
+                    fuel_tank_id=fuel_tank_id,
+                    position=position,
                 ),
                 promotes=["*"],
             )

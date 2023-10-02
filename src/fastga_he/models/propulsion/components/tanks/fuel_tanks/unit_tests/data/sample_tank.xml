@@ -15,6 +15,12 @@
                 <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
                 <thickness_ratio>0.15</thickness_ratio>
                 <span units="m" is_input="False">9.237463382822208<!--wing span--></span>
+                <root>
+                    <chord units="m" is_input="False">0.7672311779752663<!--chord length at wing root--></chord>
+                </root>
+                <tip>
+                    <chord units="m" is_input="False">0.7672311779752663<!--chord length at wing tip--></chord>
+                </tip>
                 <MAC>
                   <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
                   <at25percent>
@@ -51,7 +57,7 @@
                             <ref_chord units="m">0.946</ref_chord>
                             <length units="m">0.467</length>
                             <height units="m">0.127</height>
-                            <width units="m">0.127</width>
+                            <width units="m">3.0</width>
                         </dimension>
                     </fuel_tank_1>
                 </fuel_tank>

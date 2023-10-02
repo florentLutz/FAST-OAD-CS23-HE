@@ -17,6 +17,7 @@ from ..components.sizing_tank_height import SizingFuelTankHeight
 from ..components.sizing_tank_width import SizingFuelTankWidth
 from ..components.sizing_tank_weight import SizingFuelTankWeight
 from ..components.sizing_tank_drag import SizingFuelTankDrag
+from ..components.sizing_tank_prep_for_loads import SizingFuelTankPreparationForLoads
 
 from ..components.cstr_enforce import ConstraintsFuelTankCapacityEnforce
 from ..components.cstr_ensure import ConstraintsFuelTankCapacityEnsure
@@ -288,6 +289,53 @@ def test_fuel_tank_drag():
                 )
 
             problem.check_partials(compact_print=True)
+
+
+def test_fuel_tank_preparation_for_loads():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SizingFuelTankPreparationForLoads(
+                fuel_tank_id="fuel_tank_1", position="inside_the_wing"
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingFuelTankPreparationForLoads(fuel_tank_id="fuel_tank_1", position="inside_the_wing"),
+        ivc,
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:y_ratio_start",
+        )
+        == pytest.approx(0.075, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:y_ratio_end",
+        )
+        == pytest.approx(0.725, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:chord_slope",
+        )
+        == pytest.approx(0.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:start_chord",
+        )
+        == pytest.approx(0.767, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
 
 
 def test_sizing_tank():

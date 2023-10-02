@@ -50,7 +50,7 @@ class SizingFuelTankCGY(om.ExplicitComponent):
             self.add_input(
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":CG:y_ratio",
                 val=np.nan,
-                desc="X position of the fuel tank center of gravity as a ratio of the wing half-span",
+                desc="Y position of the fuel tank center of gravity as a ratio of the wing half-span",
             )
 
             self.declare_partials(of="*", wrt="*", method="exact")
