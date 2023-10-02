@@ -9,13 +9,16 @@ import pytest
 
 from ..delta_from_pt_file import SlipstreamAirframeLiftClean, SlipstreamAirframeLift
 from ..wing_punctual_loads_from_pt_file import PowerTrainPunctualLoadsFromFile
+from ..wing_punctual_tanks_from_pt_file import PowerTrainPunctualTanksFromFile
 from ..wing_distributed_loads_from_pt_file import PowerTrainDistributedLoadsFromFile
+from ..wing_distributed_tanks_from_pt_file import PowerTrainDistributedTanksFromFile
 from ..fuel_cg_from_pt_file import FuelCGFromPTFile
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "reference_data.xml"
 PROPULSION_FILE = pth.join("data", "sample_power_train_file.yml")
+PROPULSION_FILE_TANKS = pth.join("data", "sample_fuel_propulsion_for_assembler.yml")
 NB_POINTS_TEST = 10
 
 
@@ -103,6 +106,31 @@ def test_punctual_mass_assembler():
     problem.check_partials(compact_print=True)
 
 
+def test_punctual_tank_assembler():
+
+    pt_file_path = pth.join(pth.dirname(__file__), PROPULSION_FILE_TANKS)
+
+    ivc = get_indep_var_comp(
+        list_inputs(PowerTrainPunctualTanksFromFile(power_train_file_path=pt_file_path)),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        PowerTrainPunctualTanksFromFile(power_train_file_path=pt_file_path),
+        ivc,
+    )
+
+    assert problem.get_val("data:weight:airframe:wing:punctual_tanks:y_ratio") == pytest.approx(
+        np.array([0.4]), rel=1e-6
+    )
+    assert problem.get_val(
+        "data:weight:airframe:wing:punctual_tanks:fuel_inside", units="kg"
+    ) == pytest.approx(np.array([12.0]), rel=1e-6)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_distributed_mass_assembler():
 
     pt_file_path = pth.join(pth.dirname(__file__), PROPULSION_FILE)
@@ -133,6 +161,40 @@ def test_distributed_mass_assembler():
     assert problem.get_val("data:weight:airframe:wing:distributed_mass:mass") == pytest.approx(
         120.0, rel=1e-6
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_distributed_tanks_assembler():
+
+    pt_file_path = pth.join(pth.dirname(__file__), PROPULSION_FILE_TANKS)
+
+    ivc = get_indep_var_comp(
+        list_inputs(PowerTrainDistributedTanksFromFile(power_train_file_path=pt_file_path)),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        PowerTrainDistributedTanksFromFile(power_train_file_path=pt_file_path),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:weight:airframe:wing:distributed_tanks:y_ratio_start"
+    ) == pytest.approx(0.3, rel=1e-6)
+    assert problem.get_val(
+        "data:weight:airframe:wing:distributed_tanks:y_ratio_end"
+    ) == pytest.approx(0.6, rel=1e-6)
+    assert problem.get_val(
+        "data:weight:airframe:wing:distributed_tanks:start_chord"
+    ) == pytest.approx(0.7, rel=1e-6)
+    assert problem.get_val(
+        "data:weight:airframe:wing:distributed_tanks:chord_slope"
+    ) == pytest.approx(0.0, rel=1e-6)
+    assert problem.get_val(
+        "data:weight:airframe:wing:distributed_tanks:fuel_inside"
+    ) == pytest.approx(160.0, rel=1e-6)
 
     problem.check_partials(compact_print=True)
 

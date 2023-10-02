@@ -1,0 +1,68 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  ice_1:
+    id: fastga_he.pt_component.internal_combustion_engine
+    position: on_the_wing  # "on_the_wing", "in_the_front", "in_the_back"
+
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  ice_2:
+    id: fastga_he.pt_component.internal_combustion_engine
+    position: on_the_wing  # "on_the_wing", "in_the_front", "in_the_back"
+
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+    options:
+      number_of_engines: 2
+      number_of_tanks: 4
+    position: in_the_front
+
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing
+
+  fuel_tank_2:
+    id: fastga_he.pt_component.fuel_tank
+    position: wing_pod
+    symmetrical: fuel_tank_3
+
+  fuel_tank_3:
+    id: fastga_he.pt_component.fuel_tank
+    position: wing_pod
+
+  fuel_tank_4:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing
+    symmetrical: fuel_tank_1
+
+component_connections:
+  - source: propeller_1
+    target: ice_1
+
+  - source: ice_1
+    target: [fuel_system_1, 1]
+
+  - source: [fuel_system_1, 1]
+    target: fuel_tank_1
+
+  - source: [ fuel_system_1, 2 ]
+    target: fuel_tank_2
+
+  - source: propeller_2
+    target: ice_2
+
+  - source: ice_2
+    target: [fuel_system_1, 2]
+
+  - source: [ fuel_system_1, 3 ]
+    target: fuel_tank_3
+
+  - source: [fuel_system_1, 4]
+    target: fuel_tank_4
+
+watcher_file_path: ../results/two_fuel_propulsion.csv

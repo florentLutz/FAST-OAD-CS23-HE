@@ -76,7 +76,14 @@ DST_W = "distributed_wing"
 PCT_W = "punctual_wing"
 # VARIES_MASS contains a boolean which tells whether or not the components makes the mass of the
 # aircraft vary during the mission. This will help prevent setting a fake initial fuel
-# consumption when the power train is all electric.
+# consumption when the power train is all electric. DST_W_F contains a list of position for which
+# the component should be considered as a distributed load that acts on the wing and contains
+# fuel. (The reason being that to compute the stresses on the wing we need to test with and
+# without fuel)
+DST_W_F = "distributed_fuel_wing"
+# PCT_W contains a list of position for which the component should be considered as a punctual
+# load that acts on the wing
+PCT_W_F = "punctual_fuel_wing"
 VARIES_MASS = "varies_mass"
 # VARIESN_T_MASS contains a boolean which tells whether or not the component is a source
 # component which does not make the mass of the aircraft
@@ -124,6 +131,8 @@ PROPELLER = {
     SWL: True,
     DST_W: [],
     PCT_W: ["on_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: False,
     ETA: 0.8,
@@ -164,6 +173,8 @@ PMSM = {
     SWL: False,
     DST_W: [],
     PCT_W: ["on_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: False,
     ETA: 0.95,
@@ -211,6 +222,8 @@ INVERTER = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: False,
     ETA: 0.98,
@@ -242,6 +255,8 @@ DC_BUS = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: False,
     ETA: 1.0,
@@ -273,6 +288,8 @@ DC_LINE = {
     SWL: False,
     DST_W: [],
     PCT_W: [],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: False,
     ETA: 0.98,
@@ -309,6 +326,8 @@ DC_DC_CONVERTER = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: False,
     ETA: 0.98,
@@ -348,6 +367,8 @@ BATTERY_PACK = {
     SWL: False,
     DST_W: ["inside_the_wing"],
     PCT_W: ["wing_pod"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: True,
     ETA: 0.95,
@@ -384,6 +405,8 @@ DC_SSPC = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: False,
     ETA: 0.99,
@@ -415,6 +438,8 @@ DC_SPLITTER = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: False,
     ETA: 1.0,
@@ -455,6 +480,8 @@ RECTIFIER = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: False,
     ETA: 0.98,
@@ -498,6 +525,8 @@ GENERATOR = {
     SWL: False,
     DST_W: [],
     PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,
     VARIESN_T_MASS: False,
     ETA: 0.95,
@@ -535,6 +564,8 @@ ICE = {
     SWL: False,
     DST_W: [],
     PCT_W: ["on_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: True,
     VARIESN_T_MASS: False,
     ETA: 0.4,
@@ -568,6 +599,8 @@ FUEL_TANK = {
     SWL: False,
     DST_W: [],
     PCT_W: [],
+    DST_W_F: ["inside_the_wing"],
+    PCT_W_F: ["wing_pod"],
     VARIES_MASS: False,  # Seems weird but the ICE already does the job so we won't double up
     VARIESN_T_MASS: True,
     ETA: 1.0,
@@ -601,6 +634,8 @@ FUEL_SYSTEM = {
     SWL: False,
     DST_W: [],
     PCT_W: [],
+    DST_W_F: [],
+    PCT_W_F: [],
     VARIES_MASS: False,  # Seems weird but the ICE already does the job so we won't double up
     VARIESN_T_MASS: True,
     ETA: 1.0,
@@ -647,7 +682,9 @@ DICTIONARY_I_TO_SET = {}
 DICTIONARY_SFR = {}
 DICTIONARY_SWL = {}
 DICTIONARY_DST_W = {}
+DICTIONARY_DST_W_F = {}
 DICTIONARY_PCT_W = {}
+DICTIONARY_PCT_W_F = {}
 DICTIONARY_VARIES_MASS = {}
 DICTIONARY_VARIESN_T_MASS = {}
 DICTIONARY_ETA = {}
@@ -676,7 +713,9 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_SFR[known_component[ID]] = known_component[SFR]
     DICTIONARY_SWL[known_component[ID]] = known_component[SWL]
     DICTIONARY_DST_W[known_component[ID]] = known_component[DST_W]
+    DICTIONARY_DST_W_F[known_component[ID]] = known_component[DST_W_F]
     DICTIONARY_PCT_W[known_component[ID]] = known_component[PCT_W]
+    DICTIONARY_PCT_W_F[known_component[ID]] = known_component[PCT_W_F]
     DICTIONARY_VARIES_MASS[known_component[ID]] = known_component[VARIES_MASS]
     DICTIONARY_VARIESN_T_MASS[known_component[ID]] = known_component[VARIESN_T_MASS]
     DICTIONARY_ETA[known_component[ID]] = known_component[ETA]

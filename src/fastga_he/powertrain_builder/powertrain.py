@@ -990,6 +990,42 @@ class FASTGAHEPowerTrainConfigurator:
 
         return punctual_mass_names, punctual_mass_types, component_pairs
 
+    def get_wing_punctual_fuel_element_list(self) -> Tuple[list, list, list]:
+        """
+        This function returns a list of the components that are to be considered as punctual
+        fuel tanks acting on the wing due to their positions as defined in the powertrain file
+        """
+
+        self._get_components()
+
+        punctual_tank_names = []
+        punctual_tank_types = []
+        component_pairs = copy.deepcopy(self._components_symmetrical_pairs)
+
+        for component_id, component_name, component_position, component_type in zip(
+            self._components_id,
+            self._components_name,
+            self._components_position,
+            self._components_type,
+        ):
+            if component_position in resources.DICTIONARY_PCT_W_F[component_id]:
+                punctual_tank_names.append(component_name)
+                punctual_tank_types.append(component_type)
+
+        # TODO: improve the way this is done, as I'm not satisfied with it
+        for component_pair in self._components_symmetrical_pairs:
+
+            if component_pair[0] in punctual_tank_names:
+                continue
+
+            elif component_pair[1] in punctual_tank_names:
+                continue
+
+            else:
+                component_pairs.remove(component_pair)
+
+        return punctual_tank_names, punctual_tank_types, component_pairs
+
     def get_wing_distributed_mass_element_list(self) -> Tuple[list, list, list]:
         """
         This function returns a list of the components that are to be considered as distributed
@@ -1025,6 +1061,42 @@ class FASTGAHEPowerTrainConfigurator:
                 component_pairs.remove(component_pair)
 
         return distributed_mass_names, distributed_mass_types, component_pairs
+
+    def get_wing_distributed_fuel_element_list(self) -> Tuple[list, list, list]:
+        """
+        This function returns a list of the components that are to be considered as distributed
+        fuel tanks acting on the wing due to their positions as defined in the powertrain file
+        """
+
+        self._get_components()
+
+        distributed_tanks_names = []
+        distributed_tanks_types = []
+        component_pairs = copy.deepcopy(self._components_symmetrical_pairs)
+
+        for component_id, component_name, component_position, component_type in zip(
+            self._components_id,
+            self._components_name,
+            self._components_position,
+            self._components_type,
+        ):
+            if component_position in resources.DICTIONARY_DST_W_F[component_id]:
+                distributed_tanks_names.append(component_name)
+                distributed_tanks_types.append(component_type)
+
+        # TODO: improve the way this is done, as I'm not satisfied with it
+        for component_pair in self._components_symmetrical_pairs:
+
+            if component_pair[0] in distributed_tanks_names:
+                continue
+
+            elif component_pair[1] in distributed_tanks_names:
+                continue
+
+            else:
+                component_pairs.remove(component_pair)
+
+        return distributed_tanks_names, distributed_tanks_types, component_pairs
 
     def will_aircraft_mass_vary(self):
         """

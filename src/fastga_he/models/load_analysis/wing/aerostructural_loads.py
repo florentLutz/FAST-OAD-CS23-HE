@@ -774,3 +774,36 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         linear_mass_array = prop_coeff * chord_array
 
         return linear_mass_array
+
+    @staticmethod
+    def fuel_distribution(y_start, y_end, chord_start, chord_slope, fuel_mass, y_array_orig):
+        """
+        Computes the value of the linear weight at each point of the y vector to represent the
+        fuel tank as a distributed mass. This method ensure that integrating the resulting array
+        on the original vector, gives the actual mass value. This method assumes the height of
+        the distributed mass is constant though its chord can vary.
+
+        :param y_start: span at which the fuel tank starts
+        :param y_end: span at which the fuel tank ends
+        :param chord_start: chord occupied by the fuel tank
+        :param chord_slope: chord slope along the width of the fuel tank, assumed linear
+        :param fuel_mass: mass of fuel inside the tank
+        :param y_array_orig: the original y_vector
+        """
+
+        # Create the array which will contain the tank cross section area at each section
+        y_array = y_array_orig.flatten()
+
+        y_in_index = np.where((y_array >= y_start) & (y_array <= y_end))[0]
+        y_in_array = y_array[y_in_index]
+
+        chord_in_array = chord_start + y_in_array * chord_slope
+        chord_array = np.zeros_like(y_array)
+
+        chord_array[y_in_index] = chord_in_array
+
+        prop_coeff = fuel_mass / trapz(chord_array, y_array_orig)
+
+        linear_mass_array = prop_coeff * chord_array
+
+        return linear_mass_array
