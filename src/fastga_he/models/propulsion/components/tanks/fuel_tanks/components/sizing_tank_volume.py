@@ -92,4 +92,6 @@ class SizingFuelTankVolume(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":volume",
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity",
-        ] = (1.0 / self.rho_fuel)
+        ] = (
+            1.0 / self.rho_fuel
+        )
