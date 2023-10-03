@@ -23,6 +23,8 @@ from fastga_he.models.propulsion.components import (
     SizingRectifier,
     SizingGenerator,
     SizingICE,
+    SizingFuelTank,
+    SizingFuelSystem,
 )
 
 from .constants import (
@@ -30,7 +32,9 @@ from .constants import (
     SUBMODEL_POWER_TRAIN_CG,
     SUBMODEL_POWER_TRAIN_DRAG,
     SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_LOADS,
+    SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_TANKS,
     SUBMODEL_POWER_TRAIN_WING_DISTRIBUTED_LOADS,
+    SUBMODEL_POWER_TRAIN_WING_DISTRIBUTED_TANKS,
 )
 
 
@@ -114,9 +118,23 @@ class PowerTrainSizingFromFile(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
+            name="punctual_tanks_prep",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_TANKS, options=option_pt_file
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
             name="distributed_load_prep",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_POWER_TRAIN_WING_DISTRIBUTED_LOADS, options=option_pt_file
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="distributed_tanks_prep",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_POWER_TRAIN_WING_DISTRIBUTED_TANKS, options=option_pt_file
             ),
             promotes=["*"],
         )

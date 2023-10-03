@@ -56,6 +56,15 @@ power_train_components:
   ice_1:
     id: fastga_he.pt_component.internal_combustion_engine
     position: in_the_back  # "on_the_wing", "in_the_front", "in_the_back"
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+    options:
+      number_of_engines: 1
+      number_of_tanks: 1
+    position: in_the_back
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
+    position: in_the_fuselage
 
 component_connections:
   - source: propeller_1
@@ -96,6 +105,13 @@ component_connections:
 
   - source: generator_1
     target: ice_1
+
+  - source: ice_1
+    target: [fuel_system_1, 1]
+
+  - source: [fuel_system_1, 1]
+    target: fuel_tank_1
+
 
 
 watcher_file_path: ../results/fuel_and_battery_propulsion_share.csv

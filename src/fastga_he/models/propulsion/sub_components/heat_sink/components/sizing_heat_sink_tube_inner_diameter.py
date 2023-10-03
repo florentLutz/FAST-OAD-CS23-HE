@@ -163,7 +163,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             (
                 thermal_conductivity_coolant
                 * 0.023
-                * prandtl_coolant ** 0.3
+                * prandtl_coolant ** 0.4
                 * (4.0 * density_coolant) ** 0.8
             )
             / (y_term * (dynamic_viscosity_coolant * np.pi) ** 0.8)
@@ -183,9 +183,9 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                 / (y_term * (dynamic_viscosity_coolant * np.pi) ** 0.8)
             )
             ** (1.0 / 0.8)
-            * 0.3
+            * 0.4
             / 0.8
-            * prandtl_coolant ** (0.3 / 0.8 - 1.0)
+            * prandtl_coolant ** (0.4 / 0.8 - 1.0)
         )
         partials[
             prefix + ":heat_sink:tube:inner_diameter",
@@ -196,7 +196,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                     (
                         thermal_conductivity_coolant
                         * 0.023
-                        * prandtl_coolant ** 0.3
+                        * prandtl_coolant ** 0.4
                         * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                     )
                     / (y_term * np.pi ** 0.8)
@@ -212,7 +212,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             (
                 thermal_conductivity_coolant
                 * 0.023
-                * prandtl_coolant ** 0.3
+                * prandtl_coolant ** 0.4
                 * (4.0 * mass_flow_max_coolant) ** 0.8
             )
             / (y_term * (dynamic_viscosity_coolant * np.pi) ** 0.8)
@@ -226,7 +226,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             (
                 (
                     0.023
-                    * prandtl_coolant ** 0.3
+                    * prandtl_coolant ** 0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (y_term * (dynamic_viscosity_coolant * np.pi) ** 0.8)
@@ -243,7 +243,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                 (
                     thermal_conductivity_coolant
                     * 0.023
-                    * prandtl_coolant ** 0.3
+                    * prandtl_coolant ** 0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (dynamic_viscosity_coolant * np.pi) ** 0.8
@@ -262,7 +262,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                 (
                     thermal_conductivity_coolant
                     * 0.023
-                    * prandtl_coolant ** 0.3
+                    * prandtl_coolant ** 0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (dynamic_viscosity_coolant * np.pi) ** 0.8
@@ -281,7 +281,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                 (
                     thermal_conductivity_coolant
                     * 0.023
-                    * prandtl_coolant ** 0.3
+                    * prandtl_coolant ** 0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (dynamic_viscosity_coolant * np.pi) ** 0.8
@@ -297,7 +297,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                 (
                     thermal_conductivity_coolant
                     * 0.023
-                    * prandtl_coolant ** 0.3
+                    * prandtl_coolant ** 0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (dynamic_viscosity_coolant * np.pi) ** 0.8
@@ -313,7 +313,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                 (
                     thermal_conductivity_coolant
                     * 0.023
-                    * prandtl_coolant ** 0.3
+                    * prandtl_coolant ** 0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (dynamic_viscosity_coolant * np.pi) ** 0.8

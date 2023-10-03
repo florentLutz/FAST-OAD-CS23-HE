@@ -81,6 +81,7 @@
       </cabin>
       <flap>
         <span_ratio>0.5</span_ratio>
+        <chord_ratio>0.2</chord_ratio>
       </flap>
       <fuselage>
         <front_length units="m" is_input="True">1.87292<!--length of the front cone of the aircraft--></front_length>
@@ -93,6 +94,7 @@
         <area units="m**2" is_input="True">16.887140554758876<!--wing area--></area>
         <wet_area units="m**2" is_input="True">35.46299516499364</wet_area>
         <aspect_ratio is_input="True">7.981<!--wing aspect ratio--></aspect_ratio>
+        <thickness_ratio>0.12</thickness_ratio>
         <span units="m" is_input="True">11.605647253590986<!--wing span--></span>
         <MAC>
           <length units="m" is_input="True">1.4541595355959134<!--length of mean aerodynamic chord of wing--></length>
@@ -203,6 +205,18 @@
         <low_speed>
           <CD0 is_input="False">0.0</CD0>
         </low_speed>
+        <fuel_tank>
+          <fuel_tank_1>
+            <CG>
+              <y_ratio>0.4</y_ratio>
+            </CG>
+          </fuel_tank_1>
+          <fuel_tank_2>
+            <CG>
+              <y_ratio>0.4</y_ratio>
+            </CG>
+          </fuel_tank_2>
+        </fuel_tank>
         <DC_SSPC>
           <dc_sspc_3>
                         <low_speed>

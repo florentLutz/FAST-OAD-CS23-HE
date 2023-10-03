@@ -38,17 +38,6 @@ class ComputeLowerFlange(om.ExplicitComponent):
         self.add_input("data:geometry:fuselage:maximum_height", val=np.nan, units="m")
         self.add_input("data:geometry:landing_gear:y", val=np.nan, units="m")
         self.add_input("data:geometry:landing_gear:type", val=np.nan)
-        self.add_input("data:geometry:propulsion:engine:layout", val=np.nan)
-        self.add_input("data:geometry:propulsion:engine:count", val=np.nan)
-        self.add_input(
-            "data:geometry:propulsion:engine:y_ratio",
-            shape_by_conn=True,
-        )
-        self.add_input("data:geometry:propulsion:tank:y_ratio_tank_end", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:y_ratio_tank_beginning", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:LE_chord_percentage", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:TE_chord_percentage", val=np.nan)
-        self.add_input("data:geometry:propulsion:nacelle:width", val=np.nan, units="m")
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
         self.add_input("data:geometry:wing:thickness_ratio", val=np.nan)
@@ -100,7 +89,6 @@ class ComputeLowerFlange(om.ExplicitComponent):
             "data:aerodynamics:slipstream:wing:cruise:prop_on:velocity", val=np.nan, units="m/s"
         )
 
-        self.add_input("data:weight:propulsion:engine:mass", val=np.nan, units="kg")
         self.add_input("data:weight:airframe:landing_gear:main:mass", val=np.nan, units="kg")
         self.add_input(
             "data:weight:airframe:wing:punctual_mass:y_ratio",
@@ -114,6 +102,20 @@ class ComputeLowerFlange(om.ExplicitComponent):
             units="kg",
             val=0.0,
         )
+        # Same as with punctual loads expect here, we will have a tag to "turn it off" when at MZFW
+        self.add_input(
+            "data:weight:airframe:wing:punctual_tanks:y_ratio",
+            shape_by_conn=True,
+            val=0.0,
+        )
+        self.add_input(
+            "data:weight:airframe:wing:punctual_tanks:fuel_inside",
+            shape_by_conn=True,
+            copy_shape="data:weight:airframe:wing:punctual_tanks:y_ratio",
+            units="kg",
+            val=0.0,
+        )
+
         # Here we add all the inputs necessary for the addition of the distributed mass other
         # than the fuel (batteries for instance), this input will later be an output of the
         # powertrain sizing but their default value will be set at 0 so that it is used the same
@@ -154,6 +156,43 @@ class ComputeLowerFlange(om.ExplicitComponent):
             units="kg",
             desc="Array containing the value of masses that are distributed on the wing",
             copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
+        )
+        # Here we add all the inputs necessary for the addition of the distributed tanks
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the starting positions of all distributed tanks on the wing",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:y_ratio_end",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the end positions of all distributed tanks on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:start_chord",
+            shape_by_conn=True,
+            val=np.nan,
+            units="m",
+            desc="Array containing the value of the wing chord at the beginning of the distributed tanks",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:chord_slope",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the value of the chord slope for the distributed tanks. Fuel mass is assumed to vary with chord only (not thickness)",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:fuel_inside",
+            shape_by_conn=True,
+            val=np.nan,
+            units="kg",
+            desc="Array containing the value of fuel inside the tanks that are distributed on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
         )
 
         self.add_input("data:mission:sizing:cs23:safety_factor", val=np.nan)
@@ -228,6 +267,7 @@ class ComputeLowerFlange(om.ExplicitComponent):
             load_factor_neg = inputs[
                 "data:mission:sizing:cs23:sizing_factor:ultimate_mtow:negative"
             ]
+            fuel_tag = 1.0
         else:
             mass = inputs["data:weight:aircraft:MZFW"]
             load_factor_pos = inputs[
@@ -236,9 +276,7 @@ class ComputeLowerFlange(om.ExplicitComponent):
             load_factor_neg = inputs[
                 "data:mission:sizing:cs23:sizing_factor:ultimate_mzfw:negative"
             ]
-
-        mzfw = inputs["data:weight:aircraft:MZFW"]
-        fuel_mass = max(0, mass - mzfw)
+            fuel_tag = 0.0
 
         fus_width = inputs["data:geometry:fuselage:maximum_width"]
         fus_height = inputs["data:geometry:fuselage:maximum_height"]
@@ -315,7 +353,7 @@ class ComputeLowerFlange(om.ExplicitComponent):
         dynamic_pressure = 1.0 / 2.0 * atm.density * v_c_tas ** 2.0
 
         y_vector, weight_array_orig = AerostructuralLoadHE.compute_relief_force(
-            inputs, y_vector_orig, chord_vector_orig, wing_mass, fuel_mass
+            inputs, y_vector_orig, chord_vector_orig, wing_mass, fuel_tag
         )
         cl_s = AerostructuralLoadHE.compute_cl_s(
             y_vector_orig, y_vector_orig, y_vector, cl_vector_orig, chord_vector_orig
@@ -356,7 +394,7 @@ class ComputeLowerFlange(om.ExplicitComponent):
         lower_flange_area = np.fmax(lower_flange_area_pos, lower_flange_area_neg)
         lower_flange_mass = abs(2.0 * rho_m / np.cos(sweep_e)) * trapz(lower_flange_area, y_vector)
 
-        if inputs["data:geometry:propulsion:engine:count"] > 4:
+        if len(inputs["data:weight:airframe:wing:punctual_mass:mass"]) > 4:
             lower_flange_mass *= 1.1
 
         if not self.options["min_fuel_in_wing"]:

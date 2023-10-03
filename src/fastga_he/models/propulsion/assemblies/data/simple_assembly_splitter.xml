@@ -45,8 +45,10 @@
             </fuselage>
             <flap>
                 <span_ratio>0.45</span_ratio>
+                <chord_ratio>0.2</chord_ratio>
             </flap>
             <wing>
+                <thickness_ratio>0.15</thickness_ratio>
                 <wet_area units="m**2" is_input="False">26.657254276457444<!--wing wet area--></wet_area>
                 <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
                 <MAC>
@@ -66,6 +68,23 @@
         </geometry>
         <propulsion>
             <he_power_train>
+                <fuel_system>
+                    <fuel_system_1>
+                        <number_engine>1.0</number_engine>
+                        <total_fuel_flowed units="kg">41.24</total_fuel_flowed>
+                        <CG>
+                            <y_ratio>0.4</y_ratio>
+                        </CG>
+                    </fuel_system_1>
+                </fuel_system>
+                <fuel_tank>
+                    <fuel_tank_1>
+                        <fuel_consumed_mission units="kg">41.24</fuel_consumed_mission>
+                        <CG>
+                            <y_ratio>0.4</y_ratio>
+                        </CG>
+                    </fuel_tank_1>
+                </fuel_tank>
                 <ICE>
                     <ice_1>
                         <from_LE units="m">0.5</from_LE>
@@ -106,7 +125,7 @@
                         <voltage_dc_max units="V" is_input="False">850.0<!--Maximum value of the voltage at the output of the rectifier (DC side)--></voltage_dc_max>
                         <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
-                        <heat_sink_temperature_mission units="degK">12.0e3</heat_sink_temperature_mission>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <casing>
                             <thermal_resistance units="K/W">0.01</thermal_resistance>
                         </casing>

@@ -23,6 +23,8 @@ from fastga_he.models.propulsion.components import (
     SlipstreamRectifier,
     SlipstreamGenerator,
     SlipstreamICE,
+    SlipstreamFuelTank,
+    SlipstreamFuelSystem,
 )
 
 from .constants import (

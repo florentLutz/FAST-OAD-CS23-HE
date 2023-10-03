@@ -88,23 +88,49 @@ def test_assembly_performances_splitter_50_50():
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                108225.3,
-                108777.1,
-                109320.1,
-                109854.0,
-                110378.7,
-                110894.3,
-                111400.5,
-                111897.3,
-                112384.5,
-                112862.1,
+                107407.1,
+                107950.1,
+                108484.3,
+                109009.6,
+                109525.8,
+                110033.0,
+                110530.9,
+                111019.4,
+                111498.6,
+                111968.2,
             ]
         ),
         abs=1,
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([4.09, 4.10, 4.12, 4.13, 4.14, 4.15, 4.16, 4.17, 4.18, 4.19]),
+        np.array([4.07, 4.09, 4.1, 4.11, 4.12, 4.13, 4.14, 4.15, 4.16, 4.17]),
+        abs=1e-2,
+    )
+    # Only one input and one output to the system so input and output should be equal
+    assert problem.get_val(
+        "performances.fuel_system_1.fuel_consumed_in_t_1", units="kg"
+    ) == pytest.approx(
+        problem.get_val("performances.ice_1.fuel_consumed_t", units="kg"),
+        abs=1e-2,
+    )
+    assert problem.get_val(
+        "performances.fuel_tank_1.fuel_remaining_t", units="kg"
+    ) == pytest.approx(
+        np.array(
+            [
+                41.24,
+                37.17,
+                33.08,
+                28.98,
+                24.88,
+                20.76,
+                16.63,
+                12.48,
+                8.336,
+                4.173,
+            ]
+        ),
         abs=1e-2,
     )
 
@@ -177,23 +203,49 @@ def test_assembly_performances_splitter_60_40():
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                86101.5,
-                86533.8,
-                86959.2,
-                87377.3,
-                87788.3,
-                88192.1,
-                88588.4,
-                88977.4,
-                89358.8,
-                89732.6,
+                85598.0,
+                86025.0,
+                86444.9,
+                86857.8,
+                87263.6,
+                87662.1,
+                88053.4,
+                88437.3,
+                88813.8,
+                89182.7,
             ]
         ),
         abs=1,
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.54, 3.56, 3.58, 3.59, 3.61, 3.63, 3.64, 3.66, 3.68, 3.69]),
+        np.array([3.52, 3.54, 3.55, 3.57, 3.59, 3.6, 3.62, 3.63, 3.65, 3.67]),
+        abs=1e-2,
+    )
+    # Only one input and one output to the system so input and output should be equal
+    assert problem.get_val(
+        "performances.fuel_system_1.fuel_consumed_in_t_1", units="kg"
+    ) == pytest.approx(
+        problem.get_val("performances.ice_1.fuel_consumed_t", units="kg"),
+        abs=1e-2,
+    )
+    assert problem.get_val(
+        "performances.fuel_tank_1.fuel_remaining_t", units="kg"
+    ) == pytest.approx(
+        np.array(
+            [
+                35.93,
+                32.41,
+                28.87,
+                25.32,
+                21.75,
+                18.17,
+                14.56,
+                10.94,
+                7.314,
+                3.665,
+            ]
+        ),
         abs=1e-2,
     )
 
@@ -264,6 +316,18 @@ def test_assembly_performances_splitter_100_0():
 
     assert voltage_out == pytest.approx(voltage_in_2, rel=5e-3)
 
+    # Only one input and one output to the system so input and output should be equal
+    assert problem.get_val(
+        "performances.fuel_system_1.fuel_consumed_in_t_1", units="kg"
+    ) == pytest.approx(
+        problem.get_val("performances.ice_1.fuel_consumed_t", units="kg"),
+        abs=1e-2,
+    )
+    # No fuel is used, so no fuel is loaded so there is no fuel remaining
+    assert problem.get_val(
+        "performances.fuel_tank_1.fuel_remaining_t", units="kg"
+    ) == pytest.approx(np.zeros(NB_POINTS_TEST), abs=1e-2)
+
 
 def test_assembly_performances_splitter_100_0_only_part():
 
@@ -326,6 +390,33 @@ def test_assembly_performances_splitter_100_0_only_part():
 
     assert voltage_out == pytest.approx(voltage_in_2, rel=5e-3)
 
+    # Only one input and one output to the system so input and output should be equal
+    assert problem.get_val(
+        "performances.fuel_system_1.fuel_consumed_in_t_1", units="kg"
+    ) == pytest.approx(
+        problem.get_val("performances.ice_1.fuel_consumed_t", units="kg"),
+        abs=1e-2,
+    )
+    assert problem.get_val(
+        "performances.fuel_tank_1.fuel_remaining_t", units="kg"
+    ) == pytest.approx(
+        np.array(
+            [
+                5.52,
+                5.52,
+                5.52,
+                5.52,
+                5.52,
+                5.52,
+                5.52,
+                5.52,
+                4.58,
+                2.75,
+            ]
+        ),
+        abs=1e-2,
+    )
+
 
 def test_performances_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_splitter.yml")
@@ -386,23 +477,47 @@ def test_performances_from_pt_file():
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                108259.2,
-                108808.8,
-                109349.5,
-                109881.2,
-                110403.7,
-                110917.0,
-                111421.0,
-                111915.5,
-                112400.5,
-                112875.8,
+                107407.1,
+                107950.1,
+                108484.3,
+                109009.6,
+                109525.8,
+                110032.9,
+                110530.8,
+                111019.4,
+                111498.6,
+                111968.2,
             ]
         ),
         rel=1e-3,
     )
 
     assert problem.get_val("component.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([4.09, 4.1, 4.12, 4.13, 4.14, 4.15, 4.16, 4.17, 4.18, 4.19]),
+        np.array([4.07, 4.09, 4.1, 4.11, 4.12, 4.13, 4.14, 4.15, 4.16, 4.17]),
+        abs=1e-2,
+    )
+    # Only one input and one output to the system so input and output should be equal
+    assert problem.get_val(
+        "component.fuel_system_1.fuel_consumed_in_t_1", units="kg"
+    ) == pytest.approx(
+        problem.get_val("component.ice_1.fuel_consumed_t", units="kg"),
+        abs=1e-2,
+    )
+    assert problem.get_val("component.fuel_tank_1.fuel_remaining_t", units="kg") == pytest.approx(
+        np.array(
+            [
+                41.24,
+                37.17,
+                33.08,
+                28.98,
+                24.88,
+                20.76,
+                16.63,
+                12.48,
+                8.336,
+                4.173,
+            ]
+        ),
         abs=1e-2,
     )
 
@@ -472,6 +587,9 @@ def test_assembly_sizing_from_pt_file():
     assert problem.get_val(
         "data:propulsion:he_power_train:ICE:ice_1:mass", units="kg"
     ) == pytest.approx(363.50, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:mass", units="kg"
+    ) == pytest.approx(0.4124, rel=1e-2)
 
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
         2308.87, rel=1e-2

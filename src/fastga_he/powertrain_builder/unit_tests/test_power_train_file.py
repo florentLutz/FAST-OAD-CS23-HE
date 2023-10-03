@@ -282,6 +282,17 @@ def test_independent_voltage_subgraph():
         power_train_file_path=sample_power_train_file_path
     )
 
+    # Small trick to be able to run this test from everywhere
+    old_working_directory = os.getcwd()
+    if "unit_tests" in old_working_directory:
+        new_working_directory = os.path.dirname(os.path.dirname(old_working_directory))
+    elif "powertrain_builder" in old_working_directory:
+        new_working_directory = os.path.dirname(old_working_directory)
+    else:
+        new_working_directory = old_working_directory
+
+    os.chdir(new_working_directory)
+
     print("\n")
     sub_graphs = power_train_configurator.get_graphs_connected_voltage()
 
@@ -292,6 +303,8 @@ def test_independent_voltage_subgraph():
 
             nx.draw_kamada_kawai(sub_graph, ax=fig.add_subplot(), with_labels=True)
             fig.savefig("powertrain_builder/unit_tests/outputs/graph_" + str(i + 1) + ".png")
+
+    os.chdir(old_working_directory)
 
 
 def test_voltage_setter_list():

@@ -93,9 +93,13 @@
             <airframe>
                 <wing>
                     <punctual_mass>
-                        <mass>0.0</mass>
-                        <y_ratio>0.0</y_ratio>
+                        <mass>175.92</mass>
+                        <y_ratio>0.34</y_ratio>
                     </punctual_mass>
+                    <punctual_tanks>
+                        <fuel_inside>0.0</fuel_inside>
+                        <y_ratio>0.0</y_ratio>
+                    </punctual_tanks>
                     <distributed_mass>
                         <y_ratio_start>0.15</y_ratio_start>
                         <y_ratio_end>0.9</y_ratio_end>
@@ -103,6 +107,13 @@
                         <chord_slope>0.0</chord_slope>
                         <mass units="kg">75.0</mass>
                     </distributed_mass>
+                    <distributed_tanks>
+                        <y_ratio_start>0.42</y_ratio_start>
+                        <y_ratio_end>0.92</y_ratio_end>
+                        <start_chord units="m">0.8274063</start_chord>
+                        <chord_slope>-0.048</chord_slope>
+                        <fuel_inside units="kg">194.0</fuel_inside>
+                    </distributed_tanks>
                 </wing>
                 <landing_gear>
                     <main>

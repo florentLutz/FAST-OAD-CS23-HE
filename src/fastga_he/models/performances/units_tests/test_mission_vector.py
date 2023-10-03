@@ -1361,7 +1361,8 @@ def test_initialize_cog():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("fuel_consumed_t", units="kg", val=np.linspace(1.0, 2.0, 30))
+    ivc.add_output("fuel_mass_t", units="kg", val=np.linspace(45.0, 2.0, 30))
+    ivc.add_output("fuel_lever_arm_t", units="kg*m", val=np.linspace(45.0, 2.0, 30) * 2.5)
 
     problem = run_system(
         InitializeCoG(
@@ -1374,36 +1375,36 @@ def test_initialize_cog():
     )
     expected_cog = np.array(
         [
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
-            3.478,
+            3.45,
+            3.451,
+            3.451,
+            3.452,
+            3.453,
+            3.454,
+            3.455,
+            3.456,
+            3.457,
+            3.458,
+            3.459,
+            3.46,
+            3.461,
+            3.462,
+            3.463,
+            3.464,
+            3.464,
+            3.465,
+            3.466,
+            3.467,
+            3.468,
+            3.469,
+            3.47,
+            3.471,
+            3.472,
+            3.473,
+            3.474,
+            3.475,
+            3.476,
+            3.477,
         ]
     )
     assert problem.get_val("x_cg", units="m") == pytest.approx(expected_cog, rel=1e-3)
@@ -1497,6 +1498,16 @@ def test_performances_per_phase():
         units="kg",
     )
     ivc.add_output(
+        name="fuel_mass_t_econ",
+        val=np.linspace(48.0, 2.0, 32),
+        units="kg",
+    )
+    ivc.add_output(
+        name="fuel_lever_arm_t_econ",
+        val=np.linspace(144.0, 6.0, 32),
+        units="kg*m",
+    )
+    ivc.add_output(
         name="non_consumable_energy_t_econ",
         val=np.linspace(10.0, 25.0, 32),
         units="W*h",
@@ -1567,9 +1578,14 @@ def test_mission_vector():
         ivc,
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(45.60, abs=1e-2)
+    assert sizing_fuel == pytest.approx(45.63, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_mission_vector_from_yml():
@@ -1773,7 +1789,7 @@ def test_mission_vector_from_yml_fuel_turbo():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(38.95, abs=1e-2)
+    assert sizing_fuel == pytest.approx(39.04, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1807,9 +1823,9 @@ def test_mission_vector_from_yml_fuel_and_battery():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(20.135, abs=1e-2)
+    assert sizing_fuel == pytest.approx(20.158, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(74.816, abs=1e-2)
+    assert sizing_energy == pytest.approx(74.914, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
@@ -1899,7 +1915,7 @@ def test_recording():
     residuals = filter_residuals(residuals)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(20.135, abs=1e-2)
+    assert sizing_fuel == pytest.approx(20.158, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -1924,6 +1940,28 @@ def test_case_reader():
         fig.add_trace(scatter)
 
     fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_case_analyzer():
+
+    cr = om.CaseReader("results/cases.sql")
+
+    solver_case = cr.get_cases("root.nonlinear_solver")
+    for case in solver_case:
+
+        residuals_dict = {}
+
+        for residual in case.residuals:
+
+            residuals_dict[residual] = sum(np.square(case.residuals[residual]))
+
+        top_residuals = max(residuals_dict, key=residuals_dict.get)
+
+        # print the result
+        print(
+            f"The top residuals is {top_residuals} with a score of {residuals_dict[top_residuals]}."
+        )
 
 
 def test_criss_cross_network_viewer():
@@ -1965,10 +2003,10 @@ def test_mission_criss_cross():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(25.76, abs=1e-2)
+    assert sizing_fuel == pytest.approx(25.795, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(50.181, abs=1e-2)
+    assert sizing_energy == pytest.approx(50.243, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.0601, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.058, abs=1e-2)

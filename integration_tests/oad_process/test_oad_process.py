@@ -95,15 +95,17 @@ def test_fuel_and_battery(cleanup):
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        744.0, rel=1e-2
+        761.0, rel=1e-2
     )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(24.46, rel=1e-2)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(24.71, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(128.0, rel=1e-2)
 
 
 def test_sizing_sr22(cleanup):
+
+    # TODO: Recheck inputs
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -136,10 +138,10 @@ def test_sizing_sr22(cleanup):
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        1679.0, rel=1e-2
+        1747.0, rel=1e-2
     )
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        271.04, rel=1e-2
+        275.76, rel=1e-2
     )
 
 
@@ -178,11 +180,11 @@ def test_sizing_fuel_and_battery_share(cleanup):
     problem.write_outputs()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(23.34, abs=1e-2)
+    assert sizing_fuel == pytest.approx(23.38, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(31.889, abs=1e-2)
+    assert sizing_energy == pytest.approx(32.633, abs=1e-2)
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        801.65, rel=1e-2
+        815.414, rel=1e-2
     )
 
 
@@ -297,35 +299,35 @@ def test_read_case_recorder():
     multiplicative_factor = np.maximum(battery_pack_1_capa_mult, battery_pack_1_c_rate_mult)
     multiplicative_factor = np.clip(multiplicative_factor, 0.9, 1.0 / 0.9)
 
-    # scatter_number_of_battery_module = go.Scatter(
-    #     x=np.arange(1, 50),
-    #     y=battery_pack_1_modules_nb,
-    #     mode="lines+markers",
-    #     name="Number of battery modules",
-    # )
-    # fig.add_trace(scatter_number_of_battery_module)
-    # fig.update_layout(
-    #     title_text="Evolution of the number of battery module during the sizing process",
-    #     title_x=0.5,
-    #     xaxis_title="Number of modules [-]",
-    #     yaxis_title="Number of iteration [-]",
-    #     legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
-    # )
-
-    scatter_multiplicative_factor = go.Scatter(
+    scatter_number_of_battery_module = go.Scatter(
         x=np.arange(1, 50),
-        y=multiplicative_factor,
+        y=battery_pack_1_modules_nb,
         mode="lines+markers",
-        name="Multiplicative factor on the number of modules",
+        name="Number of battery modules",
     )
-    fig.add_trace(scatter_multiplicative_factor)
+    fig.add_trace(scatter_number_of_battery_module)
     fig.update_layout(
-        title_text="Evolution of the multiplicative factor on the number of modules",
+        title_text="Evolution of the number of battery module during the sizing process",
         title_x=0.5,
-        xaxis_title="Multiplicative factor [-]",
+        xaxis_title="Number of modules [-]",
         yaxis_title="Number of iteration [-]",
         legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
     )
+
+    # scatter_multiplicative_factor = go.Scatter(
+    #     x=np.arange(1, 50),
+    #     y=multiplicative_factor,
+    #     mode="lines+markers",
+    #     name="Multiplicative factor on the number of modules",
+    # )
+    # fig.add_trace(scatter_multiplicative_factor)
+    # fig.update_layout(
+    #     title_text="Evolution of the multiplicative factor on the number of modules",
+    #     title_x=0.5,
+    #     xaxis_title="Multiplicative factor [-]",
+    #     yaxis_title="Number of iteration [-]",
+    #     legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
+    # )
 
     fig.show()
 

@@ -83,38 +83,19 @@ class AerodynamicLoadsHE(om.ExplicitComponent):
         )
 
         self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:root:virtual_chord", val=np.nan, units="m")
         self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:root:y", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:tip:y", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:root:thickness_ratio", val=np.nan)
-        self.add_input("data:geometry:wing:tip:thickness_ratio", val=np.nan)
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
         self.add_input("data:geometry:wing:MAC:leading_edge:x:local", val=np.nan, units="m")
         self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
         self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
-        self.add_input("data:geometry:fuselage:length", val=np.nan, units="m")
         self.add_input("data:geometry:fuselage:maximum_width", val=np.nan, units="m")
         self.add_input(
             "data:geometry:horizontal_tail:MAC:at25percent:x:from_wingMAC25", val=np.nan, units="m"
         )
-        self.add_input("data:geometry:flap:chord_ratio", val=np.nan)
-        self.add_input("data:geometry:wing:aileron:chord_ratio", val=np.nan)
         self.add_input("data:geometry:landing_gear:height", val=np.nan, units="m")
         self.add_input("data:geometry:landing_gear:y", val=np.nan, units="m")
         self.add_input("data:geometry:landing_gear:type", val=np.nan)
-        self.add_input("data:geometry:propulsion:engine:layout", val=np.nan)
-        self.add_input("data:geometry:propulsion:engine:count", val=np.nan)
-        self.add_input(
-            "data:geometry:propulsion:engine:y_ratio",
-            shape_by_conn=True,
-        )
-        self.add_input("data:geometry:propulsion:nacelle:width", val=np.nan, units="m")
-        self.add_input("data:geometry:propulsion:tank:y_ratio_tank_end", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:y_ratio_tank_beginning", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:LE_chord_percentage", val=np.nan)
-        self.add_input("data:geometry:propulsion:tank:TE_chord_percentage", val=np.nan)
 
         # These are not used as the output of the method from AerostructuralLoadsHe which
         # requires them is not registered.
@@ -132,6 +113,20 @@ class AerodynamicLoadsHE(om.ExplicitComponent):
             units="kg",
             val=0.0,
         )
+        # Same as with punctual loads expect here, we will have a tag to "turn it off" when at MZFW
+        self.add_input(
+            "data:weight:airframe:wing:punctual_tanks:y_ratio",
+            shape_by_conn=True,
+            val=0.0,
+        )
+        self.add_input(
+            "data:weight:airframe:wing:punctual_tanks:fuel_inside",
+            shape_by_conn=True,
+            copy_shape="data:weight:airframe:wing:punctual_tanks:y_ratio",
+            units="kg",
+            val=0.0,
+        )
+
         self.add_input(
             "data:weight:airframe:wing:distributed_mass:y_ratio_start",
             shape_by_conn=True,
@@ -168,14 +163,48 @@ class AerodynamicLoadsHE(om.ExplicitComponent):
             desc="Array containing the value of masses that are distributed on the wing",
             copy_shape="data:weight:airframe:wing:distributed_mass:y_ratio_start",
         )
+        # Here we add all the inputs necessary for the addition of the distributed tanks
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the starting positions of all distributed tanks on the wing",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:y_ratio_end",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the end positions of all distributed tanks on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:start_chord",
+            shape_by_conn=True,
+            val=np.nan,
+            units="m",
+            desc="Array containing the value of the wing chord at the beginning of the distributed tanks",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:chord_slope",
+            shape_by_conn=True,
+            val=np.nan,
+            desc="Array containing the value of the chord slope for the distributed tanks. Fuel mass is assumed to vary with chord only (not thickness)",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
+        self.add_input(
+            "data:weight:airframe:wing:distributed_tanks:fuel_inside",
+            shape_by_conn=True,
+            val=np.nan,
+            units="kg",
+            desc="Array containing the value of fuel inside the tanks that are distributed on the wing",
+            copy_shape="data:weight:airframe:wing:distributed_tanks:y_ratio_start",
+        )
 
-        self.add_input("data:weight:propulsion:engine:mass", val=np.nan, units="kg")
         self.add_input("data:weight:airframe:landing_gear:main:mass", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft_empty:CG:z", val=np.nan, units="m")
 
         self.add_input("data:mission:sizing:main_route:cruise:altitude", val=np.nan, units="ft")
-
-        self.add_input("settings:geometry:fuel_tanks:depth", val=np.nan)
 
         self.add_output(
             "data:loads:aerodynamic:ultimate:force_distribution",

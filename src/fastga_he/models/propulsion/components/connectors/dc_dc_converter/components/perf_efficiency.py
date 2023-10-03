@@ -61,7 +61,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
             / (inputs["dc_current_out"] * inputs["dc_voltage_out"] + inputs["losses_converter"]),
         )
 
-        outputs["efficiency"] = efficiency
+        outputs["efficiency"] = np.clip(efficiency, 0.5, 1.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 

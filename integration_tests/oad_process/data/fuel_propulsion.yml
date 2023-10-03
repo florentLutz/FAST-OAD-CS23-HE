@@ -8,9 +8,32 @@ power_train_components:
     id: fastga_he.pt_component.internal_combustion_engine
     position: in_the_front  # "on_the_wing", "in_the_front", "in_the_back"
 
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+    options:
+      number_of_engines: 1
+      number_of_tanks: 2
+    position: in_the_front
+
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing
+  fuel_tank_2:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing
+    symmetrical: fuel_tank_1
+
 component_connections:
   - source: propeller_1
     target: ice_1
 
+  - source: ice_1
+    target: [fuel_system_1, 1]
+
+  - source: [fuel_system_1, 1]
+    target: fuel_tank_1
+
+  - source: [fuel_system_1, 2]
+    target: fuel_tank_2
 
 watcher_file_path: ../results/fuel_propulsion_pt_watcher.csv

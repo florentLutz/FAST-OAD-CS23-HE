@@ -22,6 +22,7 @@
         <length units="m" is_input="True">1.477417183742213<!--cabin length--></length>
       </cabin>
       <flap>
+        <chord_ratio is_input="True">0.2<!--flap chord as a percentage of the wing chord--></chord_ratio>
         <span_ratio is_input="True">0.45<!--flap span as a percentage of the wing span--></span_ratio>
       </flap>
       <fuselage>
@@ -30,6 +31,7 @@
       <wing>
         <area units="m**2" is_input="True">7.105673586278243<!--wing area--></area>
         <span units="m" is_input="True">9.237463382822208<!--wing span--></span>
+        <thickness_ratio is_input="True">0.15<!--mean thickness ratio of wing--></thickness_ratio>
         <MAC>
           <length units="m" is_input="True">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
           <at25percent>
@@ -46,9 +48,9 @@
     </geometry>
     <propulsion>
       <he_power_train>
-        <mass units="kg" is_input="False">2308.8744286705382</mass>
+        <mass units="kg" is_input="False">2321.545637246881</mass>
         <CG>
-          <x units="m" is_input="False">2.83477206969471</x>
+          <x units="m" is_input="False">2.83403155435543</x>
         </CG>
         <cruise>
           <CD0 is_input="False">0.0056121861665163735</CD0>
@@ -553,6 +555,60 @@
             <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
           </battery_pack_1cell>
         </battery_pack>
+        <fuel_system>
+          <fuel_system_1>
+            <connected_volume units="m**3" is_input="False">0.057365419390735854<!--Capacity of the connected tank in terms of volume--></connected_volume>
+            <fuel_type is_input="True">1.0<!--Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <mass units="kg" is_input="False">12.258808576342691<!--Weight of the fuel system--></mass>
+            <number_engine is_input="True">1.0<!--Number of engine connected to this fuel system--></number_engine>
+            <total_fuel_flowed units="kg" is_input="True">41.24<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
+            <CG>
+              <x units="m" is_input="False">2.692856507431314<!--X position of the fuel system center of gravity--></x>
+              <y units="m" is_input="False">1.8474926765644417<!--Y position of the ICE center of gravity--></y>
+              <y_ratio is_input="True">0.4<!--Y position of the ICE center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+          </fuel_system_1>
+        </fuel_system>
+        <fuel_tank>
+          <fuel_tank_1>
+            <capacity units="kg" is_input="False">41.6524<!--Capacity of the tank in terms of weight--></capacity>
+            <fuel_consumed_mission units="kg" is_input="True">41.24<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
+            <fuel_total_mission units="kg" is_input="False">41.6524<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
+            <fuel_type is_input="True">1.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <mass units="kg" is_input="False">0.41240000000000004<!--Weight of the fuel tanks--></mass>
+            <unusable_fuel_mission units="kg" is_input="False">0.41240000000000004<!--Amount of trapped fuel in the tank--></unusable_fuel_mission>
+            <volume units="m**3" is_input="False">0.05793907358464321<!--Capacity of the tank in terms of volume--></volume>
+            <CG>
+              <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
+              <y units="m" is_input="False">1.8474926765644417<!--Y position of the fuel tank center of gravity--></y>
+              <y_ratio is_input="True">0.4<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <dimension>
+              <height units="m" is_input="False">0.12617910808386587<!--Value of the length of the tank in the z-direction, computed differently based on the location of the tank--></height>
+              <length units="m" is_input="False">0.7009950449103659<!--Value of the length of the tank in the x-direction, computed differently based on the location of the tank--></length>
+              <ref_chord units="m" is_input="False">0.934660059880488<!--Reference wing chord for the tank--></ref_chord>
+              <width units="m" is_input="False">0.6550419977186555<!--Value of the length of the tank in the y-direction, computed differently based on the location of the tank--></width>
+            </dimension>
+            <distributed_tanks>
+              <chord_slope is_input="False">0.0<!--When tank is considered as a distributed mass, the rate at which the chord varies--></chord_slope>
+              <start_chord units="m" is_input="False">0.7672311779752663<!--When tank is considered as a distributed mass, the chord at the start--></start_chord>
+              <y_ratio_end is_input="False">0.47091145811054125<!--When tank is considered as a distributed mass, the position of the end as a ratio of the half-span--></y_ratio_end>
+              <y_ratio_start is_input="False">0.3290885418894588<!--When tank is considered as a distributed mass, the position of the start as a ratio of the half-span--></y_ratio_start>
+            </distributed_tanks>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+          </fuel_tank_1>
+        </fuel_tank>
         <generator>
           <generator_1>
             <diameter units="m" is_input="False">0.4824</diameter>
@@ -922,10 +978,21 @@
             <y_ratio_end is_input="False">[]</y_ratio_end>
             <y_ratio_start is_input="False">[]</y_ratio_start>
           </distributed_mass>
+          <distributed_tanks>
+            <chord_slope is_input="False">[]</chord_slope>
+            <fuel_inside units="kg" is_input="False">[]</fuel_inside>
+            <start_chord units="m" is_input="False">[]</start_chord>
+            <y_ratio_end is_input="False">[]</y_ratio_end>
+            <y_ratio_start is_input="False">[]</y_ratio_start>
+          </distributed_tanks>
           <punctual_mass>
             <mass units="kg" is_input="False">[]<!--mass of the punctual masses on the wing used for wing load computation--></mass>
             <y_ratio is_input="False">[]<!--position (as a percent of wing semi-span) of the punctual masses on the wing used for wing load computation, only positive ratio will be considered--></y_ratio>
           </punctual_mass>
+          <punctual_tanks>
+            <fuel_inside units="kg" is_input="False">[]</fuel_inside>
+            <y_ratio is_input="False">[]</y_ratio>
+          </punctual_tanks>
         </wing>
       </airframe>
     </weight>

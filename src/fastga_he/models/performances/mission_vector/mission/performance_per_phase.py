@@ -60,6 +60,18 @@ class PerformancePerPhase(om.ExplicitComponent):
             units="kg",
         )
         self.add_input(
+            "fuel_mass_t_econ",
+            shape=number_of_points + 2,
+            val=np.full(number_of_points + 2, np.nan),
+            units="kg",
+        )
+        self.add_input(
+            "fuel_lever_arm_t_econ",
+            shape=number_of_points + 2,
+            val=np.full(number_of_points + 2, np.nan),
+            units="kg*m",
+        )
+        self.add_input(
             "non_consumable_energy_t_econ",
             shape=number_of_points + 2,
             val=np.full(number_of_points + 2, np.nan),
@@ -95,6 +107,8 @@ class PerformancePerPhase(om.ExplicitComponent):
         self.add_output("data:mission:sizing:main_route:reserve:energy", units="W*h")
 
         self.add_output("fuel_consumed_t", shape=number_of_points, units="kg")
+        self.add_output("fuel_mass_t", shape=number_of_points, units="kg")
+        self.add_output("fuel_lever_arm_t", shape=number_of_points, units="kg*m")
         self.add_output("non_consumable_energy_t", shape=number_of_points, units="W*h")
         self.add_output("thrust_rate_t", shape=number_of_points)
 
@@ -127,6 +141,10 @@ class PerformancePerPhase(om.ExplicitComponent):
             method="exact",
         )
         self.declare_partials(of="fuel_consumed_t", wrt="fuel_consumed_t_econ", method="exact")
+
+        self.declare_partials(of="fuel_mass_t", wrt="fuel_mass_t_econ", method="exact")
+
+        self.declare_partials(of="fuel_lever_arm_t", wrt="fuel_lever_arm_t_econ", method="exact")
 
         self.declare_partials(
             of="data:mission:sizing:main_route:climb:energy",
@@ -196,6 +214,8 @@ class PerformancePerPhase(om.ExplicitComponent):
         # This one is two element longer than the other array since it includes the fuel consumed
         # for the taxi phases, hence why we stop at -2 for the descent fuel consumption
         fuel_consumed_t_econ = inputs["fuel_consumed_t_econ"]
+        fuel_mass_t_econ = inputs["fuel_mass_t_econ"]
+        fuel_lever_arm_t_econ = inputs["fuel_lever_arm_t_econ"]
         non_consumable_energy = inputs["non_consumable_energy_t_econ"]
         thrust_rate_t_econ = inputs["thrust_rate_t_econ"]
 
@@ -287,6 +307,8 @@ class PerformancePerPhase(om.ExplicitComponent):
         outputs["data:mission:sizing:taxi_in:energy"] = non_consumable_energy[-1]
 
         outputs["fuel_consumed_t"] = fuel_consumed_t_econ[1:-1]
+        outputs["fuel_mass_t"] = fuel_mass_t_econ[1:-1]
+        outputs["fuel_lever_arm_t"] = fuel_lever_arm_t_econ[1:-1]
         outputs["non_consumable_energy_t"] = non_consumable_energy[1:-1]
         outputs["thrust_rate_t"] = thrust_rate_t_econ[1:-1]
 
@@ -412,6 +434,8 @@ class PerformancePerPhase(om.ExplicitComponent):
         d_fc_d_fc_t[:, 1 : number_of_points + 1] = np.eye(number_of_points)
         partials["fuel_consumed_t", "fuel_consumed_t_econ"] = d_fc_d_fc_t
         partials["non_consumable_energy_t", "non_consumable_energy_t_econ"] = d_fc_d_fc_t
+        partials["fuel_mass_t", "fuel_mass_t_econ"] = d_fc_d_fc_t
+        partials["fuel_lever_arm_t", "fuel_lever_arm_t_econ"] = d_fc_d_fc_t
 
         d_tr_d_tr_t = np.zeros((number_of_points, number_of_points + 2))
         d_tr_d_tr_t[:, 1 : number_of_points + 1] = np.eye(number_of_points)

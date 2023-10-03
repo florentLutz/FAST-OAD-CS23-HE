@@ -273,12 +273,14 @@ class MissionVector(om.Group):
             ],
         )
 
+        self.connect("solve_equilibrium.fuel_consumed_t", "to_csv.fuel_consumed_t")
         self.connect(
-            "solve_equilibrium.fuel_consumed_t",
-            [
-                "to_csv.fuel_consumed_t",
-                "initialization.initialize_center_of_gravity.fuel_consumed_t",
-            ],
+            "solve_equilibrium.fuel_mass_t",
+            "initialization.initialize_center_of_gravity.fuel_mass_t",
+        )
+        self.connect(
+            "solve_equilibrium.fuel_lever_arm_t",
+            "initialization.initialize_center_of_gravity.fuel_lever_arm_t",
         )
 
         self.connect(
@@ -465,6 +467,8 @@ class MissionVector(om.Group):
         # only have electric components
         if run_guesses:
             self.set_initial_guess_mass(outputs=outputs, inputs=inputs)
+            self.set_initial_guess_fuel_consumed(outputs=outputs)
+            self.set_initial_guess_energy_consumed(outputs=outputs)
             self.set_initial_guess_energies(outputs=outputs)
             self.set_initial_guess_thrust(outputs=outputs, inputs=inputs)
             self.set_initial_guess_alpha(outputs=outputs)
@@ -577,15 +581,58 @@ class MissionVector(om.Group):
             number_of_points_cruise, 0.50 * DUMMY_FUEL_CONSUMED / number_of_points_cruise
         )
         fuel_descent = np.full(
-            number_of_points_descent, 0.15 * DUMMY_FUEL_CONSUMED / number_of_points_descent
+            number_of_points_descent, 0.10 * DUMMY_FUEL_CONSUMED / number_of_points_descent
         )
         fuel_reserve = np.full(
-            number_of_points_reserve, 0.20 * DUMMY_FUEL_CONSUMED / number_of_points_reserve
+            number_of_points_reserve, 0.25 * DUMMY_FUEL_CONSUMED / number_of_points_reserve
         )
 
         dummy_fuel_consumed = np.concatenate((fuel_climb, fuel_cruise, fuel_descent, fuel_reserve))
 
         return dummy_fuel_consumed
+
+    def set_initial_guess_fuel_consumed(self, outputs):
+        """
+        Provides and sets educated guess of the variation of fuel consumed during the flight. It
+        is a mere initial guess, the end results will still be accurate.
+
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        number_of_points_total = (
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
+        )
+
+        dummy_fuel_consumed = self._get_initial_guess_fuel_consumed()
+
+        if self.options["power_train_file_path"]:
+            if self.configurator.will_aircraft_mass_vary():
+
+                outputs[
+                    "solve_equilibrium.performance_per_phase.fuel_consumed_t"
+                ] = dummy_fuel_consumed
+
+            else:
+
+                outputs["solve_equilibrium.performance_per_phase.fuel_consumed_t"] = np.zeros(
+                    number_of_points_total
+                )
+                outputs["solve_equilibrium.performance_per_phase.fuel_mass_t"] = np.zeros(
+                    number_of_points_total
+                )
+
+        else:
+
+            outputs["solve_equilibrium.performance_per_phase.fuel_consumed_t"] = dummy_fuel_consumed
 
     def set_initial_guess_mass(self, inputs, outputs):
         """
@@ -1120,6 +1167,81 @@ class MissionVector(om.Group):
             # If there are no PT file we assume full fuel
             outputs["solve_equilibrium.sizing_fuel.data:mission:sizing:fuel"] = DUMMY_FUEL_CONSUMED
             outputs["solve_equilibrium.sizing_fuel.data:mission:sizing:energy"] = 0.0
+
+    def _get_initial_guess_energy_consumed(self) -> np.ndarray:
+        """
+        Provides an educated guess of the variation of energy consumed during the flight. It is a
+        mere initial guess, the end results will still be accurate. Does not set it.
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        # The following energy repartition will be adopted for now, 15% for climb, 50% for cruise,
+        # 10% for descent, 25% for reserve
+        energy_climb = np.full(
+            number_of_points_climb, 0.15 * DUMMY_ENERGY_CONSUMED / number_of_points_climb
+        )
+        energy_cruise = np.full(
+            number_of_points_cruise, 0.50 * DUMMY_ENERGY_CONSUMED / number_of_points_cruise
+        )
+        energy_descent = np.full(
+            number_of_points_descent, 0.10 * DUMMY_ENERGY_CONSUMED / number_of_points_descent
+        )
+        energy_reserve = np.full(
+            number_of_points_reserve, 0.25 * DUMMY_ENERGY_CONSUMED / number_of_points_reserve
+        )
+
+        dummy_energy_consumed = np.concatenate(
+            (energy_climb, energy_cruise, energy_descent, energy_reserve)
+        )
+
+        return dummy_energy_consumed
+
+    def set_initial_guess_energy_consumed(self, outputs):
+        """
+        Provides and sets educated guess of the variation of energy consumed during the flight. It
+        is a mere initial guess, the end results will still be accurate.
+
+        :param outputs: OpenMDAO vector containing the value of outputs (and thus their initial
+         guesses)
+        """
+
+        number_of_points_climb = self.options["number_of_points_climb"]
+        number_of_points_cruise = self.options["number_of_points_cruise"]
+        number_of_points_descent = self.options["number_of_points_descent"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
+        number_of_points_total = (
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
+        )
+
+        dummy_energy_consumed = self._get_initial_guess_fuel_consumed()
+
+        if self.options["power_train_file_path"]:
+            if self.configurator.has_fuel_non_consumable_energy_source():
+
+                outputs[
+                    "solve_equilibrium.performance_per_phase.non_consumable_energy_t"
+                ] = dummy_energy_consumed
+
+            else:
+
+                outputs[
+                    "solve_equilibrium.performance_per_phase.non_consumable_energy_t"
+                ] = np.zeros(number_of_points_total)
+
+        else:
+
+            # If no pt file we assumed full fuel
+            outputs["solve_equilibrium.performance_per_phase.non_consumable_energy_t"] = np.zeros(
+                number_of_points_total
+            )
 
 
 def get_propulsive_power(

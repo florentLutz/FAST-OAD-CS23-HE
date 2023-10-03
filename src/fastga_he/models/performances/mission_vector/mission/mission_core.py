@@ -95,6 +95,8 @@ class MissionCore(om.Group):
                 "thrust_rate_t_econ",
                 "non_consumable_energy_t_econ",
                 "fuel_consumed_t_econ",
+                "fuel_mass_t_econ",
+                "fuel_lever_arm_t_econ",
             ],
         )
         self.add_subsystem(
@@ -109,8 +111,10 @@ class MissionCore(om.Group):
                 "thrust_rate_t_econ",
                 "non_consumable_energy_t_econ",
                 "fuel_consumed_t_econ",
+                "fuel_mass_t_econ",
+                "fuel_lever_arm_t_econ",
             ],
-            promotes_outputs=["data:*", "fuel_consumed_t"],
+            promotes_outputs=["data:*", "fuel_consumed_t", "fuel_mass_t", "fuel_lever_arm_t"],
         )
         self.add_subsystem("sizing_fuel", SizingEnergy(), promotes=["*"])
         self.add_subsystem(

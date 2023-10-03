@@ -99,6 +99,18 @@ class FuelConsumed(om.ExplicitComponent):
             units="kg",
         )
         self.add_output(
+            "fuel_mass_t_econ",
+            val=np.full(number_of_points + 2, 0.0),
+            desc="fuel mass remaining in the tanks at each time step",
+            units="kg",
+        )
+        self.add_output(
+            "fuel_lever_arm_t_econ",
+            val=np.full(number_of_points + 2, 0.0),
+            desc="fuel lever arm at each time step",
+            units="kg*m",
+        )
+        self.add_output(
             "non_consumable_energy_t_econ",
             val=np.full(number_of_points + 2, 0.0),
             desc="fuel consumed at each time step",

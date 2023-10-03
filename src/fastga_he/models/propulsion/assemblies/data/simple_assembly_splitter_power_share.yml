@@ -42,6 +42,13 @@ power_train_components:
     id: fastga_he.pt_component.generator
   ice_1:
     id: fastga_he.pt_component.internal_combustion_engine
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+    options:
+      number_of_engines: 1
+      number_of_tanks: 1
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
 
 component_connections:
   - source: propeller_1
@@ -82,6 +89,12 @@ component_connections:
 
   - source: generator_1
     target: ice_1
+
+  - source: ice_1
+    target: [ fuel_system_1, 1 ]
+
+  - source: [ fuel_system_1, 1 ]
+    target: fuel_tank_1
 
 
 watcher_file_path:

@@ -14,6 +14,7 @@ from fastga_he.models.propulsion.assemblers.constants import (
     SUBMODEL_POWER_TRAIN_PERF,
     SUBMODEL_POWER_RATE,
 )
+from fastga_he.models.propulsion.assemblers.fuel_cg_from_pt_file import FuelCGFromPTFile
 
 ENERGY_CONSUMPTION_FROM_PT_FILE = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
 
@@ -68,6 +69,11 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
             propulsive_load_names,
             propulsive_load_types,
         ) = self.configurator.get_propulsive_element_list()
+
+        (
+            tank_names,
+            _,
+        ) = self.configurator.get_fuel_tank_list()
 
         options_pt_perf = {
             "power_train_file_path": power_train_file_path,
@@ -129,8 +135,23 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
             ],
         )
 
+        self.add_subsystem(
+            "tank_and_fuel_CG",
+            subsys=FuelCGFromPTFile(
+                power_train_file_path=power_train_file_path, number_of_points=number_of_points
+            ),
+            promotes_inputs=["data:*"],
+            promotes_outputs=["*"],
+        )
+
         for propulsive_load_name in propulsive_load_names:
             self.connect(
                 "power_train_performances." + propulsive_load_name + ".shaft_power_for_power_rate",
                 "mock_up_interface." + propulsive_load_name + "_shaft_power_out",
+            )
+
+        for tank_name in tank_names:
+            self.connect(
+                "power_train_performances." + tank_name + ".fuel_remaining_t",
+                "tank_and_fuel_CG." + tank_name + "_fuel_remaining_t",
             )
