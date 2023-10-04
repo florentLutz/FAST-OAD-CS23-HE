@@ -6,6 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
+from ..components.perf_direct_bus_connection import PerformancesBatteryDirectBusConnection
 from ..components.perf_module_current import PerformancesModuleCurrent
 from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
 from ..components.perf_internal_resistance import PerformancesInternalResistance
@@ -27,19 +28,6 @@ from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 
 
 class PerformancesBatteryPack(om.Group):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        # Solvers setup
-        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 200
-        self.nonlinear_solver.options["rtol"] = 1e-5
-        self.nonlinear_solver.options["atol"] = 1e-5
-        self.nonlinear_solver.options["stall_limit"] = 20
-        self.nonlinear_solver.options["stall_tol"] = 1e-5
-        self.linear_solver = om.DirectSolver()
-
     def initialize(self):
 
         self.options.declare(
@@ -51,11 +39,19 @@ class PerformancesBatteryPack(om.Group):
             desc="Identifier of the battery pack",
             allow_none=False,
         )
+        self.options.declare(
+            name="direct_bus_connection",
+            default=False,
+            types=bool,
+            desc="If the battery is directly connected to a bus, a special mode is required to "
+            "interface the two",
+        )
 
     def setup(self):
 
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
+        direct_bus_connection = self.options["direct_bus_connection"]
 
         self.add_subsystem(
             "cell_temperature",
@@ -64,6 +60,7 @@ class PerformancesBatteryPack(om.Group):
             ),
             promotes=["*"],
         )
+
         self.add_subsystem(
             "current_per_module",
             PerformancesModuleCurrent(
@@ -123,9 +120,17 @@ class PerformancesBatteryPack(om.Group):
         )
         self.add_subsystem(
             "battery_voltage",
-            PerformancesBatteryVoltage(number_of_points=number_of_points),
+            PerformancesBatteryVoltage(
+                number_of_points=number_of_points, direct_bus_connection=direct_bus_connection
+            ),
             promotes=["*"],
         )
+        if self.options["direct_bus_connection"]:
+            self.add_subsystem(
+                "direct_bus_connection",
+                PerformancesBatteryDirectBusConnection(number_of_points=number_of_points),
+                promotes=["*"],
+            )
         self.add_subsystem(
             "joule_losses_cell",
             PerformancesCellJouleLosses(number_of_points=number_of_points),
@@ -194,5 +199,9 @@ class PerformancesBatteryPack(om.Group):
         fake_cell_voltage = np.linspace(4.2, 2.65, number_of_points)
         module_voltage = fake_cell_voltage * number_of_cells_module
 
-        outputs["voltage_out"] = module_voltage
         outputs["module_voltage"] = module_voltage
+
+        if self.options["direct_bus_connection"]:
+            outputs["battery_voltage"] = module_voltage
+        else:
+            outputs["voltage_out"] = module_voltage

@@ -2,6 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import os.path as pth
 import copy
 
 import openmdao.api as om
@@ -678,6 +679,17 @@ def test_battery_voltage():
 
     problem.check_partials(compact_print=True)
 
+    # Check with the other battery mode
+    problem = run_system(
+        PerformancesBatteryVoltage(number_of_points=NB_POINTS_TEST, direct_bus_connection=True),
+        ivc,
+    )
+    assert problem.get_val("battery_voltage", units="V") == pytest.approx(
+        [802.0, 786.0, 770.0, 760.0, 750.0, 740.0, 734.0, 726.0, 720.0, 714.0], rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_module_c_rate():
     ivc = get_indep_var_comp(
@@ -1064,5 +1076,7 @@ def test_performances_battery_pack():
         [0.974, 0.969, 0.97, 0.973, 0.976, 0.978, 0.978, 0.975, 0.971, 0.966],
         rel=1e-2,
     )
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
     problem.check_partials(compact_print=True)
