@@ -201,6 +201,8 @@ def test_assembly_performances_constant_demand():
         abs=1e-5,
     )
 
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2_direct.html"))
+
 
 def test_read_recording():
 

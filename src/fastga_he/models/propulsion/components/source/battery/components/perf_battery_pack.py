@@ -61,6 +61,13 @@ class PerformancesBatteryPack(om.Group):
             promotes=["*"],
         )
 
+        if self.options["direct_bus_connection"]:
+            self.add_subsystem(
+                "direct_bus_connection",
+                PerformancesBatteryDirectBusConnection(number_of_points=number_of_points),
+                promotes=["*"],
+            )
+
         self.add_subsystem(
             "current_per_module",
             PerformancesModuleCurrent(
@@ -125,12 +132,6 @@ class PerformancesBatteryPack(om.Group):
             ),
             promotes=["*"],
         )
-        if self.options["direct_bus_connection"]:
-            self.add_subsystem(
-                "direct_bus_connection",
-                PerformancesBatteryDirectBusConnection(number_of_points=number_of_points),
-                promotes=["*"],
-            )
         self.add_subsystem(
             "joule_losses_cell",
             PerformancesCellJouleLosses(number_of_points=number_of_points),
