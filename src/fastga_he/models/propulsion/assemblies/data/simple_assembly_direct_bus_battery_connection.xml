@@ -88,7 +88,7 @@
                         <number_modules>200.0</number_modules>
                         <number_cells>8000.0</number_cells>
                         <module>
-                            <number_cells>180.0</number_cells>
+                            <number_cells>220.0</number_cells>
                             <mass units="kg">198.4</mass>
                         </module>
                         <cell>

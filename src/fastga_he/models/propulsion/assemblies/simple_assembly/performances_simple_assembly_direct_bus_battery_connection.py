@@ -55,15 +55,6 @@ class PerformancesAssemblyDirectBusBatteryConnection(om.Group):
         )
 
         self.add_subsystem(
-            "dc_sspc_412",
-            PerformancesDCSSPC(
-                dc_sspc_id="dc_sspc_412",
-                number_of_points=number_of_points,
-            ),
-            promotes=["data:*"],
-        )
-
-        self.add_subsystem(
             "dc_bus_1",
             PerformancesDCBus(
                 dc_bus_id="dc_bus_1",
@@ -75,29 +66,12 @@ class PerformancesAssemblyDirectBusBatteryConnection(om.Group):
         )
 
         self.add_subsystem(
-            "dc_sspc_1",
-            PerformancesDCSSPC(
-                dc_sspc_id="dc_sspc_1", number_of_points=number_of_points, at_bus_output=False
-            ),
-            promotes=["data:*"],
-        )
-
-        self.add_subsystem(
             "dc_line_1",
             PerformancesHarness(
                 harness_id="harness_1",
                 number_of_points=number_of_points,
             ),
             promotes=["data:*", "exterior_temperature"],
-        )
-
-        self.add_subsystem(
-            "dc_sspc_2",
-            PerformancesDCSSPC(
-                dc_sspc_id="dc_sspc_2",
-                number_of_points=number_of_points,
-            ),
-            promotes=["data:*"],
         )
 
         self.add_subsystem(
@@ -118,6 +92,30 @@ class PerformancesAssemblyDirectBusBatteryConnection(om.Group):
                 direct_bus_connection=True,
             ),
             promotes=["data:*", "time_step"],
+        )
+
+        self.add_subsystem(
+            "dc_sspc_412",
+            PerformancesDCSSPC(
+                dc_sspc_id="dc_sspc_412",
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "dc_sspc_1",
+            PerformancesDCSSPC(
+                dc_sspc_id="dc_sspc_1", number_of_points=number_of_points, at_bus_output=False
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "dc_sspc_2",
+            PerformancesDCSSPC(
+                dc_sspc_id="dc_sspc_2",
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*"],
         )
 
         self.connect("propeller_1.rpm", "motor_1.rpm")
