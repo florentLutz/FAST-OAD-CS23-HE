@@ -13,8 +13,10 @@ from stdatm import Atmosphere
 
 import plotly.graph_objects as go
 
-from tests.testing_utilities import get_indep_var_comp, list_inputs
+from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
+
+from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 
 from .simple_assembly.performances_simple_assembly_direct_bus_battery_connection import (
     PerformancesAssemblyDirectBusBatteryConnection,
@@ -202,6 +204,86 @@ def test_assembly_performances_constant_demand():
     )
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2_direct.html"))
+
+
+def test_performances_from_pt_file():
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_direct_bus_battery_connection.yml")
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PowerTrainPerformancesFromFile(
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+                pre_condition_pt=True,
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    problem = run_system(
+        PowerTrainPerformancesFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_pt=True,
+        ),
+        ivc,
+    )
+
+    # om.n2(problem)
+
+    _, _, residuals = problem.model.component.get_nonlinear_vectors()
+
+    assert problem.get_val("component.battery_pack_1.dc_current_out", units="A") * problem.get_val(
+        "component.battery_pack_1.voltage_out", units="V"
+    ) == pytest.approx(
+        np.array(
+            [
+                200947.88948097,
+                201943.77675022,
+                202922.6272714,
+                203884.69048768,
+                204830.16057226,
+                205759.14744679,
+                206671.66570984,
+                207567.63042259,
+                208446.85482771,
+                209309.05288289,
+            ]
+        ),
+        rel=1e-4,
+    )
+
+    # We check that it decreases with time, because as time goes on, SOC decrease so R_int increases
+    assert problem.get_val("component.dc_bus_2.dc_voltage", units="V") == pytest.approx(
+        np.array(
+            [
+                894.89220788,
+                884.3542933,
+                875.63044188,
+                867.56790618,
+                859.31893933,
+                850.34946438,
+                840.41802815,
+                829.53848453,
+                817.93197987,
+                805.96626297,
+            ]
+        ),
+        abs=1,
+    )
 
 
 def test_read_recording():
