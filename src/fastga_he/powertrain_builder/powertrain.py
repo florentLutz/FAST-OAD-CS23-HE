@@ -934,14 +934,34 @@ class FASTGAHEPowerTrainConfigurator:
         """
 
         self._get_components()
+        # We need to trigger the generation of the connections because that what triggers the
+        # identification of batteries directly connected to a bus
+        self._get_connections()
         components_perf_watchers_name_organised_list = []
         components_perf_watchers_unit_organised_list = []
         components_name_organised_list = []
 
+        name_to_id = dict(zip(self._components_name, self._components_id))
+        id_to_option = dict(zip(self._components_id, self._components_options))
+
         for component_name, components_perf_watchers in zip(
             self._components_name, self._components_perf_watchers
         ):
-            for components_perf_watcher in components_perf_watchers:
+
+            component_perf_watchers_copy = copy.deepcopy(components_perf_watchers)
+
+            # Need a more generic way to do this, here we will do it once because the battery is
+            # a unique case
+            component_id = name_to_id[component_name]
+            if component_id == "fastga_he.pt_component.battery_pack":
+                component_option = id_to_option[component_id]
+                # If there is a direct connection, the option won't be empty
+                if component_option and {"voltage_out": "V"} in component_perf_watchers_copy:
+                    # We remove what has become an input and add what has become an output
+                    component_perf_watchers_copy.remove({"voltage_out": "V"})
+                    component_perf_watchers_copy.append({"dc_current_out": "A"})
+
+            for components_perf_watcher in component_perf_watchers_copy:
                 key, value = list(components_perf_watcher.items())[0]
                 components_name_organised_list.append(component_name)
                 components_perf_watchers_name_organised_list.append(key)

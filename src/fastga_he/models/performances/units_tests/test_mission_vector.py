@@ -1624,6 +1624,8 @@ def test_mission_vector_from_yml():
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
     assert mission_end_soc == pytest.approx(0.0546, abs=1e-2)
+    pt_mass = problem.get_val("data:propulsion:he_power_train:mass", units="kg")
+    assert pt_mass == pytest.approx(1216.079, abs=1e-2)
 
 
 def test_mission_vector_from_yml_simplified_models():
@@ -1690,6 +1692,45 @@ def test_mission_vector_from_yml_simplified_models():
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.inverter.efficiency"
     ] = previously_active_models["submodel.propulsion.inverter.efficiency"]
+
+
+def test_mission_vector_direct_bus_battery_connection():
+
+    # Define used files depending on options
+    xml_file_name = "sample_ac.xml"
+    process_file_name = "mission_vector_direct_bus_battery.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    configurator.write_needed_inputs(ref_inputs)
+
+    # Create problems with inputs
+    problem = configurator.get_problem(read_inputs=True)
+    problem.setup()
+
+    # om.n2(problem)
+
+    problem.run_model()
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    if not pth.exists(RESULTS_FOLDER_PATH):
+        os.mkdir(RESULTS_FOLDER_PATH)
+
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(144.91, abs=1e-2)
+    mission_end_soc = problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
+    )
+    assert mission_end_soc == pytest.approx(-0.0240, abs=1e-2)
+    pt_mass = problem.get_val("data:propulsion:he_power_train:mass", units="kg")
+    assert pt_mass == pytest.approx(931.036, abs=1e-2)
 
 
 def test_mission_vector_from_yml_fuel():
