@@ -356,7 +356,7 @@ def test_assembly_performances_with_direct_sspc_battery_connection():
 
     write_outputs(
         pth.join(
-            outputs.__path__[0], "simple_assembly_direct_bus_battery_connection_performances.xml"
+            outputs.__path__[0], "simple_assembly_direct_sspc_battery_connection_performances.xml"
         ),
         problem,
     )
@@ -421,4 +421,108 @@ def test_assembly_performances_with_direct_sspc_battery_connection():
             ]
         ),
         abs=1,
+    )
+
+
+def test_direct_sspc_battery_connection_from_pt_file():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_direct_sspc_battery_connection.yml")
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PowerTrainPerformancesFromFile(
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+                pre_condition_pt=True,
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    problem = run_system(
+        PowerTrainPerformancesFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_pt=True,
+        ),
+        ivc,
+    )
+
+    # om.n2(problem)
+
+    _, _, residuals = problem.model.component.get_nonlinear_vectors()
+
+    assert problem.get_val("component.dc_sspc_3.dc_current_in", units="A") * problem.get_val(
+        "component.dc_sspc_3.dc_voltage_in", units="V"
+    ) == pytest.approx(
+        np.array(
+            [
+                200951.39173014,
+                201947.46794058,
+                202926.48481506,
+                203888.71469815,
+                204834.37031537,
+                205763.57395313,
+                206676.34589143,
+                207572.60005299,
+                208452.14174877,
+                209314.67112781,
+            ]
+        ),
+        rel=1e-4,
+    )
+
+    assert problem.get_val("component.battery_pack_1.dc_current_out", units="A") * problem.get_val(
+        "component.battery_pack_1.voltage_out", units="V"
+    ) == pytest.approx(
+        np.array(
+            [
+                202981.20376782,
+                203987.34135412,
+                204976.24728794,
+                205948.1966648,
+                206903.40435896,
+                207841.99389205,
+                208763.98574892,
+                209669.29298282,
+                210557.71893815,
+                211428.96073516,
+            ]
+        ),
+        rel=1e-4,
+    )
+
+    # We check that it decreases with time, because as time goes on, SOC decrease so R_int
+    # increases. Almost no difference with the case where the battery is directly linked with a
+    # bus because the battery imposes the voltage so if we were to check on the inverter we would
+    # see something significantly lower.
+    assert problem.get_val("component.battery_pack_1.voltage_out", units="V") == pytest.approx(
+        np.array(
+            [
+                894.77423232,
+                884.11246599,
+                875.30019898,
+                867.15064454,
+                858.79535234,
+                849.69266091,
+                839.60481993,
+                828.55807373,
+                816.79141177,
+                804.69154247,
+            ]
+        ),
+        rel=1e-4,
     )

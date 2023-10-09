@@ -459,6 +459,7 @@ class FASTGAHEPowerTrainConfigurator:
             if target_id == "fastga_he.pt_component.battery_pack" and (
                 source_id == "fastga_he.pt_component.dc_bus"
                 or source_id == "fastga_he.pt_component.dc_splitter"
+                or source_id == "fastga_he.pt_component.dc_sspc"
             ):
 
                 # First we'll check if the option has already been set or no, just to avoid
