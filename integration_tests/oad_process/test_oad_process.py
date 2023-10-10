@@ -27,50 +27,6 @@ def cleanup():
     rmtree("D:/tmp", ignore_errors=True)
 
 
-def test_pipistrel_like(cleanup):
-
-    """Test the overall aircraft design process with wing positioning under VLM method."""
-    logging.basicConfig(level=logging.WARNING)
-    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
-    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
-
-    # Define used files depending on options
-    xml_file_name = "pipistrel_source.xml"
-    process_file_name = "pipistrel_configuration.yml"
-
-    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
-
-    # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
-
-    # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
-    problem.setup()
-
-    # Adding a recorder
-    recorder = om.SqliteRecorder(pth.join(RESULTS_FOLDER_PATH, "pipistrel_cases.sql"))
-    solver = problem.model.nonlinear_solver
-    solver.add_recorder(recorder)
-    solver.recording_options["record_solver_residuals"] = True
-
-    # Give good initial guess on a few key value to reduce the time it takes to converge
-    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=800.0)
-
-    # Run the problem
-    problem.run_model()
-
-    _, _, residuals = problem.model.get_nonlinear_vectors()
-    residuals = filter_residuals(residuals)
-
-    problem.write_outputs()
-
-    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        577.55, rel=1e-2
-    )
-
-
 def test_fuel_and_battery(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""

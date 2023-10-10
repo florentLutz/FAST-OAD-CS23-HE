@@ -16,6 +16,7 @@ model:
   geometry:
     id: fastga.geometry.legacy
     propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+    cabin_sizing: 0.0 # Manually input the front, rear and cabin length
   aerodynamics_lowspeed:
     id: fastga.aerodynamics.lowspeed.legacy
     propulsion_id: fastga.wrapper.propulsion.basicIC_engine
@@ -33,14 +34,14 @@ model:
     number_of_points_cruise: 30
     number_of_points_descent: 20
     number_of_points_reserve: 10
-    power_train_file_path: ./simple_assembly.yml
+    power_train_file_path: ./pipistrel_assembly.yml
     out_file: ../results/mission_data.csv
     use_linesearch: False
     pre_condition_pt: True
     use_apply_nonlinear: True
   power_train_sizing:
     id: fastga_he.power_train.sizing
-    power_train_file_path: ./simple_assembly.yml
+    power_train_file_path: ./pipistrel_assembly.yml
   weight:
     id: fastga.weight.legacy
     propulsion_id: fastga.wrapper.propulsion.basicIC_engine
@@ -56,14 +57,14 @@ model:
     id: fastga.loop.wing_position
   wing_area:
     id: fastga_he.loop.wing_area
-    power_train_file_path: ./simple_assembly.yml
+    power_train_file_path: ./pipistrel_assembly.yml
 
 submodels:
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
   submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
-  submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+  submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
   submodel.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
   submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
