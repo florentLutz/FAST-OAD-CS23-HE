@@ -3,7 +3,6 @@ import os.path as pth
 from shutil import rmtree
 import logging
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 import pytest
@@ -36,8 +35,8 @@ def test_pipistrel_like(cleanup):
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     # Define used files depending on options
-    xml_file_name = "full_sizing.xml"
-    process_file_name = "full_sizing.yml"
+    xml_file_name = "pipistrel_source.xml"
+    process_file_name = "pipistrel_configuration.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
 
@@ -49,7 +48,17 @@ def test_pipistrel_like(cleanup):
     # Create problems with inputs
     problem = configurator.get_problem(read_inputs=True)
     problem.setup()
-    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=1000.0)
+
+    # Adding a recorder
+    recorder = om.SqliteRecorder(pth.join(RESULTS_FOLDER_PATH, "pipistrel_cases.sql"))
+    solver = problem.model.nonlinear_solver
+    solver.add_recorder(recorder)
+    solver.recording_options["record_solver_residuals"] = True
+
+    # Give good initial guess on a few key value to reduce the time it takes to converge
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=800.0)
+
+    # Run the problem
     problem.run_model()
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
@@ -58,7 +67,7 @@ def test_pipistrel_like(cleanup):
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        608.94, rel=1e-2
+        577.55, rel=1e-2
     )
 
 
