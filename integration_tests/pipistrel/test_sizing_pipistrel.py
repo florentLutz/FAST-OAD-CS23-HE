@@ -12,6 +12,15 @@ import plotly.express as px
 import fastoad.api as oad
 import openmdao.api as om
 
+from PIL import Image
+
+from fastga.utils.postprocessing.analysis_and_plots import mass_breakdown_bar_plot
+
+from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
+from fastga_he.gui.analysis_and_plots import (
+    aircraft_geometry_plot,
+)
+
 from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
@@ -157,7 +166,7 @@ def test_comparison_with_data():
         graph_number=1,
         fig=fig,
     )
-    # Electric motor weight 22.7 kg
+    # Electric motor weight 22.8 kg
     # (https://www.pipistrel.fr/aircraft/electric-flight/e-811/)
     scatter_compare_mass(
         actual_mass=22.8,
@@ -220,6 +229,9 @@ def test_comparison_with_data():
         title_x=0.5,
         xaxis_title="Component",
         yaxis_title="Mass [kg]",
+        font=dict(
+            size=18,
+        ),
     )
 
     fig.show()
@@ -256,3 +268,58 @@ def scatter_compare_mass(actual_mass, computed_mass, axes_name, graph_number, fi
             showlegend=False,
         )
     )
+
+
+def test_pipistrel_network_viewer():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "pipistrel_assembly.yml")
+    network_file_path = pth.join(RESULTS_FOLDER_PATH, "pipistrel_assembly.html")
+
+    if not os.path.exists(network_file_path):
+        power_train_network_viewer(pt_file_path, network_file_path)
+
+
+def test_mass_bar_plot():
+
+    results_pipistrel_file_path = pth.join(RESULTS_FOLDER_PATH, "pipistrel_out.xml")
+    data_pipistrel_file_path = pth.join(DATA_FOLDER_PATH, "pipistrel_data.xml")
+
+    fig = mass_breakdown_bar_plot(results_pipistrel_file_path, name="Computed results")
+    fig = mass_breakdown_bar_plot(data_pipistrel_file_path, name="Actual value", fig=fig)
+
+    fig.update_layout(
+        title_text="Comparison of computed aircraft mass with reference value for the Pipistrel",
+        title_x=0.5,
+    )
+
+    fig.show()
+
+
+def test_aircraft_geometry_plot():
+
+    results_pipistrel_file_path = pth.join(RESULTS_FOLDER_PATH, "pipistrel_out.xml")
+
+    fig = aircraft_geometry_plot(results_pipistrel_file_path, name="Pipistrel")
+
+    fig.update_layout(
+        title_text="Comparison of computed aircraft geometry with top view of the Pipistrel",
+        title_x=0.5,
+    )
+
+    pipistrel_top_view = Image.open("data/Top_view_clean.JPG")
+
+    fig.add_layout_image(
+        dict(
+            source=pipistrel_top_view,
+            xref="x",
+            yref="y",
+            y=6.47,
+            x=-10.71 / 2,
+            sizex=10.71,
+            sizey=6.47,
+            sizing="stretch",
+            opacity=0.75,
+            layer="below",
+        )
+    )
+    fig.show()
