@@ -94,6 +94,48 @@ def test_pipistrel_like():
     )
 
 
+def test_pipistrel_detailed_mission():
+
+    """Test the overall aircraft design process with wing positioning under VLM method."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "pipistrel_mission_in.xml"
+    process_file_name = "pipistrel_mission_configuration.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+    configurator.write_needed_inputs(ref_inputs)
+
+    # Create problems with inputs
+    problem = configurator.get_problem(read_inputs=True)
+    problem.setup()
+
+    problem.set_val(
+        "performances.solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_1.direct_bus_connection.dc_current_out",
+        units="A",
+        val=np.full(302, 100.0),
+    )
+    problem.set_val(
+        "performances.solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_2.direct_bus_connection.dc_current_out",
+        units="A",
+        val=np.full(302, 100.0),
+    )
+
+    # Run the problem
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+
 def test_residuals_analyzer():
     # Does not bring much info since the bloody reluctance is so high ...
 
