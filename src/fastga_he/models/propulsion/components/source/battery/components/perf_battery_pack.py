@@ -22,6 +22,7 @@ from ..components.perf_entropic_heat_coefficient import PerformancesEntropicHeat
 from ..components.perf_entropic_losses import PerformancesCellEntropicLosses
 from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
+from ..components.perf_battery_power import PerformancesBatteryPower
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
@@ -157,6 +158,11 @@ class PerformancesBatteryPack(om.Group):
             PerformancesBatteryLosses(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "battery_power",
+            PerformancesBatteryPower(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(

@@ -351,6 +351,7 @@ BATTERY_PACK = {
         {"voltage_out": "V"},
         {"efficiency": None},
         {"relative_capacity": None},
+        {"power_out": "kW"},
     ],
     SMP: [
         {"delta_Cd": None},
