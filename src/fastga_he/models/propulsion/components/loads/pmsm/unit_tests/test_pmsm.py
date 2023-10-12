@@ -466,7 +466,9 @@ def test_losses():
 def test_efficiency():
 
     ivc = get_indep_var_comp(
-        list_inputs(PerformancesEfficiency(number_of_points=NB_POINTS_TEST)), __file__, XML_FILE
+        list_inputs(PerformancesEfficiency(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
     )
     ivc.add_output("shaft_power_out", np.linspace(30, 70, NB_POINTS_TEST), units="kW")
     ivc.add_output(
@@ -476,7 +478,9 @@ def test_efficiency():
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PerformancesEfficiency(number_of_points=NB_POINTS_TEST), ivc)
+    problem = run_system(
+        PerformancesEfficiency(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+    )
 
     assert problem.get_val("efficiency") == pytest.approx(
         [0.923, 0.928, 0.932, 0.936, 0.938, 0.941, 0.942, 0.944, 0.945, 0.946], rel=1e-2

@@ -182,6 +182,7 @@ class DEPEquilibrium(om.Group):
                 ),
                 promotes=[
                     "data:*",
+                    "settings:*",
                     "convergence:*",
                     "fuel_consumed_t_econ",
                     "non_consumable_energy_t_econ",
