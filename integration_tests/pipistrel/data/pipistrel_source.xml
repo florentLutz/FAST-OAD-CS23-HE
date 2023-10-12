@@ -582,6 +582,11 @@
         <k_factor_sfc is_input="True">1.0<!--k_factor that can be used to adjust the consumption on engine level to the aircraft level--></k_factor_sfc>
       </IC_engine>
       <he_power_train>
+        <PMSM>
+          <motor_1>
+            <k_efficiency is_input="True">0.937<!--K factor for the PMSM efficiency--></k_efficiency>
+          </motor_1>
+        </PMSM>
         <DC_bus>
           <insulation>
             <breakdown_voltage units="V" is_input="True">340.0<!--Mininum breakdown voltage of air cavity--></breakdown_voltage>

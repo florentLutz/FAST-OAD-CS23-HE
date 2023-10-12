@@ -264,6 +264,15 @@
     </mission>
   </data>
   <settings>
+    <propulsion>
+      <he_power_train>
+        <PMSM>
+          <motor_1>
+            <k_efficiency is_input="True">0.937<!--K factor for the PMSM efficiency--></k_efficiency>
+          </motor_1>
+        </PMSM>
+      </he_power_train>
+    </propulsion>
     <weight>
       <aircraft>
         <payload>
@@ -288,7 +297,7 @@
       <he_power_train>
         <propeller>
           <propeller_1>
-            <min_power units="kW" is_input="True">1.0<!--Convergence parameter used to aid convergence since, if power is too low in the network, the code will have trouble converging--></min_power>
+            <min_power units="kW" is_input="True">0.5<!--Convergence parameter used to aid convergence since, if power is too low in the network, the code will have trouble converging--></min_power>
           </propeller_1>
         </propeller>
       </he_power_train>
