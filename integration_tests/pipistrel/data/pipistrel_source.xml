@@ -370,13 +370,13 @@
           <propeller_1>
             <installation_angle units="deg" is_input="True">0.0</installation_angle>
             <activity_factor is_input="True">125.0<!--Activity factor of the propeller--></activity_factor>
-            <blade_twist units="deg" is_input="True">20.5<!--Twist between the propeller blade root and tip--></blade_twist>
+            <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="cm" is_input="True">164.0<!--Diameter of the propeller--></diameter>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
-            <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
+            <solidity is_input="True">0.125<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>
       </he_power_train>
@@ -516,11 +516,11 @@
           <thrust_rate is_input="True">1.0<!--thrust rate during takeoff phase--></thrust_rate>
         </takeoff>
         <taxi_in>
-          <duration units="s" is_input="True">300.0<!--duration of taxi-in phase in sizing mission--></duration>
+          <duration units="s" is_input="True">150.0<!--duration of taxi-in phase in sizing mission--></duration>
           <speed units="knot" is_input="True">20.0<!--speed during taxi-in phase in sizing mission--></speed>
         </taxi_in>
         <taxi_out>
-          <duration units="s" is_input="True">300.0<!--duration of taxi-out phase in sizing mission--></duration>
+          <duration units="s" is_input="True">150.0<!--duration of taxi-out phase in sizing mission--></duration>
           <speed units="knot" is_input="True">20.0<!--speed during taxi-out phase in sizing mission--></speed>
         </taxi_out>
         <cs23>
@@ -544,7 +544,7 @@
         </cs23>
         <main_route>
           <climb>
-            <v_eas units="m/s" is_input="True">37.0</v_eas> <!--75 KIAS-->
+            <v_eas units="m/s" is_input="True">38.0</v_eas> <!--75 KIAS-->
             <climb_rate>
               <cruise_level units="ft/min" is_input="True">610.0<!--target climb rate at the end of climb--></cruise_level>
               <sea_level units="ft/min" is_input="True">650.0<!--target climb rate at sea level--></sea_level>
@@ -559,7 +559,7 @@
             <v_eas units="m/s" is_input="True">35.0</v_eas>
           </descent>
           <reserve>
-            <altitude units="m" is_input="True">1000.0<!--altitude of the reserve segment--></altitude>
+            <altitude units="ft" is_input="True">1000.0<!--altitude of the reserve segment--></altitude>
             <duration units="min" is_input="True">30.0<!--duration of the reserve segment--></duration>
           </reserve>
         </main_route>
@@ -652,10 +652,32 @@
         </tank>
       </propulsion>
     </weight>
+    <mission>
+      <sizing>
+        <main_route>
+          <reserve>
+            <speed>
+              <k_factor is_input="True">1.3<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+            </speed>
+          </reserve>
+        </main_route>
+      </sizing>
+    </mission>
     <wing>
       <structure>
         <F_COMP>1.0</F_COMP>
       </structure>
     </wing>
   </settings>
+  <convergence>
+    <propulsion>
+      <he_power_train>
+        <propeller>
+          <propeller_1>
+            <min_power units="kW">5.0</min_power>
+          </propeller_1>
+        </propeller>
+      </he_power_train>
+    </propulsion>
+  </convergence>
 </FASTOAD_model>

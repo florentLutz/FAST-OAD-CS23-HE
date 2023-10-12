@@ -102,7 +102,10 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
         definitive_list = []
 
         for promotion in promotes_list:
-            definitive_list.append((promotion, promotion + "_econ"))
+            if ":*" not in promotion:
+                definitive_list.append((promotion, promotion + "_econ"))
+            else:
+                definitive_list.append(promotion)
 
         self.add_subsystem(
             "power_train_performances",

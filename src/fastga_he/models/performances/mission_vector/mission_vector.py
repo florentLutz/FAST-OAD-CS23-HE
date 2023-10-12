@@ -152,7 +152,7 @@ class MissionVector(om.Group):
                 use_linesearch=self.options["use_linesearch"],
                 pre_condition_pt=self.options["pre_condition_pt"],
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "convergence:*"],
         )
         self.add_subsystem(
             "to_csv",
