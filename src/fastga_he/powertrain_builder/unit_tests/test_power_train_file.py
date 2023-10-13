@@ -781,7 +781,13 @@ def test_current_to_set():
     inputs = {
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_out_target_mission": np.array(
             [400.0]
-        )
+        ),
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:module:number_cells": np.array(
+            [96.0]
+        ),
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:module:number_cells": np.array(
+            [96.0]
+        ),
     }
 
     current_to_set = power_train_configurator.get_current_to_set(
@@ -820,6 +826,12 @@ def test_current_to_set():
         "data:propulsion:he_power_train:DC_splitter:dc_splitter_0:power_split": np.array([50.0]),
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:voltage_out_target_mission": np.array(
             [400.0]
+        ),
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:module:number_cells": np.array(
+            [96.0]
+        ),
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:module:number_cells": np.array(
+            [96.0]
         ),
     }
 
