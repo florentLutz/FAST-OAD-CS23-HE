@@ -1,0 +1,31 @@
+title: Sample OAD Process
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+# Input and output files
+input_file: ../results/pipistrel_mission_in.xml
+output_file: ../results/pipistrel_mission_out.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA', debug_print=["objs"])
+
+model:
+  performances:
+    id: fastga_he.performances.mission_vector
+    number_of_points_climb: 100
+    number_of_points_cruise: 100
+    number_of_points_descent: 50
+    number_of_points_reserve: 50
+    power_train_file_path: ./pipistrel_assembly_detailed_mission.yml
+    out_file: ../workdir/mission_data_detailed.csv
+    use_linesearch: False
+    pre_condition_pt: True
+    use_apply_nonlinear: True
+
+submodels:
+  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
+  submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
+  submodel.performances.mission_vector.climb_speed: null
+  submodel.performances.mission_vector.descent_speed: null
+  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file

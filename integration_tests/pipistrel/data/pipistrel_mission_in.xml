@@ -1,0 +1,306 @@
+<FASTOAD_model>
+  <data>
+    <TLAR>
+      <NPAX_design is_input="True">0.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>
+      <luggage_mass_design units="kg" is_input="True">10.0<!--luggage design mass--></luggage_mass_design>
+      <range units="km" is_input="True">53.0<!--design range--></range>
+      <v_cruise units="knot" is_input="True">93.0<!--cruise speed--></v_cruise>
+    </TLAR>
+    <aerodynamics>
+      <fuselage>
+        <cm_alpha units="1/rad" is_input="True">-0.31888656813218563<!--derivative of fuselage pitching moment coefficient with respect to angle of attack--></cm_alpha>
+      </fuselage>
+      <aircraft>
+        <cruise>
+          <CD0 is_input="True">0.032788346208614226<!--profile drag coefficient for the complete aircraft in cruise conditions--></CD0>
+        </cruise>
+        <low_speed>
+          <CD0 is_input="True">0.034796490048989534<!--profile drag coefficient for the complete aircraft in low speed conditions--></CD0>
+        </low_speed>
+      </aircraft>
+      <elevator>
+        <low_speed>
+          <CD_delta units="1/rad**2" is_input="True">0.024695183106171872<!--derivative of horizontal tail drag coefficient with respect to elevator command--></CD_delta>
+          <CL_delta units="1/rad" is_input="True">0.28396135835645114<!--derivative of horizontal tail lift coefficient with respect to elevator command--></CL_delta>
+        </low_speed>
+      </elevator>
+      <horizontal_tail>
+        <cruise>
+          <CL0 is_input="True">-0.0020600529561811015<!--lift coefficient of the horizontal tail when aircraft AOA is null in cruise conditions--></CL0>
+          <CL_alpha units="1/rad" is_input="True">0.29795768766723174<!--derivative of lift coefficient of horizontal tail with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
+          <induced_drag_coefficient is_input="True">0.050015817392635484<!--coefficient to multiply by the lift coefficient squared to get induced drag in cruise conditions--></induced_drag_coefficient>
+        </cruise>
+      </horizontal_tail>
+      <wing>
+        <cruise>
+          <CD0 is_input="True">0.006344962950555839<!--profile drag coefficient for wing in cruise conditions--></CD0>
+          <CL0_clean is_input="True">0.09537387830712318<!--wing lift coefficient at zero aircraft angle of attack in cruise conditions and with no flaps deployed--></CL0_clean>
+          <CL_alpha units="1/rad" is_input="True">5.163876260038608<!--wing lift coefficient slope with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
+          <CM0_clean is_input="True">-0.015672163858931134<!--wing pitching moment coefficient in cruise conditions and with no flaps deployed--></CM0_clean>
+          <induced_drag_coefficient is_input="True">0.035661667037749194<!--coefficient to multiply by the lift coefficient squared to get wing induced drag in cruise conditions--></induced_drag_coefficient>
+        </cruise>
+        <low_speed>
+          <CL0_clean is_input="True">0.09477510457203993<!--wing lift coefficient at zero aircraft angle of attack in low speed conditions and with no flaps deployed--></CL0_clean>
+          <CL_max_clean is_input="True">1.4467115358069713<!--wing maximum lift coefficient for positive angle of attack--></CL_max_clean>
+          <CL_ref is_input="True">0.9903832267850955</CL_ref>
+          <induced_drag_coefficient is_input="True">0.0355088010884161<!--coefficient to multiply by the lift coefficient squared to get wing induced drag in low speed conditions--></induced_drag_coefficient>
+        </low_speed>
+      </wing>
+    </aerodynamics>
+    <geometry>
+      <fuselage>
+        <front_length units="m" is_input="True">1.0<!--length of the front cone of the aircraft--></front_length>
+      </fuselage>
+      <wing>
+        <area units="m**2" is_input="True">10.045138002412735<!--wing area--></area>
+        <wet_area units="m**2" is_input="True">19.155283986782685<!--wet area of wing--></wet_area>
+        <MAC>
+          <length units="m" is_input="True">0.9134082272145709<!--length of mean aerodynamic chord of wing--></length>
+          <at25percent>
+            <x units="m" is_input="True">2.0393368030070342<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+          </at25percent>
+        </MAC>
+      </wing>
+      <cabin>
+        <seats>
+          <passenger>
+            <count_by_row is_input="True">2.0<!--number of passenger seats per row--></count_by_row>
+            <length units="m" is_input="True">0.8<!--passenger seats length--></length>
+          </passenger>
+          <pilot>
+            <length units="m" is_input="True">0.7<!--pilot seats length--></length>
+          </pilot>
+        </seats>
+      </cabin>
+      <horizontal_tail>
+        <MAC>
+          <at25percent>
+            <x>
+              <from_wingMAC25 units="m" is_input="True">4.1<!--distance along X between 25% MAC of wing and 25% MAC of horizontal tail--></from_wingMAC25>
+            </x>
+          </at25percent>
+        </MAC>
+      </horizontal_tail>
+    </geometry>
+    <propulsion>
+      <he_power_train>
+        <thrust_distribution is_input="True">1.0</thrust_distribution>
+        <DC_SSPC>
+          <dc_sspc_1>
+            <efficiency is_input="True">0.9905642055999171<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+          </dc_sspc_1>
+          <dc_sspc_2>
+            <efficiency is_input="True">0.9905642055999171<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+          </dc_sspc_2>
+        </DC_SSPC>
+        <DC_cable_harness>
+          <harness_1>
+            <length units="m" is_input="True">2.9089002199091203<!--Length of the harness--></length>
+            <number_cables is_input="True">1.0</number_cables>
+            <cable>
+              <heat_capacity units="J/degK" is_input="True">1367.468659164012</heat_capacity>
+              <initial_temperature units="degK" is_input="True">288.15</initial_temperature>
+              <radius units="m" is_input="True">0.00660830324967223</radius>
+              <resistance units="ohm" is_input="True">0.0012220238744177386</resistance>
+            </cable>
+            <properties>
+              <resistance_temperature_scale_factor units="1/degK" is_input="True">0.00393</resistance_temperature_scale_factor>
+            </properties>
+          </harness_1>
+        </DC_cable_harness>
+        <DC_splitter>
+          <dc_splitter_1>
+            <power_split is_input="True">50.0<!--Percent of the power going to the first (primary) input, in %--></power_split>
+          </dc_splitter_1>
+        </DC_splitter>
+        <PMSM>
+          <motor_1>
+            <shaft_power_rating units="kW" is_input="True">53.568322295001266<!--Value of the maximum power the PMSM can provide, used for sizing--></shaft_power_rating>
+            <torque_constant units="N*m/A" is_input="True">1.4165061956978502</torque_constant>
+            <loss_coefficient>
+              <alpha units="W/N**2/m**2" is_input="True">0.014387932357415222</alpha>
+              <beta units="W*s/rad" is_input="True">5.392246691335773</beta>
+              <gamma units="W*s**2/rad**2" is_input="True">0.01265600700760136</gamma>
+            </loss_coefficient>
+          </motor_1>
+        </PMSM>
+        <battery_pack>
+          <battery_pack_1>
+            <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <number_modules is_input="True">12.0<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <module>
+              <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
+            </module>
+          </battery_pack_1>
+          <battery_pack_2>
+            <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <number_modules is_input="True">12.0<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <module>
+              <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
+            </module>
+          </battery_pack_2>
+        </battery_pack>
+        <inverter>
+          <inverter_1>
+            <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
+            <power_factor is_input="True">1.0</power_factor>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
+            <casing>
+              <thermal_resistance units="degK/W" is_input="True">0.01<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
+            </casing>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+              <resistance units="ohm" is_input="True">0.016078352433951268</resistance>
+              <thermal_resistance units="degK/W" is_input="True">0.9199912890014897<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
+            </diode>
+            <energy_off>
+              <a is_input="True">0.0004940841228761027</a>
+              <b is_input="True">0.00034030311012866587</b>
+              <c is_input="True">-3.879142271640717e-07</c>
+            </energy_off>
+            <energy_on>
+              <a is_input="True">0.0018449366889642933</a>
+              <b is_input="True">3.3256504177779456e-05</b>
+              <c is_input="True">4.414821486895305e-06</c>
+            </energy_on>
+            <energy_rr>
+              <a is_input="True">0.0017531450915611885</a>
+              <b is_input="True">0.0002539092853205021</b>
+              <c is_input="True">-1.4952505636745089e-06</c>
+            </energy_rr>
+            <igbt>
+              <gate_voltage units="V" is_input="True">0.87</gate_voltage>
+              <resistance units="ohm" is_input="True">0.012983054639179903</resistance>
+              <thermal_resistance units="degK/W" is_input="True">0.7136381026833987<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
+            </igbt>
+            <properties>
+              <resistance_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">0.0033</diode>
+                <igbt units="1/degK" is_input="True">0.0041</igbt>
+              </resistance_temperature_scale_factor>
+              <voltage_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">-0.0022</diode>
+                <igbt units="1/degK" is_input="True">-0.00105</igbt>
+              </voltage_temperature_scale_factor>
+            </properties>
+          </inverter_1>
+        </inverter>
+        <propeller>
+          <propeller_1>
+            <activity_factor is_input="True">125.0<!--Activity factor of the propeller--></activity_factor>
+            <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
+            <cl_clean_ref is_input="True">0.0<!--Value of the clean lift coefficient of the section behind the propeller for reference wing lift coefficient--></cl_clean_ref>
+            <diameter units="cm" is_input="True">164.0<!--Diameter of the propeller--></diameter>
+            <diameter_to_chord_ratio is_input="True">1.7954732080760456<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
+            <diameter_to_span_ratio is_input="True">0.2982513634677817<!--Diameter of the propeller as a ratio of the wing half span--></diameter_to_span_ratio>
+            <flapped_ratio is_input="True">0.0<!--Portion of the span, downstream of the propeller, which has flaps--></flapped_ratio>
+            <from_wing_LE_ratio is_input="True">2.2326668401764564<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
+            <installation_angle units="deg" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
+            <solidity is_input="True">0.125<!--Solidity of the propeller--></solidity>
+            <wing_chord_ref units="m" is_input="True">0.9134082272145714<!--Value of the wing chord behind the propeller--></wing_chord_ref>
+          </propeller_1>
+        </propeller>
+      </he_power_train>
+    </propulsion>
+    <weight>
+      <aircraft>
+        <MTOW units="kg" is_input="True">604.6926642827556<!--maximum takeoff weight of the aircraft--></MTOW>
+        <payload units="kg" is_input="True">172.0<!--design payload weight--></payload>
+      </aircraft>
+      <aircraft_empty>
+        <mass units="kg" is_input="True">432.6926642827556<!--mass of empty aircraft--></mass>
+        <CG>
+          <x units="m" is_input="True">1.9898086064591898<!--X-position center of gravity of empty aircraft--></x>
+        </CG>
+      </aircraft_empty>
+      <payload>
+        <rear_fret>
+          <CG>
+            <x units="m" is_input="True">3.0<!--X-position of center of gravity of the rear fret--></x>
+          </CG>
+        </rear_fret>
+      </payload>
+    </weight>
+    <mission>
+      <sizing>
+        <initial_climb>
+          <energy units="W*h" is_input="True">0.0</energy>
+          <fuel units="kg" is_input="True">0.0</fuel>
+        </initial_climb>
+        <takeoff>
+          <energy units="W*h" is_input="True">0.0</energy>
+          <fuel units="kg" is_input="True">0.0</fuel>
+        </takeoff>
+        <taxi_in>
+          <duration units="s" is_input="True">150.0<!--duration of taxi in phase--></duration>
+          <speed units="knot" is_input="True">20.0<!--ground velocity during taxi in phase--></speed>
+        </taxi_in>
+        <taxi_out>
+          <duration units="s" is_input="True">150.0<!--duration of taxi out phase--></duration>
+          <speed units="knot" is_input="True">20.0<!--ground velocity during taxi out phase--></speed>
+        </taxi_out>
+        <main_route>
+          <climb>
+            <v_eas units="m/s" is_input="True">38.0</v_eas>
+            <climb_rate>
+              <cruise_level units="ft/min" is_input="True">610.0<!--target climb rate at the end of climb--></cruise_level>
+              <sea_level units="ft/min" is_input="True">650.0<!--target climb rate at sea level--></sea_level>
+            </climb_rate>
+          </climb>
+          <cruise>
+            <altitude units="ft" is_input="True">2000.0<!--main route cruise phase altitude--></altitude>
+          </cruise>
+          <descent>
+            <descent_rate units="ft/min" is_input="True">-450.0<!--target descent rate for the aircraft--></descent_rate>
+            <v_eas units="m/s" is_input="True">35.0</v_eas>
+          </descent>
+          <reserve>
+            <altitude units="ft" is_input="True">1000.0</altitude>
+            <duration units="min" is_input="True">30.0<!--duration of the reserve segment--></duration>
+          </reserve>
+        </main_route>
+      </sizing>
+    </mission>
+  </data>
+  <settings>
+    <propulsion>
+      <he_power_train>
+        <PMSM>
+          <motor_1>
+            <k_efficiency is_input="True">0.937<!--K factor for the PMSM efficiency--></k_efficiency>
+          </motor_1>
+        </PMSM>
+      </he_power_train>
+    </propulsion>
+    <weight>
+      <aircraft>
+        <payload>
+          <design_mass_per_passenger units="kg" is_input="True">80.0<!--Design value of mass per passenger--></design_mass_per_passenger>
+        </payload>
+      </aircraft>
+    </weight>
+    <mission>
+      <sizing>
+        <main_route>
+          <reserve>
+            <speed>
+              <k_factor is_input="True">1.3<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+            </speed>
+          </reserve>
+        </main_route>
+      </sizing>
+    </mission>
+  </settings>
+  <convergence>
+    <propulsion>
+      <he_power_train>
+        <propeller>
+          <propeller_1>
+            <min_power units="kW" is_input="True">0.5<!--Convergence parameter used to aid convergence since, if power is too low in the network, the code will have trouble converging--></min_power>
+          </propeller_1>
+        </propeller>
+      </he_power_train>
+    </propulsion>
+  </convergence>
+</FASTOAD_model>

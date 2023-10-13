@@ -80,7 +80,7 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
-            + "cell:c_rate_caliber",
+            + ":cell:c_rate_caliber",
             val=2.4,
             units="h**-1",
             desc="Maximum C-rate that the battery reference cell can provide",
@@ -102,7 +102,7 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
             wrt=[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
-                + "cell:c_rate_caliber",
+                + ":cell:c_rate_caliber",
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max",
             ],
             method="exact",
@@ -132,7 +132,7 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
             - inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
-                + "cell:c_rate_caliber"
+                + ":cell:c_rate_caliber"
             ]
         )
 
@@ -165,5 +165,5 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
             + ":cell:max_c_rate",
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
-            + "cell:c_rate_caliber",
+            + ":cell:c_rate_caliber",
         ] = -1.0

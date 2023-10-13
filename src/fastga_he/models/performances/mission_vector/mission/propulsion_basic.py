@@ -91,6 +91,16 @@ class FuelConsumed(om.ExplicitComponent):
             val=np.full(number_of_points + 2, 7.3e-6),
             units="kg/s/N",
         )
+        self.add_input(
+            "settings:propulsion:IC_engine:dummy_setting",
+            shape=number_of_points + 2,
+            desc="Not actually used for anything, just here for compatibility",
+        )
+        self.add_input(
+            "convergence:propulsion:IC_engine:dummy_convergence",
+            shape=number_of_points + 2,
+            desc="Not actually used for anything, just here for compatibility",
+        )
 
         self.add_output(
             "fuel_consumed_t_econ",

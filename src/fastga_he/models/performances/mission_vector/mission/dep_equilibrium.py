@@ -182,10 +182,11 @@ class DEPEquilibrium(om.Group):
                 ),
                 promotes=[
                     "data:*",
+                    "settings:*",
+                    "convergence:*",
                     "fuel_consumed_t_econ",
                     "non_consumable_energy_t_econ",
                     "thrust_rate_t_econ",
-                    "true_airspeed_econ",
                     "true_airspeed_econ",
                     "time_step_econ",
                     "exterior_temperature_econ",

@@ -15,13 +15,13 @@ from abc import ABC
 from importlib.resources import open_text
 from typing import Tuple, List
 
+import re
+
 import numpy as np
 from jsonschema import validate
 from ruamel.yaml import YAML
 
 import networkx as nx
-
-from utils.format_to_array import format_to_array
 
 from .exceptions import (
     FASTGAHEUnknownComponentID,
@@ -450,6 +450,32 @@ class FASTGAHEPowerTrainConfigurator:
                 or target_id == "fastga_he.pt_component.dc_splitter"
             ):
                 self._sspc_list[source_name] = True
+
+            # The possibility to connect a battery directly to a bus has been added. However,
+            # to make it backward compatible (whatever it means today because I have no used) and
+            # to impart less burden during the writing of the pt file, we won't ask the user to
+            # set the option accordingly, rather, we will do it here.
+
+            if target_id == "fastga_he.pt_component.battery_pack" and (
+                source_id == "fastga_he.pt_component.dc_bus"
+                or source_id == "fastga_he.pt_component.dc_splitter"
+                or source_id == "fastga_he.pt_component.dc_sspc"
+            ):
+
+                # First we'll check if the option has already been set or no, just to avoid
+                # losing time
+
+                target_index = self._components_name.index(target_name)
+                target_option = self._components_options[target_index]
+
+                if not target_option:
+                    self._components_options[target_index] = {"direct_bus_connection": True}
+
+                current_outputs = resources.DICTIONARY_OUT[target_id]
+
+                target_outputs = []
+                for current_output in current_outputs:
+                    target_outputs.append(tuple(reversed(current_output)))
 
             for system_input, system_output in zip(source_inputs, target_outputs):
 
@@ -909,14 +935,34 @@ class FASTGAHEPowerTrainConfigurator:
         """
 
         self._get_components()
+        # We need to trigger the generation of the connections because that what triggers the
+        # identification of batteries directly connected to a bus
+        self._get_connections()
         components_perf_watchers_name_organised_list = []
         components_perf_watchers_unit_organised_list = []
         components_name_organised_list = []
 
+        name_to_id = dict(zip(self._components_name, self._components_id))
+        id_to_option = dict(zip(self._components_id, self._components_options))
+
         for component_name, components_perf_watchers in zip(
             self._components_name, self._components_perf_watchers
         ):
-            for components_perf_watcher in components_perf_watchers:
+
+            component_perf_watchers_copy = copy.deepcopy(components_perf_watchers)
+
+            # Need a more generic way to do this, here we will do it once because the battery is
+            # a unique case
+            component_id = name_to_id[component_name]
+            if component_id == "fastga_he.pt_component.battery_pack":
+                component_option = id_to_option[component_id]
+                # If there is a direct connection, the option won't be empty
+                if component_option and {"voltage_out": "V"} in component_perf_watchers_copy:
+                    # We remove what has become an input and add what has become an output
+                    component_perf_watchers_copy.remove({"voltage_out": "V"})
+                    component_perf_watchers_copy.append({"dc_current_out": "A"})
+
+            for components_perf_watcher in component_perf_watchers_copy:
                 key, value = list(components_perf_watcher.items())[0]
                 components_name_organised_list.append(component_name)
                 components_perf_watchers_name_organised_list.append(key)
@@ -1287,6 +1333,8 @@ class FASTGAHEPowerTrainConfigurator:
 
         name_to_type = dict(zip(self._components_name, self._components_type))
         name_to_id = dict(zip(self._components_name, self._components_id))
+        name_to_ct = dict(zip(self._components_name, self._components_type))
+        name_to_option = dict(zip(self._components_name, self._components_options))
 
         final_list = []
         voltage_at_each_node = {}
@@ -1312,10 +1360,38 @@ class FASTGAHEPowerTrainConfigurator:
                 reference_voltage = inputs[input_name]
             else:
                 # We need to use a fake value here, but, a priori, since there are no voltage
-                # setter there won't be any voltage to set so we can put anything there
-                reference_voltage = np.array([DEFAULT_VOLTAGE_VALUE])
+                # setter there won't be any voltage to set so we can put anything there. Expect,
+                # again, for the battery which is a particular case. It doesn't appear as a
+                # setter in the condition above but actually is when it is directly connected to
+                # a bus.
 
-            # We now transform it in the proper array
+                reference_voltage = None
+
+                # The way we'll do it is a bit horrible but it is quick and works
+                for node in sub_graph.nodes:
+
+                    component_name = node.replace("_in", "").replace("_out", "")
+                    component_id = name_to_id[component_name]
+
+                    if (
+                        component_id == "fastga_he.pt_component.battery_pack"
+                        and "_out" in node
+                        and name_to_option[component_name]
+                    ):
+                        number_of_cell_in_series = self.get_number_of_cell_in_series(
+                            component_name=component_name,
+                            component_type=name_to_ct[component_name],
+                            inputs=inputs,
+                        )
+                        reference_voltage = (
+                            np.linspace(4.2, 2.65, number_of_points) * number_of_cell_in_series
+                        )
+
+                if reference_voltage is None:
+                    reference_voltage = np.array([DEFAULT_VOLTAGE_VALUE])
+
+            # We now transform it in the proper array, if it already has the right shape,
+            # this line does nothing
             if len(reference_voltage):
                 reference_voltage = np.full(number_of_points, reference_voltage)
 
@@ -1336,6 +1412,28 @@ class FASTGAHEPowerTrainConfigurator:
                     variable_name = component_name + "." + voltage_to_set
                     voltage_dict_subgraph[variable_name] = reference_voltage
 
+                # If the node in question is the output of a battery in "normal" mode,
+                # we can guesstimate the voltage but since it is so peculiar (not constant during
+                # mission) we won't make it appear in the registered_components.py. Yet another
+                # point of the code where the battery is a exception ^^'
+
+                if (
+                    component_id == "fastga_he.pt_component.battery_pack"
+                    and "_out" in node
+                    and not name_to_option[component_name]
+                ):
+
+                    number_of_cell_in_series = self.get_number_of_cell_in_series(
+                        component_name=component_name,
+                        component_type=name_to_ct[component_name],
+                        inputs=inputs,
+                    )
+                    voltage_to_set = (
+                        np.linspace(4.2, 2.65, number_of_points) * number_of_cell_in_series
+                    )
+
+                    voltage_dict_subgraph[component_name + ".voltage_out"] = voltage_to_set
+
                 voltage_at_each_node[node] = reference_voltage
 
             final_list.append(voltage_dict_subgraph)
@@ -1343,6 +1441,38 @@ class FASTGAHEPowerTrainConfigurator:
         self._voltage_at_each_node = voltage_at_each_node
 
         return final_list
+
+    @staticmethod
+    def get_number_of_cell_in_series(component_name: str, component_type: str, inputs) -> float:
+        """
+        This function returns the number of cell in series inside a battery module. Was put there
+        because there is quite a process to extract the value and we will need it twice at least.
+
+        :param component_name: name of the battery pack
+        :param component_type: type of battery pack, for now there is only one but who knows
+        :param inputs: inputs vector, in the OpenMDAO format
+        """
+
+        # We only know the promoted name of the variable so we can't access it
+        # directly, but in the error message that will pop up when we try to use it,
+        # we have all the info we need
+
+        try:
+            number_of_cell_in_series = float(
+                inputs[
+                    PT_DATA_PREFIX + component_type + ":" + component_name + ":module:number_cells"
+                ]
+            )
+
+        except RuntimeError as e:
+            error_message = e.args[0]
+            abs_names = re.findall(r"\[.*?\]", error_message)[0][1:-1].replace(" ", "").split(",")
+            abs_name = abs_names[0]
+            split_abs_name = abs_name.split(".")
+            proper_abs_name = ".".join(split_abs_name[1:])
+            number_of_cell_in_series = float(inputs[proper_abs_name])
+
+        return number_of_cell_in_series
 
     def get_independent_sub_propulsion_chain(self):
         """
@@ -1986,6 +2116,7 @@ class FASTGAHEPowerTrainConfigurator:
             _, _ = self.get_power_to_set(inputs, propulsive_power_dict)
 
         name_to_id = dict(zip(self._components_name, self._components_id))
+        name_to_option = dict(zip(self._components_name, self._components_options))
 
         all_voltage_dict = copy.deepcopy(self._voltage_at_each_node)
         all_power_dict = copy.deepcopy(self._power_at_each_node)
@@ -2055,6 +2186,19 @@ class FASTGAHEPowerTrainConfigurator:
                     current = all_power_dict[node] / voltage_node / factor
                     all_current_dict[variable_name] = current
 
+            # If the component is a battery, there will be no "official" current to set,
+            # but as seen empirically if the battery is directly connected to a bus and the
+            # current is not set properly, it might prevent the code from converging.
+            if (
+                name_to_id[component_name] == "fastga_he.pt_component.battery_pack"
+                and name_to_option[component_name]
+            ):
+                voltage_node = all_voltage_dict[node]
+                current = all_power_dict[node] / voltage_node
+                variable_name = component_name + ".dc_current_out"
+
+                all_current_dict[variable_name] = current
+
         return all_current_dict
 
 
@@ -2078,3 +2222,16 @@ class _YAMLSerializer(ABC):
         yaml.default_flow_style = False
         with open(file_path, "w") as file:
             yaml.dump(self._data, file)
+
+
+def format_to_array(input_array: np.ndarray, number_of_points: int) -> np.ndarray:
+    """
+    Takes an inputs which is either a one-element array or a multi-element array and formats it.
+    """
+
+    if len(input_array):
+        output_array = np.full(number_of_points, input_array[0])
+    else:
+        output_array = input_array
+
+    return output_array

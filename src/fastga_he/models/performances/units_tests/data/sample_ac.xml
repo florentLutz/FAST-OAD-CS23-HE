@@ -53,6 +53,7 @@
     </aerodynamics>
     <geometry>
       <fuselage>
+        <rear_length units="m" is_input="True">4.642491990994737<!--length of the front cone of the aircraft--></rear_length>
         <front_length units="m" is_input="True">1.87292<!--length of the front cone of the aircraft--></front_length>
       </fuselage>
       <propeller>
@@ -87,6 +88,7 @@
         </nacelle>
       </propulsion>
       <cabin>
+        <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
         <seats>
           <passenger>
             <count_by_row is_input="True">2.0<!--number of passenger seats per row--></count_by_row>

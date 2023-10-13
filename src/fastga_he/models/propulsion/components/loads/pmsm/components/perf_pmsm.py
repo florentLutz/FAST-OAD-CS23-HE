@@ -44,7 +44,7 @@ class PerformancesPMSM(om.Group):
         )
         self.add_subsystem(
             "efficiency",
-            PerformancesEfficiency(number_of_points=number_of_points),
+            PerformancesEfficiency(motor_id=motor_id, number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(

@@ -2,11 +2,10 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import numpy as np
 import openmdao.api as om
 
 import fastoad.api as oad
-
-from utils.format_to_array import format_to_array
 
 from .perf_switching_frequency import PerformancesSwitchingFrequencyMission
 from .perf_voltage_out_target import PerformancesVoltageOutTargetMission
@@ -143,3 +142,16 @@ class PerformancesDCDCConverter(om.Group):
         formatted_voltage = format_to_array(not_formatted_voltage, number_of_points)
 
         outputs["voltage_out_target.voltage_out_target"] = formatted_voltage
+
+
+def format_to_array(input_array: np.ndarray, number_of_points: int) -> np.ndarray:
+    """
+    Takes an inputs which is either a one-element array or a multi-element array and formats it.
+    """
+
+    if len(input_array):
+        output_array = np.full(number_of_points, input_array[0])
+    else:
+        output_array = input_array
+
+    return output_array

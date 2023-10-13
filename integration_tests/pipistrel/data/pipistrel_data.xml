@@ -1,0 +1,28 @@
+<FASTOAD_model>
+  <data>
+    <weight>
+      <aircraft>
+        <MTOW units="kg">600.0</MTOW>
+        <OWE units="kg">428.0</OWE>
+        <payload units="kg">172.0</payload>
+      </aircraft>
+      <airframe>
+        <mass units="kg">0.0</mass>
+      </airframe>
+      <propulsion>
+        <mass units="kg">0.0</mass>
+      </propulsion>
+      <furniture>
+        <mass units="kg">0.0</mass>
+      </furniture>
+      <systems>
+        <mass units="kg">0.0</mass>
+      </systems>
+    </weight>
+    <mission>
+      <sizing>
+        <fuel units="kg">0.0</fuel>
+      </sizing>
+    </mission>
+  </data>
+</FASTOAD_model>

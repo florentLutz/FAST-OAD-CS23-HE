@@ -14,13 +14,22 @@ class PerformancesEfficiency(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
+        )
 
     def setup(self):
 
         number_of_points = self.options["number_of_points"]
+        motor_id = self.options["motor_id"]
 
         self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
         self.add_input("power_losses", units="W", val=np.nan, shape=number_of_points)
+        self.add_input(
+            "settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency",
+            val=1.0,
+            desc="K factor for the PMSM efficiency",
+        )
 
         self.add_output(
             "efficiency",
@@ -34,15 +43,28 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["efficiency"] = inputs["shaft_power_out"] / (
-            inputs["shaft_power_out"] + inputs["power_losses"]
+        motor_id = self.options["motor_id"]
+
+        outputs["efficiency"] = (
+            inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
+            * inputs["shaft_power_out"]
+            / (inputs["shaft_power_out"] + inputs["power_losses"])
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
+        motor_id = self.options["motor_id"]
+
         partials["efficiency", "shaft_power_out"] = np.diag(
-            inputs["power_losses"] / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0
+            inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
+            * inputs["power_losses"]
+            / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0
         )
         partials["efficiency", "power_losses"] = -np.diag(
-            inputs["shaft_power_out"] / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0
+            inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
+            * inputs["shaft_power_out"]
+            / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0
         )
+        partials[
+            "efficiency", "settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"
+        ] = inputs["shaft_power_out"] / (inputs["shaft_power_out"] + inputs["power_losses"])

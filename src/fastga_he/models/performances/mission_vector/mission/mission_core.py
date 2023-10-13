@@ -90,6 +90,8 @@ class MissionCore(om.Group):
             oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_EQUILIBRIUM, options=options_equilibrium),
             promotes=[
                 "data:*",
+                "settings:*",
+                "convergence:*",
                 "mass",
                 "time_step",
                 "thrust_rate_t_econ",

@@ -2,6 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import os.path as pth
 import copy
 
 import openmdao.api as om
@@ -36,6 +37,7 @@ from ..components.perf_cell_losses import PerformancesCellLosses
 from ..components.perf_battery_losses import PerformancesBatteryLosses
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
+from ..components.perf_battery_power import PerformancesBatteryPower
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 from ..components.cstr_ensure import ConstraintsSOCEnsure
 from ..components.cstr_enforce import ConstraintsSOCEnforce
@@ -678,6 +680,17 @@ def test_battery_voltage():
 
     problem.check_partials(compact_print=True)
 
+    # Check with the other battery mode
+    problem = run_system(
+        PerformancesBatteryVoltage(number_of_points=NB_POINTS_TEST, direct_bus_connection=True),
+        ivc,
+    )
+    assert problem.get_val("battery_voltage", units="V") == pytest.approx(
+        [802.0, 786.0, 770.0, 760.0, 750.0, 740.0, 734.0, 726.0, 720.0, 714.0], rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_module_c_rate():
     ivc = get_indep_var_comp(
@@ -975,7 +988,7 @@ def test_maximum():
     problem.check_partials(compact_print=True)
 
 
-def test_battery_efficiency():
+def test_battery_power():
 
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
@@ -985,12 +998,35 @@ def test_battery_efficiency():
         val=np.array([802.0, 786.0, 770.0, 760.0, 750.0, 740.0, 734.0, 726.0, 720.0, 714.0]),
     )
     ivc.add_output("dc_current_out", np.linspace(400, 410, NB_POINTS_TEST), units="A")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesBatteryPower(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    assert problem.get_val("power_out", units="kW") == pytest.approx(
+        [320.8, 315.2, 309.7, 306.5, 303.3, 300.1, 298.4, 296.0, 294.4, 292.7],
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_battery_efficiency():
+
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
     ivc.add_output(
         "losses_battery",
         np.array(
             [2596.24, 2063.36, 3824.4, 5434.4, 5789.6, 4770.96, 2929.52, 1169.84, 448.88, 1380.88]
         ),
         units="W",
+    )
+    ivc.add_output(
+        "power_out",
+        np.array([320.8, 315.2, 309.7, 306.5, 303.3, 300.1, 298.4, 296.0, 294.4, 292.7]),
+        units="kW",
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -1064,5 +1100,7 @@ def test_performances_battery_pack():
         [0.974, 0.969, 0.97, 0.973, 0.976, 0.978, 0.978, 0.975, 0.971, 0.966],
         rel=1e-2,
     )
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
     problem.check_partials(compact_print=True)
