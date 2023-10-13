@@ -15,6 +15,8 @@ from abc import ABC
 from importlib.resources import open_text
 from typing import Tuple, List
 
+import re
+
 import numpy as np
 from jsonschema import validate
 from ruamel.yaml import YAML
@@ -1331,6 +1333,8 @@ class FASTGAHEPowerTrainConfigurator:
 
         name_to_type = dict(zip(self._components_name, self._components_type))
         name_to_id = dict(zip(self._components_name, self._components_id))
+        name_to_ct = dict(zip(self._components_name, self._components_type))
+        name_to_option = dict(zip(self._components_name, self._components_options))
 
         final_list = []
         voltage_at_each_node = {}
@@ -1356,10 +1360,38 @@ class FASTGAHEPowerTrainConfigurator:
                 reference_voltage = inputs[input_name]
             else:
                 # We need to use a fake value here, but, a priori, since there are no voltage
-                # setter there won't be any voltage to set so we can put anything there
-                reference_voltage = np.array([DEFAULT_VOLTAGE_VALUE])
+                # setter there won't be any voltage to set so we can put anything there. Expect,
+                # again, for the battery which is a particular case. It doesn't appear as a
+                # setter in the condition above but actually is when it is directly connected to
+                # a bus.
 
-            # We now transform it in the proper array
+                reference_voltage = None
+
+                # The way we'll do it is a bit horrible but it is quick and works
+                for node in sub_graph.nodes:
+
+                    component_name = node.replace("_in", "").replace("_out", "")
+                    component_id = name_to_id[component_name]
+
+                    if (
+                        component_id == "fastga_he.pt_component.battery_pack"
+                        and "_out" in node
+                        and name_to_option[component_name]
+                    ):
+                        number_of_cell_in_series = self.get_number_of_cell_in_series(
+                            component_name=component_name,
+                            component_type=name_to_ct[component_name],
+                            inputs=inputs,
+                        )
+                        reference_voltage = (
+                            np.linspace(4.2, 2.65, number_of_points) * number_of_cell_in_series
+                        )
+
+                if reference_voltage is None:
+                    reference_voltage = np.array([DEFAULT_VOLTAGE_VALUE])
+
+            # We now transform it in the proper array, if it already has the right shape,
+            # this line does nothing
             if len(reference_voltage):
                 reference_voltage = np.full(number_of_points, reference_voltage)
 
@@ -1380,6 +1412,28 @@ class FASTGAHEPowerTrainConfigurator:
                     variable_name = component_name + "." + voltage_to_set
                     voltage_dict_subgraph[variable_name] = reference_voltage
 
+                # If the node in question is the output of a battery in "normal" mode,
+                # we can guesstimate the voltage but since it is so peculiar (not constant during
+                # mission) we won't make it appear in the registered_components.py. Yet another
+                # point of the code where the battery is a exception ^^'
+
+                if (
+                    component_id == "fastga_he.pt_component.battery_pack"
+                    and "_out" in node
+                    and not name_to_option[component_name]
+                ):
+
+                    number_of_cell_in_series = self.get_number_of_cell_in_series(
+                        component_name=component_name,
+                        component_type=name_to_ct[component_name],
+                        inputs=inputs,
+                    )
+                    voltage_to_set = (
+                        np.linspace(4.2, 2.65, number_of_points) * number_of_cell_in_series
+                    )
+
+                    voltage_dict_subgraph[component_name + ".voltage_out"] = voltage_to_set
+
                 voltage_at_each_node[node] = reference_voltage
 
             final_list.append(voltage_dict_subgraph)
@@ -1387,6 +1441,38 @@ class FASTGAHEPowerTrainConfigurator:
         self._voltage_at_each_node = voltage_at_each_node
 
         return final_list
+
+    @staticmethod
+    def get_number_of_cell_in_series(component_name: str, component_type: str, inputs) -> float:
+        """
+        This function returns the number of cell in series inside a battery module. Was put there
+        because there is quite a process to extract the value and we will need it twice at least.
+
+        :param component_name: name of the battery pack
+        :param component_type: type of battery pack, for now there is only one but who knows
+        :param inputs: inputs vector, in the OpenMDAO format
+        """
+
+        # We only know the promoted name of the variable so we can't access it
+        # directly, but in the error message that will pop up when we try to use it,
+        # we have all the info we need
+
+        try:
+            number_of_cell_in_series = float(
+                inputs[
+                    PT_DATA_PREFIX + component_type + ":" + component_name + ":module:number_cells"
+                ]
+            )
+
+        except RuntimeError as e:
+            error_message = e.args[0]
+            abs_names = re.findall(r"\[.*?\]", error_message)[0][1:-1].replace(" ", "").split(",")
+            abs_name = abs_names[0]
+            split_abs_name = abs_name.split(".")
+            proper_abs_name = ".".join(split_abs_name[1:])
+            number_of_cell_in_series = float(inputs[proper_abs_name])
+
+        return number_of_cell_in_series
 
     def get_independent_sub_propulsion_chain(self):
         """
