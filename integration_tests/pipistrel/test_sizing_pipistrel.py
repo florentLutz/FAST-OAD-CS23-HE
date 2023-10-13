@@ -70,17 +70,6 @@ def test_pipistrel_like():
     problem.set_val("data:weight:aircraft:ZFW", units="kg", val=600.0)
     problem.set_val("data:weight:aircraft:MLW", units="kg", val=600.0)
 
-    problem.set_val(
-        "performances.solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_1.direct_bus_connection.dc_current_out",
-        units="A",
-        val=np.full(92, 100.0),
-    )
-    problem.set_val(
-        "performances.solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_2.direct_bus_connection.dc_current_out",
-        units="A",
-        val=np.full(92, 100.0),
-    )
-
     # Run the problem
     problem.run_model()
 
@@ -92,6 +81,8 @@ def test_pipistrel_like():
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         600.00, rel=1e-2
     )
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(26.647, abs=1e-2)
 
 
 def test_pipistrel_detailed_mission():
@@ -116,17 +107,6 @@ def test_pipistrel_detailed_mission():
     problem = configurator.get_problem(read_inputs=True)
     problem.setup()
 
-    problem.set_val(
-        "performances.solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_1.direct_bus_connection.dc_current_out",
-        units="A",
-        val=np.full(302, 100.0),
-    )
-    problem.set_val(
-        "performances.solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_2.direct_bus_connection.dc_current_out",
-        units="A",
-        val=np.full(302, 100.0),
-    )
-
     # Run the problem
     problem.run_model()
 
@@ -134,6 +114,9 @@ def test_pipistrel_detailed_mission():
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
+
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(26.507, abs=1e-2)
 
 
 def test_pipistrel_not_detailed_mission():
@@ -159,16 +142,6 @@ def test_pipistrel_not_detailed_mission():
     problem.setup()
 
     problem.set_val(
-        "performances.solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_1.direct_bus_connection.dc_current_out",
-        units="A",
-        val=np.full(92, 100.0),
-    )
-    problem.set_val(
-        "performances.solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_2.direct_bus_connection.dc_current_out",
-        units="A",
-        val=np.full(92, 100.0),
-    )
-    problem.set_val(
         "data:mission:sizing:main_route:descent:descent_rate",
         units="ft/min",
         val=-500.0,
@@ -186,6 +159,9 @@ def test_pipistrel_not_detailed_mission():
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
+
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(26.476, abs=1e-2)
 
 
 def test_residuals_analyzer():

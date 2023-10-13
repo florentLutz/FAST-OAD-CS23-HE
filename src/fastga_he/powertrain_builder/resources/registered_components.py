@@ -54,7 +54,7 @@ V_TO_SET = "voltage_to_precondition"
 # contains the power cannot tell me whether it is at the input or output of the component (
 # "active_power" for the PMSM for instance)
 P_TO_SET = "power_to_precondition"
-# P_TO_SET contains a list of tuple with for each type of components of their power
+# I_TO_SET contains a list of tuple with for each type of components of their current
 # characteristic that can be set and whether they are at the input of the component ("in") or at
 # the output ( "out"). Unlike P_TO_SET I may be able to do with that tag but it doesn't matter
 # too much if it doesn't. Also unlike P_TO_SET we will only be dealing with electric power (
@@ -362,7 +362,7 @@ BATTERY_PACK = {
     SETS_V: False,
     IO_INDEP_V: False,
     V_TO_SET: [],
-    P_TO_SET: [],
+    P_TO_SET: [("power_out", "out")],
     I_TO_SET: [],
     SFR: False,
     SWL: False,

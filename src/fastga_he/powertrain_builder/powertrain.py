@@ -2116,6 +2116,7 @@ class FASTGAHEPowerTrainConfigurator:
             _, _ = self.get_power_to_set(inputs, propulsive_power_dict)
 
         name_to_id = dict(zip(self._components_name, self._components_id))
+        name_to_option = dict(zip(self._components_name, self._components_options))
 
         all_voltage_dict = copy.deepcopy(self._voltage_at_each_node)
         all_power_dict = copy.deepcopy(self._power_at_each_node)
@@ -2184,6 +2185,19 @@ class FASTGAHEPowerTrainConfigurator:
 
                     current = all_power_dict[node] / voltage_node / factor
                     all_current_dict[variable_name] = current
+
+            # If the component is a battery, there will be no "official" current to set,
+            # but as seen empirically if the battery is directly connected to a bus and the
+            # current is not set properly, it might prevent the code from converging.
+            if (
+                name_to_id[component_name] == "fastga_he.pt_component.battery_pack"
+                and name_to_option[component_name]
+            ):
+                voltage_node = all_voltage_dict[node]
+                current = all_power_dict[node] / voltage_node
+                variable_name = component_name + ".dc_current_out"
+
+                all_current_dict[variable_name] = current
 
         return all_current_dict
 
