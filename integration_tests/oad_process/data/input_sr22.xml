@@ -2,7 +2,7 @@
   <data>
     <TLAR>
       <NPAX_design>2.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>
-      <luggage_mass_design units="kg">55.0<!--luggage design mass--></luggage_mass_design>
+      <luggage_mass_design units="kg">35.0<!--luggage design mass--></luggage_mass_design>
       <range units="NM">971.0<!--top-level requirement: design range--></range>
       <v_approach units="kn">79.0<!--approach speed--></v_approach>
       <v_cruise units="kn">160.0<!--cruise speed--></v_cruise>
@@ -266,7 +266,7 @@
       </systems>
       <airframe>
         <wing>
-          <k_factor>0.9<!--proportional corrective factor for wing mass--></k_factor>
+          <k_factor>1.0<!--proportional corrective factor for wing mass--></k_factor>
           <punctual_mass>
             <mass>0.0</mass>
             <y_ratio>0.0</y_ratio>
@@ -292,7 +292,7 @@
           </CG>
         </fuel_lines>
         <unusable_fuel>
-          <mass units="lbm" is_input="False">79.15834073866525<!--total unusable fuel mass--></mass>
+          <mass units="lbm" is_input="False">0.0<!--total unusable fuel mass--></mass>
         </unusable_fuel>
         <tank>
           <CG>
@@ -317,17 +317,6 @@
         <depth>0.6<!--Average tank depth to the max wing profile depth. The value depends on the shape of the section profile and the allowance made for structure. Typical values lie between 0.5 and 0.8--></depth>
       </fuel_tanks>
     </geometry>
-    <mission>
-      <sizing>
-        <main_route>
-          <reserve>
-            <speed>
-              <k_factor>2.21</k_factor>
-            </speed>
-          </reserve>
-        </main_route>
-      </sizing>
-    </mission>
     <weight>
       <aircraft>
         <CG>
