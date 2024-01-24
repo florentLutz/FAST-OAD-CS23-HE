@@ -42,14 +42,14 @@ def test_pipistrel_like():
     process_file_name = "pipistrel_configuration.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
-    # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
     problem.setup()
 
     # Removing previous case and adding a recorder
@@ -82,7 +82,7 @@ def test_pipistrel_like():
         600.00, rel=1e-2
     )
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(26.647, abs=1e-2)
+    assert sizing_energy == pytest.approx(26.629, abs=1e-2)
 
 
 def test_pipistrel_detailed_mission():

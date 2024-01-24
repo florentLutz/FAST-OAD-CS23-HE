@@ -71,6 +71,8 @@ def test_fuel_and_battery(cleanup):
 def test_sizing_sr22(cleanup):
 
     # TODO: Recheck inputs
+    # TODO: The setup has been change to optimize the number of setup calls but it hasn't been an
+    #  official release yet
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -82,14 +84,14 @@ def test_sizing_sr22(cleanup):
     process_file_name = "full_sizing_fuel.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
-    # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
     problem.setup()
 
     # om.n2(problem, show_browser=True)
