@@ -504,6 +504,7 @@
               <y_ratio is_input="True">0.34<!--X position of the battery center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <cell>
+              <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
               <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
               <volume units="L" is_input="False">0.01763<!--Volume of the cell used for the assembly of the battery pack--></volume>
             </cell>
@@ -530,9 +531,6 @@
               <volume units="L" is_input="False">3.3056249999999996<!--Volume of one module of the battery--></volume>
             </module>
           </battery_pack_1>
-          <battery_pack_1cell>
-            <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
-          </battery_pack_1cell>
         </battery_pack>
         <inverter>
           <inverter_1>

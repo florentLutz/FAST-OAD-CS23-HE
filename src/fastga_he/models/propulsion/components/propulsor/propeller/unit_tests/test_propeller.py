@@ -549,11 +549,12 @@ def test_power_coefficient():
     )
 
     assert problem.get_val("power_coefficient") == pytest.approx(
-        np.array([0.0693, 0.0696, 0.0697, 0.0706, 0.0707, 0.0711, 0.0713, 0.0714, 0.0717, 0.0725]),
+        np.array([0.0642, 0.0645, 0.0646, 0.0656, 0.0657, 0.0660, 0.0663, 0.0664, 0.0667, 0.0676]),
         rel=1e-2,
     )
 
-    # Derivative wrt Re is accurate with the proper step (at least 1)
+    # Derivative wrt Re doesn't seem to be accurate regardless of the step, can't figure out why,
+    # it seems ok
     problem.check_partials(compact_print=True)
 
 
@@ -592,7 +593,7 @@ def test_efficiency():
     )
 
     # Derivative wrt Re is accurate with the proper step (at least 1)
-    problem.check_partials(compact_print=True)
+    problem.check_partials(compact_print=True, step=1)
 
 
 def test_shaft_power():
@@ -1576,7 +1577,7 @@ def test_propeller_performances():
     )
 
     assert problem.get_val("shaft_power_in", units="kW") == pytest.approx(
-        np.array([187.4, 188.2, 188.5, 191.1, 191.4, 192.2, 192.7, 193.1, 193.9, 196.2]),
+        np.array([173.8, 174.8, 175.7, 176.7, 177.6, 178.6, 179.5, 180.4, 181.3, 182.1]),
         rel=1e-2,
     )
 

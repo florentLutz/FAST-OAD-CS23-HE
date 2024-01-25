@@ -157,7 +157,7 @@
             <installation_angle units="deg">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <material>0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades>3.0<!--Number of blades on the propeller--></number_blades>
-            <rpm_mission units="1/min">2700.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_mission units="1/min">2500.0</rpm_mission>
             <solidity>0.13117604<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>
@@ -325,5 +325,16 @@
         </tank>
       </propulsion>
     </weight>
+    <mission>
+      <sizing>
+        <main_route>
+          <reserve>
+            <speed>
+              <k_factor is_input="True">2.2<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+            </speed>
+          </reserve>
+        </main_route>
+      </sizing>
+    </mission>
   </settings>
 </FASTOAD_model>
