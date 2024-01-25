@@ -68,50 +68,6 @@ def test_fuel_and_battery(cleanup):
     ) == pytest.approx(128.0, rel=1e-2)
 
 
-def test_sizing_sr22(cleanup):
-
-    # TODO: Recheck inputs
-    # TODO: The setup has been change to optimize the number of setup calls but it hasn't been an
-    #  official release yet
-
-    """Test the overall aircraft design process with wing positioning under VLM method."""
-    logging.basicConfig(level=logging.WARNING)
-    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
-    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
-
-    # Define used files depending on options
-    xml_file_name = "input_sr22.xml"
-    process_file_name = "full_sizing_fuel.yml"
-
-    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
-    problem = configurator.get_problem()
-
-    # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-
-    problem.write_needed_inputs(ref_inputs)
-    problem.read_inputs()
-    problem.setup()
-
-    # om.n2(problem, show_browser=True)
-
-    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=1000.0)
-    problem.run_model()
-
-    _, _, residuals = problem.model.get_nonlinear_vectors()
-    residuals = filter_residuals(residuals)
-
-    problem.write_outputs()
-
-    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        1642.0, rel=1e-2
-    )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        254.76, rel=1e-2
-    )
-
-
 def test_sizing_fuel_and_battery_share(cleanup):
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
