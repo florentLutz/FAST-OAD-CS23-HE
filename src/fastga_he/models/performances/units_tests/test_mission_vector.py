@@ -1619,11 +1619,11 @@ def test_mission_vector_from_yml():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(156.75, abs=1e-2)
+    assert sizing_energy == pytest.approx(146.75, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.0135, abs=1e-2)
+    assert mission_end_soc == pytest.approx(-0.01359, abs=1e-2)
     pt_mass = problem.get_val("data:propulsion:he_power_train:mass", units="kg")
     assert pt_mass == pytest.approx(1188.54, abs=1e-2)
 

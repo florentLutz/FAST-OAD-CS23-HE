@@ -150,7 +150,7 @@
         </fuel_tank>
         <propeller>
           <propeller_1>
-            <activity_factor>129.9145<!--Activity factor of the propeller--></activity_factor>
+            <activity_factor>128.6<!--Activity factor of the propeller--></activity_factor>
             <blade_twist units="deg">17.8<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio>0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m">1.98<!--Diameter of the propeller--></diameter>
@@ -158,7 +158,7 @@
             <material>0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades>3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min">2500.0</rpm_mission>
-            <solidity>0.13117604<!--Solidity of the propeller--></solidity>
+            <solidity>0.13517604<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>
       </he_power_train>
