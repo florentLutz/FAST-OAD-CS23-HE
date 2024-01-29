@@ -1,4 +1,4 @@
-title: Sample power train file for testing purposes
+title: Powertrain file for the sizing of the Cirrus SR22
 
 power_train_components:
   propeller_1:
@@ -13,14 +13,14 @@ power_train_components:
     options:
       number_of_engines: 1
       number_of_tanks: 2
-    position: in_the_front
+    position: in_the_front  # "in_the_wing", "in_the_front", "in_the_back"
 
   fuel_tank_1:
     id: fastga_he.pt_component.fuel_tank
-    position: inside_the_wing
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_fuselage"
   fuel_tank_2:
     id: fastga_he.pt_component.fuel_tank
-    position: inside_the_wing
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_fuselage"
     symmetrical: fuel_tank_1
 
 component_connections:
