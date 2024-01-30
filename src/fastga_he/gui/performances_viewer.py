@@ -13,6 +13,12 @@ from plotly.subplots import make_subplots
 
 from fastga_he.powertrain_builder.powertrain import PROMOTION_FROM_MISSION
 
+MARKER_DICTIONARY = {
+    "sizing:main_route:climb": "circle-open",
+    "sizing:main_route:cruise": "square",
+    "sizing:main_route:descent": "diamond",
+    "sizing:main_route:reserve": "cross",
+}
 COLOR_DICTIONARY = {
     "sizing:main_route:climb": px.colors.qualitative.Prism[1],
     "sizing:main_route:cruise": px.colors.qualitative.Prism[2],
@@ -151,7 +157,11 @@ class PerformancesViewer:
                             x=x,
                             y=y,
                             mode="markers",
-                            marker={"color": COLOR_DICTIONARY[name]},
+                            marker={
+                                "color": COLOR_DICTIONARY[name],
+                                "symbol": MARKER_DICTIONARY[name],
+                                "size": 8,
+                            },
                             name=name,
                             legendgroup="Primary axis",
                             legendgrouptitle_text="primary_axis",
@@ -164,7 +174,11 @@ class PerformancesViewer:
                                 x=x,
                                 y=y_2,
                                 mode="markers",
-                                marker={"color": COLOR_DICTIONARY_AXIS_2[name]},
+                                marker={
+                                    "color": COLOR_DICTIONARY_AXIS_2[name],
+                                    "symbol": MARKER_DICTIONARY[name],
+                                    "size": 8,
+                                },
                                 name=name,
                                 legendgroup="Secondary axis",
                                 legendgrouptitle_text="secondary_axis",

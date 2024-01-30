@@ -100,7 +100,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         r_igbt = inputs["resistance_igbt"]
         r_d = inputs["resistance_diode"]
 
-        beta = inputs["modulation_index"]
+        beta = np.clip(inputs["modulation_index"], 0.0, 1.001)
         current = inputs["ac_current_rms_in_one_phase"]
 
         conduction_loss_diode = v_d0 * current / (2.0 * np.pi) * (
@@ -124,7 +124,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         r_igbt = inputs["resistance_igbt"]
         r_d = inputs["resistance_diode"]
 
-        beta = inputs["modulation_index"]
+        beta = np.clip(inputs["modulation_index"], 0.0, 1.001)
         current = inputs["ac_current_rms_in_one_phase"]
 
         partials[
@@ -139,10 +139,13 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             "conduction_losses_diode",
             "resistance_diode",
         ] = np.diag(current ** 2.0 / 8.0 * (1.0 - 8.0 / (3.0 * np.pi) * beta * cos_phi))
-        partials[
-            "conduction_losses_diode",
-            "modulation_index",
-        ] = -np.diag(cos_phi * (v_d0 * current / 8.0 + r_d * current ** 2.0 / (3.0 * np.pi)))
+        partials["conduction_losses_diode", "modulation_index"] = -np.diag(
+            np.where(
+                beta == inputs["modulation_index"],
+                cos_phi * (v_d0 * current / 8.0 + r_d * current ** 2.0 / (3.0 * np.pi)),
+                0.0,
+            )
+        )
         partials["conduction_losses_diode", "ac_current_rms_in_one_phase"] = np.diag(
             v_d0 / (2.0 * np.pi) * (1.0 - np.pi / 4.0 * beta * cos_phi)
             + r_d * current / 4.0 * (1.0 - 8.0 / (3.0 * np.pi) * beta * cos_phi)
@@ -162,10 +165,14 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             "conduction_losses_IGBT",
             "resistance_igbt",
         ] = np.diag(current ** 2.0 / 8.0 * (1.0 + 8.0 / (3.0 * np.pi) * beta * cos_phi))
-        partials["conduction_losses_IGBT", "modulation_index"] = np.diag(
-            v_ce0 * current / 8.0 * cos_phi + r_igbt * current ** 2.0 / (3.0 * np.pi) * cos_phi
-        )
         partials["conduction_losses_IGBT", "ac_current_rms_in_one_phase"] = np.diag(
             v_ce0 / (2.0 * np.pi) * (1.0 + np.pi / 4.0 * beta * cos_phi)
             + r_igbt * current / 4.0 * (1.0 + 8.0 / (3.0 * np.pi) * beta * cos_phi)
+        )
+        partials["conduction_losses_IGBT", "modulation_index"] = np.diag(
+            np.where(
+                beta == inputs["modulation_index"],
+                v_ce0 * current / 8.0 * cos_phi + r_igbt * current ** 2.0 / (3.0 * np.pi) * cos_phi,
+                0.0,
+            )
         )

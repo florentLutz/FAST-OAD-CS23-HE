@@ -20,6 +20,7 @@ from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 from fastga_he.gui.analysis_and_plots import (
     aircraft_geometry_plot,
 )
+from fastga_he.gui.performances_viewer import PerformancesViewer
 
 from utils.filter_residuals import filter_residuals
 
@@ -30,7 +31,7 @@ RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 COLORS = px.colors.qualitative.Prism
 
 
-def test_pipistrel_like():
+def test_pipistrel_velis_electro():
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -367,13 +368,15 @@ def test_mass_bar_plot():
 
 def test_aircraft_geometry_plot():
 
-    results_pipistrel_file_path = pth.join(RESULTS_FOLDER_PATH, "pipistrel_out.xml")
+    results_pipistrel_file_path = pth.join(DATA_FOLDER_PATH, "pipistrel_for_postprocessing.xml")
 
     fig = aircraft_geometry_plot(results_pipistrel_file_path, name="Pipistrel")
 
     fig.update_layout(
         title_text="Comparison of computed aircraft geometry with top view of the Pipistrel",
         title_x=0.5,
+        height=800,
+        width=1600,
     )
 
     pipistrel_top_view = Image.open("data/Top_view_clean.JPG")
@@ -392,4 +395,6 @@ def test_aircraft_geometry_plot():
             layer="below",
         )
     )
-    fig.show()
+
+    # fig.show()
+    fig.write_image(pth.join(RESULTS_FOLDER_PATH, "pipistrel_geometry.pdf"))
