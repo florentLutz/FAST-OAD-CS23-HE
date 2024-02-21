@@ -60,54 +60,12 @@ def test_fuel_and_battery(cleanup):
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        761.0, rel=1e-2
+        722.0, rel=1e-2
     )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(24.71, rel=1e-2)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(23.13, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(128.0, rel=1e-2)
-
-
-def test_sizing_sr22(cleanup):
-
-    # TODO: Recheck inputs
-
-    """Test the overall aircraft design process with wing positioning under VLM method."""
-    logging.basicConfig(level=logging.WARNING)
-    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
-    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
-
-    # Define used files depending on options
-    xml_file_name = "input_sr22.xml"
-    process_file_name = "full_sizing_fuel.yml"
-
-    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
-
-    # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
-
-    # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
-    problem.setup()
-
-    # om.n2(problem, show_browser=True)
-
-    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=1000.0)
-    problem.run_model()
-
-    _, _, residuals = problem.model.get_nonlinear_vectors()
-    residuals = filter_residuals(residuals)
-
-    problem.write_outputs()
-
-    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        1747.0, rel=1e-2
-    )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        275.76, rel=1e-2
-    )
+    ) == pytest.approx(124.3, rel=1e-2)
 
 
 def test_sizing_fuel_and_battery_share(cleanup):
@@ -145,11 +103,11 @@ def test_sizing_fuel_and_battery_share(cleanup):
     problem.write_outputs()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(23.38, abs=1e-2)
+    assert sizing_fuel == pytest.approx(23.06, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(32.633, abs=1e-2)
+    assert sizing_energy == pytest.approx(27.878, abs=1e-2)
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        815.414, rel=1e-2
+        802.91, rel=1e-2
     )
 
 

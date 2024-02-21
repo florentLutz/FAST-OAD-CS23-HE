@@ -71,7 +71,13 @@ def aircraft_geometry_plot(
     y_ht = np.array([0, ht_span / 2.0, ht_span / 2.0, 0.0, 0.0])
 
     x_ht = np.array(
-        [0, ht_tip_leading_edge_x, ht_tip_leading_edge_x + ht_tip_chord, ht_root_chord, 0]
+        [
+            -0.25 * ht_root_chord,
+            ht_tip_leading_edge_x - 0.25 * ht_tip_chord,
+            ht_tip_leading_edge_x + 0.75 * ht_tip_chord,
+            0.75 * ht_root_chord,
+            -0.25 * ht_root_chord,
+        ]
     )
 
     # Fuselage parameters

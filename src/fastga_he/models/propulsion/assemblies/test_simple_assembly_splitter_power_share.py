@@ -200,7 +200,20 @@ def test_assembly_performances_splitter_150_kw_low_requirement():
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.704, 3.714, 3.724, 3.734, 3.744, 3.754, 3.763, 3.773, 3.782, 3.791]),
+        np.array(
+            [
+                3.53345024,
+                3.55747546,
+                3.5812576,
+                3.60479619,
+                3.62809081,
+                3.65114111,
+                3.67394681,
+                3.69650769,
+                3.71057751,
+                3.72215259,
+            ]
+        ),
         abs=1e-2,
     )
 
@@ -217,16 +230,16 @@ def test_assembly_performances_splitter_150_kw_low_requirement():
     ) == pytest.approx(
         np.array(
             [
-                37.48,
-                33.78,
-                30.06,
-                26.34,
-                22.60,
-                18.86,
-                15.11,
-                11.34,
-                7.573,
-                3.791,
+                36.35939602,
+                32.82594578,
+                29.26847032,
+                25.68721271,
+                22.08241652,
+                18.45432571,
+                14.8031846,
+                11.12923779,
+                7.43273011,
+                3.72215259,
             ]
         ),
         abs=1e-2,
@@ -275,12 +288,10 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     problem.setup()
     # Run problem and check obtained value(s) is/(are) correct
 
-    # Adding a recorder
-    if not pth.exists(pth.join(OUTPUT_FOLDER_PATH, "cases.sql")):
-        recorder = om.SqliteRecorder(pth.join(OUTPUT_FOLDER_PATH, "cases.sql"))
-        solver = model.performances.nonlinear_solver
-        solver.add_recorder(recorder)
-        solver.recording_options["record_solver_residuals"] = True
+    recorder = om.SqliteRecorder(pth.join(OUTPUT_FOLDER_PATH, "cases.sql"))
+    solver = model.performances.nonlinear_solver
+    solver.add_recorder(recorder)
+    solver.recording_options["record_solver_residuals"] = True
 
     problem.run_model()
 
@@ -303,7 +314,20 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.47, 3.88, 4.2, 4.56, 4.99, 5.51, 5.53, 5.53, 5.53, 5.53]),
+        np.array(
+            [
+                3.31960595,
+                3.78038653,
+                4.0761746,
+                4.40550377,
+                4.79189658,
+                5.25861361,
+                5.53154804,
+                5.53154804,
+                5.53154804,
+                5.53154804,
+            ]
+        ),
         abs=1e-2,
     )
 
@@ -320,16 +344,16 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     ) == pytest.approx(
         np.array(
             [
-                48.72,
-                45.25,
-                41.37,
-                37.17,
-                32.61,
-                27.63,
-                22.12,
-                16.59,
-                11.06,
-                5.531,
+                47.75837319,
+                44.43876724,
+                40.65838071,
+                36.58220611,
+                32.17670234,
+                27.38480576,
+                22.12619215,
+                16.59464411,
+                11.06309608,
+                5.53154804,
             ]
         ),
         abs=1e-2,
@@ -337,7 +361,9 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     assert problem.get_val(
         "performances.battery_pack_1.state_of_charge", units="percent"
     ) == pytest.approx(
-        np.array([100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 98.96, 96.79, 93.42]),
+        np.array(
+            [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 99.46394211, 97.84550426, 95.07976344]
+        ),
         abs=1e-2,
     )
 
@@ -411,22 +437,35 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
     )
 
     assert problem.get_val("component.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array([3.47, 3.88, 4.2, 4.56, 4.99, 5.51, 5.53, 5.53, 5.53, 5.53]),
+        np.array(
+            [
+                3.31960595,
+                3.78038653,
+                4.0761746,
+                4.40550373,
+                4.79189658,
+                5.25861361,
+                5.53154804,
+                5.53154804,
+                5.53154804,
+                5.53154804,
+            ]
+        ),
         abs=1e-2,
     )
     assert problem.get_val("component.fuel_tank_1.fuel_remaining_t", units="kg") == pytest.approx(
         np.array(
             [
-                48.72,
-                45.25,
-                41.37,
-                37.17,
-                32.61,
-                27.63,
-                22.12,
-                16.59,
-                11.06,
-                5.531,
+                47.75837314,
+                44.43876719,
+                40.65838066,
+                36.58220606,
+                32.17670233,
+                27.38480576,
+                22.12619215,
+                16.59464411,
+                11.06309608,
+                5.53154804,
             ]
         ),
         abs=1e-2,
@@ -435,7 +474,9 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
     assert problem.get_val(
         "component.battery_pack_1.state_of_charge", units="percent"
     ) == pytest.approx(
-        np.array([100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 98.96, 96.79, 93.42]),
+        np.array(
+            [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 99.46394211, 97.84550426, 95.07976345]
+        ),
         rel=1e-3,
     )
 

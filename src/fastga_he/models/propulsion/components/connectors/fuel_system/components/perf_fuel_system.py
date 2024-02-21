@@ -75,4 +75,5 @@ class PerformancesFuelSystem(om.Group):
         )
 
         # Because I don't want to have to give the option on the number of engine to the sizing
-        # group, I'll make it an output of one of those component. It was initially anivc but since ivc output appear as input of the problem (???) I have to do it someway else
+        # group, I'll make it an output of one of those component. It was initially an ivc but since
+        # ivc output appear as input of the problem (???) I have to do it someway else

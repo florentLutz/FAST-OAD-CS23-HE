@@ -38,37 +38,19 @@ class SizingICEWeight(om.ExplicitComponent):
             val=250.0,
             desc="Installed weight of the ICE engine",
         )
-        self.add_output(
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":fuel_lines_mass",
-            units="kg",
-            val=250.0,
-            desc="Installed weight of the ICE engine",
-        )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ICE:" + ice_id + ":mass",
             wrt="data:propulsion:he_power_train:ICE:" + ice_id + ":uninstalled_mass",
             val=1.2 * 1.2,
         )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ICE:" + ice_id + ":fuel_lines_mass",
-            wrt="data:propulsion:he_power_train:ICE:" + ice_id + ":uninstalled_mass",
-            val=0.2,
-        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         ice_id = self.options["ice_id"]
 
-        # The mass of fuel lines typically depends on the number of tank and engine, which is not
-        # known a priori, instead, we will consider and added 20% weight, until a different
-        # approach is found
-
-        outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":fuel_lines_mass"] = (
-            0.2 * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":uninstalled_mass"]
-        )
-
-        # We take 1.2 for the installed mass as now, the propeller weight is properly computed
+        # We take 1.2 for the installed mass as now, the propeller weight is properly computed as
+        # are the fuel lines
         outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":mass"] = (
-            1.2 * 1.2 * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":uninstalled_mass"]
+            1.2 * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":uninstalled_mass"]
         )

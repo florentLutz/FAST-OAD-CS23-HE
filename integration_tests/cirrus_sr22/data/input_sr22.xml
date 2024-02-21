@@ -53,16 +53,8 @@
         <type>0.0<!--0=non-retractable / 1=retractable--></type>
       </landing_gear>
       <propeller>
-        <installation_angle unnits="deg">0.0</installation_angle>
-        <average_rpm units="rpm">2500.0</average_rpm>
-        <blades_number>3.0<!--number of blades on the propeller--></blades_number>
-        <chord_vect units="m">[0.11163526, 0.15856474, 0.16254664, 0.21189369, 0.18558474, 0.11163526, 0.11163526]<!--blade chord at the station along the radius stored in radius_ratio_vect--></chord_vect>
         <depth units="m">0.3<!--depth of the propeller--></depth>
         <diameter units="m">1.98<!--propeller diameter--></diameter>
-        <hub_diameter units="m">0.4<!--propeller hub diameter--></hub_diameter>
-        <radius_ratio_vect>[0.165, 0.3, 0.45, 0.655, 0.835, 0.975, 1.0]<!--blade station at which blade geometric properties are sampled, as a percent of blade radius--></radius_ratio_vect>
-        <sweep_vect units="deg">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--blade sweep at the station along the radius stored in radius_ratio_vect--></sweep_vect>
-        <twist_vect units="deg">[59.9549991, 54.62741602, 50.40984436, 46.40324949, 43.92011437, 42.42629402, 42.19068494]<!--blade twist at the station along the radius stored in radius_ratio_vect--></twist_vect>
       </propeller>
       <vertical_tail>
         <area units="m**2">1.51<!--vertical tail area--></area>
@@ -106,23 +98,17 @@
       </wing>
       <propulsion>
         <engine>
-          <count is_input="True">1.0<!--number of engines--></count>
-          <layout is_input="True">3.0<!--position of engines (1=under the wing / 2=rear fuselage)--></layout>
-          <y_ratio is_input="True">0.34<!--engine position with respect to total span--></y_ratio>
+          <count>1.0<!--number of engines--></count>
+          <layout>3.0<!--position of engines (1=under the wing / 2=rear fuselage / 3=nose)--></layout>
+          <y_ratio>0.0<!--engine position with respect to total span--></y_ratio>
         </engine>
         <nacelle>
-          <height units="m" is_input="True">0.6230628899061188<!--height of the nacelle--></height>
-          <length units="m" is_input="True">0.35<!--length of the nacelle--></length>
-          <master_cross_section units="m**2" is_input="True">0.5789057194060345</master_cross_section>
-          <wet_area units="m**2" is_input="True">1.09<!--nacelle wet area--></wet_area>
-          <width units="m" is_input="True">0.9291288709126333<!--width of the nacelle--></width>
+          <height units="m" is_input="False">0.7546659597502833<!--height of the nacelle--></height>
+          <length units="m" is_input="False">1.148849535217935<!--length of the nacelle--></length>
+          <master_cross_section units="m**2" is_input="False">0.8492852704999014</master_cross_section>
+          <wet_area units="m**2" is_input="False">4.3197777006580775<!--nacelle wet area--></wet_area>
+          <width units="m" is_input="False">1.1253790627855103<!--width of the nacelle--></width>
         </nacelle>
-        <tank>
-          <LE_chord_percentage>0.08<!--distance between the leading edge and the start of the wing tank as a percentage of the wing chord--></LE_chord_percentage>
-          <TE_chord_percentage>0.08<!--distance between the trailing edge device and the start of the wing tank as a percentage of the wing chord--></TE_chord_percentage>
-          <y_ratio_tank_beginning>0.1<!--ratio of the total span where the fuel tanks begin--></y_ratio_tank_beginning>
-          <y_ratio_tank_end>0.9<!--ratio of the total span where the fuel tanks end--></y_ratio_tank_end>
-        </tank>
       </propulsion>
     </geometry>
     <propulsion>
@@ -133,34 +119,46 @@
         <strokes_nb>4.0<!--number of strokes on the engine--></strokes_nb>
       </IC_engine>
       <he_power_train>
+        <thrust_distribution>1.0</thrust_distribution>
+        <ICE>
+          <ice_1>
+            <pme_max units="bar">20.62<!--Maximum Mean Effective Pressure in the ICE cylinders--></pme_max>
+            <power_rating_SL units="W">231000.0<!--Maximum power the motor can provide at Sea Level--></power_rating_SL>
+            <rpm_max units="1/min">2700.0<!--Maximum RPM on the shaft of the engine--></rpm_max>
+            <strokes_number>4.0</strokes_number>
+          </ice_1>
+        </ICE>
+        <fuel_system>
+          <fuel_system_1>
+            <fuel_distribution>[1.0, 1.0]</fuel_distribution>
+            <fuel_type>1.0<!--Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+          </fuel_system_1>
+        </fuel_system>
         <fuel_tank>
           <fuel_tank_1>
+            <fuel_type>1.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <CG>
-              <y_ratio>0.4</y_ratio>
+              <y_ratio>0.4<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
           </fuel_tank_1>
           <fuel_tank_2>
+            <fuel_type>1.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <CG>
-              <y_ratio>0.4</y_ratio>
+              <y_ratio>0.4<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
           </fuel_tank_2>
         </fuel_tank>
-        <ICE>
-          <ice_1>
-            <power_rating_SL units="W">231000.0</power_rating_SL>
-          </ice_1>
-        </ICE>
         <propeller>
           <propeller_1>
-            <installation_angle units="deg">0.0</installation_angle>
-            <activity_factor is_input="True">129.9145 <!--Activity factor of the propeller--></activity_factor>
-            <blade_twist units="deg" is_input="True">17.8<!--Twist between the propeller blade root and tip--></blade_twist>
-            <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
-            <diameter units="m" is_input="True">1.98<!--Diameter of the propeller--></diameter>
-            <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
-            <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
-            <rpm_mission units="1/min" is_input="True">2700.0</rpm_mission>
-            <solidity is_input="True">0.13117604<!--Solidity of the propeller--></solidity>
+            <activity_factor>128.6<!--Activity factor of the propeller--></activity_factor>
+            <blade_twist units="deg">17.8<!--Twist between the propeller blade root and tip--></blade_twist>
+            <depth_to_diameter_ratio>0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
+            <diameter units="m">1.98<!--Diameter of the propeller--></diameter>
+            <installation_angle units="deg">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <material>0.0<!--1.0 for composite, 0.0 for aluminium--></material>
+            <number_blades>3.0<!--Number of blades on the propeller--></number_blades>
+            <rpm_mission units="1/min">2500.0</rpm_mission>
+            <solidity>0.13517604<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>
       </he_power_train>
@@ -191,33 +189,29 @@
     </handling_qualities>
     <mission>
       <sizing>
-        <fuel units="kg">0.0<!--consumed fuel mass during whole mission--></fuel>
         <initial_climb>
           <energy units="W*h">0.0</energy>
-          <fuel units="kg" is_input="False">0.08855397685162596</fuel>
+          <fuel units="kg">0.08855397685162596</fuel>
         </initial_climb>
         <landing>
           <elevator_angle units="deg">-25.0<!--position of the elevator during landing--></elevator_angle>
+          <flap_angle units="deg">30.0<!--position of the flaps during landing--></flap_angle>
           <target_sideslip units="deg">15.0</target_sideslip>
         </landing>
         <takeoff>
-          <fuel units="kg" is_input="False">0.4560783599663149</fuel>
-          <altitude units="m">0.0<!--altitude at takeoff in sizing mission--></altitude>
           <elevator_angle units="deg">-25.0<!--position of the elevator during takeoff--></elevator_angle>
           <energy units="W*h">0.0</energy>
           <flap_angle units="deg">10.0<!--flap angle during takeoff phase in sizing mission--></flap_angle>
-          <friction_coefficient_no_brake>0.03<!--ground friction coefficient with no brake in sizing mission--></friction_coefficient_no_brake>
+          <fuel units="kg">0.4560783599663149</fuel>
           <thrust_rate>1.0<!--thrust rate during takeoff phase--></thrust_rate>
         </takeoff>
         <taxi_in>
           <duration units="s">300.0<!--duration of taxi-in phase in sizing mission--></duration>
           <speed units="kn">20.0<!--speed during taxi-in phase in sizing mission--></speed>
-          <thrust_rate>0.3<!--thrust rate (between 0.0 and 1.0) during taxi-in phase in sizing mission--></thrust_rate>
         </taxi_in>
         <taxi_out>
           <duration units="s">300.0<!--duration of taxi-out phase in sizing mission--></duration>
           <speed units="kn">20.0<!--speed during taxi-out phase in sizing mission--></speed>
-          <thrust_rate>0.3<!--thrust rate (between 0.0 and 1.0) during taxi-out phase in sizing mission--></thrust_rate>
         </taxi_out>
         <cs23>
           <characteristic_speed>
@@ -240,94 +234,73 @@
           </reserve>
           <climb>
             <climb_rate>
-              <cruise_level units="ft/min">750.0<!--target climb rate at the end of climb--></cruise_level>
-              <sea_level units="ft/min">1200.0<!--target climb rate at sea level--></sea_level>
+              <cruise_level units="ft/min">790.0<!--target climb rate at the end of climb--></cruise_level>
+              <sea_level units="ft/min">1270.0<!--target climb rate at sea level--></sea_level>
             </climb_rate>
           </climb>
         </main_route>
       </sizing>
     </mission>
     <weight>
-      <systems>
-        <power>
-          <electric_systems>
-            <mass units="lbm" is_input="False">189.12923759516593<!--Mass of aircraft systems_inp_data:weight:systems:power:electric_systems:mass--></mass>
-            <CG>
-              <x units="m" is_input="False">3.0797953725521685<!--X-position of center of gravity of the electric power unit--></x>
-            </CG>
-          </electric_systems>
-          <hydraulic_systems>
-            <mass units="lbm" is_input="False">25.5648480458697<!--Mass of aircraft systems_inp_data:weight:systems:power:hydraulic_systems:mass--></mass>
-            <CG>
-              <x units="m" is_input="False">3.0797953725521685<!--X-position of center of gravity of the hydraulic power unit--></x>
-            </CG>
-          </hydraulic_systems>
-        </power>
-      </systems>
       <airframe>
+        <fuselage>
+          <k_factor>1.0<!--proportional corrective factor for fuselage mass--></k_factor>
+        </fuselage>
+        <horizontal_tail>
+          <k_factor>1.0<!--proportional corrective factor for horizontal tail mass--></k_factor>
+        </horizontal_tail>
+        <paint>
+          <mass units="lbm">1.0<!--Mass of the airframe_inp_data:weight:airframe:paint:mass--></mass>
+        </paint>
+        <vertical_tail>
+          <k_factor>1.0<!--proportional corrective factor for vertical tail mass--></k_factor>
+        </vertical_tail>
         <wing>
           <k_factor>0.9<!--proportional corrective factor for wing mass--></k_factor>
-          <punctual_mass>
-            <mass>0.0</mass>
-            <y_ratio>0.0</y_ratio>
-          </punctual_mass>
         </wing>
       </airframe>
       <propulsion>
-        <mass units="kg" is_input="False">364.30434004692574<!--Mass of the propulsion system--></mass>
-        <CG>
-          <x units="m" is_input="False">1.0642233936418526</x>
-        </CG>
         <engine>
-          <mass units="lbm" is_input="False">731.6708415039819<!--Mass of the propulsion system_inp_data:weight:propulsion:engine:mass--></mass>
-          <CG>
-            <x units="m" is_input="False">0.9893097211307611<!--X-position of center of gravity of the engine(s)--></x>
-            <z units="m" is_input="False">1.22<!--Z-position of center of gravity of the engine(s)--></z>
-          </CG>
+          <mass units="lbm">731.6708415039819<!--Mass of the propulsion system_inp_data:weight:propulsion:engine:mass--></mass>
         </engine>
         <fuel_lines>
-          <mass units="lbm" is_input="False">71.48274780115939<!--Mass of the propulsion system_inp_data:weight:propulsion:fuel_lines:mass--></mass>
-          <CG>
-            <x units="m" is_input="False">1.8310119054491025<!--X-position of center of gravity of the fuel lines--></x>
-          </CG>
+          <mass units="lbm">71.48274780115939<!--Mass of the propulsion system_inp_data:weight:propulsion:fuel_lines:mass--></mass>
         </fuel_lines>
         <unusable_fuel>
-          <mass units="lbm" is_input="False">79.15834073866525<!--total unusable fuel mass--></mass>
+          <mass units="lbm">0.0<!--total unusable fuel mass--></mass>
         </unusable_fuel>
-        <tank>
-          <CG>
-            <x units="m" is_input="False">2.672714089767444<!--X-position of center of gravity of the tank--></x>
-          </CG>
-        </tank>
       </propulsion>
+      <systems>
+        <power>
+          <electric_systems>
+            <mass units="lbm">189.12923759516593<!--Mass of aircraft systems_inp_data:weight:systems:power:electric_systems:mass--></mass>
+          </electric_systems>
+          <hydraulic_systems>
+            <mass units="lbm">25.5648480458697<!--Mass of aircraft systems_inp_data:weight:systems:power:hydraulic_systems:mass--></mass>
+          </hydraulic_systems>
+        </power>
+      </systems>
     </weight>
   </data>
   <settings>
+    <handling_qualities>
+      <rudder>
+        <safety_margin>0.2<!--Ratio of the total rudder deflection not used in the computation of the VT area to leave a safety margin--></safety_margin>
+      </rudder>
+    </handling_qualities>
     <propulsion>
+      <IC_engine>
+        <k_factor_sfc>1.0<!--k_factor that can be used to adjust the consumption on engine level to the aircraft level--></k_factor_sfc>
+      </IC_engine>
       <he_power_train>
         <ICE>
           <ice_1>
-            <cg_in_nacelle>0.9</cg_in_nacelle>
+            <cg_in_nacelle>0.9<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
+            <k_sfc>1.0<!--K-factor to adjust the sfc of the ICE--></k_sfc>
           </ice_1>
         </ICE>
       </he_power_train>
     </propulsion>
-    <geometry>
-      <fuel_tanks>
-        <depth>0.6<!--Average tank depth to the max wing profile depth. The value depends on the shape of the section profile and the allowance made for structure. Typical values lie between 0.5 and 0.8--></depth>
-      </fuel_tanks>
-    </geometry>
-    <mission>
-      <sizing>
-        <main_route>
-          <reserve>
-            <speed>
-              <k_factor>2.21</k_factor>
-            </speed>
-          </reserve>
-        </main_route>
-      </sizing>
-    </mission>
     <weight>
       <aircraft>
         <CG>
@@ -344,6 +317,24 @@
           </front>
         </landing_gear>
       </airframe>
+      <propulsion>
+        <tank>
+          <CG>
+            <from_wingMAC25>0.25<!--distance between the tank CG and 25 percent of wing MAC as a ratio of the wing MAC--></from_wingMAC25>
+          </CG>
+        </tank>
+      </propulsion>
     </weight>
+    <mission>
+      <sizing>
+        <main_route>
+          <reserve>
+            <speed>
+              <k_factor is_input="True">2.2<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+            </speed>
+          </reserve>
+        </main_route>
+      </sizing>
+    </mission>
   </settings>
 </FASTOAD_model>

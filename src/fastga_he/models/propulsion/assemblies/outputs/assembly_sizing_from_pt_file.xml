@@ -48,9 +48,9 @@
     </geometry>
     <propulsion>
       <he_power_train>
-        <mass units="kg" is_input="False">2321.545637246881</mass>
+        <mass units="kg" is_input="False">2260.9459554553396</mass>
         <CG>
-          <x units="m" is_input="False">2.83403155435543</x>
+          <x units="m" is_input="False">2.8290514856633595</x>
         </CG>
         <cruise>
           <CD0 is_input="False">0.0056121861665163735</CD0>
@@ -424,8 +424,7 @@
           <ice_1>
             <displacement_volume units="m**3" is_input="False">0.010561482918417932</displacement_volume>
             <from_LE units="m" is_input="True">0.5<!--Distance between the ICE front face and the leading edge--></from_LE>
-            <fuel_lines_mass units="kg" is_input="False">50.49973482628469<!--Installed weight of the ICE engine--></fuel_lines_mass>
-            <mass units="kg" is_input="False">363.5980907492497<!--Installed weight of the ICE engine--></mass>
+            <mass units="kg" is_input="False">302.9984089577081<!--Installed weight of the ICE engine--></mass>
             <pme_max units="bar" is_input="True">20.62<!--Maximum Mean Effective Pressure in the ICE cylinders--></pme_max>
             <power_max_SL units="kW" is_input="True">245.0<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
             <power_rating_SL units="kW" is_input="False">245.0<!--Maximum power the motor can provide at Sea Level--></power_rating_SL>
@@ -525,6 +524,7 @@
               <y_ratio is_input="True">0.34<!--X position of the battery center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <cell>
+              <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
               <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
               <volume units="L" is_input="False">0.01763<!--Volume of the cell used for the assembly of the battery pack--></volume>
             </cell>
@@ -551,9 +551,6 @@
               <volume units="L" is_input="False">3.3056249999999996<!--Volume of one module of the battery--></volume>
             </module>
           </battery_pack_1>
-          <battery_pack_1cell>
-            <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
-          </battery_pack_1cell>
         </battery_pack>
         <fuel_system>
           <fuel_system_1>

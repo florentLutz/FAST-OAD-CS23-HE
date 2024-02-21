@@ -20,6 +20,7 @@ from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 from fastga_he.gui.analysis_and_plots import (
     aircraft_geometry_plot,
 )
+from fastga_he.gui.performances_viewer import PerformancesViewer
 
 from utils.filter_residuals import filter_residuals
 
@@ -30,7 +31,7 @@ RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 COLORS = px.colors.qualitative.Prism
 
 
-def test_pipistrel_like():
+def test_pipistrel_velis_electro():
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -42,14 +43,14 @@ def test_pipistrel_like():
     process_file_name = "pipistrel_configuration.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
-    # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
     problem.setup()
 
     # Removing previous case and adding a recorder
@@ -82,7 +83,7 @@ def test_pipistrel_like():
         600.00, rel=1e-2
     )
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(26.647, abs=1e-2)
+    assert sizing_energy == pytest.approx(25.01, abs=1e-2)
 
 
 def test_pipistrel_detailed_mission():
@@ -116,7 +117,7 @@ def test_pipistrel_detailed_mission():
     problem.write_outputs()
 
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(26.507, abs=1e-2)
+    assert sizing_energy == pytest.approx(24.76, abs=1e-2)
 
 
 def test_pipistrel_not_detailed_mission():
@@ -161,7 +162,7 @@ def test_pipistrel_not_detailed_mission():
     problem.write_outputs()
 
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(26.476, abs=1e-2)
+    assert sizing_energy == pytest.approx(24.72, abs=1e-2)
 
 
 def test_residuals_analyzer():
@@ -367,13 +368,15 @@ def test_mass_bar_plot():
 
 def test_aircraft_geometry_plot():
 
-    results_pipistrel_file_path = pth.join(RESULTS_FOLDER_PATH, "pipistrel_out.xml")
+    results_pipistrel_file_path = pth.join(DATA_FOLDER_PATH, "pipistrel_for_postprocessing.xml")
 
     fig = aircraft_geometry_plot(results_pipistrel_file_path, name="Pipistrel")
 
     fig.update_layout(
         title_text="Comparison of computed aircraft geometry with top view of the Pipistrel",
         title_x=0.5,
+        height=800,
+        width=1600,
     )
 
     pipistrel_top_view = Image.open("data/Top_view_clean.JPG")
@@ -392,4 +395,6 @@ def test_aircraft_geometry_plot():
             layer="below",
         )
     )
-    fig.show()
+
+    # fig.show()
+    fig.write_image(pth.join(RESULTS_FOLDER_PATH, "pipistrel_geometry.pdf"))

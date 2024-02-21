@@ -1599,10 +1599,12 @@ def test_mission_vector_from_yml():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1619,13 +1621,13 @@ def test_mission_vector_from_yml():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(150.01, abs=1e-2)
+    assert sizing_energy == pytest.approx(146.75, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.0546, abs=1e-2)
+    assert mission_end_soc == pytest.approx(-0.01359, abs=1e-2)
     pt_mass = problem.get_val("data:propulsion:he_power_train:mass", units="kg")
-    assert pt_mass == pytest.approx(1216.079, abs=1e-2)
+    assert pt_mass == pytest.approx(1188.54, abs=1e-2)
 
 
 def test_mission_vector_from_yml_simplified_models():
@@ -1654,10 +1656,12 @@ def test_mission_vector_from_yml_simplified_models():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1674,11 +1678,11 @@ def test_mission_vector_from_yml_simplified_models():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(149.56, abs=1e-2)
+    assert sizing_energy == pytest.approx(146.49, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.0387, abs=1e-2)
+    assert mission_end_soc == pytest.approx(-0.0082, abs=1e-2)
 
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.performances.dc_line.temperature_profile"
@@ -1704,10 +1708,13 @@ def test_mission_vector_direct_bus_battery_connection():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    configurator.write_needed_inputs(ref_inputs)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1724,13 +1731,13 @@ def test_mission_vector_direct_bus_battery_connection():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(144.91, abs=1e-2)
+    assert sizing_energy == pytest.approx(141.73, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(-0.0240, abs=1e-2)
+    assert mission_end_soc == pytest.approx(-0.0439, abs=1e-2)
     pt_mass = problem.get_val("data:propulsion:he_power_train:mass", units="kg")
-    assert pt_mass == pytest.approx(931.036, abs=1e-2)
+    assert pt_mass == pytest.approx(910.533, abs=1e-2)
 
 
 def test_mission_vector_direct_sspc_battery_connection():
@@ -1743,10 +1750,13 @@ def test_mission_vector_direct_sspc_battery_connection():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    configurator.write_needed_inputs(ref_inputs)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1763,13 +1773,13 @@ def test_mission_vector_direct_sspc_battery_connection():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(146.28, abs=1e-2)
+    assert sizing_energy == pytest.approx(143.06, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(-0.0158, abs=1e-2)
+    assert mission_end_soc == pytest.approx(-0.0349, abs=1e-2)
     pt_mass = problem.get_val("data:propulsion:he_power_train:mass", units="kg")
-    assert pt_mass == pytest.approx(945.07, abs=1e-2)
+    assert pt_mass == pytest.approx(924.43, abs=1e-2)
 
 
 def test_mission_vector_from_yml_fuel():
@@ -1783,10 +1793,12 @@ def test_mission_vector_from_yml_fuel():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1801,7 +1813,7 @@ def test_mission_vector_from_yml_fuel():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(34.21, abs=1e-2)
+    assert sizing_fuel == pytest.approx(33.42, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1817,10 +1829,12 @@ def test_mission_vector_from_yml_two_fuel():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1835,7 +1849,7 @@ def test_mission_vector_from_yml_two_fuel():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(33.26, abs=1e-2)
+    assert sizing_fuel == pytest.approx(31.67, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1851,10 +1865,12 @@ def test_mission_vector_from_yml_fuel_turbo():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1869,7 +1885,7 @@ def test_mission_vector_from_yml_fuel_turbo():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(39.04, abs=1e-2)
+    assert sizing_fuel == pytest.approx(38.13, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1885,10 +1901,12 @@ def test_mission_vector_from_yml_fuel_and_battery():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1903,13 +1921,13 @@ def test_mission_vector_from_yml_fuel_and_battery():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(20.158, abs=1e-2)
+    assert sizing_fuel == pytest.approx(19.72, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(74.914, abs=1e-2)
+    assert sizing_energy == pytest.approx(73.288, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.129, abs=1e-2)
+    assert mission_end_soc == pytest.approx(0.1254, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -1995,7 +2013,7 @@ def test_recording():
     residuals = filter_residuals(residuals)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(20.158, abs=1e-2)
+    assert sizing_fuel == pytest.approx(19.72, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -2065,10 +2083,12 @@ def test_mission_criss_cross():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -2083,10 +2103,10 @@ def test_mission_criss_cross():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(25.795, abs=1e-2)
+    assert sizing_fuel == pytest.approx(24.69, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(50.243, abs=1e-2)
+    assert sizing_energy == pytest.approx(48.180, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(0.058, abs=1e-2)
+    assert mission_end_soc == pytest.approx(-0.0153, abs=1e-2)

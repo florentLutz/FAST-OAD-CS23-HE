@@ -38,7 +38,7 @@
         <aspect_ratio is_input="True">4.65<!--aspect ratio of horizontal tail--></aspect_ratio>
         <elevator_chord_ratio is_input="True">0.4<!--elevator chord ratio--></elevator_chord_ratio>
         <sweep_25 units="deg" is_input="True">4.0<!--sweep angle at 25% chord of horizontal tail--></sweep_25>
-        <taper_ratio is_input="True">1.0<!--taper ratio of horizontal tail--></taper_ratio>
+        <taper_ratio is_input="True">0.6<!--taper ratio of horizontal tail--></taper_ratio>
         <thickness_ratio is_input="True">0.125<!--thickness ratio of horizontal tail--></thickness_ratio>
         <MAC>
           <at25percent>
@@ -56,6 +56,7 @@
         <diameter units="m" is_input="True">1.2<!--propeller diameter--></diameter>
       </propeller>
       <vertical_tail>
+        <area units="m**2">0.86</area>
         <aspect_ratio is_input="True">1.43<!--aspect ratio of vertical tail--></aspect_ratio>
         <sweep_25 units="deg" is_input="True">30.0<!--sweep angle at 25% chord of vertical tail--></sweep_25>
         <taper_ratio is_input="True">0.62<!--taper ratio of vertical tail--></taper_ratio>
@@ -375,8 +376,8 @@
             <diameter units="cm" is_input="True">164.0<!--Diameter of the propeller--></diameter>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
-            <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
-            <solidity is_input="True">0.125<!--Solidity of the propeller--></solidity>
+            <rpm_mission units="1/min" is_input="True">[1780, 2350, 2350, 2350, 2350, 2350, 2350, 2350, 2350, 2350, 2350,2350, 2350, 2350, 2350, 2350, 2350, 2350, 2350, 2350, 2350, 2350,2350, 2350, 2350, 2350, 2350, 2350, 2350, 2350, 2350, 2300, 2300,2300, 2300, 2300, 2300, 2300, 2300, 2300, 2300, 2300, 2300, 2300,2300, 2300, 2300, 2300, 2300, 2300, 2300, 2300, 2300, 2300, 2300,2300, 2300, 2300, 2300, 2300, 2300, 1780, 1780, 1780, 1780, 1780,1780, 1780, 1780, 1780, 1780, 1780, 1780, 1780, 1780, 1780, 1780,1780, 1780, 1780, 1780, 1780, 1780, 1780, 1780, 1780, 1780, 1780,1780, 1780, 1780, 1780]<!--RPM of the propeller for the points--></rpm_mission>
+            <solidity is_input="True">0.135<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>
       </he_power_train>
@@ -662,7 +663,7 @@
         <main_route>
           <reserve>
             <speed>
-              <k_factor is_input="True">1.3<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+              <k_factor is_input="True">1.38<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
             </speed>
           </reserve>
         </main_route>

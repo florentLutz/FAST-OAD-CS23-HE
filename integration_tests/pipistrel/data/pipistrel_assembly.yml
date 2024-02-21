@@ -18,11 +18,11 @@ power_train_components:
     position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
   harness_1:
     id: fastga_he.pt_component.dc_line
-    position: from_front_to_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+    position: from_rear_to_front  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
 
   dc_splitter_1:
     id: fastga_he.pt_component.dc_splitter
-    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
 
   dc_sspc_1:
     id: fastga_he.pt_component.dc_sspc

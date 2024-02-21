@@ -127,16 +127,16 @@ def test_assembly_performances():
     ) * problem.get_val("performances.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                206099.7,
-                207168.1,
-                208211.4,
-                209239.0,
-                210256.6,
-                211266.4,
-                212267.0,
-                213254.2,
-                214223.4,
-                215175.2,
+                197132.0,
+                198194.0,
+                199230.0,
+                200250.0,
+                201257.0,
+                202253.0,
+                203240.0,
+                204212.0,
+                205167.0,
+                206103.0,
             ]
         ),
         abs=1,
@@ -257,7 +257,7 @@ def test_performances_sizing_assembly_battery_enforce():
     ) == pytest.approx(19.40, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(2591.74, rel=1e-2)
+    ) == pytest.approx(2483.0, rel=1e-2)
 
 
 def test_performances_sizing_assembly_battery_ensure():
@@ -307,7 +307,7 @@ def test_performances_sizing_assembly_battery_ensure():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
-    ) == pytest.approx(31.97, rel=1e-2)
+    ) == pytest.approx(35.11, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(3000.0, rel=1e-2)
@@ -433,16 +433,16 @@ def test_performances_from_pt_file():
     assert current_in * voltage_in == pytest.approx(
         np.array(
             [
-                206099.6,
-                207167.3,
-                208210.4,
-                209235.7,
-                210250.4,
-                211259.8,
-                212265.3,
-                213262.8,
-                214231.9,
-                215113.6,
+                197132.0,
+                198193.0,
+                199229.0,
+                200247.0,
+                201251.0,
+                202246.0,
+                203236.0,
+                204218.0,
+                205181.0,
+                206076.0,
             ]
         ),
         abs=1,
