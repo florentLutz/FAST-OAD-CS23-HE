@@ -60,12 +60,12 @@ def test_fuel_and_battery(cleanup):
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        761.0, rel=1e-2
+        722.0, rel=1e-2
     )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(24.71, rel=1e-2)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(23.13, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(128.0, rel=1e-2)
+    ) == pytest.approx(124.3, rel=1e-2)
 
 
 def test_sizing_fuel_and_battery_share(cleanup):
@@ -103,11 +103,11 @@ def test_sizing_fuel_and_battery_share(cleanup):
     problem.write_outputs()
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(23.38, abs=1e-2)
+    assert sizing_fuel == pytest.approx(23.06, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(32.633, abs=1e-2)
+    assert sizing_energy == pytest.approx(27.878, abs=1e-2)
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        815.414, rel=1e-2
+        802.91, rel=1e-2
     )
 
 

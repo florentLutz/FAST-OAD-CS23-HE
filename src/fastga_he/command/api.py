@@ -19,6 +19,7 @@ import numpy as np
 import openmdao.api as om
 
 import fastoad.api as oad
+from fastoad.openmdao.problem import ProblemAnalysis
 
 
 def list_inputs_metadata(component: Union[om.ExplicitComponent, om.Group]) -> tuple:
@@ -39,8 +40,9 @@ def list_inputs_metadata(component: Union[om.ExplicitComponent, om.Group]) -> tu
     try:
         prob_copy.setup()
     except RuntimeError:
+        problem_analysis = ProblemAnalysis(prob_copy)
         # noinspection PyProtectedMember
-        vars_metadata = oad.FASTOADProblem()._get_undetermined_dynamic_vars_metadata(prob_copy)
+        vars_metadata = problem_analysis._get_undetermined_dynamic_vars(prob_copy)
         if vars_metadata:
             # If vars_metadata is empty, it means the RuntimeError was not because
             # of dynamic shapes, and the incoming self.setup() will raise it.

@@ -756,14 +756,14 @@ files = [
 
 [[package]]
 name = "fast-oad-core"
-version = "1.4.2"
+version = "1.6.0"
 description = "FAST-OAD is a framework for performing rapid Overall Aircraft Design"
 category = "main"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = ">=3.8,<4.0"
 files = [
-    {file = "FAST-OAD-core-1.4.2.tar.gz", hash = "sha256:144a3d2265070108ae221d2e8676e9c30cf5296420658d91346ae3b9f0277135"},
-    {file = "FAST_OAD_core-1.4.2-py3-none-any.whl", hash = "sha256:556cde3adbe4095c4a3489726250297ab0746d6d1725276313e23ceb98da07b8"},
+    {file = "fast_oad_core-1.6.0-py3-none-any.whl", hash = "sha256:8c8c16576fed3037b2506982f7ec248e6daceb81731da20700a332ed13fcc6dd"},
+    {file = "fast_oad_core-1.6.0.tar.gz", hash = "sha256:8572daaac2d7393aadd119502664411bcbbfa0ec918147740940618a66a9455a"},
 ]
 
 [package.dependencies]
@@ -776,18 +776,18 @@ ipopo = ">=1.0.0,<2.0.0"
 ipysheet = ">=0.5.0,<1"
 ipywidgets = ">=7.7.0,<8.0.0"
 jsonschema = ">=3.2.0,<5"
-jupyter-client = "<7.0.0 || >7.0.0,<7.0.1 || >7.0.1,<7.0.2 || >7.0.2,<7.0.3 || >7.0.3,<7.0.4 || >7.0.4,<7.0.5 || >7.0.5"
 jupyterlab = ">=3.3.0,<4.0.0"
 lxml = ">=4.6.5,<5.0.0"
 notebook = ">=6.0,<7.0"
-numpy = ">=1.21.0,<2.0.0"
-openmdao = ">=3.10,<4.0"
-pandas = ">=1.1.0,<2.0.0"
+numpy = ">=1.22.0,<2.0.0"
+openmdao = ">=3.18,<4.0"
+pandas = ">=1.3.4,<2.0.0"
 plotly = ">=5.0.0,<6.0.0"
+pyDOE2 = ">=1.3.0,<2.0.0"
 "ruamel.yaml" = ">=0.15.78,<0.18"
-scipy = ">=1.4.1,<2.0.0"
+scipy = ">=1.9.3,<2.0.0"
 stdatm = "<1.0.0"
-tabulate = ">=0.8.9,<0.9.0"
+tabulate = ">=0.8.9,<1"
 tomlkit = ">=0.5.3,<1"
 wop = ">=2.2.0,<3.0.0"
 
@@ -2758,7 +2758,7 @@ files = [
 name = "pydoe2"
 version = "1.3.0"
 description = "Design of experiments for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -3725,14 +3725,14 @@ tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
 name = "stdatm"
-version = "0.3.0"
+version = "0.3.1"
 description = "Numpy-oriented Standard Atmosphere model"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "stdatm-0.3.0-py3-none-any.whl", hash = "sha256:ada82f8418c2269137959570e4ed7a665b302031cbcb86c3aca4b5efc00ba868"},
-    {file = "stdatm-0.3.0.tar.gz", hash = "sha256:030f27bb614e5cab046f19652248be85d2dfd852da506872d837f67b065ab4d5"},
+    {file = "stdatm-0.3.1-py3-none-any.whl", hash = "sha256:cd79961f73cd9a83b273dcdc61faa0206aeee64232b17fe192e7b472611933f2"},
+    {file = "stdatm-0.3.1.tar.gz", hash = "sha256:d75bc67230c25adecd3d6eacdc66a274de6aa02756c1d8f027b540361a95dfef"},
 ]
 
 [package.dependencies]
@@ -4126,6 +4126,16 @@ files = [
     {file = "wrapt-1.14.1-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:8ad85f7f4e20964db4daadcab70b47ab05c7c1cf2a7c1e51087bfaa83831854c"},
     {file = "wrapt-1.14.1-cp310-cp310-win32.whl", hash = "sha256:a9a52172be0b5aae932bef82a79ec0a0ce87288c7d132946d645eba03f0ad8a8"},
     {file = "wrapt-1.14.1-cp310-cp310-win_amd64.whl", hash = "sha256:6d323e1554b3d22cfc03cd3243b5bb815a51f5249fdcbb86fda4bf62bab9e164"},
+    {file = "wrapt-1.14.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:ecee4132c6cd2ce5308e21672015ddfed1ff975ad0ac8d27168ea82e71413f55"},
+    {file = "wrapt-1.14.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:2020f391008ef874c6d9e208b24f28e31bcb85ccff4f335f15a3251d222b92d9"},
+    {file = "wrapt-1.14.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2feecf86e1f7a86517cab34ae6c2f081fd2d0dac860cb0c0ded96d799d20b335"},
+    {file = "wrapt-1.14.1-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:240b1686f38ae665d1b15475966fe0472f78e71b1b4903c143a842659c8e4cb9"},
+    {file = "wrapt-1.14.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a9008dad07d71f68487c91e96579c8567c98ca4c3881b9b113bc7b33e9fd78b8"},
+    {file = "wrapt-1.14.1-cp311-cp311-musllinux_1_1_aarch64.whl", hash = "sha256:6447e9f3ba72f8e2b985a1da758767698efa72723d5b59accefd716e9e8272bf"},
+    {file = "wrapt-1.14.1-cp311-cp311-musllinux_1_1_i686.whl", hash = "sha256:acae32e13a4153809db37405f5eba5bac5fbe2e2ba61ab227926a22901051c0a"},
+    {file = "wrapt-1.14.1-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:49ef582b7a1152ae2766557f0550a9fcbf7bbd76f43fbdc94dd3bf07cc7168be"},
+    {file = "wrapt-1.14.1-cp311-cp311-win32.whl", hash = "sha256:358fe87cc899c6bb0ddc185bf3dbfa4ba646f05b1b0b9b5a27c2cb92c2cea204"},
+    {file = "wrapt-1.14.1-cp311-cp311-win_amd64.whl", hash = "sha256:26046cd03936ae745a502abf44dac702a5e6880b2b01c29aea8ddf3353b68224"},
     {file = "wrapt-1.14.1-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:43ca3bbbe97af00f49efb06e352eae40434ca9d915906f77def219b88e85d907"},
     {file = "wrapt-1.14.1-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:6b1a564e6cb69922c7fe3a678b9f9a3c54e72b469875aa8018f18b4d1dd1adf3"},
     {file = "wrapt-1.14.1-cp35-cp35m-manylinux2010_i686.whl", hash = "sha256:00b6d4ea20a906c0ca56d84f93065b398ab74b927a7a3dbd470f6fc503f95dc3"},
@@ -4232,4 +4242,4 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8, <3.10"
-content-hash = "06d682c49c918ef058124a409276c59649f0811821df1039b68106f1fc241223"
+content-hash = "85b5c90d535bede7f45fc0353b6751cee579562526ae6ac26eec26f671c45e49"

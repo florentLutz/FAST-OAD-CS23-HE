@@ -1599,10 +1599,12 @@ def test_mission_vector_from_yml():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1654,10 +1656,12 @@ def test_mission_vector_from_yml_simplified_models():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1704,10 +1708,13 @@ def test_mission_vector_direct_bus_battery_connection():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    configurator.write_needed_inputs(ref_inputs)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1743,10 +1750,13 @@ def test_mission_vector_direct_sspc_battery_connection():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    configurator.write_needed_inputs(ref_inputs)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1783,10 +1793,12 @@ def test_mission_vector_from_yml_fuel():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1801,7 +1813,7 @@ def test_mission_vector_from_yml_fuel():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(33.41, abs=1e-2)
+    assert sizing_fuel == pytest.approx(33.42, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -1817,10 +1829,12 @@ def test_mission_vector_from_yml_two_fuel():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1851,10 +1865,12 @@ def test_mission_vector_from_yml_fuel_turbo():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -1885,10 +1901,12 @@ def test_mission_vector_from_yml_fuel_and_battery():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)
@@ -2065,10 +2083,12 @@ def test_mission_criss_cross():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-    configurator.write_needed_inputs(ref_inputs)
 
     # Create problems with inputs
-    problem = configurator.get_problem(read_inputs=True)
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
     problem.setup()
 
     # om.n2(problem)

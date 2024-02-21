@@ -83,7 +83,7 @@ def test_pipistrel_velis_electro():
         600.00, rel=1e-2
     )
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(26.629, abs=1e-2)
+    assert sizing_energy == pytest.approx(25.01, abs=1e-2)
 
 
 def test_pipistrel_detailed_mission():
@@ -117,7 +117,7 @@ def test_pipistrel_detailed_mission():
     problem.write_outputs()
 
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(26.507, abs=1e-2)
+    assert sizing_energy == pytest.approx(24.76, abs=1e-2)
 
 
 def test_pipistrel_not_detailed_mission():
@@ -162,7 +162,7 @@ def test_pipistrel_not_detailed_mission():
     problem.write_outputs()
 
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(26.476, abs=1e-2)
+    assert sizing_energy == pytest.approx(24.72, abs=1e-2)
 
 
 def test_residuals_analyzer():

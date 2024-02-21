@@ -168,6 +168,10 @@ class ToCSV(om.ExplicitComponent):
             "tsfc", shape=number_of_points, val=np.full(number_of_points, 7e-6), units="kg/s/N"
         )
 
+        self.declare_partials(
+            of="*", wrt=["fuel_consumed_t", "time_step", "thrust"], method="exact"
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         number_of_points_climb = self.options["number_of_points_climb"]
@@ -281,3 +285,13 @@ class ToCSV(om.ExplicitComponent):
             _LOGGER.info("Saved mission results in %s", self.options["out_file"])
 
             outputs["tsfc"] = tsfc
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+
+        thrust = inputs["thrust"]
+        fuel_consumed_t = inputs["fuel_consumed_t"]
+        time_step = inputs["time_step"]
+
+        partials["tsfc", "thrust"] = np.diag(-fuel_consumed_t / time_step / thrust ** 2.0)
+        partials["tsfc", "fuel_consumed_t"] = np.diag(1.0 / time_step / thrust)
+        partials["tsfc", "time_step"] = np.diag(-fuel_consumed_t / time_step ** 2.0 / thrust)

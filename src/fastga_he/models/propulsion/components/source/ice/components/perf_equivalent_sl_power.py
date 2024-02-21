@@ -28,10 +28,10 @@ class PerformancesEquivalentSeaLevelPower(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("shaft_power_out", units="kW", val=np.nan, shape=number_of_points)
+        self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
         self.add_input("density", units="kg/m**3", val=np.nan, shape=number_of_points)
 
-        self.add_output("equivalent_SL_power", units="kW", val=np.full(number_of_points, 250e3))
+        self.add_output("equivalent_SL_power", units="W", val=np.full(number_of_points, 250e6))
 
         self.declare_partials(of="equivalent_SL_power", wrt="*", method="exact")
 

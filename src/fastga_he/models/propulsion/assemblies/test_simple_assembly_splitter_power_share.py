@@ -288,12 +288,10 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     problem.setup()
     # Run problem and check obtained value(s) is/(are) correct
 
-    # Adding a recorder
-    if not pth.exists(pth.join(OUTPUT_FOLDER_PATH, "cases.sql")):
-        recorder = om.SqliteRecorder(pth.join(OUTPUT_FOLDER_PATH, "cases.sql"))
-        solver = model.performances.nonlinear_solver
-        solver.add_recorder(recorder)
-        solver.recording_options["record_solver_residuals"] = True
+    recorder = om.SqliteRecorder(pth.join(OUTPUT_FOLDER_PATH, "cases.sql"))
+    solver = model.performances.nonlinear_solver
+    solver.add_recorder(recorder)
+    solver.recording_options["record_solver_residuals"] = True
 
     problem.run_model()
 
