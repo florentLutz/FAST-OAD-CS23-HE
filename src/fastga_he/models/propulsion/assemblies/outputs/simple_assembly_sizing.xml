@@ -696,7 +696,7 @@
             <CG>
               <x units="m" is_input="False">2.202458712937498<!--X position of the propeller center of gravity--></x>
               <y units="m" is_input="False">1.5703687750797755<!--Y position of the DC bus center of gravity--></y>
-              <y_ratio is_input="True">0.34<!--Y position of the propeller center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y_ratio is_input="True">0.34<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
             </CG>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
