@@ -26,14 +26,8 @@ def cleanup():
 
 def test_sizing_sr22(cleanup):
 
-    # TODO: Recheck inputs
-    # ANS: Essentially the same as the reference aircraft in FAST-OAD-GA, for very similar results
-
     # TODO: Check why he needs the propulsion data as inputs
     # ANS: still used for the Z_cg of the aircraft which is assumed to have only a minor influence
-
-    # TODO: The setup has been change to optimize the number of setup calls but it hasn't been an
-    #  official release yet
 
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
