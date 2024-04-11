@@ -1,0 +1,14 @@
+<FASTOAD_model>
+    <data>
+        <propulsion>
+            <he_power_train>
+                <turboshaft>
+                    <turboshaft_1>
+                        <power_rating units="kW">634.0</power_rating>
+                        <uninstalled_mass units="kg">192.9758</uninstalled_mass>
+                    </turboshaft_1>
+                </turboshaft>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
