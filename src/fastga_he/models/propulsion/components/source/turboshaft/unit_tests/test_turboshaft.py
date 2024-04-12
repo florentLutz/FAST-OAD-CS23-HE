@@ -3,6 +3,8 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import pytest
+import numpy as np
+import openmdao.api as om
 
 from ..components.cstr_enforce import ConstraintsRatedPowerEnforce
 from ..components.cstr_ensure import ConstraintsRatedPowerEnsure
@@ -16,6 +18,10 @@ from ..components.sizing_turboshaft_nacelle_wet_area import SizingTurboshaftNace
 from ..components.sizing_turboshaft_drag import SizingTurboshaftDrag
 from ..components.sizing_turboshaft_cg_x import SizingTurboshaftCGX
 from ..components.sizing_turboshaft_cg_y import SizingTurboshaftCGY
+
+from ..components.perf_density_ratio import PerformancesDensityRatio
+from ..components.perf_mach import PerformancesMach
+from ..components.perf_max_power_opr_limit import PerformancesMaxPowerOPRLimit
 
 from ..components.sizing_turboshaft import SizingTurboshaft
 
@@ -325,3 +331,115 @@ def test_ice_sizing():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_density_ratio():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "density",
+        val=np.linspace(1.225, 0.413, NB_POINTS_TEST),
+        units="kg/m**3",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PerformancesDensityRatio(number_of_points=NB_POINTS_TEST), ivc)
+
+    assert problem.get_val("density_ratio") == pytest.approx(
+        np.array([1.000, 0.926, 0.852, 0.779, 0.705, 0.631, 0.558, 0.484, 0.410, 0.337]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_mach_number():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PerformancesMach(number_of_points=NB_POINTS_TEST), ivc)
+
+    assert problem.get_val("mach") == pytest.approx(
+        np.array([0.240, 0.243, 0.246, 0.248, 0.251, 0.254, 0.257, 0.260, 0.263, 0.265]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_max_power_opr_limit():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesMaxPowerOPRLimit(
+                turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "density_ratio",
+        val=np.array([1.000, 0.926, 0.852, 0.779, 0.705, 0.631, 0.558, 0.484, 0.410, 0.337]),
+        units="kg/m**3",
+    )
+    ivc.add_output(
+        "mach",
+        val=np.array([0.240, 0.243, 0.246, 0.248, 0.251, 0.254, 0.257, 0.260, 0.263, 0.265]),
+    )
+    ivc.add_output("shaft_power_out", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMaxPowerOPRLimit(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("design_power_opr_limit", units="kW") == pytest.approx(
+        np.array(
+            [
+                249.59566783,
+                308.87997178,
+                381.0245687,
+                469.77660427,
+                582.07289321,
+                726.97327963,
+                917.25819814,
+                1181.39566876,
+                1563.06758566,
+                2145.35570125,
+            ]
+        ),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_max_power_opr_limit_ref_point():
+
+    # Same test as above but on a point close to the original model to see if it matches
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("density_ratio", val=np.array([0.3813]), units="kg/m**3")
+    ivc.add_output("mach", val=np.array([0.5]))
+    ivc.add_output("shaft_power_out", val=np.array([446.32]), units="kW")
+    ivc.add_output(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:OPR", val=9.5
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:T41t",
+        val=1350,
+        units="degK",
+    )
+    ivc.add_output("data:propulsion:he_power_train:turboshaft:turboshaft_1:limit:OPR", val=12.0)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMaxPowerOPRLimit(turboshaft_id="turboshaft_1", number_of_points=1),
+        ivc,
+    )
+    assert problem.get_val("design_power_opr_limit", units="kW") == pytest.approx(745.7, rel=1e-2)

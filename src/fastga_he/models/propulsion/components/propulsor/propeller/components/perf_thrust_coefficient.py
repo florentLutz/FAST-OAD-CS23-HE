@@ -5,8 +5,6 @@
 import numpy as np
 import openmdao.api as om
 
-from stdatm import Atmosphere
-
 
 class PerformancesThrustCoefficient(om.ExplicitComponent):
     """Computation of the thrust coefficient of the propeller."""
