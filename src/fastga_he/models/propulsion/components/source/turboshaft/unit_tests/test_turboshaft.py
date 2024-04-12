@@ -30,6 +30,8 @@ from ..components.perf_equivalent_rated_power_opr_limit import (
     PerformancesEquivalentRatedPowerOPRLimit,
 )
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.perf_fuel_consumption import PerformancesTurboshaftFuelConsumption
+from ..components.perf_fuel_consumed import PerformancesTurboshaftFuelConsumed
 
 from ..components.sizing_turboshaft import SizingTurboshaft
 
@@ -576,6 +578,70 @@ def test_maximum():
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_max", units="kW"
     ) == pytest.approx(
         1011.9,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_fuel_consumption():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesTurboshaftFuelConsumption(
+                turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "density_ratio",
+        val=np.array([1.000, 0.926, 0.852, 0.779, 0.705, 0.631, 0.558, 0.484, 0.410, 0.337]),
+        units="kg/m**3",
+    )
+    ivc.add_output(
+        "mach",
+        val=np.array([0.240, 0.243, 0.246, 0.248, 0.251, 0.254, 0.257, 0.260, 0.263, 0.265]),
+    )
+    ivc.add_output("shaft_power_out", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftFuelConsumption(
+            turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("fuel_consumption", units="kg/h") == pytest.approx(
+        np.array([212.15, 213.19, 213.01, 211.97, 209.76, 206.66, 202.97, 198.41, 193.29, 188.06]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_fuel_consumed():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumption",
+        val=np.array(
+            [212.15, 213.19, 213.01, 211.97, 209.76, 206.66, 202.97, 198.41, 193.29, 188.06]
+        ),
+        units="kg/h",
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftFuelConsumed(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("fuel_consumed_t", units="kg") == pytest.approx(
+        np.array([29.46, 29.60, 29.58, 29.44, 29.13, 28.70, 28.19, 27.55, 26.84, 26.11]),
         rel=1e-2,
     )
 
