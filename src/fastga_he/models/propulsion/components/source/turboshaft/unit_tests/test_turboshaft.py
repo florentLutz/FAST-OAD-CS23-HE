@@ -22,6 +22,14 @@ from ..components.sizing_turboshaft_cg_y import SizingTurboshaftCGY
 from ..components.perf_density_ratio import PerformancesDensityRatio
 from ..components.perf_mach import PerformancesMach
 from ..components.perf_max_power_opr_limit import PerformancesMaxPowerOPRLimit
+from ..components.perf_max_power_itt_limit import PerformancesMaxPowerITTLimit
+from ..components.perf_equivalent_rated_power_itt_limit import (
+    PerformancesEquivalentRatedPowerITTLimit,
+)
+from ..components.perf_equivalent_rated_power_opr_limit import (
+    PerformancesEquivalentRatedPowerOPRLimit,
+)
+from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.sizing_turboshaft import SizingTurboshaft
 
@@ -400,18 +408,7 @@ def test_max_power_opr_limit():
 
     assert problem.get_val("design_power_opr_limit", units="kW") == pytest.approx(
         np.array(
-            [
-                249.59566783,
-                308.87997178,
-                381.0245687,
-                469.77660427,
-                582.07289321,
-                726.97327963,
-                917.25819814,
-                1181.39566876,
-                1563.06758566,
-                2145.35570125,
-            ]
+            [249.59, 308.87, 381.02, 469.77, 582.07, 726.97, 917.25, 1181.39, 1563.06, 2145.35]
         ),
         rel=1e-2,
     )
@@ -443,3 +440,143 @@ def test_max_power_opr_limit_ref_point():
         ivc,
     )
     assert problem.get_val("design_power_opr_limit", units="kW") == pytest.approx(745.7, rel=1e-2)
+
+
+def test_max_power_itt_limit():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesMaxPowerITTLimit(
+                turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "density_ratio",
+        val=np.array([1.000, 0.926, 0.852, 0.779, 0.705, 0.631, 0.558, 0.484, 0.410, 0.337]),
+        units="kg/m**3",
+    )
+    ivc.add_output(
+        "mach",
+        val=np.array([0.240, 0.243, 0.246, 0.248, 0.251, 0.254, 0.257, 0.260, 0.263, 0.265]),
+    )
+    ivc.add_output("shaft_power_out", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMaxPowerITTLimit(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("design_power_itt_limit", units="kW") == pytest.approx(
+        np.array([250.26, 285.93, 324.67, 367.12, 414.49, 468.15, 529.82, 603.56, 694.52, 811.54]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_equivalent_power_itt_limit():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesEquivalentRatedPowerITTLimit(
+                turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "design_power_itt_limit",
+        units="kW",
+        val=np.array(
+            [250.26, 285.93, 324.67, 367.12, 414.49, 468.15, 529.82, 603.56, 694.52, 811.54]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesEquivalentRatedPowerITTLimit(
+            turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("equivalent_rated_power_itt_limit", units="kW") == pytest.approx(
+        np.array([118.05, 134.87, 153.14, 173.17, 195.51, 220.82, 249.91, 284.70, 327.60, 382.80]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_equivalent_power_opr_limit():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesEquivalentRatedPowerOPRLimit(
+                turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "design_power_opr_limit",
+        units="kW",
+        val=np.array(
+            [249.59, 308.87, 381.02, 469.77, 582.07, 726.97, 917.25, 1181.39, 1563.06, 2145.35]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesEquivalentRatedPowerOPRLimit(
+            turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("equivalent_rated_power_opr_limit", units="kW") == pytest.approx(
+        np.array([117.73, 145.69, 179.72, 221.58, 274.56, 342.91, 432.66, 557.25, 737.29, 1011.9]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maximum():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("shaft_power_out", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+    ivc.add_output(
+        "equivalent_rated_power_opr_limit",
+        val=np.array(
+            [117.73, 145.69, 179.72, 221.58, 274.56, 342.91, 432.66, 557.25, 737.29, 1011.9]
+        ),
+        units="kW",
+    )
+    ivc.add_output(
+        "equivalent_rated_power_itt_limit",
+        val=np.array(
+            [118.05, 134.87, 153.14, 173.17, 195.51, 220.82, 249.91, 284.70, 327.60, 382.80]
+        ),
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMaximum(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_max", units="kW"
+    ) == pytest.approx(
+        1011.9,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)

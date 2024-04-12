@@ -54,9 +54,11 @@
                         <design_point>
                             <T41t units="degK">1400.0</T41t>
                             <OPR>12.0</OPR>
+                            <power_ratio>2.12</power_ratio>
                         </design_point>
                         <limit>
                             <OPR>12.5</OPR>
+                            <ITT units="degK">1125.0</ITT>
                         </limit>
                     </turboshaft_1>
                 </turboshaft>
