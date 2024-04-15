@@ -35,8 +35,17 @@ from ..components.perf_fuel_consumption import PerformancesTurboshaftFuelConsump
 from ..components.perf_fuel_consumed import PerformancesTurboshaftFuelConsumed
 from ..components.perf_sfc import PerformancesSFC
 
+from ..components.slipstream_density_ratio import SlipstreamDensityRatio
+from ..components.slipstream_mach import SlipstreamMach
+from ..components.slipstream_required_power import SlipstreamRequiredPower
+from ..components.slipstream_exhaust_velocity import SlipstreamExhaustVelocity
+from ..components.slipstream_exhaust_mass_flow import SlipstreamExhaustMassFlow
+from ..components.slipstream_exhaust_thrust import SlipstreamExhaustThrust
+from ..components.slipstream_delta_cd import SlipstreamTurboshaftDeltaCd
+
 from ..components.sizing_turboshaft import SizingTurboshaft
 from ..components.perf_turboshaft import PerformancesTurboshaft
+from ..components.slipstream_turboshaft import SlipstreamTurboshaft
 
 from ..constants import POSSIBLE_POSITION
 
@@ -737,5 +746,224 @@ def test_performances_turboshaft():
         1011.9,
         rel=1e-2,
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_slipstream_density_ratio():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "density",
+        val=np.linspace(1.225, 0.413, NB_POINTS_TEST),
+        units="kg/m**3",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SlipstreamDensityRatio(number_of_points=NB_POINTS_TEST), ivc)
+
+    assert problem.get_val("density_ratio") == pytest.approx(
+        np.array([1.000, 0.926, 0.852, 0.779, 0.705, 0.631, 0.558, 0.484, 0.410, 0.337]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_slipstream_mach():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SlipstreamMach(number_of_points=NB_POINTS_TEST), ivc)
+
+    assert problem.get_val("mach") == pytest.approx(
+        np.array([0.240, 0.243, 0.246, 0.248, 0.251, 0.254, 0.257, 0.260, 0.263, 0.265]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_slipstream_required_power():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SlipstreamRequiredPower(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output("shaft_power_out", val=np.linspace(250, 575.174, NB_POINTS_TEST), units="kW")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamRequiredPower(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("power_required", units="kW") == pytest.approx(
+        np.linspace(300, 625.174, NB_POINTS_TEST),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_exhaust_velocity():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SlipstreamExhaustVelocity(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "density_ratio",
+        val=np.array([1.000, 0.926, 0.852, 0.779, 0.705, 0.631, 0.558, 0.484, 0.410, 0.337]),
+        units="kg/m**3",
+    )
+    ivc.add_output(
+        "mach",
+        val=np.array([0.240, 0.243, 0.246, 0.248, 0.251, 0.254, 0.257, 0.260, 0.263, 0.265]),
+    )
+    ivc.add_output("power_required", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamExhaustVelocity(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("exhaust_velocity", units="m/s") == pytest.approx(
+        np.array([133.65, 139.96, 147.30, 155.90, 166.28, 179.01, 194.87, 215.66, 243.91, 284.17]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_exhaust_mass_flow():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SlipstreamExhaustMassFlow(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "density_ratio",
+        val=np.array([1.000, 0.926, 0.852, 0.779, 0.705, 0.631, 0.558, 0.484, 0.410, 0.337]),
+        units="kg/m**3",
+    )
+    ivc.add_output("power_required", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamExhaustMassFlow(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("exhaust_mass_flow", units="kg/s") == pytest.approx(
+        np.array([4.209, 4.084, 3.934, 3.764, 3.568, 3.349, 3.111, 2.847, 2.557, 2.245]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_exhaust_thrust():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 300.0, NB_POINTS_TEST), units="m/s")
+    ivc.add_output(
+        "exhaust_velocity",
+        val=np.array(
+            [133.65, 139.96, 147.30, 155.90, 166.28, 179.01, 194.87, 215.66, 243.91, 284.17]
+        ),
+        units="m/s",
+    )
+    ivc.add_output(
+        "exhaust_mass_flow",
+        val=np.array([4.209, 4.084, 3.934, 3.764, 3.568, 3.349, 3.111, 2.847, 2.557, 2.245]),
+        units="kg/s",
+    )
+
+    problem = run_system(
+        SlipstreamExhaustThrust(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("exhaust_thrust", units="N") == pytest.approx(
+        np.array([218.23665, 138.51112889, 66.92171111, 5.14413333, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_delta_cd():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SlipstreamTurboshaftDeltaCd(number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "density",
+        val=np.linspace(1.225, 0.413, NB_POINTS_TEST),
+        units="kg/m**3",
+    )
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("exhaust_thrust", val=np.linspace(250.0, 200.0, NB_POINTS_TEST), units="N")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamTurboshaftDeltaCd(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("delta_Cd") * 1e3 == pytest.approx(
+        np.array([-8.584, -8.850, -9.181, -9.592, -10.10, -10.76, -11.62, -12.76, -14.34, -16.64]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_slipstream():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SlipstreamTurboshaft(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("shaft_power_out", val=np.linspace(250, 575.174, NB_POINTS_TEST), units="kW")
+    ivc.add_output(
+        "density",
+        val=np.linspace(1.225, 0.413, NB_POINTS_TEST),
+        units="kg/m**3",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamTurboshaft(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("delta_Cd") * 1e3 == pytest.approx(
+        np.array([-7.495, -8.460, -9.614, -11.01, -12.76, -14.99, -17.90, -21.87, -27.54, -36.18]),
+        rel=1e-2,
+    )
+    assert problem.get_val("delta_Cl") == pytest.approx(np.zeros(NB_POINTS_TEST), rel=1e-2)
+    assert problem.get_val("delta_Cm") == pytest.approx(np.zeros(NB_POINTS_TEST), rel=1e-2)
 
     problem.check_partials(compact_print=True)
