@@ -29,7 +29,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
-        self.add_input("shaft_power_out", units="kW", val=np.nan, shape=number_of_points)
+        self.add_input("power_required", units="kW", val=np.nan, shape=number_of_points)
         self.add_input(
             "equivalent_rated_power_opr_limit",
             units="kW",
@@ -58,7 +58,7 @@ class PerformancesMaximum(om.ExplicitComponent):
 
         turboshaft_id = self.options["turboshaft_id"]
 
-        max_rated_power = inputs["shaft_power_out"]
+        max_rated_power = inputs["power_required"]
         max_power_opr_limit = inputs["equivalent_rated_power_opr_limit"]
         max_power_itt_limit = inputs["equivalent_rated_power_itt_limit"]
 
@@ -75,7 +75,7 @@ class PerformancesMaximum(om.ExplicitComponent):
 
         turboshaft_id = self.options["turboshaft_id"]
 
-        max_rated_power = inputs["shaft_power_out"]
+        max_rated_power = inputs["power_required"]
         max_power_opr_limit = inputs["equivalent_rated_power_opr_limit"]
         max_power_itt_limit = inputs["equivalent_rated_power_itt_limit"]
 
@@ -95,7 +95,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             ] = np.zeros_like(max_power_itt_limit)
             partials[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_max",
-                "shaft_power_out",
+                "power_required",
             ] = np.zeros_like(max_power_itt_limit)
         elif self.max_power in max_power_opr_limit:
             partial = np.where(
@@ -113,7 +113,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             ] = partial
             partials[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_max",
-                "shaft_power_out",
+                "power_required",
             ] = np.zeros_like(max_power_itt_limit)
         else:
             partial = np.where(
@@ -131,5 +131,5 @@ class PerformancesMaximum(om.ExplicitComponent):
             ] = np.zeros_like(max_power_itt_limit)
             partials[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_max",
-                "shaft_power_out",
+                "power_required",
             ] = partial

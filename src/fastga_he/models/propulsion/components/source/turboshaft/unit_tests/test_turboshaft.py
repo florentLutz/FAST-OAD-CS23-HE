@@ -21,6 +21,7 @@ from ..components.sizing_turboshaft_cg_y import SizingTurboshaftCGY
 
 from ..components.perf_density_ratio import PerformancesDensityRatio
 from ..components.perf_mach import PerformancesMach
+from ..components.perf_required_power import PerformancesRequiredPower
 from ..components.perf_max_power_opr_limit import PerformancesMaxPowerOPRLimit
 from ..components.perf_max_power_itt_limit import PerformancesMaxPowerITTLimit
 from ..components.perf_equivalent_rated_power_itt_limit import (
@@ -32,8 +33,10 @@ from ..components.perf_equivalent_rated_power_opr_limit import (
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_fuel_consumption import PerformancesTurboshaftFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesTurboshaftFuelConsumed
+from ..components.perf_sfc import PerformancesSFC
 
 from ..components.sizing_turboshaft import SizingTurboshaft
+from ..components.perf_turboshaft import PerformancesTurboshaft
 
 from ..constants import POSSIBLE_POSITION
 
@@ -380,6 +383,31 @@ def test_mach_number():
     problem.check_partials(compact_print=True)
 
 
+def test_required_power():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesRequiredPower(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output("shaft_power_out", val=np.linspace(250, 575.174, NB_POINTS_TEST), units="kW")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesRequiredPower(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("power_required", units="kW") == pytest.approx(
+        np.linspace(300, 625.174, NB_POINTS_TEST),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_max_power_opr_limit():
 
     ivc = get_indep_var_comp(
@@ -400,7 +428,7 @@ def test_max_power_opr_limit():
         "mach",
         val=np.array([0.240, 0.243, 0.246, 0.248, 0.251, 0.254, 0.257, 0.260, 0.263, 0.265]),
     )
-    ivc.add_output("shaft_power_out", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+    ivc.add_output("power_required", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -425,7 +453,7 @@ def test_max_power_opr_limit_ref_point():
     ivc = om.IndepVarComp()
     ivc.add_output("density_ratio", val=np.array([0.3813]), units="kg/m**3")
     ivc.add_output("mach", val=np.array([0.5]))
-    ivc.add_output("shaft_power_out", val=np.array([446.32]), units="kW")
+    ivc.add_output("power_required", val=np.array([446.32]), units="kW")
     ivc.add_output(
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:OPR", val=9.5
     )
@@ -464,7 +492,7 @@ def test_max_power_itt_limit():
         "mach",
         val=np.array([0.240, 0.243, 0.246, 0.248, 0.251, 0.254, 0.257, 0.260, 0.263, 0.265]),
     )
-    ivc.add_output("shaft_power_out", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+    ivc.add_output("power_required", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -553,7 +581,7 @@ def test_equivalent_power_opr_limit():
 def test_maximum():
 
     ivc = om.IndepVarComp()
-    ivc.add_output("shaft_power_out", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+    ivc.add_output("power_required", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
     ivc.add_output(
         "equivalent_rated_power_opr_limit",
         val=np.array(
@@ -604,7 +632,7 @@ def test_fuel_consumption():
         "mach",
         val=np.array([0.240, 0.243, 0.246, 0.248, 0.251, 0.254, 0.257, 0.260, 0.263, 0.265]),
     )
-    ivc.add_output("shaft_power_out", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+    ivc.add_output("power_required", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -642,6 +670,71 @@ def test_fuel_consumed():
 
     assert problem.get_val("fuel_consumed_t", units="kg") == pytest.approx(
         np.array([29.46, 29.60, 29.58, 29.44, 29.13, 28.70, 28.19, 27.55, 26.84, 26.11]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_sfc():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumption",
+        val=np.array(
+            [212.15, 213.19, 213.01, 211.97, 209.76, 206.66, 202.97, 198.41, 193.29, 188.06]
+        ),
+        units="kg/h",
+    )
+    ivc.add_output("power_required", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesSFC(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("specific_fuel_consumption", units="kg/h/kW") == pytest.approx(
+        np.array([0.707, 0.634, 0.572, 0.519, 0.471, 0.429, 0.392, 0.358, 0.328, 0.300]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_performances_turboshaft():
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesTurboshaft(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("shaft_power_out", val=np.linspace(250, 575.174, NB_POINTS_TEST), units="kW")
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+    ivc.add_output(
+        "density",
+        val=np.linspace(1.225, 0.413, NB_POINTS_TEST),
+        units="kg/m**3",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaft(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("fuel_consumed_t", units="kg") == pytest.approx(
+        np.array([29.46, 29.60, 29.58, 29.44, 29.13, 28.70, 28.19, 27.55, 26.84, 26.11]),
+        rel=1e-2,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_max", units="kW"
+    ) == pytest.approx(
+        1011.9,
         rel=1e-2,
     )
 

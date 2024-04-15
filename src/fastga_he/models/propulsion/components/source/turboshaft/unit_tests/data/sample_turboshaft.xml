@@ -37,6 +37,7 @@
                         <from_LE units="m">0.5</from_LE>
                         <power_rating units="kW">634.0</power_rating>
                         <uninstalled_mass units="kg">192.9758</uninstalled_mass>
+                        <power_offtake units="kW">50.0</power_offtake>
                         <engine>
                             <height units="m">0.512</height>
                             <width units="m">0.512</width>

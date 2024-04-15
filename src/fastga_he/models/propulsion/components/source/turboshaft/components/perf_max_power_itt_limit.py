@@ -35,7 +35,7 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
 
         self.add_input("mach", val=np.nan, shape=number_of_points)
         self.add_input("density_ratio", val=np.nan, shape=number_of_points)
-        self.add_input("shaft_power_out", units="MW", val=np.nan, shape=number_of_points)
+        self.add_input("power_required", units="MW", val=np.nan, shape=number_of_points)
         self.add_input(
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:OPR",
             val=np.nan,
@@ -70,7 +70,7 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
 
         density_ratio = inputs["density_ratio"]
         mach = inputs["mach"]
-        power = inputs["shaft_power_out"]
+        power = inputs["power_required"]
         # Need to divide by SL temperature for the surrogate
         design_t41t = (
             inputs[
@@ -120,7 +120,7 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
 
         density_ratio = inputs["density_ratio"]
         mach = inputs["mach"]
-        power = inputs["shaft_power_out"]
+        power = inputs["power_required"]
         design_t41t = (
             inputs[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t"
@@ -198,7 +198,7 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
         )
         d_log_shaft_power_d_shaft_power = 1.0 / (np.log(10) * power)
 
-        partials["design_power_itt_limit", "shaft_power_out"] = np.diag(
+        partials["design_power_itt_limit", "power_required"] = np.diag(
             d_power_d_log_power * d_log_power_d_log_shaft_power * d_log_shaft_power_d_shaft_power
         )
 

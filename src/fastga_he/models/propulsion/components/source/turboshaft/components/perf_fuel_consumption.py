@@ -30,7 +30,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
 
         self.add_input("mach", val=np.nan, shape=number_of_points)
         self.add_input("density_ratio", val=np.nan, shape=number_of_points)
-        self.add_input("shaft_power_out", units="kW", val=np.nan, shape=number_of_points)
+        self.add_input("power_required", units="kW", val=np.nan, shape=number_of_points)
         self.add_input(
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:OPR",
             val=np.nan,
@@ -67,7 +67,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
 
         density_ratio = inputs["density_ratio"]
         mach = inputs["mach"]
-        power = inputs["shaft_power_out"]
+        power = inputs["power_required"]
         # Need to divide by SL temperature for the surrogate
         design_t41t = inputs[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t"
@@ -119,7 +119,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
 
         density_ratio = inputs["density_ratio"]
         mach = inputs["mach"]
-        power = inputs["shaft_power_out"]
+        power = inputs["power_required"]
         # Need to divide by SL temperature for the surrogate
         design_t41t = inputs[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t"
@@ -259,6 +259,6 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         )
         d_log_power_d_power = 1.0 / (np.log(10) * power)
 
-        partials["fuel_consumption", "shaft_power_out"] = np.diag(
+        partials["fuel_consumption", "power_required"] = np.diag(
             d_fc_d_log_fc * d_log_fc_d_log_power * d_log_power_d_power
         )
