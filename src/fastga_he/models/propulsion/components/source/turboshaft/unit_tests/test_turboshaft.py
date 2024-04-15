@@ -22,6 +22,7 @@ from ..components.sizing_turboshaft_cg_y import SizingTurboshaftCGY
 from ..components.perf_density_ratio import PerformancesDensityRatio
 from ..components.perf_mach import PerformancesMach
 from ..components.perf_required_power import PerformancesRequiredPower
+from ..components.perf_power_for_power_rate import PerformancesPowerForPowerRate
 from ..components.perf_max_power_opr_limit import PerformancesMaxPowerOPRLimit
 from ..components.perf_max_power_itt_limit import PerformancesMaxPowerITTLimit
 from ..components.perf_equivalent_rated_power_itt_limit import (
@@ -363,6 +364,7 @@ def test_density_ratio():
         val=np.linspace(1.225, 0.413, NB_POINTS_TEST),
         units="kg/m**3",
     )
+    ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2000.0), units="min**-1")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(PerformancesDensityRatio(number_of_points=NB_POINTS_TEST), ivc)
@@ -410,6 +412,25 @@ def test_required_power():
     )
 
     assert problem.get_val("power_required", units="kW") == pytest.approx(
+        np.linspace(300, 625.174, NB_POINTS_TEST),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_power_for_power_rate():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("power_required", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPowerForPowerRate(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("shaft_power_for_power_rate", units="kW") == pytest.approx(
         np.linspace(300, 625.174, NB_POINTS_TEST),
         rel=1e-2,
     )

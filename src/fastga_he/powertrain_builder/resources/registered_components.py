@@ -641,6 +641,48 @@ FUEL_SYSTEM = {
     VARIESN_T_MASS: True,
     ETA: 1.0,
 }
+TURBOSHAFT = {
+    ID: "fastga_he.pt_component.turboshaft",
+    CN: "Turboshaft",
+    CN_ID: "turboshaft_id",
+    CT: "turboshaft",
+    ATT: None,
+    PT: ["time_step", "density", "settings:*", "altitude", "true_airspeed"],
+    SPT: [],
+    IN: [(None, "fuel_consumed_t")],
+    OUT: [("rpm", None), ("shaft_power_out", None)],
+    CTC: ["source", "propulsive_load"],
+    MP: [
+        {"specific_fuel_consumption": "kg/kW/h"},
+        {"fuel_consumption": "kg/h"},
+        {"fuel_consumed_t": "kg"},
+        {"design_power_opr_limit": "kW"},
+        {"design_power_itt_limit": "kW"},
+    ],
+    SMP: [
+        {"exhaust_velocity": "m/s"},
+        {"exhaust_mass_flow": "kg/s"},
+        {"exhaust_thrust": "N"},
+        {"delta_Cd": None},
+    ],
+    ICON: "turbine",
+    ICON_SIZE: 40,
+    RSD: ["fuel_consumption", "torque_out"],
+    SETS_V: False,
+    IO_INDEP_V: False,
+    V_TO_SET: [],
+    P_TO_SET: [],
+    I_TO_SET: [],
+    SFR: False,
+    SWL: False,
+    DST_W: [],
+    PCT_W: ["on_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
+    VARIES_MASS: True,
+    VARIESN_T_MASS: False,
+    ETA: 0.35,
+}
 
 KNOWN_COMPONENTS = [
     PROPELLER,
@@ -657,6 +699,7 @@ KNOWN_COMPONENTS = [
     ICE,
     FUEL_TANK,
     FUEL_SYSTEM,
+    TURBOSHAFT,
 ]
 
 KNOWN_ID = []

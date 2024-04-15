@@ -29,6 +29,7 @@ icons_dict = {
     "inverter": pth.join(icons.__path__[0], "DC_AC.png"),
     "fuel_tank": pth.join(icons.__path__[0], "fuel_tank.png"),
     "fuel_system": pth.join(icons.__path__[0], "fuel_system.png"),
+    "turbine": pth.join(icons.__path__[0], "turbine.png"),
 }
 
 

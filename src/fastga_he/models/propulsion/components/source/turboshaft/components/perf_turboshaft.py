@@ -11,6 +11,7 @@ from .perf_required_power import PerformancesRequiredPower
 from .perf_fuel_consumption import PerformancesTurboshaftFuelConsumption
 from .perf_fuel_consumed import PerformancesTurboshaftFuelConsumed
 from .perf_sfc import PerformancesSFC
+from .perf_power_for_power_rate import PerformancesPowerForPowerRate
 from .perf_max_power_itt_limit import PerformancesMaxPowerITTLimit
 from .perf_equivalent_rated_power_itt_limit import PerformancesEquivalentRatedPowerITTLimit
 from .perf_max_power_opr_limit import PerformancesMaxPowerOPRLimit
@@ -51,6 +52,11 @@ class PerformancesTurboshaft(om.Group):
             subsys=PerformancesRequiredPower(
                 number_of_points=number_of_points, turboshaft_id=turboshaft_id
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="power_for_power_rate",
+            subsys=PerformancesPowerForPowerRate(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(
