@@ -161,7 +161,14 @@ class DEPEquilibrium(om.Group):
             self.add_subsystem(
                 "compute_dep_effect",
                 oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
-                promotes_inputs=["data:*", "alpha", "thrust", "density", "true_airspeed"],
+                promotes_inputs=[
+                    "data:*",
+                    "alpha",
+                    "thrust",
+                    "density",
+                    "true_airspeed",
+                    "altitude",
+                ],
                 promotes_outputs=["delta_Cl", "delta_Cd", "delta_Cm"],
             )
             self.add_subsystem(

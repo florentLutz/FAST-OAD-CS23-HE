@@ -648,7 +648,7 @@ TURBOSHAFT = {
     CT: "turboshaft",
     ATT: None,
     PT: ["time_step", "density", "settings:*", "altitude", "true_airspeed"],
-    SPT: [],
+    SPT: ["data:*", "true_airspeed", "density", "altitude"],
     IN: [(None, "fuel_consumed_t")],
     OUT: [("rpm", None), ("shaft_power_out", None)],
     CTC: ["source", "propulsive_load"],
