@@ -5,6 +5,8 @@
 import openmdao.api as om
 import fastoad.api as oad
 
+from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
+
 from ..constants import (
     HE_SUBMODEL_DEP_EFFECT,
     HE_SUBMODEL_EQUILIBRIUM,
@@ -32,6 +34,8 @@ class DEPEquilibrium(om.Group):
         self.nonlinear_solver.options["stall_limit"] = 5
         self.nonlinear_solver.options["stall_tol"] = 1e-6
         self.linear_solver = om.DirectSolver()
+
+        self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
 
@@ -205,3 +209,14 @@ class DEPEquilibrium(om.Group):
                     "fuel_mass_t_econ",
                 ],
             )
+
+        self.configurator.load(self.options["power_train_file_path"])
+
+        slip_ins, perf_outs = self.configurator.get_performances_to_slipstream_element_lists()
+
+        for perf_out, slip_in in zip(perf_outs, slip_ins):
+
+            perf_out_full_name = "compute_energy_consumed.power_train_performances." + perf_out
+            slip_in_full_name = "compute_dep_effect." + slip_in
+
+            self.connect(perf_out_full_name, slip_in_full_name)

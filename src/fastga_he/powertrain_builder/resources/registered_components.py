@@ -25,6 +25,9 @@ PT = "promoted_variables"
 # The SPT field contains the variables that must be promoted from aircraft level for the components
 # slipstream group to work
 SPT = "slipstream_promoted_variables"
+# The PTS field contains the variables that must be connected from the performances computation
+# of a component to the computation of the slipstream effect caused by that component.
+PTS = "performances_to_slipstream_connection"
 # The MP field will contain the variables that will be of interest for the analysis of the
 # mission performances and that will be registered in the power train performances CSV file
 MP = "mission_performances_watcher"
@@ -100,6 +103,7 @@ PROPELLER = {
     ATT: None,
     PT: ["convergence:*", "true_airspeed", "altitude", "density"],
     SPT: ["data:*", "true_airspeed", "cl_wing_clean", "density", "alpha"],
+    PTS: [],
     IN: [(None, "rpm"), (None, "shaft_power_in")],
     OUT: None,
     CTC: "propulsor",
@@ -145,6 +149,7 @@ PMSM = {
     ATT: None,
     PT: ["settings:*"],
     SPT: [],
+    PTS: [],
     IN: [
         (None, "ac_current_rms_in_one_phase"),
         (None, "ac_voltage_peak_in"),
@@ -187,6 +192,7 @@ INVERTER = {
     ATT: None,
     PT: ["settings:*"],
     SPT: [],
+    PTS: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [
         ("ac_current_rms_out_one_phase", None),
@@ -236,6 +242,7 @@ DC_BUS = {
     ATT: ["number_of_inputs", "number_of_outputs"],
     PT: [],
     SPT: [],
+    PTS: [],
     IN: [(None, "dc_voltage"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out_", None)],
     CTC: "connector",
@@ -269,6 +276,7 @@ DC_LINE = {
     ATT: None,
     PT: ["exterior_temperature", "settings:*", "time_step"],
     SPT: [],
+    PTS: [],
     IN: [("dc_voltage_in", None), (None, "dc_current")],
     OUT: [("dc_voltage_out", None), (None, "dc_current")],
     CTC: "connector",
@@ -302,6 +310,7 @@ DC_DC_CONVERTER = {
     ATT: None,
     PT: [],
     SPT: [],
+    PTS: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [("dc_voltage_out", None), (None, "dc_current_out")],
     CTC: "connector",
@@ -340,6 +349,7 @@ BATTERY_PACK = {
     ATT: None,
     PT: ["time_step"],
     SPT: [],
+    PTS: [],
     IN: None,
     OUT: [(None, "voltage_out"), ("dc_current_out", None)],
     CTC: "source",
@@ -382,6 +392,7 @@ DC_SSPC = {
     ATT: ["closed_by_default"],
     PT: [],
     SPT: [],
+    PTS: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],
     OUT: [(None, "dc_voltage_out"), ("dc_current_out", None)],
     CTC: "connector",
@@ -420,6 +431,7 @@ DC_SPLITTER = {
     ATT: ["splitter_mode"],
     PT: [],
     SPT: [],
+    PTS: [],
     IN: [(None, "dc_voltage_in_"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out", None)],
     CTC: "connector",
@@ -453,6 +465,7 @@ RECTIFIER = {
     ATT: None,
     PT: [],
     SPT: [],
+    PTS: [],
     IN: [
         (None, "ac_current_rms_in_one_phase"),
         ("ac_voltage_rms_in", None),
@@ -495,6 +508,7 @@ GENERATOR = {
     ATT: None,
     PT: [],
     SPT: [],
+    PTS: [],
     IN: [(None, "rpm"), (None, "shaft_power_in")],
     OUT: [
         ("ac_current_rms_out_one_phase", None),
@@ -540,6 +554,7 @@ ICE = {
     ATT: None,
     PT: ["time_step", "density", "settings:*"],
     SPT: [],
+    PTS: [],
     IN: [(None, "fuel_consumed_t")],
     OUT: [("rpm", None), ("shaft_power_out", None)],
     CTC: ["source", "propulsive_load"],
@@ -579,6 +594,7 @@ FUEL_TANK = {
     ATT: None,
     PT: [],
     SPT: [],
+    PTS: [],
     IN: None,
     OUT: [("fuel_consumed_t", None)],
     CTC: "tank",
@@ -614,6 +630,7 @@ FUEL_SYSTEM = {
     ATT: ["number_of_engines", "number_of_tanks"],
     PT: [],
     SPT: [],
+    PTS: [],
     IN: [(None, "fuel_consumed_in_t_")],
     OUT: [("fuel_consumed_out_t_", None)],
     CTC: "connector",
@@ -649,6 +666,7 @@ TURBOSHAFT = {
     ATT: None,
     PT: ["time_step", "density", "settings:*", "altitude", "true_airspeed"],
     SPT: ["data:*", "true_airspeed", "density", "altitude"],
+    PTS: ["shaft_power_out"],
     IN: [(None, "fuel_consumed_t")],
     OUT: [("rpm", None), ("shaft_power_out", None)],
     CTC: ["source", "propulsive_load"],
@@ -710,6 +728,7 @@ DICTIONARY_CT = {}
 DICTIONARY_ATT = {}
 DICTIONARY_PT = {}
 DICTIONARY_SPT = {}
+DICTIONARY_PTS = {}
 DICTIONARY_IN = {}
 DICTIONARY_OUT = {}
 DICTIONARY_CTC = {}
@@ -741,6 +760,7 @@ for known_component in KNOWN_COMPONENTS:
     DICTIONARY_ATT[known_component[ID]] = known_component[ATT]
     DICTIONARY_PT[known_component[ID]] = known_component[PT]
     DICTIONARY_SPT[known_component[ID]] = known_component[SPT]
+    DICTIONARY_PTS[known_component[ID]] = known_component[PTS]
     DICTIONARY_IN[known_component[ID]] = known_component[IN]
     DICTIONARY_OUT[known_component[ID]] = known_component[OUT]
     DICTIONARY_CTC[known_component[ID]] = known_component[CTC]

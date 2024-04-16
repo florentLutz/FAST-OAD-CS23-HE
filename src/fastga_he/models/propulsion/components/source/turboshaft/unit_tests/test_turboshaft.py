@@ -742,6 +742,8 @@ def test_performances_turboshaft():
         XML_FILE,
     )
     ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
+    # Unused but necessary for compatibility
+    ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2000.0), units="min**-1")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
     ivc.add_output("shaft_power_out", val=np.linspace(250, 575.174, NB_POINTS_TEST), units="kW")
     ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
@@ -808,7 +810,10 @@ def test_slipstream_mach():
     problem.check_partials(compact_print=True)
 
 
-def test_slipstream_required_power():
+def test_slipstream_required_power_bigger_power():
+
+    # This component is meant to work in conjunction with the variable being outputed from the
+    # mission so the shaft power will be longer than the other variables likes altitude and mach
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -817,7 +822,13 @@ def test_slipstream_required_power():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("shaft_power_out", val=np.linspace(250, 575.174, NB_POINTS_TEST), units="kW")
+    ivc.add_output(
+        "shaft_power_out",
+        val=np.concatenate(
+            (np.full(1, 50.0), np.linspace(250, 575.174, NB_POINTS_TEST), np.full(1, 50.0))
+        ),
+        units="kW",
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -967,7 +978,14 @@ def test_slipstream():
     )
     ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
-    ivc.add_output("shaft_power_out", val=np.linspace(250, 575.174, NB_POINTS_TEST), units="kW")
+    # Fake variable at beginning and end required because ... ... that's why
+    ivc.add_output(
+        "shaft_power_out",
+        val=np.concatenate(
+            (np.full(1, 50.0), np.linspace(250, 575.174, NB_POINTS_TEST), np.full(1, 50.0))
+        ),
+        units="kW",
+    )
     ivc.add_output(
         "density",
         val=np.linspace(1.225, 0.413, NB_POINTS_TEST),

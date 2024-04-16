@@ -106,6 +106,10 @@ class FASTGAHEPowerTrainConfigurator:
         # modules for the code to work
         self._components_slipstream_promotes = None
 
+        # Contains the list of variables that needs to be promoted from the performances
+        # computations to slipstream computation
+        self._components_performances_to_slipstream = None
+
         # Contains a list with, for each component, a boolean telling whether or not the component
         # needs the flaps position for the computation of the slipstream effects
         self._components_slipstream_flaps = None
@@ -236,6 +240,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_options_list = []
         components_promote_list = []
         components_slip_promote_list = []
+        components_perf_to_slip_list = []
         components_type_class_list = []
         components_perf_watchers_list = []
         components_slipstream_perf_watchers_list = []
@@ -313,6 +318,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_om_type_list.append(resources.DICTIONARY_CN[component_id])
             components_promote_list.append(resources.DICTIONARY_PT[component_id])
             components_slip_promote_list.append(resources.DICTIONARY_SPT[component_id])
+            components_perf_to_slip_list.append(resources.DICTIONARY_PTS[component_id])
             components_type_class_list.append(resources.DICTIONARY_CTC[component_id])
             components_perf_watchers_list.append(resources.DICTIONARY_MP[component_id])
             components_slipstream_perf_watchers_list.append(resources.DICTIONARY_SMP[component_id])
@@ -358,6 +364,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_options = components_options_list
         self._components_promotes = components_promote_list
         self._components_slipstream_promotes = components_slip_promote_list
+        self._components_performances_to_slipstream = components_perf_to_slip_list
         self._components_type_class = components_type_class_list
         self._components_perf_watchers = components_perf_watchers_list
         self._components_slipstream_perf_watchers = components_slipstream_perf_watchers_list
@@ -703,6 +710,37 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_slipstream_flaps,
             self._components_slipstream_wing_lift,
         )
+
+    def get_performances_to_slipstream_element_lists(self) -> tuple:
+        """
+        Returns the list of variable to promote from the performances component to the slipstream
+        component.
+        """
+
+        self._get_components()
+        self._get_connections()
+
+        variables_to_check = []
+
+        # Get a list of the variables to connect from performances to slipstream.
+        for candidate_component, candidate_connections in zip(
+            self._components_name, self._components_performances_to_slipstream
+        ):
+            for candidate_connection in candidate_connections:
+                variables_to_check.append(candidate_component + "." + candidate_connection)
+
+        inputs_in_slipstream = []
+        outputs_in_performances = []
+
+        for variable_to_check in variables_to_check:
+            inputs_in_slipstream.append(variable_to_check)
+            outputs_in_performances.append(
+                self._components_connection_outputs[
+                    self._components_connection_inputs.index(variable_to_check)
+                ]
+            )
+
+        return inputs_in_slipstream, outputs_in_performances
 
     @staticmethod
     def enforce_sspc_last(

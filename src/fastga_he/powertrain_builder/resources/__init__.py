@@ -15,6 +15,7 @@ from .registered_components import (
     DICTIONARY_ATT,
     DICTIONARY_PT,
     DICTIONARY_SPT,
+    DICTIONARY_PTS,
     DICTIONARY_IN,
     DICTIONARY_OUT,
     DICTIONARY_CTC,

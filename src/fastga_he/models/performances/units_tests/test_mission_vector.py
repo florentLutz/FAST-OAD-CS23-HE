@@ -2131,9 +2131,9 @@ def test_mission_vector_turboshaft():
 
     problem.setup()
 
-    om.n2(problem, show_browser=True)
+    # om.n2(problem, show_browser=True)
 
-    # problem.run_model()
+    problem.run_model()
     problem.write_outputs()
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
@@ -2143,6 +2143,6 @@ def test_mission_vector_turboshaft():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(33.42, abs=1e-2)
+    assert sizing_fuel == pytest.approx(87.76, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)

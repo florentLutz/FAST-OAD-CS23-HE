@@ -31,7 +31,7 @@ class SlipstreamRequiredPower(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
-        self.add_input("shaft_power_out", units="kW", val=np.nan, shape=number_of_points)
+        self.add_input("shaft_power_out", units="kW", val=np.nan, shape=number_of_points + 2)
         self.add_input(
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake",
             val=0.0,
@@ -45,10 +45,17 @@ class SlipstreamRequiredPower(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
+        number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
+        # Because this variable will need to be connected to the performances computation,
+        # it might be bigger than the number of point, in which case, we need to cut it down to
+        # size by removing the first and last points which represents the taxi phases
+        untreated_shaft_power = inputs["shaft_power_out"]
+        shaft_power = untreated_shaft_power[1:-1]
+
         outputs["power_required"] = (
-            inputs["shaft_power_out"]
+            shaft_power
             + inputs[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake"
             ]
@@ -59,7 +66,10 @@ class SlipstreamRequiredPower(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
-        partials["power_required", "shaft_power_out"] = np.eye(number_of_points)
+        partial = np.zeros((number_of_points, number_of_points + 2))
+        partial[:, 1 : number_of_points + 1] = np.eye(number_of_points)
+        partials["power_required", "shaft_power_out"] = partial
+
         partials[
             "power_required",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake",
