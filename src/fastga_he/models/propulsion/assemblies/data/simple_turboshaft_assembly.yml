@@ -1,0 +1,13 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+  turboshaft_1:
+    id: fastga_he.pt_component.turboshaft
+
+component_connections:
+  - source: propeller_1
+    target: turboshaft_1
+
+watcher_file_path: ./simple_turboshaft_assembly_performances.csv
