@@ -28,8 +28,8 @@ class SlipstreamExhaustThrust(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        exhaust_mass_flow = inputs["exhaust_mass_flow"]
-        exhaust_velocity = inputs["exhaust_velocity"]
+        exhaust_mass_flow = self.smooth_array(inputs["exhaust_mass_flow"])
+        exhaust_velocity = self.smooth_array(inputs["exhaust_velocity"])
         true_airspeed = inputs["true_airspeed"]
 
         # In practice, we should rarely be in conditions where the flow at the exhaust is slower
@@ -44,8 +44,8 @@ class SlipstreamExhaustThrust(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        exhaust_mass_flow = inputs["exhaust_mass_flow"]
-        exhaust_velocity = inputs["exhaust_velocity"]
+        exhaust_mass_flow = self.smooth_array(inputs["exhaust_mass_flow"])
+        exhaust_velocity = self.smooth_array(inputs["exhaust_velocity"])
         true_airspeed = inputs["true_airspeed"]
 
         partials_m_dot_8 = exhaust_velocity - true_airspeed
@@ -63,3 +63,23 @@ class SlipstreamExhaustThrust(om.ExplicitComponent):
         partials["exhaust_thrust", "true_airspeed"] = np.diag(
             np.where(exhaust_velocity > true_airspeed, partials_v0, np.zeros_like(exhaust_velocity))
         )
+
+    @staticmethod
+    def smooth_array(array):
+        """
+        In some integration tests, some values of arrays have been seen going to absurd values, this
+        is a protection against it.
+        """
+
+        median_value = np.median(array)
+        # Median value should be during cruise. If max value is too far from median value we cut it
+        array_without_absurd_values = np.where(
+            array > 5 * median_value, np.zeros_like(array), array
+        )
+        smoothed_array = np.where(
+            array > 5 * median_value,
+            np.full_like(array, np.max(array_without_absurd_values)),
+            array,
+        )
+
+        return smoothed_array

@@ -48,7 +48,7 @@ class PerformancesRequiredPower(om.ExplicitComponent):
         turboshaft_id = self.options["turboshaft_id"]
 
         outputs["power_required"] = (
-            inputs["shaft_power_out"]
+            self.smooth_power(inputs["shaft_power_out"])
             + inputs[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake"
             ]
@@ -64,3 +64,23 @@ class PerformancesRequiredPower(om.ExplicitComponent):
             "power_required",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake",
         ] = np.ones(number_of_points)
+
+    @staticmethod
+    def smooth_power(power):
+        """
+        In some integration tests, some values of power have been seen going to absurd values, this
+        is a protection against it.
+        """
+
+        median_power = np.median(power)
+        # Median power should be during cruise. If max power is too far from median power we cut it
+        power_without_absurd_values = np.where(
+            power > 5 * median_power, np.zeros_like(power), power
+        )
+        smoothed_power = np.where(
+            power > 5 * median_power,
+            np.full_like(power, np.max(power_without_absurd_values)),
+            power,
+        )
+
+        return smoothed_power

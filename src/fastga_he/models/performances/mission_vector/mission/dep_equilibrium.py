@@ -110,12 +110,6 @@ class DEPEquilibrium(om.Group):
                 "power_train_file_path": self.options["power_train_file_path"],
             }
             self.add_subsystem(
-                "compute_dep_effect",
-                oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
-                promotes_inputs=["*"],
-                promotes_outputs=["*"],
-            )
-            self.add_subsystem(
                 "preparation_for_energy_consumption",
                 PrepareForEnergyConsumption(number_of_points=number_of_points),
                 promotes_inputs=["*"],
@@ -132,6 +126,12 @@ class DEPEquilibrium(om.Group):
                 oad.RegisterSubmodel.get_submodel(
                     HE_SUBMODEL_ENERGY_CONSUMPTION, options=options_propulsion
                 ),
+                promotes_inputs=["*"],
+                promotes_outputs=["*"],
+            )
+            self.add_subsystem(
+                "compute_dep_effect",
+                oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
                 promotes_inputs=["*"],
                 promotes_outputs=["*"],
             )
@@ -162,19 +162,6 @@ class DEPEquilibrium(om.Group):
                 "flaps_position": self.options["flaps_position"],
                 "power_train_file_path": self.options["power_train_file_path"],
             }
-            self.add_subsystem(
-                "compute_dep_effect",
-                oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
-                promotes_inputs=[
-                    "data:*",
-                    "alpha",
-                    "thrust",
-                    "density",
-                    "true_airspeed",
-                    "altitude",
-                ],
-                promotes_outputs=["delta_Cl", "delta_Cd", "delta_Cm"],
-            )
             self.add_subsystem(
                 "preparation_for_energy_consumption",
                 PrepareForEnergyConsumption(number_of_points=number_of_points),
@@ -208,6 +195,19 @@ class DEPEquilibrium(om.Group):
                     "fuel_lever_arm_t_econ",
                     "fuel_mass_t_econ",
                 ],
+            )
+            self.add_subsystem(
+                "compute_dep_effect",
+                oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
+                promotes_inputs=[
+                    "data:*",
+                    "alpha",
+                    "thrust",
+                    "density",
+                    "true_airspeed",
+                    "altitude",
+                ],
+                promotes_outputs=["delta_Cl", "delta_Cd", "delta_Cm"],
             )
 
         self.configurator.load(self.options["power_train_file_path"])

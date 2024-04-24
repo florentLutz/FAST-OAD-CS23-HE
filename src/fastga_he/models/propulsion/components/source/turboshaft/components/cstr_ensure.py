@@ -12,7 +12,7 @@ import fastoad.api as oad
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_TURBOSHAFT_RATED_POWER,
-    "fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce",
+    "fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.ensure",
 )
 class ConstraintsRatedPowerEnsure(om.ExplicitComponent):
     """
