@@ -167,7 +167,7 @@
         </fuel_tank>
         <propeller>
           <propeller_1>
-            <activity_factor is_input="True">156.37<!--Activity factor of the propeller--></activity_factor>
+            <activity_factor is_input="True">140.0<!--Activity factor of the propeller--></activity_factor>
             <blade_twist units="deg" is_input="True">25.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.3<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">2.31<!--propeller diameter--></diameter>
@@ -175,7 +175,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">5.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
-            <solidity is_input="True">0.25<!--Solidity of the propeller--></solidity>
+            <solidity is_input="True">0.24<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>
         <turboshaft>
@@ -455,6 +455,11 @@
             <k_sfc is_input="True">1.0<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
           </turboshaft_1>
         </turboshaft>
+        <propeller>
+          <propeller_1>
+            <installation_effect>0.987</installation_effect>
+          </propeller_1>
+        </propeller>
       </he_power_train>
     </propulsion>
     <weight>
