@@ -46,6 +46,11 @@ _LOGGER = logging.getLogger(__name__)  # Logger for this module
 
 
 class ToCSV(om.ExplicitComponent):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.previous_iter_count_apply = 0
+
     def initialize(self):
 
         self.options.declare(
@@ -237,17 +242,7 @@ class ToCSV(om.ExplicitComponent):
             )
         )
 
-        if self.options["out_file"] == "":
-
-            outputs["tsfc"] = tsfc
-
-        else:
-
-            if os.path.exists(self.options["out_file"]):
-                os.remove(self.options["out_file"])
-
-            if not os.path.exists(os.path.dirname(self.options["out_file"])):
-                os.mkdir(os.path.dirname(self.options["out_file"]))
+        if self.options["out_file"] != "":
 
             results_df = pd.DataFrame(columns=CSV_DATA_LABELS)
             results_df["time"] = time
@@ -280,11 +275,24 @@ class ToCSV(om.ExplicitComponent):
             results_df["fuel_flow (kg/s)"] = fuel_flow
             results_df["time step (s)"] = time_step
 
-            results_df.to_csv(self.options["out_file"])
+            # If we are not currently using apply non linear, we save results. This allows us to
+            # only save the results when the component is actually used
 
-            _LOGGER.info("Saved mission results in %s", self.options["out_file"])
+            if self.iter_count_apply == self.previous_iter_count_apply:
+                if os.path.exists(self.options["out_file"]):
+                    os.remove(self.options["out_file"])
 
-            outputs["tsfc"] = tsfc
+                if not os.path.exists(os.path.dirname(self.options["out_file"])):
+                    os.mkdir(os.path.dirname(self.options["out_file"]))
+
+                results_df.to_csv(self.options["out_file"])
+
+                _LOGGER.info("Saved mission results in %s", self.options["out_file"])
+
+            else:
+                self.previous_iter_count_apply = self.iter_count_apply
+
+        outputs["tsfc"] = tsfc
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
