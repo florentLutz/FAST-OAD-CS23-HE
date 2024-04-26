@@ -62,6 +62,7 @@ model:
 
 submodels:
     submodel.weight.mass.payload: null
+    submodel.weight.mass.airframe.fuselage: fastga.submodel.weight.mass.airframe.fuselage.roskam
     submodel.weight.mass.airframe.paint: fastga.submodel.weight.mass.airframe.paint.by_wet_area
     submodel.weight.mass.airframe.flight_controls: fastga.submodel.weight.mass.airframe.flight_controls.flops
     submodel.weight.mass.system.life_support_system: fastga.submodel.weight.mass.system.life_support_system.flops
