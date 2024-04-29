@@ -1,0 +1,69 @@
+<FASTOAD_model>
+    <data>
+        <aerodynamics>
+            <cruise>
+                  <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
+                  <unit_reynolds units="1/m" is_input="False">2948053.940803294<!--unitary reynolds number representative of high speed aerodynamics--></unit_reynolds>
+            </cruise>
+            <low_speed>
+                <mach is_input="False">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
+                <unit_reynolds units="1/m" is_input="False">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
+            </low_speed>
+        </aerodynamics>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <span units="m" is_input="False">10.0<!--wing area--></span>
+                <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
+                <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <turboshaft>
+                    <turboshaft_1>
+                        <power_max units="kW">625.0</power_max>
+                        <from_LE units="m">0.5</from_LE>
+                        <power_rating units="kW">634.0</power_rating>
+                        <uninstalled_mass units="kg">192.9758</uninstalled_mass>
+                        <power_offtake units="kW">50.0</power_offtake>
+                        <engine>
+                            <height units="m">0.512</height>
+                            <width units="m">0.512</width>
+                            <length units="m">1.702</length>
+                        </engine>
+                        <nacelle>
+                            <height units="m">0.5632</height>
+                            <width units="m">0.5632</width>
+                            <length units="m">3.404</length>
+                            <wet_area units="m**2">7.66</wet_area>
+                        </nacelle>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <design_point>
+                            <T41t units="degK">1400.0</T41t>
+                            <OPR>12.0</OPR>
+                            <power_ratio>2.12</power_ratio>
+                        </design_point>
+                        <limit>
+                            <OPR>12.5</OPR>
+                            <ITT units="degK">1125.0</ITT>
+                        </limit>
+                    </turboshaft_1>
+                </turboshaft>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>

@@ -103,7 +103,30 @@ def test_fuel_system_weight():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_system:fuel_system_1:mass", units="kg"
-    ) == pytest.approx(24.22, rel=1e-2)
+    ) == pytest.approx(10.98, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_fuel_system_weight_jet_fuel():
+
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:propulsion:he_power_train:fuel_system:fuel_system_1:fuel_type", val=3.0)
+    ivc.add_output(
+        "data:propulsion:he_power_train:fuel_system:fuel_system_1:number_engine", val=1.0
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:fuel_system:fuel_system_1:connected_volume",
+        val=62.59,
+        units="L",
+    )
+
+    problem = run_system(SizingFuelSystemWeight(fuel_system_id="fuel_system_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_system:fuel_system_1:mass", units="kg"
+    ) == pytest.approx(3.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -228,7 +251,7 @@ def test_sizing_tank():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_system:fuel_system_1:mass", units="kg"
-    ) == pytest.approx(24.22, rel=1e-2)
+    ) == pytest.approx(10.98, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_system:fuel_system_1:cruise:CD0"
     ) == pytest.approx(0.0, rel=1e-2)

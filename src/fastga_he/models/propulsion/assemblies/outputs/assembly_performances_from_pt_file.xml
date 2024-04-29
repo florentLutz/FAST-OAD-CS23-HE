@@ -232,6 +232,12 @@
             <reference_temperature units="degK" is_input="True">293.15</reference_temperature>
           </inverter_1>
         </inverter>
+        <propeller>
+          <propeller_1>
+            <effective_advance_ratio is_input="True">1.0<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
+            <installation_effect is_input="True">0.95<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
+          </propeller_1>
+        </propeller>
         <DC_cable_harness>
           <harness_1>
             <cable>

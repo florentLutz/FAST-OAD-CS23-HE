@@ -42,7 +42,7 @@ class SizingICEWeight(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:ICE:" + ice_id + ":mass",
             wrt="data:propulsion:he_power_train:ICE:" + ice_id + ":uninstalled_mass",
-            val=1.2 * 1.2,
+            val=1.2,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

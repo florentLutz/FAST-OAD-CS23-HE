@@ -322,6 +322,22 @@ class MissionVector(om.Group):
 
             self.configurator.load(pt_file_path)
 
+            # If necessary connect the variables from the performances computation to the
+            # slipstream. We could do it deeper in the hierarchy but since we already do similar
+            # stuff here
+            slip_ins, perf_outs = self.configurator.get_performances_to_slipstream_element_lists()
+
+            for perf_out, slip_in in zip(perf_outs, slip_ins):
+                perf_out_full_name = (
+                    "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances."
+                    + perf_out
+                )
+                slip_in_full_name = (
+                    "solve_equilibrium.compute_dep_equilibrium.compute_dep_effect." + slip_in
+                )
+
+                self.connect(perf_out_full_name, slip_in_full_name)
+
             if self.configurator.get_watcher_file_path():
 
                 number_of_points = (

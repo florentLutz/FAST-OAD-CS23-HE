@@ -82,6 +82,7 @@ class NoDEPEffect(om.ExplicitComponent):
 
         self.add_input("density", val=np.full(number_of_points, np.nan), units="kg/m**3")
         self.add_input("true_airspeed", val=np.full(number_of_points, np.nan), units="m/s")
+        self.add_input("altitude", val=np.full(number_of_points, np.nan), units="ft")
 
         self.add_input("alpha", val=np.full(number_of_points, np.nan), units="deg")
         self.add_input("thrust", val=np.full(number_of_points, np.nan), units="N")

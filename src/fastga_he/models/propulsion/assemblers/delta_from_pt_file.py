@@ -25,6 +25,7 @@ from fastga_he.models.propulsion.components import (
     SlipstreamICE,
     SlipstreamFuelTank,
     SlipstreamFuelSystem,
+    SlipstreamTurboshaft,
 )
 
 from .constants import (
@@ -208,13 +209,26 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
+        # Need some mock-up interface because the slipstream of some components requires data
+        # that other don't. That makes it so that when we need them we need to promote them,
+        # when we don't and still promote them it crashes. Hence why the interface
+        self.add_input("altitude", val=np.full(number_of_points, np.nan), units="ft")
+
         self.add_input(name="alpha", val=np.full(number_of_points, np.nan), units="rad")
         self.add_input(name="data:aerodynamics:wing:cruise:CL_alpha", val=np.nan, units="rad**-1")
         self.add_input(name="data:aerodynamics:wing:cruise:CL0_clean", val=np.nan)
 
         self.add_output(name="cl_wing_clean", val=0.5, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt=[
+                "alpha",
+                "data:aerodynamics:wing:cruise:CL_alpha",
+                "data:aerodynamics:wing:cruise:CL0_clean",
+            ],
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

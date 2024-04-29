@@ -46,7 +46,7 @@ class SlipstreamPropellerThrustLoading(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
 
         prop_dia = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
-        thrust = inputs["thrust"]
+        thrust = np.maximum(inputs["thrust"], np.ones_like(inputs["thrust"]))
         tas = inputs["true_airspeed"]
         rho = inputs["density"]
 
@@ -59,7 +59,7 @@ class SlipstreamPropellerThrustLoading(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
 
         prop_dia = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
-        thrust = inputs["thrust"]
+        thrust = np.maximum(inputs["thrust"], np.ones_like(inputs["thrust"]))
         tas = inputs["true_airspeed"]
         rho = inputs["density"]
 

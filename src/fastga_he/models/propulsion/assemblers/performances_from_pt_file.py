@@ -2,7 +2,6 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
 
@@ -29,6 +28,7 @@ from fastga_he.models.propulsion.components import (
     PerformancesICE,
     PerformancesFuelTank,
     PerformancesFuelSystem,
+    PerformancesTurboshaft,
 )
 
 from .constants import SUBMODEL_POWER_TRAIN_PERF, SUBMODEL_THRUST_DISTRIBUTOR

@@ -60,11 +60,9 @@ def test_sizing_sr22(cleanup):
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        1629.0, rel=1e-2
+        1601.0, rel=1e-2
     )
-    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        1019.0, rel=1e-2
-    )
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(992.0, rel=1e-2)
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        235.00, rel=1e-2
+        234.00, rel=1e-2
     )

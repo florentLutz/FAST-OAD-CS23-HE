@@ -27,6 +27,7 @@ from fastga_he.models.propulsion.components import (
     SizingICE,
     SizingFuelTank,
     SizingFuelSystem,
+    SizingTurboshaft,
 )
 
 from tests.testing_utilities import VariableListLocal

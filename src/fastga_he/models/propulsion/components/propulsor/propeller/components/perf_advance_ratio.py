@@ -31,6 +31,13 @@ class PerformancesAdvanceRatio(om.ExplicitComponent):
         )
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input("true_airspeed", units="m/s", val=50.0, shape=number_of_points)
+        self.add_input(
+            name="settings:propulsion:he_power_train:propeller:"
+            + propeller_id
+            + ":effective_advance_ratio",
+            val=1.0,
+            desc="Decrease in power coefficient due to installation effects of the propeller",
+        )
 
         self.add_output("advance_ratio", val=0.7, shape=number_of_points)
 
@@ -41,22 +48,42 @@ class PerformancesAdvanceRatio(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
 
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
+        effective_j = inputs[
+            "settings:propulsion:he_power_train:propeller:"
+            + propeller_id
+            + ":effective_advance_ratio"
+        ]
 
-        outputs["advance_ratio"] = inputs["true_airspeed"] / (inputs["rpm"] / 60.0 * diameter)
+        outputs["advance_ratio"] = (
+            inputs["true_airspeed"] / (inputs["rpm"] / 60.0 * diameter) * effective_j
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         propeller_id = self.options["propeller_id"]
 
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
+        effective_j = inputs[
+            "settings:propulsion:he_power_train:propeller:"
+            + propeller_id
+            + ":effective_advance_ratio"
+        ]
 
         partials["advance_ratio", "true_airspeed"] = np.diag(
-            1.0 / (inputs["rpm"] / 60.0 * diameter)
+            1.0 / (inputs["rpm"] / 60.0 * diameter) * effective_j
         )
         partials["advance_ratio", "rpm"] = -np.diag(
-            inputs["true_airspeed"] / (inputs["rpm"] ** 2.0 / 60.0 * diameter)
+            inputs["true_airspeed"] / (inputs["rpm"] ** 2.0 / 60.0 * diameter) * effective_j
         )
         partials[
             "advance_ratio",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-        ] = -inputs["true_airspeed"] / (inputs["rpm"] / 60.0 * diameter ** 2.0)
+        ] = (
+            -inputs["true_airspeed"] / (inputs["rpm"] / 60.0 * diameter ** 2.0) * effective_j
+        )
+        partials[
+            "advance_ratio",
+            "settings:propulsion:he_power_train:propeller:"
+            + propeller_id
+            + ":effective_advance_ratio",
+        ] = inputs["true_airspeed"] / (inputs["rpm"] / 60.0 * diameter)

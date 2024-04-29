@@ -2110,3 +2110,39 @@ def test_mission_criss_cross():
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
     assert mission_end_soc == pytest.approx(-0.0153, abs=1e-2)
+
+
+def test_mission_vector_turboshaft():
+
+    # Define used files depending on options
+    xml_file_name = "sample_turboshaft_propulsion.xml"
+    process_file_name = "turboshaft_propulsion_mission_vector.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    # Create problems with inputs
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.setup()
+
+    # om.n2(problem, show_browser=True)
+
+    problem.run_model()
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    if not pth.exists(RESULTS_FOLDER_PATH):
+        os.mkdir(RESULTS_FOLDER_PATH)
+
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(87.76, abs=1e-2)
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(0.0, abs=1e-2)
