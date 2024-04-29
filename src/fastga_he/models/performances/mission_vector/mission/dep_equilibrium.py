@@ -209,14 +209,3 @@ class DEPEquilibrium(om.Group):
                 ],
                 promotes_outputs=["delta_Cl", "delta_Cd", "delta_Cm"],
             )
-
-        self.configurator.load(self.options["power_train_file_path"])
-
-        slip_ins, perf_outs = self.configurator.get_performances_to_slipstream_element_lists()
-
-        for perf_out, slip_in in zip(perf_outs, slip_ins):
-
-            perf_out_full_name = "compute_energy_consumed.power_train_performances." + perf_out
-            slip_in_full_name = "compute_dep_effect." + slip_in
-
-            self.connect(perf_out_full_name, slip_in_full_name)

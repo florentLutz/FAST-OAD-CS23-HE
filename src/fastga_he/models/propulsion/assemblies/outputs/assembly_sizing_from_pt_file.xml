@@ -48,9 +48,9 @@
     </geometry>
     <propulsion>
       <he_power_train>
-        <mass units="kg" is_input="False">2260.9459554553396</mass>
+        <mass units="kg" is_input="False">2254.2476489145165</mass>
         <CG>
-          <x units="m" is_input="False">2.8290514856633595</x>
+          <x units="m" is_input="False">2.829456177540917</x>
         </CG>
         <cruise>
           <CD0 is_input="False">0.0056121861665163735</CD0>
@@ -556,7 +556,7 @@
           <fuel_system_1>
             <connected_volume units="m**3" is_input="False">0.057365419390735854<!--Capacity of the connected tank in terms of volume--></connected_volume>
             <fuel_type is_input="True">1.0<!--Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
-            <mass units="kg" is_input="False">12.258808576342691<!--Weight of the fuel system--></mass>
+            <mass units="lbm" is_input="False">12.258808576342691<!--Weight of the fuel system--></mass>
             <number_engine is_input="True">1.0<!--Number of engine connected to this fuel system--></number_engine>
             <total_fuel_flowed units="kg" is_input="True">41.24<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
             <CG>

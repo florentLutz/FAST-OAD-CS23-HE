@@ -579,6 +579,7 @@ def test_slipstream_from_pt_file():
     )
 
     altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
     ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
     ivc.add_output("alpha", val=np.linspace(5.0, 10.0, NB_POINTS_TEST), units="deg")
