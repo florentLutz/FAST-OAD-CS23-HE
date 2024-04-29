@@ -57,11 +57,11 @@ def test_sizing_tbm900():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        3389.0, rel=1e-2
+        3337.0, rel=1e-2
     )
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        2105.0, rel=1e-2
+        2058.0, rel=1e-2
     )
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        804.00, rel=1e-2
+        800.00, rel=1e-2
     )

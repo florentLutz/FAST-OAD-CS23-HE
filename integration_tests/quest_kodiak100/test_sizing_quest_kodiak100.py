@@ -57,14 +57,14 @@ def test_sizing_kodiak_100():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        3389.0, rel=1e-2
+        3280.0, rel=1e-2
     )
     # Actual value is 3290 kg
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        2105.0, rel=1e-2
+        1727.0, rel=1e-2
     )
     # Actual value is 1712 kg
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        804.00, rel=1e-2
+        933.00, rel=1e-2
     )
-    # Actual value is 2110 lbs or 1000 kg
+    # Actual value is 2110 lbs or 960 kg

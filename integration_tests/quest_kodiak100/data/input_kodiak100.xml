@@ -237,13 +237,13 @@
     </aerodynamics>
     <handling_qualities>
       <static_margin>
-        <target is_input="True">0.23<!--aircraft static margin--></target>
+        <target is_input="True">0.20<!--aircraft static margin--></target>
       </static_margin>
     </handling_qualities>
     <weight>
       <aircraft>
         <max_payload units="kg" is_input="True">1140.0<!--max payload weight--></max_payload>
-        <payload units="kg" is_input="True">580.0<!--design payload weight--></payload>
+        <payload units="kg" is_input="True">620.0<!--design payload weight--></payload>
         <CG>
           <aft>
             <MAC_limit is_input="True">0.16<!--position of the aft limit of the Weight and balance envelop as a percent of MAC--></MAC_limit>
@@ -328,7 +328,7 @@
         </initial_climb>
         <landing>
           <elevator_angle units="deg" is_input="True">-30.0<!--elevator maximum angle during landing phase in sizing mission--></elevator_angle>
-          <target_sideslip units="deg" is_input="True">15.0</target_sideslip>
+          <target_sideslip units="deg" is_input="True">18.0</target_sideslip>
         </landing>
         <takeoff>
           <elevator_angle units="deg" is_input="True">-30.0<!--elevator maximum angle during takeoff phase in sizing mission--></elevator_angle>
@@ -383,7 +383,7 @@
     </geometry>
     <handling_qualities>
       <rudder>
-        <safety_margin is_input="True">0.2<!--Ratio of the total rudder deflection not used in the computation of the VT area to leave a safety margin--></safety_margin>
+        <safety_margin is_input="True">0.30<!--Ratio of the total rudder deflection not used in the computation of the VT area to leave a safety margin--></safety_margin>
       </rudder>
     </handling_qualities>
     <propulsion>
@@ -421,7 +421,7 @@
         <turboshaft>
           <turboshaft_1>
             <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
-            <k_sfc is_input="True">1.0<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
+            <k_sfc is_input="True">1.05<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
           </turboshaft_1>
         </turboshaft>
       </he_power_train>
@@ -485,7 +485,7 @@
         <main_route>
           <reserve>
             <speed>
-              <k_factor is_input="True">1.38<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+              <k_factor is_input="True">1.5<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
             </speed>
           </reserve>
         </main_route>

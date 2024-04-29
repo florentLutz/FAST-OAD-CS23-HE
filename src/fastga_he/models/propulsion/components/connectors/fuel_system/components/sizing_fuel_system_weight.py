@@ -43,10 +43,15 @@ class SizingFuelSystemWeight(om.ExplicitComponent):
             val=np.nan,
             desc="Number of engine connected to this fuel system",
         )
+        self.add_input(
+            "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":fuel_type",
+            val=1.0,
+            desc="Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1",
+        )
 
         self.add_output(
             "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":mass",
-            units="kg",
+            units="lbm",
             val=20.0,
             desc="Weight of the fuel system",
         )
@@ -71,9 +76,16 @@ class SizingFuelSystemWeight(om.ExplicitComponent):
                 "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":number_engine"
             ]
         )
+        fuel_type = inputs[
+            "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":fuel_type"
+        ]
 
-        self.exponent = 0.667 if number_of_engine == 1.0 else 0.6
-        self.factor = 2.0 if number_of_engine == 1.0 else 4.5
+        if fuel_type == 3.0:
+            self.exponent = 1.0
+            self.factor = 0.40
+        else:
+            self.exponent = 0.667 if number_of_engine == 1.0 else 0.6
+            self.factor = 2.0 if number_of_engine == 1.0 else 4.5
 
         outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":mass"] = (
             self.factor * volume ** self.exponent
