@@ -229,6 +229,11 @@
           <thrust_limit units="N" is_input="True">[13454.237385926104, 15445.882318378934, 17409.231650734866, 19144.60063477435, 20908.399410396873, 22846.805178623505, 24942.022016881194, 27197.519899543593, 29609.080280991373, 32216.24794924741]<!--maximum thrust output of the propeller at sea level for varying velocities--></thrust_limit>
         </sea_level>
       </propeller>
+      <wing>
+        <low_speed>
+          <CL_max_clean>1.3528061405111684</CL_max_clean>
+        </low_speed>
+      </wing>
     </aerodynamics>
     <handling_qualities>
       <static_margin>
@@ -273,16 +278,44 @@
           <mass units="lbm" is_input="True">96.12197732934376<!--total unusable fuel mass--></mass>
         </unusable_fuel>
       </propulsion>
+      <furniture>
+        <passenger_seats>
+          <mass units="kg" is_input="False">160.0<!--Mass of aircraft furniture_inp_data:weight:furniture:passenger_seats:mass--></mass>
+        </passenger_seats>
+      </furniture>
       <systems>
         <recording>
-          <mass units="kg" is_input="True">40.0<!--Mass of aircraft systems_inp_data:weight:systems:recording:mass--></mass>
+          <mass units="kg" is_input="True">3.5<!--Mass of aircraft systems_inp_data:weight:systems:recording:mass--></mass>
         </recording>
+        <life_support>
+          <air_conditioning>
+            <mass units="kg" is_input="True">30.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:air_conditioning:mass--></mass>
+          </air_conditioning>
+          <de_icing>
+            <mass units="kg" is_input="True">0.72<!--Mass of aircraft systems_inp_data:weight:systems:life_support:de_icing:mass--></mass>
+          </de_icing>
+          <fixed_oxygen>
+            <mass units="kg" is_input="True">19.7<!--Mass of aircraft systems_inp_data:weight:systems:life_support:fixed_oxygen:mass--></mass>
+          </fixed_oxygen>
+          <insulation>
+            <mass units="kg" is_input="True">4.17<!--Mass of aircraft systems_inp_data:weight:systems:life_support:insulation:mass--></mass>
+          </insulation>
+          <internal_lighting>
+            <mass units="kg" is_input="True">1.7<!--Mass of aircraft systems_inp_data:weight:systems:life_support:internal_lighting:mass--></mass>
+          </internal_lighting>
+          <seat_installation>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:seat_installation:mass--></mass>
+          </seat_installation>
+          <security_kits>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:life_support:security_kits:mass--></mass>
+          </security_kits>
+        </life_support>
         <power>
           <electric_systems>
-            <mass units="kg" is_input="True">100.0<!--Mass of aircraft systems_inp_data:weight:systems:power:electric_systems:mass--></mass>
+            <mass units="kg" is_input="True">66.0<!--Mass of aircraft systems_inp_data:weight:systems:power:electric_systems:mass--></mass>
           </electric_systems>
           <hydraulic_systems>
-            <mass units="kg" is_input="True">25.0<!--Mass of aircraft systems_inp_data:weight:systems:power:hydraulic_systems:mass--></mass>
+            <mass units="kg" is_input="True">0.0<!--Mass of aircraft systems_inp_data:weight:systems:power:hydraulic_systems:mass--></mass>
           </hydraulic_systems>
         </power>
       </systems>
@@ -300,7 +333,7 @@
         <takeoff>
           <elevator_angle units="deg" is_input="True">-30.0<!--elevator maximum angle during takeoff phase in sizing mission--></elevator_angle>
           <energy units="W*h" is_input="True">0.0</energy>
-          <fuel units="kg" is_input="True">1.6</fuel>
+          <fuel units="kg" is_input="True">15.0</fuel>
           <thrust_rate is_input="True">1.0<!--thrust rate during takeoff phase--></thrust_rate>
         </takeoff>
         <taxi_in>
@@ -395,7 +428,7 @@
     </propulsion>
     <weight>
       <aircraft>
-        <MLW_MZFW_ratio is_input="True">1.16</MLW_MZFW_ratio>
+        <MLW_MZFW_ratio is_input="True">1.063</MLW_MZFW_ratio>
         <CG>
           <range is_input="True">0.26<!--distance between front position and aft position of CG, as ratio of mean aerodynamic chord (allows to have front position of CG, as currently, FAST-OAD estimates only the aft position of CG)--></range>
           <aft>
@@ -415,7 +448,7 @@
       </aircraft>
       <airframe>
         <paint>
-          <surface_density units="kg/m**2" is_input="True">0.33</surface_density>
+          <surface_density units="kg/m**2" is_input="True">0.28</surface_density>
         </paint>
         <landing_gear>
           <front>
