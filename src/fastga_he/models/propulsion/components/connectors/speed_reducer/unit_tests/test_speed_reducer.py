@@ -13,6 +13,9 @@ from ..components.perf_torque_in import PerformancesTorqueIn
 from ..components.perf_torque_out import PerformancesTorqueOut
 from ..components.perf_maximum import PerformancesMaximum
 
+from ..components.cstr_enforce import ConstraintsTorqueEnforce
+from ..components.cstr_ensure import ConstraintsTorqueEnsure
+
 from ..components.perf_speed_reducer import PerformancesSpeedReducer
 
 from ..constants import POSSIBLE_POSITION
@@ -166,6 +169,60 @@ def test_performances_speed_reducer():
     assert problem.get_val("torque_in", units="N*m") == pytest.approx(
         np.array([246.1, 266.0, 284.9, 302.9, 319.9, 336.1, 351.6, 366.3, 380.3, 393.8]),
         rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_torque_constraint_enforce():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsTorqueEnforce(speed_reducer_id="speed_reducer_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsTorqueEnforce(speed_reducer_id="speed_reducer_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_in_rating", units="N*m"
+    ) == pytest.approx(393.8, rel=1e-3)
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_out_rating",
+            units="N*m",
+        )
+        == pytest.approx(763.9, rel=1e-3)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_torque_constraint_ensure():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsTorqueEnsure(speed_reducer_id="speed_reducer_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsTorqueEnsure(speed_reducer_id="speed_reducer_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_in_rating",
+            units="N*m",
+        )
+        == pytest.approx(-6.2, rel=1e-3)
+    )
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_out_rating",
+            units="N*m",
+        )
+        == pytest.approx(-36.1, rel=1e-3)
     )
 
     problem.check_partials(compact_print=True)

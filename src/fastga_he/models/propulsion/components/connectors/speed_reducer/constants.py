@@ -2,4 +2,6 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+SUBMODEL_CONSTRAINTS_SPEED_REDUCER_TORQUE = "submodel.propulsion.constraints.speed_reducer.torque"
+
 POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]

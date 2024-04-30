@@ -6,7 +6,9 @@
                     <speed_reducer_1>
                         <gear_ratio>2.0</gear_ratio>
                         <efficiency>0.97</efficiency>
+                        <torque_in_rating units="N*m">400.0</torque_in_rating>
                         <torque_in_max units="N*m">393.8</torque_in_max>
+                        <torque_out_rating units="N*m">800.0</torque_out_rating>
                         <torque_out_max units="N*m">763.9</torque_out_max>
                     </speed_reducer_1>
                 </speed_reducer>
