@@ -1,15 +1,42 @@
 <FASTOAD_model>
     <data>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <MAC>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+                <span units="m">13.0</span>
+            </wing>
+        </geometry>
         <propulsion>
             <he_power_train>
                 <speed_reducer>
                     <speed_reducer_1>
+                        <front_length_ratio>0.8</front_length_ratio>
+                        <rear_length_ratio>0.5</rear_length_ratio>
+                        <CG>
+                            <y_ratio>0.5</y_ratio>
+                        </CG>
                         <gear_ratio>2.0</gear_ratio>
                         <efficiency>0.97</efficiency>
                         <torque_in_rating units="N*m">400.0</torque_in_rating>
                         <torque_in_max units="N*m">393.8</torque_in_max>
                         <torque_out_rating units="N*m">800.0</torque_out_rating>
                         <torque_out_max units="N*m">763.9</torque_out_max>
+                        <scaling>
+                            <dimensions>1.37164828</dimensions>
+                        </scaling>
                     </speed_reducer_1>
                 </speed_reducer>
             </he_power_train>
