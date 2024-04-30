@@ -701,6 +701,45 @@ TURBOSHAFT = {
     VARIESN_T_MASS: False,
     ETA: 0.35,
 }
+SPEED_REDUCER = {
+    ID: "fastga_he.pt_component.speed_reducer",
+    CN: "SpeedReducer",
+    CN_ID: "speed_reducer_id",
+    CT: "speed_reducer",
+    ATT: None,
+    PT: [],
+    SPT: [],
+    PTS: [],
+    IN: [(None, "rpm_in"), (None, "shaft_power_in")],
+    OUT: [("rpm_out", None), ("shaft_power_out", None)],
+    CTC: "connector",
+    MP: [
+        {"torque_in": "N*m"},
+        {"torque_out": "N*m"},
+        {"rpm_in": "min**-1"},
+        {"shaft_power_in": "kW"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
+    ICON: "gearbox",
+    ICON_SIZE: 30,
+    RSD: ["torque_in"],
+    SETS_V: False,
+    IO_INDEP_V: False,
+    V_TO_SET: [],
+    P_TO_SET: [("shaft_power_in", "in")],
+    I_TO_SET: [],
+    SFR: False,
+    SWL: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.98,
+}
 
 KNOWN_COMPONENTS = [
     PROPELLER,
@@ -718,6 +757,7 @@ KNOWN_COMPONENTS = [
     FUEL_TANK,
     FUEL_SYSTEM,
     TURBOSHAFT,
+    SPEED_REDUCER,
 ]
 
 KNOWN_ID = []

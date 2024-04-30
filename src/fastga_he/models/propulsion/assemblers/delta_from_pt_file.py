@@ -26,6 +26,7 @@ from fastga_he.models.propulsion.components import (
     SlipstreamFuelTank,
     SlipstreamFuelSystem,
     SlipstreamTurboshaft,
+    SlipstreamSpeedReducer,
 )
 
 from .constants import (

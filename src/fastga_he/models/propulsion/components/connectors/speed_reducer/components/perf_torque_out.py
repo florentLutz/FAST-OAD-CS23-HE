@@ -22,7 +22,7 @@ class PerformancesTorqueOut(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
+        self.add_input("shaft_power_out", units="kW", val=np.nan, shape=number_of_points)
         self.add_input("rpm_out", units="min**-1", val=np.nan, shape=number_of_points)
 
         self.add_output("torque_out", units="N*m", val=200.0, shape=number_of_points)
@@ -31,7 +31,7 @@ class PerformancesTorqueOut(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        power = inputs["shaft_power_out"]
+        power = inputs["shaft_power_out"] * 1000.0
         rpm = inputs["rpm_out"]
         omega = rpm * 2.0 * np.pi / 60
 
@@ -43,5 +43,5 @@ class PerformancesTorqueOut(om.ExplicitComponent):
         rpm = inputs["rpm_out"]
         omega = rpm * 2.0 * np.pi / 60
 
-        partials["torque_out", "shaft_power_out"] = np.diag(1.0 / omega)
+        partials["torque_out", "shaft_power_out"] = np.diag(1000.0 / omega)
         partials["torque_out", "rpm_out"] = -np.diag(power / omega ** 2.0) * 2.0 * np.pi / 60

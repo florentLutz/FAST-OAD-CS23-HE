@@ -188,6 +188,11 @@
         <low_speed>
           <CD0 is_input="False">0.0</CD0>
         </low_speed>
+        <speed_reducer>
+          <gearbox_1>
+            <gear_ratio>2.0</gear_ratio>
+          </gearbox_1>
+        </speed_reducer>
         <DC_SSPC>
           <dc_sspc_1>
             <current_caliber units="A" is_input="False">638.2945793798842<!--Maximum current flowing through the SSPC--></current_caliber>

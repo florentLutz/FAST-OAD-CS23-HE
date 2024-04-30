@@ -1630,6 +1630,52 @@ def test_mission_vector_from_yml():
     assert pt_mass == pytest.approx(1188.54, abs=1e-2)
 
 
+def test_mission_vector_from_yml_gearbox():
+
+    # Define used files depending on options
+    xml_file_name = "sample_ac.xml"
+    process_file_name = "mission_vector_gearbox.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    # Create problems with inputs
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.setup()
+
+    # om.n2(problem)
+
+    problem.run_model()
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    if not pth.exists(RESULTS_FOLDER_PATH):
+        os.mkdir(RESULTS_FOLDER_PATH)
+
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
+    # Efficiency of the gearbox is 0.98, if we take the result from the previous test and include
+    # the efficiency of the gearbox assuming nothing else changes we should an energy consumed of
+    # 146.75/0.98 = 149.74, which means we must also have impacted the efficiencies of other
+    # components of the pt
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(148.60, abs=1e-2)
+    mission_end_soc = problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
+    )
+    assert mission_end_soc == pytest.approx(-0.01359, abs=1e-2)
+    pt_mass = problem.get_val("data:propulsion:he_power_train:mass", units="kg")
+    assert pt_mass == pytest.approx(1152.75, abs=1e-2)
+
+
 def test_mission_vector_from_yml_simplified_models():
 
     previously_active_models = copy.deepcopy(oad.RegisterSubmodel.active_models)
