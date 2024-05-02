@@ -23,6 +23,8 @@
             <he_power_train>
                 <planetary_gear>
                     <planetary_gear_1>
+                        <torque_out_max units="N*m">790.0</torque_out_max>
+                        <torque_out_rating units="N*m">750.0</torque_out_rating>
                         <gear_ratio>1.0</gear_ratio>
                         <efficiency>0.98</efficiency>
                         <front_length_ratio>0.9</front_length_ratio>

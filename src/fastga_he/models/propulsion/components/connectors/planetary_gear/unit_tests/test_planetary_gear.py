@@ -18,6 +18,9 @@ from ..components.perf_torque_out import PerformancesTorqueOut
 from ..components.perf_torque_in import PerformancesTorqueIn
 from ..components.perf_maximum import PerformancesMaximum
 
+from ..components.cstr_enforce import ConstraintsTorqueEnforce
+from ..components.cstr_ensure import ConstraintsTorqueEnsure
+
 from ..components.sizing_cg_x import SizingPlanetaryGearCGX
 from ..components.sizing_cg_y import SizingPlanetaryGearCGY
 
@@ -405,6 +408,50 @@ def test_performances_planetary_gear_power_share():
     assert problem.get_val("shaft_power_in_1", units="kW") == pytest.approx(
         np.full(NB_POINTS_TEST, 66.66),
         rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_torque_constraint_enforce():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsTorqueEnforce(planetary_gear_id="planetary_gear_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsTorqueEnforce(planetary_gear_id="planetary_gear_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:torque_out_rating",
+            units="N*m",
+        )
+        == pytest.approx(790.0, rel=1e-3)
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_torque_constraint_ensure():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsTorqueEnsure(planetary_gear_id="planetary_gear_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsTorqueEnsure(planetary_gear_id="planetary_gear_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:planetary_gear:planetary_gear_1:torque_out_rating",
+            units="N*m",
+        )
+        == pytest.approx(40.0, rel=1e-3)
     )
 
     problem.check_partials(compact_print=True)
