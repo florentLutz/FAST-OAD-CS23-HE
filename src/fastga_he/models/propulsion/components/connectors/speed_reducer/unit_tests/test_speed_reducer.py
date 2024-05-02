@@ -351,7 +351,7 @@ def test_cg_y():
         problem.check_partials(compact_print=True)
 
 
-def test_dc_dc_converter_sizing():
+def test_speed_reducer_sizing():
 
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(

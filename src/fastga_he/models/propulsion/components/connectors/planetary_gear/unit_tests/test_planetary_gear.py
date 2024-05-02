@@ -21,10 +21,14 @@ from ..components.perf_maximum import PerformancesMaximum
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 
+from ..components.sizing_weight import SizingPlanetaryGearWeight
+from ..components.sizing_dimension_scaling import SizingPlanetaryGearDimensionScaling
+from ..components.sizing_dimension import SizingPlanetaryGearDimensions
 from ..components.sizing_cg_x import SizingPlanetaryGearCGX
 from ..components.sizing_cg_y import SizingPlanetaryGearCGY
 
 from ..components.perf_planetary_gear import PerformancesPlanetaryGear
+from ..components.sizing_planetary_gear import SizingPlanetaryGear
 
 from ..constants import POSSIBLE_POSITION
 
@@ -457,6 +461,68 @@ def test_torque_constraint_ensure():
     problem.check_partials(compact_print=True)
 
 
+def test_sizing_weight():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingPlanetaryGearWeight(planetary_gear_id="planetary_gear_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingPlanetaryGearWeight(planetary_gear_id="planetary_gear_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:mass", units="kg"
+    ) == pytest.approx(15.59, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_sizing_dimension_scaling():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingPlanetaryGearDimensionScaling(planetary_gear_id="planetary_gear_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingPlanetaryGearDimensionScaling(planetary_gear_id="planetary_gear_1"), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:scaling:dimensions"
+    ) == pytest.approx(1.34, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_sizing_dimension():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingPlanetaryGearDimensions(planetary_gear_id="planetary_gear_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingPlanetaryGearDimensions(planetary_gear_id="planetary_gear_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:width", units="m"
+    ) == pytest.approx(0.201, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:height", units="m"
+    ) == pytest.approx(0.201, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:length", units="m"
+    ) == pytest.approx(0.3551, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_cg_x():
 
     expected_cg = [2.69, 0.45, 2.54]
@@ -513,3 +579,43 @@ def test_cg_y():
         )
 
         problem.check_partials(compact_print=True)
+
+
+def test_planetary_gear_sizing():
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingPlanetaryGear(planetary_gear_id="planetary_gear_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingPlanetaryGear(planetary_gear_id="planetary_gear_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:mass",
+            units="kg",
+        )
+        == pytest.approx(16.22, rel=1e-2)
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:CG:x", units="m"
+    ) == pytest.approx(2.69, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:CG:y", units="m"
+    ) == pytest.approx(2.21, rel=1e-2)
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:low_speed:CD0",
+        )
+        == pytest.approx(0.0, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:cruise:CD0",
+        )
+        == pytest.approx(0.0, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)

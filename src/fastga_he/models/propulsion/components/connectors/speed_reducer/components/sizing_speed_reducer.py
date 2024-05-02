@@ -19,7 +19,7 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingSpeedReducer(om.Group):
     """
-    Class that regroups all of the sub components for the sizing of the DC/DC converter.
+    Class that regroups all of the sub components for the sizing of the speed reducer.
     """
 
     def initialize(self):
