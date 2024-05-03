@@ -1668,9 +1668,9 @@ def test_op_mission_vector_from_yml():
     if not pth.exists(RESULTS_FOLDER_PATH):
         os.mkdir(RESULTS_FOLDER_PATH)
 
-    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    sizing_fuel = problem.get_val("data:mission:operational:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
-    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    sizing_energy = problem.get_val("data:mission:operational:energy", units="kW*h")
     assert sizing_energy == pytest.approx(92.7, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"

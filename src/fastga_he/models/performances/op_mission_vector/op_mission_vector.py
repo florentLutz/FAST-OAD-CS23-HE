@@ -242,7 +242,20 @@ class OperationalMissionVector(om.Group):
                 "data:weight:*",
                 "settings:*",
             ],
-            promotes_outputs=["data:*"],
+            promotes_outputs=[
+                (
+                    "data:mission:sizing:main_route:climb:v_eas",
+                    "data:mission:operational:climb:v_eas",
+                ),
+                (
+                    "data:mission:sizing:main_route:descent:v_eas",
+                    "data:mission:operational:descent:v_eas",
+                ),
+                (
+                    "data:mission:sizing:main_route:reserve:v_tas",
+                    "data:mission:operational:reserve:v_tas",
+                ),
+            ],
         )
         self.add_subsystem(
             "solve_equilibrium",
@@ -294,7 +307,97 @@ class OperationalMissionVector(om.Group):
                 "convergence:*",
                 "settings:*",
             ],
-            promotes_outputs=["data:*"],
+            promotes_outputs=[
+                "data:propulsion:*",
+                (
+                    "data:mission:sizing:energy",
+                    "data:mission:operational:energy",
+                ),
+                (
+                    "data:mission:sizing:fuel",
+                    "data:mission:operational:fuel",
+                ),
+                (
+                    "data:mission:sizing:main_route:climb:distance",
+                    "data:mission:operational:climb:distance",
+                ),
+                (
+                    "data:mission:sizing:main_route:climb:duration",
+                    "data:mission:operational:climb:duration",
+                ),
+                (
+                    "data:mission:sizing:main_route:climb:energy",
+                    "data:mission:operational:climb:energy",
+                ),
+                (
+                    "data:mission:sizing:main_route:climb:fuel",
+                    "data:mission:operational:climb:fuel",
+                ),
+                (
+                    "data:mission:sizing:main_route:cruise:distance",
+                    "data:mission:operational:cruise:distance",
+                ),
+                (
+                    "data:mission:sizing:main_route:cruise:duration",
+                    "data:mission:operational:cruise:duration",
+                ),
+                (
+                    "data:mission:sizing:main_route:cruise:energy",
+                    "data:mission:operational:cruise:energy",
+                ),
+                (
+                    "data:mission:sizing:main_route:cruise:fuel",
+                    "data:mission:operational:cruise:fuel",
+                ),
+                (
+                    "data:mission:sizing:main_route:descent:distance",
+                    "data:mission:operational:descent:distance",
+                ),
+                (
+                    "data:mission:sizing:main_route:descent:duration",
+                    "data:mission:operational:descent:duration",
+                ),
+                (
+                    "data:mission:sizing:main_route:descent:energy",
+                    "data:mission:operational:descent:energy",
+                ),
+                (
+                    "data:mission:sizing:main_route:descent:fuel",
+                    "data:mission:operational:descent:fuel",
+                ),
+                (
+                    "data:mission:sizing:main_route:reserve:energy",
+                    "data:mission:operational:reserve:energy",
+                ),
+                (
+                    "data:mission:sizing:main_route:reserve:fuel",
+                    "data:mission:operational:reserve:fuel",
+                ),
+                (
+                    "data:mission:sizing:taxi_in:energy",
+                    "data:mission:operational:taxi_in:energy",
+                ),
+                (
+                    "data:mission:sizing:taxi_in:fuel",
+                    "data:mission:operational:taxi_in:fuel",
+                ),
+                (
+                    "data:mission:sizing:taxi_in:thrust",
+                    "data:mission:operational:taxi_in:thrust",
+                ),
+                (
+                    "data:mission:sizing:taxi_out:energy",
+                    "data:mission:operational:taxi_out:energy",
+                ),
+                (
+                    "data:mission:sizing:taxi_out:fuel",
+                    "data:mission:operational:taxi_out:fuel",
+                ),
+                (
+                    "data:mission:sizing:taxi_out:thrust",
+                    "data:mission:operational:taxi_out:thrust",
+                ),
+            ],
         )
         self.add_subsystem(
             "to_csv",
