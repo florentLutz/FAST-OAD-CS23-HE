@@ -14,6 +14,16 @@ from .connectors.dc_sspc import SizingDCSSPC, PerformancesDCSSPC, SlipstreamDCSS
 from .connectors.dc_splitter import SizingDCSplitter, PerformancesDCSplitter, SlipstreamDCSplitter
 from .connectors.rectifier import SizingRectifier, PerformancesRectifier, SlipstreamRectifier
 from .connectors.fuel_system import SizingFuelSystem, PerformancesFuelSystem, SlipstreamFuelSystem
+from .connectors.speed_reducer import (
+    SizingSpeedReducer,
+    PerformancesSpeedReducer,
+    SlipstreamSpeedReducer,
+)
+from .connectors.planetary_gear import (
+    SizingPlanetaryGear,
+    PerformancesPlanetaryGear,
+    SlipstreamPlanetaryGear,
+)
 
 from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM
 

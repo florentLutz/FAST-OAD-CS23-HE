@@ -45,10 +45,12 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         motor_id = self.options["motor_id"]
 
-        outputs["efficiency"] = (
+        outputs["efficiency"] = np.where(
+            inputs["shaft_power_out"] != 0.0,
             inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
             * inputs["shaft_power_out"]
-            / (inputs["shaft_power_out"] + inputs["power_losses"])
+            / (inputs["shaft_power_out"] + inputs["power_losses"]),
+            np.ones_like(inputs["shaft_power_out"]),
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):

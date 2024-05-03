@@ -29,6 +29,8 @@ from fastga_he.models.propulsion.components import (
     PerformancesFuelTank,
     PerformancesFuelSystem,
     PerformancesTurboshaft,
+    PerformancesSpeedReducer,
+    PerformancesPlanetaryGear,
 )
 
 from .constants import SUBMODEL_POWER_TRAIN_PERF, SUBMODEL_THRUST_DISTRIBUTOR

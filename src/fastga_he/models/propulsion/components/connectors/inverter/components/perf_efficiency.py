@@ -64,7 +64,11 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         useful_power = 3.0 * current * ac_voltage_rms_out
 
-        outputs["efficiency"] = useful_power / (useful_power + losses_inverter)
+        outputs["efficiency"] = np.where(
+            useful_power != 0.0,
+            useful_power / (useful_power + losses_inverter),
+            np.ones_like(useful_power),
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 

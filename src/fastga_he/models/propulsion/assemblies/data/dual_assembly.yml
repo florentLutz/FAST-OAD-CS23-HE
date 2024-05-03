@@ -1,0 +1,90 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+
+  planetary_gear_1:
+    id: fastga_he.pt_component.planetary_gear
+    options:
+      gear_mode: power_share
+
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+  motor_2:
+    id: fastga_he.pt_component.pmsm
+
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+
+  harness_1:
+    id: fastga_he.pt_component.dc_line
+  harness_2:
+    id: fastga_he.pt_component.dc_line
+
+  dc_bus_5:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 2
+
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+
+  battery_pack_1:
+    id: fastga_he.pt_component.battery_pack
+
+component_connections:
+  - source: propeller_1
+    target: [planetary_gear_1, 1]
+
+  - source: [planetary_gear_1, 1]
+    target: motor_1
+  - source: [ planetary_gear_1, 2 ]
+    target: motor_2
+
+  - source: motor_1
+    target: inverter_1
+  - source: motor_2
+    target: inverter_2
+
+  - source: inverter_1
+    target: [dc_bus_1, 1]
+  - source: inverter_2
+    target: [dc_bus_2, 1]
+
+  # DC BUS 1
+  - source: [dc_bus_1, 1]
+    target: harness_1
+
+  # DC BUS 2
+  - source: [dc_bus_2, 1]
+    target: harness_2
+
+  # DC BUS 5
+  - source: harness_1
+    target: [dc_bus_5, 1]
+  - source: harness_2
+    target: [dc_bus_5, 2]
+
+  - source: [dc_bus_5, 1]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: battery_pack_1
+
+watcher_file_path: ./dual_assembly_performances.csv

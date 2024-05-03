@@ -38,13 +38,26 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["ac_voltage_rms_in"] = inputs["apparent_power"] / inputs["ac_current_rms_in"]
+        # Ones_like or Zeros_like ?
+        outputs["ac_voltage_rms_in"] = np.where(
+            inputs["ac_current_rms_in"] != 0.0,
+            inputs["apparent_power"] / inputs["ac_current_rms_in"],
+            np.ones_like(inputs["ac_current_rms_in"]),
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         partials["ac_voltage_rms_in", "apparent_power"] = np.diag(
-            1.0 / (inputs["ac_current_rms_in"])
+            np.where(
+                inputs["ac_current_rms_in"] != 0.0,
+                1.0 / (inputs["ac_current_rms_in"]),
+                np.full_like(inputs["ac_current_rms_in"], 1e-6),
+            )
         )
         partials["ac_voltage_rms_in", "ac_current_rms_in"] = -np.diag(
-            inputs["apparent_power"] / (inputs["ac_current_rms_in"] ** 2.0)
+            np.where(
+                inputs["ac_current_rms_in"] != 0.0,
+                inputs["apparent_power"] / (inputs["ac_current_rms_in"] ** 2.0),
+                np.full_like(inputs["ac_current_rms_in"], -1e-6),
+            )
         )
