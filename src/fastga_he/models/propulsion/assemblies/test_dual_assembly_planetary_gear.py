@@ -15,6 +15,7 @@ from utils.filter_residuals import filter_residuals
 from fastga_he.models.propulsion.assemblers.performances_from_pt_file import (
     PowerTrainPerformancesFromFile,
 )
+from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
 from ..components.loads.pmsm import PerformancesPMSM
 from ..components.connectors.planetary_gear import PerformancesPlanetaryGear
@@ -26,6 +27,7 @@ from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
 from ..components.source.battery import PerformancesBatteryPack
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
+OUT_FOLDER_PATH = pth.join(pth.dirname(__file__), "outputs")
 
 XML_FILE = "dual_assembly.xml"
 NB_POINTS_TEST = 50
@@ -425,6 +427,9 @@ def test_assembly_power_share():
 def test_assembly_from_pt_file():
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "dual_assembly.yml")
+    network_file_path = pth.join(OUT_FOLDER_PATH, "dual_assembly.html")
+
+    power_train_network_viewer(pt_file_path, network_file_path)
 
     ivc = get_indep_var_comp(
         list_inputs(

@@ -576,6 +576,18 @@ class FASTGAHEPowerTrainConfigurator:
                 neighbors = list(graph.neighbors(component_name))
                 if set(neighbors).intersection(propulsor_name):
                     propulsive_load_names.append(component_name)
+                # If there are gearboxes among neighbor, we also check for the neighbor of the
+                # gearbox. Not very generic way to do things :/
+                else:
+                    name_to_id = dict(zip(self._components_name, self._components_id))
+                    for neighbor in set(neighbors):
+                        if (
+                            name_to_id[neighbor] == "fastga_he.pt_component.speed_reducer"
+                            or name_to_id[neighbor] == "fastga_he.pt_component.planetary_gear"
+                        ):
+                            neighbors_gb = list(graph.neighbors(neighbor))
+                            if set(neighbors_gb).intersection(propulsor_name):
+                                propulsive_load_names.append(component_name)
 
         distance_from_propulsive_load = {}
         connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
@@ -1639,6 +1651,81 @@ class FASTGAHEPowerTrainConfigurator:
                     new_problematic_nodes.remove(problematic_node)
                     new_problematic_nodes += problematic_nodes_to_add
 
+                # If it is a planetary gearbox
+                elif associated_component_type == "fastga_he.pt_component.planetary_gear":
+
+                    problematic_nodes_to_add = []
+
+                    # This node does not have a priority just yet, so we'll first need to take a
+                    # look at it
+                    power = None
+
+                    for neighbor in graph.adj[problematic_node]:
+                        if neighbor in list(nodes_with_power.keys()):
+                            power = nodes_with_power[neighbor]
+
+                    for neighbor in graph.adj[problematic_node]:
+
+                        neighbor_counter = 1
+
+                        if neighbor not in list(nodes_with_power.keys()):
+                            # If we haven't treated the neighbor yet, it means its an input of the
+                            # gearbox. We will add a fake input node and do the connection to
+                            # that neighbor. We should also take the opportunity to see whether
+                            # or not this is the gearbox "priority" input
+
+                            # First we identify which input of the splitter in matches, first
+                            # find the name of the component
+                            neighbor_components_name = neighbor.replace("_in", "")
+                            neighbor_components_name = neighbor_components_name.replace("_out", "")
+
+                            input_name = neighbor_components_name + ".shaft_power_out"
+
+                            # We look at the number of the corresponding gearbox input. Will be a
+                            # bit farfetched as we need to find using the current neighbor. For
+                            # gearboxes, the two connexion are rpm and shaft power and they are
+                            # both output of the input side of the gearbox, so we'll have to use
+                            # the input list
+                            # We look at the number of the corresponding splitter input
+                            index = self._components_connection_inputs.index(input_name)
+                            gearbox_input_name = self._components_connection_outputs[index]
+
+                            (
+                                primary_input_power,
+                                secondary_power_output,
+                            ) = self.gearbox_power_inputs(
+                                inputs=inputs,
+                                components_name=associated_component_name,
+                                power_output=power,
+                            )
+
+                            # If it ends with a "1", its the priority input. We add the node as a
+                            # problematic node, we set its priority and we add the node to the
+                            # graph as well as the proper edge.
+                            if gearbox_input_name[-1] == "1":
+                                node_name = associated_component_name + "_in_1"
+                                problematic_nodes_to_add.append(node_name)
+                                nodes_with_power[node_name] = primary_input_power
+
+                                copied_graph.add_edge(neighbor, node_name)
+
+                            else:
+                                node_name = (
+                                    associated_component_name + "_in_" + str(neighbor_counter + 1)
+                                )
+                                problematic_nodes_to_add.append(node_name)
+                                nodes_with_power[node_name] = secondary_power_output
+
+                                copied_graph.add_edge(neighbor, node_name)
+
+                                neighbor_counter += 1
+
+                    # Now we remove the splitter and instead add its two neighbor, which will
+                    # serve as new branch start
+
+                    new_problematic_nodes.remove(problematic_node)
+                    new_problematic_nodes += problematic_nodes_to_add
+
                 # If it is a splitter
                 elif associated_component_type == "fastga_he.pt_component.dc_splitter":
 
@@ -1875,6 +1962,55 @@ class FASTGAHEPowerTrainConfigurator:
 
         return primary_input, secondary_output
 
+    def gearbox_power_inputs(
+        self, inputs, components_name: str, power_output: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Computes the power at each input of the gearbox, depending on the mode the power at the
+        output
+
+        :param inputs: OpenMDAO vector containing the value of inputs
+        :param components_name: the name of the gearbox in question
+        :param power_output: the power at the output of the gearbox
+        """
+
+        number_of_points = len(power_output)
+
+        # First we need to search what mode the gearbox is in
+        name_to_option = dict(zip(self._components_name, self._components_options))
+
+        # Check that an option is declared, else it means it is in default mode which is
+        # percent_split
+        mode = "percent_split"
+        if name_to_option[components_name]:
+            if "gear_mode" in list(name_to_option[components_name].keys()):
+                mode = name_to_option[components_name]["gear_mode"]
+
+        if mode == "percent_split":
+            input_name = (
+                "data:propulsion:he_power_train:planetary_gear:" + components_name + ":power_split"
+            )
+            power_split = inputs[input_name]
+            power_split = format_to_array(power_split, number_of_points)
+
+            # Should be in %
+            primary_input = power_split * power_output / 100.0
+            secondary_output = (100.0 - power_split) * power_output / 100.0
+
+        else:
+
+            input_name = (
+                "data:propulsion:he_power_train:planetary_gear:" + components_name + ":power_share"
+            )
+            power_share = inputs[input_name]
+            power_share = format_to_array(power_share, number_of_points)
+
+            # Should be in W
+            primary_input = np.minimum(power_share, power_output)
+            secondary_output = power_output - primary_input
+
+        return primary_input, secondary_output
+
     def set_priority_in_graph(
         self, graph: nx.Graph, nodes_with_power: dict, starting_points_name: list
     ) -> tuple:
@@ -2020,10 +2156,20 @@ class FASTGAHEPowerTrainConfigurator:
                 power_to_set = resources.DICTIONARY_P_TO_SET[component_id]
 
                 for power in power_to_set:
-                    # These are tuple which contains the "in" or "out" tag plus the name of the variable
+                    # These are tuple which contains the "in" or "out" tag plus the name of the
+                    # variable
                     if power[1] == "in" and node.endswith("_in"):
                         variable_name = component_name + "." + power[0]
-                        power_dict_subgraph[variable_name] = power_in_this_subgraph[node]
+
+                        # If we are to set the power of a component with multiple inputs,
+                        # the node name will not match and will need to be modified. We will
+                        # check that we are in this case if the variable name endswith a number
+                        if variable_name[-1].isdigit():
+                            power_dict_subgraph[variable_name] = power_in_this_subgraph[
+                                node + "_" + variable_name[-1]
+                            ]
+                        else:
+                            power_dict_subgraph[variable_name] = power_in_this_subgraph[node]
 
                     elif power[1] == "out" and node.endswith("_out"):
                         variable_name = component_name + "." + power[0]
