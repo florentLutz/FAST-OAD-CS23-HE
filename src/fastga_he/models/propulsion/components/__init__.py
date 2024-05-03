@@ -19,6 +19,11 @@ from .connectors.speed_reducer import (
     PerformancesSpeedReducer,
     SlipstreamSpeedReducer,
 )
+from .connectors.planetary_gear import (
+    SizingPlanetaryGear,
+    PerformancesPlanetaryGear,
+    SlipstreamPlanetaryGear,
+)
 
 from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM
 

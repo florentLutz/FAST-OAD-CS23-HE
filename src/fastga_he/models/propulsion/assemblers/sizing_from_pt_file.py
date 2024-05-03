@@ -27,6 +27,7 @@ from fastga_he.models.propulsion.components import (
     SizingFuelSystem,
     SizingTurboshaft,
     SizingSpeedReducer,
+    SizingPlanetaryGear,
 )
 
 from .constants import (

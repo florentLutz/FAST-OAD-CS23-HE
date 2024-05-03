@@ -740,6 +740,49 @@ SPEED_REDUCER = {
     VARIESN_T_MASS: False,
     ETA: 0.98,
 }
+PLANETARY_GEAR = {
+    ID: "fastga_he.pt_component.planetary_gear",
+    CN: "PlanetaryGear",
+    CN_ID: "planetary_gear_id",
+    CT: "planetary_gear",
+    ATT: ["gear_mode"],
+    PT: [],
+    SPT: [],
+    PTS: [],
+    IN: [(None, "rpm_in_"), (None, "shaft_power_in_")],
+    OUT: [("rpm_out", None), ("shaft_power_out", None)],
+    CTC: "connector",
+    MP: [
+        {"torque_in_1": "N*m"},
+        {"torque_in_2": "N*m"},
+        {"torque_out": "N*m"},
+        {"rpm_in_1": "min**-1"},
+        {"rpm_in_2": "min**-1"},
+        {"shaft_power_in_1": "kW"},
+        {"shaft_power_in_2": "kW"},
+        {"power_split": "percent"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
+    ICON: "gearbox",
+    ICON_SIZE: 30,
+    RSD: ["torque_in_1", "torque_in_2"],
+    SETS_V: False,
+    IO_INDEP_V: False,
+    V_TO_SET: [],
+    P_TO_SET: [("shaft_power_in_1", "in"), ("shaft_power_in_2", "in")],
+    I_TO_SET: [],
+    SFR: False,
+    SWL: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.98,
+}
 
 KNOWN_COMPONENTS = [
     PROPELLER,
@@ -758,6 +801,7 @@ KNOWN_COMPONENTS = [
     FUEL_SYSTEM,
     TURBOSHAFT,
     SPEED_REDUCER,
+    PLANETARY_GEAR,
 ]
 
 KNOWN_ID = []

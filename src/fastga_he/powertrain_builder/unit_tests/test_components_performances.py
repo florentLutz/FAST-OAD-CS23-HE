@@ -31,6 +31,7 @@ from fastga_he.models.propulsion.components import (
     PerformancesFuelSystem,
     PerformancesTurboshaft,
     PerformancesSpeedReducer,
+    PerformancesPlanetaryGear,
 )
 
 from tests.testing_utilities import VariableListLocal
