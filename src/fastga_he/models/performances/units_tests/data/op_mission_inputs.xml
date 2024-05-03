@@ -341,15 +341,13 @@
       </he_power_train>
     </propulsion>
     <mission>
-      <sizing>
-        <main_route>
-          <reserve>
-            <speed>
-              <k_factor is_input="True">1.3<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
-            </speed>
-          </reserve>
-        </main_route>
-      </sizing>
+      <operational>
+        <reserve>
+          <speed>
+            <k_factor is_input="True">1.3<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+          </speed>
+        </reserve>
+      </operational>
     </mission>
   </settings>
 </FASTOAD_model>

@@ -240,7 +240,10 @@ class OperationalMissionVector(om.Group):
                     "data:mission:operational:reserve:duration",
                 ),
                 "data:weight:*",
-                "settings:*",
+                (
+                    "settings:mission:sizing:main_route:reserve:speed:k_factor",
+                    "settings:operational:reserve:speed:k_factor",
+                ),
             ],
             promotes_outputs=[
                 (
@@ -303,9 +306,8 @@ class OperationalMissionVector(om.Group):
                 ),
                 "data:propulsion:*",
                 ("data:weight:aircraft:MTOW", "data:mission:operational:TOW"),
-                "settings:*",
+                "settings:propulsion:*",
                 "convergence:*",
-                "settings:*",
             ],
             promotes_outputs=[
                 "data:propulsion:*",
