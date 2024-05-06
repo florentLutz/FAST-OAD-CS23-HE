@@ -113,6 +113,12 @@
       </horizontal_tail>
     </geometry>
     <mission>
+      <operational>
+        <fuel units="kg">150.0</fuel>
+        <payload>
+          <mass units="kg">200.0</mass>
+        </payload>
+      </operational>
       <sizing>
         <energy units="W*h" is_input="False">220741.32132973778</energy>
         <fuel units="kg" is_input="False">0.0</fuel>
@@ -770,6 +776,7 @@
     <weight>
       <aircraft>
         <MTOW units="kg" is_input="True">1000.0<!--maximum takeoff weight of the aircraft--></MTOW>
+        <OWE units="kg" is_input="True">600.0<!--maximum takeoff weight of the aircraft--></OWE>
         <payload units="kg" is_input="True">390.0<!--design payload weight--></payload>
         <in_flight_variation>
           <fixed_mass_comp>

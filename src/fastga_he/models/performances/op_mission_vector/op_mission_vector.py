@@ -19,6 +19,7 @@ from fastga_he.models.performances.mission_vector.initialization.initialize impo
 from fastga_he.models.performances.mission_vector.mission.mission_core import MissionCore
 from fastga_he.models.performances.mission_vector.to_csv import ToCSV
 from fastga_he.models.weight.cg.op_cg_variation import OperationalInFlightCGVariation
+from fastga_he.models.performances.op_mission_vector.update_tow import UpdateTOW
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from fastga_he.models.propulsion.assemblers.performances_watcher import (
@@ -424,6 +425,7 @@ class OperationalMissionVector(om.Group):
                 "data:aerodynamics:*",
             ],
         )
+        self.add_subsystem("update_tow", UpdateTOW(), promotes=["*"])
 
         self.connect(
             "initialization.initialize_engine_setting.engine_setting",

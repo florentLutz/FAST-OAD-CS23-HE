@@ -72,6 +72,7 @@ from fastga_he.models.performances.mission_vector.mission.performance_per_phase 
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
 from fastga_he.models.propulsion.assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
+from fastga_he.models.performances.op_mission_vector.update_tow import UpdateTOW
 
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
@@ -1671,11 +1672,24 @@ def test_op_mission_vector_from_yml():
     sizing_fuel = problem.get_val("data:mission:operational:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:operational:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(93.96, abs=1e-2)
+    assert sizing_energy == pytest.approx(88.78, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(40.81, abs=1e-2)
+    assert mission_end_soc == pytest.approx(44.45, abs=1e-2)
+    mission_tow = problem.get_val("data:mission:operational:TOW", units="kg")
+    assert mission_tow == pytest.approx(840.0, abs=1e-2)
+
+
+def test_update_tow():
+
+    ivc = get_indep_var_comp(list_inputs(UpdateTOW()), __file__, XML_FILE)
+
+    problem = run_system(UpdateTOW(), ivc)
+    sizing_fuel = problem.get_val("data:mission:operational:TOW", units="kg")
+    assert sizing_fuel == pytest.approx(950.0, abs=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_mission_vector_from_yml_gearbox():

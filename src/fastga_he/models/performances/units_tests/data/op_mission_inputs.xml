@@ -1,6 +1,9 @@
 <FASTOAD_model>
   <data>
     <weight>
+      <aircraft>
+        <OWE units="kg">450.0</OWE>
+      </aircraft>
       <aircraft_empty>
         <mass units="kg" is_input="True">1109.0666294775604<!--mass of empty aircraft--></mass>
         <CG>
