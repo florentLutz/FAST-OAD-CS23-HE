@@ -104,3 +104,6 @@ def test_operational_mission_kodiak_100():
     assert problem.get_val("data:mission:operational:fuel", units="kg") == pytest.approx(
         224.00, rel=1e-2
     )
+    assert problem.get_val(
+        "data:environmental_impact:operational:fuel_emissions", units="kg"
+    ) == pytest.approx(856.0, rel=1e-2)

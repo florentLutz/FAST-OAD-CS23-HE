@@ -23,6 +23,9 @@ model:
         use_linesearch: True
         pre_condition_pt: False
         use_apply_nonlinear: True
+    environmental_impact:
+        id: fastga_he.environmental.energy_simple
+        mission: operational
 
 submodels:
     submodel.weight.mass.payload: null

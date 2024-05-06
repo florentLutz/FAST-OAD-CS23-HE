@@ -1,0 +1,14 @@
+<FASTOAD_model>
+  <data>
+    <mission>
+      <operational>
+        <energy units="kW*h" is_input="False">160.0</energy>
+        <fuel units="kg" is_input="False">224.62529117214783</fuel>
+      </operational>
+      <sizing>
+        <energy units="kW*h" is_input="False">0.0</energy>
+        <fuel units="kg" is_input="False">933.1108964566974</fuel>
+      </sizing>
+    </mission>
+  </data>
+</FASTOAD_model>
