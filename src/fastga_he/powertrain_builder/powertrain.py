@@ -1519,8 +1519,13 @@ class FASTGAHEPowerTrainConfigurator:
             abs_names = re.findall(r"\[.*?\]", error_message)[0][1:-1].replace(" ", "").split(",")
             abs_name = abs_names[0]
             split_abs_name = abs_name.split(".")
-            proper_abs_name = ".".join(split_abs_name[1:])
-            number_of_cell_in_series = float(inputs[proper_abs_name])
+            # Sometimes the number of cells is not one deep but two deep so we try both
+            try:
+                proper_abs_name = ".".join(split_abs_name[1:])
+                number_of_cell_in_series = float(inputs[proper_abs_name])
+            except KeyError:
+                proper_abs_name = ".".join(split_abs_name[2:])
+                number_of_cell_in_series = float(inputs[proper_abs_name])
 
         return number_of_cell_in_series
 

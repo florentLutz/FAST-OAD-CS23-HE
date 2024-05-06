@@ -72,6 +72,7 @@ from fastga_he.models.performances.mission_vector.mission.performance_per_phase 
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
 from fastga_he.models.propulsion.assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
+from fastga_he.models.performances.op_mission_vector.update_tow import UpdateTOW
 
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
@@ -1587,6 +1588,8 @@ def test_mission_vector():
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
+    # om.n2(problem, outfile=pth.join(RESULTS_FOLDER_PATH, "n2_simple_mission_vector.html"))
+
     problem.check_partials(compact_print=True)
 
 
@@ -1630,6 +1633,63 @@ def test_mission_vector_from_yml():
     assert mission_end_soc == pytest.approx(-0.01359, abs=1e-2)
     pt_mass = problem.get_val("data:propulsion:he_power_train:mass", units="kg")
     assert pt_mass == pytest.approx(1188.54, abs=1e-2)
+
+
+def test_op_mission_vector_from_yml():
+
+    # Define used files depending on options
+    xml_file_name = "op_mission_inputs.xml"
+    process_file_name = "op_mission_vector.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    # Create problems with inputs
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.setup()
+
+    # om.n2(
+    #     problem,
+    #     outfile=pth.join(RESULTS_FOLDER_PATH, "n2_op_mission_vector_from_yml.html"),
+    #     show_browser=False,
+    # )
+
+    problem.run_model()
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    if not pth.exists(RESULTS_FOLDER_PATH):
+        os.mkdir(RESULTS_FOLDER_PATH)
+
+    sizing_fuel = problem.get_val("data:mission:operational:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
+    sizing_energy = problem.get_val("data:mission:operational:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(88.78, abs=1e-2)
+    mission_end_soc = problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
+    )
+    assert mission_end_soc == pytest.approx(44.45, abs=1e-2)
+    mission_tow = problem.get_val("data:mission:operational:TOW", units="kg")
+    assert mission_tow == pytest.approx(840.0, abs=1e-2)
+
+
+def test_update_tow():
+
+    ivc = get_indep_var_comp(list_inputs(UpdateTOW()), __file__, XML_FILE)
+
+    problem = run_system(UpdateTOW(), ivc)
+    sizing_fuel = problem.get_val("data:mission:operational:TOW", units="kg")
+    assert sizing_fuel == pytest.approx(950.0, abs=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_mission_vector_from_yml_gearbox():

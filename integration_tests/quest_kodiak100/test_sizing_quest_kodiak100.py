@@ -68,3 +68,42 @@ def test_sizing_kodiak_100():
         933.00, rel=1e-2
     )
     # Actual value is 2110 lbs or 960 kg
+
+
+def test_operational_mission_kodiak_100():
+
+    """Test the overall aircraft design process with wing positioning."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_kodiak100_op_mission.xml"
+    process_file_name = "operational_mission_kodiak100.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    assert problem.get_val("data:mission:operational:TOW", units="kg") == pytest.approx(
+        2571.0, rel=1e-2
+    )
+    assert problem.get_val("data:mission:operational:fuel", units="kg") == pytest.approx(
+        224.00, rel=1e-2
+    )
+    assert problem.get_val(
+        "data:environmental_impact:operational:fuel_emissions", units="kg"
+    ) == pytest.approx(856.0, rel=1e-2)
