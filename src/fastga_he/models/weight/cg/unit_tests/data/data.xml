@@ -771,6 +771,14 @@
       </wing>
     </constraints>
     <mission>
+      <operational>
+        <payload>
+          <mass units="kg">390.0</mass>
+          <CG>
+            <x units="m">3.47</x>
+          </CG>
+        </payload>
+      </operational>
       <sizing>
         <fuel units="kg" is_input="False">238.8774532834575<!--consumed fuel mass during whole mission--></fuel>
         <holding>

@@ -1,5 +1,13 @@
 <FASTOAD_model>
   <data>
+    <weight>
+      <aircraft_empty>
+        <mass units="kg" is_input="True">1109.0666294775604<!--mass of empty aircraft--></mass>
+        <CG>
+          <x units="m" is_input="True">3.4201712232854646<!--X-position center of gravity of empty aircraft--></x>
+        </CG>
+      </aircraft_empty>
+    </weight>
     <aerodynamics>
       <fuselage>
         <cm_alpha units="1/rad" is_input="True">-0.4685<!--derivative of fuselage pitching moment coefficient with respect to angle of attack--></cm_alpha>
@@ -65,6 +73,12 @@
     </geometry>
     <mission>
       <operational>
+        <payload>
+          <mass units="kg" is_input="True">390.0<!--mass of empty aircraft--></mass>
+          <CG>
+            <x units="m" is_input="True">3.47<!--X-position center of gravity of empty aircraft--></x>
+          </CG>
+        </payload>
         <TOW units="kg" is_input="True">900.0</TOW>
         <range units="km" is_input="True">200.0<!--design range--></range>
         <cruise>
@@ -289,16 +303,6 @@
         </propeller>
       </he_power_train>
     </propulsion>
-    <weight>
-      <aircraft>
-        <in_flight_variation>
-          <fixed_mass_comp>
-            <equivalent_moment units="kg*m" is_input="True">5214.022983724151</equivalent_moment>
-            <mass units="kg" is_input="True">1499.0666294775604</mass>
-          </fixed_mass_comp>
-        </in_flight_variation>
-      </aircraft>
-    </weight>
   </data>
   <convergence>
     <propulsion>

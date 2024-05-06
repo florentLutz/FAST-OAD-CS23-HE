@@ -1671,11 +1671,11 @@ def test_op_mission_vector_from_yml():
     sizing_fuel = problem.get_val("data:mission:operational:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:operational:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(92.7, abs=1e-2)
+    assert sizing_energy == pytest.approx(93.96, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
-    assert mission_end_soc == pytest.approx(41.69, abs=1e-2)
+    assert mission_end_soc == pytest.approx(40.81, abs=1e-2)
 
 
 def test_mission_vector_from_yml_gearbox():

@@ -18,7 +18,7 @@ from typing import Tuple
 from fastga_he.models.performances.mission_vector.initialization.initialize import Initialize
 from fastga_he.models.performances.mission_vector.mission.mission_core import MissionCore
 from fastga_he.models.performances.mission_vector.to_csv import ToCSV
-from fastga_he.models.weight.cg.cg_variation import InFlightCGVariation
+from fastga_he.models.weight.cg.op_cg_variation import OperationalInFlightCGVariation
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from fastga_he.models.propulsion.assemblers.performances_watcher import (
@@ -203,6 +203,9 @@ class OperationalMissionVector(om.Group):
         self.nonlinear_solver.options["use_apply_nonlinear"] = self.options["use_apply_nonlinear"]
 
         self.add_subsystem(
+            "in_flight_cg_variation", OperationalInFlightCGVariation(), promotes=["*"]
+        )
+        self.add_subsystem(
             "initialization",
             Initialize(
                 number_of_points_climb=number_of_points_climb,
@@ -215,6 +218,14 @@ class OperationalMissionVector(om.Group):
                 ("data:TLAR:range", "data:mission:operational:range"),
                 "data:aerodynamics:*",
                 "data:geometry:*",
+                (
+                    "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
+                    "data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:equivalent_moment",
+                ),
+                (
+                    "data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass",
+                    "data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:mass",
+                ),
                 (
                     "data:mission:sizing:main_route:climb:climb_rate:cruise_level",
                     "data:mission:operational:climb:climb_rate:cruise_level",
@@ -239,7 +250,6 @@ class OperationalMissionVector(om.Group):
                     "data:mission:sizing:main_route:reserve:duration",
                     "data:mission:operational:reserve:duration",
                 ),
-                "data:weight:*",
                 (
                     "settings:mission:sizing:main_route:reserve:speed:k_factor",
                     "settings:operational:reserve:speed:k_factor",
