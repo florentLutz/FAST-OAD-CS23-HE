@@ -1588,7 +1588,7 @@ def test_mission_vector():
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
-    om.n2(problem, outfile=pth.join(RESULTS_FOLDER_PATH, "n2_simple_mission_vector.html"))
+    # om.n2(problem, outfile=pth.join(RESULTS_FOLDER_PATH, "n2_simple_mission_vector.html"))
 
     problem.check_partials(compact_print=True)
 
@@ -1654,11 +1654,11 @@ def test_op_mission_vector_from_yml():
 
     problem.setup()
 
-    om.n2(
-        problem,
-        outfile=pth.join(RESULTS_FOLDER_PATH, "n2_op_mission_vector_from_yml.html"),
-        show_browser=False,
-    )
+    # om.n2(
+    #     problem,
+    #     outfile=pth.join(RESULTS_FOLDER_PATH, "n2_op_mission_vector_from_yml.html"),
+    #     show_browser=False,
+    # )
 
     problem.run_model()
     problem.write_outputs()
