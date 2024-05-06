@@ -34,6 +34,11 @@ from fastga_he.models.propulsion.assemblers.energy_consumption_mission_vector im
     ENERGY_CONSUMPTION_FROM_PT_FILE,
 )
 from fastga_he.models.propulsion.assemblers.delta_from_pt_file import DEP_EFFECT_FROM_PT_FILE
+from fastga_he.models.performances.mission_vector.initialization.constants import (
+    SUBMODEL_CLIMB_SPEED_VECT,
+    SUBMODEL_DESCENT_SPEED_VECT,
+    SUBMODEL_RESERVE_SPEED_VECT,
+)
 
 from fastga_he.models.performances.mission_vector.mission.thrust_taxi import MIN_POWER_TAXI
 
@@ -206,6 +211,102 @@ class OperationalMissionVector(om.Group):
         self.add_subsystem(
             "in_flight_cg_variation", OperationalInFlightCGVariation(), promotes=["*"]
         )
+
+        initialization_input_promote_list = [
+            ("data:TLAR:v_cruise", "data:mission:operational:cruise:v_tas"),
+            ("data:TLAR:range", "data:mission:operational:range"),
+            "data:aerodynamics:*",
+            "data:geometry:*",
+            (
+                "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
+                "data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:equivalent_moment",
+            ),
+            (
+                "data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass",
+                "data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:mass",
+            ),
+            (
+                "data:mission:sizing:main_route:climb:climb_rate:cruise_level",
+                "data:mission:operational:climb:climb_rate:cruise_level",
+            ),
+            (
+                "data:mission:sizing:main_route:climb:climb_rate:sea_level",
+                "data:mission:operational:climb:climb_rate:sea_level",
+            ),
+            (
+                "data:mission:sizing:main_route:cruise:altitude",
+                "data:mission:operational:cruise:altitude",
+            ),
+            (
+                "data:mission:sizing:main_route:descent:descent_rate",
+                "data:mission:operational:descent:descent_rate",
+            ),
+            (
+                "data:mission:sizing:main_route:reserve:altitude",
+                "data:mission:operational:reserve:altitude",
+            ),
+            (
+                "data:mission:sizing:main_route:reserve:duration",
+                "data:mission:operational:reserve:duration",
+            ),
+            (
+                "settings:mission:sizing:main_route:reserve:speed:k_factor",
+                "settings:operational:reserve:speed:k_factor",
+            ),
+        ]
+        initialization_output_promote_list = []
+
+        # Three case can happen when detecting which submodel is active:
+        #   - 1) No submodel have been defined in the config file or in .py script so the
+        #        oad.RegisterSubmodel.active_models[SUBMODEL_CLIMB_SPEED_VECT] will return a
+        #        KeyError. In particular it means the submodel has not been deactivated
+        #   - 2) A submodel is defined and it is not deactivated
+        #   - 3) A submodel is defined and it has been deactivated
+        if not self.is_service_active(SUBMODEL_CLIMB_SPEED_VECT):
+            initialization_input_promote_list.append(
+                (
+                    "data:mission:sizing:main_route:climb:v_eas",
+                    "data:mission:operational:climb:v_eas",
+                )
+            )
+        else:
+            initialization_output_promote_list.append(
+                (
+                    "data:mission:sizing:main_route:climb:v_eas",
+                    "data:mission:operational:climb:v_eas",
+                )
+            )
+
+        if not self.is_service_active(SUBMODEL_DESCENT_SPEED_VECT):
+            initialization_input_promote_list.append(
+                (
+                    "data:mission:sizing:main_route:descent:v_eas",
+                    "data:mission:operational:descent:v_eas",
+                )
+            )
+        else:
+            initialization_output_promote_list.append(
+                (
+                    "data:mission:sizing:main_route:descent:v_eas",
+                    "data:mission:operational:descent:v_eas",
+                )
+            )
+
+        if not self.is_service_active(SUBMODEL_RESERVE_SPEED_VECT):
+            initialization_input_promote_list.append(
+                (
+                    "data:mission:sizing:main_route:reserve:v_tas",
+                    "data:mission:operational:reserve:v_tas",
+                )
+            )
+        else:
+            initialization_output_promote_list.append(
+                (
+                    "data:mission:sizing:main_route:reserve:v_tas",
+                    "data:mission:operational:reserve:v_tas",
+                )
+            )
+
         self.add_subsystem(
             "initialization",
             Initialize(
@@ -214,62 +315,8 @@ class OperationalMissionVector(om.Group):
                 number_of_points_descent=number_of_points_descent,
                 number_of_points_reserve=number_of_points_reserve,
             ),
-            promotes_inputs=[
-                ("data:TLAR:v_cruise", "data:mission:operational:cruise:v_tas"),
-                ("data:TLAR:range", "data:mission:operational:range"),
-                "data:aerodynamics:*",
-                "data:geometry:*",
-                (
-                    "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
-                    "data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:equivalent_moment",
-                ),
-                (
-                    "data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass",
-                    "data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:mass",
-                ),
-                (
-                    "data:mission:sizing:main_route:climb:climb_rate:cruise_level",
-                    "data:mission:operational:climb:climb_rate:cruise_level",
-                ),
-                (
-                    "data:mission:sizing:main_route:climb:climb_rate:sea_level",
-                    "data:mission:operational:climb:climb_rate:sea_level",
-                ),
-                (
-                    "data:mission:sizing:main_route:cruise:altitude",
-                    "data:mission:operational:cruise:altitude",
-                ),
-                (
-                    "data:mission:sizing:main_route:descent:descent_rate",
-                    "data:mission:operational:descent:descent_rate",
-                ),
-                (
-                    "data:mission:sizing:main_route:reserve:altitude",
-                    "data:mission:operational:reserve:altitude",
-                ),
-                (
-                    "data:mission:sizing:main_route:reserve:duration",
-                    "data:mission:operational:reserve:duration",
-                ),
-                (
-                    "settings:mission:sizing:main_route:reserve:speed:k_factor",
-                    "settings:operational:reserve:speed:k_factor",
-                ),
-            ],
-            promotes_outputs=[
-                (
-                    "data:mission:sizing:main_route:climb:v_eas",
-                    "data:mission:operational:climb:v_eas",
-                ),
-                (
-                    "data:mission:sizing:main_route:descent:v_eas",
-                    "data:mission:operational:descent:v_eas",
-                ),
-                (
-                    "data:mission:sizing:main_route:reserve:v_tas",
-                    "data:mission:operational:reserve:v_tas",
-                ),
-            ],
+            promotes_inputs=initialization_input_promote_list,
+            promotes_outputs=initialization_output_promote_list,
         )
         self.add_subsystem(
             "solve_equilibrium",
@@ -1516,6 +1563,14 @@ class OperationalMissionVector(om.Group):
             outputs["solve_equilibrium.performance_per_phase.non_consumable_energy_t"] = np.zeros(
                 number_of_points_total
             )
+
+    @staticmethod
+    def is_service_active(service_id: str) -> bool:
+
+        try:
+            return bool(oad.RegisterSubmodel.active_models[service_id])
+        except KeyError:
+            return True
 
 
 def get_propulsive_power(
