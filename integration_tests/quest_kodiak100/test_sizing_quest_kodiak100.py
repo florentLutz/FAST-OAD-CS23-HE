@@ -107,3 +107,38 @@ def test_operational_mission_kodiak_100():
     assert problem.get_val(
         "data:environmental_impact:operational:fuel_emissions", units="kg"
     ) == pytest.approx(856.0, rel=1e-2)
+
+
+def test_retrofit_hybrid_kodiak():
+
+    """Test the overall aircraft design process with wing positioning."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_hybrid_kodiak.xml"
+    process_file_name = "hybrid_kodiak_retrofit.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # om.n2(problem, outfile=pth.join(RESULTS_FOLDER_PATH, "hybrid_kodiak_n2.html"))
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
+        224.00, rel=1e-2
+    )

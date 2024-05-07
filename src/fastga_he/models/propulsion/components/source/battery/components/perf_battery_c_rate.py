@@ -5,6 +5,10 @@
 import openmdao.api as om
 import numpy as np
 
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 class PerformancesModuleCRate(om.ExplicitComponent):
     """
