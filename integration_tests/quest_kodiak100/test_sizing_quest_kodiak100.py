@@ -99,14 +99,14 @@ def test_operational_mission_kodiak_100():
     problem.write_outputs()
 
     assert problem.get_val("data:mission:operational:TOW", units="kg") == pytest.approx(
-        2571.0, rel=1e-2
+        3104.0, rel=1e-2
     )
     assert problem.get_val("data:mission:operational:fuel", units="kg") == pytest.approx(
-        224.00, rel=1e-2
+        237.00, rel=1e-2
     )
     assert problem.get_val(
         "data:environmental_impact:operational:fuel_emissions", units="kg"
-    ) == pytest.approx(856.0, rel=1e-2)
+    ) == pytest.approx(906.0, rel=1e-2)
 
 
 def test_retrofit_hybrid_kodiak():

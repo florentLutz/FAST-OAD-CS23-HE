@@ -1,0 +1,39 @@
+title: Powertrain file for the operational mission of the TBM900
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: in_the_nose  # "on_the_wing", "in_the_nose"
+  turboshaft_1:
+    id: fastga_he.pt_component.turboshaft
+    position: in_the_front  # "on_the_wing", "in_the_front", "in_the_back"
+
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+    options:
+      number_of_engines: 1
+      number_of_tanks: 2
+    position: in_the_front  # "in_the_wing", "in_the_front", "in_the_back"
+
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_fuselage"
+  fuel_tank_2:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_fuselage"
+    symmetrical: fuel_tank_1
+
+component_connections:
+  - source: propeller_1
+    target: turboshaft_1
+
+  - source: turboshaft_1
+    target: [fuel_system_1, 1]
+
+  - source: [fuel_system_1, 1]
+    target: fuel_tank_1
+
+  - source: [fuel_system_1, 2]
+    target: fuel_tank_2
+
+watcher_file_path: ../results/fuel_propulsion_pt_watcher_op_mission.csv
