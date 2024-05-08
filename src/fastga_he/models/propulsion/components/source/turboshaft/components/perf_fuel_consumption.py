@@ -73,7 +73,6 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         density_ratio = inputs["density_ratio"]
         mach = inputs["mach"]
         power = inputs["power_required"]
-        # Need to divide by SL temperature for the surrogate
         design_t41t = inputs[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t"
         ]

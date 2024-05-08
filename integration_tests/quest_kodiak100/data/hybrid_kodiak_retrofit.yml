@@ -67,4 +67,4 @@ submodels:
   submodel.weight.mass.furniture.seats: null
   submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
   submodel.weight.mass.airframe.flight_controls: fastga.submodel.weight.mass.airframe.flight_controls.flops
-  submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
+  submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.ensure

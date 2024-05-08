@@ -677,6 +677,8 @@ TURBOSHAFT = {
         {"design_power_opr_limit": "kW"},
         {"design_power_itt_limit": "kW"},
         {"power_required": "kW"},
+        {"equivalent_rated_power_opr_limit": "kW"},
+        {"equivalent_rated_power_itt_limit": "kW"},
     ],
     SMP: [
         {"exhaust_velocity": "m/s"},
