@@ -30,6 +30,9 @@ power_train_components:
     id: fastga_he.pt_component.battery_pack
     position: underbelly  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
 
+  gearbox_1:
+    id: fastga_he.pt_component.speed_reducer
+    position: in_the_front  # "inside_the_wing", "in_the_back"
   turboshaft_1:
     id: fastga_he.pt_component.turboshaft
     position: in_the_front  # "on_the_wing", "in_the_front", "in_the_back"
@@ -52,6 +55,9 @@ component_connections:
     target: [planetary_gear_1, 1]
 
   - source: [planetary_gear_1, 1]
+    target: gearbox_1
+
+  - source: gearbox_1
     target: turboshaft_1
 
   - source: turboshaft_1

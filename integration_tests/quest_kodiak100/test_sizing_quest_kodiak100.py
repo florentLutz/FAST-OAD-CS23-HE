@@ -111,6 +111,14 @@ def test_operational_mission_kodiak_100():
 
 def test_retrofit_hybrid_kodiak():
 
+    """
+    We'll take a new turboshaft that correspond to the PW206B as it seems to have a fairly good sfc according to
+    https://en.wikipedia.org/wiki/Pratt_%26_Whitney_Canada_PW200. We'll use that reference sfc as well as some
+    educated on OPR and thermodynamic to get the right k_sfc before we can get our hand on more data (possibly from
+    Jane's). We'll consider that sfc is given at Sea Level Static with power equal to limit power. This gives an k_sfc
+    of 1.05
+    """
+
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -132,6 +140,11 @@ def test_retrofit_hybrid_kodiak():
 
     # om.n2(problem, outfile=pth.join(RESULTS_FOLDER_PATH, "hybrid_kodiak_n2.html"))
 
+    # Change battery pack characteristics so that they match those of a high power, lower capacity cell like the
+    # Samsung INR18650-25R, we also take the weight fraction of the Pipistrel battery. Assumes same polarization curve
+    problem.model_options["*"] = {"cell_capacity_ref": 2.5, "cell_weight_ref": 45.0e-3}
+    problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber", val=8.0, units="h**-1")
+
     problem.run_model()
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
@@ -140,5 +153,5 @@ def test_retrofit_hybrid_kodiak():
     problem.write_outputs()
 
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        224.00, rel=1e-2
+        227.00, abs=1.0
     )
