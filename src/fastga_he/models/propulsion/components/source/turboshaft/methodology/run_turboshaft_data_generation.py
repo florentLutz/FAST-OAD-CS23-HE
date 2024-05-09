@@ -625,8 +625,11 @@ if __name__ == "__main__":
         np.full_like(doeX[:, 2], 1000),
     )
     doeX[:, 5] = (
-        doeX[:, 5] * (temperature_ratio_max - temperature_ratio_min) + power_ratio_min
+        doeX[:, 5] * (temperature_ratio_max - temperature_ratio_min) + temperature_ratio_min
     ) * doeX[:, 4]
+
+    # Artificially add two smaller engine
+    # doeX = [[221.0, 500.0, 7.0, 8.5, 820.0, 615.0], [354.0, 600.0, 9.2, 10.5, 840.0, 672.0]]
 
     for turboshaft_design_parameter in doeX:
         t1 = time.time()
