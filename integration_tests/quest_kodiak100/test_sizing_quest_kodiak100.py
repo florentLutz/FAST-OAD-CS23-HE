@@ -137,14 +137,21 @@ def test_retrofit_hybrid_kodiak():
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
-    problem.setup()
 
     # om.n2(problem, outfile=pth.join(RESULTS_FOLDER_PATH, "hybrid_kodiak_n2.html"))
 
     # Change battery pack characteristics so that they match those of a high power,
     # lower capacity cell like the Samsung INR18650-25R, we also take the weight fraction of the
     # Pipistrel battery. Assumes same polarization curve
-    problem.model_options["*"] = {"cell_capacity_ref": 2.5, "cell_weight_ref": 45.0e-3}
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
     problem.set_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
         val=8.0,
@@ -159,3 +166,9 @@ def test_retrofit_hybrid_kodiak():
     problem.write_outputs()
 
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(226.00, abs=1.0)
+    assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
+        699.0, abs=1.0
+    )
+    assert problem.get_val(
+        "data:environmental_impact:sizing:emissions", units="kg"
+    ) == pytest.approx(867.00, abs=1.0)

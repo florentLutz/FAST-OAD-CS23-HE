@@ -49,4 +49,4 @@ if __name__ == "__main__":
     )
 
     fig.show()
-    fig.write_image("relative_cap.pdf")
+    # fig.write_image("relative_cap.pdf")

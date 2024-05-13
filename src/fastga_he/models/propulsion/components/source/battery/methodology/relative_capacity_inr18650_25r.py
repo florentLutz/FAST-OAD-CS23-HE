@@ -14,8 +14,8 @@ import plotly.graph_objects as go
 
 if __name__ == "__main__":
 
-    current = np.array([10000, 15000, 20000])
-    relative_capacity = np.array([1.0, 0.97, 0.95])
+    current = np.array([500, 5000, 10000, 15000, 20000])
+    relative_capacity = np.array([1.0, 0.97, 1.0, 0.97, 0.95])
 
     fig = go.Figure()
     scatter = go.Scatter(
@@ -49,4 +49,4 @@ if __name__ == "__main__":
     )
 
     fig.show()
-    fig.write_image("relative_cap.pdf")
+    # fig.write_image("relative_cap.pdf")
