@@ -109,10 +109,13 @@ if __name__ == "__main__":
     fig.update_layout(
         height=600,
         width=1900,
-        title_text="Statistical analysis PT6A Family",
-        title_x=0.5,
+        # title_text="Statistical analysis PT6A Family",
+        # title_x=0.5,
+        # title_font=dict(size=50),
         showlegend=False,
+        font=dict(size=25),
     )
+    fig.update_annotations(font_size=30)
 
     fig.update_xaxes(title_text="Rated Power (kW)", row=1, col=1)
     fig.update_xaxes(title_text="Rated Power (kW)", row=1, col=2)
