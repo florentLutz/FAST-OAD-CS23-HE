@@ -13,10 +13,26 @@ class PerformancesRelativeCapacity(om.ExplicitComponent):
     polynomial interpolation is implemented based on the value from :cite:`samsung:2015` .
     """
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.poly = None
+        self.der_poly = None
+
     def initialize(self):
 
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            "reference_curve_current",
+            default=[680, 3400, 6800, 8000],
+            desc="Data for the relative capacity curve of the reference cell, in mA",
+        )
+        self.options.declare(
+            "reference_curve_relative_capacity",
+            default=[1, 0.97, 0.95, 0.92],
+            desc="Data for the relative capacity curve of the reference cell",
         )
 
     def setup(self):
@@ -29,15 +45,17 @@ class PerformancesRelativeCapacity(om.ExplicitComponent):
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
+        self.poly = np.polyfit(
+            self.options["reference_curve_current"],
+            self.options["reference_curve_relative_capacity"],
+            3,
+        )
+        self.der_poly = np.polyder(self.poly)
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         current = inputs["current_one_module"]
-        relative_capacity = (
-            -6.82654770e-13 * current ** 3.0
-            + 8.26830658e-09 * current ** 2.0
-            - 3.49786561e-05 * current
-            + 1.02017687e00
-        )
+        relative_capacity = np.polyval(self.poly, current)
 
         # The capacity can't be > 1.0 even if the interpolation allows it for very small
         # current. Likewise, if the relative capacity is below 0.85 (somewhat arbitrary value,
@@ -53,15 +71,8 @@ class PerformancesRelativeCapacity(om.ExplicitComponent):
 
         current = inputs["current_one_module"]
 
-        relative_capacity = (
-            -6.82654770e-13 * current ** 3.0
-            + 8.26830658e-09 * current ** 2.0
-            - 3.49786561e-05 * current
-            + 1.02017687e00
-        )
-        d_r_d_current = (
-            -3.0 * 6.82654770e-13 * current ** 2.0 + 2.0 * 8.26830658e-09 * current - 3.49786561e-05
-        )
+        relative_capacity = np.polyval(self.poly, current)
+        d_r_d_current = np.polyval(self.der_poly, current)
         d_r_d_current = np.where(
             relative_capacity < 1.0, d_r_d_current, np.zeros_like(d_r_d_current)
         )
