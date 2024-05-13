@@ -384,13 +384,13 @@
             <power_rating units="kW">321.0</power_rating>
             <power_offtake units="kW" is_input="True">30.0<!--Mechanical offtake on the turboshaft, is added to shaft power out--></power_offtake>
             <design_point>
-              <OPR is_input="True">7.0<!--OPR of the turboshaft at the design point--></OPR>
+              <OPR is_input="True">8.0<!--OPR of the turboshaft at the design point--></OPR>
               <T41t units="degK" is_input="True">1400.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
               <power_ratio is_input="True">1.56<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
             </design_point>
             <limit>
               <ITT is_input="True" units="degK">1100.0<!--Limit ITT of the turboshaft--></ITT>
-              <OPR is_input="True">9.0<!--Limit OPR of the turboshaft--></OPR>
+              <OPR is_input="True">8.0<!--Limit OPR of the turboshaft--></OPR>
             </limit>
           </turboshaft_1>
         </turboshaft>
@@ -605,7 +605,7 @@
         <turboshaft>
           <turboshaft_1>
             <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
-            <k_sfc is_input="True">1.18<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
+            <k_sfc is_input="True">1.11<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
           </turboshaft_1>
         </turboshaft>
         <DC_DC_converter>

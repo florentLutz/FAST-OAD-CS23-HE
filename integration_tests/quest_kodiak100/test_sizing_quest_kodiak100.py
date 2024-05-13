@@ -165,10 +165,10 @@ def test_retrofit_hybrid_kodiak():
 
     problem.write_outputs()
 
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(226.00, abs=1.0)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(210.00, abs=1.0)
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
         699.0, abs=1.0
     )
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
-    ) == pytest.approx(867.00, abs=1.0)
+    ) == pytest.approx(805.00, abs=1.0)
