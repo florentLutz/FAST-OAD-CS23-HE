@@ -195,6 +195,50 @@
     <propulsion>
       <he_power_train>
         <thrust_distribution is_input="True">1.0</thrust_distribution>
+        <DC_DC_converter>
+          <dc_dc_converter_1>
+            <front_length_ratio is_input="True">0.9<!--Location of the DC/DC converter CG as a ratio of the aircraft front length--></front_length_ratio>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
+            <voltage_out_target_mission units="V" is_input="True">800.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
+            <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
+            <capacitor>
+              <aspect_ratio is_input="True">1.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
+            </capacitor>
+            <control_card>
+              <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
+            </control_card>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+            </diode>
+            <heat_sink>
+              <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
+              <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
+              <coolant>
+                <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
+                <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
+                <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
+                <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
+                <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
+                <thermal_conductivity units="W/m/degK" is_input="True">0.402<!--Thermal conductivity of the coolant fluid--></thermal_conductivity>
+              </coolant>
+              <tube>
+                <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
+                <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
+              </tube>
+            </heat_sink>
+            <inductor>
+              <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
+              <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
+              <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
+            </inductor>
+            <module>
+              <number is_input="True">1.0<!--Number of module to cool down, will depend on the component (3 for inverter/rectifiers, 1 for DC/DC)--></number>
+            </module>
+            <tube>
+              <number_of_passes is_input="True">4.0<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
+            </tube>
+          </dc_dc_converter_1>
+        </DC_DC_converter>
         <DC_bus>
           <dc_bus_1>
             <front_length_ratio is_input="True">0.9<!--Location of the DC bus CG as a ratio of the aircraft front length--></front_length_ratio>
@@ -264,13 +308,13 @@
             </diode>
             <heat_sink>
               <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
-              <temperature_rating units="degK">373.15</temperature_rating>
+              <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
               <coolant>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
-                <temperature_in_rating units="degK">323.15</temperature_in_rating>
-                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
+                <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
                 <thermal_conductivity units="W/m/degK" is_input="True">0.402<!--Thermal conductivity of the coolant fluid--></thermal_conductivity>
               </coolant>
               <tube>
@@ -282,7 +326,7 @@
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
             </igbt>
             <inductor>
-              <inductance units="H" is_input="False">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
+              <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
             </inductor>
@@ -307,57 +351,12 @@
         <planetary_gear>
           <planetary_gear_1>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
+            <front_length_ratio is_input="True">0.9<!--Location of the planetary gear CG as a ratio of the aircraft front length--></front_length_ratio>
             <gear_ratio is_input="True">2.0<!--Gear ratio of the planetary gear--></gear_ratio>
             <power_share units="kW" is_input="True">191.0<!--Share of the power going to the first (primary) input, in W--></power_share>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
-            <CG>
-              <y_ratio is_input="True">0.0<!--Y position of the planetary gear center of gravity as a ratio of the wing half-span--></y_ratio>
-            </CG>
           </planetary_gear_1>
         </planetary_gear>
-        <DC_DC_converter>
-          <dc_dc_converter_1>
-            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
-            <voltage_out_target_mission units="V" is_input="True">800.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
-            <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
-            <capacitor>
-              <aspect_ratio is_input="True">1.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
-            </capacitor>
-            <control_card>
-              <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
-            </control_card>
-            <diode>
-              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
-            </diode>
-            <heat_sink>
-              <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
-              <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
-              <coolant>
-                <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
-                <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
-                <temperature_in_rating units="degK">323.15</temperature_in_rating>
-                <temperature_out_rating units="degK">353.15</temperature_out_rating>
-                <thermal_conductivity units="W/m/degK" is_input="True">0.402<!--Thermal conductivity of the coolant fluid--></thermal_conductivity>
-              </coolant>
-              <tube>
-                <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
-                <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
-              </tube>
-            </heat_sink>
-            <inductor>
-              <inductance units="H" is_input="False">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
-              <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
-              <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
-            </inductor>
-            <module>
-              <number is_input="True">1<!--Number of module to cool down, will depend on the component (3 for inverter/rectifiers, 1 for DC/DC)--></number>
-            </module>
-            <tube>
-              <number_of_passes is_input="True">4<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
-            </tube>
-          </dc_dc_converter_1>
-        </DC_DC_converter>
         <propeller>
           <propeller_1>
             <activity_factor is_input="True">150.0<!--Activity factor of the propeller--></activity_factor>
@@ -381,15 +380,15 @@
         </speed_reducer>
         <turboshaft>
           <turboshaft_1>
-            <power_rating units="kW">321.0</power_rating>
             <power_offtake units="kW" is_input="True">30.0<!--Mechanical offtake on the turboshaft, is added to shaft power out--></power_offtake>
+            <power_rating units="kW" is_input="True">321.0<!--Flat rating of the turboshaft--></power_rating>
             <design_point>
               <OPR is_input="True">8.0<!--OPR of the turboshaft at the design point--></OPR>
               <T41t units="degK" is_input="True">1400.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
               <power_ratio is_input="True">1.56<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
             </design_point>
             <limit>
-              <ITT is_input="True" units="degK">1100.0<!--Limit ITT of the turboshaft--></ITT>
+              <ITT units="degK" is_input="True">1100.0<!--Limit ITT of the turboshaft--></ITT>
               <OPR is_input="True">8.0<!--Limit OPR of the turboshaft--></OPR>
             </limit>
           </turboshaft_1>
@@ -398,6 +397,7 @@
     </propulsion>
     <weight>
       <aircraft>
+        <MLW units="kg" is_input="False">3047.6443930100922<!--maximum landing weight--></MLW>
         <MTOW units="kg" is_input="True">3280.3834256571254<!--maximum takeoff weight of the aircraft--></MTOW>
         <max_payload units="kg" is_input="True">1140.0<!--max payload weight--></max_payload>
         <payload units="kg" is_input="True">620.0<!--design payload weight--></payload>
@@ -519,18 +519,21 @@
             <v_eas units="knot" is_input="True">140.0</v_eas>
           </descent>
           <reserve>
-            <v_tas units="m/s" is_input="False">58.52013383961101</v_tas>
             <altitude units="ft" is_input="True">10000.0</altitude>
             <duration units="min" is_input="True">45.0<!--duration of the reserve segment--></duration>
           </reserve>
         </main_route>
+        <payload>
+          <CG>
+            <x units="m" is_input="True">4.1</x>
+          </CG>
+        </payload>
       </sizing>
     </mission>
   </data>
   <settings>
     <weight>
       <aircraft>
-        <MLW_MZFW_ratio is_input="True">1.063</MLW_MZFW_ratio>
         <CG>
           <range is_input="True">0.26<!--distance between front position and aft position of CG, as ratio of mean aerodynamic chord (allows to have front position of CG potentially fwd of the computed one, as currently, FAST-OAD uses the aft position of CG as a reference)--></range>
           <aft>
@@ -571,9 +574,9 @@
       <he_power_train>
         <DC_bus>
           <insulation>
-            <breakdown_voltage units="V" is_input="True">340<!--Mininum breakdown voltage of air cavity--></breakdown_voltage>
+            <breakdown_voltage units="V" is_input="True">340.0<!--Mininum breakdown voltage of air cavity--></breakdown_voltage>
             <density units="kg/m**3" is_input="True">1450.0<!--Density of the insulation, Gexol is assumed--></density>
-            <dielectric_permittivity is_input="True">4<!--Dielectric permittivity of the insulation, chosen as Gexol insulation--></dielectric_permittivity>
+            <dielectric_permittivity is_input="True">4.0<!--Dielectric permittivity of the insulation, chosen as Gexol insulation--></dielectric_permittivity>
             <void_thickness units="m" is_input="True">5e-05</void_thickness>
           </insulation>
         </DC_bus>

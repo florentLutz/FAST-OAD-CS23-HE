@@ -15,7 +15,16 @@
 import numpy as np
 import openmdao.api as om
 
+import fastoad.api as oad
 
+from fastga_he.models.performances.mission_vector.constants import SUBMODEL_CG_VARIATION
+
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_CG_VARIATION
+] = "fastga_he.submodel.performances.cg_variation.legacy"
+
+
+@oad.RegisterSubmodel(SUBMODEL_CG_VARIATION, "fastga_he.submodel.performances.cg_variation.legacy")
 class InFlightCGVariation(om.ExplicitComponent):
     """
     Computes the coefficient necessary to the calculation of the cg position at any point of
@@ -124,3 +133,74 @@ class InFlightCGVariation(om.ExplicitComponent):
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             "data:weight:aircraft:payload",
         ] = 0.0
+
+
+@oad.RegisterSubmodel(SUBMODEL_CG_VARIATION, "fastga_he.submodel.performances.cg_variation.simple")
+class InFlightCGVariationSimple(om.ExplicitComponent):
+    """
+    Computes the coefficient necessary to the calculation of the cg position at any point of
+    the sizing mission assuming a cg of payload as input.
+    """
+
+    def setup(self):
+        self.add_input("data:weight:aircraft_empty:CG:x", val=np.nan, units="m")
+        self.add_input("data:weight:aircraft_empty:mass", val=np.nan, units="kg")
+        self.add_input("data:weight:aircraft:payload", val=np.nan, units="kg")
+        self.add_input("data:mission:sizing:payload:CG:x", val=np.nan, units="m")
+
+        self.add_output(
+            "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
+            units="kg*m",
+        )
+        self.add_output("data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass", units="kg")
+
+        self.declare_partials(
+            of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass",
+            wrt=["data:weight:aircraft:payload", "data:weight:aircraft_empty:mass"],
+            val=1.0,
+        )
+        self.declare_partials(
+            of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
+            wrt=[
+                "data:weight:aircraft_empty:mass",
+                "data:weight:aircraft_empty:CG:x",
+                "data:weight:aircraft:payload",
+                "data:mission:sizing:payload:CG:x",
+            ],
+            method="exact",
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        m_empty = inputs["data:weight:aircraft_empty:mass"]
+        x_cg_plane_aft = inputs["data:weight:aircraft_empty:CG:x"]
+
+        payload = inputs["data:weight:aircraft:payload"]
+        x_cg_payload = inputs["data:mission:sizing:payload:CG:x"]
+
+        equivalent_moment = m_empty * x_cg_plane_aft + payload * x_cg_payload
+        mass = m_empty + payload
+
+        outputs[
+            "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment"
+        ] = equivalent_moment
+        outputs["data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass"] = mass
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+
+        partials[
+            "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
+            "data:weight:aircraft_empty:mass",
+        ] = inputs["data:weight:aircraft_empty:CG:x"]
+        partials[
+            "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
+            "data:weight:aircraft_empty:CG:x",
+        ] = inputs["data:weight:aircraft_empty:mass"]
+        partials[
+            "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
+            "data:weight:aircraft:payload",
+        ] = inputs["data:mission:sizing:payload:CG:x"]
+        partials[
+            "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
+            "data:mission:sizing:payload:CG:x",
+        ] = inputs["data:weight:aircraft:payload"]

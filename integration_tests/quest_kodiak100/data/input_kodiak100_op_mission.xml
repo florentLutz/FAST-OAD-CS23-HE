@@ -87,7 +87,7 @@
         <payload>
           <mass units="kg" is_input="True">1140.0</mass>
           <CG>
-            <x units="m" is_input="True">5.6</x>
+            <x units="m" is_input="True">4.1</x>
           </CG>
         </payload>
         <reserve>

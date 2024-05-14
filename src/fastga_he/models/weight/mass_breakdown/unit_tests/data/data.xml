@@ -87,6 +87,7 @@
         </geometry>
         <weight>
             <aircraft>
+                <OWE units="kg" is_input="True">900.0<!--maximum takeoff weight--></OWE>
                 <MTOW units="kg" is_input="True">1769.0<!--maximum takeoff weight--></MTOW>
                 <MZFW units="kg" is_input="True">1381.7<!--maximum zero fuel weight--></MZFW>
             </aircraft>
@@ -129,6 +130,7 @@
         </weight>
         <mission>
             <sizing>
+                <fuel>250.</fuel>
                 <main_route>
                     <cruise>
                         <altitude units="ft" is_input="True">8000.0<!--altitude during cruise phase in sizing mission--></altitude>

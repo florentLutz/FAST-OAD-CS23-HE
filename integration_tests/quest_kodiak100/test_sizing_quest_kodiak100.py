@@ -99,14 +99,14 @@ def test_operational_mission_kodiak_100():
     problem.write_outputs()
 
     assert problem.get_val("data:mission:operational:TOW", units="kg") == pytest.approx(
-        3102.0, abs=1
+        3113.0, abs=1
     )
     assert problem.get_val("data:mission:operational:fuel", units="kg") == pytest.approx(
-        235.00, abs=1
+        246.00, abs=1
     )
     assert problem.get_val(
         "data:environmental_impact:operational:fuel_emissions", units="kg"
-    ) == pytest.approx(896.0, abs=1)
+    ) == pytest.approx(938.0, abs=1)
 
 
 def test_retrofit_hybrid_kodiak():
@@ -117,7 +117,7 @@ def test_retrofit_hybrid_kodiak():
     sfc according to https://en.wikipedia.org/wiki/Pratt_%26_Whitney_Canada_PW200. We'll use that
     reference sfc as well as some educated on OPR and thermodynamic to get the right k_sfc before
     we can get our hand on more data (possibly from Jane's). We'll consider that sfc is given at
-    Sea Level Static with power equal to limit power. This gives an k_sfc of 1.05
+    Sea Level Static with power equal to limit power. This gives an k_sfc of 1.11
 
     """
 
@@ -158,6 +158,8 @@ def test_retrofit_hybrid_kodiak():
         units="h**-1",
     )
 
+    # om.n2(problem)
+
     problem.run_model()
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
@@ -165,10 +167,10 @@ def test_retrofit_hybrid_kodiak():
 
     problem.write_outputs()
 
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(210.00, abs=1.0)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(208.00, abs=1.0)
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        699.0, abs=1.0
+        690.0, abs=1.0
     )
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
-    ) == pytest.approx(805.00, abs=1.0)
+    ) == pytest.approx(797.00, abs=1.0)

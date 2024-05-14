@@ -28,6 +28,7 @@ from fastga_he.models.propulsion.assemblers.performances_watcher import (
 from fastga_he.models.performances.mission_vector.constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
     HE_SUBMODEL_DEP_EFFECT,
+    SUBMODEL_CG_VARIATION,
 )
 from fastga_he.models.propulsion.assemblers.energy_consumption_mission_vector import (
     ENERGY_CONSUMPTION_FROM_PT_FILE,
@@ -128,7 +129,11 @@ class MissionVector(om.Group):
 
         self.nonlinear_solver.options["use_apply_nonlinear"] = self.options["use_apply_nonlinear"]
 
-        self.add_subsystem("in_flight_cg_variation", InFlightCGVariation(), promotes=["*"])
+        self.add_subsystem(
+            "in_flight_cg_variation",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CG_VARIATION),
+            promotes=["*"],
+        )
         self.add_subsystem(
             "initialization",
             Initialize(
