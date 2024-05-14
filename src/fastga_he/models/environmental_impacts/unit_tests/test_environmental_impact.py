@@ -31,6 +31,9 @@ def test_impact_sizing_jet_fuel():
     ) == pytest.approx(
         problem.get_val("data:environmental_impact:sizing:emissions", units="kg"), abs=1e-2
     )
+    assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
+        2.72, abs=1e-2
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -57,6 +60,9 @@ def test_impact_operational_biofuel():
     assert problem.get_val(
         "data:environmental_impact:operational:emissions", units="kg"
     ) == pytest.approx(116.248, abs=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operational:emission_factor"
+    ) == pytest.approx(0.275, abs=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -91,6 +97,9 @@ def test_impact_both():
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
     ) == pytest.approx(866.67, abs=1e-2)
+    assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
+        0.66, abs=1e-2
+    )
 
     assert problem.get_val(
         "data:environmental_impact:operational:fuel_emissions", units="kg"
@@ -101,5 +110,8 @@ def test_impact_both():
     assert problem.get_val(
         "data:environmental_impact:operational:emissions", units="kg"
     ) == pytest.approx(225.68, abs=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operational:emission_factor"
+    ) == pytest.approx(0.5344, abs=1e-2)
 
     problem.check_partials(compact_print=True)

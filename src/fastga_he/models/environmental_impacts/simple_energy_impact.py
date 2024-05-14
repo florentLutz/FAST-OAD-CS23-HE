@@ -69,6 +69,9 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             self.add_input("data:mission:sizing:fuel", units="kg", val=np.nan)
             self.add_input("data:mission:sizing:energy", units="kW*h", val=np.nan)
 
+            self.add_input("data:TLAR:range", np.nan, units="km")
+            self.add_input("data:weight:aircraft:payload", val=np.nan, units="kg")
+
             self.add_output(
                 "data:environmental_impact:sizing:fuel_emissions",
                 units="g",
@@ -88,6 +91,11 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
                 val=0.0,
                 desc="Total emissions during the sizing mission, in gCO2,eq",
             )
+            self.add_output(
+                "data:environmental_impact:sizing:emission_factor",
+                val=0.0,
+                desc="Total emissions during the sizing mission per kg of payload per km [kgCO2/kg/km]",
+            )
 
             self.declare_partials(
                 of="data:environmental_impact:sizing:fuel_emissions",
@@ -104,11 +112,23 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
                 wrt=["data:mission:sizing:fuel", "data:mission:sizing:energy"],
                 method="exact",
             )
+            self.declare_partials(
+                of="data:environmental_impact:sizing:emission_factor",
+                wrt=[
+                    "data:mission:sizing:fuel",
+                    "data:mission:sizing:energy",
+                    "data:TLAR:range",
+                    "data:weight:aircraft:payload",
+                ],
+            )
 
         if mission_option == "operational" or mission_option == "both":
 
             self.add_input("data:mission:operational:fuel", units="kg", val=np.nan)
             self.add_input("data:mission:operational:energy", units="kW*h", val=np.nan)
+
+            self.add_input("data:mission:operational:range", np.nan, units="km")
+            self.add_input("data:mission:operational:payload:mass", val=np.nan, units="kg")
 
             self.add_output(
                 "data:environmental_impact:operational:fuel_emissions",
@@ -130,6 +150,11 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
                 val=0.0,
                 desc="Total emissions during the operational mission, in gCO2,eq",
             )
+            self.add_output(
+                "data:environmental_impact:operational:emission_factor",
+                val=0.0,
+                desc="Total emissions during the operational mission per kg of payload per km [kgCO2/kg/km]",
+            )
 
             self.declare_partials(
                 of="data:environmental_impact:operational:fuel_emissions",
@@ -145,6 +170,15 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
                 of="data:environmental_impact:operational:emissions",
                 wrt=["data:mission:operational:fuel", "data:mission:operational:energy"],
                 method="exact",
+            )
+            self.declare_partials(
+                of="data:environmental_impact:operational:emission_factor",
+                wrt=[
+                    "data:mission:operational:fuel",
+                    "data:mission:operational:energy",
+                    "data:mission:operational:range",
+                    "data:mission:operational:payload:mass",
+                ],
             )
 
         if self.options["fuel_type"] == "biofuel_ft_pathway":
@@ -179,6 +213,9 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             fuel_consumed = inputs["data:mission:sizing:fuel"]
             electricity_consumed = inputs["data:mission:sizing:energy"]
 
+            design_range = inputs["data:TLAR:range"]
+            payload = inputs["data:weight:aircraft:payload"]
+
             emissions_fuel = fuel_consumed * self.energy_content_fuel * self.carbon_intensity_fuel
             emissions_electricity = (
                 electricity_consumed * self.carbon_intensity_electricity * KWH_TO_MJ
@@ -189,11 +226,17 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             outputs["data:environmental_impact:sizing:emissions"] = (
                 emissions_electricity + emissions_fuel
             )
+            outputs["data:environmental_impact:sizing:emission_factor"] = (
+                (emissions_electricity + emissions_fuel) / design_range / payload
+            )
 
         if mission_option == "operational" or mission_option == "both":
 
             fuel_consumed = inputs["data:mission:operational:fuel"]
             electricity_consumed = inputs["data:mission:operational:energy"]
+
+            op_range = inputs["data:mission:operational:range"]
+            payload = inputs["data:mission:operational:payload:mass"]
 
             emissions_fuel = fuel_consumed * self.energy_content_fuel * self.carbon_intensity_fuel
             emissions_electricity = (
@@ -207,12 +250,21 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             outputs["data:environmental_impact:operational:emissions"] = (
                 emissions_electricity + emissions_fuel
             )
+            outputs["data:environmental_impact:operational:emission_factor"] = (
+                (emissions_electricity + emissions_fuel) / op_range / payload
+            )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         mission_option = self.options["mission"]
 
         if mission_option == "design" or mission_option == "both":
+
+            fuel_consumed = inputs["data:mission:sizing:fuel"]
+            electricity_consumed = inputs["data:mission:sizing:energy"]
+
+            design_range = inputs["data:TLAR:range"]
+            payload = inputs["data:weight:aircraft:payload"]
 
             partials[
                 "data:environmental_impact:sizing:fuel_emissions", "data:mission:sizing:fuel"
@@ -228,7 +280,38 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
                 self.carbon_intensity_electricity * KWH_TO_MJ
             )
 
+            partials[
+                "data:environmental_impact:sizing:emission_factor", "data:mission:sizing:energy"
+            ] = (self.carbon_intensity_electricity * KWH_TO_MJ / design_range / payload)
+            partials[
+                "data:environmental_impact:sizing:emission_factor", "data:mission:sizing:fuel"
+            ] = (self.energy_content_fuel * self.carbon_intensity_fuel / design_range / payload)
+            partials["data:environmental_impact:sizing:emission_factor", "data:TLAR:range"] = (
+                -(
+                    electricity_consumed * self.carbon_intensity_electricity * KWH_TO_MJ
+                    + self.energy_content_fuel * self.carbon_intensity_fuel * fuel_consumed
+                )
+                / design_range ** 2.0
+                / payload
+            )
+            partials[
+                "data:environmental_impact:sizing:emission_factor", "data:weight:aircraft:payload"
+            ] = (
+                -(
+                    electricity_consumed * self.carbon_intensity_electricity * KWH_TO_MJ
+                    + self.energy_content_fuel * self.carbon_intensity_fuel * fuel_consumed
+                )
+                / design_range
+                / payload ** 2.0
+            )
+
         if mission_option == "operational" or mission_option == "both":
+
+            fuel_consumed = inputs["data:mission:operational:fuel"]
+            electricity_consumed = inputs["data:mission:operational:energy"]
+
+            op_range = inputs["data:mission:operational:range"]
+            payload = inputs["data:mission:operational:payload:mass"]
 
             partials[
                 "data:environmental_impact:operational:fuel_emissions",
@@ -251,4 +334,39 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
                 "data:mission:operational:energy",
             ] = (
                 self.carbon_intensity_electricity * KWH_TO_MJ
+            )
+
+            partials[
+                "data:environmental_impact:operational:emission_factor",
+                "data:mission:operational:energy",
+            ] = (
+                self.carbon_intensity_electricity * KWH_TO_MJ / op_range / payload
+            )
+            partials[
+                "data:environmental_impact:operational:emission_factor",
+                "data:mission:operational:fuel",
+            ] = (
+                self.energy_content_fuel * self.carbon_intensity_fuel / op_range / payload
+            )
+            partials[
+                "data:environmental_impact:operational:emission_factor",
+                "data:mission:operational:range",
+            ] = (
+                -(
+                    electricity_consumed * self.carbon_intensity_electricity * KWH_TO_MJ
+                    + self.energy_content_fuel * self.carbon_intensity_fuel * fuel_consumed
+                )
+                / op_range ** 2.0
+                / payload
+            )
+            partials[
+                "data:environmental_impact:operational:emission_factor",
+                "data:mission:operational:payload:mass",
+            ] = (
+                -(
+                    electricity_consumed * self.carbon_intensity_electricity * KWH_TO_MJ
+                    + self.energy_content_fuel * self.carbon_intensity_fuel * fuel_consumed
+                )
+                / op_range
+                / payload ** 2.0
             )

@@ -1,7 +1,19 @@
 <FASTOAD_model>
   <data>
+    <TLAR>
+      <range units="NM">1140.0</range>
+    </TLAR>
+    <weight>
+      <aircraft>
+        <payload>620.0</payload>
+      </aircraft>
+    </weight>
     <mission>
       <operational>
+        <range units="NM">200.0</range>
+        <payload>
+          <mass units="kg">1140.0</mass>
+        </payload>
         <energy units="kW*h" is_input="False">160.0</energy>
         <fuel units="kg" is_input="False">224.62529117214783</fuel>
       </operational>

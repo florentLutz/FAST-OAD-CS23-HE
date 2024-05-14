@@ -107,6 +107,9 @@ def test_operational_mission_kodiak_100():
     assert problem.get_val(
         "data:environmental_impact:operational:fuel_emissions", units="kg"
     ) == pytest.approx(938.0, abs=1)
+    assert problem.get_val(
+        "data:environmental_impact:operational:emission_factor"
+    ) == pytest.approx(2.223, abs=1e-2)
 
 
 def test_retrofit_hybrid_kodiak():
@@ -174,3 +177,192 @@ def test_retrofit_hybrid_kodiak():
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
     ) == pytest.approx(797.00, abs=1.0)
+    assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
+        2.216, abs=1e-2
+    )
+
+
+def test_retrofit_hybrid_kodiak_european_mix():
+
+    """
+    Computation of the emissions factor with the Europe electricity index.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "hybrid_kodiak_full_sizing.xml"
+    process_file_name = "hybrid_kodiak_emissions_europe_mix.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    problem.run_model()
+
+    problem.write_outputs()
+
+    assert problem.get_val(
+        "data:environmental_impact:sizing:emissions", units="kg"
+    ) == pytest.approx(803.49, abs=1.0)
+    assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
+        2.233, abs=1e-2
+    )
+
+
+def test_retrofit_hybrid_kodiak_french_mix_ft():
+
+    """
+
+    Computation of the emissions factor with the french electricity emission index and biofuel
+    obtained with FT pathway.
+
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "hybrid_kodiak_full_sizing.xml"
+    process_file_name = "hybrid_kodiak_emissions_french_mix_ft.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    problem.run_model()
+
+    problem.write_outputs()
+
+    assert problem.get_val(
+        "data:environmental_impact:sizing:emissions", units="kg"
+    ) == pytest.approx(73.109, abs=1.0)
+    assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
+        0.2032, abs=1e-2
+    )
+
+
+def test_operational_mission_kodiak_100_ft():
+    """
+    Computation of the emissions factor with the french electricity emission index and biofuel
+    obtained with FT pathway.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "op_mission_full.xml"
+    process_file_name = "op_kodiak_emissions_ft.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    problem.run_model()
+
+    problem.write_outputs()
+
+    assert problem.get_val(
+        "data:environmental_impact:operational:emissions", units="kg"
+    ) == pytest.approx(81.505, abs=1.0)
+    assert problem.get_val(
+        "data:environmental_impact:operational:emission_factor"
+    ) == pytest.approx(0.1930, abs=1e-2)
+
+
+def test_retrofit_hybrid_kodiak_french_mix_hefa():
+
+    """
+
+    Computation of the emissions factor with the french electricity emission index and biofuel
+    obtained with HEFA pathway.
+
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "hybrid_kodiak_full_sizing.xml"
+    process_file_name = "hybrid_kodiak_emissions_french_mix_hefa.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    problem.run_model()
+
+    problem.write_outputs()
+
+    assert problem.get_val(
+        "data:environmental_impact:sizing:emissions", units="kg"
+    ) == pytest.approx(197.38, abs=1.0)
+    assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
+        0.5486, abs=1e-2
+    )
+
+
+def test_operational_mission_kodiak_100_hefa():
+    """
+    Computation of the emissions factor with the french electricity emission index and biofuel
+    obtained with HEFA pathway.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "op_mission_full.xml"
+    process_file_name = "op_kodiak_emissions_hefa.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    problem.run_model()
+
+    problem.write_outputs()
+
+    assert problem.get_val(
+        "data:environmental_impact:operational:emissions", units="kg"
+    ) == pytest.approx(228.638, abs=1.0)
+    assert problem.get_val(
+        "data:environmental_impact:operational:emission_factor"
+    ) == pytest.approx(0.5415, abs=1e-2)
