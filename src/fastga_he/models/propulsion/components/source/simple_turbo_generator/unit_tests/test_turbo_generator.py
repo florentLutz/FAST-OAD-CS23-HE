@@ -7,6 +7,11 @@ import pytest
 
 import openmdao.api as om
 
+from ..components.cstr_enforce import ConstraintsPowerEnforce
+from ..components.cstr_ensure import ConstraintsPowerEnsure
+
+from ..components.cstr_turbo_generator import ConstraintTurboGeneratorPowerRateMission
+
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_current_rms_3_phases import PerformancesCurrentRMS3Phases
@@ -23,6 +28,66 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "sample_simple_generator.xml"
 NB_POINTS_TEST = 10
+
+
+def test_constraints_enforce_power():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsPowerEnforce(turbo_generator_id="turbo_generator_1")),
+        __file__,
+        XML_FILE,
+    )
+    problem = run_system(ConstraintsPowerEnforce(turbo_generator_id="turbo_generator_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:power_rating",
+            units="kW",
+        )
+        == pytest.approx(750, rel=1e-2)
+    )
+
+
+def test_constraints_ensure_power():
+
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsPowerEnsure(turbo_generator_id="turbo_generator_1")),
+        __file__,
+        XML_FILE,
+    )
+    problem = run_system(ConstraintsPowerEnsure(turbo_generator_id="turbo_generator_1"), ivc)
+
+    assert (
+        problem.get_val(
+            "constraints:propulsion:he_power_train:turbo_generator:turbo_generator_1:power_rating",
+            units="kW",
+        )
+        == pytest.approx(-50.0, rel=1e-2)
+    )
+
+
+def test_constraint_power_for_power_rate():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            ConstraintTurboGeneratorPowerRateMission(turbo_generator_id="turbo_generator_1")
+        ),
+        __file__,
+        XML_FILE,
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        ConstraintTurboGeneratorPowerRateMission(turbo_generator_id="turbo_generator_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:shaft_power_rating",
+            units="kW",
+        )
+        == pytest.approx(750, rel=1e-2)
+    )
+
+    problem.check_partials(compact_print=True)
 
 
 def test_rpm_mission():
