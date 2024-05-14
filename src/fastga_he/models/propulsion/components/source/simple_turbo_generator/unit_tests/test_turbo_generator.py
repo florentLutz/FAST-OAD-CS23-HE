@@ -7,6 +7,12 @@ import pytest
 
 import openmdao.api as om
 
+from ..components.sizing_weight import SizingTurboGeneratorWeight
+from ..components.sizing_turbo_generator_cg_x import SizingTurboGeneratorCGX
+from ..components.sizing_turbo_generator_cg_y import SizingTurboGeneratorCGY
+
+from ..components.sizing_turbo_generator import SizingTurboGenerator
+
 from ..components.cstr_enforce import ConstraintsPowerEnforce
 from ..components.cstr_ensure import ConstraintsPowerEnsure
 
@@ -28,6 +34,104 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "sample_simple_generator.xml"
 NB_POINTS_TEST = 10
+
+
+def test_weight():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingTurboGeneratorWeight(turbo_generator_id="turbo_generator_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingTurboGeneratorWeight(turbo_generator_id="turbo_generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:mass", units="kg"
+    ) == pytest.approx(160.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_turbo_generator_cg_x():
+
+    expected_cg = [2.69, 0.4, 4.8]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingTurboGeneratorCGX(turbo_generator_id="turbo_generator_1", position=option)
+            ),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SizingTurboGeneratorCGX(turbo_generator_id="turbo_generator_1", position=option), ivc
+        )
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_turbo_generator_cg_y():
+
+    expected_cg = [2.0, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingTurboGeneratorCGY(turbo_generator_id="turbo_generator_1", position=option)
+            ),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SizingTurboGeneratorCGY(turbo_generator_id="turbo_generator_1", position=option), ivc
+        )
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:CG:y", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_sizing():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingTurboGenerator(turbo_generator_id="turbo_generator_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingTurboGenerator(turbo_generator_id="turbo_generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:mass", units="kg"
+    ) == pytest.approx(150.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:CG:x", units="m"
+    ) == pytest.approx(4.8, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:CG:y", units="m"
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:low_speed:CD0"
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:cruise:CD0"
+    ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_constraints_enforce_power():

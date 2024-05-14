@@ -29,6 +29,11 @@
                         <rpm_mission units="min**-1">2350.0</rpm_mission>
                         <voltage_out_target_mission units="V">800.0</voltage_out_target_mission>
                         <efficiency is_input="True">0.99<!--Value of the generator efficiency--></efficiency>
+                        <front_length_ratio>0.8</front_length_ratio>
+                        <rear_length_ratio>0.5</rear_length_ratio>
+                        <CG>
+                            <y_ratio>0.5</y_ratio>
+                        </CG>
                     </turbo_generator_1>
                 </turbo_generator>
             </he_power_train>
