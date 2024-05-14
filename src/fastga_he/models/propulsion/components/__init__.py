@@ -33,5 +33,10 @@ from .source.battery import SizingBatteryPack, PerformancesBatteryPack, Slipstre
 from .source.generator import SizingGenerator, PerformancesGenerator, SlipstreamGenerator
 from .source.ice import SizingICE, PerformancesICE, SlipstreamICE
 from .source.turboshaft import SizingTurboshaft, PerformancesTurboshaft, SlipstreamTurboshaft
+from .source.simple_turbo_generator import (
+    SizingTurboGenerator,
+    PerformancesTurboGenerator,
+    SlipstreamTurboGenerator,
+)
 
 from .tanks.fuel_tanks import SizingFuelTank, PerformancesFuelTank, SlipstreamFuelTank
