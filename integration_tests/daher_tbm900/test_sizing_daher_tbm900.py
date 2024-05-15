@@ -43,6 +43,8 @@ def test_sizing_tbm900():
     n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_tbm900.html")
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
+    problem.model_options["*propeller_1*"] = {"mass_as_input": True}
+
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
     problem.setup()
@@ -57,13 +59,13 @@ def test_sizing_tbm900():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        3337.0, rel=1e-2
+        3378.0, rel=1e-2
     )
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        2058.0, rel=1e-2
+        2089.0, rel=1e-2
     )
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        800.00, rel=1e-2
+        802.00, rel=1e-2
     )
 
 
@@ -95,11 +97,11 @@ def test_operational_mission_tbm_900():
     problem.write_outputs()
 
     assert problem.get_val("data:mission:operational:TOW", units="kg") == pytest.approx(
-        3008.0, rel=1e-2
+        3013.0, rel=1e-2
     )
     assert problem.get_val("data:mission:operational:fuel", units="kg") == pytest.approx(
-        300.00, rel=1e-2
+        274.00, abs=1
     )
     assert problem.get_val(
         "data:environmental_impact:operational:fuel_emissions", units="kg"
-    ) == pytest.approx(1145.0, rel=1e-2)
+    ) == pytest.approx(1046.0, rel=1e-2)

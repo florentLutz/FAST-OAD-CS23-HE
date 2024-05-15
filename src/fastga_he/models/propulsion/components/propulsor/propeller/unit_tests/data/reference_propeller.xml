@@ -60,6 +60,7 @@
             <he_power_train>
                 <propeller>
                     <propeller_1>
+                        <input_mass units="lbm">75.0</input_mass>
                         <installation_angle units="deg">2.0</installation_angle>
                         <flapped_ratio>0.9</flapped_ratio>
                         <cl_clean_ref>1.085</cl_clean_ref>

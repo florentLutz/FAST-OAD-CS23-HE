@@ -2,32 +2,32 @@
   <data>
     <aerodynamics>
       <fuselage>
-        <cm_alpha units="1/rad" is_input="True">-0.3151398674778705<!--derivative of fuselage pitching moment coefficient with respect to angle of attack--></cm_alpha>
+        <cm_alpha units="1/rad" is_input="True">-0.30642531046313026<!--derivative of fuselage pitching moment coefficient with respect to angle of attack--></cm_alpha>
       </fuselage>
       <aircraft>
         <cruise>
-          <CD0 is_input="True">0.025021290866656866<!--profile drag coefficient for the complete aircraft in cruise conditions--></CD0>
+          <CD0 is_input="True">0.024849086967128706<!--profile drag coefficient for the complete aircraft in cruise conditions--></CD0>
         </cruise>
         <low_speed>
-          <CD0 is_input="True">0.04583931901462887<!--profile drag coefficient for the complete aircraft in low speed conditions--></CD0>
+          <CD0 is_input="True">0.045433298919844836<!--profile drag coefficient for the complete aircraft in low speed conditions--></CD0>
         </low_speed>
       </aircraft>
       <elevator>
         <low_speed>
-          <CD_delta units="1/rad**2" is_input="True">0.0726837704414327<!--derivative of horizontal tail drag coefficient with respect to elevator command--></CD_delta>
-          <CL_delta units="1/rad" is_input="True">0.6718881524111829<!--derivative of horizontal tail lift coefficient with respect to elevator command--></CL_delta>
+          <CD_delta units="1/rad**2" is_input="True">0.07157718346594436<!--derivative of horizontal tail drag coefficient with respect to elevator command--></CD_delta>
+          <CL_delta units="1/rad" is_input="True">0.6615946748432041<!--derivative of horizontal tail lift coefficient with respect to elevator command--></CL_delta>
         </low_speed>
       </elevator>
       <horizontal_tail>
         <cruise>
-          <CL0 is_input="True">-0.023693280865289122<!--lift coefficient of the horizontal tail when aircraft AOA is null in cruise conditions--></CL0>
-          <CL_alpha units="1/rad" is_input="True">0.6782771344769839<!--derivative of lift coefficient of horizontal tail with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
-          <induced_drag_coefficient is_input="True">0.3083016228675979<!--coefficient to multiply by the lift coefficient squared to get induced drag in cruise conditions--></induced_drag_coefficient>
+          <CL0 is_input="True">-0.023332558301601497<!--lift coefficient of the horizontal tail when aircraft AOA is null in cruise conditions--></CL0>
+          <CL_alpha units="1/rad" is_input="True">0.6679505837459843<!--derivative of lift coefficient of horizontal tail with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
+          <induced_drag_coefficient is_input="True">0.30360783003991143<!--coefficient to multiply by the lift coefficient squared to get induced drag in cruise conditions--></induced_drag_coefficient>
         </cruise>
       </horizontal_tail>
       <wing>
         <cruise>
-          <CD0 is_input="True">0.005664856792382682<!--profile drag coefficient for wing in cruise conditions--></CD0>
+          <CD0 is_input="True">0.005662069188470925<!--profile drag coefficient for wing in cruise conditions--></CD0>
           <CL0_clean is_input="True">0.23298028148062255<!--wing lift coefficient at zero aircraft angle of attack in cruise conditions and with no flaps deployed--></CL0_clean>
           <CL_alpha units="1/rad" is_input="True">5.355436256087551<!--wing lift coefficient slope with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
           <CM0_clean is_input="True">-0.09750983189767702<!--wing pitching moment coefficient in cruise conditions and with no flaps deployed--></CM0_clean>
@@ -35,7 +35,7 @@
         </cruise>
         <low_speed>
           <CL0_clean is_input="True">0.204790710736541<!--wing lift coefficient at zero aircraft angle of attack in low speed conditions and with no flaps deployed--></CL0_clean>
-          <CL_max_clean is_input="True">1.439181737876197<!--wing maximum lift coefficient for positive angle of attack--></CL_max_clean>
+          <CL_max_clean is_input="True">1.4393079246440363<!--wing maximum lift coefficient for positive angle of attack--></CL_max_clean>
           <CL_ref is_input="True">1.0345371825563727</CL_ref>
           <induced_drag_coefficient is_input="True">0.043984224639376956<!--coefficient to multiply by the lift coefficient squared to get wing induced drag in low speed conditions--></induced_drag_coefficient>
         </low_speed>
@@ -43,12 +43,12 @@
     </aerodynamics>
     <geometry>
       <wing>
-        <area units="m**2" is_input="True">17.858680117727022<!--_inp_data:geometry:wing:area--></area>
-        <wet_area units="m**2" is_input="True">33.05353581201835<!--wet area of wing--></wet_area>
+        <area units="m**2" is_input="True">18.0614762530338<!--_inp_data:geometry:wing:area--></area>
+        <wet_area units="m**2" is_input="True">33.45297491241806<!--wet area of wing--></wet_area>
         <MAC>
-          <length units="m" is_input="True">1.5069009755943348<!--length of mean aerodynamic chord of wing--></length>
+          <length units="m" is_input="True">1.5153210901153311<!--length of mean aerodynamic chord of wing--></length>
           <at25percent>
-            <x units="m" is_input="True">4.588148013945911<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+            <x units="m" is_input="True">4.536161082834146<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
           </at25percent>
         </MAC>
       </wing>
@@ -78,7 +78,7 @@
         </cruise>
         <descent>
           <descent_rate units="ft/min" is_input="True">-1500.0<!--target descent rate for the aircraft--></descent_rate>
-          <v_eas units="knot" is_input="True">230.0</v_eas>
+          <v_eas units="knot" is_input="True">160.0</v_eas>
         </descent>
         <initial_climb>
           <energy units="W*h" is_input="True">0.0</energy>
@@ -123,14 +123,14 @@
             <blade_twist units="deg" is_input="True">25.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <cl_clean_ref is_input="True">0.0<!--Value of the clean lift coefficient of the section behind the propeller for reference wing lift coefficient--></cl_clean_ref>
             <diameter units="m" is_input="True">2.31<!--Diameter of the propeller--></diameter>
-            <diameter_to_chord_ratio is_input="True">1.3069946793749023<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
-            <diameter_to_span_ratio is_input="True">0.38118473161652694<!--Diameter of the propeller as a ratio of the wing half span--></diameter_to_span_ratio>
+            <diameter_to_chord_ratio is_input="True">1.2997208379178475<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
+            <diameter_to_span_ratio is_input="True">0.37906331723941966<!--Diameter of the propeller as a ratio of the wing half span--></diameter_to_span_ratio>
             <flapped_ratio is_input="True">0.0<!--Portion of the span, downstream of the propeller, which has flaps--></flapped_ratio>
-            <from_wing_LE_ratio is_input="True">2.596050918128534<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
+            <from_wing_LE_ratio is_input="True">2.552573048994623<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.25<!--Solidity of the propeller--></solidity>
-            <wing_chord_ref units="m" is_input="True">1.7674134688174907<!--Value of the wing chord behind the propeller--></wing_chord_ref>
+            <wing_chord_ref units="m" is_input="True">1.777304735454284<!--Value of the wing chord behind the propeller--></wing_chord_ref>
           </propeller_1>
         </propeller>
         <turboshaft>
@@ -152,12 +152,12 @@
         <fuel_tank>
           <fuel_tank_1>
             <CG>
-              <x units="m" is_input="True">4.965020602334968<!--X position of the battery center of gravity--></x>
+              <x units="m" is_input="True">4.915530440099956<!--X position of the battery center of gravity--></x>
             </CG>
           </fuel_tank_1>
           <fuel_tank_2>
             <CG>
-              <x units="m" is_input="True">4.965020602334968<!--X position of the battery center of gravity--></x>
+              <x units="m" is_input="True">4.915530440099956<!--X position of the battery center of gravity--></x>
             </CG>
           </fuel_tank_2>
         </fuel_tank>
@@ -165,12 +165,12 @@
     </propulsion>
     <weight>
       <aircraft>
-        <OWE units="kg" is_input="True">2058.080079867122<!--Mass of aircraft--></OWE>
+        <OWE units="kg" is_input="True">2088.97081285802<!--Mass of aircraft--></OWE>
       </aircraft>
       <aircraft_empty>
-        <mass units="kg" is_input="True">1989.9835668846683<!--mass of empty aircraft--></mass>
+        <mass units="kg" is_input="True">2020.6424212883871<!--mass of empty aircraft--></mass>
         <CG>
-          <x units="m" is_input="True">4.6921350460249<!--X-position center of gravity of empty aircraft--></x>
+          <x units="m" is_input="True">4.627710188675167<!--X-position center of gravity of empty aircraft--></x>
         </CG>
       </aircraft_empty>
     </weight>

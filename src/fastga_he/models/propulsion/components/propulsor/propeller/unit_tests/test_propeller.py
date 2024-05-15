@@ -7,6 +7,7 @@ import pytest
 
 import openmdao.api as om
 
+from ..components.sizing_input_weight import SizingPropellerInputWeight
 from ..components.sizing_weight import SizingPropellerWeight
 from ..components.sizing_propeller_depth import SizingPropellerDepth
 from ..components.sizing_propeller_cg_x import SizingPropellerCGX
@@ -69,6 +70,23 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "reference_propeller.xml"
 NB_POINTS_TEST = 10
+
+
+def test_input_weight():
+
+    ivc = get_indep_var_comp(
+        list_inputs(SizingPropellerInputWeight(propeller_id="propeller_1")), __file__, XML_FILE
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingPropellerInputWeight(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:mass", units="lbm"
+    ) == pytest.approx(
+        75.0, rel=1e-2
+    )  # Real value for Cirrus SR22 prop is 75 lbs
+
+    problem.check_partials(compact_print=True)
 
 
 def test_weight():

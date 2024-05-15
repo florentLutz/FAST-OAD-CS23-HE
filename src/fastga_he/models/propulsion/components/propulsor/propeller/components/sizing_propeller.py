@@ -5,6 +5,7 @@
 import openmdao.api as om
 
 from .sizing_weight import SizingPropellerWeight
+from .sizing_input_weight import SizingPropellerInputWeight
 from .sizing_propeller_depth import SizingPropellerDepth
 from .sizing_propeller_cg_x import SizingPropellerCGX
 from .sizing_propeller_cg_y import SizingPropellerCGY
@@ -36,6 +37,12 @@ class SizingPropeller(om.Group):
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
+        self.options.declare(
+            name="mass_as_input",
+            default=False,
+            types=bool,
+            desc="If True, the mass will be an input and not be computed",
+        )
 
     def setup(self):
 
@@ -51,11 +58,18 @@ class SizingPropeller(om.Group):
             promotes=["*"],
         )
 
-        self.add_subsystem(
-            "propeller_wright",  # Like Orville and Wilbur
-            SizingPropellerWeight(propeller_id=propeller_id),
-            promotes=["data:*"],
-        )
+        if self.options["mass_as_input"]:
+            self.add_subsystem(
+                "propeller_weight",  # Like Orville and Wilbur
+                SizingPropellerInputWeight(propeller_id=propeller_id),
+                promotes=["data:*"],
+            )
+        else:
+            self.add_subsystem(
+                "propeller_wright",  # Like Orville and Wilbur
+                SizingPropellerWeight(propeller_id=propeller_id),
+                promotes=["data:*"],
+            )
         self.add_subsystem(
             "propeller_depth",
             SizingPropellerDepth(propeller_id=propeller_id),

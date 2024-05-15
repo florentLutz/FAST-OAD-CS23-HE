@@ -167,6 +167,7 @@
         </fuel_tank>
         <propeller>
           <propeller_1>
+            <input_mass units="kg" is_input="False">70.0</input_mass>
             <activity_factor is_input="True">156.0<!--Activity factor of the propeller--></activity_factor>
             <blade_twist units="deg" is_input="True">25.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.3<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
@@ -258,7 +259,7 @@
     <weight>
       <aircraft>
         <max_payload units="kg" is_input="True">650.0<!--max payload weight--></max_payload>
-        <payload units="kg" is_input="True">480.0<!--design payload weight--></payload>
+        <payload units="kg" is_input="True">487.0<!--design payload weight--></payload>
         <CG>
           <aft>
             <MAC_limit>0.13</MAC_limit>
