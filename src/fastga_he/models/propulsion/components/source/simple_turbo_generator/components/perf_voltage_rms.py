@@ -29,15 +29,17 @@ class PerformancesVoltageRMS(om.ImplicitComponent):
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
-    def apply_nonlinear(self, inputs, outputs, residuals):
+    def apply_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
 
         residuals["ac_voltage_rms_out"] = (
             outputs["ac_voltage_rms_out"] - inputs["voltage_out_target"]
         )
 
-    def linearize(self, inputs, outputs, partials):
+    def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
 
         number_of_points = self.options["number_of_points"]
 
-        partials["ac_voltage_rms_out", "ac_voltage_rms_out"] = np.eye(number_of_points)
-        partials["ac_voltage_rms_out", "voltage_out_target"] = -np.eye(number_of_points)
+        jacobian["ac_voltage_rms_out", "ac_voltage_rms_out"] = np.eye(number_of_points)
+        jacobian["ac_voltage_rms_out", "voltage_out_target"] = -np.eye(number_of_points)

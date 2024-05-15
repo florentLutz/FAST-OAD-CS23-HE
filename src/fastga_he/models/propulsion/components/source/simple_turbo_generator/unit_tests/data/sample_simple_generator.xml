@@ -1,0 +1,53 @@
+<FASTOAD_model>
+    <data>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <span units="m">8.0</span>
+                <MAC>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <turbo_generator>
+                    <turbo_generator_1>
+                        <shaft_power_max units="W">750e3</shaft_power_max>
+                        <power_rating units="kW">800</power_rating>
+                        <power_factor>0.95</power_factor>
+                        <rpm_mission units="min**-1">2350.0</rpm_mission>
+                        <voltage_out_target_mission units="V">800.0</voltage_out_target_mission>
+                        <efficiency is_input="True">0.99<!--Value of the generator efficiency--></efficiency>
+                        <front_length_ratio>0.8</front_length_ratio>
+                        <rear_length_ratio>0.5</rear_length_ratio>
+                        <CG>
+                            <y_ratio>0.5</y_ratio>
+                        </CG>
+                    </turbo_generator_1>
+                </turbo_generator>
+            </he_power_train>
+        </propulsion>
+    </data>
+    <settings>
+        <propulsion>
+            <he_power_train>
+                <turbo_generator>
+                    <turbo_generator_1>
+                        <power_factor>0.95</power_factor>
+                    </turbo_generator_1>
+                </turbo_generator>
+            </he_power_train>
+        </propulsion>
+    </settings>
+</FASTOAD_model>

@@ -180,6 +180,14 @@
                         </CG>
                     </rectifier_1>
                 </rectifier>
+                <turbo_generator>
+                    <generator_1>
+                        <shaft_power_max units="W">108181.60732714</shaft_power_max>
+                        <rpm_mission units="1/min" is_input="True">2500.0<!--RPM of the propeller for the points--></rpm_mission>
+                        <voltage_out_target_mission units="V" is_input="True">690.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
+                        <efficiency>0.9<!--Target output voltage of the rectifier for the points--></efficiency>
+                    </generator_1>
+                </turbo_generator>
                 <generator>
                     <generator_1>
                         <voltage_out_target_mission units="V" is_input="True">690.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>

@@ -786,6 +786,50 @@ PLANETARY_GEAR = {
     VARIESN_T_MASS: False,
     ETA: 0.98,
 }
+TURBO_GENERATOR = {
+    ID: "fastga_he.pt_component.turbo_generator_simple",
+    CN: "TurboGenerator",
+    CN_ID: "turbo_generator_id",
+    CT: "turbo_generator",
+    ATT: None,
+    PT: [],
+    SPT: [],
+    PTS: [],
+    IN: [(None, "rpm"), (None, "shaft_power_in")],
+    OUT: [
+        ("ac_current_rms_out_one_phase", None),
+        (None, "ac_voltage_rms_out"),
+        (None, "ac_voltage_peak_out"),
+    ],
+    CTC: "connector",
+    MP: [
+        {"rpm": "1/min"},
+        {"shaft_power_in": "kW"},
+        {"torque_in": "N*m"},
+        {"ac_voltage_rms_out": "V"},
+        {"ac_voltage_peak_out": "V"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
+    ICON: "generator",
+    ICON_SIZE: 30,
+    RSD: ["shaft_power_in", "ac_voltage_rms_out"],
+    SETS_V: True,
+    IO_INDEP_V: False,
+    V_TO_SET: ["ac_voltage_rms_out", "ac_voltage_peak_out"],
+    P_TO_SET: [("active_power", "out"), ("shaft_power_in", "in")],
+    I_TO_SET: [("ac_current_rms_out", "out")],
+    SFR: False,
+    SWL: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.95,
+}
 
 KNOWN_COMPONENTS = [
     PROPELLER,
@@ -805,6 +849,7 @@ KNOWN_COMPONENTS = [
     TURBOSHAFT,
     SPEED_REDUCER,
     PLANETARY_GEAR,
+    TURBO_GENERATOR,
 ]
 
 KNOWN_ID = []

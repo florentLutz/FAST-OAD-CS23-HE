@@ -30,6 +30,7 @@ from fastga_he.models.propulsion.components import (
     SlipstreamTurboshaft,
     SlipstreamSpeedReducer,
     SlipstreamPlanetaryGear,
+    SlipstreamTurboGenerator,
 )
 
 from tests.testing_utilities import VariableListLocal
