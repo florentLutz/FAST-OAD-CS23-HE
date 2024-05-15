@@ -830,6 +830,47 @@ TURBO_GENERATOR = {
     VARIESN_T_MASS: False,
     ETA: 0.95,
 }
+GEARBOX = {
+    ID: "fastga_he.pt_component.gearbox",
+    CN: "Gearbox",
+    CN_ID: "gearbox_id",
+    CT: "gearbox",
+    ATT: [],
+    PT: [],
+    SPT: [],
+    PTS: [],
+    IN: [(None, "rpm_in"), (None, "shaft_power_in")],
+    OUT: [("rpm_out_", None), ("shaft_power_out_", None)],
+    CTC: "connector",
+    MP: [
+        {"torque_in": "N*m"},
+        {"torque_out_1": "N*m"},
+        {"torque_out_2": "N*m"},
+        {"rpm_in": "min**-1"},
+        {"shaft_power_in": "kW"},
+        {"power_split": "percent"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
+    ICON: "gearbox",
+    ICON_SIZE: 30,
+    RSD: ["torque_out_2", "torque_out_1"],
+    SETS_V: False,
+    IO_INDEP_V: False,
+    V_TO_SET: [],
+    P_TO_SET: [("shaft_power_in", "in")],
+    I_TO_SET: [],
+    SFR: False,
+    SWL: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.98,
+}
 
 KNOWN_COMPONENTS = [
     PROPELLER,
@@ -850,6 +891,7 @@ KNOWN_COMPONENTS = [
     SPEED_REDUCER,
     PLANETARY_GEAR,
     TURBO_GENERATOR,
+    GEARBOX,
 ]
 
 KNOWN_ID = []

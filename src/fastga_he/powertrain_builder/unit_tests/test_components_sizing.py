@@ -31,6 +31,7 @@ from fastga_he.models.propulsion.components import (
     SizingSpeedReducer,
     SizingPlanetaryGear,
     SizingTurboGenerator,
+    SizingGearbox,
 )
 
 from tests.testing_utilities import VariableListLocal

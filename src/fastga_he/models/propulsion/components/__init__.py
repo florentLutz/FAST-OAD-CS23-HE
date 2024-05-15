@@ -24,6 +24,7 @@ from .connectors.planetary_gear import (
     PerformancesPlanetaryGear,
     SlipstreamPlanetaryGear,
 )
+from .connectors.gearbox import SizingGearbox, PerformancesGearbox, SlipstreamGearbox
 
 from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM
 
