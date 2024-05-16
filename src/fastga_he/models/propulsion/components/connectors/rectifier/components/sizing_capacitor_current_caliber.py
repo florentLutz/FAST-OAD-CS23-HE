@@ -32,7 +32,7 @@ class SizingRectifierCapacitorCurrentCaliber(om.ExplicitComponent):
         )
         self.add_input(
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":power_factor",
-            val=np.nan,
+            val=1.0,
         )
 
         self.add_output(

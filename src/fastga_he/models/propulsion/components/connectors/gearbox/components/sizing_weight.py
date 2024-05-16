@@ -33,7 +33,7 @@ class SizingGearboxWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:gearbox:" + gearbox_id + ":gear_ratio",
             val=np.nan,
-            desc="Gear ratio of the gearboxr",
+            desc="Gear ratio of the gearbox",
         )
         self.add_input(
             name="data:propulsion:he_power_train:gearbox:" + gearbox_id + ":tech_level_constant",

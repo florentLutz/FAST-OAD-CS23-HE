@@ -64,7 +64,7 @@
     </geometry>
     <mission>
       <operational>
-        <range units="NM" is_input="True">250</range>
+        <range units="NM" is_input="True">250.0</range>
         <climb>
           <v_eas units="knot" is_input="True">124.0</v_eas>
           <climb_rate>

@@ -1,0 +1,286 @@
+title: Powertrain file for the sizing of EcoPulse
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: in_the_nose  # "on_the_wing", "in_the_nose"
+  propeller_elec_1:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+    symmetrical: propeller_elec_6
+  propeller_elec_2:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+    symmetrical: propeller_elec_5
+  propeller_elec_3:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+    symmetrical: propeller_elec_4
+  propeller_elec_4:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  propeller_elec_5:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  propeller_elec_6:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+    symmetrical: motor_6
+  motor_2:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+    symmetrical: motor_5
+  motor_3:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+    symmetrical: motor_4
+  motor_4:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  motor_5:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  motor_6:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    symmetrical: inverter_6
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    symmetrical: inverter_5
+  inverter_3:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    symmetrical: inverter_4
+  inverter_4:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  inverter_5:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  inverter_6:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    symmetrical: dc_bus_6
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    symmetrical: dc_bus_5
+  dc_bus_3:
+    id: fastga_he.pt_component.dc_bus
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    symmetrical: dc_bus_4
+  dc_bus_4:
+    id: fastga_he.pt_component.dc_bus
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  dc_bus_5:
+    id: fastga_he.pt_component.dc_bus
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  dc_bus_6:
+    id: fastga_he.pt_component.dc_bus
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+
+  harness_1:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+    symmetrical: harness_6
+  harness_2:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+    symmetrical: harness_5
+  harness_3:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+    symmetrical: harness_4
+  harness_4:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+  harness_5:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+  harness_6:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing  # "inside_the_wing", "from_rear_to_front", "from_rear_to_wing", "from_front_to_wing", "from_rear_to_nose", "from_front_to_nose", "from_wing_to_nose"
+
+  bus_nose:
+    id: fastga_he.pt_component.dc_bus
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 6
+
+  rectifier:
+    id: fastga_he.pt_component.rectifier
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
+  turbo_generator:
+    id: fastga_he.pt_component.turbo_generator_simple
+
+  gearbox_1:
+    id: fastga_he.pt_component.gearbox
+    position: in_the_front
+  turboshaft_1:
+    id: fastga_he.pt_component.turboshaft
+    position: in_the_front  # "on_the_wing", "in_the_front", "in_the_back"
+
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+    options:
+      number_of_engines: 1
+      number_of_tanks: 2
+    position: in_the_front  # "in_the_wing", "in_the_front", "in_the_back"
+
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_fuselage"
+  fuel_tank_2:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_fuselage"
+    symmetrical: fuel_tank_1
+
+
+component_connections:
+  - source: propeller_1
+    target: [gearbox_1, 1]
+
+  - source: turbo_generator
+    target: [gearbox_1, 2]
+
+  - source: [gearbox_1, 1]
+    target: turboshaft_1
+
+  - source: turboshaft_1
+    target: [fuel_system_1, 1]
+
+  - source: [fuel_system_1, 1]
+    target: fuel_tank_1
+
+  - source: [fuel_system_1, 2]
+    target: fuel_tank_2
+
+  - source: rectifier
+    target: turbo_generator
+
+  - source: [bus_nose, 1]
+    target: rectifier
+
+  - source: harness_1
+    target: [bus_nose, 1]
+
+  - source: [dc_bus_1, 1]
+    target: harness_1
+
+  - source: inverter_1
+    target: [dc_bus_1, 1]
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: propeller_elec_1
+    target: motor_1
+
+  - source: harness_2
+    target: [bus_nose, 2]
+
+  - source: [dc_bus_2, 1]
+    target: harness_2
+
+  - source: inverter_2
+    target: [dc_bus_2, 1]
+
+  - source: motor_2
+    target: inverter_2
+
+  - source: propeller_elec_2
+    target: motor_2
+
+  - source: harness_3
+    target: [bus_nose, 3]
+
+  - source: [dc_bus_3, 1]
+    target: harness_3
+
+  - source: inverter_3
+    target: [dc_bus_3, 1]
+
+  - source: motor_3
+    target: inverter_3
+
+  - source: propeller_elec_3
+    target: motor_3
+
+  - source: harness_4
+    target: [bus_nose, 4]
+
+  - source: [dc_bus_4, 1]
+    target: harness_4
+
+  - source: inverter_4
+    target: [dc_bus_4, 1]
+
+  - source: motor_4
+    target: inverter_4
+
+  - source: propeller_elec_4
+    target: motor_4
+
+  - source: harness_5
+    target: [bus_nose, 5]
+
+  - source: [dc_bus_5, 1]
+    target: harness_5
+
+  - source: inverter_5
+    target: [dc_bus_5, 1]
+
+  - source: motor_5
+    target: inverter_5
+
+  - source: propeller_elec_5
+    target: motor_5
+
+  - source: harness_6
+    target: [bus_nose, 6]
+
+  - source: [dc_bus_6, 1]
+    target: harness_6
+
+  - source: inverter_6
+    target: [dc_bus_6, 1]
+
+  - source: motor_6
+    target: inverter_6
+
+  - source: propeller_elec_6
+    target: motor_6
+
+watcher_file_path: ../results/turbo_electric_propulsion_pt_watcher.csv

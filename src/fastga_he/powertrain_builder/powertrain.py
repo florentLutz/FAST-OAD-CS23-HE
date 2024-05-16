@@ -1652,6 +1652,32 @@ class FASTGAHEPowerTrainConfigurator:
                             )
                             problematic_nodes_to_add.append(neighbor)
 
+                    new_problematic_nodes.remove(problematic_node)
+                    new_problematic_nodes += problematic_nodes_to_add
+
+                # If the associated component is a plain gearbox it means it has multiple
+                # outputs so we need to look for their priority take the highest among them
+                # and add 1
+                if associated_component_type == "fastga_he.pt_component.gearbox":
+
+                    problematic_nodes_to_add = []
+
+                    power = 0
+                    for neighbor in graph.adj[problematic_node]:
+                        if neighbor in list(nodes_with_power.keys()):
+                            power += nodes_with_power[neighbor]
+
+                    nodes_with_power[problematic_node] = power
+
+                    # Then we add the gearbox inputs (there may be more than 1) in the list of
+                    # "problematic nodes" and we add their priority
+                    for neighbor in graph.adj[problematic_node]:
+                        if neighbor not in list(nodes_with_power.keys()):
+                            nodes_with_power[neighbor] = (
+                                power / name_to_eta[associated_component_name]
+                            )
+                            problematic_nodes_to_add.append(neighbor)
+
                     # Then we add the input as a problematic node
                     new_problematic_nodes.remove(problematic_node)
                     new_problematic_nodes += problematic_nodes_to_add

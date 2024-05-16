@@ -744,6 +744,28 @@ def test_get_power_on_each_node():
     )
 
 
+def test_get_power_on_each_node_will_fail():
+
+    # Very simple power train
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_quad_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    propulsive_power_dict = {
+        "propeller_0": np.array([50e3]),
+        "propeller_1": np.array([50e3]),
+        "propeller_2": np.array([50e3]),
+        "propeller_3": np.array([50e3]),
+    }
+
+    # power_at_each_node = power_train_configurator.get_power_to_set(
+    #     inputs=None, propulsive_power_dict=propulsive_power_dict
+    # )[0][0]
+
+
 def test_power_to_set():
 
     # Very simple power train

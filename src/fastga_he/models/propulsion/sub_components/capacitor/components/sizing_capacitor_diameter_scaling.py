@@ -31,7 +31,7 @@ class SizingCapacitorDiameterScaling(om.ExplicitComponent):
         )
         self.add_input(
             name=prefix + ":capacitor:aspect_ratio",
-            val=np.nan,
+            val=1.0,
             desc="Ratio of the capacitor diameter over its height",
         )
 

@@ -1,0 +1,10 @@
+<FASTOAD_model>
+    <data>
+        <geometry>
+            <wing>
+                <area units="m**2">9.0</area>
+                <target_span units="m">12.0</target_span>
+            </wing>
+        </geometry>
+    </data>
+</FASTOAD_model>

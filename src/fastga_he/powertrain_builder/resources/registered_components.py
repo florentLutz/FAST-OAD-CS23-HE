@@ -848,7 +848,6 @@ GEARBOX = {
         {"torque_out_2": "N*m"},
         {"rpm_in": "min**-1"},
         {"shaft_power_in": "kW"},
-        {"power_split": "percent"},
     ],
     SMP: [
         {"delta_Cd": None},
