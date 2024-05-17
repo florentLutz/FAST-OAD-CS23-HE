@@ -299,9 +299,11 @@ class ComputeWebMass(om.ExplicitComponent):
         # We delete the zeros
         y_vector = AerostructuralLoadHE.delete_additional_zeros(y_vector)
         y_vector_slip = AerostructuralLoadHE.delete_additional_zeros(y_vector_slip)
-        cl_vector = AerostructuralLoadHE.delete_additional_zeros(cl_vector)
-        cl_vector_slip = AerostructuralLoadHE.delete_additional_zeros(cl_vector_slip)
-        chord_vector = AerostructuralLoadHE.delete_additional_zeros(chord_vector)
+        cl_vector = AerostructuralLoadHE.delete_additional_zeros(cl_vector, len(y_vector))
+        cl_vector_slip = AerostructuralLoadHE.delete_additional_zeros(
+            cl_vector_slip, len(y_vector_slip)
+        )
+        chord_vector = AerostructuralLoadHE.delete_additional_zeros(chord_vector, len(y_vector))
 
         # We add the first point at the root
         y_vector, _ = AerostructuralLoadHE.insert_in_sorted_array(y_vector, 0.0)

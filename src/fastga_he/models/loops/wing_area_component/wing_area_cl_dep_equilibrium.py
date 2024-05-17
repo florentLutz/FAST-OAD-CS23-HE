@@ -290,6 +290,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path) -> float:
         ivc.add_output(name="x_cg", val=np.array([cg_max_fwd]), units="m")
         ivc.add_output(name="gamma", val=np.array([0.0]), units=None)
         ivc.add_output(name="altitude", val=np.array([0.0]), units="m")
+        ivc.add_output(name="density", val=Atmosphere(np.array([0.0])).density, units="kg/m**3")
         ivc.add_output(name="exterior_temperature", val=Atmosphere(0.0).temperature, units="degK")
         # Time step is not important since we don't care about the fuel consumption
         ivc.add_output(name="time_step", val=np.array([0.1]), units="s")
@@ -356,6 +357,14 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path) -> float:
         problem.run_driver()
 
         wing_area_approach = problem.get_val("data:geometry:wing:area", units="m**2")
+        print("Wing area in approach conditions", wing_area_approach)
+        print(
+            "Constraints: alpha/alpha_max; thrust; delta/delta_max: delta_cl",
+            problem["alpha"] / alpha_max,
+            problem["thrust_rate"],
+            problem["delta_m"] / min_elevator_angle,
+            problem["delta_Cl"],
+        )
 
     except RuntimeError:
         wing_area_approach = wing_area_landing_init_guess

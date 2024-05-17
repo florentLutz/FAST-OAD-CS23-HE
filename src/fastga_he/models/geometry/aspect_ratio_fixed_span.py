@@ -5,7 +5,12 @@
 import openmdao.api as om
 import numpy as np
 
+import fastoad.api as oad
 
+from fastoad.module_management.constants import ModelDomain
+
+
+@oad.RegisterOpenMDAOSystem("fastga_he.loads.aspect_ratio_fixed_span", domain=ModelDomain.GEOMETRY)
 class AspectRatioFromTargetSpan(om.ExplicitComponent):
     def setup(self):
 

@@ -2260,8 +2260,8 @@ class FASTGAHEPowerTrainConfigurator:
         retained_components = []
 
         # First, we pop all the components that we don't need
-        for component_name, component_type_class in zip(
-            self._components_name, self._components_type_class
+        for component_name, component_type_class, component_id in zip(
+            self._components_name, self._components_type_class, self._components_id
         ):
             if (
                 "propulsor" not in component_type_class
@@ -2269,7 +2269,10 @@ class FASTGAHEPowerTrainConfigurator:
             ):
                 simplified_serializer.data[KEY_PT_COMPONENTS].pop(component_name)
             else:
-                retained_components.append(component_name)
+                if not (component_id == "fastga_he.pt_component.turboshaft"):
+                    retained_components.append(component_name)
+                else:
+                    simplified_serializer.data[KEY_PT_COMPONENTS].pop(component_name)
 
         # Then we pop all the connections that don't involve the components we have
         self._get_connections()

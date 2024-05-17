@@ -126,7 +126,7 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         )
         if np.any(thrust_econ) < 50.0:
 
-            thrust_econ = np.abs(
+            thrust_econ = np.maximum(
                 thrust_econ,
                 np.full_like(thrust_econ, 50.0),
             )
@@ -172,7 +172,7 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
 
         d_thrust_econ_d_thrust = np.zeros((number_of_points + 2, number_of_points))
         d_thrust_econ_d_thrust_diagonal = np.where(
-            inputs["thrust"] > 0, np.ones_like(inputs["thrust"]), np.zeros_like(inputs["thrust"])
+            inputs["thrust"] > 50.0, np.ones_like(inputs["thrust"]), np.zeros_like(inputs["thrust"])
         )
         d_thrust_econ_d_thrust[1 : number_of_points + 1, :] = np.diag(
             d_thrust_econ_d_thrust_diagonal

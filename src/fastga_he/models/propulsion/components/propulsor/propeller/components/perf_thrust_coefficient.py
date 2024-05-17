@@ -51,9 +51,9 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
 
         # Ensuring we take the absolute value for the computation of thrust in case we eventually
         # want to do some energy recovery
-        outputs["thrust_coefficient"] = np.abs(inputs["thrust"]) / (
-            rho * rps ** 2.0 * diameter ** 4.0
-        )
+        outputs["thrust_coefficient"] = np.maximum(
+            inputs["thrust"], np.zeros_like(inputs["thrust"])
+        ) / (rho * rps ** 2.0 * diameter ** 4.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]
@@ -63,18 +63,28 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
         rho = inputs["density"]
         rps = inputs["rpm"] / 60.0
 
+        partial_thrust = np.where(
+            inputs["thrust"] > 0, np.ones_like(inputs["thrust"]), np.zeros_like(inputs["thrust"])
+        )
+
         partials["thrust_coefficient", "thrust"] = np.diag(
-            np.sign(inputs["thrust"]) / (rho * rps ** 2.0 * diameter ** 4.0)
+            partial_thrust / (rho * rps ** 2.0 * diameter ** 4.0)
         )
         partials["thrust_coefficient", "rpm"] = np.diag(
-            -2.0 * np.abs(inputs["thrust"]) / (rho * rps ** 3 * diameter ** 4.0) / 60.0
+            -2.0
+            * np.maximum(inputs["thrust"], np.zeros_like(inputs["thrust"]))
+            / (rho * rps ** 3 * diameter ** 4.0)
+            / 60.0
         )
         partials[
             "thrust_coefficient",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
         ] = (
-            -4.0 * np.abs(inputs["thrust"]) / (rho * rps ** 2.0 * diameter ** 5.0)
+            -4.0
+            * np.maximum(inputs["thrust"], np.zeros_like(inputs["thrust"]))
+            / (rho * rps ** 2.0 * diameter ** 5.0)
         )
         partials["thrust_coefficient", "density"] = -np.diag(
-            inputs["thrust"] / (rho ** 2.0 * rps ** 2.0 * diameter ** 4.0)
+            np.maximum(inputs["thrust"], np.zeros_like(inputs["thrust"]))
+            / (rho ** 2.0 * rps ** 2.0 * diameter ** 4.0)
         )
