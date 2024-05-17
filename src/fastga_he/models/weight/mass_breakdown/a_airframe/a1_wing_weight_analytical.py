@@ -31,6 +31,7 @@ from .wing_components.compute_secondary_mass import ComputeSecondaryMass
 from .wing_components.update_wing_mass import UpdateWingMass
 
 from fastga.models.weight.mass_breakdown.a_airframe.constants import SUBMODEL_WING_MASS
+from .constants import SUBMODEL_WING_SKIN_MASS
 
 
 @oad.RegisterSubmodel(
@@ -68,7 +69,11 @@ class ComputeWingMassAnalytical(om.Group):
             ComputeLowerFlange(min_fuel_in_wing=True),
             promotes=["*"],
         )
-        self.add_subsystem("compute_skin_mass", ComputeSkinMass(), promotes=["*"])
+        self.add_subsystem(
+            "compute_skin_mass",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_WING_SKIN_MASS),
+            promotes=["*"],
+        )
         self.add_subsystem("compute_ribs_mass", ComputeRibsMass(), promotes=["*"])
         self.add_subsystem("compute_misc_mass", ComputeMiscMass(), promotes=["*"])
         self.add_subsystem("compute_primary_structure", ComputePrimaryMass(), promotes=["*"])

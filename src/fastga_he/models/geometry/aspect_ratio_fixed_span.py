@@ -10,7 +10,9 @@ import fastoad.api as oad
 from fastoad.module_management.constants import ModelDomain
 
 
-@oad.RegisterOpenMDAOSystem("fastga_he.loads.aspect_ratio_fixed_span", domain=ModelDomain.GEOMETRY)
+@oad.RegisterOpenMDAOSystem(
+    "fastga_he.geometry.aspect_ratio_fixed_span", domain=ModelDomain.GEOMETRY
+)
 class AspectRatioFromTargetSpan(om.ExplicitComponent):
     def setup(self):
 
@@ -23,19 +25,18 @@ class AspectRatioFromTargetSpan(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["data:geometry:wing:aspect_ratio"] = np.sqrt(
-            inputs["data:geometry:wing:target_span"] * inputs["data:geometry:wing:area"]
+        outputs["data:geometry:wing:aspect_ratio"] = (
+            inputs["data:geometry:wing:target_span"] ** 2.0 / inputs["data:geometry:wing:area"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["data:geometry:wing:aspect_ratio", "data:geometry:wing:target_span"] = (
-            1.0
-            / 2.0
-            * np.sqrt(inputs["data:geometry:wing:area"] / inputs["data:geometry:wing:target_span"])
+        partials[
+            "data:geometry:wing:aspect_ratio", "data:geometry:wing:target_span"
+        ] = 2.0 * np.sqrt(
+            inputs["data:geometry:wing:area"] / inputs["data:geometry:wing:target_span"]
         )
         partials["data:geometry:wing:aspect_ratio", "data:geometry:wing:area"] = (
-            1.0
-            / 2.0
-            * np.sqrt(inputs["data:geometry:wing:target_span"] / inputs["data:geometry:wing:area"])
+            -inputs["data:geometry:wing:target_span"] ** 2.0
+            / inputs["data:geometry:wing:area"] ** 2.0
         )

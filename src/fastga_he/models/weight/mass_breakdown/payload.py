@@ -25,9 +25,10 @@ class ComputePayloadForRetrofit(om.ExplicitComponent):
 
     def setup(self):
 
-        self.add_input("data:weight:aircraft:MTOW", val=np.nan, units="kg")
+        self.add_input("data:weight:aircraft:target_MTOW", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:OWE", val=np.nan, units="kg")
         self.add_input("data:mission:sizing:fuel", val=np.nan, units="kg")
+        self.add_input("data:weight:aircraft:max_payload", val=np.nan, units="kg")
 
         self.add_output("data:weight:aircraft:payload", units="kg", val=500.0)
 
@@ -35,14 +36,27 @@ class ComputePayloadForRetrofit(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["data:weight:aircraft:payload"] = (
-            inputs["data:weight:aircraft:MTOW"]
+        outputs["data:weight:aircraft:payload"] = min(
+            inputs["data:weight:aircraft:target_MTOW"]
             - inputs["data:weight:aircraft:OWE"]
-            - inputs["data:mission:sizing:fuel"]
+            - inputs["data:mission:sizing:fuel"],
+            inputs["data:weight:aircraft:max_payload"],
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["data:weight:aircraft:payload", "data:weight:aircraft:MTOW"] = 1.0
-        partials["data:weight:aircraft:payload", "data:weight:aircraft:OWE"] = -1.0
-        partials["data:weight:aircraft:payload", "data:mission:sizing:fuel"] = -1.0
+        if (
+            inputs["data:weight:aircraft:target_MTOW"]
+            - inputs["data:weight:aircraft:OWE"]
+            - inputs["data:mission:sizing:fuel"]
+            < inputs["data:weight:aircraft:max_payload"]
+        ):
+            partials["data:weight:aircraft:payload", "data:weight:aircraft:target_MTOW"] = 1.0
+            partials["data:weight:aircraft:payload", "data:weight:aircraft:OWE"] = -1.0
+            partials["data:weight:aircraft:payload", "data:mission:sizing:fuel"] = -1.0
+            partials["data:weight:aircraft:payload", "data:weight:aircraft:max_payload"] = 0.0
+        else:
+            partials["data:weight:aircraft:payload", "data:weight:aircraft:target_MTOW"] = 0.0
+            partials["data:weight:aircraft:payload", "data:weight:aircraft:OWE"] = 0.0
+            partials["data:weight:aircraft:payload", "data:mission:sizing:fuel"] = 0.0
+            partials["data:weight:aircraft:payload", "data:weight:aircraft:max_payload"] = 1.0

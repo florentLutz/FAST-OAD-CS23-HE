@@ -68,6 +68,7 @@
         <sweep_25 units="deg" is_input="True">0.0<!--sweep angle at 25% chord of wing--></sweep_25>
         <taper_ratio is_input="True">0.61<!--taper ratio of wing--></taper_ratio>
         <target_span units="m" is_input="True">12.187937449726817</target_span>
+        <aspect_ratio>9.12</aspect_ratio>
         <thickness_ratio is_input="True">0.146<!--mean thickness ratio of wing--></thickness_ratio>
         <twist units="deg" is_input="True">-2.0<!--Negative twist means tip AOA is smaller than root--></twist>
         <aileron>
@@ -102,9 +103,9 @@
       </cabin>
       <propulsion>
         <engine>
-          <count is_input="True">6.0<!--number of engine--></count>
+          <count is_input="True">1.0<!--number of engine--></count>
           <layout is_input="True">3.0<!--position of engines (1=under the wing / 2=rear fuselage / 3=nose)--></layout>
-          <y_ratio is_input="True">[0.925, 0.64, 0.36]<!--engine position along wing span (if layout=1-2)--></y_ratio>
+          <y_ratio is_input="True">0.0<!--engine position along wing span (if layout=1-2)--></y_ratio>
         </engine>
         <nacelle>
           <height units="m" is_input="False">0.61468<!--height of the nacelle--></height>
@@ -746,7 +747,7 @@
             <blade_twist units="deg" is_input="True">25.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.3<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">2.31<!--propeller diameter--></diameter>
-            <input_mass units="kg" is_input="True">70.0<!--Propeller mass as an input, because of some convention adopted, it must be a different variable than the actual weight--></input_mass>
+            <input_mass units="kg" is_input="True">5.0<!--Propeller mass as an input, because of some convention adopted, it must be a different variable than the actual weight--></input_mass>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.25<!--Solidity of the propeller--></solidity>
@@ -756,8 +757,8 @@
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">1.5<!--Diameter of the propeller--></diameter>
-            <from_LE units="m" is_input="True">0.05<!--Distance between the propeller and the leading edge--></from_LE>
-            <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <from_LE units="m" is_input="True">0.01<!--Distance between the propeller and the leading edge--></from_LE>
+            <installation_angle units="deg" is_input="True">-2.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
@@ -771,8 +772,8 @@
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">1.5<!--Diameter of the propeller--></diameter>
-            <from_LE units="m" is_input="True">0.05<!--Distance between the propeller and the leading edge--></from_LE>
-            <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <from_LE units="m" is_input="True">0.01<!--Distance between the propeller and the leading edge--></from_LE>
+            <installation_angle units="deg" is_input="True">-2.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
@@ -786,8 +787,8 @@
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">1.5<!--Diameter of the propeller--></diameter>
-            <from_LE units="m" is_input="True">0.05<!--Distance between the propeller and the leading edge--></from_LE>
-            <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <from_LE units="m" is_input="True">0.01<!--Distance between the propeller and the leading edge--></from_LE>
+            <installation_angle units="deg" is_input="True">-2.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
@@ -801,8 +802,8 @@
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">1.5<!--Diameter of the propeller--></diameter>
-            <from_LE units="m" is_input="True">0.05<!--Distance between the propeller and the leading edge--></from_LE>
-            <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <from_LE units="m" is_input="True">0.01<!--Distance between the propeller and the leading edge--></from_LE>
+            <installation_angle units="deg" is_input="True">-2.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
@@ -816,8 +817,8 @@
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">1.5<!--Diameter of the propeller--></diameter>
-            <from_LE units="m" is_input="True">0.05<!--Distance between the propeller and the leading edge--></from_LE>
-            <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <from_LE units="m" is_input="True">0.01<!--Distance between the propeller and the leading edge--></from_LE>
+            <installation_angle units="deg" is_input="True">-2.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
@@ -831,8 +832,8 @@
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">1.5<!--Diameter of the propeller--></diameter>
-            <from_LE units="m" is_input="True">0.05<!--Distance between the propeller and the leading edge--></from_LE>
-            <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <from_LE units="m" is_input="True">0.01<!--Distance between the propeller and the leading edge--></from_LE>
+            <installation_angle units="deg" is_input="True">-2.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
@@ -1008,7 +1009,7 @@
     </aerodynamics>
     <weight>
       <aircraft>
-        <MTOW units="kg" is_input="True">3378.6334646306163<!--maximum takeoff weight of the aircraft--></MTOW>
+        <target_MTOW units="kg" is_input="True">3378.6334646306163<!--maximum takeoff weight of the aircraft--></target_MTOW>
         <max_payload units="kg" is_input="True">650.0<!--max payload weight--></max_payload>
         <CG>
           <aft>
@@ -1019,6 +1020,13 @@
           </fwd>
         </CG>
       </aircraft>
+      <airframe>
+        <wing>
+          <skin>
+            <mass units="kg" is_input="False">146.3959192062155</mass>
+          </skin>
+        </wing>
+      </airframe>
       <furniture>
         <mass units="kg" is_input="True">1.0<!--Mass of aircraft_inp_data:weight:furniture:mass--></mass>
         <passenger_seats>
@@ -1097,6 +1105,7 @@
             <vd units="knot" is_input="True">320.0<!--limit speed--></vd>
           </characteristic_speed>
           <sizing_factor>
+            <ultimate_aircraft is_input="True">5.7<!--ultimate load factor that the aircraft will experience (default value is 5.7)--></ultimate_aircraft>
             <ultimate_mtow>
               <negative is_input="True">-2.25</negative>
               <positive is_input="True">5.7</positive>

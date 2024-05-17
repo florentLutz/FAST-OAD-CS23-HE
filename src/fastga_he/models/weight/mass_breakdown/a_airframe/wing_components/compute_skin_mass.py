@@ -18,11 +18,18 @@ in her MAE research project report.
 import openmdao.api as om
 import numpy as np
 
+import fastoad.api as oad
+
 from stdatm import Atmosphere
 
 from scipy.interpolate import interp1d
 
+from ..constants import SUBMODEL_WING_SKIN_MASS
 
+
+@oad.RegisterSubmodel(
+    SUBMODEL_WING_SKIN_MASS, "fastga_he.submodel.weight.mass.airframe.wing.skin.default"
+)
 class ComputeSkinMass(om.ExplicitComponent):
     def setup(self):
 
