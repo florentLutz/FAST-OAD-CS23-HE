@@ -1009,6 +1009,8 @@
     </aerodynamics>
     <weight>
       <aircraft>
+        <MLW units="kg" is_input="False">3177.206142915303<!--maximum landing weight--></MLW>
+        <MZFW units="kg" is_input="False">2738.97081285802<!--maximum zero fuel weight--></MZFW>
         <target_MTOW units="kg" is_input="True">3378.6334646306163<!--maximum takeoff weight of the aircraft--></target_MTOW>
         <max_payload units="kg" is_input="True">650.0<!--max payload weight--></max_payload>
         <CG>
@@ -1028,7 +1030,7 @@
         </wing>
       </airframe>
       <furniture>
-        <mass units="kg" is_input="True">1.0<!--Mass of aircraft_inp_data:weight:furniture:mass--></mass>
+        <mass units="kg" is_input="True">295.0<!--Mass of aircraft_inp_data:weight:furniture:mass--></mass>
         <passenger_seats>
           <mass units="kg" is_input="True">295.0<!--Mass of aircraft furniture_inp_data:weight:furniture:passenger_seats:mass--></mass>
         </passenger_seats>
@@ -1401,28 +1403,28 @@
             <installation_effect is_input="True">0.987<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
           </propeller_1>
           <propeller_elec_1>
-            <effective_advance_ratio is_input="True">1.0<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
-            <installation_effect is_input="True">0.95<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
+            <effective_advance_ratio is_input="True">0.97<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
+            <installation_effect is_input="True">0.99<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
           </propeller_elec_1>
           <propeller_elec_2>
-            <effective_advance_ratio is_input="True">1.0<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
-            <installation_effect is_input="True">0.95<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
+            <effective_advance_ratio is_input="True">0.97<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
+            <installation_effect is_input="True">0.99<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
           </propeller_elec_2>
           <propeller_elec_3>
-            <effective_advance_ratio is_input="True">1.0<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
-            <installation_effect is_input="True">0.95<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
+            <effective_advance_ratio is_input="True">0.97<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
+            <installation_effect is_input="True">0.99<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
           </propeller_elec_3>
           <propeller_elec_4>
-            <effective_advance_ratio is_input="True">1.0<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
-            <installation_effect is_input="True">0.95<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
+            <effective_advance_ratio is_input="True">0.97<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
+            <installation_effect is_input="True">0.99<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
           </propeller_elec_4>
           <propeller_elec_5>
-            <effective_advance_ratio is_input="True">1.0<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
-            <installation_effect is_input="True">0.95<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
+            <effective_advance_ratio is_input="True">0.97<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
+            <installation_effect is_input="True">0.99<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
           </propeller_elec_5>
           <propeller_elec_6>
-            <effective_advance_ratio is_input="True">1.0<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
-            <installation_effect is_input="True">0.95<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
+            <effective_advance_ratio is_input="True">0.97<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
+            <installation_effect is_input="True">0.99<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
           </propeller_elec_6>
         </propeller>
         <turboshaft>
@@ -1447,7 +1449,7 @@
         <main_route>
           <reserve>
             <speed>
-              <k_factor is_input="True">1.022<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+              <k_factor is_input="True">1.3<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
             </speed>
           </reserve>
         </main_route>

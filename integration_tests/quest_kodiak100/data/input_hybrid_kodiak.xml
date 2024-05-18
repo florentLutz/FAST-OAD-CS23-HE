@@ -353,7 +353,7 @@
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
             <front_length_ratio is_input="True">0.9<!--Location of the planetary gear CG as a ratio of the aircraft front length--></front_length_ratio>
             <gear_ratio is_input="True">2.0<!--Gear ratio of the planetary gear--></gear_ratio>
-            <power_share units="kW" is_input="True">191.0<!--Share of the power going to the first (primary) input, in W--></power_share>
+            <power_share units="kW" is_input="True">291.0<!--Share of the power going to the first (primary) input, in W--></power_share>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
           </planetary_gear_1>
         </planetary_gear>
@@ -399,6 +399,7 @@
       <aircraft>
         <MLW units="kg" is_input="False">3047.6443930100922<!--maximum landing weight--></MLW>
         <MTOW units="kg" is_input="True">3280.3834256571254<!--maximum takeoff weight of the aircraft--></MTOW>
+        <target_MTOW units="kg" is_input="True">3280.3834256571254<!--maximum takeoff weight of the aircraft--></target_MTOW>
         <max_payload units="kg" is_input="True">1140.0<!--max payload weight--></max_payload>
         <payload units="kg" is_input="True">620.0<!--design payload weight--></payload>
         <CG>

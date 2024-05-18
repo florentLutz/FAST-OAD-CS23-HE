@@ -192,13 +192,47 @@ def test_ecopulse_new_wing():
 
     problem.write_outputs()
 
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(300.0, abs=1.0)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(324.0, abs=1.0)
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        805.0, abs=1.0
+        734.0, abs=1.0
     )
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
-    ) == pytest.approx(1145.0, abs=1.0)
+    ) == pytest.approx(1236.0, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        3.66, abs=1e-2
+        4.49, abs=1e-2
     )
+
+
+def test_ecopulse_new_wing_mission_analysis():
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "ecopulse_new_wing_mission_analysis.xml"
+    process_file_name = "ecopulse_new_wing_mission_analysis.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.model_options["*propeller_1*"] = {"mass_as_input": True}
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # om.n2(problem)
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(327.0, abs=1.0)

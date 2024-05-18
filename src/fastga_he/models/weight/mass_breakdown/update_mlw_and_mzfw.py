@@ -89,3 +89,26 @@ class UpdateMLWandMZFW(om.ExplicitComponent):
             "data:weight:aircraft:MLW",
             "settings:weight:aircraft:MLW_MZFW_ratio",
         ] = mzfw
+
+
+@oad.RegisterSubmodel(SUBMODEL_MZFW_MLW, "fastga_he.submodel.weight.mass.mzfw_and_mlw.only_zfw")
+class UpdateZFW(om.ExplicitComponent):
+    def setup(self):
+        self.add_input("data:weight:aircraft:OWE", val=np.nan, units="kg")
+        self.add_input("data:weight:aircraft:payload", val=np.nan, units="kg")
+
+        self.add_output("data:weight:aircraft:ZFW", units="kg")
+
+        self.declare_partials(
+            "data:weight:aircraft:ZFW",
+            ["data:weight:aircraft:OWE", "data:weight:aircraft:payload"],
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        owe = inputs["data:weight:aircraft:OWE"]
+        pl = inputs["data:weight:aircraft:payload"]
+
+        zfw = owe + pl
+
+        outputs["data:weight:aircraft:ZFW"] = zfw

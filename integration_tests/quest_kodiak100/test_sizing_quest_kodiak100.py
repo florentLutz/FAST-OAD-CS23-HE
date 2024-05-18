@@ -170,15 +170,15 @@ def test_retrofit_hybrid_kodiak():
 
     problem.write_outputs()
 
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(208.00, abs=1.0)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(210.00, abs=1.0)
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        690.0, abs=1.0
+        529.0, abs=1.0
     )
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
-    ) == pytest.approx(797.00, abs=1.0)
+    ) == pytest.approx(805.00, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        2.216, abs=1e-2
+        1.924, abs=1e-2
     )
 
 
@@ -212,9 +212,9 @@ def test_retrofit_hybrid_kodiak_european_mix():
 
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
-    ) == pytest.approx(803.49, abs=1.0)
+    ) == pytest.approx(809.405, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        2.233, abs=1e-2
+        1.933, abs=1e-2
     )
 
 
@@ -253,7 +253,7 @@ def test_retrofit_hybrid_kodiak_french_mix_ft():
         "data:environmental_impact:sizing:emissions", units="kg"
     ) == pytest.approx(73.109, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        0.2032, abs=1e-2
+        0.1728, abs=1e-2
     )
 
 
@@ -328,7 +328,7 @@ def test_retrofit_hybrid_kodiak_french_mix_hefa():
         "data:environmental_impact:sizing:emissions", units="kg"
     ) == pytest.approx(197.38, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        0.5486, abs=1e-2
+        0.4733, abs=1e-2
     )
 
 
