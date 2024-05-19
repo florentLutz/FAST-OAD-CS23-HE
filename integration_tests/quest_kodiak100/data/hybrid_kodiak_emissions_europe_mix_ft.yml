@@ -14,5 +14,4 @@ model:
   environmental_impact:
     id: fastga_he.environmental.energy_simple
     mission: design
-    electricity_mix: france
-    fuel_type: biofuel_hefa_pathway
+    fuel_type: biofuel_ft_pathway

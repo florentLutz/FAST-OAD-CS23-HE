@@ -218,7 +218,7 @@ def test_retrofit_hybrid_kodiak_european_mix():
     )
 
 
-def test_retrofit_hybrid_kodiak_french_mix_ft():
+def test_retrofit_hybrid_kodiak_eu_mix_ft():
 
     """
 
@@ -233,7 +233,7 @@ def test_retrofit_hybrid_kodiak_french_mix_ft():
 
     # Define used files depending on options
     xml_file_name = "hybrid_kodiak_full_sizing.xml"
-    process_file_name = "hybrid_kodiak_emissions_french_mix_ft.yml"
+    process_file_name = "hybrid_kodiak_emissions_europe_mix_ft.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
     problem = configurator.get_problem()
@@ -251,9 +251,9 @@ def test_retrofit_hybrid_kodiak_french_mix_ft():
 
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
-    ) == pytest.approx(73.109, abs=1.0)
+    ) == pytest.approx(76.19, rel=1e-3)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        0.1728, abs=1e-2
+        0.182, rel=1e-3
     )
 
 
@@ -293,7 +293,7 @@ def test_operational_mission_kodiak_100_ft():
     ) == pytest.approx(0.1930, abs=1e-2)
 
 
-def test_retrofit_hybrid_kodiak_french_mix_hefa():
+def test_retrofit_hybrid_kodiak_eu_mix_hefa():
 
     """
 
@@ -308,7 +308,7 @@ def test_retrofit_hybrid_kodiak_french_mix_hefa():
 
     # Define used files depending on options
     xml_file_name = "hybrid_kodiak_full_sizing.xml"
-    process_file_name = "hybrid_kodiak_emissions_french_mix_hefa.yml"
+    process_file_name = "hybrid_kodiak_emissions_europe_mix_hefa.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
     problem = configurator.get_problem()
@@ -326,9 +326,9 @@ def test_retrofit_hybrid_kodiak_french_mix_hefa():
 
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
-    ) == pytest.approx(197.38, abs=1.0)
+    ) == pytest.approx(202.01, rel=1e-3)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        0.4733, abs=1e-2
+        0.4826, rel=1e-3
     )
 
 
