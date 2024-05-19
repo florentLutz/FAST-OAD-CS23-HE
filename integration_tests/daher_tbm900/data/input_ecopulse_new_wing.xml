@@ -132,7 +132,7 @@
       <fuel_type is_input="True">3.0<!--engine fuel type (1.0 - gasoline, 2.0 - gasoil)--></fuel_type>
       <max_rpm units="1/min" is_input="True">3000.<!--maximum number of rotation per minute on the engine--></max_rpm>
       <he_power_train>
-        <thrust_distribution is_input="True">[0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]</thrust_distribution>
+        <thrust_distribution is_input="True">[1.0, 1.0, 1.0, 1.0, 1.0, 1.0]</thrust_distribution>
         <DC_bus>
           <bus_nose>
             <front_length_ratio is_input="True">0.9<!--Location of the DC bus CG as a ratio of the aircraft front length--></front_length_ratio>

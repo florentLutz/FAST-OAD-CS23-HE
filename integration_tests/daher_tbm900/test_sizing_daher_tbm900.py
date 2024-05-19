@@ -149,15 +149,15 @@ def test_retrofit_ecopulse():
 
     problem.write_outputs()
 
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(335.0, abs=1.0)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(334.0, abs=1.0)
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        817.0, abs=1.0
+        829.0, abs=1.0
     )
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
-    ) == pytest.approx(1280.0, abs=1.0)
+    ) == pytest.approx(1277.0, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        5.720, abs=1e-2
+        5.82, abs=1e-2
     )
 
 
@@ -192,15 +192,18 @@ def test_ecopulse_new_wing():
 
     problem.write_outputs()
 
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(324.0, abs=1.0)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(319.0, abs=1.0)
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        734.0, abs=1.0
+        726.0, abs=1.0
     )
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
-    ) == pytest.approx(1236.0, abs=1.0)
+    ) == pytest.approx(1218.0, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        4.49, abs=1e-2
+        4.492, abs=1e-2
+    )
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
+        2473.5, rel=1e-3
     )
 
 
