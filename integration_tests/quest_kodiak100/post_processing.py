@@ -49,7 +49,7 @@ if __name__ == "__main__":
         line=dict(color="rgba(0,128,0,0.7)"),
         marker=dict(color="rgba(0,128,0,0.7)"),
         fill="tozeroy",
-        fillcolor='rgba(0,128,0,0.7)'
+        fillcolor="rgba(0,128,0,0.7)",
     )
     fig.add_trace(scatter)
 
@@ -73,7 +73,7 @@ if __name__ == "__main__":
         showlegend=False,
         line=dict(color="rgba(255,127,80,1.0)"),
         marker=dict(color="rgba(255,127,80,1.0)"),
-        fillcolor='rgba(255,127,80,1.0)'
+        fillcolor="rgba(255,127,80,1.0)",
     )
     fig.add_trace(turboshaft_power_fill)
 

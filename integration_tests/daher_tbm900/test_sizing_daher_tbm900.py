@@ -14,6 +14,7 @@ import fastoad.api as oad
 from utils.filter_residuals import filter_residuals
 
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
+from fastga_he.gui.power_train_weight_breakdown import power_train_mass_breakdown
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
@@ -207,6 +208,16 @@ def test_ecopulse_new_wing():
     )
 
 
+def test_ecopulse_new_wing_pt_mass_breakdown():
+
+    path_to_result_file = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ecopulse_new_wing.xml")
+    path_to_pt_file = pth.join(DATA_FOLDER_PATH, "ecopulse_powertrain_new_wing.yml")
+
+    fig = power_train_mass_breakdown(path_to_result_file, path_to_pt_file)
+    fig.update_layout(uniformtext=dict(minsize=17, mode='hide'))
+    fig.show()
+
+
 def test_ecopulse_new_wing_mission_analysis():
 
     logging.basicConfig(level=logging.WARNING)
@@ -238,4 +249,4 @@ def test_ecopulse_new_wing_mission_analysis():
 
     problem.write_outputs()
 
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(327.0, abs=1.0)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(321.0, abs=1.0)

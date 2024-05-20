@@ -1,9 +1,6 @@
 title: Powertrain file for the sizing of EcoPulse
 
 power_train_components:
-  propeller_1:
-    id: fastga_he.pt_component.propeller
-    position: in_the_nose  # "on_the_wing", "in_the_nose"
   propeller_elec_1:
     id: fastga_he.pt_component.propeller
     position: on_the_wing  # "on_the_wing", "in_the_nose"
@@ -145,9 +142,6 @@ power_train_components:
   turbo_generator:
     id: fastga_he.pt_component.turbo_generator_simple
 
-  gearbox_1:
-    id: fastga_he.pt_component.gearbox
-    position: in_the_front
   turboshaft_1:
     id: fastga_he.pt_component.turboshaft
     position: in_the_front  # "on_the_wing", "in_the_front", "in_the_back"
@@ -169,13 +163,7 @@ power_train_components:
 
 
 component_connections:
-  - source: propeller_1
-    target: [gearbox_1, 1]
-
   - source: turbo_generator
-    target: [gearbox_1, 2]
-
-  - source: [gearbox_1, 1]
     target: turboshaft_1
 
   - source: turboshaft_1
