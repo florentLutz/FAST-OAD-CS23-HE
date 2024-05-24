@@ -21,6 +21,10 @@ import fastoad.api as oad
 
 from .constants import SUBMODEL_MZFW_MLW
 
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_MZFW_MLW
+] = "fastga_he.submodel.weight.mass.mzfw_and_mlw.legacy"
+
 
 @oad.RegisterSubmodel(SUBMODEL_MZFW_MLW, "fastga_he.submodel.weight.mass.mzfw_and_mlw.legacy")
 class UpdateMLWandMZFW(om.ExplicitComponent):
