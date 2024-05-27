@@ -214,7 +214,7 @@ def test_ecopulse_new_wing_pt_mass_breakdown():
     path_to_pt_file = pth.join(DATA_FOLDER_PATH, "ecopulse_powertrain_new_wing.yml")
 
     fig = power_train_mass_breakdown(path_to_result_file, path_to_pt_file)
-    fig.update_layout(uniformtext=dict(minsize=17, mode='hide'))
+    fig.update_layout(uniformtext=dict(minsize=17, mode="hide"))
     fig.show()
 
 
