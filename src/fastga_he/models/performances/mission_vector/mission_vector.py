@@ -562,13 +562,12 @@ class MissionVector(om.Group):
             # So that we can set the power
             power_to_set = self.configurator.get_power_to_set(inputs, propulsive_power_dict)[1]
 
-            for sub_graphs in power_to_set:
-                for power in sub_graphs:
-                    output_name = (
-                        "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances."
-                        + power
-                    )
-                    outputs[output_name] = sub_graphs[power]
+            for power in power_to_set:
+                output_name = (
+                    "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances."
+                    + power
+                )
+                outputs[output_name] = power_to_set[power]
 
             # So that we can set the current
             current_to_set = self.configurator.get_current_to_set(

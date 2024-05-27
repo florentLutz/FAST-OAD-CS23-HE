@@ -1575,403 +1575,6 @@ class FASTGAHEPowerTrainConfigurator:
 
         return graph
 
-    def get_independent_sub_propulsion_chain(self):
-        """
-        This function returns a list of graphs of connected PT sub propulsion chain. As a
-        prevision for next step all component will be split between their inputs and outputs to
-        allow to include efficiency.
-        """
-
-        # TODO: very similar to self.get_graphs_connected_voltage(), think of refactoring ?
-
-        self._get_components()
-        self._get_connections()
-
-        graph = nx.Graph()
-
-        for component_name, component_id in zip(self._components_name, self._components_id):
-            graph.add_node(
-                component_name + "_out",
-            )
-            graph.add_node(
-                component_name + "_in",
-            )
-
-            graph.add_edge(
-                component_name + "_out",
-                component_name + "_in",
-            )
-
-        for connection in self._connection_list:
-            # For bus and splitter, we don't really care about what number of input it is
-            # connected to so we do the following
-
-            if type(connection["source"]) is list:
-                source = connection["source"][0]
-            else:
-                source = connection["source"]
-
-            if type(connection["target"]) is list:
-                target = connection["target"][0]
-            else:
-                target = connection["target"]
-
-            graph.add_edge(
-                source + "_in",
-                target + "_out",
-            )
-
-        sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
-
-        return sub_graphs
-
-    def get_power_on_each_node_v2(self, graph, inputs, propulsive_power_dict) -> dict:
-        """
-        Returns a dictionary which will contain the power at each node of a graph based on the
-        propulsive power at its propulsor, on the assumed efficiencies of its components and the
-        value of power split on its splitter.
-        """
-
-        return dict()
-
-    def get_power_on_each_node(self, graph, inputs, propulsive_power_dict) -> dict:
-        """
-        Returns a dictionary which will contain the power at each node of a graph based on the
-        propulsive power at its propulsor, on the assumed efficiencies of its components and the
-        value of power split on its splitter.
-        """
-
-        copied_graph = copy.deepcopy(graph)
-        name_to_id = dict(zip(self._components_name, self._components_id))
-        name_to_eta = dict(zip(self._components_name, self._components_efficiency))
-
-        # For each graph we attribute a priority to the nodes which is going to impose the order
-        # in which we make the computation. Propulsive loads will have the highest priority (0)
-        # and then each neighboring nodes will have the priority just below. Slight detail nodes
-        # with more than one neighbor will have a priority which will be slightly below the
-        # biggest priority among the neighbour. E.g:
-        # Node 1 (0) --- Node 2 (1) --- Node 3 (2) \
-        #                                           Node 6 (3)
-        #                Node 4 (0) --- Node 5 (1) /
-
-        propulsive_loads_proper_name = list(propulsive_power_dict.keys())
-
-        # So we start, for each propulsive load by exploring the branch until someone has more
-        # than two neighbor
-
-        nodes_with_power = {}
-
-        for propulsive_load_name in propulsive_loads_proper_name:
-            nodes_with_power[propulsive_load_name] = propulsive_power_dict[propulsive_load_name]
-
-        problematic_nodes = copy.deepcopy(propulsive_loads_proper_name)
-
-        while problematic_nodes:
-
-            problematic_nodes, copied_graph = self.set_priority_in_graph(
-                copied_graph, nodes_with_power, problematic_nodes
-            )
-
-            # At this point, we painted the priority as mush as we could but we have encountered
-            # some "problematic nodes" which we must dealt with. They can be of two types: buses
-            # (multiple outputs but one input) or splitter (one output but two inputs)
-
-            new_problematic_nodes = copy.deepcopy(problematic_nodes)
-
-            for problematic_node in problematic_nodes:
-                associated_component_name = problematic_node.replace("_in", "")
-                associated_component_name = associated_component_name.replace("_out", "")
-
-                associated_component_type = name_to_id[associated_component_name]
-
-                # If the associated component is a bus it means it has multiple outputs so we
-                # need to look for their priority take the highest among them and add 1
-                if associated_component_type == "fastga_he.pt_component.dc_bus":
-
-                    problematic_nodes_to_add = []
-
-                    power = 0
-                    for neighbor in graph.adj[problematic_node]:
-                        if neighbor in list(nodes_with_power.keys()):
-                            power += nodes_with_power[neighbor]
-
-                    nodes_with_power[problematic_node] = power
-
-                    # Then we add the bus inputs (there may be more than 1) in the list of
-                    # "problematic nodes" and we add their priority
-                    for neighbor in graph.adj[problematic_node]:
-                        if neighbor not in list(nodes_with_power.keys()):
-
-                            nodes_with_power[neighbor] = (
-                                power / name_to_eta[associated_component_name]
-                            )
-                            problematic_nodes_to_add.append(neighbor)
-
-                    new_problematic_nodes.remove(problematic_node)
-                    new_problematic_nodes += problematic_nodes_to_add
-
-                # If the associated component is a plain gearbox it means it has multiple
-                # outputs so we need to look for their priority take the highest among them
-                # and add 1
-                if associated_component_type == "fastga_he.pt_component.gearbox":
-
-                    problematic_nodes_to_add = []
-
-                    power = 0
-                    for neighbor in graph.adj[problematic_node]:
-                        if neighbor in list(nodes_with_power.keys()):
-                            power += nodes_with_power[neighbor]
-
-                    nodes_with_power[problematic_node] = power
-
-                    # Then we add the gearbox inputs (there may be more than 1) in the list of
-                    # "problematic nodes" and we add their priority
-                    for neighbor in graph.adj[problematic_node]:
-                        if neighbor not in list(nodes_with_power.keys()):
-                            nodes_with_power[neighbor] = (
-                                power / name_to_eta[associated_component_name]
-                            )
-                            problematic_nodes_to_add.append(neighbor)
-
-                    # Then we add the input as a problematic node
-                    new_problematic_nodes.remove(problematic_node)
-                    new_problematic_nodes += problematic_nodes_to_add
-
-                # If it is a planetary gearbox
-                elif associated_component_type == "fastga_he.pt_component.planetary_gear":
-
-                    problematic_nodes_to_add = []
-
-                    # This node does not have a priority just yet, so we'll first need to take a
-                    # look at it
-                    power = None
-
-                    for neighbor in graph.adj[problematic_node]:
-                        if neighbor in list(nodes_with_power.keys()):
-                            power = nodes_with_power[neighbor]
-
-                    for neighbor in graph.adj[problematic_node]:
-
-                        neighbor_counter = 1
-
-                        if neighbor not in list(nodes_with_power.keys()):
-                            # If we haven't treated the neighbor yet, it means its an input of the
-                            # gearbox. We will add a fake input node and do the connection to
-                            # that neighbor. We should also take the opportunity to see whether
-                            # or not this is the gearbox "priority" input
-
-                            # First we identify which input of the splitter in matches, first
-                            # find the name of the component
-                            neighbor_components_name = neighbor.replace("_in", "")
-                            neighbor_components_name = neighbor_components_name.replace("_out", "")
-
-                            input_name = neighbor_components_name + ".shaft_power_out"
-
-                            # We look at the number of the corresponding gearbox input. Will be a
-                            # bit farfetched as we need to find using the current neighbor. For
-                            # gearboxes, the two connexion are rpm and shaft power and they are
-                            # both output of the input side of the gearbox, so we'll have to use
-                            # the input list
-                            # We look at the number of the corresponding splitter input
-                            index = self._components_connection_inputs.index(input_name)
-                            gearbox_input_name = self._components_connection_outputs[index]
-
-                            (
-                                primary_input_power,
-                                secondary_power_output,
-                            ) = self.gearbox_power_inputs(
-                                inputs=inputs,
-                                components_name=associated_component_name,
-                                power_output=power,
-                            )
-
-                            # If it ends with a "1", its the priority input. We add the node as a
-                            # problematic node, we set its priority and we add the node to the
-                            # graph as well as the proper edge.
-                            if gearbox_input_name[-1] == "1":
-                                node_name = associated_component_name + "_in_1"
-                                problematic_nodes_to_add.append(node_name)
-                                nodes_with_power[node_name] = primary_input_power
-
-                                copied_graph.add_edge(neighbor, node_name)
-
-                            else:
-                                node_name = (
-                                    associated_component_name + "_in_" + str(neighbor_counter + 1)
-                                )
-                                problematic_nodes_to_add.append(node_name)
-                                nodes_with_power[node_name] = secondary_power_output
-
-                                copied_graph.add_edge(neighbor, node_name)
-
-                                neighbor_counter += 1
-
-                    # Now we remove the splitter and instead add its two neighbor, which will
-                    # serve as new branch start
-
-                    new_problematic_nodes.remove(problematic_node)
-                    new_problematic_nodes += problematic_nodes_to_add
-
-                # If it is a splitter
-                elif associated_component_type == "fastga_he.pt_component.dc_splitter":
-
-                    problematic_nodes_to_add = []
-
-                    # This node does not have a priority just yet, so we'll first need to take a
-                    # look at it
-                    power = None
-
-                    for neighbor in graph.adj[problematic_node]:
-                        if neighbor in list(nodes_with_power.keys()):
-                            power = nodes_with_power[neighbor]
-
-                    for neighbor in graph.adj[problematic_node]:
-
-                        neighbor_counter = 1
-
-                        if neighbor not in list(nodes_with_power.keys()):
-                            # If we haven't treated the neighbor yet, it means its an input of the
-                            # splitter. We will add a fake input node and do the connection to
-                            # that neighbor. We should also take the opportunity to see whether
-                            # or not this is the splitter "priority" input
-
-                            # First we identify which input of the splitter in matches, first
-                            # find the name of the component
-                            neighbor_components_name = neighbor.replace("_in", "")
-                            neighbor_components_name = neighbor_components_name.replace("_out", "")
-
-                            # Then identify which current output it correspond to. Here if the
-                            # component in question is not an sspc, the following should work.
-                            # Else we will try both way
-
-                            output_name = neighbor_components_name + ".dc_current_out"
-                            if (
-                                name_to_id[neighbor_components_name]
-                                == "fastga_he.pt_component.dc_sspc"
-                            ):
-                                if output_name not in self._components_connection_outputs:
-                                    output_name = neighbor_components_name + ".dc_current_in"
-
-                            # We look at the number of the corresponding splitter input
-                            index = self._components_connection_outputs.index(output_name)
-                            splitter_input_name = self._components_connection_inputs[index]
-
-                            (
-                                primary_input_power,
-                                secondary_power_output,
-                            ) = self.splitter_power_inputs(
-                                inputs=inputs,
-                                components_name=associated_component_name,
-                                power_output=power,
-                            )
-
-                            # If it ends with a "1", its the priority input. We add the node as a
-                            # problematic node, we set its priority and we add the node to the
-                            # graph as well as the proper edge.
-                            if splitter_input_name[-1] == "1":
-                                node_name = associated_component_name + "_in_1"
-                                problematic_nodes_to_add.append(node_name)
-                                nodes_with_power[node_name] = primary_input_power
-
-                                copied_graph.add_edge(node_name, neighbor)
-
-                            else:
-                                node_name = (
-                                    associated_component_name + "_in_" + str(neighbor_counter + 1)
-                                )
-                                problematic_nodes_to_add.append(node_name)
-                                nodes_with_power[node_name] = secondary_power_output
-
-                                copied_graph.add_edge(node_name, neighbor)
-
-                                neighbor_counter += 1
-
-                    # Now we remove the splitter and instead add its two neighbor, which will
-                    # serve as new branch start
-
-                    new_problematic_nodes.remove(problematic_node)
-                    new_problematic_nodes += problematic_nodes_to_add
-
-                # Should be a fuel system. They are a bit specific because they can have multiple
-                # inputs and multiple outputs
-                elif associated_component_type == "fastga_he.pt_component.fuel_system":
-
-                    problematic_nodes_to_add = []
-
-                    # This node does not have a priority just yet, so we'll first need to take a
-                    # look at it. Fuel system can have multiple output, so we'll simply sum the
-                    # one whose power we know
-                    power = 0.0
-                    neighbor_counter = 0
-
-                    for neighbor in graph.adj[problematic_node]:
-                        if neighbor in list(nodes_with_power.keys()):
-                            power += nodes_with_power[neighbor]
-                            neighbor_counter += 1
-
-                    input_power_dict = self.fuel_system_power_inputs(
-                        inputs=inputs,
-                        components_name=associated_component_name,
-                        power_output=power,
-                    )
-
-                    # Once we have the power at the output, not that, we check how many engine we
-                    # had at the output, it there was only one, the code can proceed. Else,
-                    # we need to move to the input of the fuel system and then we can proceed
-                    if neighbor_counter > 1:
-                        # We add the out not to the list of stuff to remove and move the
-                        # problematic node to the input.
-                        nodes_with_power[problematic_node] = power
-                        fuel_system_input_name = problematic_node.replace("out", "in")
-
-                        new_problematic_nodes.remove(problematic_node)
-
-                        problematic_node = fuel_system_input_name
-
-                        new_problematic_nodes.append(problematic_node)
-
-                    for neighbor in graph.adj[problematic_node]:
-
-                        if neighbor not in list(nodes_with_power.keys()):
-                            # If we haven't treated the neighbor yet, it means its an input of the
-                            # fuel system. We will add a fake input node and do the connection to
-                            # that neighbor.
-
-                            # First we identify which input of the fuel system it matches, first
-                            # find the name of the component
-                            neighbor_components_name = neighbor.replace("_in", "")
-                            neighbor_components_name = neighbor_components_name.replace("_out", "")
-
-                            # Then we check among the connected tanks component, which inputs
-                            # number it correspond to
-
-                            tank_output_name = neighbor_components_name + ".fuel_consumed_t"
-                            index = self._components_connection_inputs.index(tank_output_name)
-                            corresponding_fs_input = self._components_connection_outputs[index]
-
-                            node_number = corresponding_fs_input[-1]
-
-                            # From the way we built the dict, we should have the power like this
-                            neighbor_power = input_power_dict[corresponding_fs_input.split(".")[-1]]
-
-                            node_name = associated_component_name + "_in_" + node_number
-                            problematic_nodes_to_add.append(node_name)
-                            nodes_with_power[node_name] = neighbor_power
-
-                            copied_graph.add_edge(node_name, neighbor)
-
-                    # Now we remove the fuel system and instead add its neighbors, which will
-                    # serve as new branch start
-
-                    new_problematic_nodes.remove(problematic_node)
-                    new_problematic_nodes += problematic_nodes_to_add
-
-                copied_graph.remove_node(problematic_node)
-
-            problematic_nodes = new_problematic_nodes
-
-        return nodes_with_power
-
     @staticmethod
     def fuel_system_power_inputs(inputs, components_name: str, power_output: np.ndarray) -> dict:
         """
@@ -2097,89 +1700,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         return primary_input, secondary_output
 
-    def set_priority_in_graph(
-        self, graph: nx.Graph, nodes_with_power: dict, starting_points_name: list
-    ) -> tuple:
-        """
-        Explore a graph and set the priority of its node base on the priority of the starting
-        points.
-        """
-
-        name_to_eta = dict(zip(self._components_name, self._components_efficiency))
-
-        problematic_nodes = []
-        another_copied_graph = copy.deepcopy(graph)
-        sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
-
-        # First we must associate each starting point with its subgraphs (To prevent errors in
-        # case one subgraph has multiple starting points or there are multiple subgraphs in,
-        # each with one starting point)
-
-        ordered_sub_graphs = []
-
-        for starting_point in starting_points_name:
-            for subgraph in sub_graphs:
-                if subgraph.has_node(starting_point):
-                    ordered_sub_graphs.append(subgraph)
-                    continue
-
-        for starting_point, subgraph in zip(starting_points_name, ordered_sub_graphs):
-
-            current_node = starting_point
-
-            # The inputs of the end components (usually sources, are not really necessary,
-            # so we will start the number of explored nodes at 1. The other reason for that being
-            # that it crashes if I start at 0
-            node_explored = 1
-
-            initial_number_of_nodes = subgraph.number_of_nodes()
-            # We look at how many neighbor the current node has, and if it more than 2 we stop
-            # exploring :) Also we'll put a failsafe to avoid infinite while
-
-            while len(graph.adj[current_node]) <= 2 and node_explored < initial_number_of_nodes:
-
-                for adj_node in graph.adj[current_node]:
-
-                    # A previously explored neighbor
-                    if adj_node in list(nodes_with_power.keys()):
-
-                        # Here depending on whether we are going from a component's input to
-                        # output or from a component to the other, setting the power will be
-                        # different
-
-                        current_components_name = current_node.replace("_in", "")
-                        current_components_name = current_components_name.replace("_out", "")
-
-                        adj_components_name = adj_node.replace("_in", "")
-                        adj_components_name = adj_components_name.replace("_out", "")
-
-                        # if name is the same, we compute the power below base on the efficiency,
-                        # else its the same power, to refactor, we'll just say the efficiency is 1
-                        if current_components_name == adj_components_name:
-                            eta = name_to_eta[current_components_name]
-                        else:
-                            eta = 1.0
-
-                        nodes_with_power[current_node] = nodes_with_power[adj_node] / eta
-
-                    # Not a previously explored neighbor
-                    else:
-                        next_node = adj_node
-                        node_explored += 1
-
-                # When we are done with the node, we remove it :)
-                another_copied_graph.remove_node(current_node)
-
-                current_node = next_node
-
-            if len(graph.adj[current_node]) > 2 and current_node not in problematic_nodes:
-                problematic_nodes.append(current_node)
-
-        graph = another_copied_graph
-
-        return problematic_nodes, graph
-
-    def get_power_to_set_v2(self, inputs, propulsive_power_dict: dict) -> dict:
+    def get_power_to_set(self, inputs, propulsive_power_dict: dict) -> Tuple[dict, dict]:
 
         """
         Returns a list of the power at each nodes of each subgraph. Also returns a list of the
@@ -2225,6 +1746,8 @@ class FASTGAHEPowerTrainConfigurator:
                 treated_nodes.append(untreated_node)
             else:
                 power_at_each_node[untreated_node] = np.zeros_like(template_power)
+
+        node_to_remove_at_the_end = []
 
         # Remove treated nodes
         untreated_nodes = [x for x in untreated_nodes if x not in treated_nodes]
@@ -2315,10 +1838,28 @@ class FASTGAHEPowerTrainConfigurator:
                                 power_output=power_at_each_node[predecessor],
                             )
 
-                            if list(graph.pred[node])[0].endswith("1"):
+                            # Then identify which current output it correspond to. Here if the
+                            # component in question is not an sspc, the following should work.
+                            # Else we will try both way
+
+                            output_name = component_name + ".dc_current_out"
+                            if name_to_id[component_name] == "fastga_he.pt_component.dc_sspc":
+                                if output_name not in self._components_connection_outputs:
+                                    output_name = component_name + ".dc_current_in"
+
+                            # We look at the number of the corresponding splitter input
+                            index = self._components_connection_outputs.index(output_name)
+                            splitter_input_name = self._components_connection_inputs[index]
+
+                            if splitter_input_name.endswith("1"):
                                 power_at_each_node[node] = primary_input_power
+                                power_at_each_node[predecessor + "_1"] = primary_input_power
                             else:
                                 power_at_each_node[node] = secondary_power_output
+                                power_at_each_node[predecessor + "_2"] = secondary_power_output
+
+                            if predecessor not in node_to_remove_at_the_end:
+                                node_to_remove_at_the_end.append(predecessor)
 
                         elif predecessor_type == "fastga_he.pt_component.planetary_gear":
 
@@ -2331,10 +1872,25 @@ class FASTGAHEPowerTrainConfigurator:
                                 power_output=power_at_each_node[predecessor],
                             )
 
-                            if node.endswith("1"):
+                            # We look at the number of the corresponding gearbox input. Will be a
+                            # bit farfetched as we need to find using the current neighbor. For
+                            # gearboxes, the two connexion are rpm and shaft power and they are
+                            # both output of the input side of the gearbox, so we'll have to use
+                            # the input list
+                            # We look at the number of the corresponding splitter input
+                            input_name = component_name + ".shaft_power_out"
+                            index = self._components_connection_inputs.index(input_name)
+                            gearbox_input_name = self._components_connection_outputs[index]
+
+                            if gearbox_input_name.endswith("1"):
                                 power_at_each_node[node] = primary_input_power
+                                power_at_each_node[predecessor + "_1"] = primary_input_power
                             else:
                                 power_at_each_node[node] = secondary_power_output
+                                power_at_each_node[predecessor + "_2"] = primary_input_power
+
+                            if predecessor not in node_to_remove_at_the_end:
+                                node_to_remove_at_the_end.append(predecessor)
 
                         elif predecessor_type == "fastga_he.pt_component.fuel_system":
 
@@ -2344,10 +1900,19 @@ class FASTGAHEPowerTrainConfigurator:
                                 power_output=power_at_each_node[predecessor],
                             )
 
-                            input_number = node[-1]
+                            output_name = component_name + ".fuel_consumed_t"
+                            index = self._components_connection_inputs.index(output_name)
+                            fuel_system_input_name = self._components_connection_outputs[index]
+                            input_number = fuel_system_input_name[-1]
                             power_at_each_node[node] = input_power_dict[
                                 "fuel_consumed_in_t_" + input_number
                             ]
+                            power_at_each_node[predecessor + "_" + input_number] = input_power_dict[
+                                "fuel_consumed_in_t_" + input_number
+                            ]
+
+                            if predecessor not in node_to_remove_at_the_end:
+                                node_to_remove_at_the_end.append(predecessor)
 
                         treated_nodes.append(node)
                         previous_treated_node_number += 1
@@ -2358,7 +1923,7 @@ class FASTGAHEPowerTrainConfigurator:
                 # to do so since we ensured to get there that all predecessor were already treated
                 if len(list(graph.pred[node])) > 1:
 
-                    power = np.zero_like(template_power)
+                    power = np.zeros_like(template_power)
                     for current_predecessor in graph.pred[node]:
                         power += power_at_each_node[current_predecessor]
 
@@ -2370,96 +1935,40 @@ class FASTGAHEPowerTrainConfigurator:
             # Now we remove all nodes we treated in this while loop
             untreated_nodes = [x for x in untreated_nodes if x not in treated_nodes]
 
-        return power_at_each_node
-
-    def get_power_to_set(
-        self, inputs, propulsive_power_dict: dict
-    ) -> Tuple[List[dict], List[dict]]:
-        """
-        Returns a list of the power at each nodes of each subgraph. Also returns a list of the
-        dict of current variable names and the value they should be set at for each of the
-        subgraph. Dict will be empty if there is no power to set. The power to set are defined in
-        the registered_components.py file.
-
-        :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
-        voltages to check
-        :param propulsive_power_dict: dictionary with the propulsive power of each propulsor
-        """
-
-        # We rewrite the propulsive power dict to match the name of the nodes
-        propulsive_loads_name = list(propulsive_power_dict.keys())
-        propulsive_loads_proper_name = []
-        proper_propulsive_power_dict = {}
-
-        for propulsive_load_name in propulsive_loads_name:
-            propulsive_load_proper_name = propulsive_load_name + "_out"
-            propulsive_loads_proper_name.append(propulsive_load_name)
-            proper_propulsive_power_dict[propulsive_load_proper_name] = propulsive_power_dict[
-                propulsive_load_name
-            ]
-
-        power_in_each_subgraph = []
-        final_list = []
-        power_at_each_node = {}
-
-        # First step is to identify the independent sub-propulsion chain
-        sub_graphs = self.get_independent_sub_propulsion_chain()
-
-        # Need to be put here else the _get_component hasn't triggered yet
-        name_to_id = dict(zip(self._components_name, self._components_id))
-
-        # Then for each subgraph we get the power on each node
-        for sub_graph in sub_graphs:
-
-            power_dict_subgraph = {}
-
-            # First we reconstruct the right propulsive load dict to ensure that we only take the
-            # load we are interested in
-            propulsive_power_dict_this_subgraph = {}
-            for propulsive_load_name in list(proper_propulsive_power_dict.keys()):
-                if propulsive_load_name in sub_graph.nodes:
-                    propulsive_power_dict_this_subgraph[
-                        propulsive_load_name
-                    ] = proper_propulsive_power_dict[propulsive_load_name]
-
-            power_in_this_subgraph = self.get_power_on_each_node(
-                sub_graph, inputs, propulsive_power_dict_this_subgraph
-            )
-            power_in_each_subgraph.append(power_in_this_subgraph)
-
-            nodes_list = list(sub_graph.nodes)
-            for node in nodes_list:
-                component_name = node.replace("_in", "").replace("_out", "")
-                component_id = name_to_id[component_name]
-
-                power_to_set = resources.DICTIONARY_P_TO_SET[component_id]
-
-                for power in power_to_set:
-                    # These are tuple which contains the "in" or "out" tag plus the name of the
-                    # variable
-                    if power[1] == "in" and node.endswith("_in"):
-                        variable_name = component_name + "." + power[0]
-
-                        # If we are to set the power of a component with multiple inputs,
-                        # the node name will not match and will need to be modified. We will
-                        # check that we are in this case if the variable name endswith a number
-                        if variable_name[-1].isdigit():
-                            power_dict_subgraph[variable_name] = power_in_this_subgraph[
-                                node + "_" + variable_name[-1]
-                            ]
-                        else:
-                            power_dict_subgraph[variable_name] = power_in_this_subgraph[node]
-
-                    elif power[1] == "out" and node.endswith("_out"):
-                        variable_name = component_name + "." + power[0]
-                        power_dict_subgraph[variable_name] = power_in_this_subgraph[node]
-
-            final_list.append(power_dict_subgraph)
-            power_at_each_node = dict(power_at_each_node, **power_in_this_subgraph)
+        for node_to_remove in node_to_remove_at_the_end:
+            power_at_each_node.pop(node_to_remove)
 
         self._power_at_each_node = power_at_each_node
 
-        return power_in_each_subgraph, final_list
+        final_list = {}
+
+        for node in list(graph.nodes):
+            component_name = node.replace("_in", "").replace("_out", "")
+            component_id = name_to_id[component_name]
+
+            power_to_set = resources.DICTIONARY_P_TO_SET[component_id]
+
+            for power in power_to_set:
+                # These are tuple which contains the "in" or "out" tag plus the name of the
+                # variable
+                if power[1] == "in" and node.endswith("_in"):
+                    variable_name = component_name + "." + power[0]
+
+                    # If we are to set the power of a component with multiple inputs,
+                    # the node name will not match and will need to be modified. We will
+                    # check that we are in this case if the variable name endswith a number
+                    if variable_name[-1].isdigit():
+                        final_list[variable_name] = power_at_each_node[
+                            node + "_" + variable_name[-1]
+                        ]
+                    else:
+                        final_list[variable_name] = power_at_each_node[node]
+
+                elif power[1] == "out" and node.endswith("_out"):
+                    variable_name = component_name + "." + power[0]
+                    final_list[variable_name] = power_at_each_node[node]
+
+        return power_at_each_node, final_list
 
     def get_network_elements_list(self) -> tuple:
         """
@@ -2659,11 +2168,13 @@ class FASTGAHEPowerTrainConfigurator:
                 name_to_id[component_name] == "fastga_he.pt_component.battery_pack"
                 and name_to_option[component_name]
             ):
-                voltage_node = all_voltage_dict[node]
-                current = all_power_dict[node] / voltage_node
-                variable_name = component_name + ".dc_current_out"
+                # We just don't deal with battery inputs
+                if node.endswith("_out"):
+                    voltage_node = all_voltage_dict[node]
+                    current = all_power_dict[node] / voltage_node
+                    variable_name = component_name + ".dc_current_out"
 
-                all_current_dict[variable_name] = current
+                    all_current_dict[variable_name] = current
 
         return all_current_dict
 
