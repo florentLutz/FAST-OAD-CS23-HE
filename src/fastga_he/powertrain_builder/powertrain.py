@@ -1529,6 +1529,52 @@ class FASTGAHEPowerTrainConfigurator:
 
         return number_of_cell_in_series
 
+    def get_directed_graph_sub_propulsion_chain(self):
+        """
+        This function returns a list of directed graphs of connected PT sub propulsion chain. As a
+        prevision for next step all component will be split between their inputs and outputs to
+        allow to include efficiency.
+        """
+
+        self._get_components()
+        self._get_connections()
+
+        graph = nx.DiGraph()
+
+        for component_name, component_id in zip(self._components_name, self._components_id):
+            graph.add_node(
+                component_name + "_out",
+            )
+            graph.add_node(
+                component_name + "_in",
+            )
+
+            graph.add_edge(
+                component_name + "_out",
+                component_name + "_in",
+            )
+
+        for connection in self._connection_list:
+            # For bus and splitter, we don't really care about what number of input it is
+            # connected to so we do the following
+
+            if type(connection["source"]) is list:
+                source = connection["source"][0]
+            else:
+                source = connection["source"]
+
+            if type(connection["target"]) is list:
+                target = connection["target"][0]
+            else:
+                target = connection["target"]
+
+            graph.add_edge(
+                source + "_in",
+                target + "_out",
+            )
+
+        return graph
+
     def get_independent_sub_propulsion_chain(self):
         """
         This function returns a list of graphs of connected PT sub propulsion chain. As a
@@ -1578,6 +1624,15 @@ class FASTGAHEPowerTrainConfigurator:
         sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
 
         return sub_graphs
+
+    def get_power_on_each_node_v2(self, graph, inputs, propulsive_power_dict) -> dict:
+        """
+        Returns a dictionary which will contain the power at each node of a graph based on the
+        propulsive power at its propulsor, on the assumed efficiencies of its components and the
+        value of power split on its splitter.
+        """
+
+        return dict()
 
     def get_power_on_each_node(self, graph, inputs, propulsive_power_dict) -> dict:
         """
@@ -2123,6 +2178,199 @@ class FASTGAHEPowerTrainConfigurator:
         graph = another_copied_graph
 
         return problematic_nodes, graph
+
+    def get_power_to_set_v2(self, inputs, propulsive_power_dict: dict) -> dict:
+
+        """
+        Returns a list of the power at each nodes of each subgraph. Also returns a list of the
+        dict of current variable names and the value they should be set at for each of the
+        subgraph. Dict will be empty if there is no power to set. The power to set are defined in
+        the registered_components.py file.
+
+        :param inputs: inputs vector, in the OpenMDAO format, which contains the value of the
+        voltages to check
+        :param propulsive_power_dict: dictionary with the propulsive power of each propulsor
+        """
+
+        # We rewrite the propulsive power dict to match the name of the nodes
+        propulsive_loads_name = list(propulsive_power_dict.keys())
+        propulsive_loads_proper_name = []
+        proper_propulsive_power_dict = {}
+
+        for propulsive_load_name in propulsive_loads_name:
+            propulsive_load_proper_name = propulsive_load_name + "_out"
+            propulsive_loads_proper_name.append(propulsive_load_name)
+            proper_propulsive_power_dict[propulsive_load_proper_name] = propulsive_power_dict[
+                propulsive_load_name
+            ]
+
+        graph = self.get_directed_graph_sub_propulsion_chain()
+
+        # Need to be put here else the _get_component hasn't triggered yet
+        name_to_id = dict(zip(self._components_name, self._components_id))
+        name_to_eta = dict(zip(self._components_name, self._components_efficiency))
+
+        # Get a list of nodes who hasn't been treated, will serve as way to check that good
+        # progress is made.
+        untreated_nodes = list(graph.nodes)
+
+        power_at_each_node = {}
+        # Initialize the dict with the power at each node with an array full of zeros except for
+        # propulsors.
+        template_power = list(proper_propulsive_power_dict.values())[0]
+        treated_nodes = []
+        for untreated_node in untreated_nodes:
+            if untreated_node in list(proper_propulsive_power_dict.keys()):
+                power_at_each_node[untreated_node] = proper_propulsive_power_dict[untreated_node]
+                treated_nodes.append(untreated_node)
+            else:
+                power_at_each_node[untreated_node] = np.zeros_like(template_power)
+
+        # Remove treated nodes
+        untreated_nodes = [x for x in untreated_nodes if x not in treated_nodes]
+
+        # Now we can start treating the nodes. We'll just keep going over the graph until all
+        # nodes have been treated and we'll check that progress is being made by monitoring the
+        # number of nodes treated each loop.
+        previous_treated_node_number = 1
+
+        while len(untreated_nodes) != 0 and previous_treated_node_number != 0:
+
+            previous_treated_node_number = 0
+
+            for node in untreated_nodes:
+
+                # First check that we can treat the node. If we can't we move to the next node.
+                # A node can be treated if all its predecessor were treated
+                can_be_treated = True
+                for predecessor in graph.pred[node]:
+                    if predecessor not in treated_nodes:
+                        can_be_treated = False
+
+                if not can_be_treated:
+                    continue
+
+                component_name = copy.deepcopy(node)
+                component_end = component_name[-1]
+                if component_end.isdigit():
+                    str_to_replace = "_" + component_end
+                    component_name = component_name.replace(str_to_replace, "")
+                component_name = component_name.replace("_out", "").replace("_in", "")
+
+                # Here we are sure the node can be treated. But we'll add it to the list of
+                # treated nodes only after we compute its value. Several case can however happen.
+
+                # 1) If it only has one predecessor and that predecessor only has one successor it
+                # means its either the connection between the input and output of a component so
+                # we include the efficiency or its the output of a component connected to the
+                # input of another one.
+                if len(list(graph.pred[node])) == 1:
+
+                    predecessor = list(graph.pred[node])[0]
+                    if predecessor.endswith("_1"):
+                        predecessor = predecessor.replace("_1", "")
+                    predecessor_name = predecessor.replace("_out", "").replace("_in", "")
+
+                    if len(list(graph.succ[predecessor])) == 1:
+
+                        # To get the component name, we remove the "_in" the "_out" and the "_1".
+                        # We should only have to remove the "_1" as we are ensure that there is
+                        # only one predecessor it must be a "_1"
+
+                        # if name is the same, we compute the power below base on the efficiency,
+                        # else its the same power, to refactor, we'll just say the efficiency is 1
+                        if component_name == predecessor_name:
+                            eta = name_to_eta[component_name]
+                        else:
+                            eta = 1.0
+
+                        power_at_each_node[node] = power_at_each_node[predecessor] / eta
+
+                        treated_nodes.append(node)
+                        previous_treated_node_number += 1
+                        continue
+
+                # 2) If it only has one predecessor and that predecessor only more than successor it
+                # means its a component that splits_power (either planetary gear, splitter, ...).
+                if len(list(graph.pred[node])) == 1:
+
+                    predecessor = list(graph.pred[node])[0]
+                    if predecessor.endswith("_1"):
+                        predecessor = predecessor.replace("_1", "")
+                    predecessor_name = predecessor.replace("_out", "").replace("_in", "")
+
+                    if len(list(graph.succ[predecessor])) > 1:
+
+                        # Check the predecessor type
+                        predecessor_type = name_to_id[predecessor_name]
+
+                        if predecessor_type == "fastga_he.pt_component.dc_splitter":
+
+                            (
+                                primary_input_power,
+                                secondary_power_output,
+                            ) = self.splitter_power_inputs(
+                                inputs=inputs,
+                                components_name=predecessor_name,
+                                power_output=power_at_each_node[predecessor],
+                            )
+
+                            if list(graph.pred[node])[0].endswith("1"):
+                                power_at_each_node[node] = primary_input_power
+                            else:
+                                power_at_each_node[node] = secondary_power_output
+
+                        elif predecessor_type == "fastga_he.pt_component.planetary_gear":
+
+                            (
+                                primary_input_power,
+                                secondary_power_output,
+                            ) = self.gearbox_power_inputs(
+                                inputs=inputs,
+                                components_name=predecessor_name,
+                                power_output=power_at_each_node[predecessor],
+                            )
+
+                            if node.endswith("1"):
+                                power_at_each_node[node] = primary_input_power
+                            else:
+                                power_at_each_node[node] = secondary_power_output
+
+                        elif predecessor_type == "fastga_he.pt_component.fuel_system":
+
+                            input_power_dict = self.fuel_system_power_inputs(
+                                inputs=inputs,
+                                components_name=predecessor_name,
+                                power_output=power_at_each_node[predecessor],
+                            )
+
+                            input_number = node[-1]
+                            power_at_each_node[node] = input_power_dict[
+                                "fuel_consumed_in_t_" + input_number
+                            ]
+
+                        treated_nodes.append(node)
+                        previous_treated_node_number += 1
+                        continue
+
+                # 2) If it has more than one predecessor it is the output of a bus/fuel
+                # system/gear. In this case we simply sum all the predecessor. We should be able
+                # to do so since we ensured to get there that all predecessor were already treated
+                if len(list(graph.pred[node])) > 1:
+
+                    power = np.zero_like(template_power)
+                    for current_predecessor in graph.pred[node]:
+                        power += power_at_each_node[current_predecessor]
+
+                    power_at_each_node[node] = power
+                    treated_nodes.append(node)
+                    previous_treated_node_number += 1
+                    continue
+
+            # Now we remove all nodes we treated in this while loop
+            untreated_nodes = [x for x in untreated_nodes if x not in treated_nodes]
+
+        return power_at_each_node
 
     def get_power_to_set(
         self, inputs, propulsive_power_dict: dict
