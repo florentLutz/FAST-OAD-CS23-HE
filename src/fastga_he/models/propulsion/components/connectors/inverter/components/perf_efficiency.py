@@ -50,7 +50,13 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         self.add_output("efficiency", val=np.full(number_of_points, 1.0), lower=0.0, upper=1.0)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -78,12 +84,12 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         useful_power = 3.0 * current * ac_voltage_rms_out
 
-        partials["efficiency", "ac_voltage_rms_out"] = np.diag(
+        partials["efficiency", "ac_voltage_rms_out"] = (
             3.0 * current * losses_inverter / (useful_power + losses_inverter) ** 2.0
         )
-        partials["efficiency", "ac_current_rms_out_one_phase"] = np.diag(
+        partials["efficiency", "ac_current_rms_out_one_phase"] = (
             3.0 * ac_voltage_rms_out * losses_inverter / (useful_power + losses_inverter) ** 2.0
         )
-        partials["efficiency", "losses_inverter"] = np.diag(
+        partials["efficiency", "losses_inverter"] = (
             -useful_power / (useful_power + losses_inverter) ** 2.0
         )

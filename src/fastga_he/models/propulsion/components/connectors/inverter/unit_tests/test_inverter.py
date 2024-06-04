@@ -1546,3 +1546,5 @@ def test_performances_inverter_tot():
     assert problem.get_val("dc_current_in", units="A") == pytest.approx(
         expected_dc_current_in, rel=1e-2
     )
+
+    problem.check_partials(compact_print=True)
