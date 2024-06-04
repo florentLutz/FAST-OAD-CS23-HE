@@ -32,7 +32,20 @@ class PerformancesApparentPower(om.ExplicitComponent):
             "apparent_power", units="W", val=np.full(number_of_points, 50e3), shape=number_of_points
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="active_power",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt="settings:propulsion:he_power_train:PMSM:" + motor_id + ":power_factor",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -49,7 +62,7 @@ class PerformancesApparentPower(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         partials["apparent_power", "active_power"] = (
-            np.eye(number_of_points)
+            np.ones(number_of_points)
             / inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":power_factor"]
         )
         partials[

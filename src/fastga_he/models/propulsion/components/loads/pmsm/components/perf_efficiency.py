@@ -39,7 +39,20 @@ class PerformancesEfficiency(om.ExplicitComponent):
             upper=1.0,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt=["shaft_power_out", "power_losses"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt="settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -57,12 +70,12 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         motor_id = self.options["motor_id"]
 
-        partials["efficiency", "shaft_power_out"] = np.diag(
+        partials["efficiency", "shaft_power_out"] = (
             inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
             * inputs["power_losses"]
             / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0
         )
-        partials["efficiency", "power_losses"] = -np.diag(
+        partials["efficiency", "power_losses"] = -(
             inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
             * inputs["shaft_power_out"]
             / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0

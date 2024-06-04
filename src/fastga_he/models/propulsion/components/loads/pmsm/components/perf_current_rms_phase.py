@@ -35,16 +35,15 @@ class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points) / 3.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         outputs["ac_current_rms_in_one_phase"] = inputs["ac_current_rms_in"] / 3.0
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        number_of_points = self.options["number_of_points"]
-
-        partials["ac_current_rms_in_one_phase", "ac_current_rms_in"] = (
-            np.eye(number_of_points) / 3.0
-        )
