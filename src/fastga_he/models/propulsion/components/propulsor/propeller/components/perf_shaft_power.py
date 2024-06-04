@@ -43,7 +43,23 @@ class PerformancesShaftPower(om.ExplicitComponent):
 
         self.add_output("shaft_power_in", val=50e3, shape=number_of_points, units="W")
 
-        self.declare_partials(of="shaft_power_in", wrt=["*"], method="exact")
+        self.declare_partials(
+            of="shaft_power_in",
+            wrt=[
+                "convergence:propulsion:he_power_train:propeller:" + propeller_id + ":min_power",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+        self.declare_partials(
+            of="shaft_power_in",
+            wrt=["rpm", "density", "power_coefficient"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -80,8 +96,8 @@ class PerformancesShaftPower(om.ExplicitComponent):
 
         shaft_power = power_coefficient * (rho * rps ** 3.0 * diameter ** 5.0)
 
-        partials["shaft_power_in", "power_coefficient"] = np.diag(
-            np.where(shaft_power < min_shaft_power, 1e-6, rho * rps ** 3.0 * diameter ** 5.0)
+        partials["shaft_power_in", "power_coefficient"] = np.where(
+            shaft_power < min_shaft_power, 1e-6, rho * rps ** 3.0 * diameter ** 5.0
         )
         partials[
             "shaft_power_in",
@@ -91,19 +107,15 @@ class PerformancesShaftPower(om.ExplicitComponent):
             1e-6,
             5.0 * power_coefficient * rho * rps ** 3.0 * diameter ** 4.0,
         )
-        partials["shaft_power_in", "rpm"] = np.diag(
-            np.where(
-                shaft_power < min_shaft_power,
-                1e-6,
-                3.0 * power_coefficient * rho * rps ** 2.0 * diameter ** 5.0 / 60.0,
-            )
+        partials["shaft_power_in", "rpm"] = np.where(
+            shaft_power < min_shaft_power,
+            1e-6,
+            3.0 * power_coefficient * rho * rps ** 2.0 * diameter ** 5.0 / 60.0,
         )
-        partials["shaft_power_in", "density"] = np.diag(
-            np.where(
-                shaft_power < min_shaft_power,
-                1e-6,
-                power_coefficient * rps ** 3.0 * diameter ** 5.0,
-            )
+        partials["shaft_power_in", "density"] = np.where(
+            shaft_power < min_shaft_power,
+            1e-6,
+            power_coefficient * rps ** 3.0 * diameter ** 5.0,
         )
         partials[
             "shaft_power_in",
