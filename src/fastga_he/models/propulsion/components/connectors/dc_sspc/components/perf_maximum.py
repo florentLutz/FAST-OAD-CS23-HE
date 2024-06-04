@@ -61,11 +61,15 @@ class PerformancesDCSSPCMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max",
             wrt="dc_current_in",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_max",
             wrt=["dc_voltage_in", "dc_voltage_out"],
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
