@@ -77,7 +77,7 @@
           <span_ratio is_input="True">0.164</span_ratio>
         </aileron>
         <kink>
-          <span_ratio is_input="True">0.5<!--ratio (Y-position of kink)/(semi-span)--></span_ratio>
+          <span_ratio is_input="True">0.0<!--ratio (Y-position of kink)/(semi-span)--></span_ratio>
         </kink>
         <root>
           <thickness_ratio is_input="True">0.16<!--thickness ratio at wing root--></thickness_ratio>
