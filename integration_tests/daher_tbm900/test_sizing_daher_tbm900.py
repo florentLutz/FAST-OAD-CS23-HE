@@ -11,6 +11,11 @@ import pytest
 import openmdao.api as om
 import fastoad.api as oad
 
+from fastga.utils.postprocessing.analysis_and_plots import (
+    mass_breakdown_bar_plot,
+    aircraft_geometry_plot,
+)
+
 from utils.filter_residuals import filter_residuals
 
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
@@ -251,3 +256,63 @@ def test_ecopulse_new_wing_mission_analysis():
     problem.write_outputs()
 
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(321.0, abs=1.0)
+
+
+def test_weight_comparison():
+
+    ref_aircraft = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_op.xml")
+    ref_aircraft_sizing = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ref.xml")
+    ref_datafile = oad.DataFile(ref_aircraft_sizing)
+
+    # Add fake values corresponding to the op mission, don't want to do it directly in the file
+    # as it might get overwritten
+    datafile = oad.DataFile(ref_aircraft)
+
+    tow_value = datafile["data:mission:operational:TOW"].value[0]
+    tow_units = datafile["data:mission:operational:TOW"].units
+    datafile.append(oad.Variable("data:weight:aircraft:MTOW", val=tow_value, units=tow_units))
+
+    payload_value = datafile["data:mission:operational:payload:mass"].value[0]
+    payload_units = datafile["data:mission:operational:payload:mass"].units
+    datafile.append(
+        oad.Variable("data:weight:aircraft:payload", val=payload_value, units=payload_units)
+    )
+
+    fuel_value = datafile["data:mission:operational:fuel"].value[0]
+    fuel_units = datafile["data:mission:operational:fuel"].units
+    datafile.append(oad.Variable("data:mission:sizing:fuel", val=fuel_value, units=fuel_units))
+
+    datafile.append(ref_datafile["data:weight:airframe:mass"])
+    datafile.append(ref_datafile["data:weight:furniture:mass"])
+    datafile.append(ref_datafile["data:weight:propulsion:mass"])
+    datafile.append(ref_datafile["data:weight:systems:mass"])
+
+    datafile.save()
+
+    retrofit_aircraft = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ecopulse_retrofit.xml")
+
+    retrofit_datafile = oad.DataFile(retrofit_aircraft)
+    retrofit_datafile["data:weight:airframe:mass"].value = ref_datafile[
+        "data:weight:airframe:mass"
+    ].value
+    retrofit_datafile.save()
+
+    new_wing_aircraft = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ecopulse_new_wing.xml")
+
+    fig = mass_breakdown_bar_plot(
+        ref_aircraft, name="Reference aircraft on the operational mission"
+    )
+    fig = mass_breakdown_bar_plot(retrofit_aircraft, name="Conservative hybrid design", fig=fig)
+    fig = mass_breakdown_bar_plot(new_wing_aircraft, name="Hybrid design from scratch", fig=fig)
+    fig.update_layout(font=dict(size=20))
+    fig.show()
+
+
+def test_geometry_comparison():
+
+    ref_aircraft_sizing = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ref.xml")
+    new_wing_aircraft = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ecopulse_new_wing.xml")
+
+    fig = aircraft_geometry_plot(ref_aircraft_sizing, name="Reference aircraft")
+    fig = aircraft_geometry_plot(new_wing_aircraft, name="Hybrid design from scratch", fig=fig)
+    fig.show()
