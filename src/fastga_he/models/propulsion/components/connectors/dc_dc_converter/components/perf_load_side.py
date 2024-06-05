@@ -44,7 +44,13 @@ class PerformancesConverterLoadSide(om.ExplicitComponent):
             upper=1000.0,
         )
 
-        self.declare_partials(of="dc_current_in", wrt="*", method="exact")
+        self.declare_partials(
+            of="dc_current_in",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -61,9 +67,9 @@ class PerformancesConverterLoadSide(om.ExplicitComponent):
         partials_voltage = np.where(
             np.abs(inputs["power"]) < 10.0, 1e-8, -inputs["power"] / inputs["dc_voltage_in"] ** 2
         )
-        partials["dc_current_in", "dc_voltage_in"] = np.diag(partials_voltage)
+        partials["dc_current_in", "dc_voltage_in"] = partials_voltage
 
         partials_power = np.where(
             np.abs(inputs["power"]) < 10.0, 1e-8, 1.0 / inputs["dc_voltage_in"]
         )
-        partials["dc_current_in", "power"] = np.diag(partials_power)
+        partials["dc_current_in", "power"] = partials_power

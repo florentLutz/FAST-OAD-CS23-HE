@@ -64,26 +64,39 @@ class PerformancesConverterRelations(om.ImplicitComponent):
             of="power_rel",
             wrt=["dc_voltage_out", "dc_current_out", "power_rel", "efficiency"],
             method="exact",
-        )
-        self.declare_partials(
-            of="voltage_out_rel", wrt=["voltage_out_rel", "voltage_out_target"], method="exact"
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
-    def apply_nonlinear(self, inputs, outputs, residuals):
+        self.declare_partials(
+            of="voltage_out_rel",
+            wrt="voltage_out_rel",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="voltage_out_rel",
+            wrt="voltage_out_target",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=-np.ones(number_of_points),
+        )
+
+    def apply_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
 
         residuals["voltage_out_rel"] = outputs["voltage_out_rel"] - inputs["voltage_out_target"]
         residuals["power_rel"] = (inputs["dc_voltage_out"] * inputs["dc_current_out"]) - outputs[
             "power_rel"
         ] * inputs["efficiency"]
 
-    def linearize(self, inputs, outputs, partials):
+    def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
 
-        number_of_points = self.options["number_of_points"]
-
-        partials["power_rel", "power_rel"] = -np.diag(inputs["efficiency"])
-        partials["power_rel", "efficiency"] = -np.diag(outputs["power_rel"])
-        partials["power_rel", "dc_voltage_out"] = np.diag(inputs["dc_current_out"])
-        partials["power_rel", "dc_current_out"] = np.diag(inputs["dc_voltage_out"])
-
-        partials["voltage_out_rel", "voltage_out_rel"] = np.eye(number_of_points)
-        partials["voltage_out_rel", "voltage_out_target"] = -np.eye(number_of_points)
+        jacobian["power_rel", "power_rel"] = -inputs["efficiency"]
+        jacobian["power_rel", "efficiency"] = -outputs["power_rel"]
+        jacobian["power_rel", "dc_voltage_out"] = inputs["dc_current_out"]
+        jacobian["power_rel", "dc_current_out"] = inputs["dc_voltage_out"]
