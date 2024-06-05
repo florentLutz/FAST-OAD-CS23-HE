@@ -40,7 +40,20 @@ class PerformancesSFC(om.ExplicitComponent):
             "specific_fuel_consumption", units="g/kW/h", val=200.0, shape=number_of_points
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="specific_fuel_consumption",
+            wrt=["mean_effective_pressure", "rpm"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="specific_fuel_consumption",
+            wrt="settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -103,9 +116,9 @@ class PerformancesSFC(om.ExplicitComponent):
             1e-6,
         )
 
-        partials["specific_fuel_consumption", "mean_effective_pressure"] = np.diag(partials_mep)
+        partials["specific_fuel_consumption", "mean_effective_pressure"] = partials_mep
 
-        partials["specific_fuel_consumption", "rpm"] = np.diag(
+        partials["specific_fuel_consumption", "rpm"] = (
             (
                 +6507.41622273
                 - 2.0 * 6292.54999479 * rpm
