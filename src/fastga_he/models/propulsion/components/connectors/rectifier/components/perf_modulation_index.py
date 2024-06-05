@@ -41,7 +41,21 @@ class PerformancesModulationIndex(om.ImplicitComponent):
             desc="Modulation index of the rectifier",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="modulation_index",
+            wrt="ac_voltage_peak_in",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="modulation_index",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
@@ -52,11 +66,9 @@ class PerformancesModulationIndex(om.ImplicitComponent):
         )
 
     def linearize(self, inputs, outputs, partials):
-        number_of_points = self.options["number_of_points"]
 
-        partials["modulation_index", "ac_voltage_peak_in"] = np.eye(number_of_points)
-        partials["modulation_index", "dc_voltage_out"] = -np.diag(outputs["modulation_index"])
-        partials["modulation_index", "modulation_index"] = -np.diag(inputs["dc_voltage_out"])
+        partials["modulation_index", "dc_voltage_out"] = -outputs["modulation_index"]
+        partials["modulation_index", "modulation_index"] = -inputs["dc_voltage_out"]
 
     def guess_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None

@@ -51,7 +51,13 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
             upper=1000.0,
         )
 
-        self.declare_partials(of="ac_current_rms_in_one_phase", wrt="*", method="exact")
+        self.declare_partials(
+            of="ac_current_rms_in_one_phase",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -70,11 +76,11 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
             1e-6,
             -inputs["power"] / inputs["ac_voltage_rms_in"] ** 2 / 3.0,
         )
-        partials["ac_current_rms_in_one_phase", "ac_voltage_rms_in"] = np.diag(partials_voltage_in)
+        partials["ac_current_rms_in_one_phase", "ac_voltage_rms_in"] = partials_voltage_in
 
         partials_power = np.where(
             inputs["power"] < 10.0,
             1e-6,
             1.0 / inputs["ac_voltage_rms_in"] / 3.0,
         )
-        partials["ac_current_rms_in_one_phase", "power"] = np.diag(partials_power)
+        partials["ac_current_rms_in_one_phase", "power"] = partials_power

@@ -57,7 +57,13 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         self.add_output("efficiency", val=0.98, shape=number_of_points, lower=0.0, upper=1.0)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -84,18 +90,18 @@ class PerformancesEfficiency(om.ExplicitComponent):
             1e-6,
             losses_rectifier / (useful_power + losses_rectifier) ** 2.0 * dc_voltage_out,
         )
-        partials["efficiency", "dc_current_out"] = np.diag(partials_dc_current)
+        partials["efficiency", "dc_current_out"] = partials_dc_current
 
         partials_dc_voltage = np.where(
             useful_power < 10.0,
             1e-6,
             losses_rectifier / (useful_power + losses_rectifier) ** 2.0 * dc_current_out,
         )
-        partials["efficiency", "dc_voltage_out"] = np.diag(partials_dc_voltage)
+        partials["efficiency", "dc_voltage_out"] = partials_dc_voltage
 
         partials_losses = np.where(
             useful_power < 10.0,
             1e-6,
             -useful_power / (useful_power + losses_rectifier) ** 2.0,
         )
-        partials["efficiency", "losses_rectifier"] = np.diag(partials_losses)
+        partials["efficiency", "losses_rectifier"] = partials_losses
