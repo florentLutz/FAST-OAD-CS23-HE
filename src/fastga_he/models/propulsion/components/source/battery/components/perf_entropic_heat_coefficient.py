@@ -27,7 +27,13 @@ class PerformancesEntropicHeatCoefficient(om.ExplicitComponent):
             "entropic_heat_coefficient", units="V/degK", val=np.full(number_of_points, 1e-3)
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -50,5 +56,5 @@ class PerformancesEntropicHeatCoefficient(om.ExplicitComponent):
         )
 
         partials["entropic_heat_coefficient", "state_of_charge"] = (
-            np.diag(2.154e-2 - 2.0 * 2.869e-4 * soc + 3.0 * 1.028e-6 * soc ** 2.0) * 1e-3
-        )
+            2.154e-2 - 2.0 * 2.869e-4 * soc + 3.0 * 1.028e-6 * soc ** 2.0
+        ) * 1e-3

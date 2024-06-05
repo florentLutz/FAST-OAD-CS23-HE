@@ -32,7 +32,13 @@ class PerformancesCellEntropicLosses(om.ExplicitComponent):
 
         self.add_output("entropic_losses_cell", units="W", val=np.full(number_of_points, 1))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -44,12 +50,12 @@ class PerformancesCellEntropicLosses(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["entropic_losses_cell", "current_one_module"] = -np.diag(
+        partials["entropic_losses_cell", "current_one_module"] = -(
             inputs["cell_temperature"] * inputs["entropic_heat_coefficient"]
         )
-        partials["entropic_losses_cell", "cell_temperature"] = -np.diag(
+        partials["entropic_losses_cell", "cell_temperature"] = -(
             inputs["current_one_module"] * inputs["entropic_heat_coefficient"]
         )
-        partials["entropic_losses_cell", "entropic_heat_coefficient"] = -np.diag(
+        partials["entropic_losses_cell", "entropic_heat_coefficient"] = -(
             inputs["current_one_module"] * inputs["cell_temperature"]
         )

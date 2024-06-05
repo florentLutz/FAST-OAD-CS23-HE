@@ -44,14 +44,15 @@ class PerformancesBatteryVoltage(om.ExplicitComponent):
 
         self.add_output(self.output_name, units="V", val=np.full(number_of_points, 500.0))
 
-        self.declare_partials(of=self.output_name, wrt="*", method="exact")
+        self.declare_partials(
+            of=self.output_name,
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         outputs[self.output_name] = inputs["module_voltage"]
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        number_of_points = self.options["number_of_points"]
-
-        partials[self.output_name, "module_voltage"] = np.eye(number_of_points)

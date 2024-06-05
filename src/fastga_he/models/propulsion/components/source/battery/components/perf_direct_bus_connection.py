@@ -36,15 +36,25 @@ class PerformancesBatteryDirectBusConnection(om.ImplicitComponent):
             upper=1000.0,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="dc_current_out",
+            wrt="voltage_out",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="dc_current_out",
+            wrt="battery_voltage",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=-np.ones(number_of_points),
+        )
 
-    def apply_nonlinear(self, inputs, outputs, residuals):
+    def apply_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
 
         residuals["dc_current_out"] = inputs["voltage_out"] - inputs["battery_voltage"]
-
-    def linearize(self, inputs, outputs, partials):
-
-        number_of_points = self.options["number_of_points"]
-
-        partials["dc_current_out", "voltage_out"] = np.eye(number_of_points)
-        partials["dc_current_out", "battery_voltage"] = -np.eye(number_of_points)

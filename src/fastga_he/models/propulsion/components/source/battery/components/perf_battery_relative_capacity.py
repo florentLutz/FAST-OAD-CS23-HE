@@ -43,7 +43,13 @@ class PerformancesRelativeCapacity(om.ExplicitComponent):
 
         self.add_output("relative_capacity", val=np.full(number_of_points, 1.0))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
         self.poly = np.polyfit(
             self.options["reference_curve_current"],
@@ -80,4 +86,4 @@ class PerformancesRelativeCapacity(om.ExplicitComponent):
             relative_capacity > 0.0, d_r_d_current, np.zeros_like(d_r_d_current)
         )
 
-        partials["relative_capacity", "current_one_module"] = np.diag(d_r_d_current)
+        partials["relative_capacity", "current_one_module"] = d_r_d_current

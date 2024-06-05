@@ -34,7 +34,13 @@ class PerformancesEnergyConsumption(om.ExplicitComponent):
             units="W*h",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -44,12 +50,12 @@ class PerformancesEnergyConsumption(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["non_consumable_energy_t", "dc_current_out"] = np.diag(
+        partials["non_consumable_energy_t", "dc_current_out"] = (
             inputs["voltage_out"] * inputs["time_step"]
         )
-        partials["non_consumable_energy_t", "voltage_out"] = np.diag(
+        partials["non_consumable_energy_t", "voltage_out"] = (
             inputs["dc_current_out"] * inputs["time_step"]
         )
-        partials["non_consumable_energy_t", "time_step"] = np.diag(
+        partials["non_consumable_energy_t", "time_step"] = (
             inputs["dc_current_out"] * inputs["voltage_out"]
         )
