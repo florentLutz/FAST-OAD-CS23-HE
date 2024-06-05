@@ -34,8 +34,38 @@ class UpdateMass(om.ExplicitComponent):
             "mass", shape=number_of_points, val=np.full(number_of_points, 1500.0), units="kg"
         )
 
-    def setup_partials(self):
-        self.declare_partials("*", "*", method="exact")
+        self.declare_partials(
+            of="mass",
+            wrt="data:weight:aircraft:MTOW",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+            val=1.0,
+        )
+        self.declare_partials(
+            of="mass",
+            wrt=[
+                "data:mission:sizing:taxi_out:fuel",
+                "data:mission:sizing:initial_climb:fuel",
+                "data:mission:sizing:takeoff:fuel",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+            val=1.0,
+        )
+
+        partials_fuel_consumed = -(
+            np.tri(number_of_points, number_of_points) - np.eye(number_of_points)
+        )
+        self.declare_partials(
+            of="mass",
+            wrt="fuel_consumed_t",
+            method="exact",
+            val=np.ones(len(np.where(partials_fuel_consumed != 0)[0])),
+            rows=np.where(partials_fuel_consumed != 0)[0],
+            cols=np.where(partials_fuel_consumed != 0)[1],
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -56,15 +86,4 @@ class UpdateMass(om.ExplicitComponent):
             - fuel_takeoff
             - fuel_initial_climb
             - np.cumsum(np.concatenate((np.zeros(1), inputs["fuel_consumed_t"][:-1])))
-        )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        number_of_points = self.options["number_of_points"]
-
-        partials["mass", "data:weight:aircraft:MTOW"] = np.full(number_of_points, 1.0)
-        partials["mass", "data:mission:sizing:taxi_out:fuel"] = np.full(number_of_points, -1.0)
-        partials["mass", "data:mission:sizing:initial_climb:fuel"] = np.full(number_of_points, -1.0)
-        partials["mass", "data:mission:sizing:takeoff:fuel"] = np.full(number_of_points, -1.0)
-        partials["mass", "fuel_consumed_t"] = -(
-            np.tri(number_of_points, number_of_points) - np.eye(number_of_points)
         )

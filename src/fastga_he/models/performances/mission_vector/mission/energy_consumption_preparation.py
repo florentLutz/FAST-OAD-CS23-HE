@@ -78,42 +78,115 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         self.add_output("true_airspeed_econ", shape=number_of_points + 2, units="m/s")
         self.add_output("engine_setting_econ", shape=number_of_points + 2)
 
+        t_econ_to_t = np.zeros((number_of_points + 2, number_of_points))
+        t_econ_to_t[1 : number_of_points + 1, :] = np.eye(number_of_points)
+
         self.declare_partials(
             of="thrust_econ",
-            wrt=[
-                "thrust",
-                "data:mission:sizing:taxi_out:thrust",
-                "data:mission:sizing:taxi_in:thrust",
-            ],
+            wrt="thrust",
             method="exact",
+            rows=np.where(t_econ_to_t != 0)[0],
+            cols=np.where(t_econ_to_t != 0)[1],
+        )
+        self.declare_partials(
+            of="thrust_econ",
+            wrt="data:mission:sizing:taxi_out:thrust",
+            method="exact",
+            rows=np.array([0]),
+            cols=np.array([0]),
+            val=1.0,
+        )
+        self.declare_partials(
+            of="thrust_econ",
+            wrt="data:mission:sizing:taxi_in:thrust",
+            method="exact",
+            rows=np.array([number_of_points + 1]),
+            cols=np.array([0]),
+            val=1.0,
         )
 
-        self.declare_partials(of="altitude_econ", wrt="altitude", method="exact")
-        self.declare_partials(of="density_econ", wrt="density", method="exact")
-        self.declare_partials(of="engine_setting_econ", wrt="engine_setting", method="exact")
+        self.declare_partials(
+            of="altitude_econ",
+            wrt="altitude",
+            method="exact",
+            rows=np.where(t_econ_to_t != 0)[0],
+            cols=np.where(t_econ_to_t != 0)[1],
+            val=np.ones(len(np.where(t_econ_to_t != 0)[0])),
+        )
+        self.declare_partials(
+            of="density_econ",
+            wrt="density",
+            method="exact",
+            rows=np.where(t_econ_to_t != 0)[0],
+            cols=np.where(t_econ_to_t != 0)[1],
+            val=np.ones(len(np.where(t_econ_to_t != 0)[0])),
+        )
+        self.declare_partials(
+            of="engine_setting_econ",
+            wrt="engine_setting",
+            method="exact",
+            rows=np.where(t_econ_to_t != 0)[0],
+            cols=np.where(t_econ_to_t != 0)[1],
+            val=np.ones(len(np.where(t_econ_to_t != 0)[0])),
+        )
 
         self.declare_partials(
-            of="exterior_temperature_econ", wrt="exterior_temperature", method="exact"
+            of="exterior_temperature_econ",
+            wrt="exterior_temperature",
+            method="exact",
+            rows=np.where(t_econ_to_t != 0)[0],
+            cols=np.where(t_econ_to_t != 0)[1],
+            val=np.ones(len(np.where(t_econ_to_t != 0)[0])),
         )
 
         self.declare_partials(
             of="time_step_econ",
-            wrt=[
-                "time_step",
-                "data:mission:sizing:taxi_out:duration",
-                "data:mission:sizing:taxi_in:duration",
-            ],
+            wrt="time_step",
             method="exact",
+            rows=np.where(t_econ_to_t != 0)[0],
+            cols=np.where(t_econ_to_t != 0)[1],
+            val=np.ones(len(np.where(t_econ_to_t != 0)[0])),
+        )
+        self.declare_partials(
+            of="time_step_econ",
+            wrt="data:mission:sizing:taxi_out:duration",
+            method="exact",
+            rows=np.array([0]),
+            cols=np.array([0]),
+            val=1.0,
+        )
+        self.declare_partials(
+            of="time_step_econ",
+            wrt="data:mission:sizing:taxi_in:duration",
+            method="exact",
+            rows=np.array([number_of_points + 1]),
+            cols=np.array([0]),
+            val=1.0,
         )
 
         self.declare_partials(
             of="true_airspeed_econ",
-            wrt=[
-                "true_airspeed",
-                "data:mission:sizing:taxi_out:speed",
-                "data:mission:sizing:taxi_in:speed",
-            ],
+            wrt="true_airspeed",
             method="exact",
+            rows=np.where(t_econ_to_t != 0)[0],
+            cols=np.where(t_econ_to_t != 0)[1],
+            val=np.ones(len(np.where(t_econ_to_t != 0)[0])),
+        )
+        self.declare_partials(
+            of="true_airspeed_econ",
+            wrt="data:mission:sizing:taxi_out:speed",
+            method="exact",
+            rows=np.array([0]),
+            cols=np.array([0]),
+            val=1.0,
+        )
+        self.declare_partials(
+            of="true_airspeed_econ",
+            wrt="data:mission:sizing:taxi_in:speed",
+            method="exact",
+            rows=np.array([number_of_points + 1]),
+            cols=np.array([0]),
+            val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -168,57 +241,7 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        number_of_points = self.options["number_of_points"]
-
-        d_thrust_econ_d_thrust = np.zeros((number_of_points + 2, number_of_points))
         d_thrust_econ_d_thrust_diagonal = np.where(
             inputs["thrust"] > 50.0, np.ones_like(inputs["thrust"]), np.zeros_like(inputs["thrust"])
         )
-        d_thrust_econ_d_thrust[1 : number_of_points + 1, :] = np.diag(
-            d_thrust_econ_d_thrust_diagonal
-        )
-        partials["thrust_econ", "thrust"] = d_thrust_econ_d_thrust
-
-        d_thrust_econ_d_thrust_to = np.zeros(number_of_points + 2)
-        d_thrust_econ_d_thrust_to[0] = 1.0
-        partials["thrust_econ", "data:mission:sizing:taxi_out:thrust"] = d_thrust_econ_d_thrust_to
-
-        d_thrust_econ_d_thrust_ti = np.zeros(number_of_points + 2)
-        d_thrust_econ_d_thrust_ti[-1] = 1.0
-        partials["thrust_econ", "data:mission:sizing:taxi_in:thrust"] = d_thrust_econ_d_thrust_ti
-
-        d_altitude_econ_d_altitude = np.zeros((number_of_points + 2, number_of_points))
-        d_altitude_econ_d_altitude[1 : number_of_points + 1, :] = np.eye(number_of_points)
-        partials["altitude_econ", "altitude"] = d_altitude_econ_d_altitude
-
-        # In value it is gonna be the same so we avoid over-burdening the compute_partials function
-        partials["density_econ", "density"] = d_altitude_econ_d_altitude
-        partials["engine_setting_econ", "engine_setting"] = d_altitude_econ_d_altitude
-
-        d_temp_econ_d_temp = np.zeros((number_of_points + 2, number_of_points))
-        d_temp_econ_d_temp[1 : number_of_points + 1, :] = np.eye(number_of_points)
-        partials["exterior_temperature_econ", "exterior_temperature"] = d_temp_econ_d_temp
-
-        d_ts_econ_d_ts = np.zeros((number_of_points + 2, number_of_points))
-        d_ts_econ_d_ts[1 : number_of_points + 1, :] = np.eye(number_of_points)
-        partials["time_step_econ", "time_step"] = d_ts_econ_d_ts
-
-        d_ts_econ_d_ts_to = np.zeros(number_of_points + 2)
-        d_ts_econ_d_ts_to[0] = 1.0
-        partials["time_step_econ", "data:mission:sizing:taxi_out:duration"] = d_ts_econ_d_ts_to
-
-        d_ts_econ_d_ts_ti = np.zeros(number_of_points + 2)
-        d_ts_econ_d_ts_ti[-1] = 1.0
-        partials["time_step_econ", "data:mission:sizing:taxi_in:duration"] = d_ts_econ_d_ts_ti
-
-        d_tas_econ_d_tas = np.zeros((number_of_points + 2, number_of_points))
-        d_tas_econ_d_tas[1 : number_of_points + 1, :] = np.eye(number_of_points)
-        partials["true_airspeed_econ", "true_airspeed"] = d_tas_econ_d_tas
-
-        d_tas_econ_d_tas_to = np.zeros(number_of_points + 2)
-        d_tas_econ_d_tas_to[0] = 1.0
-        partials["true_airspeed_econ", "data:mission:sizing:taxi_out:speed"] = d_tas_econ_d_tas_to
-
-        d_tas_econ_d_tas_ti = np.zeros(number_of_points + 2)
-        d_tas_econ_d_tas_ti[-1] = 1.0
-        partials["true_airspeed_econ", "data:mission:sizing:taxi_in:speed"] = d_tas_econ_d_tas_ti
+        partials["thrust_econ", "thrust"] = d_thrust_econ_d_thrust_diagonal

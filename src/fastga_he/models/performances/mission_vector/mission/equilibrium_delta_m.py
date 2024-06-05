@@ -55,8 +55,14 @@ class EquilibriumDeltaM(om.ImplicitComponent):
 
         self.declare_partials(
             of="delta_m",
+            wrt=["x_cg", "delta_Cl", "delta_Cm", "alpha", "delta_m"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="delta_m",
             wrt=[
-                "x_cg",
                 "data:geometry:wing:MAC:length",
                 "data:geometry:wing:MAC:at25percent:x",
                 "data:geometry:horizontal_tail:MAC:at25percent:x:from_wingMAC25",
@@ -67,23 +73,29 @@ class EquilibriumDeltaM(om.ImplicitComponent):
                 "data:aerodynamics:horizontal_tail:cruise:CL0",
                 "data:aerodynamics:horizontal_tail:cruise:CL_alpha",
                 "data:aerodynamics:elevator:low_speed:CL_delta",
-                "delta_Cl",
-                "delta_Cm",
-                "alpha",
-                "delta_m",
             ],
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
         )
         if self.options["flaps_position"] == "takeoff":
             self.declare_partials(
-                of="delta_m", wrt="data:aerodynamics:flaps:takeoff:CM", method="exact"
+                of="delta_m",
+                wrt="data:aerodynamics:flaps:takeoff:CM",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
             )
         if self.options["flaps_position"] == "landing":
             self.declare_partials(
-                of="delta_m", wrt="data:aerodynamics:flaps:landing:CM", method="exact"
+                of="delta_m",
+                wrt="data:aerodynamics:flaps:landing:CM",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
             )
 
-    def linearize(self, inputs, outputs, partials):
+    def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
 
         number_of_points = self.options["number_of_points"]
 
@@ -119,49 +131,49 @@ class EquilibriumDeltaM(om.ImplicitComponent):
 
         # ------------------ Derivatives wrt delta_m residuals ------------------ #
 
-        partials["delta_m", "data:aerodynamics:wing:cruise:CM0_clean"] = l0_wing * np.ones(
+        jacobian["delta_m", "data:aerodynamics:wing:cruise:CM0_clean"] = l0_wing * np.ones(
             number_of_points
         )
-        partials["delta_m", "data:aerodynamics:fuselage:cm_alpha"] = l0_wing * alpha
-        partials["delta_m", "data:aerodynamics:wing:cruise:CL0_clean"] = x_cg - x_wing
-        partials["delta_m", "data:aerodynamics:wing:cruise:CM0_clean"] = l0_wing * np.ones(
+        jacobian["delta_m", "data:aerodynamics:fuselage:cm_alpha"] = l0_wing * alpha
+        jacobian["delta_m", "data:aerodynamics:wing:cruise:CL0_clean"] = x_cg - x_wing
+        jacobian["delta_m", "data:aerodynamics:wing:cruise:CM0_clean"] = l0_wing * np.ones(
             number_of_points
         )
-        partials["delta_m", "data:aerodynamics:horizontal_tail:cruise:CL0"] = (
+        jacobian["delta_m", "data:aerodynamics:horizontal_tail:cruise:CL0"] = (
             x_cg - x_htp
         ) * np.ones(number_of_points)
-        partials["delta_m", "delta_Cl"] = np.diag(x_cg - x_wing)
-        partials["delta_m", "delta_Cm"] = l0_wing * np.eye(number_of_points)
+        jacobian["delta_m", "delta_Cl"] = x_cg - x_wing
+        jacobian["delta_m", "delta_Cm"] = l0_wing * np.ones(number_of_points)
         d_delta_m_d_alpha = (
             (x_cg - x_wing) * cl_alpha_wing + (x_cg - x_htp) * cl_alpha_htp + cm_alpha_fus * l0_wing
         )
-        partials["delta_m", "alpha"] = np.diag(d_delta_m_d_alpha) * np.pi / 180.0
-        partials["delta_m", "data:aerodynamics:horizontal_tail:cruise:CL_alpha"] = alpha * (
+        jacobian["delta_m", "alpha"] = d_delta_m_d_alpha * np.pi / 180.0
+        jacobian["delta_m", "data:aerodynamics:horizontal_tail:cruise:CL_alpha"] = alpha * (
             x_cg - x_htp
         )
-        partials["delta_m", "data:aerodynamics:elevator:low_speed:CL_delta"] = (
+        jacobian["delta_m", "data:aerodynamics:elevator:low_speed:CL_delta"] = (
             x_cg - x_htp
         ) * delta_m
-        partials["delta_m", "delta_m"] = (
-            np.eye(number_of_points) * (x_cg - x_htp) * cl_delta_m * np.pi / 180.0
+        jacobian["delta_m", "delta_m"] = (
+            np.ones(number_of_points) * (x_cg - x_htp) * cl_delta_m * np.pi / 180.0
         )
-        partials["delta_m", "x_cg"] = (cl_wing_slip + cl_htp) * np.eye(number_of_points)
-        partials["delta_m", "data:geometry:wing:MAC:at25percent:x"] = -(
+        jacobian["delta_m", "x_cg"] = (cl_wing_slip + cl_htp) * np.ones(number_of_points)
+        jacobian["delta_m", "data:geometry:wing:MAC:at25percent:x"] = -(
             cl_wing_slip + cl_htp
         ) * np.ones(number_of_points)
-        partials[
+        jacobian[
             "delta_m", "data:geometry:horizontal_tail:MAC:at25percent:x:from_wingMAC25"
         ] = -cl_htp
-        partials["delta_m", "data:geometry:wing:MAC:length"] = (
+        jacobian["delta_m", "data:geometry:wing:MAC:length"] = (
             cm_alpha_fus * alpha + cm0_wing + delta_cm + delta_cm_flaps
         )
-        partials["delta_m", "data:aerodynamics:wing:cruise:CL_alpha"] = (x_cg - x_wing) * alpha
+        jacobian["delta_m", "data:aerodynamics:wing:cruise:CL_alpha"] = (x_cg - x_wing) * alpha
         if self.options["flaps_position"] == "takeoff":
-            partials["delta_m", "data:aerodynamics:flaps:takeoff:CM"] = l0_wing * np.ones(
+            jacobian["delta_m", "data:aerodynamics:flaps:takeoff:CM"] = l0_wing * np.ones(
                 number_of_points
             )
         if self.options["flaps_position"] == "landing":
-            partials["delta_m", "data:aerodynamics:flaps:landing:CM"] = l0_wing * np.ones(
+            jacobian["delta_m", "data:aerodynamics:flaps:landing:CM"] = l0_wing * np.ones(
                 number_of_points
             )
 
