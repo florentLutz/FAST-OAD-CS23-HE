@@ -38,6 +38,8 @@ class PerformancesTorqueOut(om.ExplicitComponent):
                 of="torque_out_" + output_number,
                 wrt=["shaft_power_out_" + output_number, "rpm_out_" + output_number],
                 method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -56,9 +58,9 @@ class PerformancesTorqueOut(om.ExplicitComponent):
             rpm = inputs["rpm_out_" + output_number]
             omega = rpm * 2.0 * np.pi / 60
 
-            partials["torque_out_" + output_number, "shaft_power_out_" + output_number] = np.diag(
+            partials["torque_out_" + output_number, "shaft_power_out_" + output_number] = (
                 1000.0 / omega
             )
             partials["torque_out_" + output_number, "rpm_out_" + output_number] = (
-                -np.diag(power * 1000.0 / omega ** 2.0) * 2.0 * np.pi / 60
+                -power * 1000.0 / omega ** 2.0 * 2.0 * np.pi / 60
             )
