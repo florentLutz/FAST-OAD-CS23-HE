@@ -45,6 +45,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":voltage_max",
             wrt="dc_voltage",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_input(
@@ -79,12 +81,13 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":current_max",
             wrt=["dc_current_in_1", "dc_current_in_2", "dc_current_out"],
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         dc_splitter_id = self.options["dc_splitter_id"]
-        number_of_points = self.options["number_of_points"]
 
         outputs[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":voltage_max"

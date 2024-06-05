@@ -71,21 +71,57 @@ class PerformancesElectricalNodePercentSplit(om.ImplicitComponent):
 
         self.declare_partials(
             of="dc_voltage",
-            wrt=["dc_voltage_in_1", "dc_voltage_in_2", "dc_voltage"],
+            wrt=["dc_voltage_in_1", "dc_voltage_in_2"],
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="dc_voltage",
+            wrt=["dc_voltage"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=-2.0 * np.ones(number_of_points),
+        )
+
+        self.declare_partials(
+            of="dc_voltage_in_1",
+            wrt="dc_current_in_1",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=100 * np.ones(number_of_points),
         )
         self.declare_partials(
             of="dc_voltage_in_1",
-            wrt=["dc_current_in_1", "dc_current_out", "power_split"],
+            wrt=["dc_current_out", "power_split"],
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+
+        self.declare_partials(
+            of="dc_voltage_in_2",
+            wrt=["dc_current_out"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=-np.ones(number_of_points),
         )
         self.declare_partials(
             of="dc_voltage_in_2",
-            wrt=["dc_current_in_1", "dc_current_out", "dc_current_in_2"],
+            wrt=["dc_current_in_1", "dc_current_in_2"],
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
         )
 
-    def apply_nonlinear(self, inputs, outputs, residuals):
+    def apply_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
 
         dc_current_out = inputs["dc_current_out"]
 
@@ -104,18 +140,8 @@ class PerformancesElectricalNodePercentSplit(om.ImplicitComponent):
         residuals["dc_voltage_in_1"] = dc_current_in_1 * 100 - power_split * dc_current_out
         residuals["dc_voltage_in_2"] = dc_current_in_1 + dc_current_in_2 - dc_current_out
 
-    def linearize(self, inputs, outputs, partials):
-
+    def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
         number_of_points = self.options["number_of_points"]
 
-        partials["dc_voltage", "dc_voltage_in_1"] = np.eye(number_of_points)
-        partials["dc_voltage", "dc_voltage_in_2"] = np.eye(number_of_points)
-        partials["dc_voltage", "dc_voltage"] = -np.eye(number_of_points) * 2.0
-
-        partials["dc_voltage_in_1", "dc_current_in_1"] = np.eye(number_of_points) * 100.0
-        partials["dc_voltage_in_1", "power_split"] = -np.diag(inputs["dc_current_out"])
-        partials["dc_voltage_in_1", "dc_current_out"] = -np.diag(inputs["power_split"])
-
-        partials["dc_voltage_in_2", "dc_current_in_1"] = np.eye(number_of_points)
-        partials["dc_voltage_in_2", "dc_current_in_2"] = np.eye(number_of_points)
-        partials["dc_voltage_in_2", "dc_current_out"] = -np.eye(number_of_points)
+        jacobian["dc_voltage_in_1", "power_split"] = -inputs["dc_current_out"]
+        jacobian["dc_voltage_in_1", "dc_current_out"] = -inputs["power_split"]

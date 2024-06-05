@@ -54,7 +54,13 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
             "adapted to mission",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -76,18 +82,18 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
         # point of the mission which the solver might interpret as the Jacobian not being full in
         # rank. Consequently, instead of putting it at 0 we put a very small value.
         partials_power_share = np.where(power_share < power_output, 100.0 / power_output, 0.0)
-        partials["power_split", "power_share"] = np.diag(partials_power_share)
+        partials["power_split", "power_share"] = partials_power_share
 
         partials_voltage_out = np.where(
             power_share < power_output,
             -100.0 * power_share / power_output / inputs["dc_voltage"],
             1e-6,
         )
-        partials["power_split", "dc_voltage"] = np.diag(partials_voltage_out)
+        partials["power_split", "dc_voltage"] = partials_voltage_out
 
         partials_current_out = np.where(
             power_share < power_output,
             -100.0 * power_share / power_output / inputs["dc_current_out"],
             1e-6,
         )
-        partials["power_split", "dc_current_out"] = np.diag(partials_current_out)
+        partials["power_split", "dc_current_out"] = partials_current_out
