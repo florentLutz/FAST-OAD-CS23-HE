@@ -90,26 +90,37 @@ class PerformancesMaximum(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
-            wrt=[
-                "dc_current_one_cable",
-                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
-            ],
+            wrt="dc_current_one_cable",
+            method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":current_max",
+            wrt="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
             method="exact",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":voltage_max",
             wrt=["dc_voltage_out", "dc_voltage_in"],
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":temperature_max",
             wrt=["cable_temperature"],
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":losses_max",
             wrt=["conduction_losses"],
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

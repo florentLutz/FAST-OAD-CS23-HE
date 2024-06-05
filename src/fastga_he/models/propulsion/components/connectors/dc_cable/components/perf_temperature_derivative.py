@@ -77,7 +77,31 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="cable_temperature_time_derivative",
+            wrt=[
+                "exterior_temperature",
+                "heat_transfer_coefficient",
+                "cable_temperature",
+                "conduction_losses",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="cable_temperature_time_derivative",
+            wrt=[
+                "data:propulsion:he_power_train:DC_cable_harness:"
+                + harness_id
+                + ":cable:heat_capacity",
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -129,13 +153,13 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         q_inf = 2.0 * cable_radius * cable_length * np.pi * h * (temp_cable - temp_ext)
 
         partials["cable_temperature_time_derivative", "conduction_losses"] = (
-            np.eye(number_of_points) / cable_heat_capacity
+            np.ones(number_of_points) / cable_heat_capacity
         )
 
-        partials["cable_temperature_time_derivative", "cable_temperature"] = -np.diag(
+        partials["cable_temperature_time_derivative", "cable_temperature"] = -(
             2.0 * cable_radius * cable_length * np.pi * h / cable_heat_capacity
         )
-        partials["cable_temperature_time_derivative", "heat_transfer_coefficient"] = -np.diag(
+        partials["cable_temperature_time_derivative", "heat_transfer_coefficient"] = -(
             2.0
             * cable_radius
             * cable_length
@@ -151,7 +175,7 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
             "cable_temperature_time_derivative",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
         ] = -(2.0 * cable_radius * h * np.pi * (temp_cable - temp_ext) / cable_heat_capacity)
-        partials["cable_temperature_time_derivative", "exterior_temperature"] = np.diag(
+        partials["cable_temperature_time_derivative", "exterior_temperature"] = (
             2.0 * cable_radius * cable_length * np.pi * h / cable_heat_capacity
         )
 

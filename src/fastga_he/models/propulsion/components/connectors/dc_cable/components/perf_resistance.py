@@ -72,7 +72,30 @@ class PerformancesResistance(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="resistance_per_cable",
+            wrt="cable_temperature",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="resistance_per_cable",
+            wrt=[
+                "settings:propulsion:he_power_train:DC_cable_harness:"
+                + harness_id
+                + ":cable:reference_temperature",
+                "data:propulsion:he_power_train:DC_cable_harness:"
+                + harness_id
+                + ":cable:resistance",
+                "data:propulsion:he_power_train:DC_cable_harness:"
+                + harness_id
+                + ":properties:resistance_temperature_scale_factor",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         harness_id = self.options["harness_id"]
@@ -117,8 +140,8 @@ class PerformancesResistance(om.ExplicitComponent):
             + ":cable:reference_temperature"
         ]
 
-        partials["resistance_per_cable", "cable_temperature"] = np.diag(
-            np.full_like(cable_temperature, reference_resistance * alpha_r)
+        partials["resistance_per_cable", "cable_temperature"] = np.full_like(
+            cable_temperature, reference_resistance * alpha_r
         )
         partials[
             "resistance_per_cable",

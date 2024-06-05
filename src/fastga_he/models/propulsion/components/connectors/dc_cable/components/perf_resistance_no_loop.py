@@ -141,7 +141,38 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="resistance_per_cable",
+            wrt=[
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
+                "settings:propulsion:he_power_train:DC_cable_harness:"
+                + harness_id
+                + ":cable:reference_temperature",
+                "data:propulsion:he_power_train:DC_cable_harness:"
+                + harness_id
+                + ":cable:resistance",
+                "data:propulsion:he_power_train:DC_cable_harness:"
+                + harness_id
+                + ":properties:resistance_temperature_scale_factor",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+        self.declare_partials(
+            of="resistance_per_cable",
+            wrt=[
+                "dc_voltage_out",
+                "dc_voltage_in",
+                "exterior_temperature",
+                "heat_transfer_coefficient",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -269,7 +300,7 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
 
         d_b_term_d_t_ext = reference_resistance * alpha_r
         d_c_term_d_t_ext = 0.0
-        partials["resistance_per_cable", "exterior_temperature",] = np.diag(
+        partials["resistance_per_cable", "exterior_temperature"] = (
             d_resistance_d_b_term * d_b_term_d_t_ext + d_resistance_d_c_term * d_c_term_d_t_ext
         )
 
@@ -311,7 +342,7 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             / h
             / (2.0 * np.pi * cable_radius * cable_length)
         )
-        partials["resistance_per_cable", "dc_voltage_out",] = np.diag(
+        partials["resistance_per_cable", "dc_voltage_out"] = (
             d_resistance_d_b_term * d_b_term_d_v_out + d_resistance_d_c_term * d_c_term_d_v_out
         )
 
@@ -325,7 +356,7 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             / h
             / (2.0 * np.pi * cable_radius * cable_length)
         )
-        partials["resistance_per_cable", "dc_voltage_in",] = np.diag(
+        partials["resistance_per_cable", "dc_voltage_in"] = (
             d_resistance_d_b_term * d_b_term_d_v_in + d_resistance_d_c_term * d_c_term_d_v_in
         )
 
@@ -338,10 +369,9 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             / h ** 2.0
             / (2.0 * np.pi * cable_radius * cable_length)
         )
-        partials[
-            "resistance_per_cable",
-            "heat_transfer_coefficient",
-        ] = np.diag(d_resistance_d_b_term * d_b_term_d_h + d_resistance_d_c_term * d_c_term_d_h)
+        partials["resistance_per_cable", "heat_transfer_coefficient"] = (
+            d_resistance_d_b_term * d_b_term_d_h + d_resistance_d_c_term * d_c_term_d_h
+        )
 
         d_b_term_d_r = 0.0
         d_c_term_d_r = -(
