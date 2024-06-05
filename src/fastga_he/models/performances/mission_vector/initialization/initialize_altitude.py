@@ -49,7 +49,36 @@ class InitializeAltitude(om.ExplicitComponent):
 
         self.add_output("altitude", shape=number_of_points, units="m")
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="data:mission:sizing:main_route:cruise:altitude",
+            method="exact",
+            cols=np.zeros(
+                number_of_points_climb + number_of_points_cruise + number_of_points_descent
+            ),
+            rows=np.arange(
+                number_of_points_climb + number_of_points_cruise + number_of_points_descent
+            ),
+        )
+
+        reserve_idx = np.linspace(
+            number_of_points_climb + number_of_points_cruise + number_of_points_descent,
+            number_of_points_climb
+            + number_of_points_cruise
+            + number_of_points_descent
+            + number_of_points_reserve
+            - 1,
+            number_of_points_reserve,
+        ).astype(int)
+
+        self.declare_partials(
+            of="*",
+            wrt="data:mission:sizing:main_route:reserve:altitude",
+            method="exact",
+            rows=reserve_idx,
+            cols=np.zeros_like(reserve_idx),
+            val=np.ones_like(reserve_idx),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -77,28 +106,15 @@ class InitializeAltitude(om.ExplicitComponent):
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
-        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         flat_partials_cruise_alt = np.concatenate(
             (
                 np.arange(number_of_points_climb) / (number_of_points_climb - 1),
                 np.ones(number_of_points_cruise),
                 np.flip(np.arange(number_of_points_descent)) / (number_of_points_descent - 1),
-                np.zeros(number_of_points_reserve),
-            )
-        )
-        flat_partials_reserve_alt = np.concatenate(
-            (
-                np.zeros(number_of_points_climb),
-                np.zeros(number_of_points_cruise),
-                np.zeros(number_of_points_descent),
-                np.ones(number_of_points_reserve),
             )
         )
 
         partials[
             "altitude", "data:mission:sizing:main_route:cruise:altitude"
         ] = flat_partials_cruise_alt
-        partials[
-            "altitude", "data:mission:sizing:main_route:reserve:altitude"
-        ] = flat_partials_reserve_alt
