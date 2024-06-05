@@ -65,7 +65,9 @@ class PerformancesFuelOutput(om.ExplicitComponent):
             self.declare_partials(
                 of="fuel_flowing_t",
                 wrt="fuel_consumed_out_t_" + str(i + 1),
-                val=np.eye(number_of_points),
+                val=np.ones(number_of_points),
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

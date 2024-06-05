@@ -67,7 +67,20 @@ class PerformancesFuelInput(om.ExplicitComponent):
                 desc="Fuel drawn from the tank connected at the input number " + str(i + 1),
             )
 
-            self.declare_partials(of="fuel_consumed_in_t_" + str(i + 1), wrt="*", method="exact")
+            self.declare_partials(
+                of="fuel_consumed_in_t_" + str(i + 1),
+                wrt="fuel_flowing_t",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
+            )
+            self.declare_partials(
+                of="fuel_consumed_in_t_" + str(i + 1),
+                wrt="data:propulsion:he_power_train:fuel_system:"
+                + fuel_system_id
+                + ":fuel_distribution",
+                method="exact",
+            )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -109,7 +122,7 @@ class PerformancesFuelInput(om.ExplicitComponent):
 
             partials["fuel_consumed_in_t_" + str(i + 1), "fuel_flowing_t"] = self.fuel_distribution[
                 i
-            ] * np.eye(number_of_points)
+            ] * np.ones(number_of_points)
 
             base_partials = (
                 (-np.tile(fuel_flow, (number_of_tanks, 1)))
