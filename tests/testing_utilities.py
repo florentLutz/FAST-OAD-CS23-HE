@@ -118,19 +118,3 @@ def list_inputs(component: Union[om.ExplicitComponent, om.Group]) -> list:
     input_names = [var.name for var in variables if var.is_input]
 
     return input_names
-
-
-class Timer(object):
-    def __init__(self, name=None):
-        self.name = name
-
-    def __enter__(self):
-        self.tstart = time.time()
-
-    def __exit__(self, type, value, traceback):
-        print("\n")
-        if self.name:
-            print(
-                "[%s]" % self.name,
-            )
-        print("Elapsed: %s" % (time.time() - self.tstart))
