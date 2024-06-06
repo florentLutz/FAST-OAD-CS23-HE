@@ -34,7 +34,13 @@ class SlipstreamPropellerContractionRatio(om.ExplicitComponent):
             desc="Contraction ratio of the propeller slipstream evaluated at the wing AC",
         )
 
-        self.declare_partials(of="*", wrt="*")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -42,6 +48,6 @@ class SlipstreamPropellerContractionRatio(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["contraction_ratio", "contraction_ratio_squared"] = np.diag(
-            0.5 / np.sqrt(inputs["contraction_ratio_squared"])
+        partials["contraction_ratio", "contraction_ratio_squared"] = 0.5 / np.sqrt(
+            inputs["contraction_ratio_squared"]
         )

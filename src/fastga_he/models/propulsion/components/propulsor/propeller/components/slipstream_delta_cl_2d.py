@@ -38,7 +38,8 @@ class SlipstreamPropellerDeltaCl2D(om.ExplicitComponent):
             "lift_increase_ratio",
             val=np.nan,
             shape=number_of_points,
-            desc="Increase in lift due to the slipstream effect behind the propeller expressed a a ratio of the clean lift",
+            desc="Increase in lift due to the slipstream effect behind the propeller expressed as"
+            " a ratio of the clean lift",
         )
 
         self.add_output(
@@ -55,12 +56,18 @@ class SlipstreamPropellerDeltaCl2D(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="delta_Cl_2D", wrt=["unblown_section_lift", "lift_increase_ratio"], method="exact"
+            of="delta_Cl_2D",
+            wrt=["unblown_section_lift", "lift_increase_ratio"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
         self.declare_partials(
             of="delta_Cl_2D_AOA_0",
             wrt=["unblown_section_lift_AOA_0", "lift_increase_ratio"],
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -72,12 +79,8 @@ class SlipstreamPropellerDeltaCl2D(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["delta_Cl_2D", "unblown_section_lift"] = np.diag(inputs["lift_increase_ratio"])
-        partials["delta_Cl_2D", "lift_increase_ratio"] = np.diag(inputs["unblown_section_lift"])
+        partials["delta_Cl_2D", "unblown_section_lift"] = inputs["lift_increase_ratio"]
+        partials["delta_Cl_2D", "lift_increase_ratio"] = inputs["unblown_section_lift"]
 
-        partials["delta_Cl_2D_AOA_0", "unblown_section_lift_AOA_0"] = np.diag(
-            inputs["lift_increase_ratio"]
-        )
-        partials["delta_Cl_2D_AOA_0", "lift_increase_ratio"] = np.diag(
-            inputs["unblown_section_lift_AOA_0"]
-        )
+        partials["delta_Cl_2D_AOA_0", "unblown_section_lift_AOA_0"] = inputs["lift_increase_ratio"]
+        partials["delta_Cl_2D_AOA_0", "lift_increase_ratio"] = inputs["unblown_section_lift_AOA_0"]

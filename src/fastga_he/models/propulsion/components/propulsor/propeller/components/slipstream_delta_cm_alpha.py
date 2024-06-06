@@ -33,11 +33,32 @@ class SlipstreamPropellerDeltaCMAlpha(om.ExplicitComponent):
         flaps_position = self.options["flaps_position"]
         number_of_points = self.options["number_of_points"]
 
+        self.add_output(
+            "delta_Cm_alpha",
+            val=-0.01,
+            shape=number_of_points,
+            desc="Increase in pitching moment due to lift caused by the propeller slipstream",
+        )
+
         if flaps_position == "takeoff":
             self.add_input("data:mission:sizing:takeoff:flap_angle", val=10.0, units="deg")
+            self.declare_partials(
+                of="delta_Cm_alpha",
+                wrt="data:mission:sizing:takeoff:flap_angle",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
+            )
 
         elif flaps_position == "landing":
             self.add_input("data:mission:sizing:landing:flap_angle", val=30.0, units="deg")
+            self.declare_partials(
+                of="delta_Cm_alpha",
+                wrt="data:mission:sizing:landing:flap_angle",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
+            )
 
         self.add_input(
             "delta_Cl",
@@ -52,14 +73,13 @@ class SlipstreamPropellerDeltaCMAlpha(om.ExplicitComponent):
             desc="Increase in the lift coefficient downstream of the propeller for an AOA of 0",
         )
 
-        self.add_output(
-            "delta_Cm_alpha",
-            val=-0.01,
-            shape=number_of_points,
-            desc="Increase in pitching moment due to lift caused by the propeller slipstream",
+        self.declare_partials(
+            of="delta_Cm_alpha",
+            wrt=["delta_Cl", "delta_Cl_AOA_0"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
-
-        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -110,7 +130,7 @@ class SlipstreamPropellerDeltaCMAlpha(om.ExplicitComponent):
         else:
             delta_f = 0.0
 
-        partials["delta_Cm_alpha", "delta_Cl"] = np.eye(number_of_points) * -0.05 * delta_f / 30.0
+        partials["delta_Cm_alpha", "delta_Cl"] = np.ones(number_of_points) * -0.05 * delta_f / 30.0
         partials["delta_Cm_alpha", "delta_Cl_AOA_0"] = (
-            np.eye(number_of_points) * 0.05 * delta_f / 30.0
+            np.ones(number_of_points) * 0.05 * delta_f / 30.0
         )

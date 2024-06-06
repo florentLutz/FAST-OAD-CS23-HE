@@ -51,10 +51,28 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
             "contraction_ratio_squared",
             val=1,
             shape=number_of_points,
-            desc="Square of the contraction ratio of the propeller slipstream evaluated at the wing AC",
+            desc="Square of the contraction ratio of the propeller slipstream evaluated at the wing"
+            " AC",
         )
 
-        self.declare_partials(of="*", wrt="*")
+        self.declare_partials(
+            of="contraction_ratio_squared",
+            wrt="axial_induction_factor",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="contraction_ratio_squared",
+            wrt=[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -129,7 +147,7 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
         ] = (
             d_sigma_2_d_ratio * prop_dist_from_le_ratio_chord / prop_rad
         )
-        partials["contraction_ratio_squared", "axial_induction_factor"] = -np.diag(
+        partials["contraction_ratio_squared", "axial_induction_factor"] = -(
             prop_dist_from_le_ratio
             / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0)
             / (

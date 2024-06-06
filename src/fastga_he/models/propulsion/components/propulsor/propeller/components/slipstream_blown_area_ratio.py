@@ -53,7 +53,24 @@ class SlipstreamPropellerBlownAreaRatio(om.ExplicitComponent):
             desc="Portion of the wing blown by the propeller",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="blown_area_ratio",
+            wrt="contraction_ratio",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="blown_area_ratio",
+            wrt=[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
+                "data:geometry:wing:area",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -85,7 +102,7 @@ class SlipstreamPropellerBlownAreaRatio(om.ExplicitComponent):
         partials["blown_area_ratio", "data:geometry:wing:area"] = (
             -contraction_ratio * prop_dia * ref_chord / wing_area ** 2.0
         )
-        partials["blown_area_ratio", "contraction_ratio"] = np.eye(number_of_points) * (
+        partials["blown_area_ratio", "contraction_ratio"] = np.ones(number_of_points) * (
             prop_dia * ref_chord / wing_area
         )
         partials[

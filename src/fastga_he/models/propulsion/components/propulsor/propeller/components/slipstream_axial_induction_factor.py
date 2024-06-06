@@ -26,7 +26,13 @@ class SlipstreamPropellerAxialInductionFactor(om.ExplicitComponent):
 
         self.add_output("axial_induction_factor", val=0.1, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -41,6 +47,6 @@ class SlipstreamPropellerAxialInductionFactor(om.ExplicitComponent):
         # To avoid unwanted division by 0
         t_c = np.clip(inputs["thrust_loading"], 1e-6, None)
 
-        partials["axial_induction_factor", "thrust_loading"] = np.diag(
+        partials["axial_induction_factor", "thrust_loading"] = (
             1.0 / np.sqrt(1.0 + 8.0 / np.pi * t_c) * 2.0 / np.pi
         )

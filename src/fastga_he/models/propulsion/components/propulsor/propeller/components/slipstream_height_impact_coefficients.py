@@ -74,7 +74,20 @@ class SlipstreamPropellerHeightImpactCoefficients(om.ExplicitComponent):
             desc="Fourth order coefficient in the beta surrogate model",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="velocity_ratio_downstream",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -145,40 +158,40 @@ class SlipstreamPropellerHeightImpactCoefficients(om.ExplicitComponent):
         d_x_matrix_d_d[4, :] = np.zeros(number_of_points)
         d_x_matrix_d_d[5, :] = np.zeros(number_of_points)
 
-        partials["f_0", "velocity_ratio_downstream"] = np.diag(
-            np.where(v_ratio == v_ratio_unclipped, np.matmul(K0, d_x_matrix_d_v), 0)
+        partials["f_0", "velocity_ratio_downstream"] = np.where(
+            v_ratio == v_ratio_unclipped, np.matmul(K0, d_x_matrix_d_v), 0
         )
         partials[
             "f_0",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
         ] = np.where(distance_ratio == distance_ratio_unclipped, np.matmul(K0, d_x_matrix_d_d), 0)
 
-        partials["f_1", "velocity_ratio_downstream"] = np.diag(
-            np.where(v_ratio == v_ratio_unclipped, np.matmul(K1, d_x_matrix_d_v), 0)
+        partials["f_1", "velocity_ratio_downstream"] = np.where(
+            v_ratio == v_ratio_unclipped, np.matmul(K1, d_x_matrix_d_v), 0
         )
         partials[
             "f_1",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
         ] = np.where(distance_ratio == distance_ratio_unclipped, np.matmul(K1, d_x_matrix_d_d), 0)
 
-        partials["f_2", "velocity_ratio_downstream"] = np.diag(
-            np.where(v_ratio == v_ratio_unclipped, np.matmul(K2, d_x_matrix_d_v), 0)
+        partials["f_2", "velocity_ratio_downstream"] = np.where(
+            v_ratio == v_ratio_unclipped, np.matmul(K2, d_x_matrix_d_v), 0
         )
         partials[
             "f_2",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
         ] = np.where(distance_ratio == distance_ratio_unclipped, np.matmul(K2, d_x_matrix_d_d), 0)
 
-        partials["f_3", "velocity_ratio_downstream"] = np.diag(
-            np.where(v_ratio == v_ratio_unclipped, np.matmul(K3, d_x_matrix_d_v), 0)
+        partials["f_3", "velocity_ratio_downstream"] = np.where(
+            v_ratio == v_ratio_unclipped, np.matmul(K3, d_x_matrix_d_v), 0
         )
         partials[
             "f_3",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
         ] = np.where(distance_ratio == distance_ratio_unclipped, np.matmul(K3, d_x_matrix_d_d), 0)
 
-        partials["f_4", "velocity_ratio_downstream"] = np.diag(
-            np.where(v_ratio == v_ratio_unclipped, np.matmul(K4, d_x_matrix_d_v), 0)
+        partials["f_4", "velocity_ratio_downstream"] = np.where(
+            v_ratio == v_ratio_unclipped, np.matmul(K4, d_x_matrix_d_v), 0
         )
         partials[
             "f_4",
