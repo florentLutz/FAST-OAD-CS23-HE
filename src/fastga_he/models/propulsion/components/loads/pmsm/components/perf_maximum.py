@@ -52,6 +52,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":current_ac_max",
             wrt="ac_current_rms_in_one_phase",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -64,6 +66,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_ac_max",
             wrt="ac_voltage_peak_in",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -76,6 +80,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_max",
             wrt="torque_out",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -88,6 +94,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_max",
             wrt="rpm",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -99,6 +107,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":losses_max",
             wrt="power_losses",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -110,6 +120,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max",
             wrt="shaft_power_out",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

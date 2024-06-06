@@ -43,7 +43,27 @@ class PerformancesBatteryLosses(om.ExplicitComponent):
 
         self.add_output("losses_battery", units="W", val=np.full(number_of_points, 1e3))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="losses_battery",
+            wrt="losses_cell",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="losses_battery",
+            wrt=[
+                "data:propulsion:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":number_modules",
+                "data:propulsion:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":module:number_cells",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -67,7 +87,7 @@ class PerformancesBatteryLosses(om.ExplicitComponent):
         battery_pack_id = self.options["battery_pack_id"]
 
         partials["losses_battery", "losses_cell"] = (
-            np.eye(number_of_points)
+            np.ones(number_of_points)
             * inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id

@@ -39,21 +39,29 @@ class PerformancesModulationIndex(om.ImplicitComponent):
             "modulation_index", val=np.full(number_of_points, 0.95), lower=0.0, upper=2.0
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
-    def apply_nonlinear(self, inputs, outputs, residuals):
+    def apply_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
 
         residuals["modulation_index"] = (
             inputs["ac_voltage_peak_out"] - outputs["modulation_index"] * inputs["dc_voltage_in"]
         )
 
-    def linearize(self, inputs, outputs, partials):
+    def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
 
         number_of_points = self.options["number_of_points"]
 
-        partials["modulation_index", "ac_voltage_peak_out"] = np.eye(number_of_points)
-        partials["modulation_index", "dc_voltage_in"] = -np.diag(outputs["modulation_index"])
-        partials["modulation_index", "modulation_index"] = -np.diag(inputs["dc_voltage_in"])
+        jacobian["modulation_index", "ac_voltage_peak_out"] = np.ones(number_of_points)
+        jacobian["modulation_index", "dc_voltage_in"] = -outputs["modulation_index"]
+        jacobian["modulation_index", "modulation_index"] = -inputs["dc_voltage_in"]
 
     def guess_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None

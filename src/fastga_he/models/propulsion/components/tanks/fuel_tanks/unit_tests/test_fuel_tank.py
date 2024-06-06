@@ -473,3 +473,5 @@ def test_performances_fuel_tank():
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission", units="kg"
     ) == pytest.approx(279.62, rel=1e-2)
+
+    problem.check_partials(compact_print=True)

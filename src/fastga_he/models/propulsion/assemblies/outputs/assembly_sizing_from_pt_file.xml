@@ -27,7 +27,6 @@
       </flap>
       <fuselage>
         <front_length units="m" is_input="True">0.5<!--length of the front cone of the aircraft--></front_length>
-        <rear_length units="m" is_input="True">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
       </fuselage>
       <wing>
         <area units="m**2" is_input="True">7.105673586278243<!--wing area--></area>
@@ -49,9 +48,9 @@
     </geometry>
     <propulsion>
       <he_power_train>
-        <mass units="kg" is_input="False">2241.7959034637342</mass>
+        <mass units="kg" is_input="False">2254.2476489145165</mass>
         <CG>
-          <x units="m" is_input="False">2.839325443223686</x>
+          <x units="m" is_input="False">2.829456177540917</x>
         </CG>
         <cruise>
           <CD0 is_input="False">0.0056121861665163735</CD0>
@@ -607,6 +606,47 @@
             </low_speed>
           </fuel_tank_1>
         </fuel_tank>
+        <generator>
+          <generator_1>
+            <diameter units="m" is_input="False">0.4824</diameter>
+            <length units="m" is_input="False">0.04146717500685886</length>
+            <mass units="kg" is_input="False">34.08806691621024</mass>
+            <phase_resistance units="ohm" is_input="False">0.10492789102414854</phase_resistance>
+            <rpm_max units="1/min" is_input="True">2500.0<!--Maximum value of the generator rpm during the mission--></rpm_max>
+            <rpm_rating units="1/min" is_input="False">2500.0<!--Max continuous rpm of the generator--></rpm_rating>
+            <shaft_power_max units="W" is_input="True">103715.3273374457</shaft_power_max>
+            <shaft_power_rating units="kW" is_input="False">103.71532733744571<!--Value of the maximum power the generator can provide, used for sizing--></shaft_power_rating>
+            <torque_constant units="N*m/A" is_input="False">8.895244105697092</torque_constant>
+            <torque_max units="N*m" is_input="True">396.16336848356326<!--Maximum value of the torque the generator receives--></torque_max>
+            <torque_rating units="N*m" is_input="False">396.16336848356326<!--Max continuous torque of the generator--></torque_rating>
+            <voltage_ac_max units="V" is_input="True">243.4614167842755<!--Maximum value of the peak voltage at the input of the generator--></voltage_ac_max>
+            <voltage_caliber units="V" is_input="True">850.0<!--Max voltage of the generator--></voltage_caliber>
+            <CG>
+              <x units="m" is_input="False">1.9981507712456423<!--X position of the generator center of gravity--></x>
+              <y units="m" is_input="False">0.0<!--Y position of the generator center of gravity--></y>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <loss_coefficient>
+              <alpha units="W/N**2/m**2" is_input="False">0.0033447749726887048</alpha>
+              <beta units="W*s/rad" is_input="False">1778.3451188366873</beta>
+              <gamma units="W*s**2/rad**2" is_input="False">1.8805600177022836</gamma>
+            </loss_coefficient>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+            <scaling>
+              <alpha is_input="False">0.20904843579304405</alpha>
+              <beta is_input="False">267.8230600657662</beta>
+              <diameter is_input="False">1.7999999999999998</diameter>
+              <gamma is_input="False">125.37066784681892</gamma>
+              <length is_input="False">0.4556832418336139</length>
+              <phase_resistance is_input="False">4.582003974853648<!--Scaling factor for the phase resistance of the motor--></phase_resistance>
+              <torque_constant is_input="False">4.681707424051101</torque_constant>
+            </scaling>
+          </generator_1>
+        </generator>
         <inverter>
           <inverter_1>
             <current_ac_max units="A" is_input="True">400.0</current_ac_max>
@@ -923,26 +963,6 @@
             </tube>
           </rectifier_1>
         </rectifier>
-        <turbo_generator>
-          <generator_1>
-            <mass units="kg" is_input="False">21.636321465428</mass>
-            <power_density units="kW/kg" is_input="True">5.0<!--Power density of the turbo generator--></power_density>
-            <power_rating units="kW" is_input="False">108.18160732714<!--Max continuous power of the turbo generator--></power_rating>
-            <rear_length_ratio is_input="True">0.1<!--Location of the turbo generator CG as a ratio of the aircraft rear length--></rear_length_ratio>
-            <shaft_power_max units="W" is_input="True">108181.60732714<!--Maximum value of the power the turbo generator receives--></shaft_power_max>
-            <shaft_power_rating units="kW" is_input="False">108.18160732714<!--Value of the maximum power the generator can provide, used for sizing--></shaft_power_rating>
-            <CG>
-              <x units="m" is_input="False">2.5423133307450625<!--X position of the turbo generator center of gravity--></x>
-              <y units="m" is_input="False">0.0<!--Y position of the turbo generator center of gravity--></y>
-            </CG>
-            <cruise>
-              <CD0 is_input="False">0.0</CD0>
-            </cruise>
-            <low_speed>
-              <CD0 is_input="False">0.0</CD0>
-            </low_speed>
-          </generator_1>
-        </turbo_generator>
       </he_power_train>
     </propulsion>
     <weight>
@@ -990,6 +1010,11 @@
             </cell>
           </battery_pack_1>
         </battery_pack>
+        <generator>
+          <generator_1>
+            <voltage_caliber units="V" is_input="False">-606.5385832157244<!--Respected if <0--></voltage_caliber>
+          </generator_1>
+        </generator>
         <DC_DC_converter>
           <dc_dc_converter_1>
             <inductor>

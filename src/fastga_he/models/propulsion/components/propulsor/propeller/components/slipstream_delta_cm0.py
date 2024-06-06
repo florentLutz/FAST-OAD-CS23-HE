@@ -33,6 +33,13 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
 
+        self.add_output(
+            "delta_Cm0",
+            val=-0.01,
+            shape=number_of_points,
+            desc="Increase in the profile pitching moment coefficient downstream of the propeller",
+        )
+
         self.add_input("data:aerodynamics:wing:cruise:CM0_clean", val=np.nan)
         self.add_input(
             "axial_induction_factor_wing_ac",
@@ -48,6 +55,26 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
             desc="Diameter of the propeller as a ratio of the wing half span",
         )
 
+        self.declare_partials(
+            of="delta_Cm0",
+            wrt="axial_induction_factor_wing_ac",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="delta_Cm0",
+            wrt=[
+                "data:aerodynamics:wing:cruise:CM0_clean",
+                "data:propulsion:he_power_train:propeller:"
+                + propeller_id
+                + ":diameter_to_span_ratio",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+
         if flaps_position == "takeoff":
             self.add_input(
                 name="data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
@@ -55,6 +82,17 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
                 desc="Portion of the span, downstream of the propeller, which has flaps",
             )
             self.add_input("data:aerodynamics:flaps:takeoff:CM_2D", val=np.nan)
+
+            self.declare_partials(
+                of="delta_Cm0",
+                wrt=[
+                    "data:aerodynamics:flaps:takeoff:CM_2D",
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+                ],
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
+            )
 
         elif flaps_position == "landing":
             self.add_input(
@@ -64,14 +102,16 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
             )
             self.add_input("data:aerodynamics:flaps:landing:CM_2D", val=np.nan)
 
-        self.add_output(
-            "delta_Cm0",
-            val=-0.01,
-            shape=number_of_points,
-            desc="Increase in the profile pitching moment coefficient downstream of the propeller",
-        )
-
-        self.declare_partials(of="*", wrt="*", method="exact")
+            self.declare_partials(
+                of="delta_Cm0",
+                wrt=[
+                    "data:aerodynamics:flaps:landing:CM_2D",
+                    "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
+                ],
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
+            )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -157,6 +197,6 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
             "delta_Cm0",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter_to_span_ratio",
         ] = a_w ** 2.0 * (cm0_clean + delta_cm0_flaps)
-        partials["delta_Cm0", "axial_induction_factor_wing_ac"] = np.diag(
+        partials["delta_Cm0", "axial_induction_factor_wing_ac"] = (
             2.0 * delta_y * a_w * (cm0_clean + delta_cm0_flaps)
         )

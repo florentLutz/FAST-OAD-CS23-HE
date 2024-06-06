@@ -27,7 +27,13 @@ class PerformancesBatteryPower(om.ExplicitComponent):
 
         self.add_output("power_out", units="kW", val=np.full(number_of_points, 20.0))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -35,5 +41,5 @@ class PerformancesBatteryPower(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["power_out", "voltage_out"] = np.diag(inputs["dc_current_out"] / 1000.0)
-        partials["power_out", "dc_current_out"] = np.diag(inputs["voltage_out"] / 1000.0)
+        partials["power_out", "voltage_out"] = inputs["dc_current_out"] / 1000.0
+        partials["power_out", "dc_current_out"] = inputs["voltage_out"] / 1000.0

@@ -73,6 +73,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_max",
             wrt="ac_current_rms_in_one_phase",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -85,6 +87,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_max",
             wrt="ac_voltage_peak_in",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -97,6 +101,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_dc_max",
             wrt="dc_current_out",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -109,6 +115,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_dc_max",
             wrt="dc_voltage_out",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -125,6 +133,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             + ":switching_frequency_max",
             wrt="switching_frequency",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -136,6 +146,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max",
             wrt="losses_rectifier",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

@@ -225,13 +225,26 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
         self.add_output(name="cl_wing_clean", val=0.5, shape=number_of_points)
 
         self.declare_partials(
-            of="*",
-            wrt=[
-                "alpha",
-                "data:aerodynamics:wing:cruise:CL_alpha",
-                "data:aerodynamics:wing:cruise:CL0_clean",
-            ],
+            of="cl_wing_clean",
+            wrt="data:aerodynamics:wing:cruise:CL0_clean",
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="cl_wing_clean",
+            wrt="data:aerodynamics:wing:cruise:CL_alpha",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+        self.declare_partials(
+            of="cl_wing_clean",
+            wrt="alpha",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -248,12 +261,9 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
-        partials["cl_wing_clean", "data:aerodynamics:wing:cruise:CL0_clean"] = np.ones(
-            number_of_points
-        )
         partials["cl_wing_clean", "data:aerodynamics:wing:cruise:CL_alpha"] = inputs["alpha"]
-        partials["cl_wing_clean", "alpha"] = (
-            np.eye(number_of_points) * inputs["data:aerodynamics:wing:cruise:CL_alpha"]
+        partials["cl_wing_clean", "alpha"] = np.full(
+            number_of_points, inputs["data:aerodynamics:wing:cruise:CL_alpha"]
         )
 
 
@@ -282,15 +292,38 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
 
         self.add_input(name="cl_wing_clean", val=np.nan, shape=number_of_points)
 
+        self.add_output(name="cl_airframe", val=0.5, shape=number_of_points)
+
+        self.declare_partials(
+            of="cl_airframe",
+            wrt="cl_wing_clean",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+
         if flaps_position == "takeoff":
             self.add_input("data:aerodynamics:flaps:takeoff:CL", val=np.nan)
+            self.declare_partials(
+                of="cl_airframe",
+                wrt="data:aerodynamics:flaps:takeoff:CL",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
+                val=np.ones(number_of_points),
+            )
 
         elif flaps_position == "landing":
             self.add_input("data:aerodynamics:flaps:landing:CL", val=np.nan)
-
-        self.add_output(name="cl_airframe", val=0.5, shape=number_of_points)
-
-        self.declare_partials(of="*", wrt="*", method="exact")
+            self.declare_partials(
+                of="cl_airframe",
+                wrt="data:aerodynamics:flaps:landing:CL",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
+                val=np.ones(number_of_points),
+            )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -308,23 +341,6 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
             delta_cl_flaps = 0.0
 
         outputs["cl_airframe"] = cl_wing_clean + delta_cl_flaps
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        number_of_points = self.options["number_of_points"]
-        flaps_position = self.options["flaps_position"]
-
-        partials["cl_airframe", "cl_wing_clean"] = np.eye(number_of_points)
-
-        if flaps_position == "takeoff":
-            partials["cl_airframe", "data:aerodynamics:flaps:takeoff:CL"] = np.ones(
-                number_of_points
-            )
-
-        elif flaps_position == "landing":
-            partials["cl_airframe", "data:aerodynamics:flaps:landing:CL"] = np.ones(
-                number_of_points
-            )
 
 
 class SlipstreamDeltaCdi(om.ExplicitComponent):
@@ -350,7 +366,20 @@ class SlipstreamDeltaCdi(om.ExplicitComponent):
 
         self.add_output(name="delta_Cdi", val=0.0, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="delta_Cdi",
+            wrt=["cl_airframe", "delta_Cl_wing"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="delta_Cdi",
+            wrt="data:aerodynamics:wing:cruise:induced_drag_coefficient",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -368,8 +397,8 @@ class SlipstreamDeltaCdi(om.ExplicitComponent):
         delta_cl_wing = inputs["delta_Cl_wing"]
         k = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
 
-        partials["delta_Cdi", "cl_airframe"] = np.diag(2.0 * k * delta_cl_wing)
-        partials["delta_Cdi", "delta_Cl_wing"] = np.diag(2.0 * k * (delta_cl_wing + cl_airframe))
+        partials["delta_Cdi", "cl_airframe"] = 2.0 * k * delta_cl_wing
+        partials["delta_Cdi", "delta_Cl_wing"] = 2.0 * k * (delta_cl_wing + cl_airframe)
         partials["delta_Cdi", "data:aerodynamics:wing:cruise:induced_drag_coefficient"] = (
             delta_cl_wing ** 2.0 + 2.0 * cl_airframe * delta_cl_wing
         )

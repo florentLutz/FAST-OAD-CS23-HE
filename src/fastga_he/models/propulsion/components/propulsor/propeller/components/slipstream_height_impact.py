@@ -67,7 +67,30 @@ class SlipstreamPropellerHeightImpact(om.ExplicitComponent):
 
         self.add_output(name="beta", val=1.0, shape=number_of_points, desc="Height impact factor")
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="beta",
+            wrt="f_0",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="beta",
+            wrt=["f_1", "f_2", "f_3", "f_4"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="beta",
+            wrt="data:propulsion:he_power_train:propeller:"
+            + propeller_id
+            + ":diameter_to_chord_ratio",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -114,11 +137,10 @@ class SlipstreamPropellerHeightImpact(om.ExplicitComponent):
         )
         r_c = np.clip(r_c_unclipped, LIMIT_DIAMETER_RATIO[0], LIMIT_DIAMETER_RATIO[1])
 
-        partials["beta", "f_0"] = np.eye(number_of_points)
-        partials["beta", "f_1"] = np.eye(number_of_points) * r_c
-        partials["beta", "f_2"] = np.eye(number_of_points) * r_c ** 2.0
-        partials["beta", "f_3"] = np.eye(number_of_points) * r_c ** 3.0
-        partials["beta", "f_4"] = np.eye(number_of_points) * r_c ** 4.0
+        partials["beta", "f_1"] = np.ones(number_of_points) * r_c
+        partials["beta", "f_2"] = np.ones(number_of_points) * r_c ** 2.0
+        partials["beta", "f_3"] = np.ones(number_of_points) * r_c ** 3.0
+        partials["beta", "f_4"] = np.ones(number_of_points) * r_c ** 4.0
 
         partials[
             "beta",

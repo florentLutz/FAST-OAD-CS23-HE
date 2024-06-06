@@ -47,7 +47,28 @@ class PerformancesTemperatureFromIncrease(om.ExplicitComponent):
             lower=1.0,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        partials_wrt_temp_increase = np.tri(number_of_points, number_of_points) - np.eye(
+            number_of_points
+        )
+
+        self.declare_partials(
+            of="cable_temperature",
+            wrt="cable_temperature_increase",
+            method="exact",
+            val=np.ones(len(np.where(partials_wrt_temp_increase == 1)[0])),
+            rows=np.where(partials_wrt_temp_increase == 1)[0],
+            cols=np.where(partials_wrt_temp_increase == 1)[1],
+        )
+        self.declare_partials(
+            of="cable_temperature",
+            wrt="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cable:initial_temperature",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+            val=np.ones(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         harness_id = self.options["harness_id"]
@@ -65,18 +86,3 @@ class PerformancesTemperatureFromIncrease(om.ExplicitComponent):
         )
 
         outputs["cable_temperature"] = temperature_profile
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        harness_id = self.options["harness_id"]
-        number_of_points = self.options["number_of_points"]
-
-        partials[
-            "cable_temperature",
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":cable:initial_temperature",
-        ] = np.ones(number_of_points)
-        partials["cable_temperature", "cable_temperature_increase"] = np.tri(
-            number_of_points, number_of_points
-        ) - np.eye(number_of_points)

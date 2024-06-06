@@ -46,7 +46,8 @@ class SlipstreamExhaustVelocity(om.ExplicitComponent):
             + turboshaft_id
             + ":design_point:power_ratio",
             val=np.nan,
-            desc="Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5",
+            desc="Ratio of the thermodynamic power divided by the rated power, typical values on "
+            "the PT6A family is between 1.3 and 2.5",
         )
         self.add_input(
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
@@ -57,7 +58,27 @@ class SlipstreamExhaustVelocity(om.ExplicitComponent):
 
         self.add_output("exhaust_velocity", units="m/s", val=120.0, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="exhaust_velocity",
+            wrt=["mach", "density_ratio", "power_required"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="exhaust_velocity",
+            wrt=[
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:OPR",
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t",
+                "data:propulsion:he_power_train:turboshaft:"
+                + turboshaft_id
+                + ":design_point:power_ratio",
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -172,7 +193,7 @@ class SlipstreamExhaustVelocity(om.ExplicitComponent):
         )
         d_log_sigma_d_sigma = 1.0 / (np.log(10) * density_ratio)
 
-        partials["exhaust_velocity", "density_ratio"] = np.diag(
+        partials["exhaust_velocity", "density_ratio"] = (
             d_v8_d_log_v8 * d_log_v8_d_log_sigma * d_log_sigma_d_sigma
         )
 
@@ -180,7 +201,7 @@ class SlipstreamExhaustVelocity(om.ExplicitComponent):
         d_log_v8_d_log_mach = -0.00280 * np.log10(design_power)
         d_log_mach_d_mach = 1.0 / (np.log(10) * mach)
 
-        partials["exhaust_velocity", "mach"] = np.diag(
+        partials["exhaust_velocity", "mach"] = (
             d_v8_d_log_v8 * d_log_v8_d_log_mach * d_log_mach_d_mach
         )
 
@@ -252,6 +273,6 @@ class SlipstreamExhaustVelocity(om.ExplicitComponent):
         )
         d_log_power_d_power = 1.0 / (np.log(10) * power)
 
-        partials["exhaust_velocity", "power_required"] = np.diag(
+        partials["exhaust_velocity", "power_required"] = (
             d_v8_d_log_v8 * d_log_v8_d_log_power * d_log_power_d_power
         )

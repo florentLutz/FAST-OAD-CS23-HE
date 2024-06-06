@@ -26,15 +26,15 @@ class PerformancesCellLosses(om.ExplicitComponent):
 
         self.add_output("losses_cell", units="W", val=np.full(number_of_points, 1))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         outputs["losses_cell"] = inputs["joule_losses_cell"] + inputs["entropic_losses_cell"]
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        number_of_points = self.options["number_of_points"]
-
-        partials["losses_cell", "joule_losses_cell"] = np.eye(number_of_points)
-        partials["losses_cell", "entropic_losses_cell"] = np.eye(number_of_points)

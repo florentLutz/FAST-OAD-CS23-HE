@@ -67,7 +67,30 @@ class PerformancesCasingTemperature(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="heat_sink_temperature",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt="losses_inverter",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":casing:thermal_resistance",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -93,8 +116,9 @@ class PerformancesCasingTemperature(om.ExplicitComponent):
         ]
         losses_one_module = inputs["losses_inverter"] / 3.0
 
-        partials["casing_temperature", "heat_sink_temperature"] = np.eye(number_of_points)
-        partials["casing_temperature", "losses_inverter"] = r_th_js / 3.0 * np.eye(number_of_points)
+        partials["casing_temperature", "losses_inverter"] = (
+            r_th_js / 3.0 * np.ones(number_of_points)
+        )
         partials[
             "casing_temperature",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:thermal_resistance",

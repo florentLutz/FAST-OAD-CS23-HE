@@ -55,29 +55,31 @@ class PerformancesDCCurrent(om.ImplicitComponent):
             upper=2000.0,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
-    def apply_nonlinear(self, inputs, outputs, residuals):
+    def apply_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
 
         residuals["dc_current_in"] = (
             outputs["dc_current_in"] * inputs["dc_voltage_in"] * inputs["efficiency"]
             - 3.0 * inputs["ac_current_rms_out_one_phase"] * inputs["ac_voltage_rms_out"]
         )
 
-    def linearize(self, inputs, outputs, partials):
+    def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
 
-        partials["dc_current_in", "dc_current_in"] = np.diag(
-            inputs["dc_voltage_in"] * inputs["efficiency"]
-        )
-        partials["dc_current_in", "dc_voltage_in"] = np.diag(
-            outputs["dc_current_in"] * inputs["efficiency"]
-        )
-        partials["dc_current_in", "efficiency"] = np.diag(
-            outputs["dc_current_in"] * inputs["dc_voltage_in"]
-        )
-        partials["dc_current_in", "ac_current_rms_out_one_phase"] = np.diag(
+        jacobian["dc_current_in", "dc_current_in"] = inputs["dc_voltage_in"] * inputs["efficiency"]
+        jacobian["dc_current_in", "dc_voltage_in"] = outputs["dc_current_in"] * inputs["efficiency"]
+        jacobian["dc_current_in", "efficiency"] = outputs["dc_current_in"] * inputs["dc_voltage_in"]
+        jacobian["dc_current_in", "ac_current_rms_out_one_phase"] = (
             -3.0 * inputs["ac_voltage_rms_out"]
         )
-        partials["dc_current_in", "ac_voltage_rms_out"] = np.diag(
+        jacobian["dc_current_in", "ac_voltage_rms_out"] = (
             -3.0 * inputs["ac_current_rms_out_one_phase"]
         )

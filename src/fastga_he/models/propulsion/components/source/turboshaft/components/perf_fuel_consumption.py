@@ -64,7 +64,28 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
 
         self.add_output("fuel_consumption", units="kg/h", val=120.0, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="fuel_consumption",
+            wrt=["mach", "density_ratio", "power_required"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="fuel_consumption",
+            wrt=[
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:OPR",
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t",
+                "data:propulsion:he_power_train:turboshaft:"
+                + turboshaft_id
+                + ":design_point:power_ratio",
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
+                "settings:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":k_sfc",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -184,7 +205,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         )
         d_log_sigma_d_sigma = 1.0 / (np.log(10) * density_ratio)
 
-        partials["fuel_consumption", "density_ratio"] = np.diag(
+        partials["fuel_consumption", "density_ratio"] = (
             d_fc_d_log_fc * d_log_fc_d_log_sigma * d_log_sigma_d_sigma * k_fc
         )
 
@@ -192,7 +213,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         d_log_fc_d_log_mach = -0.10964 - 2.0 * 0.04483 * np.log10(mach) * np.log10(design_opr)
         d_log_mach_d_mach = 1.0 / (np.log(10) * mach)
 
-        partials["fuel_consumption", "mach"] = np.diag(
+        partials["fuel_consumption", "mach"] = (
             d_fc_d_log_fc * d_log_fc_d_log_mach * d_log_mach_d_mach * k_fc
         )
 
@@ -273,7 +294,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         )
         d_log_power_d_power = 1.0 / (np.log(10) * power)
 
-        partials["fuel_consumption", "power_required"] = np.diag(
+        partials["fuel_consumption", "power_required"] = (
             d_fc_d_log_fc * d_log_fc_d_log_power * d_log_power_d_power * k_fc
         )
 

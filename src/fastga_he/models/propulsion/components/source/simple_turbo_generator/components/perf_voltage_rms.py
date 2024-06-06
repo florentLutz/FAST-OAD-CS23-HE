@@ -21,13 +21,28 @@ class PerformancesVoltageRMS(om.ImplicitComponent):
 
         self.add_output(
             "ac_voltage_rms_out",
-            units="V",
             val=np.full(number_of_points, 500.0),
             shape=number_of_points,
+            units="V",
             desc="RMS voltage at the output of the generator",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="ac_voltage_rms_out",
+            wrt="ac_voltage_rms_out",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="ac_voltage_rms_out",
+            wrt="voltage_out_target",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=-np.ones(number_of_points),
+        )
 
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
@@ -36,10 +51,3 @@ class PerformancesVoltageRMS(om.ImplicitComponent):
         residuals["ac_voltage_rms_out"] = (
             outputs["ac_voltage_rms_out"] - inputs["voltage_out_target"]
         )
-
-    def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-
-        number_of_points = self.options["number_of_points"]
-
-        jacobian["ac_voltage_rms_out", "ac_voltage_rms_out"] = np.eye(number_of_points)
-        jacobian["ac_voltage_rms_out", "voltage_out_target"] = -np.eye(number_of_points)

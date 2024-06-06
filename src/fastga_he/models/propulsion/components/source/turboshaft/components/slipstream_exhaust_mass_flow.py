@@ -56,7 +56,27 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
 
         self.add_output("exhaust_mass_flow", units="kg/s", val=10.0, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="exhaust_mass_flow",
+            wrt=["density_ratio", "power_required"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="exhaust_mass_flow",
+            wrt=[
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:OPR",
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t",
+                "data:propulsion:he_power_train:turboshaft:"
+                + turboshaft_id
+                + ":design_point:power_ratio",
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -136,7 +156,7 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
         )
         d_log_sigma_d_sigma = 1.0 / (np.log(10) * density_ratio)
 
-        partials["exhaust_mass_flow", "density_ratio"] = np.diag(
+        partials["exhaust_mass_flow", "density_ratio"] = (
             d_m_dot_8_d_log_m_dot_8 * d_log_m_dot_8_d_log_sigma * d_log_sigma_d_sigma
         )
 
@@ -201,6 +221,6 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
         d_log_m_dot_8_d_log_power = 0.21593 * np.log10(design_opr)
         d_log_power_d_power = 1.0 / (np.log(10) * power)
 
-        partials["exhaust_mass_flow", "power_required"] = np.diag(
+        partials["exhaust_mass_flow", "power_required"] = (
             d_m_dot_8_d_log_m_dot_8 * d_log_m_dot_8_d_log_power * d_log_power_d_power
         )

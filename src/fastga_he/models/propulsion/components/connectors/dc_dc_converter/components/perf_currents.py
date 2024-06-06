@@ -51,10 +51,34 @@ class PerformancesCurrents(om.ExplicitComponent):
             desc="Current going through the inductor",
         )
 
-        self.declare_partials(of="current_IGBT", wrt="*", method="exact")
-        self.declare_partials(of="current_capacitor", wrt="*", method="exact")
-        self.declare_partials(of="current_diode", wrt="*", method="exact")
-        self.declare_partials(of="current_inductor", wrt="*", method="exact")
+        self.declare_partials(
+            of="current_IGBT",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="current_capacitor",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="current_diode",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="current_inductor",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -81,31 +105,25 @@ class PerformancesCurrents(om.ExplicitComponent):
         current_out = inputs["dc_current_out"]
 
         partials["current_IGBT", "duty_cycle"] = (
-            np.diag((duty_cycle + 1.0) / (2.0 * np.sqrt(duty_cycle) * (1.0 - duty_cycle) ** 2.0))
+            (duty_cycle + 1.0)
+            / (2.0 * np.sqrt(duty_cycle) * (1.0 - duty_cycle) ** 2.0)
             * current_out
         )
-        partials["current_IGBT", "dc_current_out"] = np.diag(
-            np.sqrt(duty_cycle) / (1.0 - duty_cycle)
-        )
+        partials["current_IGBT", "dc_current_out"] = np.sqrt(duty_cycle) / (1.0 - duty_cycle)
 
-        partials["current_capacitor", "duty_cycle"] = np.diag(
-            current_out
-            / (2.0 * np.sqrt(duty_cycle) * np.sqrt(1.0 - duty_cycle) * (1.0 - duty_cycle))
+        partials["current_capacitor", "duty_cycle"] = current_out / (
+            2.0 * np.sqrt(duty_cycle) * np.sqrt(1.0 - duty_cycle) * (1.0 - duty_cycle)
         )
-        partials["current_capacitor", "dc_current_out"] = np.diag(
-            np.sqrt(duty_cycle / (1.0 - duty_cycle))
-        )
+        partials["current_capacitor", "dc_current_out"] = np.sqrt(duty_cycle / (1.0 - duty_cycle))
 
-        partials["current_diode", "duty_cycle"] = np.diag(
+        partials["current_diode", "duty_cycle"] = (
             1.0
             / (2.0 * np.sqrt(1.0 / (1.0 - duty_cycle)))
             * 1.0
             / (1.0 - duty_cycle) ** 2.0
             * current_out
         )
-        partials["current_diode", "dc_current_out"] = np.diag(np.sqrt(1.0 / (1.0 - duty_cycle)))
+        partials["current_diode", "dc_current_out"] = np.sqrt(1.0 / (1.0 - duty_cycle))
 
-        partials["current_inductor", "duty_cycle"] = np.diag(
-            1 / (1.0 - duty_cycle) ** 2.0 * current_out
-        )
-        partials["current_inductor", "dc_current_out"] = np.diag(1.0 / (1.0 - duty_cycle))
+        partials["current_inductor", "duty_cycle"] = 1 / (1.0 - duty_cycle) ** 2.0 * current_out
+        partials["current_inductor", "dc_current_out"] = 1.0 / (1.0 - duty_cycle)

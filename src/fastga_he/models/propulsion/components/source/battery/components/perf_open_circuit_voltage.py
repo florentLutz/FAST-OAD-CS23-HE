@@ -30,7 +30,13 @@ class PerformancesOpenCircuitVoltage(om.ExplicitComponent):
 
         self.add_output("open_circuit_voltage", units="V", val=np.full(number_of_points, 4.1))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -60,7 +66,7 @@ class PerformancesOpenCircuitVoltage(om.ExplicitComponent):
         )
         dod = 100.0 - soc
 
-        partials["open_circuit_voltage", "state_of_charge"] = -np.diag(
+        partials["open_circuit_voltage", "state_of_charge"] = -(
             -5.0 * 9.65121262e-10 * dod ** 4.0
             + 4.0 * 1.81419058e-07 * dod ** 3.0
             - 3.0 * 1.11814100e-05 * dod ** 2.0

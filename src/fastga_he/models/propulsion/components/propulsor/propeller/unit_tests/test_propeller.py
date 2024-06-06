@@ -1540,6 +1540,8 @@ def test_slipstream_propeller():
         assert problem.get_val("delta_Cl") == pytest.approx(expected_delta_cl, rel=1e-2)
         assert problem.get_val("delta_Cm") == pytest.approx(expected_delta_cm, rel=1e-2)
 
+    problem.check_partials(compact_print=True)
+
 
 def test_sizing_propeller():
 

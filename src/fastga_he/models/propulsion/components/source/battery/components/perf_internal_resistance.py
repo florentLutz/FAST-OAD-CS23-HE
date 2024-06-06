@@ -47,7 +47,22 @@ class PerformancesInternalResistance(om.ExplicitComponent):
 
         self.add_output("internal_resistance", units="ohm", val=np.full(number_of_points, 1e-3))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="internal_resistance",
+            wrt=["state_of_charge", "cell_temperature"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="internal_resistance",
+            wrt="settings:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":reference_temperature",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -110,7 +125,7 @@ class PerformancesInternalResistance(om.ExplicitComponent):
             + 3.90444549e-02
         )
 
-        partials["internal_resistance", "state_of_charge"] = -np.diag(
+        partials["internal_resistance", "state_of_charge"] = -(
             (
                 5.0 * 2.62771800e-11 * dod ** 4.0
                 - 4.0 * 1.48987233e-08 * dod ** 3.0
@@ -120,7 +135,7 @@ class PerformancesInternalResistance(om.ExplicitComponent):
             )
             * temperature_effect
         )
-        partials["internal_resistance", "cell_temperature"] = -np.diag(
+        partials["internal_resistance", "cell_temperature"] = -(
             soc_effect * temperature_effect * 46.39 / (cell_temperature - 254.33) ** 2.0
         )
         partials[

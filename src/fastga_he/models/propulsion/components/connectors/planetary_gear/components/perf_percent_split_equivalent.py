@@ -56,7 +56,22 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
             "adapted to mission",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="power_split",
+            wrt=["power_share", "shaft_power_out"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="power_split",
+            wrt="data:propulsion:he_power_train:planetary_gear:"
+            + planetary_gear_id
+            + ":efficiency",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -89,10 +104,10 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
         # point of the mission which the solver might interpret as the Jacobian not being full in
         # rank. Consequently, instead of putting it at 0 we put a very small value.
         partials_power_share = np.where(power_share < power_in, 100.0 / power_in, 1e-6)
-        partials["power_split", "power_share"] = np.diag(partials_power_share)
+        partials["power_split", "power_share"] = partials_power_share
 
-        partials["power_split", "shaft_power_out"] = np.diag(
-            np.where(power_share < power_in, -100.0 * power_share / (power_out ** 2.0 / eta), -1e-6)
+        partials["power_split", "shaft_power_out"] = np.where(
+            power_share < power_in, -100.0 * power_share / (power_out ** 2.0 / eta), -1e-6
         )
         partials[
             "power_split",

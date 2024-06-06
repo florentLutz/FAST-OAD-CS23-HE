@@ -60,8 +60,24 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="*",
+            wrt=["advance_ratio", "reynolds_D", "tip_mach", "thrust_coefficient"],
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt=[
+                "settings:propulsion:he_power_train:propeller:"
+                + propeller_id
+                + ":installation_effect",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":blade_twist",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":activity_factor",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":solidity",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -263,13 +279,13 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         )
         d_log_pi8_d_pi8 = 1.0 / (np.log(10) * twist_blade)
 
-        partials["power_coefficient", "advance_ratio"] = np.diag(
+        partials["power_coefficient", "advance_ratio"] = (
             d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi2 * d_log_pi2_d_pi2
         )
-        partials["power_coefficient", "tip_mach"] = np.diag(
+        partials["power_coefficient", "tip_mach"] = (
             d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi3 * d_log_pi3_d_pi3
         )
-        partials["power_coefficient", "reynolds_D"] = np.diag(
+        partials["power_coefficient", "reynolds_D"] = (
             d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi4 * d_log_pi4_d_pi4
         )
         partials[
@@ -278,10 +294,9 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         ] = (
             d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi5 * d_log_pi5_d_pi5
         )
-        partials[
-            "power_coefficient",
-            "thrust_coefficient",
-        ] = np.diag(d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi6 * d_log_pi6_d_pi6)
+        partials["power_coefficient", "thrust_coefficient"] = (
+            d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi6 * d_log_pi6_d_pi6
+        )
         partials[
             "power_coefficient",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":activity_factor",

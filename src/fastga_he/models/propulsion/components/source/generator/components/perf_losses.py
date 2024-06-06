@@ -57,7 +57,30 @@ class PerformancesLosses(om.ExplicitComponent):
 
         self.add_output("power_losses", units="W", val=0.0, shape=number_of_points)
 
-        self.declare_partials(of="power_losses", wrt="*", method="exact")
+        self.declare_partials(
+            of="power_losses",
+            wrt=["torque_in", "rpm"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="power_losses",
+            wrt=[
+                "data:propulsion:he_power_train:generator:"
+                + generator_id
+                + ":loss_coefficient:gamma",
+                "data:propulsion:he_power_train:generator:"
+                + generator_id
+                + ":loss_coefficient:beta",
+                "data:propulsion:he_power_train:generator:"
+                + generator_id
+                + ":loss_coefficient:alpha",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -101,8 +124,8 @@ class PerformancesLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:generator:" + generator_id + ":loss_coefficient:gamma"
         ]
 
-        partials["power_losses", "torque_in"] = np.diag(2.0 * alpha * torque)
-        partials["power_losses", "rpm"] = np.diag(beta + 2.0 * gamma * omega) * 2.0 * np.pi / 60.0
+        partials["power_losses", "torque_in"] = 2.0 * alpha * torque
+        partials["power_losses", "rpm"] = beta + 2.0 * gamma * omega * 2.0 * np.pi / 60.0
         partials[
             "power_losses",
             "data:propulsion:he_power_train:generator:" + generator_id + ":loss_coefficient:alpha",

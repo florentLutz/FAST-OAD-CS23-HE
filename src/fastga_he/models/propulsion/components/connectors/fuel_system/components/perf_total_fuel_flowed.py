@@ -45,7 +45,13 @@ class PerformancesTotalFuelFlowed(om.ExplicitComponent):
             desc="Total amount of fuel that flowed through the system",
         )
 
-        self.declare_partials(of="*", wrt="*", val=np.ones(number_of_points))
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            val=np.ones(number_of_points),
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

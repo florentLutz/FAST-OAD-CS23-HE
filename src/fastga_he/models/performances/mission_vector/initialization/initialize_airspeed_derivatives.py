@@ -97,7 +97,13 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
             rows=non_nul_pd,
             cols=non_nul_pd,
         )
-        self.declare_partials(of="d_vx_dt", wrt="gamma", method="exact")
+        self.declare_partials(
+            of="d_vx_dt",
+            wrt="gamma",
+            method="exact",
+            rows=non_nul_pd,
+            cols=non_nul_pd,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -142,9 +148,6 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        number_of_points_cruise = self.options["number_of_points_cruise"]
-        number_of_points_reserve = self.options["number_of_points_reserve"]
-
         true_airspeed = inputs["true_airspeed"]
         equivalent_airspeed = inputs["equivalent_airspeed"]
         altitude = inputs["altitude"]
@@ -172,13 +175,6 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
             d_v_tas_dh_descent * true_airspeed_descent * np.cos(gamma_descent)
         )
 
-        partials_wrt_gamma = np.concatenate(
-            (
-                partials_wrt_gamma_climb,
-                np.zeros(number_of_points_cruise),
-                partials_wrt_gamma_descent,
-                np.zeros(number_of_points_reserve),
-            )
-        )
+        partials_wrt_gamma = np.concatenate((partials_wrt_gamma_climb, partials_wrt_gamma_descent))
 
-        partials["d_vx_dt", "gamma"] = np.diag(partials_wrt_gamma)
+        partials["d_vx_dt", "gamma"] = partials_wrt_gamma

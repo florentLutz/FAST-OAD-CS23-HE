@@ -43,7 +43,13 @@ class PerformancesFuelConsumedMission(om.ExplicitComponent):
             desc="Amount of fuel from that tank which will be consumed during mission",
         )
 
-        self.declare_partials(of="*", wrt="*", val=np.ones(number_of_points))
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

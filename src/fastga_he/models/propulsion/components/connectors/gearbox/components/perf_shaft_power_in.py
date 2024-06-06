@@ -39,7 +39,21 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         self.add_input("shaft_power_out_2", units="kW", val=np.nan, shape=number_of_points)
 
         self.add_output("shaft_power_in", units="kW", val=5000.0, shape=number_of_points)
-        self.declare_partials(of="*", wrt="*", method="exact")
+
+        self.declare_partials(
+            of="*",
+            wrt=["shaft_power_out_1", "shaft_power_out_2"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt=["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":efficiency"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -58,8 +72,8 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         power_out = inputs["shaft_power_out_1"] + inputs["shaft_power_out_2"]
         eta = inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":efficiency"]
 
-        partials["shaft_power_in", "shaft_power_out_1"] = np.eye(number_of_points) / eta
-        partials["shaft_power_in", "shaft_power_out_2"] = np.eye(number_of_points) / eta
+        partials["shaft_power_in", "shaft_power_out_1"] = np.ones(number_of_points) / eta
+        partials["shaft_power_in", "shaft_power_out_2"] = np.ones(number_of_points) / eta
         partials[
             "shaft_power_in",
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":efficiency",

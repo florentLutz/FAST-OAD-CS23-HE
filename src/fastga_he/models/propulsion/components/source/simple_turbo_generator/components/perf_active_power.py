@@ -46,7 +46,22 @@ class PerformancesActivePower(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="active_power",
+            wrt="apparent_power",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="active_power",
+            wrt="settings:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":power_factor",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -67,7 +82,7 @@ class PerformancesActivePower(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         partials["active_power", "apparent_power"] = (
-            np.eye(number_of_points)
+            np.ones(number_of_points)
             * inputs[
                 "settings:propulsion:he_power_train:turbo_generator:"
                 + turbo_generator_id

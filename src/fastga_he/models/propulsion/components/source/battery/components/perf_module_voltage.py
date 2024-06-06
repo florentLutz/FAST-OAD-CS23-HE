@@ -40,7 +40,22 @@ class PerformancesModuleVoltage(om.ExplicitComponent):
 
         self.add_output("module_voltage", units="V", val=np.full(number_of_points, 500.0))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="module_voltage",
+            wrt="terminal_voltage",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="module_voltage",
+            wrt="data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":module:number_cells",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -60,9 +75,9 @@ class PerformancesModuleVoltage(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
 
-        partials["module_voltage", "terminal_voltage"] = (
-            np.eye(number_of_points)
-            * inputs[
+        partials["module_voltage", "terminal_voltage"] = np.full(
+            number_of_points,
+            *inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":module:number_cells"

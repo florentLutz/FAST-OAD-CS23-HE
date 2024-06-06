@@ -38,6 +38,13 @@ class PerformancesElectricalNode(om.ImplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
+        self.add_output(
+            name="dc_voltage",
+            val=np.full(number_of_points, 350),
+            units="V",
+            desc="Voltage of the bus",
+        )
+
         for i in range(self.options["number_of_inputs"]):
 
             # Choice was made to start current numbering at 1 to irritate any future programmer
@@ -50,6 +57,15 @@ class PerformancesElectricalNode(om.ImplicitComponent):
                 desc="Current going into the bus at input number " + str(i + 1),
             )
 
+            self.declare_partials(
+                of="dc_voltage",
+                wrt="dc_current_in_" + str(i + 1),
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
+                val=np.ones(number_of_points),
+            )
+
         for j in range(self.options["number_of_outputs"]):
 
             self.add_input(
@@ -60,16 +76,18 @@ class PerformancesElectricalNode(om.ImplicitComponent):
                 desc="Current going out of the bus at output number " + str(j + 1),
             )
 
-        self.add_output(
-            name="dc_voltage",
-            val=np.full(number_of_points, 350),
-            units="V",
-            desc="Voltage of the bus",
-        )
+            self.declare_partials(
+                of="dc_voltage",
+                wrt="dc_current_out_" + str(j + 1),
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
+                val=-np.ones(number_of_points),
+            )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
-
-    def apply_nonlinear(self, inputs, outputs, residuals):
+    def apply_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
 
         number_of_points = self.options["number_of_points"]
 
@@ -82,13 +100,3 @@ class PerformancesElectricalNode(om.ImplicitComponent):
 
         for j in range(self.options["number_of_outputs"]):
             residuals["dc_voltage"] -= inputs["dc_current_out_" + str(j + 1)]
-
-    def linearize(self, inputs, outputs, partials):
-
-        number_of_points = self.options["number_of_points"]
-
-        for i in range(self.options["number_of_inputs"]):
-            partials["dc_voltage", "dc_current_in_" + str(i + 1)] = np.eye(number_of_points)
-
-        for j in range(self.options["number_of_outputs"]):
-            partials["dc_voltage", "dc_current_out_" + str(j + 1)] = -np.eye(number_of_points)

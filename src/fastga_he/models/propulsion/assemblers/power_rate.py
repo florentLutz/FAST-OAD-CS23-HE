@@ -81,15 +81,21 @@ class PowerRate(om.ExplicitComponent):
             )
             self.declare_partials(
                 of="thrust_rate_t_econ",
-                wrt=[
-                    "data:propulsion:he_power_train:"
-                    + propulsive_load_type
-                    + ":"
-                    + propulsive_load_name
-                    + ":shaft_power_rating",
-                    propulsive_load_name + "_shaft_power_out",
-                ],
+                wrt="data:propulsion:he_power_train:"
+                + propulsive_load_type
+                + ":"
+                + propulsive_load_name
+                + ":shaft_power_rating",
                 method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
+            )
+            self.declare_partials(
+                of="thrust_rate_t_econ",
+                wrt=propulsive_load_name + "_shaft_power_out",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -150,7 +156,7 @@ class PowerRate(om.ExplicitComponent):
         ):
 
             partials["thrust_rate_t_econ", propulsive_load_name + "_shaft_power_out"] = (
-                np.eye(number_of_points) / max_power
+                np.ones(number_of_points) / max_power
             )
             partials[
                 "thrust_rate_t_econ",

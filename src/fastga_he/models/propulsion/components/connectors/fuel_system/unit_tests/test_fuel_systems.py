@@ -238,6 +238,8 @@ def test_fuel_system_performances():
         np.linspace(1.0, 0.8, NB_POINTS_TEST), rel=1e-2
     )
 
+    problem.check_partials(compact_print=True)
+
 
 def test_sizing_tank():
 

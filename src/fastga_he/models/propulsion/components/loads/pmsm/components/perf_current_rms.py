@@ -38,7 +38,20 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
             desc="RMS current in all the phases of the motor",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="torque_out",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -59,7 +72,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         torque = inputs["torque_out"]
         k_t = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant"]
 
-        partials["ac_current_rms_in", "torque_out"] = np.eye(number_of_points) / k_t
+        partials["ac_current_rms_in", "torque_out"] = np.ones(number_of_points) / k_t
         partials[
             "ac_current_rms_in",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant",

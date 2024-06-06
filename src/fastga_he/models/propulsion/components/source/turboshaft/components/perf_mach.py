@@ -26,7 +26,13 @@ class PerformancesMach(om.ExplicitComponent):
 
         self.add_output("mach", val=0.2, shape=number_of_points, lower=0.0)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -47,7 +53,5 @@ class PerformancesMach(om.ExplicitComponent):
         speed_of_sound = atm.speed_of_sound
         d_sos_d_altitude = atm.partial_speed_of_sound_altitude
 
-        partials["mach", "true_airspeed"] = np.diag(1.0 / speed_of_sound)
-        partials["mach", "altitude"] = np.diag(
-            -true_airspeed / speed_of_sound ** 2.0 * d_sos_d_altitude
-        )
+        partials["mach", "true_airspeed"] = 1.0 / speed_of_sound
+        partials["mach", "altitude"] = -true_airspeed / speed_of_sound ** 2.0 * d_sos_d_altitude

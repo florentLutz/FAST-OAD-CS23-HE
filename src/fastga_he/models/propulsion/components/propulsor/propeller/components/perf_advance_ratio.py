@@ -41,7 +41,25 @@ class PerformancesAdvanceRatio(om.ExplicitComponent):
 
         self.add_output("advance_ratio", val=0.7, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt=[
+                "settings:propulsion:he_power_train:propeller:"
+                + propeller_id
+                + ":effective_advance_ratio",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt=["rpm", "true_airspeed"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -69,10 +87,10 @@ class PerformancesAdvanceRatio(om.ExplicitComponent):
             + ":effective_advance_ratio"
         ]
 
-        partials["advance_ratio", "true_airspeed"] = np.diag(
+        partials["advance_ratio", "true_airspeed"] = (
             1.0 / (inputs["rpm"] / 60.0 * diameter) * effective_j
         )
-        partials["advance_ratio", "rpm"] = -np.diag(
+        partials["advance_ratio", "rpm"] = -(
             inputs["true_airspeed"] / (inputs["rpm"] ** 2.0 / 60.0 * diameter) * effective_j
         )
         partials[

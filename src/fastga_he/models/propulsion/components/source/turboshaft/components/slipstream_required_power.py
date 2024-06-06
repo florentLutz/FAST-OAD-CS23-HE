@@ -41,11 +41,27 @@ class SlipstreamRequiredPower(om.ExplicitComponent):
 
         self.add_output("power_required", val=500.0, units="kW", shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        partial_power_required = np.zeros((number_of_points, number_of_points + 2))
+        partial_power_required[:, 1 : number_of_points + 1] = np.eye(number_of_points)
+        self.declare_partials(
+            of="*",
+            wrt="shaft_power_out",
+            method="exact",
+            rows=np.where(partial_power_required != 0)[0],
+            cols=np.where(partial_power_required != 0)[1],
+            val=np.ones(len(np.where(partial_power_required != 0)[0])),
+        )
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+            val=np.ones(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
         # Because this variable will need to be connected to the performances computation,
@@ -60,17 +76,3 @@ class SlipstreamRequiredPower(om.ExplicitComponent):
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        number_of_points = self.options["number_of_points"]
-        turboshaft_id = self.options["turboshaft_id"]
-
-        partial = np.zeros((number_of_points, number_of_points + 2))
-        partial[:, 1 : number_of_points + 1] = np.eye(number_of_points)
-        partials["power_required", "shaft_power_out"] = partial
-
-        partials[
-            "power_required",
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake",
-        ] = np.ones(number_of_points)

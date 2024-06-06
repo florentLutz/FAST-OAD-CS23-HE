@@ -50,7 +50,22 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         self.add_output("shaft_power_in_1", units="kW", val=5000.0, shape=number_of_points)
         self.add_output("shaft_power_in_2", units="kW", val=5000.0, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt=["shaft_power_out", "power_split"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:planetary_gear:"
+            + planetary_gear_id
+            + ":efficiency",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         planetary_gear_id = self.options["planetary_gear_id"]
@@ -74,20 +89,20 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         ]
         percent_split = inputs["power_split"] / 100
 
-        partials["shaft_power_in_1", "shaft_power_out"] = np.diag(percent_split / eta)
+        partials["shaft_power_in_1", "shaft_power_out"] = percent_split / eta
         partials[
             "shaft_power_in_1",
             "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":efficiency",
         ] = (
             -power_out / eta ** 2.0 * percent_split
         )
-        partials["shaft_power_in_1", "power_split"] = np.diag(power_out / eta) / 100.0
+        partials["shaft_power_in_1", "power_split"] = power_out / eta / 100.0
 
-        partials["shaft_power_in_2", "shaft_power_out"] = np.diag((1.0 - percent_split) / eta)
+        partials["shaft_power_in_2", "shaft_power_out"] = (1.0 - percent_split) / eta
         partials[
             "shaft_power_in_2",
             "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":efficiency",
         ] = (
             -power_out / eta ** 2.0 * (1.0 - percent_split)
         )
-        partials["shaft_power_in_2", "power_split"] = -np.diag(power_out / eta) / 100.0
+        partials["shaft_power_in_2", "power_split"] = -power_out / eta / 100.0

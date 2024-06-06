@@ -55,7 +55,13 @@ class InitializeHorizontalSpeed(om.ExplicitComponent):
 
         self.add_output("horizontal_speed", val=np.full(number_of_points, 50.0), units="m/s")
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -69,7 +75,5 @@ class InitializeHorizontalSpeed(om.ExplicitComponent):
         true_airspeed = inputs["true_airspeed"]
         gamma = inputs["gamma"] * np.pi / 180.0
 
-        partials["horizontal_speed", "gamma"] = (
-            -np.diag(true_airspeed * np.sin(gamma)) * np.pi / 180.0
-        )
-        partials["horizontal_speed", "true_airspeed"] = np.diag(np.cos(gamma))
+        partials["horizontal_speed", "gamma"] = -(true_airspeed * np.sin(gamma)) * np.pi / 180.0
+        partials["horizontal_speed", "true_airspeed"] = np.cos(gamma)

@@ -41,7 +41,23 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
             "mean_effective_pressure", units="bar", val=15.0, shape=number_of_points, lower=0.0
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt=[
+                "data:propulsion:he_power_train:ICE:" + ice_id + ":strokes_number",
+                "data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+        self.declare_partials(
+            of="*",
+            wrt="torque_out",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -78,5 +94,5 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
             2.0 * np.pi * torque_out / volume * 1e-5
         )
         partials["mean_effective_pressure", "torque_out"] = (
-            np.eye(number_of_points) * 2.0 * np.pi * strokes_nb / volume * 1e-5
+            np.ones(number_of_points) * 2.0 * np.pi * strokes_nb / volume * 1e-5
         )

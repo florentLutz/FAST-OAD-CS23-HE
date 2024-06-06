@@ -26,7 +26,13 @@ class PerformancesCellJouleLosses(om.ExplicitComponent):
 
         self.add_output("joule_losses_cell", units="W", val=np.full(number_of_points, 1))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -36,9 +42,7 @@ class PerformancesCellJouleLosses(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["joule_losses_cell", "internal_resistance"] = np.diag(
-            inputs["current_one_module"] ** 2.0
-        )
-        partials["joule_losses_cell", "current_one_module"] = np.diag(
+        partials["joule_losses_cell", "internal_resistance"] = inputs["current_one_module"] ** 2.0
+        partials["joule_losses_cell", "current_one_module"] = (
             2.0 * inputs["internal_resistance"] * inputs["current_one_module"]
         )

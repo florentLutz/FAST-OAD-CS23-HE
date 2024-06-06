@@ -27,7 +27,8 @@ class SlipstreamPropellerAxialInductionFactorWingAC(om.ExplicitComponent):
             "contraction_ratio_squared",
             val=np.nan,
             shape=number_of_points,
-            desc="Square of the contraction ratio of the propeller slipstream evaluated at the wing AC",
+            desc="Square of the contraction ratio of the propeller slipstream evaluated at the wing"
+            " AC",
         )
 
         self.add_output(
@@ -37,7 +38,13 @@ class SlipstreamPropellerAxialInductionFactorWingAC(om.ExplicitComponent):
             desc="Value of the axial induction factor at the wing aerodynamic chord",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -53,9 +60,9 @@ class SlipstreamPropellerAxialInductionFactorWingAC(om.ExplicitComponent):
         a_p = inputs["axial_induction_factor"]
         contraction_ratio_squared = inputs["contraction_ratio_squared"]
 
-        partials["axial_induction_factor_wing_ac", "axial_induction_factor"] = np.diag(
+        partials["axial_induction_factor_wing_ac", "axial_induction_factor"] = (
             1.0 / contraction_ratio_squared
         )
-        partials["axial_induction_factor_wing_ac", "contraction_ratio_squared"] = np.diag(
+        partials["axial_induction_factor_wing_ac", "contraction_ratio_squared"] = (
             -(a_p + 1.0) / contraction_ratio_squared ** 2.0
         )

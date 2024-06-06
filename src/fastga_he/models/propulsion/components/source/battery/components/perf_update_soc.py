@@ -28,7 +28,16 @@ class PerformancesUpdateSOC(om.ExplicitComponent):
 
         self.add_output("state_of_charge", units="percent", val=np.full(number_of_points, 100.0))
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        partials = -(np.tri(number_of_points, number_of_points) - np.eye(number_of_points))
+
+        self.declare_partials(
+            of="state_of_charge",
+            wrt="state_of_charge_decrease",
+            method="exact",
+            val=-np.ones(len(np.where(partials == -1)[0])),
+            rows=np.where(partials == -1)[0],
+            cols=np.where(partials == -1)[1],
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -36,14 +45,4 @@ class PerformancesUpdateSOC(om.ExplicitComponent):
 
         outputs["state_of_charge"] = np.full(number_of_points, 100.0) - np.cumsum(
             np.concatenate((np.zeros(1), inputs["state_of_charge_decrease"][:-1]))
-        )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        # Clipping does not appear in the computation of the partials
-
-        number_of_points = self.options["number_of_points"]
-
-        partials["state_of_charge", "state_of_charge_decrease"] = -(
-            np.tri(number_of_points, number_of_points) - np.eye(number_of_points)
         )

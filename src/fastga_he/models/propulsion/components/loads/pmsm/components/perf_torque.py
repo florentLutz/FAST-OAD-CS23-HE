@@ -30,11 +30,21 @@ class PerformancesTorque(om.ExplicitComponent):
         # shaft power (which is equal to the load shaft power) feels off, so instead we will just
         # create a new variable identical to the shaft_power_out but with a different name.
 
-        self.declare_partials(of="torque_out", wrt="*", method="exact")
+        self.declare_partials(
+            of="torque_out",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
         self.add_output("shaft_power_for_power_rate", units="W", val=50e3, shape=number_of_points)
         self.declare_partials(
-            of="shaft_power_for_power_rate", wrt="shaft_power_out", val=np.eye(number_of_points)
+            of="shaft_power_for_power_rate",
+            wrt="shaft_power_out",
+            val=np.ones(number_of_points),
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -55,5 +65,5 @@ class PerformancesTorque(om.ExplicitComponent):
 
         omega = rpm * 2.0 * np.pi / 60
 
-        partials["torque_out", "shaft_power_out"] = np.diag(1.0 / omega)
-        partials["torque_out", "rpm"] = -np.diag(power / omega ** 2.0) * 2.0 * np.pi / 60
+        partials["torque_out", "shaft_power_out"] = 1.0 / omega
+        partials["torque_out", "rpm"] = -power / omega ** 2.0 * 2.0 * np.pi / 60

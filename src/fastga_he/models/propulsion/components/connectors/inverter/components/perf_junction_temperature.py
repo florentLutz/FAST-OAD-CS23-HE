@@ -122,24 +122,57 @@ class PerformancesJunctionTemperature(om.ExplicitComponent):
             wrt=[
                 "switching_losses_diode",
                 "conduction_losses_diode",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="diode_temperature",
+            wrt="casing_temperature",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="diode_temperature",
+            wrt=[
                 "data:propulsion:he_power_train:inverter:"
                 + inverter_id
                 + ":diode:thermal_resistance",
-                "casing_temperature",
             ],
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
         )
+
         self.declare_partials(
             of="IGBT_temperature",
             wrt=[
                 "switching_losses_IGBT",
                 "conduction_losses_IGBT",
-                "data:propulsion:he_power_train:inverter:"
-                + inverter_id
-                + ":igbt:thermal_resistance",
-                "casing_temperature",
             ],
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="IGBT_temperature",
+            wrt="casing_temperature",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="IGBT_temperature",
+            wrt="data:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":igbt:thermal_resistance",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -164,12 +197,10 @@ class PerformancesJunctionTemperature(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
         inverter_id = self.options["inverter_id"]
 
-        temp_c = inputs["casing_temperature"]
         r_th_jc_igbt = inputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:thermal_resistance"
         ]
@@ -183,24 +214,22 @@ class PerformancesJunctionTemperature(om.ExplicitComponent):
         igbt_losses = inputs["switching_losses_IGBT"] + inputs["conduction_losses_IGBT"]
 
         partials["diode_temperature", "switching_losses_diode"] = (
-            np.eye(number_of_points) * r_th_jc_diode
+            np.ones(number_of_points) * r_th_jc_diode
         )
         partials["diode_temperature", "conduction_losses_diode"] = (
-            np.eye(number_of_points) * r_th_jc_diode
+            np.ones(number_of_points) * r_th_jc_diode
         )
-        partials["diode_temperature", "casing_temperature"] = np.eye(number_of_points)
         partials[
             "diode_temperature",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":diode:thermal_resistance",
         ] = diode_losses
 
         partials["IGBT_temperature", "switching_losses_IGBT"] = (
-            np.eye(number_of_points) * r_th_jc_igbt
+            np.ones(number_of_points) * r_th_jc_igbt
         )
         partials["IGBT_temperature", "conduction_losses_IGBT"] = (
-            np.eye(number_of_points) * r_th_jc_igbt
+            np.ones(number_of_points) * r_th_jc_igbt
         )
-        partials["IGBT_temperature", "casing_temperature"] = np.eye(number_of_points)
         partials[
             "IGBT_temperature",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:thermal_resistance",

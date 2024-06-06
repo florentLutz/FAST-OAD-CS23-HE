@@ -60,15 +60,34 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
             "a ratio of the clean lift, for a zero angle of attack",
         )
 
-        self.declare_partials(of="lift_increase_ratio", wrt="*", method="exact")
+        self.declare_partials(
+            of="lift_increase_ratio",
+            wrt=["alpha", "beta", "axial_induction_factor_wing_ac"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="lift_increase_ratio",
+            wrt="data:propulsion:he_power_train:propeller:" + propeller_id + ":installation_angle",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+
         self.declare_partials(
             of="lift_increase_ratio_AOA_0",
-            wrt=[
-                "beta",
-                "axial_induction_factor_wing_ac",
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":installation_angle",
-            ],
+            wrt="data:propulsion:he_power_train:propeller:" + propeller_id + ":installation_angle",
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+        self.declare_partials(
+            of="lift_increase_ratio_AOA_0",
+            wrt=["beta", "axial_induction_factor_wing_ac"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -124,19 +143,19 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
 
         d_inside_square_d_alpha = -2.0 * beta * a_p * np.sin(alpha + i_p)
 
-        partials["lift_increase_ratio", "beta"] = np.diag(
-            partials_lift_increase_ratio_beta(alpha, beta, a_p, i_p, inside_square)
+        partials["lift_increase_ratio", "beta"] = partials_lift_increase_ratio_beta(
+            alpha, beta, a_p, i_p, inside_square
         )
-        partials["lift_increase_ratio_AOA_0", "beta"] = np.diag(
-            partials_lift_increase_ratio_beta(alpha_0, beta, a_p, i_p, inside_square_0)
+        partials["lift_increase_ratio_AOA_0", "beta"] = partials_lift_increase_ratio_beta(
+            alpha_0, beta, a_p, i_p, inside_square_0
         )
 
-        partials["lift_increase_ratio", "axial_induction_factor_wing_ac"] = np.diag(
-            partials_lift_increase_ratio_a_p(alpha, beta, a_p, i_p, inside_square)
-        )
-        partials["lift_increase_ratio_AOA_0", "axial_induction_factor_wing_ac"] = np.diag(
-            partials_lift_increase_ratio_a_p(alpha_0, beta, a_p, i_p, inside_square_0)
-        )
+        partials[
+            "lift_increase_ratio", "axial_induction_factor_wing_ac"
+        ] = partials_lift_increase_ratio_a_p(alpha, beta, a_p, i_p, inside_square)
+        partials[
+            "lift_increase_ratio_AOA_0", "axial_induction_factor_wing_ac"
+        ] = partials_lift_increase_ratio_a_p(alpha_0, beta, a_p, i_p, inside_square_0)
 
         partials[
             "lift_increase_ratio",
@@ -154,8 +173,8 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
             / np.sqrt(inside_square)
             * d_inside_square_d_alpha
         )
-        partials["lift_increase_ratio", "alpha"] = np.diag(
-            np.where(alpha == alpha_untreated, partials_alpha, 1e-6)
+        partials["lift_increase_ratio", "alpha"] = np.where(
+            alpha == alpha_untreated, partials_alpha, 1e-6
         )
 
 

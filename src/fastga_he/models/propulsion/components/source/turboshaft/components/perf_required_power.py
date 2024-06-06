@@ -41,7 +41,22 @@ class PerformancesRequiredPower(om.ExplicitComponent):
 
         self.add_output("power_required", val=500.0, units="kW", shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="power_required",
+            wrt="shaft_power_out",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="power_required",
+            wrt="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+            val=np.ones(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -53,17 +68,6 @@ class PerformancesRequiredPower(om.ExplicitComponent):
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        number_of_points = self.options["number_of_points"]
-        turboshaft_id = self.options["turboshaft_id"]
-
-        partials["power_required", "shaft_power_out"] = np.eye(number_of_points)
-        partials[
-            "power_required",
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake",
-        ] = np.ones(number_of_points)
 
     @staticmethod
     def smooth_power(power):

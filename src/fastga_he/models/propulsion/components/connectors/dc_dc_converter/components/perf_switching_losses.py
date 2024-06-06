@@ -102,9 +102,15 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
                 + ":energy_rr:c",
-                "switching_frequency",
-                "current_diode",
             ],
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+        self.declare_partials(
+            of="switching_losses_diode",
+            wrt=["switching_frequency", "current_diode"],
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.declare_partials(
@@ -128,9 +134,15 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
                 + ":energy_off:c",
-                "switching_frequency",
-                "current_IGBT",
             ],
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+        self.declare_partials(
+            of="switching_losses_IGBT",
+            wrt=["switching_frequency", "current_IGBT"],
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -237,11 +249,11 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         ] = (
             f_sw * i_diode ** 2.0 / 4
         )
-        partials["switching_losses_diode", "switching_frequency"] = np.diag(
+        partials["switching_losses_diode", "switching_frequency"] = (
             a_rr / 2.0 + b_rr * i_diode / np.pi + c_rr * i_diode ** 2.0 / 4
         )
-        partials["switching_losses_diode", "current_diode"] = np.diag(
-            f_sw * (b_rr / np.pi + c_rr * i_diode / 2.0)
+        partials["switching_losses_diode", "current_diode"] = f_sw * (
+            b_rr / np.pi + c_rr * i_diode / 2.0
         )
 
         partials[
@@ -286,11 +298,11 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         ] = (
             f_sw * i_igbt ** 2.0 / 4
         )
-        partials["switching_losses_IGBT", "switching_frequency"] = np.diag(
+        partials["switching_losses_IGBT", "switching_frequency"] = (
             (a_on + a_off) / 2.0
             + (b_on + b_off) * i_igbt / np.pi
             + (c_on + c_off) * i_igbt ** 2.0 / 4
         )
-        partials["switching_losses_IGBT", "current_IGBT"] = np.diag(
-            f_sw * ((b_on + b_off) / np.pi + (c_on + c_off) * i_igbt / 2.0)
+        partials["switching_losses_IGBT", "current_IGBT"] = f_sw * (
+            (b_on + b_off) / np.pi + (c_on + c_off) * i_igbt / 2.0
         )

@@ -24,7 +24,13 @@ class SlipstreamExhaustThrust(om.ExplicitComponent):
 
         self.add_output("exhaust_thrust", units="N", val=200.0, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -52,16 +58,14 @@ class SlipstreamExhaustThrust(om.ExplicitComponent):
         partials_v8 = exhaust_mass_flow
         partials_v0 = -exhaust_mass_flow
 
-        partials["exhaust_thrust", "exhaust_mass_flow"] = np.diag(
-            np.where(
-                exhaust_velocity > true_airspeed, partials_m_dot_8, np.zeros_like(exhaust_velocity)
-            )
+        partials["exhaust_thrust", "exhaust_mass_flow"] = np.where(
+            exhaust_velocity > true_airspeed, partials_m_dot_8, np.zeros_like(exhaust_velocity)
         )
-        partials["exhaust_thrust", "exhaust_velocity"] = np.diag(
-            np.where(exhaust_velocity > true_airspeed, partials_v8, np.zeros_like(exhaust_velocity))
+        partials["exhaust_thrust", "exhaust_velocity"] = np.where(
+            exhaust_velocity > true_airspeed, partials_v8, np.zeros_like(exhaust_velocity)
         )
-        partials["exhaust_thrust", "true_airspeed"] = np.diag(
-            np.where(exhaust_velocity > true_airspeed, partials_v0, np.zeros_like(exhaust_velocity))
+        partials["exhaust_thrust", "true_airspeed"] = np.where(
+            exhaust_velocity > true_airspeed, partials_v0, np.zeros_like(exhaust_velocity)
         )
 
     @staticmethod

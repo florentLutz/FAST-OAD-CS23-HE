@@ -29,7 +29,13 @@ class PerformancesApparentPower(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -37,5 +43,5 @@ class PerformancesApparentPower(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["apparent_power", "ac_voltage_rms_out"] = np.diag(inputs["ac_current_rms_out"])
-        partials["apparent_power", "ac_current_rms_out"] = np.diag(inputs["ac_voltage_rms_out"])
+        partials["apparent_power", "ac_voltage_rms_out"] = inputs["ac_current_rms_out"]
+        partials["apparent_power", "ac_current_rms_out"] = inputs["ac_voltage_rms_out"]

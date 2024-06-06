@@ -42,8 +42,20 @@ class SlipstreamPropellerDeltaCM(om.ExplicitComponent):
             desc="Increase in the pitching moment coefficient downstream of the propeller",
         )
 
-        self.declare_partials(of="delta_Cm", wrt="delta_Cm0", val=np.eye(number_of_points))
-        self.declare_partials(of="delta_Cm", wrt="delta_Cm_alpha", val=np.eye(number_of_points))
+        self.declare_partials(
+            of="delta_Cm",
+            wrt="delta_Cm0",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
+        self.declare_partials(
+            of="delta_Cm",
+            wrt="delta_Cm_alpha",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

@@ -43,6 +43,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             + ":torque_in_max",
             wrt="torque_in",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
         self.add_output(
@@ -57,6 +59,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             + ":torque_out_max",
             wrt="torque_out",
             method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

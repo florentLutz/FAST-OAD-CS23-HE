@@ -58,10 +58,12 @@ class InitializeGamma(om.ExplicitComponent):
 
         self.add_output("gamma", val=np.full(number_of_points, 0.0), units="rad")
 
-        idx = np.arange(number_of_points)
-
         self.declare_partials(
-            of="gamma", wrt=["vertical_speed", "true_airspeed"], method="exact", rows=idx, cols=idx
+            of="gamma",
+            wrt=["vertical_speed", "true_airspeed"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

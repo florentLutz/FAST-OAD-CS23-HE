@@ -45,7 +45,24 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
             val=np.full(number_of_points, 1.0),
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        if self.options["closed"]:
+            self.declare_partials(
+                of="*",
+                wrt="*",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
+                val=np.ones(number_of_points),
+            )
+        else:
+            self.declare_partials(
+                of="*",
+                wrt="*",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
+                val=np.zeros(number_of_points),
+            )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -61,17 +78,3 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
             efficiency = np.ones(number_of_points)
 
         outputs["efficiency"] = efficiency
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        number_of_points = self.options["number_of_points"]
-        dc_sspc_id = self.options["dc_sspc_id"]
-
-        if self.options["closed"]:
-            partials[
-                "efficiency", "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency"
-            ] = np.ones(number_of_points)
-        else:
-            partials[
-                "efficiency", "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency"
-            ] = np.zeros(number_of_points)

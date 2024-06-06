@@ -44,7 +44,13 @@ class PerformancesDutyCycle(om.ExplicitComponent):
             upper=np.full(number_of_points, 1.0),
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -56,9 +62,9 @@ class PerformancesDutyCycle(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["duty_cycle", "dc_voltage_out"] = np.diag(
+        partials["duty_cycle", "dc_voltage_out"] = (
             inputs["dc_voltage_in"] / (inputs["dc_voltage_out"] + inputs["dc_voltage_in"]) ** 2.0
         )
-        partials["duty_cycle", "dc_voltage_in"] = -np.diag(
+        partials["duty_cycle", "dc_voltage_in"] = -(
             inputs["dc_voltage_out"] / (inputs["dc_voltage_out"] + inputs["dc_voltage_in"]) ** 2.0
         )

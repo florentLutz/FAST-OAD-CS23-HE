@@ -41,6 +41,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_max",
             wrt=["torque_out_1", "torque_out_2"],
             method="exact",
+            cols=np.arange(number_of_points),
+            rows=np.zeros(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

@@ -76,12 +76,26 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="unblown_section_lift", wrt=shared_inputs + ["cl_wing_clean"], method="exact"
+            of="unblown_section_lift",
+            wrt=shared_inputs,
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
         )
+        self.declare_partials(
+            of="unblown_section_lift",
+            wrt="cl_wing_clean",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+
         self.declare_partials(
             of="unblown_section_lift_AOA_0",
             wrt=shared_inputs + ["data:aerodynamics:wing:cruise:CL0_clean"],
             method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -132,8 +146,8 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio"
         ]
 
-        partials["unblown_section_lift", "cl_wing_clean"] = (
-            np.eye(number_of_points) * cl_section_ref / cl_wing_ref
+        partials["unblown_section_lift", "cl_wing_clean"] = np.full(
+            number_of_points, cl_section_ref / cl_wing_ref
         )
         partials["unblown_section_lift_AOA_0", "data:aerodynamics:wing:cruise:CL0_clean"] = np.full(
             number_of_points, cl_section_ref / cl_wing_ref

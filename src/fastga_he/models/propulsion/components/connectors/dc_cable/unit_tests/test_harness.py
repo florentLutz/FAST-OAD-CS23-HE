@@ -387,19 +387,14 @@ def test_harness_cg_y():
 
 
 def test_perf_current():
-    ivc = get_indep_var_comp(
-        list_inputs(PerformancesCurrent(harness_id="harness_1", number_of_points=NB_POINTS_TEST)),
-        __file__,
-        XML_FILE,
-    )
+
+    ivc = om.IndepVarComp()
     ivc.add_output("dc_voltage_in", units="V", val=np.linspace(780, 800, NB_POINTS_TEST))
     ivc.add_output("dc_voltage_out", units="V", val=np.linspace(760, 770, NB_POINTS_TEST))
     ivc.add_output("resistance_per_cable", units="ohm", val=np.full(NB_POINTS_TEST, 0.0263))
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesCurrent(harness_id="harness_1", number_of_points=NB_POINTS_TEST), ivc
-    )
+    problem = run_system(PerformancesCurrent(number_of_points=NB_POINTS_TEST), ivc)
     expected_current = np.array(
         [760.46, 802.7, 844.95, 887.2, 929.45, 971.69, 1013.94, 1056.19, 1098.44, 1140.68]
     )

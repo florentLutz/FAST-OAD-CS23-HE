@@ -30,7 +30,13 @@ class SlipstreamDensityRatio(om.ExplicitComponent):
 
         self.add_output("density_ratio", val=1.0, shape=number_of_points, lower=0.0)
 
-        self.declare_partials(of="*", wrt="*", val=np.eye(number_of_points) / DENSITY_SL)
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.full(number_of_points, 1.0 / DENSITY_SL),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

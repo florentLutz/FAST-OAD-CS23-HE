@@ -33,7 +33,13 @@ class PerformancesSOCDecrease(om.ExplicitComponent):
             val=np.full(number_of_points, 80.0 / number_of_points),
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -43,12 +49,12 @@ class PerformancesSOCDecrease(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["state_of_charge_decrease", "c_rate"] = 100.0 * np.diag(
+        partials["state_of_charge_decrease", "c_rate"] = 100.0 * (
             inputs["time_step"] / inputs["relative_capacity"]
         )
-        partials["state_of_charge_decrease", "time_step"] = 100.0 * np.diag(
+        partials["state_of_charge_decrease", "time_step"] = 100.0 * (
             inputs["c_rate"] / inputs["relative_capacity"]
         )
-        partials["state_of_charge_decrease", "relative_capacity"] = -100.0 * np.diag(
+        partials["state_of_charge_decrease", "relative_capacity"] = -100.0 * (
             inputs["c_rate"] * inputs["time_step"] / inputs["relative_capacity"] ** 2.0
         )
