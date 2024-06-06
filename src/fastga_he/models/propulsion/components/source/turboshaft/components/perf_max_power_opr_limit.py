@@ -62,7 +62,24 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
             desc="Thermodynamic power of the turboshaft at the design point if the OPR was limiting",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="design_power_opr_limit",
+            wrt=["mach", "density_ratio", "power_required"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="design_power_opr_limit",
+            wrt=[
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:OPR",
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t",
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":limit:OPR",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -171,7 +188,7 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         )
         d_log_sigma_d_sigma = 1.0 / (np.log(10) * density_ratio)
 
-        partials["design_power_opr_limit", "density_ratio"] = np.diag(
+        partials["design_power_opr_limit", "density_ratio"] = (
             d_power_d_log_power * d_log_power_d_log_sigma * d_log_sigma_d_sigma
         )
 
@@ -187,7 +204,7 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         )
         d_log_mach_d_mach = 1.0 / (np.log(10) * mach)
 
-        partials["design_power_opr_limit", "mach"] = np.diag(
+        partials["design_power_opr_limit", "mach"] = (
             d_power_d_log_power * d_log_power_d_log_mach * d_log_mach_d_mach
         )
 
@@ -197,7 +214,7 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         )
         d_log_shaft_power_d_shaft_power = 1.0 / (np.log(10) * power)
 
-        partials["design_power_opr_limit", "power_required"] = np.diag(
+        partials["design_power_opr_limit", "power_required"] = (
             d_power_d_log_power * d_log_power_d_log_shaft_power * d_log_shaft_power_d_shaft_power
         )
 

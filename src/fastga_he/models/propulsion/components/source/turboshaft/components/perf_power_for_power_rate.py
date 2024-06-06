@@ -21,7 +21,11 @@ class PerformancesPowerForPowerRate(om.ExplicitComponent):
 
         self.add_output("shaft_power_for_power_rate", units="kW", val=500.0, shape=number_of_points)
         self.declare_partials(
-            of="shaft_power_for_power_rate", wrt="*", val=np.eye(number_of_points)
+            of="shaft_power_for_power_rate",
+            wrt="*",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

@@ -35,14 +35,16 @@ class PerformancesEquivalentRatedPowerOPRLimit(om.ExplicitComponent):
             units="kW",
             val=np.nan,
             shape=number_of_points,
-            desc="Thermodynamic power of the turboshaft at the design point if the OPR was limiting",
+            desc="Thermodynamic power of the turboshaft at the design point if the OPR was "
+            "limiting",
         )
         self.add_input(
             "data:propulsion:he_power_train:turboshaft:"
             + turboshaft_id
             + ":design_point:power_ratio",
             val=np.nan,
-            desc="Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5",
+            desc="Ratio of the thermodynamic power divided by the rated power, typical values on "
+            "the PT6A family is between 1.3 and 2.5",
         )
 
         self.add_output(
@@ -50,10 +52,26 @@ class PerformancesEquivalentRatedPowerOPRLimit(om.ExplicitComponent):
             units="kW",
             val=750.0,
             shape=number_of_points,
-            desc="Equivalent rated power of the turboshaft at the design point if the OPR was limiting",
+            desc="Equivalent rated power of the turboshaft at the design point if the OPR was "
+            "limiting",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="equivalent_rated_power_opr_limit",
+            wrt="design_power_opr_limit",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="equivalent_rated_power_opr_limit",
+            wrt="data:propulsion:he_power_train:turboshaft:"
+            + turboshaft_id
+            + ":design_point:power_ratio",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -74,7 +92,7 @@ class PerformancesEquivalentRatedPowerOPRLimit(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         partials["equivalent_rated_power_opr_limit", "design_power_opr_limit"] = (
-            np.eye(number_of_points)
+            np.ones(number_of_points)
             / inputs[
                 "data:propulsion:he_power_train:turboshaft:"
                 + turboshaft_id

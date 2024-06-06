@@ -52,7 +52,13 @@ class PerformancesMaximum(om.ExplicitComponent):
             desc="Maximum power the turboshaft has to provide",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

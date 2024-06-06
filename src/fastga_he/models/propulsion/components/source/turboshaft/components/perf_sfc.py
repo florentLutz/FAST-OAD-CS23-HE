@@ -24,7 +24,13 @@ class PerformancesSFC(om.ExplicitComponent):
             "specific_fuel_consumption", units="g/kW/h", val=200.0, shape=number_of_points
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -32,9 +38,7 @@ class PerformancesSFC(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
-        partials["specific_fuel_consumption", "fuel_consumption"] = np.diag(
-            1.0 / inputs["power_required"]
-        )
-        partials["specific_fuel_consumption", "power_required"] = -np.diag(
+        partials["specific_fuel_consumption", "fuel_consumption"] = 1.0 / inputs["power_required"]
+        partials["specific_fuel_consumption", "power_required"] = -(
             inputs["fuel_consumption"] / inputs["power_required"] ** 2.0
         )
