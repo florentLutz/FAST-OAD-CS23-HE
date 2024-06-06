@@ -27,7 +27,20 @@ class SlipstreamTurboshaftDeltaCd(om.ExplicitComponent):
 
         self.add_output("delta_Cd", val=1e-5, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="delta_Cd",
+            wrt=["density", "true_airspeed", "exhaust_thrust"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="delta_Cd",
+            wrt="data:geometry:wing:area",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -49,15 +62,15 @@ class SlipstreamTurboshaftDeltaCd(om.ExplicitComponent):
 
         exhaust_thrust = inputs["exhaust_thrust"]
 
-        partials["delta_Cd", "density"] = np.diag(
-            exhaust_thrust / (0.5 * density ** 2.0 * true_airspeed ** 2.0 * wing_area)
+        partials["delta_Cd", "density"] = exhaust_thrust / (
+            0.5 * density ** 2.0 * true_airspeed ** 2.0 * wing_area
         )
-        partials["delta_Cd", "true_airspeed"] = 2.0 * np.diag(
+        partials["delta_Cd", "true_airspeed"] = 2.0 * (
             exhaust_thrust / (0.5 * density * true_airspeed ** 3.0 * wing_area)
         )
         partials["delta_Cd", "data:geometry:wing:area"] = exhaust_thrust / (
             0.5 * density * true_airspeed ** 2.0 * wing_area ** 2.0
         )
-        partials["delta_Cd", "exhaust_thrust"] = -np.diag(
+        partials["delta_Cd", "exhaust_thrust"] = -(
             1.0 / (0.5 * density * true_airspeed ** 2.0 * wing_area)
         )
