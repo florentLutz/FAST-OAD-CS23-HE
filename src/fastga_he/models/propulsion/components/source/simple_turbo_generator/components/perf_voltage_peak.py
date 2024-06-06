@@ -39,16 +39,15 @@ class PerformancesVoltagePeak(om.ExplicitComponent):
             desc="Peak line to neutral voltage at the output of the turbo generator",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=np.full(number_of_points, np.sqrt(3.0 / 2.0)),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         outputs["ac_voltage_peak_out"] = inputs["ac_voltage_rms_out"] * np.sqrt(3.0 / 2.0)
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-
-        number_of_points = self.options["number_of_points"]
-
-        partials["ac_voltage_peak_out", "ac_voltage_rms_out"] = np.sqrt(3.0 / 2.0) * np.eye(
-            number_of_points
-        )

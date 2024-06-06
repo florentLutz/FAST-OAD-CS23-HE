@@ -36,7 +36,13 @@ class PerformancesCurrentRMS3Phases(om.ExplicitComponent):
             desc="Current at the output side of the turbo generator",
         )
 
-        self.declare_partials(of="*", wrt="*", val=3.0 * np.eye(number_of_points))
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            val=3.0 * np.ones(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

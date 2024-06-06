@@ -39,7 +39,22 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
 
         self.add_output("shaft_power_in", units="W", val=500.0e3, shape=number_of_points)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="shaft_power_in",
+            wrt="active_power",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="shaft_power_in",
+            wrt="data:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":efficiency",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -60,7 +75,7 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         turbo_generator_id = self.options["turbo_generator_id"]
 
         partials["shaft_power_in", "active_power"] = (
-            np.eye(number_of_points)
+            np.ones(number_of_points)
             / inputs[
                 "data:propulsion:he_power_train:turbo_generator:"
                 + turbo_generator_id
