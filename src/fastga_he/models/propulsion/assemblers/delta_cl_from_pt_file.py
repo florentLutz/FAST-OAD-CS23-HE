@@ -59,13 +59,21 @@ class PowerTrainDeltaClFromFile(om.ExplicitComponent):
             self.add_input(component_delta_cl, val=np.full(number_of_points, np.nan))
 
             self.declare_partials(
-                of="delta_Cl", wrt=component_delta_cl, val=np.eye(number_of_points)
+                of="delta_Cl",
+                wrt=component_delta_cl,
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
+                val=np.ones(number_of_points),
             )
 
             if component_slipstream_wing_lift:
 
                 self.declare_partials(
-                    of="delta_Cl_wing", wrt=component_delta_cl, val=np.eye(number_of_points)
+                    of="delta_Cl_wing",
+                    wrt=component_delta_cl,
+                    rows=np.arange(number_of_points),
+                    cols=np.arange(number_of_points),
+                    val=np.ones(number_of_points),
                 )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
