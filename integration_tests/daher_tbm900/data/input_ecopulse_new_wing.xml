@@ -750,6 +750,7 @@
             <input_mass units="kg" is_input="True">5.0<!--Propeller mass as an input, because of some convention adopted, it must be a different variable than the actual weight--></input_mass>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.25<!--Solidity of the propeller--></solidity>
           </propeller_1>
           <propeller_elec_1>
@@ -762,6 +763,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio is_input="True">0.925<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
@@ -777,6 +779,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio is_input="True">0.64<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
@@ -792,6 +795,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio is_input="True">0.36<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
@@ -807,6 +811,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio is_input="True">0.36<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
@@ -822,6 +827,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio is_input="True">0.64<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
@@ -837,6 +843,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio is_input="True">0.925<!--Location of the propeller along the span as a fraction of the span--></y_ratio>

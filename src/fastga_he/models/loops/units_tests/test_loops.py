@@ -178,7 +178,7 @@ def test_advanced_cl_octo_propulsion():
         ),
         ivc_loop,
     )
-    assert_allclose(problem_loop["wing_area"], 9.32, atol=1e-2)
+    assert_allclose(problem_loop["wing_area"], 9.36, atol=1e-2)
 
     inputs_list = list_inputs(
         ConstraintWingAreaLiftDEPEquilibrium(

@@ -55,6 +55,7 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
 
         self.configurator = FASTGAHEPowerTrainConfigurator()
         self.simplified_file_path = None
+        self.control_parameter_list = None
 
     def initialize(self):
         self.options.declare("propulsion_id", default=None, types=str, allow_none=True)
@@ -69,6 +70,7 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         if self.options["power_train_file_path"]:
             self.configurator.load(self.options["power_train_file_path"])
             self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
+            self.control_parameter_list = self.configurator.get_control_parameter_list()
 
         self.add_input("data:TLAR:v_approach", val=np.nan, units="m/s")
         self.add_input("data:weight:aircraft:MLW", val=np.nan, units="kg")
@@ -76,7 +78,9 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
 
         self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
 
-        input_zip = zip_equilibrium_input(self.options["propulsion_id"], self.simplified_file_path)
+        input_zip = zip_equilibrium_input(
+            self.options["propulsion_id"], self.simplified_file_path, self.control_parameter_list
+        )[0]
         for (
             var_names,
             var_unit,
@@ -142,7 +146,10 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         wing_area_landing_init_guess = 2 * mlw * g / (stall_speed ** 2) / (1.225 * max_cl)
 
         wing_area_approach = compute_wing_area(
-            inputs, self.options["propulsion_id"], self.simplified_file_path
+            inputs,
+            self.options["propulsion_id"],
+            self.simplified_file_path,
+            self.control_parameter_list,
         )
 
         # Again with the damned optimizer. It can sometimes happen that he simply does not care
@@ -233,7 +240,7 @@ class _IDThrustRate(om.ExplicitComponent):
         partials["thrust_rate", "thrust_rate_t_econ"] = d_t_r_econ_d_t_r
 
 
-def compute_wing_area(inputs, propulsion_id, pt_file_path) -> float:
+def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_list) -> float:
 
     # To deactivate all the logging messages from matplotlib
     logging.getLogger("matplotlib.font_manager").disabled = True
@@ -272,7 +279,9 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path) -> float:
 
     try:
 
-        input_zip = zip_equilibrium_input(propulsion_id, pt_file_path)
+        input_zip, inputs_name_for_promotion = zip_equilibrium_input(
+            propulsion_id, pt_file_path, control_parameter_list
+        )
 
         ivc = om.IndepVarComp()
         for var_names, var_unit, _, _, _, _ in input_zip:
@@ -312,7 +321,8 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path) -> float:
         model.add_subsystem(
             "equilibrium",
             oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_EQUILIBRIUM, options=option_equilibrium),
-            promotes=["*"],
+            promotes_inputs=inputs_name_for_promotion,
+            promotes_outputs=["*"],
         )
         model.add_subsystem("thrust_rate_id", _IDThrustRate(), promotes=["*"])
 
@@ -376,13 +386,14 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path) -> float:
     return wing_area_approach
 
 
-def zip_equilibrium_input(propulsion_id, pt_file_path):
+def zip_equilibrium_input(propulsion_id, pt_file_path, control_parameter_list=None):
     """
     Returns a list of the variables needed for the computation of the equilibrium. Based on
     the submodel currently registered and the propulsion_id required.
 
     :param propulsion_id: ID of propulsion wrapped to be used for computation of equilibrium.
     :param pt_file_path: Path to the powertrain file.
+    :param control_parameter_list: a list of control parameters to rename
     :return inputs_zip: a zip containing a list of name, a list of units, a list of shapes,
     a list of shape_by_conn boolean and a list of copy_shape str.
     """
@@ -401,6 +412,36 @@ def zip_equilibrium_input(propulsion_id, pt_file_path):
     )
 
     name, unit, value, shape, shape_by_conn, copy_shape = list_inputs_metadata(new_component)
+    names_for_promotion = []
+
+    # If there are control parameters
+    if control_parameter_list:
+
+        # We check the name we need to add to see if it is the name of a control parameter. If it
+        # is we replace it with a new name
+        for idx, var_name in enumerate(name):
+
+            if var_name[:5] == "data:" and var_name != "data:geometry:wing:area":
+                if var_name in control_parameter_list:
+
+                    # If "_mission" is already in the name we replace it with "_landing", otherwise
+                    # we simply add "_landing at the end
+                    if "_mission" in var_name:
+                        new_var_name = var_name.replace("_mission", "_landing")
+                    else:
+                        new_var_name = var_name + "_landing"
+
+                    name[idx] = new_var_name
+                    names_for_promotion.append((var_name, new_var_name))
+                else:
+
+                    names_for_promotion.append(var_name)
+            else:
+                names_for_promotion.append(var_name)
+    else:
+        for var_name in name:
+            names_for_promotion.append(var_name)
+
     inputs_zip = zip(name, unit, value, shape, shape_by_conn, copy_shape)
 
-    return inputs_zip
+    return inputs_zip, names_for_promotion

@@ -687,6 +687,7 @@
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">2.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.1<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio>0.8</y_ratio>
@@ -702,6 +703,7 @@
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">2.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.1<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio>0.6</y_ratio>
@@ -717,6 +719,7 @@
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">2.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.1<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio>0.4</y_ratio>
@@ -732,6 +735,7 @@
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">2.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.1<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio>0.4</y_ratio>
@@ -747,6 +751,7 @@
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">2.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.1<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio>0.6</y_ratio>
@@ -762,6 +767,7 @@
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">2.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.1<!--Solidity of the propeller--></solidity>
             <CG>
               <y_ratio>0.8</y_ratio>

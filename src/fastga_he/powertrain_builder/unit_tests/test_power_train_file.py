@@ -851,3 +851,29 @@ def test_current_to_set():
 
     for current in list(current_to_set.keys()):
         assert "dc_splitter_1" not in current
+
+
+def test_control_parameter_identification():
+
+    # Mass should vary
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    control_parameter_list = power_train_configurator.get_control_parameter_list()
+
+    assert control_parameter_list
+    assert (
+        "data:propulsion:he_power_train:propeller:propeller_1:rpm_mission" in control_parameter_list
+    )
+    assert (
+        "data:propulsion:he_power_train:inverter:inverter_1:junction_temperature_mission"
+        in control_parameter_list
+    )
+    assert (
+        "data:propulsion:he_power_train:rectifier:rectifier_1:voltage_out_target_mission"
+        in control_parameter_list
+    )

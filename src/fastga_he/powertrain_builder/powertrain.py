@@ -157,6 +157,10 @@ class FASTGAHEPowerTrainConfigurator:
         # the initial of the currents and power of each component
         self._components_efficiency = None
 
+        # Contains the list of control parameters name for each components. Is used to detect
+        # them in cas we want to give them a different name during the mission
+        self._components_control_parameters = None
+
         # Because of their very peculiar role, we will scan the architecture for any SSPC defined
         # by the user and whether or not they are at the output of a bus, because a specific
         # option needs to be turned on in this was
@@ -250,6 +254,7 @@ class FASTGAHEPowerTrainConfigurator:
         components_makes_mass_vary = []
         source_does_not_make_mass_vary = []
         components_efficiency = []
+        components_control_parameter = []
 
         # Doing it like that allows us to have the names of the components before we start the
         # loop, which I'm gonna use to check if the pairs are valid
@@ -327,6 +332,7 @@ class FASTGAHEPowerTrainConfigurator:
             components_makes_mass_vary.append(resources.DICTIONARY_VARIES_MASS[component_id])
             source_does_not_make_mass_vary.append(resources.DICTIONARY_VARIESN_T_MASS[component_id])
             components_efficiency.append(resources.DICTIONARY_ETA[component_id])
+            components_control_parameter.append(resources.DICTIONARY_CTRL_PARAM[component_id])
 
             if "options" in component.keys():
 
@@ -374,6 +380,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_makes_mass_vary = components_makes_mass_vary
         self._source_does_not_make_mass_vary = source_does_not_make_mass_vary
         self._components_efficiency = components_efficiency
+        self._components_control_parameters = components_control_parameter
 
     def _get_connections(self):
         """
@@ -753,6 +760,29 @@ class FASTGAHEPowerTrainConfigurator:
             )
 
         return inputs_in_slipstream, outputs_in_performances
+
+    def get_control_parameter_list(self) -> List[str]:
+        """
+        Returns the list of parameters necessary to create the sizing group based on what is
+        inside the power train file.
+        """
+
+        self._get_components()
+
+        # Because we might want different thrust distribution for mission and landing. As the
+        # default is always an array of one for that variable it shouldn't cause any problem.
+        ctrl_param_list = ["data:propulsion:he_power_train:thrust_distribution"]
+
+        for comp_name, comp_type, comp_ctrl_params in zip(
+            self._components_name, self._components_type, self._components_control_parameters
+        ):
+            for comp_ctrl_param in comp_ctrl_params:
+                ctrl_param_name = (
+                    PT_DATA_PREFIX + comp_type + ":" + comp_name + ":" + comp_ctrl_param
+                )
+                ctrl_param_list.append(ctrl_param_name)
+
+        return ctrl_param_list
 
     @staticmethod
     def enforce_sspc_last(
@@ -1393,7 +1423,6 @@ class FASTGAHEPowerTrainConfigurator:
             # First and foremost, we get the value that will serve as the for the setting of the
             # voltage in this subgraph. If there are not setters in this subgraph we just pass along
 
-            spl = dict(nx.all_pairs_shortest_path_length(sub_graph))
             voltage_dict_subgraph = {}
 
             if sub_graph_voltage_setters:
