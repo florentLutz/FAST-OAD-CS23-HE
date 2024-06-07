@@ -225,6 +225,7 @@
       <he_power_train>
         <mass units="kg" is_input="False">223.30659250135432</mass>
         <thrust_distribution is_input="True">[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]</thrust_distribution>
+        <thrust_distribution_landing is_input="True">[1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]</thrust_distribution_landing>
         <CG>
           <x units="m" is_input="False">1.373904661433179</x>
         </CG>

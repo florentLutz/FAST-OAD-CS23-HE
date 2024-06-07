@@ -769,7 +769,9 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._get_components()
 
-        ctrl_param_list = []
+        # Because we might want different thrust distribution for mission and landing. As the
+        # default is always an array of one for that variable it shouldn't cause any problem.
+        ctrl_param_list = ["data:propulsion:he_power_train:thrust_distribution"]
 
         for comp_name, comp_type, comp_ctrl_params in zip(
             self._components_name, self._components_type, self._components_control_parameters
