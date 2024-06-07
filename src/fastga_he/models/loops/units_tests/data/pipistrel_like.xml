@@ -1019,6 +1019,7 @@
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">2300.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission units="1/min" is_input="True">2300.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_landing units="1/min" is_input="True">2500.0<!--RPM of the propeller for the points--></rpm_landing>
             <solidity is_input="True">0.1<!--Solidity of the propeller--></solidity>
             <tip_mach_max is_input="False">0.36617974095552996<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
             <torque_max units="N*m" is_input="False">214.54079479982286<!--Maximum value of the propeller torque--></torque_max>
