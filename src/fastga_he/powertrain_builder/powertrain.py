@@ -1423,7 +1423,6 @@ class FASTGAHEPowerTrainConfigurator:
             # First and foremost, we get the value that will serve as the for the setting of the
             # voltage in this subgraph. If there are not setters in this subgraph we just pass along
 
-            spl = dict(nx.all_pairs_shortest_path_length(sub_graph))
             voltage_dict_subgraph = {}
 
             if sub_graph_voltage_setters:
