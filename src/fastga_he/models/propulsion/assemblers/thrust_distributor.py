@@ -82,9 +82,12 @@ class ThrustDistributor(om.ExplicitComponent):
 
         untouched_thrust_distributor = inputs["data:propulsion:he_power_train:thrust_distribution"]
 
-        # First we force to zero all the propeller that are not connected
+        # First we force to zero all the propeller that are not connected if we are not using
+        # temp copies as is the case for the advanced aerodynamic wing computation
         for propulsor_name in self.propulsor_names:
-            if not self.propulsor_connected[propulsor_name]:
+            if not self.propulsor_connected[propulsor_name] and not self.options[
+                "power_train_file_path"
+            ].endswith("temp_copy.yml"):
                 untouched_thrust_distributor[self.propulsor_names.index(propulsor_name)] = 0
                 _LOGGER.warning(
                     propulsor_name
@@ -106,13 +109,14 @@ class ThrustDistributor(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
         number_of_propulsor = len(self.propulsor_names)
 
-        # First we rescale the thrust distribution so that at all point it is between 0 and 1
-
         untouched_thrust_distributor = inputs["data:propulsion:he_power_train:thrust_distribution"]
 
-        # First we force to zero all the propeller that are not connected
+        # First we force to zero all the propeller that are not connected if we are not using
+        # temp copies as is the case for the advanced aerodynamic wing computation
         for propulsor_name in self.propulsor_names:
-            if not self.propulsor_connected[propulsor_name]:
+            if not self.propulsor_connected[propulsor_name] and not self.options[
+                "power_train_file_path"
+            ].endswith("temp_copy.yml"):
                 untouched_thrust_distributor[self.propulsor_names.index(propulsor_name)] = 0
                 _LOGGER.warning(
                     propulsor_name
