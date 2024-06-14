@@ -344,7 +344,7 @@ def test_voltage_setter_list():
         power_train_file_path=sample_power_train_file_path
     )
 
-    voltage_setter_list = power_train_configurator._list_voltage_coherence_to_check()
+    voltage_setter_list = power_train_configurator._list_voltage_coherence_to_check()[1]
 
     # In the .yml that serves for this test, there are 3 subgraphs, one with a DC/DC converter
     # and a rectifier (both sets voltage), one with a generator (which sets voltage) and one with
