@@ -1594,6 +1594,40 @@ class FASTGAHEPowerTrainConfigurator:
 
         return graph
 
+    def are_propulsor_connected_to_source(self):
+        """
+        This function returns a dictionary which contains, for each propulsor, a boolean which
+        tells whether the propulsor can be actuated (meaning its connected to a source).
+        """
+
+        propulsor_list = self.get_thrust_element_list()
+        source_list = self.get_energy_consumption_list()
+
+        is_propulsor_connected_dict = {}
+
+        source_output_name_list = []
+        for source in source_list:
+            source_output_name_list.append(source + "_out")
+
+        powertrain_graph = self.get_directed_graph_sub_propulsion_chain()
+
+        for propulsor in propulsor_list:
+
+            # For each propulsor we check that its input is connected to a source output. The
+            # should only be on input for each propulsor and one output for each source which allows
+            # to do like this
+            propulsor_input_name = propulsor + "_in"
+
+            undirected_graph = powertrain_graph.to_undirected()
+            connected_nodes = nx.node_connected_component(undirected_graph, propulsor_input_name)
+            is_propulsor_connected = bool(
+                connected_nodes.intersection(set(source_output_name_list))
+            )
+
+            is_propulsor_connected_dict[propulsor] = is_propulsor_connected
+
+        return is_propulsor_connected_dict
+
     @staticmethod
     def fuel_system_power_inputs(inputs, components_name: str, power_output: np.ndarray) -> dict:
         """
