@@ -906,3 +906,17 @@ def test_propulsor_connection():
     # They should all be connected
     assert not all(are_propulsor_connected.values())
     assert not are_propulsor_connected["propeller_2"]
+
+    # One has been disconnected manually
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_deactivated_sspc.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    are_propulsor_connected = power_train_configurator.are_propulsor_connected_to_source()
+
+    # They should all be connected
+    assert not all(are_propulsor_connected.values())
+    assert not are_propulsor_connected["propeller_1"]

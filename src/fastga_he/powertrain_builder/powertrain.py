@@ -1610,6 +1610,17 @@ class FASTGAHEPowerTrainConfigurator:
             source_output_name_list.append(source + "_out")
 
         powertrain_graph = self.get_directed_graph_sub_propulsion_chain()
+        undirected_graph = powertrain_graph.to_undirected()
+
+        # We will iterate through the default state of the sspc and remover the connections
+        # between sspc in and sspc out if they are open (meaning no current goes through it so it
+        # doesn't carry power).
+        for sspc_name, sspc_default_state in self._sspc_default_state.items():
+
+            # If not closed by default
+            if not sspc_default_state:
+
+                undirected_graph.remove_edge(sspc_name + "_in", sspc_name + "_out")
 
         for propulsor in propulsor_list:
 
@@ -1618,7 +1629,6 @@ class FASTGAHEPowerTrainConfigurator:
             # to do like this
             propulsor_input_name = propulsor + "_in"
 
-            undirected_graph = powertrain_graph.to_undirected()
             connected_nodes = nx.node_connected_component(undirected_graph, propulsor_input_name)
             is_propulsor_connected = bool(
                 connected_nodes.intersection(set(source_output_name_list))
