@@ -5,6 +5,12 @@
 import numpy as np
 import openmdao.api as om
 
+# There is a problem with that model in that if the input shaft power goes to 0 so does the
+# efficiency which then cause the apparent power to not be 0, cutting off too small value
+# should solve the problem
+CUTOFF_ETA_MIN = 0.5
+CUTOFF_ETA_MAX = 1.0
+
 
 class PerformancesEfficiency(om.ExplicitComponent):
     """Computation of the efficiency from shaft power and power losses."""
@@ -58,7 +64,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         motor_id = self.options["motor_id"]
 
-        outputs["efficiency"] = np.where(
+        unclipped_efficiency = np.where(
             inputs["shaft_power_out"] != 0.0,
             inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
             * inputs["shaft_power_out"]
@@ -66,20 +72,40 @@ class PerformancesEfficiency(om.ExplicitComponent):
             np.ones_like(inputs["shaft_power_out"]),
         )
 
+        outputs["efficiency"] = np.clip(unclipped_efficiency, CUTOFF_ETA_MIN, CUTOFF_ETA_MAX)
+
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         motor_id = self.options["motor_id"]
 
-        partials["efficiency", "shaft_power_out"] = (
-            inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
-            * inputs["power_losses"]
-            / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0
-        )
-        partials["efficiency", "power_losses"] = -(
+        unclipped_efficiency = np.where(
+            inputs["shaft_power_out"] != 0.0,
             inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
             * inputs["shaft_power_out"]
-            / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0
+            / (inputs["shaft_power_out"] + inputs["power_losses"]),
+            np.ones_like(inputs["shaft_power_out"]),
+        )
+
+        partials["efficiency", "shaft_power_out"] = np.where(
+            (unclipped_efficiency <= 1.0) & (unclipped_efficiency >= 0.5),
+            inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
+            * inputs["power_losses"]
+            / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0,
+            np.full_like(inputs["shaft_power_out"], 1e-6),
+        )
+        partials["efficiency", "power_losses"] = np.where(
+            (unclipped_efficiency <= 1.0) & (unclipped_efficiency >= 0.5),
+            -(
+                inputs["settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"]
+                * inputs["shaft_power_out"]
+                / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0
+            ),
+            np.full_like(inputs["shaft_power_out"], 1e-6),
         )
         partials[
             "efficiency", "settings:propulsion:he_power_train:PMSM:" + motor_id + ":k_efficiency"
-        ] = inputs["shaft_power_out"] / (inputs["shaft_power_out"] + inputs["power_losses"])
+        ] = np.where(
+            (unclipped_efficiency <= 1.0) & (unclipped_efficiency >= 0.5),
+            inputs["shaft_power_out"] / (inputs["shaft_power_out"] + inputs["power_losses"]),
+            np.full_like(inputs["shaft_power_out"], 1e-6),
+        )

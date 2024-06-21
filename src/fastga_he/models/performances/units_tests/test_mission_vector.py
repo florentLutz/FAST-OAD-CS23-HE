@@ -2334,6 +2334,14 @@ def test_mission_vector_eight_propeller_with_turned_off_sspc():
     problem.model.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver.options[
         "iprint"
     ] = 2
+
+    model = problem.model.performances.solve_equilibrium.compute_dep_equilibrium
+    recorder = om.SqliteRecorder(pth.join(RESULTS_FOLDER_PATH, "cases_octo_prop.sql"))
+    solver = model.nonlinear_solver
+    solver.add_recorder(recorder)
+    solver.recording_options["record_solver_residuals"] = True
+    solver.recording_options["record_outputs"] = True
+
     # om.n2(problem, show_browser=True)
 
     problem.run_model()
@@ -2360,3 +2368,62 @@ def test_mission_vector_eight_propeller_with_turned_off_sspc():
     # practice mean they'll require min shaft power), their max torque should be way blow
 
     assert torque_max_prop_4 < torque_max_prop_3 / 2.0
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_case_analyzer():
+
+    cr = om.CaseReader(pth.join(RESULTS_FOLDER_PATH, "cases_octo_prop.sql"))
+
+    solver_case = cr.get_cases(
+        "root.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver"
+    )
+    for case in solver_case:
+
+        residuals_dict = {}
+
+        for residual in case.residuals:
+
+            residuals_dict[residual] = sum(np.square(case.residuals[residual]))
+
+        top_residuals = max(residuals_dict, key=residuals_dict.get)
+
+        # print the result
+        print(
+            f"The top residuals is {top_residuals} with a score of {residuals_dict[top_residuals]}."
+        )
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_residuals_viewer():
+    """Inspection of the residuals."""
+
+    cr = om.CaseReader(pth.join(RESULTS_FOLDER_PATH, "cases_octo_prop.sql"))
+
+    solver_case = cr.get_cases(
+        "root.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver"
+    )
+    for case in solver_case:
+
+        print(
+            "Efficiency",
+            case.outputs["compute_energy_consumed.power_train_performances.motor_4.efficiency"],
+        )
+        print(
+            "Propeller shaft_power",
+            case.outputs[
+                "compute_energy_consumed.power_train_performances.propeller_4.shaft_power_in"
+            ],
+        )
+        print(
+            "Propeller Thrust coeff",
+            case.outputs[
+                "compute_energy_consumed.power_train_performances.propeller_4.thrust_coefficient"
+            ],
+        )
+        print(
+            "Propeller Power coeff",
+            case.outputs[
+                "compute_energy_consumed.power_train_performances.propeller_4.power_coefficient"
+            ],
+        )

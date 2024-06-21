@@ -44,7 +44,8 @@ class PerformancesEfficiency(om.ExplicitComponent):
         ct = inputs["thrust_coefficient"]
         cp = inputs["power_coefficient"]
 
-        outputs["efficiency"] = j * ct / cp
+        # When the propeller is not used (0W of power on the shaft, the efficiency is set to 1.0)
+        outputs["efficiency"] = np.where(cp != 0, j * ct / cp, 1.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -52,6 +53,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         ct = inputs["thrust_coefficient"]
         cp = inputs["power_coefficient"]
 
-        partials["efficiency", "advance_ratio"] = ct / cp
-        partials["efficiency", "thrust_coefficient"] = j / cp
-        partials["efficiency", "power_coefficient"] = -j * ct / cp ** 2.0
+        partials["efficiency", "advance_ratio"] = np.where(cp != 0, ct / cp, 1e-6)
+        partials["efficiency", "thrust_coefficient"] = np.where(cp != 0, j / cp, 1e-6)
+        partials["efficiency", "power_coefficient"] = np.where(cp != 0, -j * ct / cp ** 2.0, 1e-6)

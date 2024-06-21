@@ -88,7 +88,7 @@ class ThrustDistributor(om.ExplicitComponent):
             if not self.propulsor_connected[propulsor_name] and not self.options[
                 "power_train_file_path"
             ].endswith("temp_copy.yml"):
-                untouched_thrust_distributor[self.propulsor_names.index(propulsor_name)] = 1e-6
+                untouched_thrust_distributor[self.propulsor_names.index(propulsor_name)] = 0
                 _LOGGER.warning(
                     propulsor_name
                     + "is not connected to any source. Its contribution to the total aircraft "
