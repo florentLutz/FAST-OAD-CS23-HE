@@ -2306,3 +2306,100 @@ def test_mission_vector_turboshaft():
     assert sizing_fuel == pytest.approx(87.76, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_mission_vector_eight_propeller_with_turned_off_sspc():
+
+    # Define used files depending on options
+    xml_file_name = "octo_assembly.xml"
+    process_file_name = "octo_propulsion_mission_vector.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    # Create problems with inputs
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.setup()
+
+    model = problem.model.performances.solve_equilibrium.compute_dep_equilibrium
+    recorder = om.SqliteRecorder(pth.join(RESULTS_FOLDER_PATH, "cases_octo_prop.sql"))
+    solver = model.nonlinear_solver
+    solver.add_recorder(recorder)
+    solver.recording_options["record_solver_residuals"] = True
+    solver.recording_options["record_outputs"] = True
+
+    # om.n2(problem, show_browser=True)
+
+    problem.run_model()
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    if not pth.exists(RESULTS_FOLDER_PATH):
+        os.mkdir(RESULTS_FOLDER_PATH)
+
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(15.15, abs=1e-2)
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(0.0, abs=1e-2)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_4:torque_max", units="N*m"
+    ) == pytest.approx(0.0, abs=1e-2)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_case_analyzer():
+
+    cr = om.CaseReader(pth.join(RESULTS_FOLDER_PATH, "cases_octo_prop.sql"))
+
+    solver_case = cr.get_cases(
+        "root.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver"
+    )
+    for case in solver_case:
+
+        residuals_dict = {}
+
+        for residual in case.residuals:
+
+            residuals_dict[residual] = sum(np.square(case.residuals[residual]))
+
+        top_residuals = max(residuals_dict, key=residuals_dict.get)
+
+        # print the result
+        print(
+            f"The top residuals is {top_residuals} with a score of {residuals_dict[top_residuals]}."
+        )
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_residuals_viewer():
+    """Inspection of the residuals."""
+
+    cr = om.CaseReader(pth.join(RESULTS_FOLDER_PATH, "cases_octo_prop.sql"))
+
+    solver_case = cr.get_cases(
+        "root.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver"
+    )
+    for case in solver_case:
+
+        print(
+            "AC Voltage IN",
+            case.outputs[
+                "compute_energy_consumed.power_train_performances.motor_4.ac_voltage_peak_in"
+            ],
+        )
+        print(
+            "AC Current IN",
+            case.outputs[
+                "compute_energy_consumed.power_train_performances.motor_4.ac_current_rms_in"
+            ],
+        )

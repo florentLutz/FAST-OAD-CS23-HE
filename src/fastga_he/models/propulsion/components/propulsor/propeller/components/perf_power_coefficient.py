@@ -5,6 +5,11 @@
 import numpy as np
 import openmdao.api as om
 
+# Define here a cutoff thrust coefficient to be used in the case that the thrust coefficient is too
+# low. We made the observation that if the thrust coefficient is 0 or very close to zero the power
+# coefficient is big enough that it can't be considered nil because of surrogate error.
+# This cutoff is an answer to that
+CUTOFF_THRUST_COEFFICIENT = 1e-5
 KILMER = np.nan
 
 
@@ -90,7 +95,8 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         solidity = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":solidity"]
         # To avoid warning coming from negative thrust
         ct = np.maximum(
-            inputs["thrust_coefficient"], np.full_like(inputs["thrust_coefficient"], 1e-4)
+            inputs["thrust_coefficient"],
+            np.full_like(inputs["thrust_coefficient"], CUTOFF_THRUST_COEFFICIENT),
         )
         activity_factor = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":activity_factor"
@@ -144,6 +150,9 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         # it from there
         lower_efficiency = 0.5
         cp = np.clip(cp, 0.0, j * ct / lower_efficiency)
+
+        # Also as discussed if the ct is low enough (no thrust, the cp will be cutoff)
+        cp = np.where(ct > CUTOFF_THRUST_COEFFICIENT, cp, 0.0)
 
         outputs["power_coefficient"] = cp
 

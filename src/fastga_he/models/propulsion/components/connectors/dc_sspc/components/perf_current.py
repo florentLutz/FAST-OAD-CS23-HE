@@ -58,7 +58,7 @@ class PerformancesDCSSPCCurrent(om.ExplicitComponent):
                 method="exact",
                 rows=np.arange(number_of_points),
                 cols=np.arange(number_of_points),
-                val=np.zeros(number_of_points),
+                val=np.full(number_of_points, 1e-6),
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

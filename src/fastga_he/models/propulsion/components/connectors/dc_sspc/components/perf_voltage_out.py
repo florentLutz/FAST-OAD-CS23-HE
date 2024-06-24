@@ -88,7 +88,7 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
             # was to fail or if the cable was to fail, to ensure that no current flows through
             # the cable we must put the same value at each side of said cable (so it also assume
             # that there is a SSPC at both side of the cable)
-            outputs["dc_voltage_out"] = np.zeros_like(inputs["dc_voltage_in"])
+            outputs["dc_voltage_out"] = inputs["dc_voltage_in"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
@@ -105,4 +105,4 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
                 )
 
         else:
-            partials["dc_voltage_out", "dc_voltage_in"] = np.zeros(number_of_points)
+            partials["dc_voltage_out", "dc_voltage_in"] = np.ones(number_of_points)

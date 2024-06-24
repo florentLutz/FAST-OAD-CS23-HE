@@ -344,7 +344,7 @@ def test_voltage_setter_list():
         power_train_file_path=sample_power_train_file_path
     )
 
-    voltage_setter_list = power_train_configurator._list_voltage_coherence_to_check()
+    voltage_setter_list = power_train_configurator._list_voltage_coherence_to_check()[1]
 
     # In the .yml that serves for this test, there are 3 subgraphs, one with a DC/DC converter
     # and a rectifier (both sets voltage), one with a generator (which sets voltage) and one with
@@ -877,3 +877,46 @@ def test_control_parameter_identification():
         "data:propulsion:he_power_train:rectifier:rectifier_1:voltage_out_target_mission"
         in control_parameter_list
     )
+
+
+def test_propulsor_connection():
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    are_propulsor_connected = power_train_configurator.are_propulsor_connected_to_source()
+
+    # They should all be connected
+    assert all(are_propulsor_connected.values())
+
+    # One has been disconnected manually
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_one_unconnected.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    are_propulsor_connected = power_train_configurator.are_propulsor_connected_to_source()
+
+    # They should all be connected
+    assert not all(are_propulsor_connected.values())
+    assert not are_propulsor_connected["propeller_2"]
+
+    # One has been disconnected manually
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_deactivated_sspc.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    are_propulsor_connected = power_train_configurator.are_propulsor_connected_to_source()
+
+    # They should all be connected
+    assert not all(are_propulsor_connected.values())
+    assert not are_propulsor_connected["propeller_1"]

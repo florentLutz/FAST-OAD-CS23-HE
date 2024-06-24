@@ -16,11 +16,14 @@ test module for wing area computation.
 
 import os
 import os.path as pth
-import time
+
+import pytest
 
 import fastoad.api as oad
 
 from numpy.testing import assert_allclose
+
+from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
 from ..wing_area_component.wing_area_cl_dep_equilibrium import (
     UpdateWingAreaLiftDEPEquilibrium,
@@ -32,6 +35,8 @@ from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
+
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def test_advanced_cl():
@@ -144,6 +149,16 @@ def test_advanced_cl_with_proper_submodels():
         0.0,
         atol=1e-2,
     )
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_inspect_octo_propulsion():
+
+    propulsion_file = pth.join(DATA_FOLDER_PATH, "octo_assembly.yml")
+    network_file_path = pth.join(RESULTS_FOLDER_PATH, "octo_assembly.html")
+
+    if not os.path.exists(network_file_path):
+        power_train_network_viewer(propulsion_file, network_file_path)
 
 
 def test_advanced_cl_octo_propulsion():

@@ -390,11 +390,8 @@ class FASTGAHEPowerTrainConfigurator:
         The _get_components method must be ran before hand.
         """
 
-        # First check that the _get_components method has been ran
-        if not self._components_name:
-            raise FASTGAHEComponentsNotIdentified(
-                "The _get_components must be run before running the _get_connections method"
-            )
+        # This should do nothing if it has already been ran.
+        self._get_components()
 
         connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
         self._connection_list = connections_list
@@ -409,7 +406,7 @@ class FASTGAHEPowerTrainConfigurator:
         for connection in connections_list:
 
             # Check in case the source or target is not a string but an array, meaning we are
-            # dealing with a component which might have multiple inputs/outputs (buses, gearbox,
+            # dealing with a component which might have multiple inputs/outputs (bus, gearbox,
             # splitter, ...)
             if type(connection["source"]) is str:
                 source_name = connection["source"]
@@ -466,7 +463,7 @@ class FASTGAHEPowerTrainConfigurator:
                 self._sspc_list[source_name] = True
 
             # The possibility to connect a battery directly to a bus has been added. However,
-            # to make it backward compatible (whatever it means today because I have no used) and
+            # to make it backward compatible (whatever it means today because I have no users) and
             # to impart less burden during the writing of the pt file, we won't ask the user to
             # set the option accordingly, rather, we will do it here.
 
@@ -591,6 +588,7 @@ class FASTGAHEPowerTrainConfigurator:
                         if (
                             name_to_id[neighbor] == "fastga_he.pt_component.speed_reducer"
                             or name_to_id[neighbor] == "fastga_he.pt_component.planetary_gear"
+                            or name_to_id[neighbor] == "fastga_he.pt_component.gearbox"
                         ):
                             neighbors_gb = list(graph.neighbors(neighbor))
                             if set(neighbors_gb).intersection(propulsor_name):
@@ -691,7 +689,6 @@ class FASTGAHEPowerTrainConfigurator:
         inside the power train file.
         """
 
-        self._get_components()
         self._get_connections()
 
         # We now need to check if the SSPC "logic" is respected, the main rule being for now that
@@ -736,7 +733,6 @@ class FASTGAHEPowerTrainConfigurator:
         component.
         """
 
-        self._get_components()
         self._get_connections()
 
         variables_to_check = []
@@ -763,8 +759,7 @@ class FASTGAHEPowerTrainConfigurator:
 
     def get_control_parameter_list(self) -> List[str]:
         """
-        Returns the list of parameters necessary to create the sizing group based on what is
-        inside the power train file.
+        Returns the list of control parameters of the components inside the powertrain.
         """
 
         self._get_components()
@@ -1014,10 +1009,8 @@ class FASTGAHEPowerTrainConfigurator:
         watcher.
         """
 
-        self._get_components()
-        # We need to trigger the generation of the connections because that what triggers the
-        # identification of batteries directly connected to a bus
         self._get_connections()
+
         components_perf_watchers_name_organised_list = []
         components_perf_watchers_unit_organised_list = []
         components_name_organised_list = []
@@ -1061,6 +1054,7 @@ class FASTGAHEPowerTrainConfigurator:
         """
 
         self._get_components()
+
         components_slip_perf_watchers_name_organised_list = []
         components_slip_perf_watchers_unit_organised_list = []
         components_slip_name_organised_list = []
@@ -1255,7 +1249,6 @@ class FASTGAHEPowerTrainConfigurator:
         different connected voltage.
         """
 
-        self._get_components()
         self._get_connections()
 
         graph = nx.Graph()
@@ -1297,7 +1290,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         return sub_graphs
 
-    def _list_voltage_coherence_to_check(self) -> list:
+    def _list_voltage_coherence_to_check(self) -> Tuple[list, list]:
         """
         Makes a list, for all sub graphs, of the components that sets the voltage inside of them,
         the check on the coherency of the value will be ade later.
@@ -1332,7 +1325,7 @@ class FASTGAHEPowerTrainConfigurator:
 
             sub_graphs_voltage_setter.append(node_that_sets_voltage)
 
-        return sub_graphs_voltage_setter
+        return sub_graphs, sub_graphs_voltage_setter
 
     def check_voltage_coherence(self, inputs, number_of_points: int):
         """
@@ -1344,7 +1337,7 @@ class FASTGAHEPowerTrainConfigurator:
         :param number_of_points: number of points in the data to check
         """
 
-        sub_graphs_voltage_setters = self._list_voltage_coherence_to_check()
+        sub_graphs_voltage_setters = self._list_voltage_coherence_to_check()[1]
 
         name_to_type = dict(zip(self._components_name, self._components_type))
 
@@ -1407,9 +1400,7 @@ class FASTGAHEPowerTrainConfigurator:
         """
 
         # This line prompts the identification of the power train from the file
-        sub_graphs = self.get_graphs_connected_voltage()
-        # TODO: the line above is repeated in the function below, could be improved !
-        sub_graphs_voltage_setters = self._list_voltage_coherence_to_check()
+        sub_graphs, sub_graphs_voltage_setters = self._list_voltage_coherence_to_check()
 
         name_to_type = dict(zip(self._components_name, self._components_type))
         name_to_id = dict(zip(self._components_name, self._components_id))
@@ -1565,7 +1556,6 @@ class FASTGAHEPowerTrainConfigurator:
         allow to include efficiency.
         """
 
-        self._get_components()
         self._get_connections()
 
         graph = nx.DiGraph()
@@ -1603,6 +1593,50 @@ class FASTGAHEPowerTrainConfigurator:
             )
 
         return graph
+
+    def are_propulsor_connected_to_source(self):
+        """
+        This function returns a dictionary which contains, for each propulsor, a boolean which
+        tells whether the propulsor can be actuated (meaning its connected to a source).
+        """
+
+        propulsor_list = self.get_thrust_element_list()
+        source_list = self.get_energy_consumption_list()
+
+        is_propulsor_connected_dict = {}
+
+        source_output_name_list = []
+        for source in source_list:
+            source_output_name_list.append(source + "_out")
+
+        powertrain_graph = self.get_directed_graph_sub_propulsion_chain()
+        undirected_graph = powertrain_graph.to_undirected()
+
+        # We will iterate through the default state of the sspc and remover the connections
+        # between sspc in and sspc out if they are open (meaning no current goes through it so it
+        # doesn't carry power).
+        for sspc_name, sspc_default_state in self._sspc_default_state.items():
+
+            # If not closed by default
+            if not sspc_default_state:
+
+                undirected_graph.remove_edge(sspc_name + "_in", sspc_name + "_out")
+
+        for propulsor in propulsor_list:
+
+            # For each propulsor we check that its input is connected to a source output. The
+            # should only be on input for each propulsor and one output for each source which allows
+            # to do like this
+            propulsor_input_name = propulsor + "_in"
+
+            connected_nodes = nx.node_connected_component(undirected_graph, propulsor_input_name)
+            is_propulsor_connected = bool(
+                connected_nodes.intersection(set(source_output_name_list))
+            )
+
+            is_propulsor_connected_dict[propulsor] = is_propulsor_connected
+
+        return is_propulsor_connected_dict
 
     @staticmethod
     def fuel_system_power_inputs(inputs, components_name: str, power_output: np.ndarray) -> dict:
@@ -2005,7 +2039,6 @@ class FASTGAHEPowerTrainConfigurator:
         power train as a network graph.
         """
 
-        self._get_components()
         self._get_connections()
 
         icons_name = []
