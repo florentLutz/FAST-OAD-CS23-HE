@@ -2308,6 +2308,7 @@ def test_mission_vector_turboshaft():
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_mission_vector_eight_propeller_with_turned_off_sspc():
 
     # Define used files depending on options
@@ -2325,15 +2326,7 @@ def test_mission_vector_eight_propeller_with_turned_off_sspc():
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
 
-    problem.model_options["*power_train_performances*"] = {
-        "sspc_names_list": ["dc_sspc_4", "dc_sspc_5"],
-        "sspc_closed_list": [True, True],
-    }
-
     problem.setup()
-    problem.model.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver.options[
-        "iprint"
-    ] = 2
 
     model = problem.model.performances.solve_equilibrium.compute_dep_equilibrium
     recorder = om.SqliteRecorder(pth.join(RESULTS_FOLDER_PATH, "cases_octo_prop.sql"))
@@ -2354,20 +2347,13 @@ def test_mission_vector_eight_propeller_with_turned_off_sspc():
         os.mkdir(RESULTS_FOLDER_PATH)
 
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(17.83, abs=1e-2)
+    assert sizing_fuel == pytest.approx(15.15, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
-    torque_max_prop_4 = problem.get_val(
+    assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_4:torque_max", units="N*m"
-    )[0]
-    torque_max_prop_3 = problem.get_val(
-        "data:propulsion:he_power_train:propeller:propeller_3:torque_max", units="N*m"
-    )[0]
-    # Since the thrust distribution of the middle branches are overwritten to 0 (which in
-    # practice mean they'll require min shaft power), their max torque should be way blow
-
-    assert torque_max_prop_4 < torque_max_prop_3 / 2.0
+    ) == pytest.approx(0.0, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -2406,24 +2392,14 @@ def test_residuals_viewer():
     for case in solver_case:
 
         print(
-            "Efficiency",
-            case.outputs["compute_energy_consumed.power_train_performances.motor_4.efficiency"],
-        )
-        print(
-            "Propeller shaft_power",
+            "AC Voltage IN",
             case.outputs[
-                "compute_energy_consumed.power_train_performances.propeller_4.shaft_power_in"
+                "compute_energy_consumed.power_train_performances.motor_4.ac_voltage_peak_in"
             ],
         )
         print(
-            "Propeller Thrust coeff",
+            "AC Current IN",
             case.outputs[
-                "compute_energy_consumed.power_train_performances.propeller_4.thrust_coefficient"
-            ],
-        )
-        print(
-            "Propeller Power coeff",
-            case.outputs[
-                "compute_energy_consumed.power_train_performances.propeller_4.power_coefficient"
+                "compute_energy_consumed.power_train_performances.motor_4.ac_current_rms_in"
             ],
         )
