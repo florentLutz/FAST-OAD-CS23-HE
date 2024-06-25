@@ -20,7 +20,6 @@ from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 from fastga_he.gui.analysis_and_plots import (
     aircraft_geometry_plot,
 )
-from fastga_he.gui.performances_viewer import PerformancesViewer
 
 from utils.filter_residuals import filter_residuals
 
@@ -118,6 +117,40 @@ def test_pipistrel_detailed_mission():
 
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(24.86, abs=1e-2)
+
+
+def test_pipistrel_op_mission():
+
+    """Test the overall aircraft design process with wing positioning under VLM method."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "pipistrel_op_mission_in.xml"
+    process_file_name = "pipistrel_op_mission_configuration.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+    configurator.write_needed_inputs(ref_inputs)
+
+    # Create problems with inputs
+    problem = configurator.get_problem(read_inputs=True)
+    problem.setup()
+
+    # Run the problem
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    sizing_energy = problem.get_val("data:mission:operational:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(20.77, abs=1e-2)
 
 
 def test_pipistrel_not_detailed_mission():
