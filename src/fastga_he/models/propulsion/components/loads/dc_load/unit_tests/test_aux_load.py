@@ -12,6 +12,11 @@ from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.perf_aux_load import PerformancesAuxLoad
 
+from ..components.cstr_enforce import ConstraintsPowerEnforce
+from ..components.cstr_ensure import ConstraintsPowerEnsure
+
+from ..components.cstr_aux_load import ConstraintsAuxLoad
+
 from tests.testing_utilities import run_system, get_indep_var_comp
 
 XML_FILE = "ref_aux_load.xml"
@@ -99,6 +104,54 @@ def test_performances():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:aux_load:aux_load_1:power_max", units="kW"
+    ) == pytest.approx(10.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_enforce():
+
+    input_list = ["data:propulsion:he_power_train:aux_load:aux_load_1:power_max"]
+    ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsPowerEnforce(aux_load_id="aux_load_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:aux_load:aux_load_1:power_rating", units="kW"
+    ) == pytest.approx(10.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraint_ensure():
+
+    input_list = [
+        "data:propulsion:he_power_train:aux_load:aux_load_1:power_max",
+        "data:propulsion:he_power_train:aux_load:aux_load_1:power_rating",
+    ]
+    ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsPowerEnsure(aux_load_id="aux_load_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:aux_load:aux_load_1:power_rating", units="kW"
+    ) == pytest.approx(-1.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints():
+
+    input_list = ["data:propulsion:he_power_train:aux_load:aux_load_1:power_max"]
+    ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsAuxLoad(aux_load_id="aux_load_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:aux_load:aux_load_1:power_rating", units="kW"
     ) == pytest.approx(10.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

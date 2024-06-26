@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 from .perf_power_in import PerformancesPowerIn
 from .perf_current_in import PerformancesCurrentIn

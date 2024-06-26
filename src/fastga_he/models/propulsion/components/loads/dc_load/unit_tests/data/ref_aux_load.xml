@@ -5,6 +5,8 @@
                 <aux_load>
                     <aux_load_1>
                         <power_in_mission units="kW">10.0</power_in_mission>
+                        <power_max units="kW">10.0</power_max>
+                        <power_rating units="kW">11.0</power_rating>
                     </aux_load_1>
                 </aux_load>
             </he_power_train>
