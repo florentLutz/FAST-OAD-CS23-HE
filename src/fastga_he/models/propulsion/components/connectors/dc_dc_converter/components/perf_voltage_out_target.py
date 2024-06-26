@@ -3,6 +3,7 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import numpy as np
+import scipy as sp
 import openmdao.api as om
 
 from fastga_he.exceptions import ControlParameterInconsistentShapeError
@@ -101,4 +102,4 @@ class PerformancesVoltageOutTargetMission(om.ExplicitComponent):
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
                 + ":voltage_out_target_mission",
-            ] = np.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points)

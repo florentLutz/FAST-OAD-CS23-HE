@@ -3,6 +3,7 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import numpy as np
+import scipy as sp
 import openmdao.api as om
 
 import fastoad.api as oad
@@ -134,10 +135,10 @@ class PerformancesJunctionTemperatureMission(om.ExplicitComponent):
                 "data:propulsion:he_power_train:rectifier:"
                 + rectifier_id
                 + ":junction_temperature_mission",
-            ] = np.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points)
             partials[
                 "IGBT_temperature",
                 "data:propulsion:he_power_train:rectifier:"
                 + rectifier_id
                 + ":junction_temperature_mission",
-            ] = np.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points)

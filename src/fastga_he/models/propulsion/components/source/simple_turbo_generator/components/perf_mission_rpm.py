@@ -3,6 +3,7 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import numpy as np
+import scipy as sp
 import openmdao.api as om
 
 from fastga_he.exceptions import ControlParameterInconsistentShapeError
@@ -96,4 +97,4 @@ class PerformancesRPMMission(om.ExplicitComponent):
                 "data:propulsion:he_power_train:turbo_generator:"
                 + turbo_generator_id
                 + ":rpm_mission",
-            ] = np.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points)
