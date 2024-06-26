@@ -27,6 +27,7 @@ from .connectors.planetary_gear import (
 from .connectors.gearbox import SizingGearbox, PerformancesGearbox, SlipstreamGearbox
 
 from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM
+from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
 
 from .propulsor.propeller import SizingPropeller, PerformancesPropeller, SlipstreamPropeller
 

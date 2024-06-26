@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingAuxLoadCGY(om.ExplicitComponent):
+class SizingDCAuxLoadCGY(om.ExplicitComponent):
     """
     Class that computes the Y-CG of the auxiliary load based on its position. Will be based on
     simple geometric ratios, no consideration of volume will be implemented for now.

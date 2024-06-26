@@ -30,6 +30,7 @@ from fastga_he.models.propulsion.components import (
     SizingPlanetaryGear,
     SizingTurboGenerator,
     SizingGearbox,
+    SizingDCAuxLoad,
 )
 
 from .constants import (

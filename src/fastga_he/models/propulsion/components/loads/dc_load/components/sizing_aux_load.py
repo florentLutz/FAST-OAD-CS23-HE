@@ -3,17 +3,17 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 import openmdao.api as om
 
-from .cstr_aux_load import ConstraintsAuxLoad
+from .cstr_aux_load import ConstraintsDCAuxLoad
 
-from ..components.sizing_aux_load_weight import SizingAuxLoadWeight
-from ..components.sizing_aux_load_cg_y import SizingAuxLoadCGY
-from ..components.sizing_aux_load_cg_x import SizingAuxLoadCGX
-from ..components.sizing_aux_load_drag import SizingAuxLoadDrag
+from ..components.sizing_aux_load_weight import SizingDCAuxLoadWeight
+from ..components.sizing_aux_load_cg_y import SizingDCAuxLoadCGY
+from ..components.sizing_aux_load_cg_x import SizingDCAuxLoadCGX
+from ..components.sizing_aux_load_drag import SizingDCAuxLoadDrag
 
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingAuxLoad(om.Group):
+class SizingDCAuxLoad(om.Group):
     def initialize(self):
 
         self.options.declare(
@@ -38,24 +38,24 @@ class SizingAuxLoad(om.Group):
 
         self.add_subsystem(
             name="constraints",
-            subsys=ConstraintsAuxLoad(aux_load_id=aux_load_id),
+            subsys=ConstraintsDCAuxLoad(aux_load_id=aux_load_id),
             promotes=["*"],
         )
 
         self.add_subsystem(
             "weight",
-            SizingAuxLoadWeight(aux_load_id=aux_load_id),
+            SizingDCAuxLoadWeight(aux_load_id=aux_load_id),
             promotes=["data:*"],
         )
 
         self.add_subsystem(
             "aux_load_cg_x",
-            SizingAuxLoadCGX(aux_load_id=aux_load_id, position=position),
+            SizingDCAuxLoadCGX(aux_load_id=aux_load_id, position=position),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "aux_load_cg_y",
-            SizingAuxLoadCGY(aux_load_id=aux_load_id, position=position),
+            SizingDCAuxLoadCGY(aux_load_id=aux_load_id, position=position),
             promotes=["data:*"],
         )
 
@@ -63,7 +63,7 @@ class SizingAuxLoad(om.Group):
             system_name = "aux_load_drag_ls" if low_speed_aero else "aux_load_drag_cruise"
             self.add_subsystem(
                 name=system_name,
-                subsys=SizingAuxLoadDrag(
+                subsys=SizingDCAuxLoadDrag(
                     aux_load_id=aux_load_id,
                     position=position,
                     low_speed_aero=low_speed_aero,

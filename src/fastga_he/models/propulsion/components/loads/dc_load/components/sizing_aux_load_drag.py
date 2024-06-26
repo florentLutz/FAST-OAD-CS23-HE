@@ -7,7 +7,7 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingAuxLoadDrag(om.ExplicitComponent):
+class SizingDCAuxLoadDrag(om.ExplicitComponent):
     """
     Class that computes the drag coefficient of the auxiliary load based on its position. Will
     be 0.0 all the time as we wil make the assumption that it is "inside" any part of the aircraft

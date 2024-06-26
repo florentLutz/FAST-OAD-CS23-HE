@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingAuxLoadCGX(om.ExplicitComponent):
+class SizingDCAuxLoadCGX(om.ExplicitComponent):
     """
     Computation of the position, along the x-axis of the CG of the auxiliary load. If the
     auxiliary load is inside the wing we will consider it at the quarter chord.

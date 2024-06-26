@@ -9,7 +9,7 @@ from .perf_current_in import PerformancesCurrentIn
 from .perf_maximum import PerformancesMaximum
 
 
-class PerformancesAuxLoad(om.Group):
+class PerformancesDCAuxLoad(om.Group):
     def initialize(self):
 
         self.options.declare(

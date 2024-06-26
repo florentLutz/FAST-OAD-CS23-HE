@@ -199,6 +199,12 @@
             <gear_ratio>2.0</gear_ratio>
           </gearbox_1>
         </speed_reducer>
+        <aux_load>
+            <dc_aux_load_1>
+                <power_in_mission units="kW">5.0</power_in_mission>
+                <power_density units="kW/kg">5.0</power_density>
+            </dc_aux_load_1>
+        </aux_load>
         <DC_SSPC>
           <dc_sspc_1>
             <current_caliber units="A" is_input="False">638.2945793798842<!--Maximum current flowing through the SSPC--></current_caliber>

@@ -10,18 +10,18 @@ from ..components.perf_power_in import PerformancesPowerIn
 from ..components.perf_current_in import PerformancesCurrentIn
 from ..components.perf_maximum import PerformancesMaximum
 
-from ..components.perf_aux_load import PerformancesAuxLoad
+from ..components.perf_aux_load import PerformancesDCAuxLoad
 
 from ..components.cstr_enforce import ConstraintsPowerEnforce
 from ..components.cstr_ensure import ConstraintsPowerEnsure
 
-from ..components.cstr_aux_load import ConstraintsAuxLoad
+from ..components.cstr_aux_load import ConstraintsDCAuxLoad
 
-from ..components.sizing_aux_load_weight import SizingAuxLoadWeight
-from ..components.sizing_aux_load_cg_y import SizingAuxLoadCGY
-from ..components.sizing_aux_load_cg_x import SizingAuxLoadCGX
+from ..components.sizing_aux_load_weight import SizingDCAuxLoadWeight
+from ..components.sizing_aux_load_cg_y import SizingDCAuxLoadCGY
+from ..components.sizing_aux_load_cg_x import SizingDCAuxLoadCGX
 
-from ..components.sizing_aux_load import SizingAuxLoad
+from ..components.sizing_aux_load import SizingDCAuxLoad
 
 from ..constants import POSSIBLE_POSITION
 
@@ -107,7 +107,7 @@ def test_performances():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesAuxLoad(aux_load_id="aux_load_1", number_of_points=NB_POINTS_TEST), ivc
+        PerformancesDCAuxLoad(aux_load_id="aux_load_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
     assert problem.get_val(
@@ -156,7 +156,7 @@ def test_constraints():
     ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(ConstraintsAuxLoad(aux_load_id="aux_load_1"), ivc)
+    problem = run_system(ConstraintsDCAuxLoad(aux_load_id="aux_load_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:aux_load:aux_load_1:power_rating", units="kW"
@@ -174,7 +174,7 @@ def test_sizing_weight():
     ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(SizingAuxLoadWeight(aux_load_id="aux_load_1"), ivc)
+    problem = run_system(SizingDCAuxLoadWeight(aux_load_id="aux_load_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:aux_load:aux_load_1:mass", units="kg"
@@ -197,7 +197,7 @@ def test_generator_cg_y():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
 
         # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingAuxLoadCGY(aux_load_id="aux_load_1", position=option), ivc)
+        problem = run_system(SizingDCAuxLoadCGY(aux_load_id="aux_load_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:aux_load:aux_load_1:CG:y", units="m"
@@ -224,7 +224,7 @@ def test_generator_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
 
         # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingAuxLoadCGX(aux_load_id="aux_load_1", position=option), ivc)
+        problem = run_system(SizingDCAuxLoadCGX(aux_load_id="aux_load_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:aux_load:aux_load_1:CG:x", units="m"
@@ -250,7 +250,7 @@ def test_sizing():
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(SizingAuxLoad(aux_load_id="aux_load_1"), ivc)
+    problem = run_system(SizingDCAuxLoad(aux_load_id="aux_load_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:aux_load:aux_load_1:mass", units="kg"

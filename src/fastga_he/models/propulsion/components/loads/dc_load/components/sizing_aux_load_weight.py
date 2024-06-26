@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class SizingAuxLoadWeight(om.ExplicitComponent):
+class SizingDCAuxLoadWeight(om.ExplicitComponent):
     """
     Computation of the weight of the auxiliary load. Will be based on a simple power density.
     """

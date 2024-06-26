@@ -11,7 +11,7 @@ from ..constants import (
 )
 
 
-class ConstraintsAuxLoad(om.Group):
+class ConstraintsDCAuxLoad(om.Group):
     """
     Class that gather the different constraints for the aux load be they ensure or enforce.
     """
