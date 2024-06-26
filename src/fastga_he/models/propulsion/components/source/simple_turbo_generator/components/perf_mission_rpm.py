@@ -97,4 +97,4 @@ class PerformancesRPMMission(om.ExplicitComponent):
                 "data:propulsion:he_power_train:turbo_generator:"
                 + turbo_generator_id
                 + ":rpm_mission",
-            ] = sp.sparse.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

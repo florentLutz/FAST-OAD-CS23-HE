@@ -99,4 +99,4 @@ class PerformancesMissionPowerSplit(om.ExplicitComponent):
             partials[
                 "power_split",
                 "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":power_split",
-            ] = sp.sparse.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

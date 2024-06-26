@@ -86,4 +86,4 @@ class PerformancesRPMMission(om.ExplicitComponent):
         else:
             partials[
                 "rpm", "data:propulsion:he_power_train:generator:" + generator_id + ":rpm_mission"
-            ] = sp.sparse.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

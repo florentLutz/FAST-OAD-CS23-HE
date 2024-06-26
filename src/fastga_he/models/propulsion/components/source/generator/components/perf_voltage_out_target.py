@@ -99,4 +99,4 @@ class PerformancesVoltageOutTargetMission(om.ExplicitComponent):
                 "data:propulsion:he_power_train:generator:"
                 + generator_id
                 + ":voltage_out_target_mission",
-            ] = sp.sparse.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

@@ -100,4 +100,4 @@ class PerformancesCellTemperatureMission(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":cell_temperature_mission",
-            ] = sp.sparse.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

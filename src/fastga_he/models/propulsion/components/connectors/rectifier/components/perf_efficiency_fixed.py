@@ -99,4 +99,4 @@ class PerformancesEfficiencyMission(om.ExplicitComponent):
             partials[
                 "efficiency",
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":efficiency_mission",
-            ] = sp.sparse.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

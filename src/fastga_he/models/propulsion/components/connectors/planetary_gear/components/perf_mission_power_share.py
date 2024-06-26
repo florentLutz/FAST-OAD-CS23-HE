@@ -106,4 +106,4 @@ class PerformancesMissionPowerShare(om.ExplicitComponent):
                 "data:propulsion:he_power_train:planetary_gear:"
                 + planetary_gear_id
                 + ":power_share",
-            ] = sp.sparse.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

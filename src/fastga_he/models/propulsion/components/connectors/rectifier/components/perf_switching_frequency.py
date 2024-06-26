@@ -102,4 +102,4 @@ class PerformancesSwitchingFrequencyMission(om.ExplicitComponent):
                 "data:propulsion:he_power_train:rectifier:"
                 + rectifier_id
                 + ":switching_frequency_mission",
-            ] = sp.sparse.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

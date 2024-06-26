@@ -141,4 +141,4 @@ class PerformancesJunctionTemperatureMission(om.ExplicitComponent):
                 "data:propulsion:he_power_train:inverter:"
                 + inverter_id
                 + ":junction_temperature_mission",
-            ] = sp.sparse.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")
