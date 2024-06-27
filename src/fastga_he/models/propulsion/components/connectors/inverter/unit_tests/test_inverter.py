@@ -15,6 +15,7 @@ from ..components.sizing_thermal_resistance_casing import SizingInverterCasingTh
 from ..components.sizing_weight_casing import SizingInverterCasingsWeight
 from ..components.sizing_heat_capacity_casing import SizingInverterCasingHeatCapacity
 from ..components.sizing_dimension_module import SizingInverterModuleDimension
+from ..components.sizing_heat_sink_dimension import SizingInverterHeatSinkDimension
 from ..components.sizing_capacitor_current_caliber import SizingInverterCapacitorCurrentCaliber
 from ..components.sizing_capacitor_capacity import SizingInverterCapacitorCapacity
 from ..components.sizing_inductor_inductance import SizingInverterInductorInductance
@@ -261,6 +262,32 @@ def test_dimension_module():
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:module:height", units="m"
     ) == pytest.approx(0.021, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink_dimension():
+
+    inputs_list = [
+        "data:propulsion:he_power_train:inverter:inverter_1:module:length",
+        "data:propulsion:he_power_train:inverter:inverter_1:module:width",
+    ]
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingInverterHeatSinkDimension(inverter_id="inverter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:length", units="m"
+    ) == pytest.approx(0.2145, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:heat_sink:width", units="m"
+    ) == pytest.approx(0.1716, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

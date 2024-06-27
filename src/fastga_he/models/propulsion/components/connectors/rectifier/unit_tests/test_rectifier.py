@@ -29,8 +29,8 @@ from ..components.sizing_thermal_resistance import SizingRectifierThermalResista
 from ..components.sizing_thermal_resistance_casing import SizingRectifierCasingThermalResistance
 from ..components.sizing_capacitor_current_caliber import SizingRectifierCapacitorCurrentCaliber
 from ..components.sizing_capacitor_capacity import SizingRectifierCapacitorCapacity
-from ..components.sizing_capacitor_weight import SizingRectifierCapacitorWeight
 from ..components.sizing_dimension_module import SizingRectifierModuleDimension
+from ..components.sizing_heat_sink_dimension import SizingRectifierHeatSinkDimension
 from ..components.sizing_inductor_current_caliber import SizingRectifierInductorCurrentCaliber
 from ..components.sizing_weight_casing import SizingRectifierCasingsWeight
 from ..components.sizing_contactor_weight import SizingRectifierContactorWeight
@@ -1054,6 +1054,32 @@ def test_dimension_module():
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:module:height", units="m"
     ) == pytest.approx(0.021, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink_dimension():
+
+    inputs_list = [
+        "data:propulsion:he_power_train:rectifier:rectifier_1:module:length",
+        "data:propulsion:he_power_train:rectifier:rectifier_1:module:width",
+    ]
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingRectifierHeatSinkDimension(rectifier_id="rectifier_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:heat_sink:length", units="m"
+    ) == pytest.approx(0.2145, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:heat_sink:width", units="m"
+    ) == pytest.approx(0.1177, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

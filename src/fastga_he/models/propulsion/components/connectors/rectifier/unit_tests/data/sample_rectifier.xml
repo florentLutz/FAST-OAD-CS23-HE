@@ -85,6 +85,8 @@
                         <heat_sink>
                             <temperature_rating units="degK">373.15</temperature_rating>
                             <mass units="kg">0.444</mass>
+                            <length units="m">0.2145</length>
+                            <width units="m">0.1177</width>
                             <coolant>
                                 <temperature_in_rating units="degK">323.15</temperature_in_rating>
                                 <temperature_out_rating units="degK">353.15</temperature_out_rating>

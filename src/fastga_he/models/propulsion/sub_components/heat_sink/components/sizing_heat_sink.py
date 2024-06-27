@@ -4,7 +4,6 @@
 
 import openmdao.api as om
 
-from .sizing_heat_sink_dimension import SizingHeatSinkDimension
 from .sizing_heat_sink_tube_length import SizingHeatSinkTubeLength
 from .sizing_heat_sink_tube_mass_flow import SizingHeatSinkTubeMassFlow
 from .sizing_heat_sink_coolant_prandtl import SizingHeatSinkCoolantPrandtl
@@ -37,11 +36,6 @@ class SizingHeatSink(om.Group):
 
         prefix = self.options["prefix"]
 
-        self.add_subsystem(
-            "heat_sink_dimensions",
-            SizingHeatSinkDimension(prefix=prefix),
-            promotes=["*"],
-        )
         self.add_subsystem(
             "heat_sink_tube_length",
             SizingHeatSinkTubeLength(prefix=prefix),
