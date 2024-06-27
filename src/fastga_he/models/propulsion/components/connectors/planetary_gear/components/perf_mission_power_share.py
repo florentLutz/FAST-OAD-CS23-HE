@@ -3,6 +3,7 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import numpy as np
+import scipy as sp
 import openmdao.api as om
 
 from fastga_he.exceptions import ControlParameterInconsistentShapeError
@@ -105,4 +106,4 @@ class PerformancesMissionPowerShare(om.ExplicitComponent):
                 "data:propulsion:he_power_train:planetary_gear:"
                 + planetary_gear_id
                 + ":power_share",
-            ] = np.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

@@ -2,8 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
+import scipy as sp
+import openmdao.api as om
 
 from fastga_he.exceptions import ControlParameterInconsistentShapeError
 
@@ -104,4 +105,4 @@ class PerformancesMissionPowerSplit(om.ExplicitComponent):
                 "data:propulsion:he_power_train:planetary_gear:"
                 + planetary_gear_id
                 + ":power_split",
-            ] = np.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

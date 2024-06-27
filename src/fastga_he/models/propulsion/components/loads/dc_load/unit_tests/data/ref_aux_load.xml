@@ -1,0 +1,38 @@
+<FASTOAD_model>
+    <data>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <span units="m">8.0</span>
+                <MAC>
+                    <at25percent>
+                        <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                    </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <aux_load>
+                    <aux_load_1>
+                        <power_in_mission units="kW">10.0</power_in_mission>
+                        <power_max units="kW">10.0</power_max>
+                        <power_rating units="kW">11.0</power_rating>
+                        <power_density units="kW/kg">20.0</power_density>
+                        <CG>
+                            <y_ratio>0.5</y_ratio>
+                        </CG>
+                        <rear_length_ratio>0.1</rear_length_ratio>
+                        <front_length_ratio>0.5</front_length_ratio>
+                    </aux_load_1>
+                </aux_load>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>

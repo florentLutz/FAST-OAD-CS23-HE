@@ -3,6 +3,7 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import numpy as np
+import scipy as sp
 import openmdao.api as om
 
 import fastoad.api as oad
@@ -98,4 +99,4 @@ class PerformancesEfficiencyMission(om.ExplicitComponent):
             partials[
                 "efficiency",
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":efficiency_mission",
-            ] = np.eye(number_of_points)
+            ] = sp.sparse.eye(number_of_points, format="csc")

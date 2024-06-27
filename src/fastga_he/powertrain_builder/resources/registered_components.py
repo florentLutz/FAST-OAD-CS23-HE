@@ -904,6 +904,44 @@ GEARBOX = {
     ETA: 0.98,
     CTRL_PARAM: [],
 }
+DC_AUX_LOAD = {
+    ID: "fastga_he.pt_component.dc_load",
+    CN: "DCAuxLoad",
+    CN_ID: "aux_load_id",
+    CT: "aux_load",
+    ATT: None,
+    PT: [],
+    SPT: [],
+    PTS: [],
+    IN: [("dc_voltage_in", None), (None, "dc_current_in")],
+    OUT: [],
+    CTC: "load",
+    MP: [
+        {"power_in": "kW"},
+        {"dc_current_in": "A"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
+    ICON: "gears",
+    ICON_SIZE: 20,
+    RSD: [],
+    SETS_V: False,
+    IO_INDEP_V: False,
+    V_TO_SET: [],
+    P_TO_SET: [],
+    I_TO_SET: [],
+    SFR: False,
+    SWL: False,
+    DST_W: [],
+    PCT_W: ["inside_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.95,
+    CTRL_PARAM: ["power_in_mission"],
+}
 
 KNOWN_COMPONENTS = [
     PROPELLER,
@@ -925,6 +963,7 @@ KNOWN_COMPONENTS = [
     PLANETARY_GEAR,
     TURBO_GENERATOR,
     GEARBOX,
+    DC_AUX_LOAD,
 ]
 
 KNOWN_ID = []

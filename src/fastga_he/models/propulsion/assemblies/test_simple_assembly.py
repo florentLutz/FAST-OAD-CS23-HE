@@ -454,6 +454,69 @@ def test_performances_from_pt_file():
     )
 
 
+def test_performances_from_pt_file_aux_load():
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_load.yml")
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PowerTrainPerformancesFromFile(
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+                pre_condition_pt=True,
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    problem = run_system(
+        PowerTrainPerformancesFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_pt=True,
+        ),
+        ivc,
+    )
+
+    # om.n2(problem)
+
+    _, _, residuals = problem.model.component.get_nonlinear_vectors()
+
+    current_in = problem.get_val("component.dc_dc_converter_1.dc_current_in", units="A")
+    voltage_in = problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V")
+
+    assert current_in * voltage_in == pytest.approx(
+        np.array(
+            [
+                202403.0,
+                203468.0,
+                204508.0,
+                205528.0,
+                206537.0,
+                207538.0,
+                208533.0,
+                209519.0,
+                210483.0,
+                211377.0,
+            ]
+        ),
+        abs=1,
+    )
+
+
 def test_mass_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
