@@ -12,9 +12,9 @@ from .sizing_energy_coefficients import SizingDCDCConverterEnergyCoefficients
 from .sizing_resistance_scaling import SizingDCDCConverterResistanceScaling
 from .sizing_reference_resistance import SizingDCDCConverterResistances
 from .sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
-from .sizing_inductor_inductance import SizingDCDCConverterInductorInductance
 from .sizing_module_mass import SizingDCDCConverterCasingWeight
 from .sizing_dimension_module import SizingDCDCConverterModuleDimension
+from .sizing_heat_sink_dimension import SizingDCDCConverterHeatSinkDimension
 from .sizing_contactor_weight import SizingDCDCConverterContactorWeight
 from .sizing_dc_dc_converter_cg_x import SizingDCDCConverterCGX
 from .sizing_dc_dc_converter_cg_y import SizingDCDCConverterCGY
@@ -137,17 +137,11 @@ class SizingDCDCConverter(om.Group):
             promotes=["*"],
         )
 
-        # The number of modules  in the inverter isn't really up to the user to change,
-        # it depends on the topology. Here, the topology requires 3 modules to be cooled by one
-        # heat sink
-        ivc_module_number = om.IndepVarComp()
-        ivc_module_number.add_output(
-            name="data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":module:number",
-            val=1,
+        self.add_subsystem(
+            name="heat_sink_dimension",
+            subsys=SizingDCDCConverterHeatSinkDimension(dc_dc_converter_id=dc_dc_converter_id),
+            promotes=["*"],
         )
-        self.add_subsystem(name="module_number", subsys=ivc_module_number, promotes=["*"])
 
         self.add_subsystem(
             name="heat_sink_sizing",

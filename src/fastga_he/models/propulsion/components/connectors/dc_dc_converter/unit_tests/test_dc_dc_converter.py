@@ -16,6 +16,7 @@ from ..components.sizing_inductor_inductance import SizingDCDCConverterInductorI
 from ..components.sizing_capacitor_capacity import SizingDCDCConverterCapacitorCapacity
 from ..components.sizing_module_mass import SizingDCDCConverterCasingWeight
 from ..components.sizing_dimension_module import SizingDCDCConverterModuleDimension
+from ..components.sizing_heat_sink_dimension import SizingDCDCConverterHeatSinkDimension
 from ..components.sizing_contactor_weight import SizingDCDCConverterContactorWeight
 from ..components.sizing_weight import SizingDCDCConverterWeight, SizingDCDCConverterWeightBySum
 from ..components.sizing_dc_dc_converter_cg_x import SizingDCDCConverterCGX
@@ -350,6 +351,42 @@ def test_dimension_module():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:module:height", units="m"
     ) == pytest.approx(0.021, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink_dimension():
+
+    inputs_list = [
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:module:length",
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:module:width",
+    ]
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        SizingDCDCConverterHeatSinkDimension(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:heat_sink:length",
+            units="m",
+        )
+        == pytest.approx(0.0715, rel=1e-2)
+    )
+    assert (
+        problem.get_val(
+            "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:heat_sink:width",
+            units="m",
+        )
+        == pytest.approx(0.16522, rel=1e-2)
+    )
 
     problem.check_partials(compact_print=True)
 
