@@ -206,7 +206,10 @@ class OperationalMissionVector(om.Group):
 
         pt_file_path = self.options["power_train_file_path"]
 
-        self.nonlinear_solver.options["use_apply_nonlinear"] = self.options["use_apply_nonlinear"]
+        if self.options["use_apply_nonlinear"]:
+            self.nonlinear_solver.options["use_apply_nonlinear"] = self.options[
+                "use_apply_nonlinear"
+            ]
 
         self.add_subsystem(
             "in_flight_cg_variation", OperationalInFlightCGVariation(), promotes=["*"]

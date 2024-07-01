@@ -74,6 +74,8 @@ from fastga_he.models.performances.mission_vector.mission_vector import MissionV
 from fastga_he.models.propulsion.assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
 from fastga_he.models.performances.op_mission_vector.update_tow import UpdateTOW
 
+from fastga_he.models.performances.payload_range.payload_range import ComputePayloadRange
+
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -2403,3 +2405,22 @@ def test_residuals_viewer():
                 "compute_energy_consumed.power_train_performances.motor_4.ac_current_rms_in"
             ],
         )
+
+
+def test_payload_range():
+
+    xml_file = "input_payload_range.xml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    input_list = list_inputs(ComputePayloadRange(power_train_file_path=pt_file_path))
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        input_list,
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(ComputePayloadRange(power_train_file_path=pt_file_path), ivc)
+    sizing_fuel = problem.get_val("data:mission:payload_range:range", units="NM")
+    assert sizing_fuel == pytest.approx(1.0, abs=1e-2)
