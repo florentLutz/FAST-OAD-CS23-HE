@@ -2407,7 +2407,7 @@ def test_residuals_viewer():
         )
 
 
-def test_payload_range():
+def test_payload_range_elec():
 
     xml_file = "input_payload_range.xml"
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
@@ -2422,8 +2422,11 @@ def test_payload_range():
     )
 
     problem = run_system(ComputePayloadRange(power_train_file_path=pt_file_path), ivc)
-    sizing_fuel = problem.get_val("data:mission:payload_range:range", units="NM")
-    assert sizing_fuel == pytest.approx(158.94, abs=1e-2)
+    range_array = problem.get_val("data:mission:payload_range:range", units="NM")
+    assert range_array == pytest.approx([0.0, 158, 158, 215], abs=1.0)
+
+    payload_array = problem.get_val("data:mission:payload_range:payload", units="kg")
+    assert payload_array == pytest.approx([390.0, 390.0, 390.0, 0.0], abs=1.0)
 
 
 def test_payload_range_fuel():
@@ -2444,7 +2447,8 @@ def test_payload_range_fuel():
     )
 
     problem = run_system(ComputePayloadRange(power_train_file_path=pt_file_path), ivc)
-    sizing_fuel = problem.get_val("data:mission:payload_range:range", units="NM")
-    assert sizing_fuel == pytest.approx(
-        199.0, abs=1.0
-    )  # Should be 200 nm (took the reverse value of another case)
+    range_array = problem.get_val("data:mission:payload_range:range", units="NM")
+    assert range_array == pytest.approx([0.0, 415, 1226, 1350], abs=1.0)
+
+    payload_array = problem.get_val("data:mission:payload_range:payload", units="kg")
+    assert payload_array == pytest.approx([1140.0, 1140.0, 578.0, 0.0], abs=1.0)

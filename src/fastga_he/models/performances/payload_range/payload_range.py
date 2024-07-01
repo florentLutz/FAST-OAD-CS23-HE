@@ -98,7 +98,11 @@ class ComputePayloadRange(om.ExplicitComponent):
         else:
             self.add_input("data:mission:payload_range:threshold_SoC", val=np.nan, units="percent")
 
-        self.add_output("data:mission:payload_range:range", val=1.0, units="NM")
+        self.add_input("data:weight:aircraft:max_payload", val=np.nan, units="kg")
+        self.add_input("data:weight:aircraft:MTOW", val=np.nan, units="kg")
+
+        self.add_output("data:mission:payload_range:range", val=1.0, units="NM", shape=4)
+        self.add_output("data:mission:payload_range:payload", val=1.0, units="kg", shape=4)
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
@@ -131,12 +135,6 @@ class ComputePayloadRange(om.ExplicitComponent):
             mfw = 0.0
             for tank_name, tank_type in zip(tank_names, tank_types):
                 mfw += inputs[PT_DATA_PREFIX + tank_type + ":" + tank_name + ":capacity"]
-
-            ivc.add_output(
-                name="data:mission:payload_range:target_fuel",
-                val=mfw,
-                units="kg",
-            )
 
         self.cached_problem = om.Problem()
         model = self.cached_problem.model
@@ -185,11 +183,90 @@ class ComputePayloadRange(om.ExplicitComponent):
         model.op_mission.linear_solver = om.DirectSolver()
 
         self.cached_problem.setup()
-        self.cached_problem.run_model()
 
-        target_range = self.cached_problem.get_val("data:mission:operational:range", units="NM")
+        # There are four points in the payload range as computed by this framework. Points A, B,
+        # D and E. Yes, I know.
+        range_array = np.zeros(4)
+        payload_array = np.zeros(4)
 
-        outputs["data:mission:payload_range:range"] = target_range
+        max_payload = inputs["data:weight:aircraft:max_payload"][0]
+        mtow = inputs["data:weight:aircraft:MTOW"][0]
+        owe = inputs["data:weight:aircraft:OWE"][0]
+
+        # Point A correspond to max payload, no range
+        payload_array[0] = max_payload
+
+        # Point B correspond to max payload and the range that leads to the MTOW. On an electric
+        # aircraft this correspond to the design point
+        payload_array[1] = max_payload
+        self.cached_problem.set_val(
+            "data:mission:operational:payload:mass",
+            max_payload,
+            units="kg",
+        )
+        if self.configurator.will_aircraft_mass_vary():
+            target_fuel = max(mtow - owe - max_payload, 0.0)
+            self.cached_problem.set_val(
+                "data:mission:payload_range:target_fuel", target_fuel, units="kg"
+            )
+            self.cached_problem.run_model()
+            range_point_b = self.cached_problem.get_val(
+                "data:mission:operational:range", units="NM"
+            )
+            range_array[1] = range_point_b
+        else:
+            # The threshold value is already set we can just go ahead and compute the corresponding
+            # range
+            self.cached_problem.run_model()
+            range_point_b = self.cached_problem.get_val(
+                "data:mission:operational:range", units="NM"
+            )
+            range_array[1] = range_point_b
+
+        # Point D corresponds to MFW and MTOW. On an electric aircraft this point is the same as
+        # the previous one, so we will simply not recompute it.
+        if self.configurator.will_aircraft_mass_vary():
+            payload = mtow - mfw - owe
+            self.cached_problem.set_val(
+                "data:mission:operational:payload:mass",
+                payload,
+                units="kg",
+            )
+            self.cached_problem.set_val("data:mission:payload_range:target_fuel", mfw, units="kg")
+            self.cached_problem.run_model()
+            range_point_d = self.cached_problem.get_val(
+                "data:mission:operational:range", units="NM"
+            )
+            payload_array[2] = payload
+            range_array[2] = range_point_d
+        else:
+            payload_array[2] = payload_array[1]
+            range_array[2] = range_array[1]
+
+        # Point E correspond to no payload and MFW. On an electric aircraft, it's simply no payload
+        self.cached_problem.set_val(
+            "data:mission:operational:payload:mass",
+            0.0,
+            units="kg",
+        )
+        # Twice the same thing could be simplified honestly
+        if self.configurator.will_aircraft_mass_vary():
+            self.cached_problem.run_model()
+            range_point_e = self.cached_problem.get_val(
+                "data:mission:operational:range", units="NM"
+            )
+            payload_array[3] = 0
+            range_array[3] = range_point_e
+        else:
+            self.cached_problem.run_model()
+            range_point_e = self.cached_problem.get_val(
+                "data:mission:operational:range", units="NM"
+            )
+            payload_array[3] = 0
+            range_array[3] = range_point_e
+
+        outputs["data:mission:payload_range:range"] = range_array
+        outputs["data:mission:payload_range:payload"] = payload_array
 
 
 def zip_op_mission_input(pt_file_path):

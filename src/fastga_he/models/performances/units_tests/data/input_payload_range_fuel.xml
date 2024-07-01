@@ -152,14 +152,14 @@
         </fuel_system>
         <fuel_tank>
           <fuel_tank_1>
-            <capacity units="kg" is_input="False">123.08289396635777</capacity>
+            <capacity units="kg" is_input="False">486.822</capacity>
             <fuel_consumed_mission units="kg" is_input="False">115.43289396635777<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
             <CG>
               <x units="m" is_input="True">4.462616605755205</x>
             </CG>
           </fuel_tank_1>
           <fuel_tank_2>
-            <capacity units="kg" is_input="False">123.08289396635777</capacity>
+            <capacity units="kg" is_input="False">486.822</capacity>
             <fuel_consumed_mission units="kg" is_input="False">115.43289396635777<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
             <CG>
               <x units="m" is_input="True">4.462616605755205</x>
@@ -207,7 +207,9 @@
     </propulsion>
     <weight>
       <aircraft>
+        <MTOW units="kg" is_input="False">3279.200314313628<!--maximum takeoff weight of the aircraft--></MTOW>
         <OWE units="kg" is_input="True">1727.0220065946305<!--operating weight - empty--></OWE>
+        <max_payload units="kg" is_input="True">1140.0<!--max payload weight--></max_payload>
         <in_flight_variation>
           <operational>
             <fixed_mass_comp>

@@ -402,6 +402,8 @@
     <weight>
       <aircraft>
         <OWE units="kg" is_input="True">450.0<!--operating weight - empty--></OWE>
+        <max_payload units="kg" is_input="True">390.0<!--operating weight - empty--></max_payload>
+        <MTOW units="kg" is_input="True">840.0<!--operating weight - empty--></MTOW>
         <in_flight_variation>
           <operational>
             <fixed_mass_comp>
