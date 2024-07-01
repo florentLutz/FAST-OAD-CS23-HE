@@ -2424,3 +2424,27 @@ def test_payload_range():
     problem = run_system(ComputePayloadRange(power_train_file_path=pt_file_path), ivc)
     sizing_fuel = problem.get_val("data:mission:payload_range:range", units="NM")
     assert sizing_fuel == pytest.approx(158.94, abs=1e-2)
+
+
+def test_payload_range_fuel():
+
+    oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.climb_speed"] = None
+    oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.descent_speed"] = None
+
+    xml_file = "input_payload_range_fuel.xml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "turboshaft_propulsion_for_payload_range.yml")
+
+    input_list = list_inputs(ComputePayloadRange(power_train_file_path=pt_file_path))
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        input_list,
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(ComputePayloadRange(power_train_file_path=pt_file_path), ivc)
+    sizing_fuel = problem.get_val("data:mission:payload_range:range", units="NM")
+    assert sizing_fuel == pytest.approx(
+        199.0, abs=1.0
+    )  # Should be 200 nm (took the reverse value of another case)

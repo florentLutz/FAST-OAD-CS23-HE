@@ -5,9 +5,6 @@
 import openmdao.api as om
 import numpy as np
 
-from fastoad.openmdao.problem import AutoUnitsDefaultGroup
-
-from fastga_he.command.api import list_inputs_metadata
 from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
     OperationalMissionVector,
 )
@@ -76,34 +73,3 @@ class DistanceToTargetSoc(om.ImplicitComponent):
         residuals["data:mission:operational:range"] = (
             inputs[variable_name_target_soc] - inputs["data:mission:payload_range:threshold_SoC"]
         )
-
-
-def zip_op_mission_input_from_soc(pt_file_path):
-    """
-    Returns a list of the variables needed for the computation of the equilibrium. Based on
-    the submodel currently registered and the propulsion_id required.
-
-    :param pt_file_path: Path to the powertrain file.
-    :return inputs_zip: a zip containing a list of name, a list of units, a list of shapes,
-    a list of shape_by_conn boolean and a list of copy_shape str.
-    """
-
-    new_component = AutoUnitsDefaultGroup()
-    new_component.add_subsystem(
-        "system",
-        OperationalMissionVector(
-            number_of_points_climb=30,
-            number_of_points_cruise=30,
-            number_of_points_descent=20,
-            number_of_points_reserve=10,
-            power_train_file_path=pt_file_path,
-            pre_condition_pt=True,
-            use_linesearch=False,
-        ),
-        promotes=["*"],
-    )
-
-    name, unit, value, shape, shape_by_conn, copy_shape = list_inputs_metadata(new_component)
-    input_zip = zip(name, unit, value, shape, shape_by_conn, copy_shape)
-
-    return input_zip

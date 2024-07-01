@@ -7,18 +7,21 @@ import openmdao.api as om
 import numpy as np
 
 import fastoad.api as oad
+from fastoad.openmdao.problem import AutoUnitsDefaultGroup
 
-from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
+from fastga_he.command.api import list_inputs_metadata
+from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator, PT_DATA_PREFIX
 
+from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
+    OperationalMissionVector,
+)
 from fastga_he.models.performances.mission_vector.constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
     HE_SUBMODEL_DEP_EFFECT,
 )
 
-from .mission_range_from_soc import (
-    OperationalMissionVectorWithTargetSoC,
-    zip_op_mission_input_from_soc,
-)
+from .mission_range_from_soc import OperationalMissionVectorWithTargetSoC
+from .mission_range_from_fuel import OperationalMissionVectorWithTargetFuel
 
 
 class ComputePayloadRange(om.ExplicitComponent):
@@ -55,7 +58,7 @@ class ComputePayloadRange(om.ExplicitComponent):
 
         self.configurator.load(self.options["power_train_file_path"])
 
-        self._input_zip = zip_op_mission_input_from_soc(self.options["power_train_file_path"])
+        self._input_zip = zip_op_mission_input(self.options["power_train_file_path"])
 
         for (
             var_names,
@@ -83,7 +86,17 @@ class ComputePayloadRange(om.ExplicitComponent):
                         shape=var_shape,
                     )
 
-        self.add_input("data:mission:payload_range:threshold_SoC", val=np.nan, units="percent")
+        if self.configurator.will_aircraft_mass_vary():
+            tank_names, tank_types = self.configurator.get_fuel_tank_list()
+            for tank_name, tank_type in zip(tank_names, tank_types):
+                self.add_input(
+                    name=PT_DATA_PREFIX + tank_type + ":" + tank_name + ":capacity",
+                    val=np.nan,
+                    units="kg",
+                )
+
+        else:
+            self.add_input("data:mission:payload_range:threshold_SoC", val=np.nan, units="percent")
 
         self.add_output("data:mission:payload_range:range", val=1.0, units="NM")
 
@@ -91,7 +104,7 @@ class ComputePayloadRange(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        self._input_zip = zip_op_mission_input_from_soc(self.options["power_train_file_path"])
+        self._input_zip = zip_op_mission_input(self.options["power_train_file_path"])
 
         ivc = om.IndepVarComp()
         for var_names, var_unit, _, _, _, _ in self._input_zip:
@@ -106,38 +119,64 @@ class ComputePayloadRange(om.ExplicitComponent):
                     )
 
         # Add it manually
-        ivc.add_output(
-            name="data:mission:payload_range:threshold_SoC",
-            val=inputs["data:mission:payload_range:threshold_SoC"],
-            units="percent",
-            shape=np.shape(inputs["data:mission:payload_range:threshold_SoC"]),
-        )
+        if not self.configurator.will_aircraft_mass_vary():
+            ivc.add_output(
+                name="data:mission:payload_range:threshold_SoC",
+                val=inputs["data:mission:payload_range:threshold_SoC"],
+                units="percent",
+                shape=np.shape(inputs["data:mission:payload_range:threshold_SoC"]),
+            )
+        else:
+            tank_names, tank_types = self.configurator.get_fuel_tank_list()
+            mfw = 0.0
+            for tank_name, tank_type in zip(tank_names, tank_types):
+                mfw += inputs[PT_DATA_PREFIX + tank_type + ":" + tank_name + ":capacity"]
+
+            ivc.add_output(
+                name="data:mission:payload_range:target_fuel",
+                val=mfw,
+                units="kg",
+            )
 
         self.cached_problem = om.Problem()
         model = self.cached_problem.model
 
         model.add_subsystem("ivc", ivc, promotes_outputs=["*"])
-        model.add_subsystem(
-            "op_mission",
-            OperationalMissionVectorWithTargetSoC(
-                number_of_points_climb=30,
-                number_of_points_cruise=30,
-                number_of_points_descent=20,
-                number_of_points_reserve=10,
-                power_train_file_path=self.options["power_train_file_path"],
-                pre_condition_pt=True,
-                use_linesearch=False,
-                use_apply_nonlinear=False,
-                variable_name_target_SoC="data:propulsion:he_power_train:battery_pack:battery_pack_2:SOC_min",
-            ),
-            promotes=["*"],
-        )
+        if self.configurator.will_aircraft_mass_vary():
+            model.add_subsystem(
+                "op_mission",
+                OperationalMissionVectorWithTargetFuel(
+                    number_of_points_climb=30,
+                    number_of_points_cruise=30,
+                    number_of_points_descent=20,
+                    number_of_points_reserve=10,
+                    power_train_file_path=self.options["power_train_file_path"],
+                    pre_condition_pt=True,
+                    use_linesearch=False,
+                    use_apply_nonlinear=False,
+                ),
+                promotes=["*"],
+            )
+        else:
+            model.add_subsystem(
+                "op_mission",
+                OperationalMissionVectorWithTargetSoC(
+                    number_of_points_climb=30,
+                    number_of_points_cruise=30,
+                    number_of_points_descent=20,
+                    number_of_points_reserve=10,
+                    power_train_file_path=self.options["power_train_file_path"],
+                    pre_condition_pt=True,
+                    use_linesearch=False,
+                    use_apply_nonlinear=False,
+                    variable_name_target_SoC="data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min",
+                ),
+                promotes=["*"],
+            )
 
         # Replace the old solver with a NewtonSolver to handle the ImplicitComponent
-        # TODO: It would be better to straight up a NewtonSolver in the OperationalMissionVector
-        #  class but that would required to check if it is at all possible first
         model.op_mission.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        model.op_mission.nonlinear_solver.options["iprint"] = 0
+        model.op_mission.nonlinear_solver.options["iprint"] = 2
         model.op_mission.nonlinear_solver.options["maxiter"] = 100
         model.op_mission.nonlinear_solver.options["rtol"] = 1e-5
         model.op_mission.nonlinear_solver.options["atol"] = 1e-5
@@ -151,3 +190,34 @@ class ComputePayloadRange(om.ExplicitComponent):
         target_range = self.cached_problem.get_val("data:mission:operational:range", units="NM")
 
         outputs["data:mission:payload_range:range"] = target_range
+
+
+def zip_op_mission_input(pt_file_path):
+    """
+    Returns a list of the variables needed for the computation of the equilibrium. Based on
+    the submodel currently registered and the propulsion_id required.
+
+    :param pt_file_path: Path to the powertrain file.
+    :return inputs_zip: a zip containing a list of name, a list of units, a list of shapes,
+    a list of shape_by_conn boolean and a list of copy_shape str.
+    """
+
+    new_component = AutoUnitsDefaultGroup()
+    new_component.add_subsystem(
+        "system",
+        OperationalMissionVector(
+            number_of_points_climb=30,
+            number_of_points_cruise=30,
+            number_of_points_descent=20,
+            number_of_points_reserve=10,
+            power_train_file_path=pt_file_path,
+            pre_condition_pt=True,
+            use_linesearch=False,
+        ),
+        promotes=["*"],
+    )
+
+    name, unit, value, shape, shape_by_conn, copy_shape = list_inputs_metadata(new_component)
+    input_zip = zip(name, unit, value, shape, shape_by_conn, copy_shape)
+
+    return input_zip
