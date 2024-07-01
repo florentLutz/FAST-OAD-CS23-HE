@@ -2,24 +2,22 @@
 # Electric Aircraft.
 # Copyright (C) 2024 ISAE-SUPAERO
 
-import logging
-import time
 
 import openmdao.api as om
 import numpy as np
 
 import fastoad.api as oad
-from fastoad.openmdao.problem import AutoUnitsDefaultGroup
 
-from fastga_he.command.api import list_inputs_metadata
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 from fastga_he.models.performances.mission_vector.constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
     HE_SUBMODEL_DEP_EFFECT,
 )
-from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
-    OperationalMissionVector,
+
+from .mission_range_from_soc import (
+    OperationalMissionVectorWithTargetSoC,
+    zip_op_mission_input_from_soc,
 )
 
 
@@ -57,7 +55,7 @@ class ComputePayloadRange(om.ExplicitComponent):
 
         self.configurator.load(self.options["power_train_file_path"])
 
-        self.zip_op_mission_input(self.options["power_train_file_path"])
+        self._input_zip = zip_op_mission_input_from_soc(self.options["power_train_file_path"])
 
         for (
             var_names,
@@ -93,7 +91,7 @@ class ComputePayloadRange(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        self.zip_op_mission_input(self.options["power_train_file_path"])
+        self._input_zip = zip_op_mission_input_from_soc(self.options["power_train_file_path"])
 
         ivc = om.IndepVarComp()
         for var_names, var_unit, _, _, _, _ in self._input_zip:
@@ -150,103 +148,6 @@ class ComputePayloadRange(om.ExplicitComponent):
         self.cached_problem.setup()
         self.cached_problem.run_model()
 
-        print(self.cached_problem.get_val("data:mission:operational:range", units="NM"))
-        print(
-            self.cached_problem.get_val(
-                "data:propulsion:he_power_train:battery_pack:battery_pack_2:SOC_min",
-                units="percent",
-            )
-        )
+        target_range = self.cached_problem.get_val("data:mission:operational:range", units="NM")
 
-    def zip_op_mission_input(self, pt_file_path):
-        """
-        Returns a list of the variables needed for the computation of the equilibrium. Based on
-        the submodel currently registered and the propulsion_id required.
-
-        :param pt_file_path: Path to the powertrain file.
-        :return inputs_zip: a zip containing a list of name, a list of units, a list of shapes,
-        a list of shape_by_conn boolean and a list of copy_shape str.
-        """
-
-        new_component = AutoUnitsDefaultGroup()
-        new_component.add_subsystem(
-            "system",
-            OperationalMissionVector(
-                number_of_points_climb=30,
-                number_of_points_cruise=30,
-                number_of_points_descent=20,
-                number_of_points_reserve=10,
-                power_train_file_path=pt_file_path,
-                pre_condition_pt=True,
-                use_linesearch=False,
-            ),
-            promotes=["*"],
-        )
-
-        name, unit, value, shape, shape_by_conn, copy_shape = list_inputs_metadata(new_component)
-        self._input_zip = zip(name, unit, value, shape, shape_by_conn, copy_shape)
-
-
-class OperationalMissionVectorWithTargetSoC(OperationalMissionVector):
-    def initialize(self):
-
-        super().initialize()
-
-        self.options.declare(
-            "variable_name_target_SoC",
-            types=str,
-            default=None,
-            allow_none=False,
-            desc="Name of the variable that will be used to evaluate if target SOC is reached",
-        )
-
-    def setup(self):
-
-        super().setup()
-        self.add_subsystem(
-            name="distance_to_target",
-            subsys=DistanceToTargetSoc(
-                variable_name_target_SoC=self.options["variable_name_target_SoC"]
-            ),
-            promotes=["*"],
-        )
-
-
-class DistanceToTargetSoc(om.ImplicitComponent):
-    def initialize(self):
-
-        self.options.declare(
-            "variable_name_target_SoC",
-            types=str,
-            default=None,
-            allow_none=False,
-            desc="Name of the variable that will be used to evaluate if target SOC is reached",
-        )
-
-    def setup(self):
-
-        variable_name_target_soc = self.options["variable_name_target_SoC"]
-
-        self.add_input(variable_name_target_soc, val=np.nan, units="percent")
-        self.add_input("data:mission:payload_range:threshold_SoC", val=np.nan, units="percent")
-
-        self.add_output("data:mission:operational:range", units="NM", val=30.0)
-
-        self.declare_partials(
-            of="data:mission:operational:range", wrt=variable_name_target_soc, val=1.0
-        )
-        self.declare_partials(
-            of="data:mission:operational:range",
-            wrt="data:mission:payload_range:threshold_SoC",
-            val=-1.0,
-        )
-
-    def apply_nonlinear(
-        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
-    ):
-
-        variable_name_target_soc = self.options["variable_name_target_SoC"]
-
-        residuals["data:mission:operational:range"] = (
-            inputs[variable_name_target_soc] - inputs["data:mission:payload_range:threshold_SoC"]
-        )
+        outputs["data:mission:payload_range:range"] = target_range

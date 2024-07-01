@@ -2423,4 +2423,4 @@ def test_payload_range():
 
     problem = run_system(ComputePayloadRange(power_train_file_path=pt_file_path), ivc)
     sizing_fuel = problem.get_val("data:mission:payload_range:range", units="NM")
-    assert sizing_fuel == pytest.approx(1.0, abs=1e-2)
+    assert sizing_fuel == pytest.approx(158.94, abs=1e-2)
