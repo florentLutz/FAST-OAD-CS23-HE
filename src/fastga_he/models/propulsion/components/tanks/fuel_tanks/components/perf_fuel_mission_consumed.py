@@ -40,7 +40,8 @@ class PerformancesFuelConsumedMission(om.ExplicitComponent):
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_consumed_mission",
             units="kg",
             val=50.0,
-            desc="Amount of fuel from that tank which will be consumed during mission",
+            desc="Amount of fuel from that tank which will be consumed during mission (does "
+            "not account for takeoff and initial climb, the amount used for sizing does)",
         )
 
         self.declare_partials(
