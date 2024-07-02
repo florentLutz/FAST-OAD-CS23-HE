@@ -174,7 +174,7 @@ class ComputePayloadRange(om.ExplicitComponent):
 
         # Replace the old solver with a NewtonSolver to handle the ImplicitComponent
         model.op_mission.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        model.op_mission.nonlinear_solver.options["iprint"] = 2
+        model.op_mission.nonlinear_solver.options["iprint"] = 0
         model.op_mission.nonlinear_solver.options["maxiter"] = 100
         model.op_mission.nonlinear_solver.options["rtol"] = 1e-5
         model.op_mission.nonlinear_solver.options["atol"] = 1e-5

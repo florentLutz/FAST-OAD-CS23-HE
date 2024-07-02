@@ -2452,3 +2452,28 @@ def test_payload_range_fuel():
 
     payload_array = problem.get_val("data:mission:payload_range:payload", units="kg")
     assert payload_array == pytest.approx([1140.0, 1140.0, 578.0, 0.0], abs=1.0)
+
+
+def test_payload_range_hybrid():
+
+    oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.climb_speed"] = None
+    oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.descent_speed"] = None
+
+    xml_file = "input_payload_range_hybrid.xml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "hybrid_propulsion.yml")
+
+    input_list = list_inputs(ComputePayloadRange(power_train_file_path=pt_file_path))
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        input_list,
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(ComputePayloadRange(power_train_file_path=pt_file_path), ivc)
+    range_array = problem.get_val("data:mission:payload_range:range", units="NM")
+    assert range_array == pytest.approx([0.0, 183, 1492, 1586], abs=1.0)
+
+    payload_array = problem.get_val("data:mission:payload_range:payload", units="kg")
+    assert payload_array == pytest.approx([1140.0, 1140.0, 367.0, 0.0], abs=1.0)
