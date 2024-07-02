@@ -2428,6 +2428,9 @@ def test_payload_range_elec():
     payload_array = problem.get_val("data:mission:payload_range:payload", units="kg")
     assert payload_array == pytest.approx([390.0, 390.0, 390.0, 0.0], abs=1.0)
 
+    ef_array = problem.get_val("data:mission:payload_range:emission_factor") * 1000.0
+    assert ef_array == pytest.approx([0.0, 0.55154901, 0.55154901, 0.0], abs=1.0)
+
 
 def test_payload_range_fuel():
 
@@ -2453,6 +2456,9 @@ def test_payload_range_fuel():
     payload_array = problem.get_val("data:mission:payload_range:payload", units="kg")
     assert payload_array == pytest.approx([1140.0, 1140.0, 578.0, 0.0], abs=1.0)
 
+    ef_array = problem.get_val("data:mission:payload_range:emission_factor") * 1000.0
+    assert ef_array == pytest.approx([0.0, 3.31697162, 5.22867416, 0.0], abs=1.0)
+
 
 def test_payload_range_hybrid():
 
@@ -2477,3 +2483,6 @@ def test_payload_range_hybrid():
 
     payload_array = problem.get_val("data:mission:payload_range:payload", units="kg")
     assert payload_array == pytest.approx([1140.0, 1140.0, 367.0, 0.0], abs=1.0)
+
+    ef_array = problem.get_val("data:mission:payload_range:emission_factor") * 1000.0
+    assert ef_array == pytest.approx([0.0, 3.68316, 6.78295, 0.0], abs=1.0)

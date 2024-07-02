@@ -101,8 +101,23 @@ class ComputePayloadRange(om.ExplicitComponent):
         self.add_input("data:weight:aircraft:max_payload", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:MTOW", val=np.nan, units="kg")
 
+        self.add_input(
+            "data:mission:payload_range:carbon_intensity_fuel",
+            val=3.81,
+            desc="Carbon intensity of the fuel in kgCO2 per kg of fuel",
+        )
+        self.add_input(
+            "data:mission:payload_range:carbon_intensity_electricity", val=72.7, units="g/MJ"
+        )
+
         self.add_output("data:mission:payload_range:range", val=1.0, units="NM", shape=4)
         self.add_output("data:mission:payload_range:payload", val=1.0, units="kg", shape=4)
+        self.add_output(
+            "data:mission:payload_range:emission_factor",
+            val=1.0,
+            shape=4,
+            desc="Emission factor in kgCO2 per kg of payload per km",
+        )
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
@@ -188,13 +203,21 @@ class ComputePayloadRange(om.ExplicitComponent):
         # D and E. Yes, I know.
         range_array = np.zeros(4)
         payload_array = np.zeros(4)
+        ef_array = np.zeros(4)
 
         max_payload = inputs["data:weight:aircraft:max_payload"][0]
         mtow = inputs["data:weight:aircraft:MTOW"][0]
         owe = inputs["data:weight:aircraft:OWE"][0]
 
-        # Point A correspond to max payload, no range
+        carbon_intensity_fuel = inputs["data:mission:payload_range:carbon_intensity_fuel"]
+        carbon_intensity_electricity = (
+            inputs["data:mission:payload_range:carbon_intensity_electricity"] / 1000.0
+        )  # In kgCO2 per MJ
+
+        # Point A correspond to max payload, no range. The emission factor is not really defined
+        # here since emissions are nil but so is the distances
         payload_array[0] = max_payload
+        ef_array[0] = 0
 
         # Point B correspond to max payload and the range that leads to the MTOW. On an electric
         # aircraft this correspond to the design point
@@ -212,7 +235,7 @@ class ComputePayloadRange(om.ExplicitComponent):
             self.cached_problem.run_model()
             range_point_b = self.cached_problem.get_val(
                 "data:mission:operational:range", units="NM"
-            )
+            )[0]
             range_array[1] = range_point_b
         else:
             # The threshold value is already set we can just go ahead and compute the corresponding
@@ -220,8 +243,18 @@ class ComputePayloadRange(om.ExplicitComponent):
             self.cached_problem.run_model()
             range_point_b = self.cached_problem.get_val(
                 "data:mission:operational:range", units="NM"
-            )
+            )[0]
             range_array[1] = range_point_b
+
+        emissions_point_b = (
+            self.cached_problem.get_val("data:mission:operational:fuel", units="kg")[0]
+            * carbon_intensity_fuel
+            + self.cached_problem.get_val("data:mission:operational:energy", units="kW*h")[0]
+            * 3.6
+            * carbon_intensity_electricity
+        )
+        emission_factor_b = emissions_point_b / range_point_b / max_payload
+        ef_array[1] = emission_factor_b
 
         # Point D corresponds to MFW and MTOW. On an electric aircraft this point is the same as
         # the previous one, so we will simply not recompute it.
@@ -236,37 +269,41 @@ class ComputePayloadRange(om.ExplicitComponent):
             self.cached_problem.run_model()
             range_point_d = self.cached_problem.get_val(
                 "data:mission:operational:range", units="NM"
-            )
+            )[0]
             payload_array[2] = payload
             range_array[2] = range_point_d
+
+            emissions_point_d = (
+                self.cached_problem.get_val("data:mission:operational:fuel", units="kg")[0]
+                * carbon_intensity_fuel
+                + self.cached_problem.get_val("data:mission:operational:energy", units="kW*h")[0]
+                * 3.6
+                * carbon_intensity_electricity
+            )
+            emission_factor_d = emissions_point_d / range_point_d / payload
+            ef_array[2] = emission_factor_d
         else:
             payload_array[2] = payload_array[1]
             range_array[2] = range_array[1]
+            ef_array[2] = ef_array[1]
 
-        # Point E correspond to no payload and MFW. On an electric aircraft, it's simply no payload
+        # Point E correspond to no payload and MFW. On an electric aircraft, it's simply no
+        # payload. Here, the emission factor is not defined as the payload goes to 0 so we will
+        # have an emission factor of 0.
         self.cached_problem.set_val(
             "data:mission:operational:payload:mass",
             0.0,
             units="kg",
         )
-        # Twice the same thing could be simplified honestly
-        if self.configurator.will_aircraft_mass_vary():
-            self.cached_problem.run_model()
-            range_point_e = self.cached_problem.get_val(
-                "data:mission:operational:range", units="NM"
-            )
-            payload_array[3] = 0
-            range_array[3] = range_point_e
-        else:
-            self.cached_problem.run_model()
-            range_point_e = self.cached_problem.get_val(
-                "data:mission:operational:range", units="NM"
-            )
-            payload_array[3] = 0
-            range_array[3] = range_point_e
+        self.cached_problem.run_model()
+        range_point_e = self.cached_problem.get_val("data:mission:operational:range", units="NM")[0]
+        payload_array[3] = 0.0
+        range_array[3] = range_point_e
+        ef_array[3] = 0.0
 
         outputs["data:mission:payload_range:range"] = range_array
         outputs["data:mission:payload_range:payload"] = payload_array
+        outputs["data:mission:payload_range:emission_factor"] = ef_array
 
 
 def zip_op_mission_input(pt_file_path):
