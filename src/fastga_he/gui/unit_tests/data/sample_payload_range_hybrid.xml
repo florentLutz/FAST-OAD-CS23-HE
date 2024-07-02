@@ -1,0 +1,11 @@
+<FASTOAD_model>
+  <data>
+    <mission>
+      <payload_range>
+        <range units="NM">[0.0, 183, 1492, 1586]</range>
+        <payload units="kg">[1140.0, 1140.0, 367.0, 0.0]</payload>
+        <emission_factor>[0.0, 3.68316, 6.78295, 0.0]</emission_factor>
+      </payload_range>
+    </mission>
+  </data>
+</FASTOAD_model>
