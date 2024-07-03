@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 from .payload_range_inner_sampling import ComputePayloadRangeInnerSampling
 from .payload_range_inner import ComputePayloadRangeInner
