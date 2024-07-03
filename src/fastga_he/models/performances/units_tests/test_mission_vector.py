@@ -76,6 +76,14 @@ from fastga_he.models.performances.op_mission_vector.update_tow import UpdateTOW
 
 from fastga_he.models.performances.payload_range.payload_range import ComputePayloadRange
 
+from fastga_he.models.performances.payload_range.payload_range_inner_sampling import (
+    ComputePayloadRangeInnerSampling,
+)
+from fastga_he.models.performances.payload_range.payload_range_inner import ComputePayloadRangeInner
+from fastga_he.models.performances.payload_range.payload_range_inner_group import (
+    ComputePayloadRangeInnerGroup,
+)
+
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -2429,7 +2437,7 @@ def test_payload_range_elec():
     assert payload_array == pytest.approx([390.0, 390.0, 390.0, 0.0], abs=1.0)
 
     ef_array = problem.get_val("data:mission:payload_range:emission_factor") * 1000.0
-    assert ef_array == pytest.approx([0.0, 0.55154901, 0.55154901, 0.0], abs=1.0)
+    assert ef_array == pytest.approx([0.0, 0.29781, 0.29781, 0.0], rel=1e-3)
 
 
 def test_payload_range_fuel():
@@ -2457,7 +2465,7 @@ def test_payload_range_fuel():
     assert payload_array == pytest.approx([1140.0, 1140.0, 578.0, 0.0], abs=1.0)
 
     ef_array = problem.get_val("data:mission:payload_range:emission_factor") * 1000.0
-    assert ef_array == pytest.approx([0.0, 3.31697162, 5.22867416, 0.0], abs=1.0)
+    assert ef_array == pytest.approx([0.0, 1.7910, 2.8232, 0.0], rel=1e-3)
 
 
 def test_payload_range_hybrid():
@@ -2485,4 +2493,339 @@ def test_payload_range_hybrid():
     assert payload_array == pytest.approx([1140.0, 1140.0, 367.0, 0.0], abs=1.0)
 
     ef_array = problem.get_val("data:mission:payload_range:emission_factor") * 1000.0
-    assert ef_array == pytest.approx([0.0, 3.68316, 6.78295, 0.0], abs=1.0)
+    assert ef_array == pytest.approx([0.0, 1.9887, 3.6624, 0.0], rel=1e-3)
+
+
+def test_sample_payload_range_space():
+
+    xml_file = "input_payload_range_hybrid.xml"
+
+    input_list = list_inputs(ComputePayloadRangeInnerSampling(number_of_sample=15))
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        input_list,
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(ComputePayloadRangeInnerSampling(number_of_sample=15), ivc)
+    range_array = problem.get_val("data:mission:inner_payload_range:range", units="NM")
+    assert range_array == pytest.approx(
+        [
+            259.4,
+            778.4,
+            1297.3,
+            249.7,
+            749.2,
+            1248.6,
+            191.3,
+            574.1,
+            956.8,
+            127.0,
+            381.0,
+            635.1,
+            62.6,
+            188.0,
+            313.3,
+        ],
+        abs=1.0,
+    )
+
+    payload_array = problem.get_val("data:mission:inner_payload_range:payload", units="kg")
+    assert payload_array == pytest.approx(
+        [
+            114.0,
+            114.0,
+            114.0,
+            342.0,
+            342.0,
+            342.0,
+            570.0,
+            570.0,
+            570.0,
+            798.0,
+            798.0,
+            798.0,
+            1026.0,
+            1026.0,
+            1026.0,
+        ],
+        abs=1.0,
+    )
+
+
+def test_payload_range_inner():
+
+    oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.climb_speed"] = None
+    oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.descent_speed"] = None
+
+    xml_file = "input_payload_range_hybrid.xml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "hybrid_propulsion.yml")
+
+    input_list = list_inputs(
+        ComputePayloadRangeInner(number_of_sample=15, power_train_file_path=pt_file_path)
+    )
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        input_list,
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(
+        ComputePayloadRangeInner(number_of_sample=15, power_train_file_path=pt_file_path), ivc
+    )
+
+    fuel_array = problem.get_val("data:mission:inner_payload_range:fuel", units="kg")
+    assert fuel_array == pytest.approx(
+        [
+            216.11890573,
+            509.11748287,
+            814.87712505,
+            217.46387897,
+            509.31107377,
+            814.69041081,
+            189.86938353,
+            419.80614788,
+            658.25783303,
+            156.62384753,
+            313.34145788,
+            474.14134444,
+            120.75048878,
+            200.22427841,
+            280.67130484,
+        ],
+        abs=1.0,
+    )
+
+    energy_array = problem.get_val("data:mission:inner_payload_range:energy", units="kW*h")
+    assert energy_array == pytest.approx(
+        [
+            2.04803863,
+            7.31353348,
+            13.97999356,
+            6.13765375,
+            12.41001492,
+            19.49440213,
+            10.56676512,
+            15.74084523,
+            21.44096117,
+            15.11924835,
+            18.80361488,
+            22.74181018,
+            19.86645016,
+            21.81606542,
+            23.83088774,
+        ],
+        abs=1.0,
+    )
+
+    emission_array = problem.get_val("data:mission:inner_payload_range:emissions", units="kg")
+    assert emission_array == pytest.approx(
+        [
+            823.9490435,
+            1941.6517077,
+            3108.34069035,
+            830.14372561,
+            1943.72314017,
+            3109.07254012,
+            726.16788503,
+            1603.58111744,
+            2513.5738722,
+            600.69386878,
+            1198.7522366,
+            1812.43050886,
+            465.25880957,
+            768.5642014,
+            1075.59469138,
+        ],
+        abs=1.0,
+    )
+    emission_factor_array = (
+        problem.get_val("data:mission:inner_payload_range:emission_factor") * 1000.0
+    )
+    assert emission_factor_array == pytest.approx(
+        [
+            15.04473521,
+            11.81469918,
+            11.34860191,
+            5.24889227,
+            4.09609054,
+            3.93133847,
+            3.59588861,
+            2.64598604,
+            2.48859743,
+            3.2004099,
+            2.12892607,
+            1.93096934,
+            3.91139727,
+            2.15146339,
+            1.80675769,
+        ],
+        abs=1.0,
+    )
+
+
+def test_payload_range_inner_with_impossible_ranges():
+
+    oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.climb_speed"] = None
+    oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.descent_speed"] = None
+
+    xml_file = "input_payload_range_fuel.xml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "turboshaft_propulsion_for_payload_range.yml")
+
+    input_list = list_inputs(
+        ComputePayloadRangeInner(number_of_sample=15, power_train_file_path=pt_file_path)
+    )
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        input_list,
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(
+        ComputePayloadRangeInner(number_of_sample=15, power_train_file_path=pt_file_path), ivc
+    )
+    fuel_array = problem.get_val("data:mission:inner_payload_range:fuel", units="kg")
+    assert fuel_array == pytest.approx(
+        [
+            249.73863924,
+            592.96511237,
+            -1.0,
+            251.69540505,
+            593.14458674,
+            -1.0,
+            220.20538896,
+            488.50183803,
+            -1.0,
+            182.35015163,
+            364.69909411,
+            -1.0,
+            141.66003584,
+            233.87179012,
+            -1.0,
+        ],
+        abs=1.0,
+    )
+
+
+def test_payload_range_inner_with_builtin_sampling():
+
+    oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.climb_speed"] = None
+    oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.descent_speed"] = None
+
+    xml_file = "input_payload_range_hybrid.xml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "hybrid_propulsion.yml")
+
+    input_list = list_inputs(
+        ComputePayloadRangeInnerGroup(
+            number_of_sample=15, power_train_file_path=pt_file_path, generate_sample=True
+        )
+    )
+
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        input_list,
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(
+        ComputePayloadRangeInnerGroup(
+            number_of_sample=15, power_train_file_path=pt_file_path, generate_sample=True
+        ),
+        ivc,
+    )
+
+    fuel_array = problem.get_val("data:mission:inner_payload_range:fuel", units="kg")
+    assert fuel_array == pytest.approx(
+        [
+            216.11890573,
+            509.11748287,
+            814.87712505,
+            217.46387897,
+            509.31107377,
+            814.69041081,
+            189.86938353,
+            419.80614788,
+            658.25783303,
+            156.62384753,
+            313.34145788,
+            474.14134444,
+            120.75048878,
+            200.22427841,
+            280.67130484,
+        ],
+        abs=1.0,
+    )
+
+    energy_array = problem.get_val("data:mission:inner_payload_range:energy", units="kW*h")
+    assert energy_array == pytest.approx(
+        [
+            2.04803863,
+            7.31353348,
+            13.97999356,
+            6.13765375,
+            12.41001492,
+            19.49440213,
+            10.56676512,
+            15.74084523,
+            21.44096117,
+            15.11924835,
+            18.80361488,
+            22.74181018,
+            19.86645016,
+            21.81606542,
+            23.83088774,
+        ],
+        abs=1.0,
+    )
+
+    emission_array = problem.get_val("data:mission:inner_payload_range:emissions", units="kg")
+    assert emission_array == pytest.approx(
+        [
+            823.9490435,
+            1941.6517077,
+            3108.34069035,
+            830.14372561,
+            1943.72314017,
+            3109.07254012,
+            726.16788503,
+            1603.58111744,
+            2513.5738722,
+            600.69386878,
+            1198.7522366,
+            1812.43050886,
+            465.25880957,
+            768.5642014,
+            1075.59469138,
+        ],
+        abs=1.0,
+    )
+    emission_factor_array = (
+        problem.get_val("data:mission:inner_payload_range:emission_factor") * 1000.0
+    )
+    assert emission_factor_array == pytest.approx(
+        [
+            15.04473521,
+            11.81469918,
+            11.34860191,
+            5.24889227,
+            4.09609054,
+            3.93133847,
+            3.59588861,
+            2.64598604,
+            2.48859743,
+            3.2004099,
+            2.12892607,
+            1.93096934,
+            3.91139727,
+            2.15146339,
+            1.80675769,
+        ],
+        abs=1.0,
+    )

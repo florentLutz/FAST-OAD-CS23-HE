@@ -253,7 +253,7 @@ class ComputePayloadRange(om.ExplicitComponent):
             * 3.6
             * carbon_intensity_electricity
         )
-        emission_factor_b = emissions_point_b / range_point_b / max_payload
+        emission_factor_b = emissions_point_b / (range_point_b * 1.852) / max_payload
         ef_array[1] = emission_factor_b
 
         # Point D corresponds to MFW and MTOW. On an electric aircraft this point is the same as
@@ -280,7 +280,7 @@ class ComputePayloadRange(om.ExplicitComponent):
                 * 3.6
                 * carbon_intensity_electricity
             )
-            emission_factor_d = emissions_point_d / range_point_d / payload
+            emission_factor_d = emissions_point_d / (range_point_d * 1.852) / payload
             ef_array[2] = emission_factor_d
         else:
             payload_array[2] = payload_array[1]

@@ -139,6 +139,14 @@
           <thrust units="N" is_input="False">485.96112311015116</thrust>
         </taxi_out>
       </operational>
+      <payload_range>
+        <range units="NM">[0.0, 415, 1226, 1350]</range>
+        <payload units="kg">[1140.0, 1140.0, 578.0, 0.0]</payload>
+      </payload_range>
+      <inner_payload_range>
+        <range units="NM">[259.4, 778.4, 1797.3, 249.7, 749.2, 1748.6, 191.3, 574.1, 1456.8, 127.0, 381.0, 1135.1, 62.6, 188.0, 813.3]</range>
+        <payload units="kg">[114.0, 114.0, 114.0, 342.0, 342.0, 342.0, 570.0, 570.0, 570.0, 798.0, 798.0, 798.0, 1026.0, 1026.0, 1026.0]</payload>
+      </inner_payload_range>
     </mission>
     <propulsion>
       <he_power_train>

@@ -199,6 +199,15 @@
       </sizing>
     </environmental_impact>
     <mission>
+      <payload_range>
+        <range units="NM">[0.0, 183, 1492, 1586]</range>
+        <payload units="kg">[1140.0, 1140.0, 367.0, 0.0]</payload>
+        <emission_factor>[0.0, 3.68316, 6.78295, 0.0]</emission_factor>
+      </payload_range>
+      <inner_payload_range>
+        <range units="NM">[259.4, 778.4, 1297.3, 249.7, 749.2, 1248.6, 191.3, 574.1, 956.8, 127.0, 381.0, 635.1, 62.6, 188.0, 313.3]</range>
+        <payload units="kg">[114.0, 114.0, 114.0, 342.0, 342.0, 342.0, 570.0, 570.0, 570.0, 798.0, 798.0, 798.0, 1026.0, 1026.0, 1026.0]</payload>
+      </inner_payload_range>
       <operational>
         <TOW units="kg" is_input="False">3113.187794527346</TOW>
         <energy units="W*h" is_input="False">0.0</energy>
