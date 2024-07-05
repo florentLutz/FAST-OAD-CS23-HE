@@ -7,6 +7,7 @@ import openmdao.api as om
 import numpy as np
 
 import fastoad.api as oad
+from fastoad.module_management.constants import ModelDomain
 from fastoad.openmdao.problem import AutoUnitsDefaultGroup
 
 from fastga_he.command.api import list_inputs_metadata
@@ -24,6 +25,7 @@ from .mission_range_from_soc import OperationalMissionVectorWithTargetSoC
 from .mission_range_from_fuel import OperationalMissionVectorWithTargetFuel
 
 
+@oad.RegisterOpenMDAOSystem("fastga_he.payload_range.outer", domain=ModelDomain.PERFORMANCE)
 class ComputePayloadRange(om.ExplicitComponent):
     """
     Computation of the characteristic points of the payload-range diagram. Will use the

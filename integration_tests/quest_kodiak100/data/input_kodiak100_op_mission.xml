@@ -150,11 +150,13 @@
         </turboshaft>
         <fuel_tank>
           <fuel_tank_1>
+            <capacity units="kg" is_input="True">486.822<!--Capacity of the tank in terms of weight--></capacity>
             <CG>
               <x units="m" is_input="True">4.462616605755205<!--X position of the battery center of gravity--></x>
             </CG>
           </fuel_tank_1>
           <fuel_tank_2>
+            <capacity units="kg" is_input="True">486.822<!--Capacity of the tank in terms of weight--></capacity>
             <CG>
               <x units="m" is_input="True">4.462616605755205<!--X position of the battery center of gravity--></x>
             </CG>
@@ -164,6 +166,8 @@
     </propulsion>
     <weight>
       <aircraft>
+        <max_payload units="kg" is_input="True">1140.0<!--max payload weight--></max_payload>
+        <MTOW units="kg" is_input="False">3279.200314313628<!--maximum takeoff weight of the aircraft--></MTOW>
         <OWE units="kg" is_input="True">1727.0220065946305<!--Mass of aircraft--></OWE>
       </aircraft>
       <aircraft_empty>

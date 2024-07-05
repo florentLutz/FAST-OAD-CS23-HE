@@ -46,13 +46,13 @@ class ComputePayloadRangeInnerSampling(om.ExplicitComponent):
             "data:mission:inner_payload_range:range",
             val=1.0,
             units="NM",
-            shape=(self.number_of_payload + 2) * (self.number_of_ranges + 2),
+            shape=(self.number_of_payload + 3) * (self.number_of_ranges + 2),
         )
         self.add_output(
             "data:mission:inner_payload_range:payload",
             val=1.0,
             units="kg",
-            shape=(self.number_of_payload + 2) * (self.number_of_ranges + 2),
+            shape=(self.number_of_payload + 3) * (self.number_of_ranges + 2),
         )
 
         self.declare_partials(of="*", wrt="*", method="fd")
@@ -73,8 +73,14 @@ class ComputePayloadRangeInnerSampling(om.ExplicitComponent):
             / self.number_of_payload
         )
         payload_array = np.concatenate(
-            (np.array([min_payload]), payload_array, np.array([max_payload]))
+            (
+                np.array([min_payload]),
+                payload_array,
+                np.array([max_payload]),
+                np.array([outer_payload_array[2]]),
+            )
         )
+        payload_array.sort()
 
         range_array = np.array([])
         payload_mesh = np.array([])

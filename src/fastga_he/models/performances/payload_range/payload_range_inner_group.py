@@ -4,10 +4,14 @@
 
 import openmdao.api as om
 
+import fastoad.api as oad
+from fastoad.module_management.constants import ModelDomain
+
 from .payload_range_inner_sampling import ComputePayloadRangeInnerSampling
 from .payload_range_inner import ComputePayloadRangeInner
 
 
+@oad.RegisterOpenMDAOSystem("fastga_he.payload_range.inner", domain=ModelDomain.PERFORMANCE)
 class ComputePayloadRangeInnerGroup(om.Group):
     """
     Computation of the performances of the aircraft on some points inside the payload range diagram.

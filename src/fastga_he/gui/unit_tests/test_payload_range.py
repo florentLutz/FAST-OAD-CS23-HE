@@ -48,16 +48,17 @@ def test_payload_range_electric():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
-def test_inner_payload_range_hybrid():
+def test_inner_payload_range_fuel_lite():
     """
-    Tests for inner payload range display with hybrid.
+    Tests for inner payload range display with fuel.
     """
 
     fig = payload_range_inner(
-        pth.join(DATA_FOLDER_PATH, "sample_payload_range_hybrid.xml"),
+        pth.join(DATA_FOLDER_PATH, "sample_payload_range_fuel_lite.xml"),
         smooth=True,
         grid_accuracy=1000,
-        z_filter=10,
+        z_filter=1000.0,
+        what_to_plot="fuel",
     )
 
     fig.show()
@@ -74,7 +75,7 @@ def test_inner_payload_range_comparison():
         sec_aircraft_file_path=pth.join(DATA_FOLDER_PATH, "sample_payload_range_hybrid.xml"),
         smooth=True,
         grid_accuracy=1000,
-        z_filter=5,
+        z_filter=0.2,
     )
 
     fig.show()

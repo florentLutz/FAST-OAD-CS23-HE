@@ -75,6 +75,7 @@ def payload_range_outer(
 def payload_range_inner(
     ref_aircraft_file_path: str,
     sec_aircraft_file_path: str = None,
+    what_to_plot: str = "emission_factor",
     file_formatter=None,
     smooth: bool = True,
     grid_accuracy: int = 100,
@@ -87,6 +88,8 @@ def payload_range_inner(
     :param ref_aircraft_file_path: path of reference aircraft data file
     :param sec_aircraft_file_path: path of secondary aircraft data file which will be compared to
     the reference
+    :param what_to_plot: what data to plot, can be "fuel", "energy", "emissions" or
+    "emission_factor"
     :param file_formatter: the formatter that defines the format of data file. If not provided,
     default format will be assumed.
     :param smooth: boolean to trigger smoothing of the heatmap
@@ -101,7 +104,9 @@ def payload_range_inner(
 
     ref_inner_range_array = ref_variables["data:mission:inner_payload_range:range"].value
     ref_inner_payload_array = ref_variables["data:mission:inner_payload_range:payload"].value
-    ref_inner_ef_array = ref_variables["data:mission:inner_payload_range:emission_factor"].value
+    ref_inner_what_to_plot_array = ref_variables[
+        "data:mission:inner_payload_range:" + what_to_plot
+    ].value
 
     ref_outer_range_array = ref_variables["data:mission:payload_range:range"].value
     ref_outer_payload_array = ref_variables["data:mission:payload_range:payload"].value
@@ -111,7 +116,9 @@ def payload_range_inner(
 
         sec_inner_range_array = sec_variables["data:mission:inner_payload_range:range"].value
         sec_inner_payload_array = sec_variables["data:mission:inner_payload_range:payload"].value
-        sec_inner_ef_array = sec_variables["data:mission:inner_payload_range:emission_factor"].value
+        sec_inner_what_to_plot_array = sec_variables[
+            "data:mission:inner_payload_range:" + what_to_plot
+        ].value
 
         sec_outer_range_array = sec_variables["data:mission:payload_range:range"].value
         sec_outer_payload_array = sec_variables["data:mission:payload_range:payload"].value
@@ -128,18 +135,19 @@ def payload_range_inner(
 
         ref_z = griddata(
             (ref_inner_range_array, ref_inner_payload_array),
-            ref_inner_ef_array,
+            ref_inner_what_to_plot_array,
             (x_mesh, y_mesh),
             method="linear",
         )
         sec_z = griddata(
             (sec_inner_range_array, sec_inner_payload_array),
-            sec_inner_ef_array,
+            sec_inner_what_to_plot_array,
             (x_mesh, y_mesh),
             method="linear",
         )
 
-        z_for_plot = ref_z - sec_z
+        # When comparing two design, results are displayed in % and not in absolute
+        z_for_plot = (sec_z - ref_z) / ref_z
     else:
         x_for_plot = np.linspace(0, max(ref_outer_range_array), grid_accuracy)
         y_for_plot = np.linspace(0, max(ref_outer_payload_array), grid_accuracy)
@@ -147,7 +155,7 @@ def payload_range_inner(
         x_mesh, y_mesh = np.meshgrid(x_for_plot, y_for_plot)
         z_for_plot = griddata(
             (ref_inner_range_array, ref_inner_payload_array),
-            ref_inner_ef_array,
+            ref_inner_what_to_plot_array,
             (x_mesh, y_mesh),
             method="linear",
         )
@@ -156,7 +164,10 @@ def payload_range_inner(
 
     z_max = z_filter
     if sec_aircraft_file_path:
-        z_min = -z_filter
+        if z_filter:
+            z_min = -z_filter
+        else:
+            z_min = None
     else:
         z_min = 0
 
@@ -166,7 +177,6 @@ def payload_range_inner(
             x=x_for_plot,
             z=z_for_plot,
             colorscale="Viridis",
-            zsmooth="best",
             zmin=z_min,
             zmax=z_max,
         )
