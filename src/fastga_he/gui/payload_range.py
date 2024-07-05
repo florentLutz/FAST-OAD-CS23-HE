@@ -73,56 +73,92 @@ def payload_range_outer(
 
 
 def payload_range_inner(
-    aircraft_file_path: str,
-    name="",
+    ref_aircraft_file_path: str,
+    sec_aircraft_file_path: str = None,
     file_formatter=None,
     smooth: bool = True,
     grid_accuracy: int = 100,
-    z_max_filter: float = None,
+    z_filter: float = None,
 ) -> go.FigureWidget:
     """
     Returns a figure plot of the inner values of the payload range.
     Each design can be provided a name.
 
-    :param aircraft_file_path: path of data file
-    :param name: name to give to the trace added to the figure
+    :param ref_aircraft_file_path: path of reference aircraft data file
+    :param sec_aircraft_file_path: path of secondary aircraft data file which will be compared to
+    the reference
     :param file_formatter: the formatter that defines the format of data file. If not provided,
     default format will be assumed.
     :param smooth: boolean to trigger smoothing of the heatmap
     :param grid_accuracy: an interpolation on a grid of size (grid_accuracy, grid_accuracy) is done
     on the reference ef values from the input
-    :param z_max_filter: filter all values of emission factor above that value
+    :param z_filter: filter all values of emission factor above that value or below minus that value
+    when comparing aircraft
     :return: wing plot figure.
     """
 
-    variables = VariableIO(aircraft_file_path, file_formatter).read()
+    ref_variables = VariableIO(ref_aircraft_file_path, file_formatter).read()
 
-    inner_range_array = variables["data:mission:inner_payload_range:range"].value
-    inner_payload_array = variables["data:mission:inner_payload_range:payload"].value
-    inner_ef_array = variables["data:mission:inner_payload_range:emission_factor"].value
+    ref_inner_range_array = ref_variables["data:mission:inner_payload_range:range"].value
+    ref_inner_payload_array = ref_variables["data:mission:inner_payload_range:payload"].value
+    ref_inner_ef_array = ref_variables["data:mission:inner_payload_range:emission_factor"].value
 
-    outer_range_array = variables["data:mission:payload_range:range"].value
-    outer_payload_array = variables["data:mission:payload_range:payload"].value
+    ref_outer_range_array = ref_variables["data:mission:payload_range:range"].value
+    ref_outer_payload_array = ref_variables["data:mission:payload_range:payload"].value
 
-    annotation_array = []
-    for ef in inner_ef_array:
-        if inner_ef_array == INVALID_COMPUTATION_RESULT:
-            ef = np.nan
-        annotation = r"Emission factor (kgCO2/kgPAX/nm): " + str(ef)
-        annotation_array.append(annotation)
+    if sec_aircraft_file_path:
+        sec_variables = VariableIO(sec_aircraft_file_path, file_formatter).read()
 
-    x_for_plot = np.linspace(0, max(outer_range_array), grid_accuracy)
-    y_for_plot = np.linspace(0, max(outer_payload_array), grid_accuracy)
+        sec_inner_range_array = sec_variables["data:mission:inner_payload_range:range"].value
+        sec_inner_payload_array = sec_variables["data:mission:inner_payload_range:payload"].value
+        sec_inner_ef_array = sec_variables["data:mission:inner_payload_range:emission_factor"].value
 
-    x_mesh, y_mesh = np.meshgrid(x_for_plot, y_for_plot)
-    z_for_plot = griddata(
-        (inner_range_array, inner_payload_array),
-        inner_ef_array,
-        (x_mesh, y_mesh),
-        method="linear",
-    )
+        sec_outer_range_array = sec_variables["data:mission:payload_range:range"].value
+        sec_outer_payload_array = sec_variables["data:mission:payload_range:payload"].value
+
+    if sec_aircraft_file_path:
+        x_for_plot = np.linspace(
+            0, max(max(ref_outer_range_array), max(sec_outer_range_array)), grid_accuracy
+        )
+        y_for_plot = np.linspace(
+            0, max(max(ref_outer_payload_array), max(sec_outer_payload_array)), grid_accuracy
+        )
+
+        x_mesh, y_mesh = np.meshgrid(x_for_plot, y_for_plot)
+
+        ref_z = griddata(
+            (ref_inner_range_array, ref_inner_payload_array),
+            ref_inner_ef_array,
+            (x_mesh, y_mesh),
+            method="linear",
+        )
+        sec_z = griddata(
+            (sec_inner_range_array, sec_inner_payload_array),
+            sec_inner_ef_array,
+            (x_mesh, y_mesh),
+            method="linear",
+        )
+
+        z_for_plot = ref_z - sec_z
+    else:
+        x_for_plot = np.linspace(0, max(ref_outer_range_array), grid_accuracy)
+        y_for_plot = np.linspace(0, max(ref_outer_payload_array), grid_accuracy)
+
+        x_mesh, y_mesh = np.meshgrid(x_for_plot, y_for_plot)
+        z_for_plot = griddata(
+            (ref_inner_range_array, ref_inner_payload_array),
+            ref_inner_ef_array,
+            (x_mesh, y_mesh),
+            method="linear",
+        )
 
     fig = go.Figure()
+
+    z_max = z_filter
+    if sec_aircraft_file_path:
+        z_min = -z_filter
+    else:
+        z_min = 0
 
     if smooth:
         scatter = go.Heatmap(
@@ -131,8 +167,8 @@ def payload_range_inner(
             z=z_for_plot,
             colorscale="Viridis",
             zsmooth="best",
-            zmin=0,
-            zmax=z_max_filter,
+            zmin=z_min,
+            zmax=z_max,
         )
     else:
         scatter = go.Heatmap(
@@ -140,21 +176,33 @@ def payload_range_inner(
             x=x_for_plot,
             z=z_for_plot,
             colorscale="Viridis",
-            zmin=0,
-            zmax=z_max_filter,
+            zmin=z_min,
+            zmax=z_max,
         )
 
     fig.add_trace(scatter)
 
-    scatter = go.Scatter(
-        x=outer_range_array,
-        y=outer_payload_array,
+    ref_scatter = go.Scatter(
+        x=ref_outer_range_array,
+        y=ref_outer_payload_array,
         mode="lines+markers",
-        name=name,
+        name="Reference aircraft",
         showlegend=True,
     )
-    fig.add_trace(scatter)
+    fig.add_trace(ref_scatter)
+
+    if sec_aircraft_file_path:
+        sec_scatter = go.Scatter(
+            x=sec_outer_range_array,
+            y=sec_outer_payload_array,
+            mode="lines+markers",
+            name="Secondary aircraft",
+            showlegend=True,
+        )
+        fig.add_trace(sec_scatter)
 
     fig = go.FigureWidget(fig)
+
+    fig.update_layout(legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99))
 
     return fig

@@ -45,12 +45,6 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
             default="",
             desc="Path to the file containing the description of the power",
         )
-        self.options.declare(
-            name="number_of_sample",
-            types=int,
-            default=12,
-            desc="Number of sample inside the payload range envelope",
-        )
 
     def setup(self):
 
@@ -62,8 +56,6 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
         oad.RegisterSubmodel.active_models[
             HE_SUBMODEL_DEP_EFFECT
         ] = "fastga_he.submodel.performances.dep_effect.from_pt_file"
-
-        number_of_sample = self.options["number_of_sample"]
 
         self.configurator.load(self.options["power_train_file_path"])
 
@@ -108,40 +100,41 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
         self.add_input("data:mission:payload_range:payload", val=np.nan, units="kg", shape=4)
 
         self.add_input(
-            "data:mission:inner_payload_range:range", val=np.nan, units="NM", shape=number_of_sample
+            "data:mission:inner_payload_range:range", val=np.nan, units="NM", shape_by_conn=True
         )
         self.add_input(
-            "data:mission:inner_payload_range:payload",
-            val=np.nan,
-            units="kg",
-            shape=number_of_sample,
+            "data:mission:inner_payload_range:payload", val=np.nan, units="kg", shape_by_conn=True
         )
 
         self.add_output(
             "data:mission:inner_payload_range:fuel",
             val=1.0,
             units="kg",
-            shape=number_of_sample,
+            shape_by_conn=True,
+            copy_shape="data:mission:inner_payload_range:range",
             desc="Fuel consumed during selected mission",
         )
         self.add_output(
             "data:mission:inner_payload_range:energy",
             val=1.0,
             units="kW*h",
-            shape=number_of_sample,
+            shape_by_conn=True,
+            copy_shape="data:mission:inner_payload_range:range",
             desc="Fuel consumed during selected mission",
         )
         self.add_output(
             "data:mission:inner_payload_range:emissions",
             val=1.0,
             units="kg",
-            shape=number_of_sample,
+            shape_by_conn=True,
+            copy_shape="data:mission:inner_payload_range:range",
             desc="Emissions of the aircraft in kgCO2",
         )
         self.add_output(
             "data:mission:inner_payload_range:emission_factor",
             val=1.0,
-            shape=number_of_sample,
+            shape_by_conn=True,
+            copy_shape="data:mission:inner_payload_range:range",
             desc="Emission factor in kgCO2 per kg of payload per km",
         )
 

@@ -47,7 +47,6 @@ class ComputePayloadRangeInnerGroup(om.Group):
         self.add_subsystem(
             name="compute_payload_range_inner",
             subsys=ComputePayloadRangeInner(
-                number_of_sample=self.options["number_of_sample"],
                 power_train_file_path=self.options["power_train_file_path"],
             ),
             promotes=["*"],
