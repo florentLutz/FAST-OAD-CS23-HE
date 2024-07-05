@@ -7,7 +7,7 @@ import os.path as pth
 
 import pytest
 
-from ..payload_range import payload_range_outer
+from ..payload_range import payload_range_outer, payload_range_inner
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 
@@ -42,6 +42,19 @@ def test_payload_range_electric():
 
     fig = payload_range_outer(
         pth.join(DATA_FOLDER_PATH, "sample_payload_range_electric.xml"), name="Electric"
+    )
+
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_inner_payload_range_hybrid():
+    """
+    Tests for inner payload range display with hybrid.
+    """
+
+    fig = payload_range_inner(
+        pth.join(DATA_FOLDER_PATH, "sample_payload_range_hybrid.xml"), name="Hybrid"
     )
 
     fig.show()
