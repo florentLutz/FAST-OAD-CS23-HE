@@ -26,6 +26,14 @@ model:
     environmental_impact:
         id: fastga_he.environmental.energy_simple
         mission: operational
+    outer_payload_range:
+        id: fastga_he.payload_range.outer
+        power_train_file_path: ./turboshaft_propulsion_op_mission.yml
+    inner_payload_range:
+        id: fastga_he.payload_range.inner
+        power_train_file_path: ./turboshaft_propulsion_op_mission.yml
+        generate_sample: True
+        number_of_sample: 15
 
 submodels:
     submodel.weight.mass.payload: null

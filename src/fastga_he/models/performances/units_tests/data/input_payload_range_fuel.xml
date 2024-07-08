@@ -41,9 +41,17 @@
         </low_speed>
       </wing>
     </aerodynamics>
+    <environmental_impact>
+      <operational>
+        <emission_factor is_input="False">2.2235348503139574<!--Total emissions during the operational mission per kg of payload per km [kgCO2/kg/km]--></emission_factor>
+        <emissions units="g" is_input="False">938900.9317541703<!--Total emissions during the operational mission, in gCO2,eq--></emissions>
+        <energy_emissions units="g" is_input="False">0.0<!--Emissions related to energy production during the operational mission, in gCO2,eq--></energy_emissions>
+        <fuel_emissions units="g" is_input="False">938900.9317541703<!--Emissions related to fuel consumption and production during the operational mission, in gCO2,eq--></fuel_emissions>
+      </operational>
+    </environmental_impact>
     <geometry>
       <wing>
-        <area units="m**2" is_input="True">23.040814198582993<!--_inp_data:geometry:wing:area--></area>
+        <area units="m**2" is_input="True">23.040814198582993<!--wing area--></area>
         <wet_area units="m**2" is_input="True">43.82935840880368<!--wet area of wing--></wet_area>
         <MAC>
           <length units="m" is_input="True">1.6591127549960687<!--length of mean aerodynamic chord of wing--></length>
@@ -64,20 +72,35 @@
     </geometry>
     <mission>
       <operational>
-        <range units="NM" is_input="True">200.0</range>
+        <TOW units="kg" is_input="False">3113.187794527346</TOW>
+        <energy units="W*h" is_input="False">0.0</energy>
+        <fuel units="kg" is_input="False">246.16578793271555</fuel>
+        <range units="nmi" is_input="True">200.0</range>
         <climb>
+          <distance units="m" is_input="False">35995.664907714294</distance>
+          <duration units="s" is_input="False">627.6141946273906</duration>
+          <energy units="W*h" is_input="False">0.0</energy>
+          <fuel units="kg" is_input="False">21.877505660387445</fuel>
           <v_eas units="knot" is_input="True">101.0</v_eas>
           <climb_rate>
-            <cruise_level units="ft/min" is_input="True">1002.0<!--target climb rate at the end of climb--></cruise_level>
-            <sea_level units="ft/min" is_input="True">1545.0<!--target climb rate at sea level--></sea_level>
+            <cruise_level units="ft/min" is_input="True">1002.0</cruise_level>
+            <sea_level units="ft/min" is_input="True">1545.0</sea_level>
           </climb_rate>
         </climb>
         <cruise>
-          <altitude units="ft" is_input="True">10000.0<!--altitude during cruise phase in sizing mission--></altitude>
-          <v_tas units="kn" is_input="True">120.0</v_tas>
+          <altitude units="ft" is_input="True">10000.0</altitude>
+          <distance units="m" is_input="False">276210.69288316224</distance>
+          <duration units="s" is_input="False">4474.255284284485</duration>
+          <energy units="W*h" is_input="False">0.0</energy>
+          <fuel units="kg" is_input="False">114.39751283349476</fuel>
+          <v_tas units="knot" is_input="True">120.0</v_tas>
         </cruise>
         <descent>
-          <descent_rate units="ft/min" is_input="True">-800.0<!--target descent rate for the aircraft--></descent_rate>
+          <descent_rate units="ft/min" is_input="True">-800.0</descent_rate>
+          <distance units="m" is_input="False">73998.0617019611</distance>
+          <duration units="s" is_input="False">1020.0</duration>
+          <energy units="W*h" is_input="False">0.0</energy>
+          <fuel units="kg" is_input="False">18.047469501311188</fuel>
           <v_eas units="knot" is_input="True">140.0</v_eas>
         </descent>
         <initial_climb>
@@ -93,20 +116,37 @@
         <reserve>
           <altitude units="ft" is_input="True">10000.0</altitude>
           <duration units="min" is_input="True">45.0</duration>
+          <energy units="W*h" is_input="False">0.0</energy>
+          <fuel units="kg" is_input="False">67.01229077598042</fuel>
+          <v_tas units="m/s" is_input="False">58.53488701050972</v_tas>
         </reserve>
         <takeoff>
           <energy units="W*h" is_input="True">0.0</energy>
           <fuel units="kg" is_input="True">15.0</fuel>
         </takeoff>
         <taxi_in>
-          <duration units="s" is_input="True">300.0<!--duration of taxi in phase--></duration>
-          <speed units="kn" is_input="True">20.0<!--ground velocity during taxi in phase--></speed>
+          <duration units="s" is_input="True">300.0</duration>
+          <energy units="W*h" is_input="False">0.0</energy>
+          <fuel units="kg" is_input="False">4.765504580770845</fuel>
+          <speed units="knot" is_input="True">20.0</speed>
+          <thrust units="N" is_input="False">485.96112311015116</thrust>
         </taxi_in>
         <taxi_out>
-          <duration units="s" is_input="True">300.0<!--duration of taxi out phase--></duration>
-          <speed units="kn" is_input="True">20.0<!--ground velocity during taxi out phase--></speed>
+          <duration units="s" is_input="True">300.0</duration>
+          <energy units="W*h" is_input="False">0.0</energy>
+          <fuel units="kg" is_input="False">4.765504580770845</fuel>
+          <speed units="knot" is_input="True">20.0</speed>
+          <thrust units="N" is_input="False">485.96112311015116</thrust>
         </taxi_out>
       </operational>
+      <payload_range>
+        <range units="NM">[0.0, 415, 1226, 1350]</range>
+        <payload units="kg">[1140.0, 1140.0, 578.0, 0.0]</payload>
+      </payload_range>
+      <inner_payload_range>
+        <range units="NM">[106.0,261.0,783.0,1305.0,1566.0,106.0,259.0,778.0,1297.0,1556.0,106.0,250.0,749.0,1249.0,1498.0,106.0,191.0,574.0,957.0,1148.0,106.0,127.0,381.0,635.0,762.0,106.0,63.0,188.0,313.0,376.0,106.0,30.0,92.0,152.0,183.0]</range>
+        <payload units="kg">[76.0, 76.0, 76.0, 76.0, 76.0, 114.0, 114.0, 114.0, 114.0, 114.0, 342.0, 342.0, 342.0, 342.0, 342.0, 570.0, 570.0, 570.0, 570.0, 570.0, 798.0, 798.0, 798.0, 798.0, 798.0, 1026.0, 1026.0, 1026.0, 1026.0, 1026.0, 1140.0, 1140.0, 1140.0, 1140.0, 1140.0]</payload>
+      </inner_payload_range>
     </mission>
     <propulsion>
       <he_power_train>
@@ -114,29 +154,52 @@
         <fuel_system>
           <fuel_system_1>
             <fuel_distribution is_input="True">[1.0, 1.0]</fuel_distribution>
+            <number_engine is_input="False">1.0<!--Number of engine connected to this fuel system--></number_engine>
+            <total_fuel_flowed units="kg" is_input="False">230.86578793271553<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
           </fuel_system_1>
         </fuel_system>
+        <fuel_tank>
+          <fuel_tank_1>
+            <capacity units="kg" is_input="False">486.822</capacity>
+            <fuel_consumed_mission units="kg" is_input="False">115.43289396635777<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
+            <CG>
+              <x units="m" is_input="True">4.462616605755205</x>
+            </CG>
+          </fuel_tank_1>
+          <fuel_tank_2>
+            <capacity units="kg" is_input="False">486.822</capacity>
+            <fuel_consumed_mission units="kg" is_input="False">115.43289396635777<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
+            <CG>
+              <x units="m" is_input="True">4.462616605755205</x>
+            </CG>
+          </fuel_tank_2>
+        </fuel_tank>
         <propeller>
           <propeller_1>
             <activity_factor is_input="True">150.0<!--Activity factor of the propeller--></activity_factor>
+            <advance_ratio_max is_input="False">0.978931649778388<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">25.0<!--Twist between the propeller blade root and tip--></blade_twist>
-            <cl_clean_ref is_input="True">0.0<!--Value of the clean lift coefficient of the section behind the propeller for reference wing lift coefficient--></cl_clean_ref>
+            <cl_clean_ref is_input="True">0.0</cl_clean_ref>
             <diameter units="m" is_input="True">2.44<!--Diameter of the propeller--></diameter>
             <diameter_to_chord_ratio is_input="True">1.357505606827031<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
             <diameter_to_span_ratio is_input="True">0.3512120081332606<!--Diameter of the propeller as a ratio of the wing half span--></diameter_to_span_ratio>
             <flapped_ratio is_input="True">0.0<!--Portion of the span, downstream of the propeller, which has flaps--></flapped_ratio>
             <from_wing_LE_ratio is_input="True">2.2520341584490793<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
+            <tip_mach_max is_input="False">0.6705623695034154<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
+            <torque_max units="N*m" is_input="False">2178.0352948856907<!--Maximum value of the propeller torque--></torque_max>
             <wing_chord_ref units="m" is_input="True">1.7974143073361883<!--Value of the wing chord behind the propeller--></wing_chord_ref>
           </propeller_1>
         </propeller>
         <turboshaft>
           <turboshaft_1>
+            <power_max units="kW" is_input="False">511.0723492053901<!--Maximum power the turboshaft has to provide--></power_max>
             <power_offtake units="kW" is_input="True">30.0<!--Mechanical offtake on the turboshaft, is added to shaft power out--></power_offtake>
             <power_rating units="kW" is_input="True">551.0<!--Flat rating of the turboshaft--></power_rating>
-            <shaft_power_rating units="kW" is_input="True">551.0<!--Value of the maximum power the turboshaft can provide used for power rate--></shaft_power_rating>
+            <shaft_power_rating units="kW" is_input="True">551.0</shaft_power_rating>
             <design_point>
               <OPR is_input="True">7.0<!--OPR of the turboshaft at the design point--></OPR>
               <T41t units="degK" is_input="True">1400.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
@@ -148,27 +211,21 @@
             </limit>
           </turboshaft_1>
         </turboshaft>
-        <fuel_tank>
-          <fuel_tank_1>
-            <capacity units="kg" is_input="True">486.822<!--Capacity of the tank in terms of weight--></capacity>
-            <CG>
-              <x units="m" is_input="True">4.462616605755205<!--X position of the battery center of gravity--></x>
-            </CG>
-          </fuel_tank_1>
-          <fuel_tank_2>
-            <capacity units="kg" is_input="True">486.822<!--Capacity of the tank in terms of weight--></capacity>
-            <CG>
-              <x units="m" is_input="True">4.462616605755205<!--X position of the battery center of gravity--></x>
-            </CG>
-          </fuel_tank_2>
-        </fuel_tank>
       </he_power_train>
     </propulsion>
     <weight>
       <aircraft>
-        <max_payload units="kg" is_input="True">1140.0<!--max payload weight--></max_payload>
         <MTOW units="kg" is_input="False">3279.200314313628<!--maximum takeoff weight of the aircraft--></MTOW>
-        <OWE units="kg" is_input="True">1727.0220065946305<!--Mass of aircraft--></OWE>
+        <OWE units="kg" is_input="True">1727.0220065946305<!--operating weight - empty--></OWE>
+        <max_payload units="kg" is_input="True">1140.0<!--max payload weight--></max_payload>
+        <in_flight_variation>
+          <operational>
+            <fixed_mass_comp>
+              <equivalent_moment units="kg*m" is_input="False">11511.954868095627</equivalent_moment>
+              <mass units="kg" is_input="False">2810.496649023018</mass>
+            </fixed_mass_comp>
+          </operational>
+        </in_flight_variation>
       </aircraft>
       <aircraft_empty>
         <mass units="kg" is_input="True">1670.4966490230179<!--mass of empty aircraft--></mass>

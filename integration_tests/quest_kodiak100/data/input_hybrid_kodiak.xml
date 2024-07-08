@@ -278,12 +278,14 @@
         </fuel_system>
         <fuel_tank>
           <fuel_tank_1>
+            <capacity units="kg" is_input="False">486.822</capacity>
             <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <CG>
               <y_ratio is_input="True">0.365<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
           </fuel_tank_1>
           <fuel_tank_2>
+            <capacity units="kg" is_input="False">486.822</capacity>
             <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <CG>
               <y_ratio is_input="True">0.365<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -479,6 +481,50 @@
       </systems>
     </weight>
     <mission>
+      <operational>
+        <range units="NM" is_input="True">200.</range>
+        <climb>
+            <v_eas units="knot" is_input="True">101.0</v_eas>
+            <climb_rate>
+              <cruise_level units="ft/min" is_input="True">1002.0<!--target climb rate at the end of climb--></cruise_level>
+              <sea_level units="ft/min" is_input="True">1545.0<!--target climb rate at sea level--></sea_level>
+            </climb_rate>
+        </climb>
+        <cruise>
+          <altitude units="ft" is_input="True">10000.</altitude>
+          <v_tas units="knot" is_input="True">120.0<!--cruise speed--></v_tas>
+        </cruise>
+        <descent>
+          <descent_rate units="ft/min" is_input="True">-800.0<!--target descent rate for the aircraft--></descent_rate>
+          <v_eas units="knot" is_input="True">140.0</v_eas>
+        </descent>
+        <reserve>
+          <altitude units="ft" is_input="True">10000.0</altitude>
+          <duration units="min" is_input="True">45.0<!--duration of the reserve segment--></duration>
+        </reserve>
+        <payload>
+          <mass units="kg" is_input="True">1130.</mass>
+          <CG>
+            <x units="m" is_input="True">4.1</x>
+          </CG>
+        </payload>
+        <initial_climb>
+          <energy units="W*h" is_input="True">0.0</energy>
+          <fuel units="kg" is_input="True">0.3</fuel>
+        </initial_climb>
+        <takeoff>
+          <energy units="W*h" is_input="True">0.0</energy>
+          <fuel units="kg" is_input="True">15.0</fuel>
+        </takeoff>
+        <taxi_in>
+          <duration units="s" is_input="True">300.0<!--duration of taxi in phase--></duration>
+          <speed units="knot" is_input="True">20.0<!--ground velocity during taxi in phase--></speed>
+        </taxi_in>
+        <taxi_out>
+          <duration units="s" is_input="True">300.0<!--duration of taxi out phase--></duration>
+          <speed units="knot" is_input="True">20.0<!--ground velocity during taxi out phase--></speed>
+        </taxi_out>
+      </operational>
       <sizing>
         <initial_climb>
           <energy units="W*h" is_input="True">0.0</energy>
