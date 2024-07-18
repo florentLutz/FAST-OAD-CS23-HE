@@ -35,6 +35,7 @@ from ..components.perf_fuel_consumed import PerformancesICEFuelConsumed
 from ..components.perf_maximum import PerformancesMaximum
 
 from ..components.perf_inflight_co2_emissions import PerformancesICEInFlightCO2Emissions
+from ..components.perf_inflight_co_emissions import PerformancesICEInFlightCOEmissions
 
 from ..components.sizing_ice import SizingICE
 from ..components.perf_ice import PerformancesICE
@@ -581,6 +582,30 @@ def test_in_flight_co2_emissions():
                 28210.0,
                 30132.0,
             ]
+        ),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_co_emissions():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([5.12, 5.5, 5.9, 6.33, 6.81, 7.33, 7.89, 8.44, 9.1, 9.72]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesICEInFlightCOEmissions(ice_id="ice_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val("CO_emissions", units="g") == pytest.approx(
+        np.array(
+            [4085.76, 4389.0, 4708.2, 5051.34, 5434.38, 5849.34, 6296.22, 6735.12, 7261.8, 7756.56]
         ),
         rel=1e-2,
     )
