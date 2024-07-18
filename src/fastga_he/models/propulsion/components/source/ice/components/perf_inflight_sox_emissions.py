@@ -6,9 +6,9 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesICEInFlightCOEmissions(om.ExplicitComponent):
+class PerformancesICEInFlightSOxEmissions(om.ExplicitComponent):
     """
-    Computation of the ICE in flight CO emissions, will be based on a simple emissions index whose
+    Computation of the ICE in flight SOx emissions, will be based on a simple emissions index whose
     default value is taken from :cite:`kalivoda:1997`.
     """
 
@@ -31,23 +31,23 @@ class PerformancesICEInFlightCOEmissions(om.ExplicitComponent):
 
         self.add_input("fuel_consumed_t", np.full(number_of_points, np.nan), units="kg")
         self.add_input(
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:CO",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:SOx",
             units="g/kg",
-            val=798.0,
+            val=0.42,
         )
 
-        self.add_output("CO_emissions", np.full(number_of_points, 798.0), units="g")
+        self.add_output("SOx_emissions", np.full(number_of_points, 0.42), units="g")
 
         self.declare_partials(
-            of="CO_emissions",
+            of="SOx_emissions",
             wrt="fuel_consumed_t",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="CO_emissions",
-            wrt="data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:CO",
+            of="SOx_emissions",
+            wrt="data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:SOx",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -57,19 +57,19 @@ class PerformancesICEInFlightCOEmissions(om.ExplicitComponent):
 
         ice_id = self.options["ice_id"]
 
-        outputs["CO_emissions"] = (
+        outputs["SOx_emissions"] = (
             inputs["fuel_consumed_t"]
-            * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:CO"]
+            * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:SOx"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         ice_id = self.options["ice_id"]
 
-        partials["CO_emissions", "fuel_consumed_t"] = np.full_like(
+        partials["SOx_emissions", "fuel_consumed_t"] = np.full_like(
             inputs["fuel_consumed_t"],
-            inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:CO"],
+            inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:SOx"],
         )
         partials[
-            "CO_emissions", "data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:CO"
+            "SOx_emissions", "data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:SOx"
         ] = inputs["fuel_consumed_t"]

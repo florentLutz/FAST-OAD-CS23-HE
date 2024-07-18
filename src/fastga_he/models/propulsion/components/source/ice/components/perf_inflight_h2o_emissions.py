@@ -6,10 +6,10 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesICEInFlightCOEmissions(om.ExplicitComponent):
+class PerformancesICEInFlightH2OEmissions(om.ExplicitComponent):
     """
-    Computation of the ICE in flight CO emissions, will be based on a simple emissions index whose
-    default value is taken from :cite:`kalivoda:1997`.
+    Computation of the ICE in flight water vapour emissions, will be based on a simple emissions
+    index whose default value is taken from :cite:`european:2019`.
     """
 
     def initialize(self):
@@ -31,23 +31,23 @@ class PerformancesICEInFlightCOEmissions(om.ExplicitComponent):
 
         self.add_input("fuel_consumed_t", np.full(number_of_points, np.nan), units="kg")
         self.add_input(
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:CO",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:H2O",
             units="g/kg",
-            val=798.0,
+            val=1237.0,
         )
 
-        self.add_output("CO_emissions", np.full(number_of_points, 798.0), units="g")
+        self.add_output("H2O_emissions", np.full(number_of_points, 1237.0), units="g")
 
         self.declare_partials(
-            of="CO_emissions",
+            of="H2O_emissions",
             wrt="fuel_consumed_t",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="CO_emissions",
-            wrt="data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:CO",
+            of="H2O_emissions",
+            wrt="data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:H2O",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -57,19 +57,19 @@ class PerformancesICEInFlightCOEmissions(om.ExplicitComponent):
 
         ice_id = self.options["ice_id"]
 
-        outputs["CO_emissions"] = (
+        outputs["H2O_emissions"] = (
             inputs["fuel_consumed_t"]
-            * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:CO"]
+            * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:H2O"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 
         ice_id = self.options["ice_id"]
 
-        partials["CO_emissions", "fuel_consumed_t"] = np.full_like(
+        partials["H2O_emissions", "fuel_consumed_t"] = np.full_like(
             inputs["fuel_consumed_t"],
-            inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:CO"],
+            inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:H2O"],
         )
         partials[
-            "CO_emissions", "data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:CO"
+            "H2O_emissions", "data:propulsion:he_power_train:ICE:" + ice_id + ":emission_index:H2O"
         ] = inputs["fuel_consumed_t"]
