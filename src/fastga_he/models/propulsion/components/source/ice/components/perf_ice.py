@@ -70,7 +70,7 @@ class PerformancesICE(om.Group):
         self.add_subsystem(
             name="emissions",
             subsys=PerformancesICEInFlightEmissions(
-                number_of_points=number_of_points, ice_id="ice_1"
+                number_of_points=number_of_points, ice_id=ice_id
             ),
             promotes=["*"],
         )
