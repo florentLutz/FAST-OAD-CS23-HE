@@ -56,8 +56,8 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
 
         self.add_output(
             "design_power_itt_limit",
-            units="kW",
-            val=500.0,
+            units="MW",
+            val=0.5,
             shape=number_of_points,
             desc="Thermodynamic power of the turboshaft at the design point if the ITT was limiting",
         )
