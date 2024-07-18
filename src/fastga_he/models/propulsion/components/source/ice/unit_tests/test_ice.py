@@ -40,6 +40,7 @@ from ..components.perf_inflight_nox_emissions import PerformancesICEInFlightNOxE
 from ..components.perf_inflight_sox_emissions import PerformancesICEInFlightSOxEmissions
 from ..components.perf_inflight_h2o_emissions import PerformancesICEInFlightH2OEmissions
 from ..components.perf_inflight_hc_emissions import PerformancesICEInFlightHCEmissions
+from ..components.perf_inflight_emissions_sum import PerformancesICEInFlightEmissionsSum
 
 from ..components.sizing_ice import SizingICE
 from ..components.perf_ice import PerformancesICE
@@ -729,5 +730,109 @@ def test_in_flight_hc_emissions():
         ),
         rel=1e-2,
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_emissions_sum():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "CO2_emissions",
+        units="g",
+        val=np.array(
+            [
+                15872.0,
+                17050.0,
+                18290.0,
+                19623.0,
+                21111.0,
+                22723.0,
+                24459.0,
+                26164.0,
+                28210.0,
+                30132.0,
+            ]
+        ),
+    )
+    ivc.add_output(
+        "CO_emissions",
+        units="g",
+        val=np.array(
+            [4085.76, 4389.0, 4708.2, 5051.34, 5434.38, 5849.34, 6296.22, 6735.12, 7261.8, 7756.56]
+        ),
+    )
+    ivc.add_output(
+        "NOx_emissions",
+        units="g",
+        val=np.array(
+            [16.0768, 17.27, 18.526, 19.8762, 21.3834, 23.0162, 24.7746, 26.5016, 28.574, 30.5208]
+        ),
+    )
+    ivc.add_output(
+        "SOx_emissions",
+        units="g",
+        val=np.array([2.1504, 2.31, 2.478, 2.6586, 2.8602, 3.0786, 3.3138, 3.5448, 3.822, 4.0824]),
+    )
+    ivc.add_output(
+        "H2O_emissions",
+        units="g",
+        val=np.array(
+            [
+                6333.44,
+                6803.5,
+                7298.3,
+                7830.21,
+                8423.97,
+                9067.21,
+                9759.93,
+                10440.28,
+                11256.7,
+                12023.64,
+            ]
+        ),
+    )
+    ivc.add_output(
+        "HC_emissions",
+        units="g",
+        val=np.array(
+            [
+                96.59904,
+                103.7685,
+                111.3153,
+                119.42811,
+                128.48427,
+                138.29511,
+                148.86063,
+                159.23748,
+                171.6897,
+                183.38724,
+            ]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesICEInFlightEmissionsSum(ice_id="ice_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:CO2", units="kg"
+    ) == pytest.approx(223.634, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:CO", units="kg"
+    ) == pytest.approx(57.56, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:NOx", units="g"
+    ) == pytest.approx(226.5196, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:SOx", units="g"
+    ) == pytest.approx(30.2988, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:H2O", units="kg"
+    ) == pytest.approx(89.237, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:HC", units="g"
+    ) == pytest.approx(1361.06, rel=1e-2)
 
     problem.check_partials(compact_print=True)
