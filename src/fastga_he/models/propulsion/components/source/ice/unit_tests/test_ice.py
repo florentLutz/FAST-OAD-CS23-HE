@@ -41,6 +41,7 @@ from ..components.perf_inflight_sox_emissions import PerformancesICEInFlightSOxE
 from ..components.perf_inflight_h2o_emissions import PerformancesICEInFlightH2OEmissions
 from ..components.perf_inflight_hc_emissions import PerformancesICEInFlightHCEmissions
 from ..components.perf_inflight_emissions_sum import PerformancesICEInFlightEmissionsSum
+from ..components.perf_inflight_emissions import PerformancesICEInFlightEmissions
 
 from ..components.sizing_ice import SizingICE
 from ..components.perf_ice import PerformancesICE
@@ -814,6 +815,42 @@ def test_in_flight_emissions_sum():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesICEInFlightEmissionsSum(ice_id="ice_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:CO2", units="kg"
+    ) == pytest.approx(223.634, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:CO", units="kg"
+    ) == pytest.approx(57.56, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:NOx", units="g"
+    ) == pytest.approx(226.5196, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:SOx", units="g"
+    ) == pytest.approx(30.2988, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:H2O", units="kg"
+    ) == pytest.approx(89.237, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:HC", units="g"
+    ) == pytest.approx(1361.06, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_emissions():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([5.12, 5.5, 5.9, 6.33, 6.81, 7.33, 7.89, 8.44, 9.1, 9.72]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesICEInFlightEmissions(ice_id="ice_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
     assert problem.get_val(
