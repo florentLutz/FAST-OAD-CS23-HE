@@ -34,6 +34,8 @@ from ..components.perf_fuel_consumption import PerformancesICEFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesICEFuelConsumed
 from ..components.perf_maximum import PerformancesMaximum
 
+from ..components.perf_inflight_co2_emissions import PerformancesICEInFlightCO2Emissions
+
 from ..components.sizing_ice import SizingICE
 from ..components.perf_ice import PerformancesICE
 
@@ -549,3 +551,38 @@ def test_performances_ice():
     problem.check_partials(compact_print=True)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_in_flight_co2_emissions():
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([5.12, 5.5, 5.9, 6.33, 6.81, 7.33, 7.89, 8.44, 9.1, 9.72]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesICEInFlightCO2Emissions(ice_id="ice_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val("CO2_emissions", units="g") == pytest.approx(
+        np.array(
+            [
+                15872.0,
+                17050.0,
+                18290.0,
+                19623.0,
+                21111.0,
+                22723.0,
+                24459.0,
+                26164.0,
+                28210.0,
+                30132.0,
+            ]
+        ),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
