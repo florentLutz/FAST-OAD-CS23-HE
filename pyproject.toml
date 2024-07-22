@@ -28,6 +28,7 @@ classifiers = [
     "Operating System :: MacOS",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering :: Physics"
 ]
 packages = [
@@ -41,7 +42,7 @@ packages = [
 # of poetry.lock file will modify docs/requirements.txt and make
 # the commit fail because "files were modified by this hook". In that case,
 # doing again the commit including changes in docs/requirements.txt will succeed.
-python = "^3.8, <3.10"
+python = "^3.8, <3.11"
 fast-oad-cs23 = { git = "https://github.com/supaero-aircraft-design/FAST-GA.git", branch = "main" }
 fast-oad-core = "^1.7.0"
 stdatm = "^0.3.0"
@@ -53,13 +54,13 @@ click = "8.0.4"
 debugpy = "1.5.0"
 
 [tool.poetry.group.dev.dependencies]
-pyvplm = { git = "https://github.com/SizingLab/pyvplm.git", branch = "master" }
+pyvplm = { git = "https://github.com/florentLutz/pyvplm.git", branch = "master" }
 wheel = "*"
 tabula = "*"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^5.2"
-pytest-cov = "*"
+pytest = "^8.0"
+pytest-cov = "^5.0"
 nbval = "*"
 
 [tool.poetry.group.doc.dependencies]
