@@ -27,6 +27,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'poetry'
 
+      - name: Install unstable package # on 2024-07-22, some package can't be installed with poetry for some reason so as a temporary fix, we install them before poetry is ran
+        run: |
+          pip install xdsmjs==2.0.0
+
       - name: Activate environment and install dependencies
         run: |
           poetry env use ${{ matrix.python-version }}
