@@ -57,7 +57,7 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         self.add_output(
             "design_power_opr_limit",
             units="MW",
-            val=1500.0,
+            val=0.5,
             shape=number_of_points,
             desc="Thermodynamic power of the turboshaft at the design point if the OPR was limiting",
         )

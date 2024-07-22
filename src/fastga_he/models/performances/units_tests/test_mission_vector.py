@@ -2054,6 +2054,10 @@ def test_mission_vector_from_yml_fuel_and_battery():
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
     assert mission_end_soc == pytest.approx(0.1254, abs=1e-2)
+    co2_emissions_ice = problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:CO2", units="kg"
+    )
+    assert co2_emissions_ice == pytest.approx(61.16, abs=1e-2)
 
 
 def test_mission_vector_from_yml_fuel_and_battery_gear():

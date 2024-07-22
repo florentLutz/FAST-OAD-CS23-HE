@@ -13,6 +13,8 @@ from ..components.perf_fuel_consumption import PerformancesICEFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesICEFuelConsumed
 from ..components.perf_maximum import PerformancesMaximum
 
+from ..components.perf_inflight_emissions import PerformancesICEInFlightEmissions
+
 
 class PerformancesICE(om.Group):
     def initialize(self):
@@ -64,6 +66,15 @@ class PerformancesICE(om.Group):
             subsys=PerformancesICEFuelConsumed(number_of_points=number_of_points),
             promotes=["*"],
         )
+
+        self.add_subsystem(
+            name="emissions",
+            subsys=PerformancesICEInFlightEmissions(
+                number_of_points=number_of_points, ice_id=ice_id
+            ),
+            promotes=["*"],
+        )
+
         self.add_subsystem(
             name="maximum",
             subsys=PerformancesMaximum(number_of_points=number_of_points, ice_id=ice_id),
