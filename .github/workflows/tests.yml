@@ -14,7 +14,7 @@ jobs:
       matrix:
         python-version: [ "3.8", "3.9", "3.10" ]
         os: [ ubuntu-20.04 ]  # On 2024-07-22, on Windows, some package can't be installed with poetry for some reasons. Same problem as on the template for FAST-OAD plugin.
-                              # While I wait for a solution, we'll disable tests on Windows. Locally the install works just fine.
+                              # While I wait for a solution, we'll disable tests on Windows. Locally the installation works just fine.
 
     steps:
       - uses: actions/checkout@v3
