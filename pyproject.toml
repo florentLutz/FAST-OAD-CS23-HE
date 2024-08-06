@@ -1,6 +1,3 @@
-[tool.black]
-line-length = 100
-
 [tool.poetry]
 name = "FAST-OAD-CS23-HE"
 version = "0.0.1"
@@ -26,9 +23,9 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering :: Physics"
 ]
 packages = [
@@ -44,14 +41,15 @@ packages = [
 # doing again the commit including changes in docs/requirements.txt will succeed.
 python = "^3.8, <3.11"
 fast-oad-cs23 = { git = "https://github.com/supaero-aircraft-design/FAST-GA.git", branch = "main" }
-fast-oad-core = "^1.7.0"
-stdatm = "^0.3.0"
+fast-oad-core = "^1.7.3"
+stdatm = "^0.4.2"
 networkx = "*"
 pyvis = "*"
 Pillow = "9.3"
 kaleido = "0.2.1"
 click = "8.0.4"
 debugpy = "1.5.0"
+lca_algebraic = "*"
 
 [tool.poetry.group.dev.dependencies]
 pyvplm = { git = "https://github.com/florentLutz/pyvplm.git", branch = "master" }
@@ -69,13 +67,33 @@ sphinx-rtd-theme = "*"
 sphinxcontrib-bibtex = "*"
 
 [tool.poetry.group.lint.dependencies]
-pre-commit = "*"
-black = { version = "21.9b0", extras = ["jupyter"], allow-prereleases = true } # if version is changed, please change it also in .pre-commit-config.yaml file.
-pylint = "*"
+pre-commit = "^3.5.0"
+nbstripout = "^0.6.0"
+ruff = "0.5.4"
 
 [tool.poetry.plugins."fastoad.plugins"]
 "cs23_he_plugin" = "fastga_he"
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+extend-include = ["*.ipynb"]
+exclude = ["tests/dummy_plugins/"]
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["E4", "E7", "E9", "F"]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
