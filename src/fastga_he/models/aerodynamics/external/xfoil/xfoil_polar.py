@@ -280,12 +280,12 @@ class XfoilPolarMod(ExternalCodeComp):
             try:
                 super().compute(inputs, outputs)
                 result_array_p = self._read_polar(tmp_result_file_path)
-            except:
+            except:  # noqa: E722
                 # catch the error and try to read result file for non-convergence on higher angles
                 error = sys.exc_info()[1]
                 try:
                     result_array_p = self._read_polar(tmp_result_file_path)
-                except:
+                except:  # noqa: E722
                     raise TimeoutError("<p>Error: %s</p>" % error)
 
             if self.options[OPTION_COMP_NEG_AIR_SYM]:
@@ -307,13 +307,13 @@ class XfoilPolarMod(ExternalCodeComp):
                 try:
                     super().compute(inputs, outputs)
                     result_array_n = self._read_polar(tmp_result_file_path)
-                except:
+                except:  # noqa: E722
                     # catch the error and try to read result file for non-convergence on higher
                     # angles
                     e = sys.exc_info()[1]
                     try:
                         result_array_n = self._read_polar(tmp_result_file_path)
-                    except:
+                    except:  # noqa: E722
                         raise TimeoutError("<p>Error: %s</p>" % e)
 
             # Post-processing
@@ -399,7 +399,7 @@ class XfoilPolarMod(ExternalCodeComp):
                 # noinspection PyBroadException
                 try:
                     data.to_csv(result_file)
-                except:
+                except:  # noqa: E722
                     warnings.warn(
                         "Unable to save XFoil results to *.csv file: writing permission denied for "
                         "%s folder!" % local_resources.__path__[0]
@@ -425,19 +425,19 @@ class XfoilPolarMod(ExternalCodeComp):
             # noinspection PyBroadException
             try:
                 tmp_directory.cleanup()
-            except:
+            except:  # noqa: E722
                 for file_path in os.listdir(tmp_directory.name):
                     if os.path.isfile(file_path):
                         # noinspection PyBroadException
                         try:
                             file = os.open(file_path, os.O_WRONLY)
                             os.close(file)
-                        except:
+                        except:  # noqa: E722
                             _LOGGER.info("Error while trying to close %s file!", file_path)
                 # noinspection PyBroadException
                 try:
                     tmp_directory.cleanup()
-                except:
+                except:  # noqa: E722
                     _LOGGER.info(
                         "Error while trying to erase %s temporary directory!", tmp_directory.name
                     )
@@ -489,7 +489,6 @@ class XfoilPolarMod(ExternalCodeComp):
                 cm = np.asarray(cm)
 
         # Defining outputs -------------------------------------------------------------------------
-        test = self.options["inviscid"]
         outputs["xfoil:alpha"] = alpha
         outputs["xfoil:CL"] = cl
         outputs["xfoil:CD"] = cd
@@ -561,12 +560,12 @@ class XfoilPolarMod(ExternalCodeComp):
         if len(alpha) > 2:
             covered_range = max(alpha) - min(alpha)
             if np.abs(covered_range / alpha_range) >= 0.4:
-                lift_fct = (
-                    lambda x: (lift_coeff[1] - lift_coeff[0])
-                    / (alpha[1] - alpha[0])
-                    * (x - alpha[0])
-                    + lift_coeff[0]
-                )
+
+                def lift_fct(x):
+                    return (lift_coeff[1] - lift_coeff[0]) / (alpha[1] - alpha[0]) * (
+                        x - alpha[0]
+                    ) + lift_coeff[0]
+
                 delta = np.abs(lift_coeff - lift_fct(alpha))
                 return max(lift_coeff[delta <= 0.3]), False
 
@@ -588,12 +587,12 @@ class XfoilPolarMod(ExternalCodeComp):
         if len(alpha) > 2:
             covered_range = max(alpha) - min(alpha)
             if covered_range / alpha_range >= 0.4:
-                lift_fct = (
-                    lambda x: (lift_coeff[1] - lift_coeff[0])
-                    / (alpha[1] - alpha[0])
-                    * (x - alpha[0])
-                    + lift_coeff[0]
-                )
+
+                def lift_fct(x):
+                    return (lift_coeff[1] - lift_coeff[0]) / (alpha[1] - alpha[0]) * (
+                        x - alpha[0]
+                    ) + lift_coeff[0]
+
                 delta = np.abs(lift_coeff - lift_fct(alpha))
                 return min(lift_coeff[delta <= 0.3]), False
 

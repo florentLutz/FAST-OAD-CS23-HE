@@ -309,7 +309,7 @@ if __name__ == "__main__":
 
             print("Turboprop done after " + str(t2 - t1) + " s!")
         # Bad, I know
-        except:
+        except:  # noqa: E722
             pass
 
     data = np.c_[

@@ -2339,7 +2339,7 @@ def test_mission_vector_eight_propeller_with_turned_off_sspc():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
-def test_case_analyzer():
+def test_case_analyzer_octo_prop():
     cr = om.CaseReader(pth.join(RESULTS_FOLDER_PATH, "cases_octo_prop.sql"))
 
     solver_case = cr.get_cases(

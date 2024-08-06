@@ -139,7 +139,5 @@ class PerformancesElectricalNodePercentSplit(om.ImplicitComponent):
         residuals["dc_voltage_in_2"] = dc_current_in_1 + dc_current_in_2 - dc_current_out
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-        number_of_points = self.options["number_of_points"]
-
         jacobian["dc_voltage_in_1", "power_split"] = -inputs["dc_current_out"]
         jacobian["dc_voltage_in_1", "dc_current_out"] = -inputs["power_split"]

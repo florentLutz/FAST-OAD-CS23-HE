@@ -41,7 +41,7 @@ if __name__ == "__main__":
             # print((losses - alpha * speed ** 1.5) / losses * 100)
             # print(np.mean(np.abs((losses - alpha * speed ** 1.5) / losses * 100)))
 
-        except:
+        except:  # noqa: E722
             print("EMRAX " + model_number + " did not converge")
 
     print("===== Coefficients read on map =====")

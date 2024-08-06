@@ -139,7 +139,7 @@ if __name__ == "__main__":
             final_results_df = add_module_to_database(
                 data_file, final_results_df, columns_title_final
             )
-        except:
+        except:  # noqa: E722
             print("Could not read " + data_file)
 
     final_results_df.to_csv(

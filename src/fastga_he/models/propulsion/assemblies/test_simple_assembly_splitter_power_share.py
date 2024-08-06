@@ -521,7 +521,7 @@ def test_incoherent_voltage():
     )
 
     # Should work
-    problem = run_system(
+    run_system(
         PowerTrainPerformancesFromFile(
             power_train_file_path=pt_file_path,
             number_of_points=NB_POINTS_TEST,
@@ -539,7 +539,7 @@ def test_incoherent_voltage():
     )
     # Should return an exception
     with pytest.raises(FASTGAHEIncoherentVoltage) as e_info:
-        problem = run_system(
+        run_system(
             PowerTrainPerformancesFromFile(
                 power_train_file_path=pt_file_path,
                 number_of_points=NB_POINTS_TEST,

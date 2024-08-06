@@ -6,7 +6,6 @@ import openmdao.api as om
 import numpy as np
 
 
-
 class SizingICENacelleWetArea(om.ExplicitComponent):
     """
     Computation of the wet area of the ICE nacelle. Based on some very simple geometric

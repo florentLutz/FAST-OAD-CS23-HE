@@ -11,7 +11,6 @@ import plotly.graph_objects as go
 from fastoad.io import VariableIO
 
 
-
 def payload_range_outer(
     aircraft_file_path: str, name="", fig=None, file_formatter=None
 ) -> go.FigureWidget:

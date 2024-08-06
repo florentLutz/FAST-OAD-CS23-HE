@@ -3,7 +3,7 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import copy
-from pyDOE2 import *
+from pyDOE2 import lhs
 import matplotlib.pyplot as plt
 import numpy as np
 

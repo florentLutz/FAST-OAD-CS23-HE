@@ -154,7 +154,7 @@ def test_dc_sspc_cg_x():
         problem.check_partials(compact_print=True)
 
 
-def test_dc_sspc_cg_x():
+def test_dc_sspc_cg_y():
     expected_cg = [1.87, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
