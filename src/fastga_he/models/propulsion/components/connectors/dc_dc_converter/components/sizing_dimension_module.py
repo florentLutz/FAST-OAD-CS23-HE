@@ -21,7 +21,6 @@ class SizingDCDCConverterModuleDimension(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -68,7 +67,6 @@ class SizingDCDCConverterModuleDimension(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         current_caliber = inputs[
@@ -92,7 +90,6 @@ class SizingDCDCConverterModuleDimension(om.ExplicitComponent):
         ] = 0.065
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[

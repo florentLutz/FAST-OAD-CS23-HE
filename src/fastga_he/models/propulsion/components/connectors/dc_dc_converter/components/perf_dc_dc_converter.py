@@ -127,7 +127,6 @@ class PerformancesDCDCConverter(om.Group):
     def guess_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
         number_of_points = self.options["number_of_points"]
 

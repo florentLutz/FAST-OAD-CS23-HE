@@ -27,7 +27,6 @@ class SizingFuelTankLength(om.ExplicitComponent):
         self.spline = None
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -44,7 +43,6 @@ class SizingFuelTankLength(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
@@ -113,7 +111,6 @@ class SizingFuelTankLength(om.ExplicitComponent):
             )
 
         elif position == "wing_pod":
-
             self.add_input(
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":volume",
                 units="m**3",
@@ -131,18 +128,15 @@ class SizingFuelTankLength(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
         else:
-
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
 
             self.declare_partials(of="*", wrt="data:geometry:cabin:length", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             y_position = inputs[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":CG:y"
             ]
@@ -164,7 +158,6 @@ class SizingFuelTankLength(om.ExplicitComponent):
             ] = self.spline(y_position) * (1.0 - TE_CHORD_MARGIN_RATIO - flap_chord_ratio)
 
         elif position == "wing_pod":
-
             fineness_ratio = inputs[
                 "data:propulsion:he_power_train:fuel_tank:"
                 + fuel_tank_id
@@ -176,21 +169,18 @@ class SizingFuelTankLength(om.ExplicitComponent):
 
             outputs[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:length"
-            ] = (tank_volume * fineness_ratio ** 2.0) ** (1.0 / 3.0)
+            ] = (tank_volume * fineness_ratio**2.0) ** (1.0 / 3.0)
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:length"
             ] = inputs["data:geometry:cabin:length"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             y_position = inputs[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":CG:y"
             ]
@@ -214,7 +204,6 @@ class SizingFuelTankLength(om.ExplicitComponent):
             ] = spline_derivative_value
 
         elif position == "wing_pod":
-
             fineness_ratio = inputs[
                 "data:propulsion:he_power_train:fuel_tank:"
                 + fuel_tank_id
@@ -232,7 +221,7 @@ class SizingFuelTankLength(om.ExplicitComponent):
             ] = (
                 1.0
                 / 3.0
-                * (tank_volume * fineness_ratio ** 2.0) ** (-2.0 / 3.0)
+                * (tank_volume * fineness_ratio**2.0) ** (-2.0 / 3.0)
                 * 2.0
                 * fineness_ratio
                 * tank_volume
@@ -243,6 +232,6 @@ class SizingFuelTankLength(om.ExplicitComponent):
             ] = (
                 1.0
                 / 3.0
-                * (tank_volume * fineness_ratio ** 2.0) ** (-2.0 / 3.0)
-                * fineness_ratio ** 2.0
+                * (tank_volume * fineness_ratio**2.0) ** (-2.0 / 3.0)
+                * fineness_ratio**2.0
             )

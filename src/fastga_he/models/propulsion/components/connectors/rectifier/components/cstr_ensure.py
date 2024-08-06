@@ -26,7 +26,6 @@ class ConstraintsCurrentRMS1PhaseEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="rectifier_id",
             default=None,
@@ -35,7 +34,6 @@ class ConstraintsCurrentRMS1PhaseEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -64,7 +62,6 @@ class ConstraintsCurrentRMS1PhaseEnsure(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         outputs[
@@ -79,7 +76,6 @@ class ConstraintsCurrentRMS1PhaseEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[
@@ -107,7 +103,6 @@ class ConstraintsVoltagePeakEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="rectifier_id",
             default=None,
@@ -116,7 +111,6 @@ class ConstraintsVoltagePeakEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -144,7 +138,6 @@ class ConstraintsVoltagePeakEnsure(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         outputs[
@@ -159,7 +152,6 @@ class ConstraintsVoltagePeakEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[
@@ -195,7 +187,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -238,7 +229,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         outputs[
@@ -257,7 +247,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[
@@ -293,7 +282,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -326,7 +314,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         outputs[
@@ -339,7 +326,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[

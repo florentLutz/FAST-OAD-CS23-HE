@@ -50,7 +50,6 @@ class PerformancesCellTemperatureMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -76,7 +75,6 @@ class PerformancesCellTemperatureMission(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         number_of_points = self.options["number_of_points"]
 

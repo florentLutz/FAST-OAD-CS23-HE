@@ -20,7 +20,6 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -29,7 +28,6 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -86,7 +84,6 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         j = inputs["advance_ratio"]
@@ -109,7 +106,7 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         ]
 
         cp = (
-            10 ** 2.43553
+            10**2.43553
             * j
             ** (
                 0.61554
@@ -177,7 +174,7 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         ]
 
         cp = (
-            10 ** 2.43553
+            10**2.43553
             * j
             ** (
                 0.61554
@@ -300,27 +297,19 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         partials[
             "power_coefficient",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":solidity",
-        ] = (
-            d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi5 * d_log_pi5_d_pi5
-        )
+        ] = d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi5 * d_log_pi5_d_pi5
         partials["power_coefficient", "thrust_coefficient"] = (
             d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi6 * d_log_pi6_d_pi6
         )
         partials[
             "power_coefficient",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":activity_factor",
-        ] = (
-            d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi7 * d_log_pi7_d_pi7
-        )
+        ] = d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi7 * d_log_pi7_d_pi7
         partials[
             "power_coefficient",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":blade_twist",
-        ] = (
-            d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi8 * d_log_pi8_d_pi8
-        )
+        ] = d_pi1_d_log_pi_1 * d_log_pi1_d_log_pi8 * d_log_pi8_d_pi8
         partials[
             "power_coefficient",
             "settings:propulsion:he_power_train:propeller:" + propeller_id + ":installation_effect",
-        ] = (
-            -cp / k_installation
-        )
+        ] = -cp / k_installation

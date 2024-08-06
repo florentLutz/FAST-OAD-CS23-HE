@@ -25,7 +25,6 @@ class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
         self.curated_type_list = None
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -34,7 +33,6 @@ class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         # First we get the list of punctual tanks and the pairs
@@ -71,7 +69,6 @@ class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
         for punctual_tanks_name, punctual_tanks_type in zip(
             wing_punctual_tanks_list, wing_punctual_tanks_type_list
         ):
-
             y_ratio_name = (
                 PT_DATA_PREFIX + punctual_tanks_type + ":" + punctual_tanks_name + ":CG:y_ratio"
             )
@@ -98,7 +95,6 @@ class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         punctual_tanks_y_ratio = []
         # Is named masses but really, it is their capacity
         punctual_tanks_masses = []
@@ -124,7 +120,6 @@ class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
         outputs["data:weight:airframe:wing:punctual_tanks:fuel_inside"] = punctual_tanks_masses
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         name_and_type_array = np.rec.fromarrays([self.curated_name_list, self.curated_type_list])
         nb_punctual_tanks = len(self.curated_name_list)
 
@@ -146,9 +141,9 @@ class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
             partials_value = np.zeros(nb_punctual_tanks)
             partials_value[idx] = 1.0
 
-            partials[
-                "data:weight:airframe:wing:punctual_tanks:y_ratio", y_ratio_name
-            ] = partials_value
-            partials[
-                "data:weight:airframe:wing:punctual_tanks:fuel_inside", mass_name
-            ] = partials_value
+            partials["data:weight:airframe:wing:punctual_tanks:y_ratio", y_ratio_name] = (
+                partials_value
+            )
+            partials["data:weight:airframe:wing:punctual_tanks:fuel_inside", mass_name] = (
+                partials_value
+            )

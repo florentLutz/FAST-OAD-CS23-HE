@@ -23,7 +23,6 @@ class ConstraintsGearbox(om.Group):
         )
 
     def setup(self):
-
         gearbox_id = self.options["gearbox_id"]
 
         option_gearbox_id = {"gearbox_id": gearbox_id}

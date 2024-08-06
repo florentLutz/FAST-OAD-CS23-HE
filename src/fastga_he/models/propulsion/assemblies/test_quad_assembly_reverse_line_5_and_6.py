@@ -33,13 +33,11 @@ class PerformancesAssembly(om.Group):
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         ivc6 = om.IndepVarComp()
@@ -342,7 +340,6 @@ class PerformancesAssembly(om.Group):
 
 
 def test_assembly():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,

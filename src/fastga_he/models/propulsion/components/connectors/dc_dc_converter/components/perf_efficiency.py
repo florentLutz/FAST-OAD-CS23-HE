@@ -9,9 +9,9 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
-] = "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
+oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
+    "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
+)
 
 
 @oad.RegisterSubmodel(
@@ -22,7 +22,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
     """Computation of the efficiency of the inverter."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -35,7 +34,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -58,7 +56,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         efficiency = np.where(
             np.abs(inputs["dc_current_out"]) < 1,
             1.0,
@@ -70,7 +67,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         outputs["efficiency"] = np.clip(efficiency, 0.5, 1.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         losses_converter = inputs["losses_converter"]
         dc_current_out = inputs["dc_current_out"]
         voltage_out = inputs["dc_voltage_out"]

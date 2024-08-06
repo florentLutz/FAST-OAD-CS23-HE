@@ -25,7 +25,6 @@ class SlipstreamPlanetaryGear(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         ivc = om.IndepVarComp()

@@ -37,7 +37,6 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         # We have to declare them even if not used to preserve compatibility
         self.options.declare("propulsion_id", default="", types=str, allow_none=True)
         self.options.declare(
@@ -57,7 +56,6 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
         )
 
     def setup(self):
-
         # Two points for taxi out and taxi in
         number_of_points = self.options["number_of_points"] + 2
         power_train_file_path = self.options["power_train_file_path"]

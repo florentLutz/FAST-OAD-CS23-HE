@@ -23,7 +23,6 @@ class PowerTrainDragFromFile(om.ExplicitComponent):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -32,7 +31,6 @@ class PowerTrainDragFromFile(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         drag_names_ls, drag_names_cruise = self.configurator.get_drag_element_lists()
@@ -52,7 +50,6 @@ class PowerTrainDragFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         drag_names_ls, drag_names_cruise = self.configurator.get_drag_element_lists()
 
         cd0_ls = 0.0

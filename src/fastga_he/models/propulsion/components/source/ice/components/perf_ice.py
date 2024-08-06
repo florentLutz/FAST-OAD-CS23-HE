@@ -18,7 +18,6 @@ from ..components.perf_inflight_emissions import PerformancesICEInFlightEmission
 
 class PerformancesICE(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -30,7 +29,6 @@ class PerformancesICE(om.Group):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
         number_of_points = self.options["number_of_points"]
 

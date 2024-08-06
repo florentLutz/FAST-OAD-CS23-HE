@@ -29,7 +29,6 @@ class PerformancesEfficiencyMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -41,7 +40,6 @@ class PerformancesEfficiencyMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -57,7 +55,6 @@ class PerformancesEfficiencyMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -81,7 +78,6 @@ class PerformancesEfficiencyMission(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 

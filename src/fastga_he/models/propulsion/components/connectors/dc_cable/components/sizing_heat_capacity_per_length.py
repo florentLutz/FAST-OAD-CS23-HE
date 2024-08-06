@@ -10,7 +10,6 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
     """Computation of mass per length of cable."""
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -19,7 +18,6 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -111,7 +109,6 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         r_c = inputs[
@@ -153,7 +150,7 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
         ]
         rho_sheath = inputs["settings:propulsion:he_power_train:DC_cable_harness:sheath:density"]
 
-        hc_conductor = np.pi * cp_c * rho_c * (r_c ** 2.0)
+        hc_conductor = np.pi * cp_c * rho_c * (r_c**2.0)
         hc_i = np.pi * cp_in * rho_in * ((2.0 * r_c + t_in) * t_in)
         hc_shield = np.pi * cp_shield * rho_shield * ((2.0 * (r_c + t_in) + t_shield) * t_shield)
         hc_sheath = (
@@ -221,52 +218,36 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":properties:specific_heat",
-        ] = (
-            np.pi * (r_c ** 2.0) * rho_c
-        )
+        ] = np.pi * (r_c**2.0) * rho_c
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:specific_heat",
-        ] = (
-            np.pi * ((2.0 * r_c + t_in) * t_in) * rho_in
-        )
+        ] = np.pi * ((2.0 * r_c + t_in) * t_in) * rho_in
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:specific_heat",
-        ] = (
-            np.pi * ((2.0 * (r_c + t_in) + t_shield) * t_shield) * rho_shield
-        )
+        ] = np.pi * ((2.0 * (r_c + t_in) + t_shield) * t_shield) * rho_shield
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:sheath:specific_heat",
-        ] = (
-            np.pi * ((2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath) * rho_sheath
-        )
+        ] = np.pi * ((2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath) * rho_sheath
 
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":properties:density",
-        ] = (
-            np.pi * (r_c ** 2.0) * cp_c
-        )
+        ] = np.pi * (r_c**2.0) * cp_c
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:density",
-        ] = (
-            np.pi * ((2.0 * r_c + t_in) * t_in) * cp_in
-        )
+        ] = np.pi * ((2.0 * r_c + t_in) * t_in) * cp_in
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:density",
-        ] = (
-            np.pi * ((2.0 * (r_c + t_in) + t_shield) * t_shield) * cp_shield
-        )
+        ] = np.pi * ((2.0 * (r_c + t_in) + t_shield) * t_shield) * cp_shield
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:sheath:density",
-        ] = (
-            np.pi * ((2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath) * cp_sheath
-        )
+        ] = np.pi * ((2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath) * cp_sheath
 
         partials[
             output_str,
@@ -306,6 +287,4 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
-        ] = (
-            2.0 * np.pi * cp_sheath * rho_sheath * (r_c + t_in + t_shield + t_sheath)
-        )
+        ] = 2.0 * np.pi * cp_sheath * rho_sheath * (r_c + t_in + t_shield + t_sheath)

@@ -21,7 +21,6 @@ class SizingRectifierCapacitorCurrentCaliber(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -47,7 +46,6 @@ class SizingRectifierCapacitorCurrentCaliber(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         cos_phi = inputs[
@@ -58,7 +56,7 @@ class SizingRectifierCapacitorCurrentCaliber(om.ExplicitComponent):
         # to the following formula obtained by a simple derivative computation
 
         factor = np.sqrt(
-            2.0 / (3.0 * np.pi ** 2.0) * (1 + 2.0 * cos_phi ** 2.0 + 1.0 / (8.0 * cos_phi ** 2.0))
+            2.0 / (3.0 * np.pi**2.0) * (1 + 2.0 * cos_phi**2.0 + 1.0 / (8.0 * cos_phi**2.0))
         )
 
         outputs[
@@ -73,7 +71,6 @@ class SizingRectifierCapacitorCurrentCaliber(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         cos_phi = inputs[
@@ -81,7 +78,7 @@ class SizingRectifierCapacitorCurrentCaliber(om.ExplicitComponent):
         ]
 
         factor = np.sqrt(
-            2.0 / (3.0 * np.pi ** 2.0) * (1 + 2.0 * cos_phi ** 2.0 + 1.0 / (8.0 * cos_phi ** 2.0))
+            2.0 / (3.0 * np.pi**2.0) * (1 + 2.0 * cos_phi**2.0 + 1.0 / (8.0 * cos_phi**2.0))
         )
 
         partials[
@@ -101,6 +98,6 @@ class SizingRectifierCapacitorCurrentCaliber(om.ExplicitComponent):
             ]
             / (2.0 * factor)
             * 2.0
-            / (3.0 * np.pi ** 2.0)
-            * (4.0 * cos_phi - 1.0 / (4.0 * cos_phi ** 3.0))
+            / (3.0 * np.pi**2.0)
+            * (4.0 * cos_phi - 1.0 / (4.0 * cos_phi**3.0))
         )

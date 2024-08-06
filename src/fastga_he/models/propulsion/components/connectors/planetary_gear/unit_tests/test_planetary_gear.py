@@ -39,7 +39,6 @@ NB_POINTS_TEST = 10
 
 
 def test_rpm_in():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesRPMIn(planetary_gear_id="planetary_gear_1", number_of_points=NB_POINTS_TEST)
@@ -67,7 +66,6 @@ def test_rpm_in():
 
 
 def test_perf_power_split_formatting():
-
     power_split_float = 42.0
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -116,7 +114,6 @@ def test_perf_power_split_formatting():
 
 
 def test_perf_power_share_formatting():
-
     power_split_float = 150.0e3
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -165,7 +162,6 @@ def test_perf_power_share_formatting():
 
 
 def test_percent_split_equivalent():
-
     ivc_orig = get_indep_var_comp(
         list_inputs(
             PerformancesPercentSplitEquivalent(
@@ -233,7 +229,6 @@ def test_percent_split_equivalent():
 
 
 def test_shaft_power_in():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesShaftPowerIn(
@@ -271,7 +266,6 @@ def test_shaft_power_in():
 
 
 def test_torque_out():
-
     ivc = om.IndepVarComp()
     ivc.add_output("shaft_power_out", val=np.linspace(100.0, 200.0, NB_POINTS_TEST), units="kW")
     ivc.add_output("rpm_out", val=np.linspace(2000.0, 2500.0, NB_POINTS_TEST), units="min**-1")
@@ -288,7 +282,6 @@ def test_torque_out():
 
 
 def test_torque_in():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "shaft_power_in_1",
@@ -319,7 +312,6 @@ def test_torque_in():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "torque_out",
@@ -341,7 +333,6 @@ def test_maximum():
 
 
 def test_performances_planetary_gear_percent_split():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesPlanetaryGear(
@@ -381,7 +372,6 @@ def test_performances_planetary_gear_percent_split():
 
 
 def test_performances_planetary_gear_power_share():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesPlanetaryGear(
@@ -418,7 +408,6 @@ def test_performances_planetary_gear_power_share():
 
 
 def test_torque_constraint_enforce():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnforce(planetary_gear_id="planetary_gear_1")),
         __file__,
@@ -428,19 +417,15 @@ def test_torque_constraint_enforce():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(ConstraintsTorqueEnforce(planetary_gear_id="planetary_gear_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:torque_out_rating",
-            units="N*m",
-        )
-        == pytest.approx(790.0, rel=1e-3)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:torque_out_rating",
+        units="N*m",
+    ) == pytest.approx(790.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_torque_constraint_ensure():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnsure(planetary_gear_id="planetary_gear_1")),
         __file__,
@@ -450,19 +435,15 @@ def test_torque_constraint_ensure():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(ConstraintsTorqueEnsure(planetary_gear_id="planetary_gear_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "constraints:propulsion:he_power_train:planetary_gear:planetary_gear_1:torque_out_rating",
-            units="N*m",
-        )
-        == pytest.approx(40.0, rel=1e-3)
-    )
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:planetary_gear:planetary_gear_1:torque_out_rating",
+        units="N*m",
+    ) == pytest.approx(40.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_sizing_weight():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingPlanetaryGearWeight(planetary_gear_id="planetary_gear_1")),
         __file__,
@@ -480,7 +461,6 @@ def test_sizing_weight():
 
 
 def test_sizing_dimension_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingPlanetaryGearDimensionScaling(planetary_gear_id="planetary_gear_1")),
         __file__,
@@ -500,7 +480,6 @@ def test_sizing_dimension_scaling():
 
 
 def test_sizing_dimension():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingPlanetaryGearDimensions(planetary_gear_id="planetary_gear_1")),
         __file__,
@@ -524,7 +503,6 @@ def test_sizing_dimension():
 
 
 def test_cg_x():
-
     expected_cg = [2.69, 0.45, 2.54]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -541,19 +519,15 @@ def test_cg_x():
             SizingPlanetaryGearCGX(planetary_gear_id="planetary_gear_1", position=option), ivc
         )
 
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:CG:x",
-                units="m",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:CG:x",
+            units="m",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
 
 
 def test_cg_y():
-
     expected_cg = [2.21, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -570,19 +544,15 @@ def test_cg_y():
             SizingPlanetaryGearCGY(planetary_gear_id="planetary_gear_1", position=option), ivc
         )
 
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:CG:y",
-                units="m",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:CG:y",
+            units="m",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
 
 
 def test_planetary_gear_sizing():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingPlanetaryGear(planetary_gear_id="planetary_gear_1")),
@@ -592,30 +562,21 @@ def test_planetary_gear_sizing():
 
     problem = run_system(SizingPlanetaryGear(planetary_gear_id="planetary_gear_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:mass",
-            units="kg",
-        )
-        == pytest.approx(16.22, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:mass",
+        units="kg",
+    ) == pytest.approx(16.22, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:CG:x", units="m"
     ) == pytest.approx(2.69, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:CG:y", units="m"
     ) == pytest.approx(2.21, rel=1e-2)
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:low_speed:CD0",
-        )
-        == pytest.approx(0.0, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:cruise:CD0",
-        )
-        == pytest.approx(0.0, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:low_speed:CD0",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:cruise:CD0",
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

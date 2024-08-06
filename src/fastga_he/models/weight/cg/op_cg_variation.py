@@ -52,7 +52,6 @@ class OperationalInFlightCGVariation(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         m_empty = inputs["data:weight:aircraft_empty:mass"]
         x_cg_plane_aft = inputs["data:weight:aircraft_empty:CG:x"]
 
@@ -68,7 +67,6 @@ class OperationalInFlightCGVariation(om.ExplicitComponent):
         outputs["data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials[
             "data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:equivalent_moment",
             "data:weight:aircraft_empty:mass",

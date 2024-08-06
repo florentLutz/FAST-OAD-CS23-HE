@@ -6,7 +6,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 if __name__ == "__main__":
-
     rms_current = np.array(
         [
             23.183391003460187,
@@ -48,9 +47,9 @@ if __name__ == "__main__":
     a, b = x[0]
 
     print(np.exp(a), b)
-    print(np.exp(a) * rms_current ** b)
+    print(np.exp(a) * rms_current**b)
     print(weight)
 
     plt.plot(weight, weight, "o", color="red")
-    plt.plot(weight, np.exp(a) * rms_current ** b)
+    plt.plot(weight, np.exp(a) * rms_current**b)
     plt.show()

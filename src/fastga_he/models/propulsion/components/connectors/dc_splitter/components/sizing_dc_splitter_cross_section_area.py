@@ -15,7 +15,6 @@ class SizingDCSplitterCrossSectionArea(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_splitter_id",
             default=None,
@@ -25,7 +24,6 @@ class SizingDCSplitterCrossSectionArea(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         self.add_input(
@@ -47,7 +45,6 @@ class SizingDCSplitterCrossSectionArea(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         max_current = inputs[
@@ -57,10 +54,9 @@ class SizingDCSplitterCrossSectionArea(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":cross_section:area"
-        ] = (400.0 * max_current * 0.785 * (1 + 0.05 * (number_of_plates - 1.0)) * 1e-6 / 0.155)
+        ] = 400.0 * max_current * 0.785 * (1 + 0.05 * (number_of_plates - 1.0)) * 1e-6 / 0.155
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         number_of_plates = 1.0
@@ -68,6 +64,4 @@ class SizingDCSplitterCrossSectionArea(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":cross_section:area",
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":current_caliber",
-        ] = (
-            400.0 * 0.785 * (1 + 0.05 * (number_of_plates - 1.0)) * 1e-6 / 0.155
-        )
+        ] = 400.0 * 0.785 * (1 + 0.05 * (number_of_plates - 1.0)) * 1e-6 / 0.155

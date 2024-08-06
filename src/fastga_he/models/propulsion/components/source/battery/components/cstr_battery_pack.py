@@ -23,7 +23,6 @@ class ConstraintsBattery(om.Group):
         )
 
     def setup(self):
-
         option_battery_pack_id = {"battery_pack_id": self.options["battery_pack_id"]}
 
         self.add_subsystem(

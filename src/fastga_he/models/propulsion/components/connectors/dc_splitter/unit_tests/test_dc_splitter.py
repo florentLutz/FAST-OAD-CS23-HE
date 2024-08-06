@@ -35,7 +35,6 @@ NB_POINTS_TEST = 10
 
 
 def test_splitter_cross_section_area():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingDCSplitterCrossSectionArea(dc_splitter_id="dc_splitter_1")),
@@ -54,7 +53,6 @@ def test_splitter_cross_section_area():
 
 
 def test_bus_bar_cross_section_dimensions():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingSplitterCrossSectionDimensions(dc_splitter_id="dc_splitter_1")),
@@ -65,13 +63,10 @@ def test_bus_bar_cross_section_dimensions():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingSplitterCrossSectionDimensions(dc_splitter_id="dc_splitter_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:cross_section:thickness",
-            units="cm",
-        )
-        == pytest.approx(0.224, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:cross_section:thickness",
+        units="cm",
+    ) == pytest.approx(0.224, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:cross_section:width", units="cm"
     ) == pytest.approx(4.49, rel=1e-2)
@@ -80,7 +75,6 @@ def test_bus_bar_cross_section_dimensions():
 
 
 def test_bus_bar_insulation_thickness():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingDCSplitterInsulationThickness(dc_splitter_id="dc_splitter_1")),
@@ -99,7 +93,6 @@ def test_bus_bar_insulation_thickness():
 
 
 def test_bus_bar_dimensions():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingDCSplitterDimensions(dc_splitter_id="dc_splitter_1")),
@@ -124,7 +117,6 @@ def test_bus_bar_dimensions():
 
 
 def test_bus_bar_weight():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingDCSplitterWeight(dc_splitter_id="dc_splitter_1")), __file__, XML_FILE
@@ -141,7 +133,6 @@ def test_bus_bar_weight():
 
 
 def test_dc_sspc_cg_x():
-
     expected_cg = [2.69, 0.45, 2.54]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -164,7 +155,6 @@ def test_dc_sspc_cg_x():
 
 
 def test_dc_sspc_cg_x():
-
     expected_cg = [1.87, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -251,7 +241,6 @@ def test_constraints_voltage_ensure():
 
 
 def test_perf_power_split_formatting():
-
     power_split_float = 42.0
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -296,7 +285,6 @@ def test_perf_power_split_formatting():
 
 
 def test_perf_power_share_formatting():
-
     power_split_float = 150.0e3
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -345,7 +333,6 @@ def test_perf_power_share_formatting():
 
 
 def test_percent_split_equivalent():
-
     ivc_orig = om.IndepVarComp()
     ivc_orig.add_output("dc_current_out", val=np.full(NB_POINTS_TEST, 500), units="A")
     ivc_orig.add_output("dc_voltage", val=np.full(NB_POINTS_TEST, 500), units="V")
@@ -400,7 +387,6 @@ def test_percent_split_equivalent():
 
 
 def test_perf_maximum():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "dc_voltage",
@@ -438,7 +424,6 @@ def test_perf_maximum():
 
 
 def test_sizing_dc_splitter():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingDCSplitter(dc_splitter_id="dc_splitter_1")), __file__, XML_FILE

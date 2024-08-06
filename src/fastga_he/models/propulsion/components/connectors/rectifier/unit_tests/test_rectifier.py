@@ -65,7 +65,6 @@ NB_POINTS_TEST = 10
 
 
 def test_voltage_out_target_mission():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesVoltageOutTargetMission(
@@ -112,7 +111,6 @@ def test_voltage_out_target_mission():
 
 
 def test_switching_frequency_mission():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency_mission",
@@ -156,7 +154,6 @@ def test_switching_frequency_mission():
 
 
 def test_heat_sink_temperature_mission():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:rectifier:rectifier_1:heat_sink_temperature_mission",
@@ -200,7 +197,6 @@ def test_heat_sink_temperature_mission():
 
 
 def test_switching_losses():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesSwitchingLosses(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)
@@ -234,7 +230,6 @@ def test_switching_losses():
 
 
 def test_resistance_profile():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesResistance(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)
@@ -266,7 +261,6 @@ def test_resistance_profile():
 
 
 def test_gate_voltage_profile():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesGateVoltage(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)
@@ -300,7 +294,6 @@ def test_gate_voltage_profile():
 
 
 def test_conduction_losses():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesConductionLosses(
@@ -354,7 +347,6 @@ def test_conduction_losses():
 
 
 def test_total_losses_rectifier():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "switching_losses_IGBT",
@@ -414,13 +406,10 @@ def test_perf_casing_temperature():
     expected_temperature = np.array(
         [293.8, 296.2, 299.2, 302.7, 306.8, 311.5, 316.8, 322.8, 329.4, 336.8]
     )
-    assert (
-        problem.get_val(
-            "casing_temperature",
-            units="degK",
-        )
-        == pytest.approx(expected_temperature, rel=1e-2)
-    )
+    assert problem.get_val(
+        "casing_temperature",
+        units="degK",
+    ) == pytest.approx(expected_temperature, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -472,29 +461,22 @@ def test_perf_junction_temperature():
     expected_temperature_diode = np.array(
         [332.5, 346.0, 360.3, 374.9, 389.5, 403.6, 416.6, 428.3, 438.1, 445.8]
     )
-    assert (
-        problem.get_val(
-            "diode_temperature",
-            units="degK",
-        )
-        == pytest.approx(expected_temperature_diode, rel=1e-2)
-    )
+    assert problem.get_val(
+        "diode_temperature",
+        units="degK",
+    ) == pytest.approx(expected_temperature_diode, rel=1e-2)
     expected_temperature_igbt = np.array(
         [333.9, 358.4, 389.6, 428.2, 475.1, 531.0, 596.4, 672.3, 759.0, 857.4]
     )
-    assert (
-        problem.get_val(
-            "IGBT_temperature",
-            units="degK",
-        )
-        == pytest.approx(expected_temperature_igbt, rel=1e-2)
-    )
+    assert problem.get_val(
+        "IGBT_temperature",
+        units="degK",
+    ) == pytest.approx(expected_temperature_igbt, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_perf_junction_temperature_constant():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:rectifier:rectifier_1:junction_temperature_mission",
@@ -572,7 +554,6 @@ def test_efficiency():
 
 
 def test_efficiency_mission():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:rectifier:rectifier_1:efficiency_mission",
@@ -608,7 +589,6 @@ def test_efficiency_mission():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
     ivc.add_output("dc_current_out", units="A", val=np.linspace(300.0, 280.0, NB_POINTS_TEST))
     ivc.add_output("dc_voltage_out", units="V", val=np.linspace(500.0, 480.0, NB_POINTS_TEST))
@@ -655,7 +635,6 @@ def test_maximum():
 
 
 def test_constraint_enforce_current():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsCurrentRMS1PhaseEnforce(rectifier_id="rectifier_1")),
         __file__,
@@ -675,7 +654,6 @@ def test_constraint_enforce_current():
 
 
 def test_constraint_enforce_voltage():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsVoltagePeakEnforce(rectifier_id="rectifier_1")),
         __file__,
@@ -695,7 +673,6 @@ def test_constraint_enforce_voltage():
 
 
 def test_constraint_enforce_frequency():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsFrequencyEnforce(rectifier_id="rectifier_1")),
         __file__,
@@ -715,7 +692,6 @@ def test_constraint_enforce_frequency():
 
 
 def test_constraints_enforce_losses():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsLossesEnforce(rectifier_id="rectifier_1")),
@@ -725,19 +701,15 @@ def test_constraints_enforce_losses():
 
     problem = run_system(ConstraintsLossesEnforce(rectifier_id="rectifier_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:dissipable_heat",
-            units="W",
-        )
-        == pytest.approx(14582.4, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:dissipable_heat",
+        units="W",
+    ) == pytest.approx(14582.4, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_constraint_ensure_current():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsCurrentRMS1PhaseEnsure(rectifier_id="rectifier_1")),
         __file__,
@@ -757,7 +729,6 @@ def test_constraint_ensure_current():
 
 
 def test_constraint_ensure_voltage():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsVoltagePeakEnsure(rectifier_id="rectifier_1")),
         __file__,
@@ -777,7 +748,6 @@ def test_constraint_ensure_voltage():
 
 
 def test_constraint_ensure_frequency():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsFrequencyEnsure(rectifier_id="rectifier_1")),
         __file__,
@@ -789,19 +759,15 @@ def test_constraint_ensure_frequency():
         ivc,
     )
 
-    assert (
-        problem.get_val(
-            "constraints:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency",
-            units="Hz",
-        )
-        == pytest.approx(-3.0e3, rel=1e-2)
-    )
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:rectifier:rectifier_1:switching_frequency",
+        units="Hz",
+    ) == pytest.approx(-3.0e3, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_constraints_ensure_losses():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsLossesEnsure(rectifier_id="rectifier_1")),
@@ -811,19 +777,15 @@ def test_constraints_ensure_losses():
 
     problem = run_system(ConstraintsLossesEnsure(rectifier_id="rectifier_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "constraints:propulsion:he_power_train:rectifier:rectifier_1:dissipable_heat",
-            units="W",
-        )
-        == pytest.approx(-417.6, rel=1e-2)
-    )
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:rectifier:rectifier_1:dissipable_heat",
+        units="W",
+    ) == pytest.approx(-417.6, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_scaling_ratio():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierEnergyCoefficientScaling(rectifier_id="rectifier_1")),
@@ -844,7 +806,6 @@ def test_scaling_ratio():
 
 
 def test_energy_coefficient():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierEnergyCoefficients(rectifier_id="rectifier_1")),
@@ -887,7 +848,6 @@ def test_energy_coefficient():
 
 
 def test_resistance_scaling():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierResistanceScaling(rectifier_id="rectifier_1")),
@@ -905,7 +865,6 @@ def test_resistance_scaling():
 
 
 def test_resistance():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierResistances(rectifier_id="rectifier_1")), __file__, XML_FILE
@@ -924,7 +883,6 @@ def test_resistance():
 
 
 def test_thermal_resistance_casing():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierCasingThermalResistance(rectifier_id="rectifier_1")),
@@ -934,19 +892,15 @@ def test_thermal_resistance_casing():
 
     problem = run_system(SizingRectifierCasingThermalResistance(rectifier_id="rectifier_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:casing:thermal_resistance",
-            units="K/W",
-        )
-        == pytest.approx(0.010, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:casing:thermal_resistance",
+        units="K/W",
+    ) == pytest.approx(0.010, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_thermal_resistance():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierThermalResistances(rectifier_id="rectifier_1")),
@@ -967,7 +921,6 @@ def test_thermal_resistance():
 
 
 def test_capacitor_current_caliber():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierCapacitorCurrentCaliber(rectifier_id="rectifier_1")),
@@ -977,19 +930,15 @@ def test_capacitor_current_caliber():
 
     problem = run_system(SizingRectifierCapacitorCurrentCaliber(rectifier_id="rectifier_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:capacitor:current_caliber",
-            units="A",
-        )
-        == pytest.approx(68.91, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:capacitor:current_caliber",
+        units="A",
+    ) == pytest.approx(68.91, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_capacitor_capacity():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierCapacitorCapacity(rectifier_id="rectifier_1")),
@@ -999,19 +948,15 @@ def test_capacitor_capacity():
 
     problem = run_system(SizingRectifierCapacitorCapacity(rectifier_id="rectifier_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:capacitor:capacity",
-            units="F",
-        )
-        == pytest.approx(4.33e-4, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:capacitor:capacity",
+        units="F",
+    ) == pytest.approx(4.33e-4, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_capacitor_weight():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitor(prefix="data:propulsion:he_power_train:rectifier:rectifier_1")),
@@ -1023,19 +968,15 @@ def test_capacitor_weight():
         SizingCapacitor(prefix="data:propulsion:he_power_train:rectifier:rectifier_1"), ivc
     )
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:capacitor:mass",
-            units="kg",
-        )
-        == pytest.approx(1.676, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:capacitor:mass",
+        units="kg",
+    ) == pytest.approx(1.676, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_dimension_module():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierModuleDimension(rectifier_id="rectifier_1")),
@@ -1059,7 +1000,6 @@ def test_dimension_module():
 
 
 def test_heat_sink_dimension():
-
     inputs_list = [
         "data:propulsion:he_power_train:rectifier:rectifier_1:module:length",
         "data:propulsion:he_power_train:rectifier:rectifier_1:module:width",
@@ -1085,7 +1025,6 @@ def test_heat_sink_dimension():
 
 
 def test_inductor_current_caliber():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierInductorCurrentCaliber(rectifier_id="rectifier_1")),
@@ -1095,19 +1034,15 @@ def test_inductor_current_caliber():
 
     problem = run_system(SizingRectifierInductorCurrentCaliber(rectifier_id="rectifier_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:inductor:current_caliber",
-            units="A",
-        )
-        == pytest.approx(150.0, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:inductor:current_caliber",
+        units="A",
+    ) == pytest.approx(150.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_inductor():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingInductor(prefix="data:propulsion:he_power_train:rectifier:rectifier_1")),
@@ -1119,19 +1054,15 @@ def test_inductor():
         SizingInductor(prefix="data:propulsion:he_power_train:rectifier:rectifier_1"), ivc
     )
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:inductor:mass",
-            units="kg",
-        )
-        == pytest.approx(4.40, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:inductor:mass",
+        units="kg",
+    ) == pytest.approx(4.40, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_weight_casings():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierCasingsWeight(rectifier_id="rectifier_1")),
@@ -1149,7 +1080,6 @@ def test_weight_casings():
 
 
 def test_contactor_weight():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierContactorWeight(rectifier_id="rectifier_1")),
@@ -1159,19 +1089,15 @@ def test_contactor_weight():
 
     problem = run_system(SizingRectifierContactorWeight(rectifier_id="rectifier_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:contactor:mass",
-            units="kg",
-        )
-        == pytest.approx(2.32, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:contactor:mass",
+        units="kg",
+    ) == pytest.approx(2.32, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_heat_sink():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingHeatSink(prefix="data:propulsion:he_power_train:rectifier:rectifier_1")),
@@ -1184,19 +1110,15 @@ def test_heat_sink():
         SizingHeatSink(prefix="data:propulsion:he_power_train:rectifier:rectifier_1"), ivc
     )
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:heat_sink:mass",
-            units="kg",
-        )
-        == pytest.approx(0.444, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:heat_sink:mass",
+        units="kg",
+    ) == pytest.approx(0.444, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_rectifier_weight():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierWeight(rectifier_id="rectifier_1")),
         __file__,
@@ -1216,7 +1138,6 @@ def test_rectifier_weight():
 
 
 def test_rectifier_weight_by_sum():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifierWeightBySum(rectifier_id="rectifier_1")),
@@ -1226,26 +1147,19 @@ def test_rectifier_weight_by_sum():
 
     problem = run_system(SizingRectifierWeightBySum(rectifier_id="rectifier_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:mass",
-            units="kg",
-        )
-        == pytest.approx(12.011, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:rectifier:rectifier_1:power_density",
-            units="kW/kg",
-        )
-        == pytest.approx(24.77, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:mass",
+        units="kg",
+    ) == pytest.approx(12.011, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:power_density",
+        units="kW/kg",
+    ) == pytest.approx(24.77, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_rectifier_cg_x():
-
     expected_cg = [2.69, 0.45, 2.54]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -1258,19 +1172,15 @@ def test_rectifier_cg_x():
 
         problem = run_system(SizingRectifierCGX(rectifier_id="rectifier_1", position=option), ivc)
 
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:rectifier:rectifier_1:CG:x",
-                units="m",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:CG:x",
+            units="m",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
 
 
 def test_rectifier_cg_y():
-
     expected_cg = [2.34, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -1283,19 +1193,15 @@ def test_rectifier_cg_y():
 
         problem = run_system(SizingRectifierCGY(rectifier_id="rectifier_1", position=option), ivc)
 
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:rectifier:rectifier_1:CG:y",
-                units="m",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:rectifier:rectifier_1:CG:y",
+            units="m",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
 
 
 def test_sizing_rectifier():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingRectifier(rectifier_id="rectifier_1")),
@@ -1323,7 +1229,6 @@ def test_sizing_rectifier():
 
 
 def test_performances_rectifier():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)

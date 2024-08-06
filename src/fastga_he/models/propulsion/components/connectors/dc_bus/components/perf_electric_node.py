@@ -35,7 +35,6 @@ class PerformancesElectricalNode(om.ImplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_output(
@@ -46,7 +45,6 @@ class PerformancesElectricalNode(om.ImplicitComponent):
         )
 
         for i in range(self.options["number_of_inputs"]):
-
             # Choice was made to start current numbering at 1 to irritate any future programmer
             # working on the code
             self.add_input(
@@ -67,7 +65,6 @@ class PerformancesElectricalNode(om.ImplicitComponent):
             )
 
         for j in range(self.options["number_of_outputs"]):
-
             self.add_input(
                 name="dc_current_out_" + str(j + 1),
                 units="A",
@@ -88,7 +85,6 @@ class PerformancesElectricalNode(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         number_of_points = self.options["number_of_points"]
 
         # Kirchoff's law: the sum of current is zero with the sign convention we defined

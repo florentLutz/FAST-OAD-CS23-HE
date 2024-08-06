@@ -39,7 +39,6 @@ NB_POINTS_TEST = 10
 
 
 def test_energy_coefficients_scaling_ratio():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingDCSSPCResistanceScaling(dc_sspc_id="dc_sspc_1")),
@@ -57,7 +56,6 @@ def test_energy_coefficients_scaling_ratio():
 
 
 def test_resistance():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingDCSSPCResistances(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
@@ -76,7 +74,6 @@ def test_resistance():
 
 
 def test_efficiency_sizing():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingDCSSPCEfficiency(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
@@ -92,7 +89,6 @@ def test_efficiency_sizing():
 
 
 def test_weight():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingDCSSPCWeight(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
@@ -108,7 +104,6 @@ def test_weight():
 
 
 def test_dc_sspc_cg_x():
-
     expected_cg = [2.69, 0.45, 2.54]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -129,7 +124,6 @@ def test_dc_sspc_cg_x():
 
 
 def test_dc_sspc_cg_y():
-
     expected_cg = [2.0, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -150,7 +144,6 @@ def test_dc_sspc_cg_y():
 
 
 def test_sizing_dc_sspc():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(list_inputs(SizingDCSSPC(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE)
 
@@ -179,7 +172,6 @@ def test_sizing_dc_sspc():
 
 
 def test_perf_currents():
-
     ivc = om.IndepVarComp()
     output_current = np.linspace(400, 390, NB_POINTS_TEST)
     ivc.add_output("dc_current_out", units="A", val=output_current)
@@ -194,7 +186,6 @@ def test_perf_currents():
 
 
 def test_perf_voltage_out():
-
     ivc = om.IndepVarComp()
     output_current = np.linspace(400, 390, NB_POINTS_TEST)
     ivc.add_output("dc_current_in", units="A", val=output_current)
@@ -216,7 +207,6 @@ def test_perf_voltage_out():
 
 
 def test_perf_losses():
-
     ivc = om.IndepVarComp()
     output_current = np.linspace(400, 390, NB_POINTS_TEST)
     ivc.add_output("dc_current_in", units="A", val=output_current)
@@ -246,7 +236,6 @@ def test_perf_losses():
 
 
 def test_perf_power():
-
     ivc = om.IndepVarComp()
     output_current = np.linspace(400, 390, NB_POINTS_TEST)
     ivc.add_output("dc_current_in", units="A", val=output_current)
@@ -270,7 +259,6 @@ def test_perf_power():
 
 
 def test_perf_efficiency():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesDCSSPCEfficiency(number_of_points=NB_POINTS_TEST, dc_sspc_id="dc_sspc_1")
@@ -290,7 +278,6 @@ def test_perf_efficiency():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
     output_current = np.linspace(400, 390, NB_POINTS_TEST)
     ivc.add_output("dc_current_in", units="A", val=output_current)
@@ -316,7 +303,6 @@ def test_maximum():
 
 
 def test_constraint_current_ensure():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsCurrentEnsure(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
@@ -332,7 +318,6 @@ def test_constraint_current_ensure():
 
 
 def test_constraint_voltage_ensure():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsVoltageEnsure(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
@@ -348,7 +333,6 @@ def test_constraint_voltage_ensure():
 
 
 def test_constraint_current_enforce():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsCurrentEnforce(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
@@ -364,7 +348,6 @@ def test_constraint_current_enforce():
 
 
 def test_constraint_voltage_enforce():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsVoltageEnforce(dc_sspc_id="dc_sspc_1")), __file__, XML_FILE
@@ -380,7 +363,6 @@ def test_constraint_voltage_enforce():
 
 
 def test_performances():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesDCSSPC(dc_sspc_id="dc_sspc_1", number_of_points=NB_POINTS_TEST, closed=True)

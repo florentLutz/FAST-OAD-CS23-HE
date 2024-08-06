@@ -34,7 +34,6 @@ class SizingTurboGenerator(om.Group):
         )
 
     def setup(self):
-
         turbo_generator_id = self.options["turbo_generator_id"]
         position = self.options["position"]
 

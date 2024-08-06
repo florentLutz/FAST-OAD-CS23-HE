@@ -28,7 +28,6 @@ class SizingGeneratorPhaseResistanceScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
 
         self.add_input(
@@ -67,7 +66,6 @@ class SizingGeneratorPhaseResistanceScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
         max_voltage_ref = self.options["max_voltage_ref"]
@@ -84,14 +82,13 @@ class SizingGeneratorPhaseResistanceScaling(om.ExplicitComponent):
 
         voltage_scaling = max_voltage / max_voltage_ref
 
-        resistance_scaling = voltage_scaling ** 2.0 * l_scaling ** -2.62 * d_scaling ** -1.12
+        resistance_scaling = voltage_scaling**2.0 * l_scaling**-2.62 * d_scaling**-1.12
 
         outputs[
             "data:propulsion:he_power_train:generator:" + generator_id + ":scaling:phase_resistance"
         ] = resistance_scaling
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         generator_id = self.options["generator_id"]
 
         max_voltage_ref = self.options["max_voltage_ref"]
@@ -113,22 +110,16 @@ class SizingGeneratorPhaseResistanceScaling(om.ExplicitComponent):
             + generator_id
             + ":scaling:phase_resistance",
             "data:propulsion:he_power_train:generator:" + generator_id + ":voltage_caliber",
-        ] = (
-            2.0 * max_voltage / max_voltage_ref ** 2.0 * l_scaling ** -2.62 * d_scaling ** -1.12
-        )
+        ] = 2.0 * max_voltage / max_voltage_ref**2.0 * l_scaling**-2.62 * d_scaling**-1.12
         partials[
             "data:propulsion:he_power_train:generator:"
             + generator_id
             + ":scaling:phase_resistance",
             "data:propulsion:he_power_train:generator:" + generator_id + ":scaling:diameter",
-        ] = (
-            -1.12 * voltage_scaling ** 2.0 * l_scaling ** -2.62 * d_scaling ** -2.12
-        )
+        ] = -1.12 * voltage_scaling**2.0 * l_scaling**-2.62 * d_scaling**-2.12
         partials[
             "data:propulsion:he_power_train:generator:"
             + generator_id
             + ":scaling:phase_resistance",
             "data:propulsion:he_power_train:generator:" + generator_id + ":scaling:length",
-        ] = (
-            -2.62 * voltage_scaling ** 2.0 * l_scaling ** -3.62 * d_scaling ** -1.12
-        )
+        ] = -2.62 * voltage_scaling**2.0 * l_scaling**-3.62 * d_scaling**-1.12

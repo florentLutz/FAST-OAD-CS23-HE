@@ -17,7 +17,6 @@ XML_FILE = "data.xml"
 
 
 def test_aspect_ratio_from_fixed_span():
-
     ivc = get_indep_var_comp(list_inputs(AspectRatioFromTargetSpan()), __file__, XML_FILE)
 
     problem = run_system(AspectRatioFromTargetSpan(), ivc)

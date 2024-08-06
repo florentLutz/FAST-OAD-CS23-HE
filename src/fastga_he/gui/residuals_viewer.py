@@ -48,7 +48,6 @@ def residuals_viewer(
         residuals_max[component_name + "." + residual_name] = []
 
     for case in solver_case:
-
         # Because I'm 99% sure that the key cycling will always be the same in all three dict,
         # we will just do one for loop
 
@@ -65,7 +64,6 @@ def residuals_viewer(
     color_selector = 0
 
     for component_name, residual_name in zip(components_name, residuals_name):
-
         color = COLOR_ARRAY[color_selector]
         if color_selector < len(COLOR_ARRAY) - 1:
             color_selector += 1

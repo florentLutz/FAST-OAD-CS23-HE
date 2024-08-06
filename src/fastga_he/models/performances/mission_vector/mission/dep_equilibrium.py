@@ -38,7 +38,6 @@ class DEPEquilibrium(om.Group):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         # We have to declare them even if not used to preserve compatibility
         self.options.declare("propulsion_id", default="", types=str, allow_none=True)
         self.options.declare(
@@ -76,7 +75,6 @@ class DEPEquilibrium(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         if self.options["use_linesearch"]:

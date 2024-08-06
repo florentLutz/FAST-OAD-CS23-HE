@@ -50,7 +50,6 @@ def efficiency_for_curve_fit_marc(parameter, alpha_test, beta_test):
 def efficiency_for_curve_fit(
     parameter, alpha_test, beta_test, gamma_test, delta_test, epsilon_test
 ):
-
     speed, torque, max_speed_array, max_torque_array = parameter
     torque_to_adim = max_torque_array[0]
     speed_to_adim = max_speed_array[0]
@@ -70,7 +69,6 @@ def efficiency_for_curve_fit(
 
 
 if __name__ == "__main__":
-
     data_file = pth.join(pth.dirname(__file__), "data/emrax_" + MOTOR + "_efficiency_plot.csv")
 
     speed_array, torque_array, efficiency_array, fig = curve_reading(data_file, threshold=THRESHOLD)
@@ -125,10 +123,10 @@ if __name__ == "__main__":
     print("Optimal parameter", p_opt)
     # alpha, beta, gamma, delta, epsilon = p_opt
     alpha, beta, delta = p_opt
-    print("Alpha: ", alpha / max_torque_orig ** 2.0 * (max_speed_orig * max_torque_orig))
+    print("Alpha: ", alpha / max_torque_orig**2.0 * (max_speed_orig * max_torque_orig))
     # print("Beta: ", beta / max_speed_orig ** 1.5 * (max_speed_orig * max_torque_orig))
     print("Beta: ", beta / max_speed_orig * (max_speed_orig * max_torque_orig))
-    print("Delta: ", delta / max_speed_orig ** 2.0 * (max_speed_orig * max_torque_orig))
+    print("Delta: ", delta / max_speed_orig**2.0 * (max_speed_orig * max_torque_orig))
 
     power_loss = (
         alpha * (torque_array_plot / max_torque_orig) ** 2.0

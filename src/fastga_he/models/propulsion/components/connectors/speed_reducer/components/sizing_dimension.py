@@ -37,7 +37,6 @@ class SizingSpeedReducerDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         self.add_input(
@@ -66,7 +65,6 @@ class SizingSpeedReducerDimensions(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         scaling_factor = inputs[
@@ -86,7 +84,6 @@ class SizingSpeedReducerDimensions(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         partials[

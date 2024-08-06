@@ -10,13 +10,11 @@ class PerformancesLosses(om.ExplicitComponent):
     """Computation of total losses for the IGBT and the diode."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -73,7 +71,6 @@ class PerformancesLosses(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # Only one IGBT/diode couple in the topology we originally selected hence why it is just
         # a sum
         outputs["losses_converter"] = (

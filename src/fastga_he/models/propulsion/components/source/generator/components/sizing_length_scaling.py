@@ -26,7 +26,6 @@ class SizingGeneratorLengthScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
 
         self.add_input(
@@ -55,7 +54,6 @@ class SizingGeneratorLengthScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
         torque_cont_ref = self.options["torque_cont_ref"]
@@ -69,14 +67,13 @@ class SizingGeneratorLengthScaling(om.ExplicitComponent):
 
         torque_scaling = torque_cont / torque_cont_ref
 
-        l_scaling = torque_scaling * d_scaling ** -2.5
+        l_scaling = torque_scaling * d_scaling**-2.5
 
-        outputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":scaling:length"
-        ] = l_scaling
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":scaling:length"] = (
+            l_scaling
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         generator_id = self.options["generator_id"]
 
         torque_cont_ref = self.options["torque_cont_ref"]
@@ -93,12 +90,8 @@ class SizingGeneratorLengthScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:generator:" + generator_id + ":scaling:length",
             "data:propulsion:he_power_train:generator:" + generator_id + ":torque_rating",
-        ] = (
-            1.0 / torque_cont_ref * d_scaling ** -2.5
-        )
+        ] = 1.0 / torque_cont_ref * d_scaling**-2.5
         partials[
             "data:propulsion:he_power_train:generator:" + generator_id + ":scaling:length",
             "data:propulsion:he_power_train:generator:" + generator_id + ":scaling:diameter",
-        ] = (
-            -2.5 * torque_scaling * d_scaling ** -3.5
-        )
+        ] = -2.5 * torque_scaling * d_scaling**-3.5

@@ -43,28 +43,23 @@ UNIQUE_STRING = "ca_part_sur_un_depart"
 
 
 def test_all_performances_components_exist():
-
     # Component existing mean that they are import in the right place (the __init__ of the
     # components folder) and that it can be created
 
     module = __import__("fastga_he.models.propulsion.components", fromlist=[""])
 
     for component_om_name in resources.DICTIONARY_CN:
-
         performances_group_name = "Performances" + resources.DICTIONARY_CN[component_om_name]
 
         try:
-
             klass = getattr(module, performances_group_name)
             assert klass
 
         except AttributeError:
-
             assert False
 
 
 def test_all_performances_components_are_imported():
-
     performances_assembler_file_path = performances_from_pt_file.__file__
 
     r = open(performances_assembler_file_path, "r")
@@ -84,12 +79,10 @@ def test_all_performances_components_are_imported():
 
 
 def test_all_components_output_required_value():
-
     # Originally I planned on each type of components on their own but since it takes so much
     # bloody time to list outputs and inputs, we will do everything at once
 
     for component_om_name in resources.DICTIONARY_CN:
-
         performances_group_name = "Performances" + resources.DICTIONARY_CN[component_om_name]
         performances_group_id = resources.DICTIONARY_CN_ID[component_om_name]
         component_type = resources.DICTIONARY_CTC[component_om_name]
@@ -105,7 +98,6 @@ def test_all_components_output_required_value():
         variables = VariableListLocal.from_system(component)
 
         if "propulsor" in component_type:
-
             input_value = []
 
             for var in variables:
@@ -115,7 +107,6 @@ def test_all_components_output_required_value():
             assert "thrust" in input_value
 
         if "propulsive_load" in component_type:
-
             output_value = []
 
             for var in variables:
@@ -125,7 +116,6 @@ def test_all_components_output_required_value():
             assert "shaft_power_for_power_rate" in output_value
 
         if "source" in component_type:
-
             output_value = []
             input_value = []
 
@@ -143,7 +133,6 @@ def test_all_components_output_required_value():
             )
 
         if "tank" in component_type:
-
             output_value = []
 
             for var in variables:

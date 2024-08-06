@@ -146,10 +146,9 @@ def test_performances_from_pt_file():
 
 
 def test_assembly_sizing_from_pt_file():
-
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    )
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_simple_generator.yml")
 

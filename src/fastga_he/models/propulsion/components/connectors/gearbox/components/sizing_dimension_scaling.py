@@ -27,7 +27,6 @@ class SizingGearboxDimensionScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         gearbox_id = self.options["gearbox_id"]
 
         self.add_input(
@@ -45,7 +44,6 @@ class SizingGearboxDimensionScaling(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         torque_ref = self.options["torque_out_ref"]
@@ -59,7 +57,6 @@ class SizingGearboxDimensionScaling(om.ExplicitComponent):
         ) ** (1.0 / 3.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         gearbox_id = self.options["gearbox_id"]
         torque_ref = self.options["torque_out_ref"]
 
@@ -70,6 +67,4 @@ class SizingGearboxDimensionScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":scaling:dimensions",
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating",
-        ] = (
-            1.0 / 3.0 * torque_rating ** (-2.0 / 3.0) / torque_ref ** (1.0 / 3.0)
-        )
+        ] = 1.0 / 3.0 * torque_rating ** (-2.0 / 3.0) / torque_ref ** (1.0 / 3.0)

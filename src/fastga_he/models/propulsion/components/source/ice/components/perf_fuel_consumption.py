@@ -13,13 +13,11 @@ class PerformancesICEFuelConsumption(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -38,13 +36,11 @@ class PerformancesICEFuelConsumption(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["fuel_consumption"] = (
             inputs["shaft_power_out"] * inputs["specific_fuel_consumption"]
         ) / 1000.0  # To convert to kg/h
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["fuel_consumption", "shaft_power_out"] = (
             inputs["specific_fuel_consumption"] / 1000.0
         )

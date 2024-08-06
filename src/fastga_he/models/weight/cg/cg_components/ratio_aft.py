@@ -78,7 +78,6 @@ class ComputeCG(om.ExplicitComponent):
         outputs["data:weight:aircraft_empty:CG:x"] = x_cg_empty_aircraft
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         cgs = [inputs[cg_name][0] for cg_name in self.options["cg_names"]]
         masses = [inputs[mass_name][0] for mass_name in self.options["mass_names"]]
 
@@ -86,10 +85,9 @@ class ComputeCG(om.ExplicitComponent):
         tot_mass = np.sum(masses)
 
         for cg_name, mass_name in zip(self.options["cg_names"], self.options["mass_names"]):
-
             partials["data:weight:aircraft_empty:mass", mass_name] = 1.0
 
             partials["data:weight:aircraft_empty:CG:x", cg_name] = inputs[mass_name] / tot_mass
             partials["data:weight:aircraft_empty:CG:x", mass_name] = (
                 inputs[cg_name] * tot_mass - weight_moment
-            ) / tot_mass ** 2.0
+            ) / tot_mass**2.0

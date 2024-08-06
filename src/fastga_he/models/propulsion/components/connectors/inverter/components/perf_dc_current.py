@@ -13,13 +13,11 @@ class PerformancesDCCurrent(om.ImplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -66,14 +64,12 @@ class PerformancesDCCurrent(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         residuals["dc_current_in"] = (
             outputs["dc_current_in"] * inputs["dc_voltage_in"] * inputs["efficiency"]
             - 3.0 * inputs["ac_current_rms_out_one_phase"] * inputs["ac_voltage_rms_out"]
         )
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-
         jacobian["dc_current_in", "dc_current_in"] = inputs["dc_voltage_in"] * inputs["efficiency"]
         jacobian["dc_current_in", "dc_voltage_in"] = outputs["dc_current_in"] * inputs["efficiency"]
         jacobian["dc_current_in", "efficiency"] = outputs["dc_current_in"] * inputs["dc_voltage_in"]

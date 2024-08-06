@@ -25,7 +25,6 @@ class SizingDCSSPCResistanceScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         self.add_input(
@@ -45,7 +44,6 @@ class SizingDCSSPCResistanceScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         current_caliber_ref = self.options["current_caliber_ref"]
@@ -56,11 +54,10 @@ class SizingDCSSPCResistanceScaling(om.ExplicitComponent):
         current_caliber_star = current_caliber / current_caliber_ref
 
         outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":scaling:resistance"] = (
-            current_caliber_star ** -1
+            current_caliber_star**-1
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         current_caliber_ref = self.options["current_caliber_ref"]
@@ -71,6 +68,4 @@ class SizingDCSSPCResistanceScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":scaling:resistance",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
-        ] = (
-            -current_caliber_ref / current_caliber ** 2.0
-        )
+        ] = -current_caliber_ref / current_caliber**2.0

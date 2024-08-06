@@ -25,7 +25,6 @@ def identify_design(df: pd.DataFrame):
 
 
 if __name__ == "__main__":
-
     plot = False
 
     path_to_current_file = pathlib.Path(__file__)
@@ -39,7 +38,6 @@ if __name__ == "__main__":
     designs = identify_design(existing_data)
 
     if plot:
-
         # Show the max power curves for the first design
         first_design_dataframe = existing_data.loc[
             existing_data[THERMODYNAMIC_POWER_COLUMN_NAME] == designs[0]
@@ -56,7 +54,6 @@ if __name__ == "__main__":
         altitude_list.sort()
 
         for idx, alt in enumerate(altitude_list):
-
             dataframe_current_alt = first_design_dataframe.loc[
                 first_design_dataframe["Altitude (ft)"] == alt
             ]

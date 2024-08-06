@@ -21,7 +21,6 @@ class SizingCapacitorHeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -50,7 +49,6 @@ class SizingCapacitorHeight(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         outputs[prefix + ":capacitor:height"] = (
@@ -58,7 +56,6 @@ class SizingCapacitorHeight(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
         partials[prefix + ":capacitor:height", prefix + ":capacitor:aspect_ratio"] = inputs[

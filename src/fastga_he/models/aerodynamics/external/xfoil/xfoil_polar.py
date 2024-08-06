@@ -67,7 +67,6 @@ class XfoilPolarMod(ExternalCodeComp):
     """Column names in XFOIL polar result"""
 
     def initialize(self):
-
         self.options.declare(OPTION_XFOIL_EXE_PATH, default="", types=str, allow_none=True)
         self.options.declare("airfoil_folder_path", default=None, types=str, allow_none=True)
         self.options.declare("airfoil_file", default=_DEFAULT_AIRFOIL_FILE, types=str)
@@ -80,7 +79,6 @@ class XfoilPolarMod(ExternalCodeComp):
         self.options.declare(OPTION_COMP_NEG_AIR_SYM, default=False, types=bool)
 
     def setup(self):
-
         self.add_input("xfoil:mach", val=np.nan)
         self.add_input("xfoil:reynolds", val=np.nan)
         self.add_output("xfoil:alpha", shape=POLAR_POINT_COUNT, units="deg")
@@ -99,7 +97,6 @@ class XfoilPolarMod(ExternalCodeComp):
         pass
 
     def compute(self, inputs, outputs):
-
         # Define timeout for the function
         self.options["timeout"] = 15.0
 

@@ -9,7 +9,6 @@ import numpy as np
 
 
 def compute_coeff_not_adim():
-
     diameter = 2.5
     radius_max = diameter / 2
     radius_mid = 0.5 * radius_max
@@ -22,12 +21,12 @@ def compute_coeff_not_adim():
 
     matrix_to_inv = np.array(
         [
-            [root_radius ** 2.0, root_radius, 1.0, 0.0, 0.0, 0.0],
-            [radius_mid ** 2.0, radius_mid, 1.0, 0.0, 0.0, 0.0],
+            [root_radius**2.0, root_radius, 1.0, 0.0, 0.0, 0.0],
+            [radius_mid**2.0, radius_mid, 1.0, 0.0, 0.0, 0.0],
             [2.0 * radius_mid, 1.0, 0.0, 0.0, 0.0, 0.0],
             [0.0, 0.0, 0.0, 2.0 * radius_mid, 1.0, 0.0],
-            [0.0, 0.0, 0.0, radius_mid ** 2.0, radius_mid, 1.0],
-            [0.0, 0.0, 0.0, tip_radius ** 2.0, tip_radius, 1.0],
+            [0.0, 0.0, 0.0, radius_mid**2.0, radius_mid, 1.0],
+            [0.0, 0.0, 0.0, tip_radius**2.0, tip_radius, 1.0],
         ]
     )
     result_matrix = np.array(
@@ -49,7 +48,6 @@ def compute_coeff_not_adim():
 
 
 def compute_coeff_adim():
-
     radius_ratio_mid = 0.5
     chord_ratio_mid = 1.5
     chord_to_diameter_root = 0.0380
@@ -61,12 +59,12 @@ def compute_coeff_adim():
 
     matrix_to_inv = np.array(
         [
-            [root_radius_ratio ** 2.0, root_radius_ratio, 1.0, 0.0, 0.0, 0.0],
-            [radius_ratio_mid ** 2.0, radius_ratio_mid, 1.0, 0.0, 0.0, 0.0],
+            [root_radius_ratio**2.0, root_radius_ratio, 1.0, 0.0, 0.0, 0.0],
+            [radius_ratio_mid**2.0, radius_ratio_mid, 1.0, 0.0, 0.0, 0.0],
             [2.0 * radius_ratio_mid, 1.0, 0.0, 0.0, 0.0, 0.0],
             [0.0, 0.0, 0.0, 2.0 * radius_ratio_mid, 1.0, 0.0],
-            [0.0, 0.0, 0.0, radius_ratio_mid ** 2.0, radius_ratio_mid, 1.0],
-            [0.0, 0.0, 0.0, tip_radius_ratio ** 2.0, tip_radius_ratio, 1.0],
+            [0.0, 0.0, 0.0, radius_ratio_mid**2.0, radius_ratio_mid, 1.0],
+            [0.0, 0.0, 0.0, tip_radius_ratio**2.0, tip_radius_ratio, 1.0],
         ]
     )
     result_matrix = np.array(
@@ -94,7 +92,6 @@ def compute_coeff_adim():
 
 
 def compute_lambda_af(radius_ratio_mid, chord_ratio_mid, diameter, chord_to_diameter_root):
-
     root_radius_ratio = 0.2
     chord_to_diameter_tip = 0.0380
     tip_radius_ratio = 0.999
@@ -106,12 +103,12 @@ def compute_lambda_af(radius_ratio_mid, chord_ratio_mid, diameter, chord_to_diam
 
     matrix_to_inv = np.array(
         [
-            [root_radius_ratio ** 2.0, root_radius_ratio, 1.0, 0.0, 0.0, 0.0],
-            [radius_ratio_mid ** 2.0, radius_ratio_mid, 1.0, 0.0, 0.0, 0.0],
+            [root_radius_ratio**2.0, root_radius_ratio, 1.0, 0.0, 0.0, 0.0],
+            [radius_ratio_mid**2.0, radius_ratio_mid, 1.0, 0.0, 0.0, 0.0],
             [2.0 * radius_ratio_mid, 1.0, 0.0, 0.0, 0.0, 0.0],
             [0.0, 0.0, 0.0, 2.0 * radius_ratio_mid, 1.0, 0.0],
-            [0.0, 0.0, 0.0, radius_ratio_mid ** 2.0, radius_ratio_mid, 1.0],
-            [0.0, 0.0, 0.0, tip_radius_ratio ** 2.0, tip_radius_ratio, 1.0],
+            [0.0, 0.0, 0.0, radius_ratio_mid**2.0, radius_ratio_mid, 1.0],
+            [0.0, 0.0, 0.0, tip_radius_ratio**2.0, tip_radius_ratio, 1.0],
         ]
     )
     result_matrix = np.array(
@@ -136,8 +133,8 @@ def compute_lambda_af(radius_ratio_mid, chord_ratio_mid, diameter, chord_to_diam
     ]
     chord_distribution = np.where(
         radius_ratio_vect < radius_ratio_mid,
-        k12 * radius_ratio_vect ** 2.0 + k11 * radius_ratio_vect + k10,
-        k22 * radius_ratio_vect ** 2.0 + k21 * radius_ratio_vect + k20,
+        k12 * radius_ratio_vect**2.0 + k11 * radius_ratio_vect + k10,
+        k22 * radius_ratio_vect**2.0 + k21 * radius_ratio_vect + k20,
     )
 
     chord_array = chord_distribution * diameter
@@ -158,27 +155,27 @@ def compute_lambda_af(radius_ratio_mid, chord_ratio_mid, diameter, chord_to_diam
     c1 = k10 * 2 * radius_max
     c2 = k20 * 2 * radius_max
     analytical_integral_af = (
-        a1 / 6 * (radius_mid ** 6 - radius_min ** 6)
-        + b1 / 5 * (radius_mid ** 5 - radius_min ** 5)
-        + c1 / 4 * (radius_mid ** 4 - radius_min ** 4)
-        + a2 / 6 * (radius_max ** 6 - radius_mid ** 6)
-        + b2 / 5 * (radius_max ** 5 - radius_mid ** 5)
-        + c2 / 4 * (radius_max ** 4 - radius_mid ** 4)
+        a1 / 6 * (radius_mid**6 - radius_min**6)
+        + b1 / 5 * (radius_mid**5 - radius_min**5)
+        + c1 / 4 * (radius_mid**4 - radius_min**4)
+        + a2 / 6 * (radius_max**6 - radius_mid**6)
+        + b2 / 5 * (radius_max**5 - radius_mid**5)
+        + c2 / 4 * (radius_max**4 - radius_mid**4)
     )
     analytical_integral_c_star = (
-        a1 / 5 * (radius_mid ** 5 - radius_min ** 5)
-        + b1 / 4 * (radius_mid ** 4 - radius_min ** 4)
-        + c1 / 3 * (radius_mid ** 3 - radius_min ** 3)
-        + a2 / 5 * (radius_max ** 5 - radius_mid ** 5)
-        + b2 / 4 * (radius_max ** 4 - radius_mid ** 4)
-        + c2 / 3 * (radius_max ** 3 - radius_mid ** 3)
+        a1 / 5 * (radius_mid**5 - radius_min**5)
+        + b1 / 4 * (radius_mid**4 - radius_min**4)
+        + c1 / 3 * (radius_mid**3 - radius_min**3)
+        + a2 / 5 * (radius_max**5 - radius_mid**5)
+        + b2 / 4 * (radius_max**4 - radius_mid**4)
+        + c2 / 3 * (radius_max**3 - radius_mid**3)
     )
 
     activity_factor = (
-        100000 / 32 / radius_max ** 5.0 * np.sum(chord_array * radius ** 3.0 * element_length)
+        100000 / 32 / radius_max**5.0 * np.sum(chord_array * radius**3.0 * element_length)
     )
-    c_star = np.sum(chord_array * radius ** 2.0 * element_length) / np.sum(
-        radius ** 2.0 * element_length
+    c_star = np.sum(chord_array * radius**2.0 * element_length) / np.sum(
+        radius**2.0 * element_length
     )
     aspect_ratio = radius_max / c_star
 
@@ -188,7 +185,6 @@ def compute_lambda_af(radius_ratio_mid, chord_ratio_mid, diameter, chord_to_diam
 
 
 if __name__ == "__main__":
-
     doe_temp = lhs(4, samples=2000, criterion="correlation")
 
     D_min, D_max = 0.5, 3.0
@@ -218,7 +214,6 @@ if __name__ == "__main__":
     for diameter_loop, c_mid_radius, c_mid_ratio, chord_to_diameter_root_loop in zip(
         diameter_array, c_mid_radius_ratio_array, c_mid_ratio_array, chord_to_diameter_root_array
     ):
-
         af, aspect_ratio_loop, product = compute_lambda_af(
             c_mid_radius, c_mid_ratio, diameter_loop, chord_to_diameter_root_loop
         )

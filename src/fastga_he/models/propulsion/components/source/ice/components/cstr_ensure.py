@@ -21,7 +21,6 @@ class ConstraintsSeaLevelPowerEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -30,7 +29,6 @@ class ConstraintsSeaLevelPowerEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
 
         self.add_input(
@@ -65,7 +63,6 @@ class ConstraintsSeaLevelPowerEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         outputs["constraints:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL"] = (

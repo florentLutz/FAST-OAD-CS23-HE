@@ -22,7 +22,6 @@ class SizingDCDCConverterContactorWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -46,7 +45,6 @@ class SizingDCDCConverterContactorWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         current_in_caliber = inputs[
@@ -59,7 +57,7 @@ class SizingDCDCConverterContactorWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":contactor:mass"
-        ] = (0.0239 * current_in_caliber ** 0.6942)
+        ] = 0.0239 * current_in_caliber**0.6942
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
@@ -77,6 +75,4 @@ class SizingDCDCConverterContactorWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":current_in_caliber",
-        ] = (
-            0.0239 * 0.6942 * current_in_caliber ** (0.6942 - 1.0)
-        )
+        ] = 0.0239 * 0.6942 * current_in_caliber ** (0.6942 - 1.0)

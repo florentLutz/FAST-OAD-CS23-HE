@@ -12,13 +12,11 @@ class SlipstreamPropellerVelocityRatioDownstream(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("axial_induction_factor", val=np.nan, shape=number_of_points)
@@ -34,5 +32,4 @@ class SlipstreamPropellerVelocityRatioDownstream(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["velocity_ratio_downstream"] = 1.0 + 2.0 * inputs["axial_induction_factor"]

@@ -9,9 +9,9 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_INVERTER_EFFICIENCY
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_INVERTER_EFFICIENCY
-] = "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+    "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+)
 
 
 @oad.RegisterSubmodel(
@@ -21,7 +21,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
     """Computation of the efficiency of the inverter."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -34,7 +33,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -59,7 +57,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         losses_inverter = inputs["losses_inverter"]
 
         # We recall here that the variable "ac_current_rms_out_one_phase" contains the rms
@@ -77,7 +74,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         losses_inverter = inputs["losses_inverter"]
         current = inputs["ac_current_rms_out_one_phase"]
         ac_voltage_rms_out = inputs["ac_voltage_rms_out"]

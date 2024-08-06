@@ -16,7 +16,6 @@ class SizingTurboshaftNacelleDimensions(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="turboshaft_id",
             default=None,
@@ -33,7 +32,6 @@ class SizingTurboshaftNacelleDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         self.add_input(
@@ -91,11 +89,9 @@ class SizingTurboshaftNacelleDimensions(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         if self.options["position"] == "on_the_wing":
-
             outputs[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":nacelle:length"
             ] = (
@@ -106,7 +102,6 @@ class SizingTurboshaftNacelleDimensions(om.ExplicitComponent):
             )
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":nacelle:length"
             ] = (
@@ -128,18 +123,15 @@ class SizingTurboshaftNacelleDimensions(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         if self.options["position"] == "on_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":nacelle:length",
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:length",
             ] = 2.0
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":nacelle:length",
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:length",

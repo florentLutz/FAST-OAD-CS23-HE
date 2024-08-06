@@ -13,7 +13,6 @@ class PerformancePerPhase(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -34,7 +33,6 @@ class PerformancePerPhase(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -347,7 +345,6 @@ class PerformancePerPhase(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -392,9 +389,7 @@ class PerformancePerPhase(om.ExplicitComponent):
 
         outputs["data:mission:sizing:main_route:descent:fuel"] = np.sum(
             fuel_consumed_t_econ[
-                number_of_points_climb
-                + number_of_points_cruise
-                + 1 : number_of_points_climb
+                number_of_points_climb + number_of_points_cruise + 1 : number_of_points_climb
                 + number_of_points_cruise
                 + number_of_points_descent
                 + 1
@@ -402,9 +397,7 @@ class PerformancePerPhase(om.ExplicitComponent):
         )
         outputs["data:mission:sizing:main_route:descent:energy"] = np.sum(
             non_consumable_energy[
-                number_of_points_climb
-                + number_of_points_cruise
-                + 1 : number_of_points_climb
+                number_of_points_climb + number_of_points_cruise + 1 : number_of_points_climb
                 + number_of_points_cruise
                 + number_of_points_descent
                 + 1

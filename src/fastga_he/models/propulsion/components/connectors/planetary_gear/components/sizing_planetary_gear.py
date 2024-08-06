@@ -38,7 +38,6 @@ class SizingPlanetaryGear(om.Group):
         )
 
     def setup(self):
-
         position = self.options["position"]
         planetary_gear_id = self.options["planetary_gear_id"]
 

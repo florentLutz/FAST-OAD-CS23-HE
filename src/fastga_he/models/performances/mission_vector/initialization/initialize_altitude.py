@@ -10,7 +10,6 @@ class InitializeAltitude(om.ExplicitComponent):
     """Initializes the altitude at each time step."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -31,7 +30,6 @@ class InitializeAltitude(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -81,7 +79,6 @@ class InitializeAltitude(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -102,7 +99,6 @@ class InitializeAltitude(om.ExplicitComponent):
         outputs["altitude"] = altitude
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -115,6 +111,6 @@ class InitializeAltitude(om.ExplicitComponent):
             )
         )
 
-        partials[
-            "altitude", "data:mission:sizing:main_route:cruise:altitude"
-        ] = flat_partials_cruise_alt
+        partials["altitude", "data:mission:sizing:main_route:cruise:altitude"] = (
+            flat_partials_cruise_alt
+        )

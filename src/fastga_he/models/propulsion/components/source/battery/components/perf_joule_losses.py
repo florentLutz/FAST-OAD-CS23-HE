@@ -18,7 +18,6 @@ class PerformancesCellJouleLosses(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("internal_resistance", units="ohm", val=np.full(number_of_points, np.nan))
@@ -35,13 +34,11 @@ class PerformancesCellJouleLosses(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["joule_losses_cell"] = (
             inputs["internal_resistance"] * inputs["current_one_module"] ** 2.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["joule_losses_cell", "internal_resistance"] = inputs["current_one_module"] ** 2.0
         partials["joule_losses_cell", "current_one_module"] = (
             2.0 * inputs["internal_resistance"] * inputs["current_one_module"]

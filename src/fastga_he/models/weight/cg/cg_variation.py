@@ -1,4 +1,4 @@
-"""FAST - Copyright (c) 2016 ONERA ISAE. """
+"""FAST - Copyright (c) 2016 ONERA ISAE."""
 #  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
 #  Copyright (C) 2022  ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
@@ -19,9 +19,9 @@ import fastoad.api as oad
 
 from fastga_he.models.performances.mission_vector.constants import SUBMODEL_CG_VARIATION
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CG_VARIATION
-] = "fastga_he.submodel.performances.cg_variation.legacy"
+oad.RegisterSubmodel.active_models[SUBMODEL_CG_VARIATION] = (
+    "fastga_he.submodel.performances.cg_variation.legacy"
+)
 
 
 @oad.RegisterSubmodel(SUBMODEL_CG_VARIATION, "fastga_he.submodel.performances.cg_variation.legacy")
@@ -85,7 +85,6 @@ class InFlightCGVariation(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         npax = inputs["data:TLAR:NPAX_design"]
         count_by_row = inputs["data:geometry:cabin:seats:passenger:count_by_row"]
         luggage_weight = inputs["data:TLAR:luggage_mass_design"]
@@ -114,13 +113,12 @@ class InFlightCGVariation(om.ExplicitComponent):
         equivalent_moment = m_empty * x_cg_plane_aft + payload * x_cg_payload
         mass = m_empty + payload
 
-        outputs[
-            "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment"
-        ] = equivalent_moment
+        outputs["data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment"] = (
+            equivalent_moment
+        )
         outputs["data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             "data:weight:aircraft_empty:mass",
@@ -171,7 +169,6 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         m_empty = inputs["data:weight:aircraft_empty:mass"]
         x_cg_plane_aft = inputs["data:weight:aircraft_empty:CG:x"]
 
@@ -181,13 +178,12 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
         equivalent_moment = m_empty * x_cg_plane_aft + payload * x_cg_payload
         mass = m_empty + payload
 
-        outputs[
-            "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment"
-        ] = equivalent_moment
+        outputs["data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment"] = (
+            equivalent_moment
+        )
         outputs["data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             "data:weight:aircraft_empty:mass",

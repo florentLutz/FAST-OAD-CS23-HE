@@ -7,7 +7,6 @@ import numpy as np
 import plotly.graph_objects as go
 
 if __name__ == "__main__":
-
     # data from geng:2020
 
     state_of_charge = np.array(

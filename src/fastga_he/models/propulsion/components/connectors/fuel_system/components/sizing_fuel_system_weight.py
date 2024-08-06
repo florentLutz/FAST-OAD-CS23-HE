@@ -19,7 +19,6 @@ class SizingFuelSystemWeight(om.ExplicitComponent):
         self.factor = None
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_system_id",
             default=None,
@@ -29,7 +28,6 @@ class SizingFuelSystemWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_system_id = self.options["fuel_system_id"]
 
         self.add_input(
@@ -65,7 +63,6 @@ class SizingFuelSystemWeight(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_system_id = self.options["fuel_system_id"]
 
         volume = inputs[
@@ -88,11 +85,10 @@ class SizingFuelSystemWeight(om.ExplicitComponent):
             self.factor = 2.0 if number_of_engine == 1.0 else 4.5
 
         outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":mass"] = (
-            self.factor * volume ** self.exponent
+            self.factor * volume**self.exponent
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_system_id = self.options["fuel_system_id"]
 
         volume = inputs[
@@ -102,6 +98,4 @@ class SizingFuelSystemWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":mass",
             "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":connected_volume",
-        ] = (
-            self.factor * self.exponent * volume ** (self.exponent - 1.0)
-        )
+        ] = self.factor * self.exponent * volume ** (self.exponent - 1.0)

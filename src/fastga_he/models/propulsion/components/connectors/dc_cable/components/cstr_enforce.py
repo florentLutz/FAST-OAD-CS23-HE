@@ -9,12 +9,12 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_LINE_CURRENT
-] = "fastga_he.submodel.propulsion.constraints.dc_line.current.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_LINE_VOLTAGE
-] = "fastga_he.submodel.propulsion.constraints.dc_line.voltage.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_LINE_CURRENT] = (
+    "fastga_he.submodel.propulsion.constraints.dc_line.current.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_LINE_VOLTAGE] = (
+    "fastga_he.submodel.propulsion.constraints.dc_line.voltage.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -28,7 +28,6 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -37,7 +36,6 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -61,7 +59,6 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         outputs[
@@ -80,7 +77,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -112,7 +108,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         outputs[

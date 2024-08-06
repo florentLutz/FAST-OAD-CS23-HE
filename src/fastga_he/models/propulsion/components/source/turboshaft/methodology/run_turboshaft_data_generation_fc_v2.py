@@ -23,7 +23,6 @@ from turboshaft_components.turboshaft_off_design_fuel import Turboshaft
 
 
 def get_ivc_all_data(power_design, t41t_design, opr_design, altitude_design, mach_design):
-
     ivc = om.IndepVarComp()
     ivc.add_output("compressor_bleed_mass_flow", val=0.04, units="kg/s")
     ivc.add_output("cooling_bleed_ratio", val=0.025)
@@ -81,7 +80,6 @@ def get_ivc_all_data(power_design, t41t_design, opr_design, altitude_design, mac
 
 
 def run_design_point(ivc):
-
     prob = om.Problem()
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
@@ -123,7 +121,6 @@ def run_design_point(ivc):
 
 
 def get_fuel_problem(ivc):
-
     prob = om.Problem()
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
@@ -152,7 +149,6 @@ def run_off_design_fuel(
     mach_off_design: list,
     ivc: om.IndepVarComp,
 ):
-
     fuel_consumed = []
     exhaust_mass_flow = []
     exhaust_velocity = []
@@ -248,7 +244,6 @@ def run_and_save_turboshaft_full_performances(
     data_folder_pth,
     save=True,
 ):
-
     print("Design thermodynamic power: " + str(power_design) + " kW")
     print("Design TET: " + str(t41t_design) + " degK")
     print("Design OPR: " + str(opr_design))
@@ -378,20 +373,17 @@ def run_and_save_turboshaft_full_performances(
 
     if save:
         if result_file_path_fc.exists():
-
             existing_data = pd.read_csv(result_file_path_fc, index_col=0)
             stacked_dataframe = pd.concat([existing_data, result_dataframe_fc], axis=0)
             stacked_dataframe.to_csv(result_file_path_fc)
 
         else:
-
             result_dataframe_fc.to_csv(result_file_path_fc)
     else:
         print(altitude, mach, power_rate * shaft_power_limit, fuel_consumed)
 
 
 if __name__ == "__main__":
-
     path_to_current_file = pathlib.Path(__file__)
     parent_folder = path_to_current_file.parents[0]
     data_folder_path = parent_folder / "data"

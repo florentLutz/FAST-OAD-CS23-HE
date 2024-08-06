@@ -38,7 +38,6 @@ _LOGGER = logging.getLogger(__name__)
 
 class UpdateMFW(om.Group):
     def setup(self):
-
         self.add_subsystem(
             name="update_wing_y",
             subsys=ComputeWingY(),
@@ -124,7 +123,6 @@ class UpdateMFW(om.Group):
 
 class DistanceToMFWForUpdate(om.ImplicitComponent):
     def setup(self):
-
         self.add_input("data:mission:sizing:fuel", units="kg", val=np.nan)
         self.add_input("data:weight:aircraft:MFW", units="kg", val=np.nan)
 
@@ -135,14 +133,12 @@ class DistanceToMFWForUpdate(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         # Wing area will likely be in tens of m2 while MFW will likely be in hundreds of
         residuals["wing_area"] = (
             inputs["data:weight:aircraft:MFW"] - inputs["data:mission:sizing:fuel"]
         ) / 10.0
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-
         jacobian["wing_area", "data:weight:aircraft:MFW"] = 0.1
         jacobian["wing_area", "data:mission:sizing:fuel"] = -0.1
 
@@ -152,7 +148,6 @@ class DistanceToMFWForUpdate(om.ImplicitComponent):
 )
 class UpdateWingAreaGeomAdvanced(om.Group):
     def __init__(self, **kwargs):
-
         super().__init__(**kwargs)
         # Solvers setup
         self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
@@ -165,7 +160,6 @@ class UpdateWingAreaGeomAdvanced(om.Group):
         self.linear_solver = om.DirectSolver()
 
     def setup(self):
-
         self.add_subsystem(
             name="update_area",
             subsys=DistanceToMFWForUpdate(),
@@ -179,7 +173,6 @@ class UpdateWingAreaGeomAdvanced(om.Group):
 
 class DistanceToMFWForConstraint(om.ExplicitComponent):
     def setup(self):
-
         self.add_input("data:mission:sizing:fuel", units="kg", val=np.nan)
         self.add_input("MFW", units="kg", val=np.nan)
 
@@ -188,13 +181,11 @@ class DistanceToMFWForConstraint(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["data:constraints:wing:additional_fuel_capacity"] = (
             inputs["MFW"] - inputs["data:mission:sizing:fuel"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["data:constraints:wing:additional_fuel_capacity", "MFW"] = 1.0
         partials[
             "data:constraints:wing:additional_fuel_capacity", "data:mission:sizing:fuel"
@@ -212,7 +203,6 @@ class ConstraintWingAreaGeomAdvanced(om.Group):
     """
 
     def setup(self):
-
         # To rename the wing area as it is used in the UpdateMFW() group
         weight_sum = om.AddSubtractComp()
         weight_sum.add_equation(

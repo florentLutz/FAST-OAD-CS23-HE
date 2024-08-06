@@ -23,7 +23,6 @@ NB_POINTS_TEST = 10
 
 
 def test_clean_lift_wing():
-
     ivc = get_indep_var_comp(
         list_inputs(SlipstreamAirframeLiftClean(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -45,7 +44,6 @@ def test_clean_lift_wing():
 
 
 def test_airframe_lift():
-
     flaps_positions = ["cruise", "landing", "takeoff"]
     expected_values = (
         np.full(NB_POINTS_TEST, 0.6533),
@@ -54,7 +52,6 @@ def test_airframe_lift():
     )
 
     for flaps_position, expected_value in zip(flaps_positions, expected_values):
-
         ivc = get_indep_var_comp(
             list_inputs(
                 SlipstreamAirframeLift(
@@ -82,7 +79,6 @@ def test_airframe_lift():
 
 
 def test_punctual_mass_assembler():
-
     pt_file_path = pth.join(pth.dirname(__file__), PROPULSION_FILE)
 
     ivc = get_indep_var_comp(
@@ -107,7 +103,6 @@ def test_punctual_mass_assembler():
 
 
 def test_punctual_tank_assembler():
-
     pt_file_path = pth.join(pth.dirname(__file__), PROPULSION_FILE_TANKS)
 
     ivc = get_indep_var_comp(
@@ -132,7 +127,6 @@ def test_punctual_tank_assembler():
 
 
 def test_distributed_mass_assembler():
-
     pt_file_path = pth.join(pth.dirname(__file__), PROPULSION_FILE)
 
     ivc = get_indep_var_comp(
@@ -166,7 +160,6 @@ def test_distributed_mass_assembler():
 
 
 def test_distributed_tanks_assembler():
-
     pt_file_path = pth.join(pth.dirname(__file__), PROPULSION_FILE_TANKS)
 
     ivc = get_indep_var_comp(
@@ -200,7 +193,6 @@ def test_distributed_tanks_assembler():
 
 
 def test_fuel_cg_from_pt_file():
-
     pt_file_path = pth.join(pth.dirname(__file__), pth.join("data", "sample_fuel_propulsion.yml"))
 
     ivc = get_indep_var_comp(

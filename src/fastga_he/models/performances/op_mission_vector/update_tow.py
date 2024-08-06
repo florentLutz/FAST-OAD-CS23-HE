@@ -15,7 +15,6 @@ class UpdateTOW(om.ExplicitComponent):
     """
 
     def setup(self):
-
         self.add_input("data:weight:aircraft:OWE", val=np.nan, units="kg")
         self.add_input("data:mission:operational:payload:mass", val=np.nan, units="kg")
         self.add_input("data:mission:operational:fuel", val=np.nan, units="kg")
@@ -25,7 +24,6 @@ class UpdateTOW(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["data:mission:operational:TOW"] = (
             inputs["data:weight:aircraft:OWE"]
             + inputs["data:mission:operational:payload:mass"]

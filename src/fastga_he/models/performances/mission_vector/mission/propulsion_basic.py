@@ -9,9 +9,9 @@ import fastoad.api as oad
 
 from ..constants import HE_SUBMODEL_ENERGY_CONSUMPTION
 
-oad.RegisterSubmodel.active_models[
-    HE_SUBMODEL_ENERGY_CONSUMPTION
-] = "fastga_he.submodel.performances.energy_consumption.basic"
+oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
+    "fastga_he.submodel.performances.energy_consumption.basic"
+)
 
 
 @oad.RegisterSubmodel(
@@ -21,7 +21,6 @@ class FuelConsumed(om.ExplicitComponent):
     """Computes the fuel consumed at each time step."""
 
     def initialize(self):
-
         # We have to declare them even if not used to preserve compatibility
         self.options.declare("propulsion_id", default="", types=str)
         self.options.declare(
@@ -133,7 +132,6 @@ class FuelConsumed(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         time_step = inputs["time_step_econ"]
         thrust = inputs["thrust_econ"]
 

@@ -27,7 +27,6 @@ class ConstraintsDCSplitter(om.Group):
         )
 
     def setup(self):
-
         option_dc_splitter_id = {"dc_splitter_id": self.options["dc_splitter_id"]}
 
         self.add_subsystem(

@@ -10,13 +10,11 @@ class SlipstreamTurboshaftDeltaCd(om.ExplicitComponent):
     """The exhaust of the thrust will be accounted for through a negative drag coefficient."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("density", units="kg/m**3", val=np.nan, shape=number_of_points)
@@ -43,19 +41,17 @@ class SlipstreamTurboshaftDeltaCd(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         density = inputs["density"]
         true_airspeed = inputs["true_airspeed"]
         wing_area = inputs["data:geometry:wing:area"]
 
         exhaust_thrust = inputs["exhaust_thrust"]
 
-        delta_cd = -exhaust_thrust / (0.5 * density * true_airspeed ** 2.0 * wing_area)
+        delta_cd = -exhaust_thrust / (0.5 * density * true_airspeed**2.0 * wing_area)
 
         outputs["delta_Cd"] = delta_cd
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         density = inputs["density"]
         true_airspeed = inputs["true_airspeed"]
         wing_area = inputs["data:geometry:wing:area"]
@@ -63,14 +59,14 @@ class SlipstreamTurboshaftDeltaCd(om.ExplicitComponent):
         exhaust_thrust = inputs["exhaust_thrust"]
 
         partials["delta_Cd", "density"] = exhaust_thrust / (
-            0.5 * density ** 2.0 * true_airspeed ** 2.0 * wing_area
+            0.5 * density**2.0 * true_airspeed**2.0 * wing_area
         )
         partials["delta_Cd", "true_airspeed"] = 2.0 * (
-            exhaust_thrust / (0.5 * density * true_airspeed ** 3.0 * wing_area)
+            exhaust_thrust / (0.5 * density * true_airspeed**3.0 * wing_area)
         )
         partials["delta_Cd", "data:geometry:wing:area"] = exhaust_thrust / (
-            0.5 * density * true_airspeed ** 2.0 * wing_area ** 2.0
+            0.5 * density * true_airspeed**2.0 * wing_area**2.0
         )
         partials["delta_Cd", "exhaust_thrust"] = -(
-            1.0 / (0.5 * density * true_airspeed ** 2.0 * wing_area)
+            1.0 / (0.5 * density * true_airspeed**2.0 * wing_area)
         )

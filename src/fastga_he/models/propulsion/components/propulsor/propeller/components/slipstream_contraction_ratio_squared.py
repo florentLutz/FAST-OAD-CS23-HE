@@ -14,7 +14,6 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -23,7 +22,6 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         propeller_id = self.options["propeller_id"]
 
@@ -75,7 +73,6 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         prop_rad = (
@@ -92,13 +89,12 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
 
         sigma_2 = (1.0 + a_p) / (
             1.0
-            + a_p * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0))
+            + a_p * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio**2.0 + 1.0))
         )
 
         outputs["contraction_ratio_squared"] = sigma_2
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         prop_rad = (
@@ -115,7 +111,7 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
 
         sigma_2 = (1.0 + a_p) / (
             1.0
-            + a_p * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0))
+            + a_p * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio**2.0 + 1.0))
         )
 
         d_sigma_2_d_ratio = (
@@ -124,36 +120,30 @@ class SlipstreamPropellerContractionRatioSquared(om.ExplicitComponent):
             / (
                 1.0
                 + a_p
-                * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0))
+                * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio**2.0 + 1.0))
             )
-            / (prop_dist_from_le_ratio ** 2.0 + 1.0) ** 1.5
+            / (prop_dist_from_le_ratio**2.0 + 1.0) ** 1.5
         )
 
         partials[
             "contraction_ratio_squared",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-        ] = (
-            -d_sigma_2_d_ratio * prop_dist_from_le_ratio_chord * ref_chord / prop_rad ** 2.0 / 2.0
-        )
+        ] = -d_sigma_2_d_ratio * prop_dist_from_le_ratio_chord * ref_chord / prop_rad**2.0 / 2.0
         partials[
             "contraction_ratio_squared",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
-        ] = (
-            d_sigma_2_d_ratio * ref_chord / prop_rad
-        )
+        ] = d_sigma_2_d_ratio * ref_chord / prop_rad
         partials[
             "contraction_ratio_squared",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
-        ] = (
-            d_sigma_2_d_ratio * prop_dist_from_le_ratio_chord / prop_rad
-        )
+        ] = d_sigma_2_d_ratio * prop_dist_from_le_ratio_chord / prop_rad
         partials["contraction_ratio_squared", "axial_induction_factor"] = -(
             prop_dist_from_le_ratio
-            / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0)
+            / np.sqrt(prop_dist_from_le_ratio**2.0 + 1.0)
             / (
                 1.0
                 + a_p
-                * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio ** 2.0 + 1.0))
+                * (1.0 + prop_dist_from_le_ratio / np.sqrt(prop_dist_from_le_ratio**2.0 + 1.0))
             )
             ** 2.0
         )

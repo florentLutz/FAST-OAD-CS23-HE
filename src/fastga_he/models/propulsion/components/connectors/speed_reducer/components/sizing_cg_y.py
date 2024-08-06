@@ -15,7 +15,6 @@ class SizingSpeedReducerCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="speed_reducer_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingSpeedReducerCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         speed_reducer_id = self.options["speed_reducer_id"]
 
@@ -47,7 +45,6 @@ class SizingSpeedReducerCGY(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing":
-
             self.add_input(
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:y_ratio",
                 val=np.nan,
@@ -57,12 +54,10 @@ class SizingSpeedReducerCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         speed_reducer_id = self.options["speed_reducer_id"]
 
         if position == "inside_the_wing":
-
             outputs[
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:y"
             ] = (
@@ -76,18 +71,15 @@ class SizingSpeedReducerCGY(om.ExplicitComponent):
             )
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:y"
             ] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:y",
                 "data:geometry:wing:span",
@@ -102,6 +94,4 @@ class SizingSpeedReducerCGY(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:y",
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

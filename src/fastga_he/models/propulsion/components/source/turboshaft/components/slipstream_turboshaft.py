@@ -16,7 +16,6 @@ from .slipstream_delta_cd import SlipstreamTurboshaftDeltaCd
 
 class SlipstreamTurboshaft(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -28,7 +27,6 @@ class SlipstreamTurboshaft(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 

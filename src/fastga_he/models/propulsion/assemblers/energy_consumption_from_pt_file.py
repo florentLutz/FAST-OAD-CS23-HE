@@ -19,7 +19,6 @@ class EnergyConsumptionFromPTFile(om.ExplicitComponent):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -31,7 +30,6 @@ class EnergyConsumptionFromPTFile(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         source_names = self.configurator.get_energy_consumption_list()
@@ -52,7 +50,6 @@ class EnergyConsumptionFromPTFile(om.ExplicitComponent):
         )
 
         for source_name in source_names:
-
             self.add_input(
                 source_name + "_fuel_consumed_t",
                 units="kg",
@@ -80,7 +77,6 @@ class EnergyConsumptionFromPTFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         source_names = self.configurator.get_energy_consumption_list()
@@ -89,7 +85,6 @@ class EnergyConsumptionFromPTFile(om.ExplicitComponent):
         energy_consumed = np.zeros(number_of_points)
 
         for source_name in source_names:
-
             fuel_consumed += inputs[source_name + "_fuel_consumed_t"]
             energy_consumed += inputs[source_name + "_non_consumable_energy_t"]
 

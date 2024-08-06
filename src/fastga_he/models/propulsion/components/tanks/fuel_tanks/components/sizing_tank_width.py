@@ -12,7 +12,6 @@ class SizingFuelTankWidth(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -21,7 +20,6 @@ class SizingFuelTankWidth(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         self.add_input(
@@ -56,7 +54,6 @@ class SizingFuelTankWidth(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         tank_volume = inputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":volume"]
@@ -67,12 +64,11 @@ class SizingFuelTankWidth(om.ExplicitComponent):
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:height"
         ]
 
-        outputs[
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:width"
-        ] = tank_volume / (tank_length * tank_height)
+        outputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:width"] = (
+            tank_volume / (tank_length * tank_height)
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         tank_volume = inputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":volume"]
@@ -90,8 +86,8 @@ class SizingFuelTankWidth(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:width",
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:length",
-        ] = -tank_volume / (tank_length ** 2.0 * tank_height)
+        ] = -tank_volume / (tank_length**2.0 * tank_height)
         partials[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:width",
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:height",
-        ] = -tank_volume / (tank_length * tank_height ** 2.0)
+        ] = -tank_volume / (tank_length * tank_height**2.0)

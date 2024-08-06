@@ -25,7 +25,6 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingPropeller(om.Group):
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -45,7 +44,6 @@ class SizingPropeller(om.Group):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 

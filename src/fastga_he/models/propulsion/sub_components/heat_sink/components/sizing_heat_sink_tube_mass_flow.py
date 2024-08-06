@@ -23,7 +23,6 @@ class SizingHeatSinkTubeMassFlow(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -67,7 +66,6 @@ class SizingHeatSinkTubeMassFlow(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         inverter_losses_max = inputs[prefix + ":dissipable_heat"]
@@ -85,7 +83,6 @@ class SizingHeatSinkTubeMassFlow(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
         inverter_losses_max = inputs[prefix + ":dissipable_heat"]
@@ -102,24 +99,24 @@ class SizingHeatSinkTubeMassFlow(om.ExplicitComponent):
             prefix + ":heat_sink:coolant:max_mass_flow",
             prefix + ":heat_sink:coolant:specific_heat_capacity",
         ] = -inverter_losses_max / (
-            delta_t_coolant * specific_heat_capacity_coolant ** 2.0 * density_coolant
+            delta_t_coolant * specific_heat_capacity_coolant**2.0 * density_coolant
         )
         partials[
             prefix + ":heat_sink:coolant:max_mass_flow", prefix + ":heat_sink:coolant:density"
         ] = -inverter_losses_max / (
-            delta_t_coolant * specific_heat_capacity_coolant * density_coolant ** 2.0
+            delta_t_coolant * specific_heat_capacity_coolant * density_coolant**2.0
         )
         partials[
             prefix + ":heat_sink:coolant:max_mass_flow",
             prefix + ":heat_sink:coolant:temperature_out_rating",
         ] = -inverter_losses_max / (
-            delta_t_coolant ** 2.0 * specific_heat_capacity_coolant * density_coolant
+            delta_t_coolant**2.0 * specific_heat_capacity_coolant * density_coolant
         )
         partials[
             prefix + ":heat_sink:coolant:max_mass_flow",
             prefix + ":heat_sink:coolant:temperature_in_rating",
         ] = inverter_losses_max / (
-            delta_t_coolant ** 2.0 * specific_heat_capacity_coolant * density_coolant
+            delta_t_coolant**2.0 * specific_heat_capacity_coolant * density_coolant
         )
         partials[prefix + ":heat_sink:coolant:max_mass_flow", prefix + ":dissipable_heat"] = 1.0 / (
             delta_t_coolant * specific_heat_capacity_coolant * density_coolant

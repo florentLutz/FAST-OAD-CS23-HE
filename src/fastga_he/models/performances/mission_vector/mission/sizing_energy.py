@@ -10,7 +10,6 @@ class SizingEnergy(om.ExplicitComponent):
     """Computes the fuel consumed during the whole sizing mission."""
 
     def setup(self):
-
         self.add_input("data:mission:sizing:main_route:climb:fuel", val=np.nan, units="kg")
         self.add_input("data:mission:sizing:main_route:climb:energy", val=np.nan, units="W*h")
         self.add_input("data:mission:sizing:main_route:cruise:fuel", val=np.nan, units="kg")
@@ -37,7 +36,6 @@ class SizingEnergy(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["data:mission:sizing:fuel"] = (
             inputs["data:mission:sizing:main_route:climb:fuel"]
             + inputs["data:mission:sizing:main_route:cruise:fuel"]

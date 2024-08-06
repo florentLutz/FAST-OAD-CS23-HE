@@ -21,7 +21,6 @@ class SizingInductorCopperWireArea(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -47,7 +46,6 @@ class SizingInductorCopperWireArea(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         outputs[prefix + ":inductor:wire_section_area"] = (
@@ -56,12 +54,12 @@ class SizingInductorCopperWireArea(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
-        partials[prefix + ":inductor:wire_section_area", prefix + ":inductor:current_caliber",] = (
-            1.0 / inputs[prefix + ":inductor:wire_current_density"]
-        )
+        partials[
+            prefix + ":inductor:wire_section_area",
+            prefix + ":inductor:current_caliber",
+        ] = 1.0 / inputs[prefix + ":inductor:wire_current_density"]
         partials[
             prefix + ":inductor:wire_section_area",
             prefix + ":inductor:wire_current_density",

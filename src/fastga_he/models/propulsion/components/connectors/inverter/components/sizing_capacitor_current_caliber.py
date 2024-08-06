@@ -21,7 +21,6 @@ class SizingInverterCapacitorCurrentCaliber(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -47,7 +46,6 @@ class SizingInverterCapacitorCurrentCaliber(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         cos_phi = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor"]
@@ -56,7 +54,7 @@ class SizingInverterCapacitorCurrentCaliber(om.ExplicitComponent):
         # to the following formula obtained by a simple derivative computation
 
         factor = np.sqrt(
-            2.0 / (3.0 * np.pi ** 2.0) * (1 + 2.0 * cos_phi ** 2.0 + 1.0 / (8.0 * cos_phi ** 2.0))
+            2.0 / (3.0 * np.pi**2.0) * (1 + 2.0 * cos_phi**2.0 + 1.0 / (8.0 * cos_phi**2.0))
         )
 
         outputs[
@@ -67,13 +65,12 @@ class SizingInverterCapacitorCurrentCaliber(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         cos_phi = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_factor"]
 
         factor = np.sqrt(
-            2.0 / (3.0 * np.pi ** 2.0) * (1 + 2.0 * cos_phi ** 2.0 + 1.0 / (8.0 * cos_phi ** 2.0))
+            2.0 / (3.0 * np.pi**2.0) * (1 + 2.0 * cos_phi**2.0 + 1.0 / (8.0 * cos_phi**2.0))
         )
 
         partials[
@@ -87,6 +84,6 @@ class SizingInverterCapacitorCurrentCaliber(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"]
             / (2.0 * factor)
             * 2.0
-            / (3.0 * np.pi ** 2.0)
-            * (4.0 * cos_phi - 1.0 / (4.0 * cos_phi ** 3.0))
+            / (3.0 * np.pi**2.0)
+            * (4.0 * cos_phi - 1.0 / (4.0 * cos_phi**3.0))
         )

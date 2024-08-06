@@ -25,7 +25,6 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("data:mission:sizing:taxi_out:speed", np.nan, units="m/s")
@@ -190,7 +189,6 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         thrust_taxi_out = float(inputs["data:mission:sizing:taxi_out:thrust"])
         thrust_taxi_in = float(inputs["data:mission:sizing:taxi_in:thrust"])
 
@@ -198,7 +196,6 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
             (np.array([thrust_taxi_out]), inputs["thrust"], np.array([thrust_taxi_in]))
         )
         if np.any(thrust_econ) < 50.0:
-
             thrust_econ = np.maximum(
                 thrust_econ,
                 np.full_like(thrust_econ, 50.0),
@@ -240,7 +237,6 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         d_thrust_econ_d_thrust_diagonal = np.where(
             inputs["thrust"] > 50.0, np.ones_like(inputs["thrust"]), np.zeros_like(inputs["thrust"])
         )

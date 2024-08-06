@@ -34,7 +34,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -65,7 +64,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         outputs[
@@ -76,7 +74,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         partials[
@@ -108,7 +105,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -139,7 +135,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         outputs[
@@ -150,7 +145,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         partials[
@@ -182,7 +176,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -213,7 +206,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         outputs[
@@ -224,7 +216,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         partials[
@@ -256,7 +247,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -297,7 +287,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         outputs[
@@ -314,7 +303,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         partials[

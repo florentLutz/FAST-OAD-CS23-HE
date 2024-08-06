@@ -15,7 +15,6 @@ class SizingDCAuxLoadCGX(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="aux_load_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingDCAuxLoadCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         aux_load_id = self.options["aux_load_id"]
         position = self.options["position"]
 
@@ -44,11 +42,9 @@ class SizingDCAuxLoadCGX(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         elif position == "in_the_front":
-
             self.add_input(
                 name="data:propulsion:he_power_train:aux_load:"
                 + aux_load_id
@@ -59,7 +55,6 @@ class SizingDCAuxLoadCGX(om.ExplicitComponent):
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
         else:
-
             self.add_input(
                 name="data:propulsion:he_power_train:aux_load:"
                 + aux_load_id
@@ -74,18 +69,15 @@ class SizingDCAuxLoadCGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         aux_load_id = self.options["aux_load_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:x"] = inputs[
                 "data:geometry:wing:MAC:at25percent:x"
             ]
 
         elif position == "in_the_front":
-
             lav = inputs["data:geometry:fuselage:front_length"]
 
             outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:x"] = (
@@ -96,7 +88,6 @@ class SizingDCAuxLoadCGX(om.ExplicitComponent):
             )
 
         else:
-
             cabin_length = inputs["data:geometry:cabin:length"]
             lav = inputs["data:geometry:fuselage:front_length"]
             lar = inputs["data:geometry:fuselage:rear_length"]
@@ -111,19 +102,16 @@ class SizingDCAuxLoadCGX(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         aux_load_id = self.options["aux_load_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
             ] = 1.0
 
         elif position == "in_the_front":
-
             partials[
                 "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:x",
                 "data:geometry:fuselage:front_length",
@@ -136,7 +124,6 @@ class SizingDCAuxLoadCGX(om.ExplicitComponent):
             ] = inputs["data:geometry:fuselage:front_length"]
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:x",
                 "data:geometry:fuselage:front_length",

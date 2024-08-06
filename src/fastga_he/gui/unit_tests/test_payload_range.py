@@ -35,7 +35,6 @@ def test_payload_range():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_payload_range_electric():
-
     """
     Tests for payload range display with electric.
     """

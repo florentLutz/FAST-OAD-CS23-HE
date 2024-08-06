@@ -21,7 +21,6 @@ class PowerTrainDeltaClFromFile(om.ExplicitComponent):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -33,7 +32,6 @@ class PowerTrainDeltaClFromFile(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         self.configurator.load(self.options["power_train_file_path"])
 
@@ -53,7 +51,6 @@ class PowerTrainDeltaClFromFile(om.ExplicitComponent):
         for component_name, component_slipstream_wing_lift in zip(
             components_name, components_slipstream_wing_lift
         ):
-
             component_delta_cl = component_name + "_delta_Cl"
 
             self.add_input(component_delta_cl, val=np.full(number_of_points, np.nan))
@@ -67,7 +64,6 @@ class PowerTrainDeltaClFromFile(om.ExplicitComponent):
             )
 
             if component_slipstream_wing_lift:
-
                 self.declare_partials(
                     of="delta_Cl_wing",
                     wrt=component_delta_cl,
@@ -77,7 +73,6 @@ class PowerTrainDeltaClFromFile(om.ExplicitComponent):
                 )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         (
             components_name,
             _,
@@ -94,13 +89,11 @@ class PowerTrainDeltaClFromFile(om.ExplicitComponent):
         for component_name, component_slipstream_wing_lift in zip(
             components_name, components_slipstream_wing_lift
         ):
-
             component_delta_cl = component_name + "_delta_Cl"
 
             total_cl += inputs[component_delta_cl]
 
             if component_slipstream_wing_lift:
-
                 wing_cl += inputs[component_delta_cl]
 
         outputs["delta_Cl"] = total_cl

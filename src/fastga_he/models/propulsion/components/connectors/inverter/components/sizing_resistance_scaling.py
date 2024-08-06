@@ -25,7 +25,6 @@ class SizingInverterResistanceScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -45,7 +44,6 @@ class SizingInverterResistanceScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         current_caliber_ref = self.options["current_caliber_ref"]
@@ -57,7 +55,7 @@ class SizingInverterResistanceScaling(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:resistance"
-        ] = (current_caliber_star ** -1)
+        ] = current_caliber_star**-1
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         inverter_id = self.options["inverter_id"]
@@ -69,6 +67,4 @@ class SizingInverterResistanceScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:resistance",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
-        ] = (
-            -current_caliber_ref / current_caliber ** 2.0
-        )
+        ] = -current_caliber_ref / current_caliber**2.0

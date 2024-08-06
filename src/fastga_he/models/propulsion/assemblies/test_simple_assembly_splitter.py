@@ -31,7 +31,6 @@ NB_POINTS_TEST = 10
 
 
 def test_assembly_performances_splitter_50_50():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -154,7 +153,6 @@ def test_assembly_performances_splitter_50_50():
 
 
 def test_assembly_performances_splitter_60_40():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -282,7 +280,6 @@ def test_assembly_performances_splitter_60_40():
 
 
 def test_assembly_performances_splitter_100_0():
-
     input_list = list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST))
     input_list.remove("data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_split")
 
@@ -356,7 +353,6 @@ def test_assembly_performances_splitter_100_0():
 
 
 def test_assembly_performances_splitter_100_0_only_part():
-
     input_list = list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST))
     input_list.remove("data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_split")
 
@@ -567,10 +563,9 @@ def test_performances_from_pt_file():
 
 
 def test_assembly_sizing_from_pt_file():
-
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    )
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_splitter.yml")
 
@@ -650,7 +645,6 @@ def test_assembly_sizing_from_pt_file():
 
 
 def test_slipstream_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
     ivc = get_indep_var_comp(

@@ -55,7 +55,6 @@ NB_POINTS_TEST = 10
 
 
 def test_constraint_power_enforce():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsSeaLevelPowerEnforce(ice_id="ice_1")), __file__, XML_FILE
     )
@@ -71,7 +70,6 @@ def test_constraint_power_enforce():
 
 
 def test_constraint_power_ensure():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsSeaLevelPowerEnsure(ice_id="ice_1")), __file__, XML_FILE
     )
@@ -87,7 +85,6 @@ def test_constraint_power_ensure():
 
 
 def test_constraint_power_for_power_rate():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintICEPowerRateMission(ice_id="ice_1")), __file__, XML_FILE
     )
@@ -103,7 +100,6 @@ def test_constraint_power_for_power_rate():
 
 
 def test_displacement_volume():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingICEDisplacementVolume(ice_id="ice_1")), __file__, XML_FILE
     )
@@ -119,7 +115,6 @@ def test_displacement_volume():
 
 
 def test_uninstalled_weight():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingICEUninstalledWeight(ice_id="ice_1")), __file__, XML_FILE
     )
@@ -135,7 +130,6 @@ def test_uninstalled_weight():
 
 
 def installed_weight():
-
     ivc = get_indep_var_comp(list_inputs(SizingICEWeight(ice_id="ice_1")), __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -149,7 +143,6 @@ def installed_weight():
 
 
 def test_installed_dimensions_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingICEDimensionsScaling(ice_id="ice_1")), __file__, XML_FILE
     )
@@ -171,7 +164,6 @@ def test_installed_dimensions_scaling():
 
 
 def test_ice_dimensions():
-
     ivc = get_indep_var_comp(list_inputs(SizingICEDimensions(ice_id="ice_1")), __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -191,7 +183,6 @@ def test_ice_dimensions():
 
 
 def test_nacelle_dimensions():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingICENacelleDimensions(ice_id="ice_1")), __file__, XML_FILE
     )
@@ -213,7 +204,6 @@ def test_nacelle_dimensions():
 
 
 def test_nacelle_wet_area():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingICENacelleWetArea(ice_id="ice_1")), __file__, XML_FILE
     )
@@ -229,7 +219,6 @@ def test_nacelle_wet_area():
 
 
 def test_nacelle_drag():
-
     expected_drag_ls = [5.38, 0.0, 0.0]
     expected_drag_cruise = [5.32, 0.0, 0.0]
 
@@ -250,32 +239,22 @@ def test_nacelle_drag():
             )
 
             if ls_option:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:ICE:ice_1:low_speed:CD0",
-                    )
-                    * 1e3
-                    == pytest.approx(ls_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:ICE:ice_1:low_speed:CD0",
+                ) * 1e3 == pytest.approx(ls_drag, rel=1e-2)
             else:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:ICE:ice_1:cruise:CD0",
-                    )
-                    * 1e3
-                    == pytest.approx(cruise_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:ICE:ice_1:cruise:CD0",
+                ) * 1e3 == pytest.approx(cruise_drag, rel=1e-2)
 
             # Slight error on reynolds is due to step
             problem.check_partials(compact_print=True)
 
 
 def test_motor_cg_x():
-
     expected_cg = [3.03, 1.03, 3.00]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingICECGX(ice_id="ice_1", position=option)),
             __file__,
@@ -292,11 +271,9 @@ def test_motor_cg_x():
 
 
 def test_motor_cg_y():
-
     expected_cg = [2.0, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingICECGY(ice_id="ice_1", position=option)),
             __file__,
@@ -313,7 +290,6 @@ def test_motor_cg_y():
 
 
 def test_ice_sizing():
-
     ivc = get_indep_var_comp(list_inputs(SizingICE(ice_id="ice_1")), __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -328,19 +304,14 @@ def test_ice_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:ICE:ice_1:CG:y", units="m"
     ) == pytest.approx(2.0, rel=1e-2)
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:ICE:ice_1:low_speed:CD0",
-        )
-        * 1e3
-        == pytest.approx(5.32, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:low_speed:CD0",
+    ) * 1e3 == pytest.approx(5.32, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_torque():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "shaft_power_out",
@@ -364,7 +335,6 @@ def test_torque():
 
 
 def test_equivalent_power():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "shaft_power_out",
@@ -389,7 +359,6 @@ def test_equivalent_power():
 
 
 def test_mean_effective_pressure():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesMeanEffectivePressure(ice_id="ice_1", number_of_points=NB_POINTS_TEST)
@@ -416,7 +385,6 @@ def test_mean_effective_pressure():
 
 
 def test_sfc():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "mean_effective_pressure",
@@ -442,7 +410,6 @@ def test_sfc():
 
 
 def test_fuel_consumption():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "specific_fuel_consumption",
@@ -467,7 +434,6 @@ def test_fuel_consumption():
 
 
 def test_fuel_consumed():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fuel_consumption",
@@ -488,7 +454,6 @@ def test_fuel_consumed():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "equivalent_SL_power",
@@ -516,7 +481,6 @@ def test_maximum():
 
 
 def test_performances_ice():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesICE(ice_id="ice_1", number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -561,7 +525,6 @@ def test_performances_ice():
 
 
 def test_in_flight_co2_emissions():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fuel_consumed_t",
@@ -596,7 +559,6 @@ def test_in_flight_co2_emissions():
 
 
 def test_in_flight_co_emissions():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fuel_consumed_t",
@@ -620,7 +582,6 @@ def test_in_flight_co_emissions():
 
 
 def test_in_flight_nox_emissions():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fuel_consumed_t",
@@ -644,7 +605,6 @@ def test_in_flight_nox_emissions():
 
 
 def test_in_flight_sox_emissions():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fuel_consumed_t",
@@ -666,7 +626,6 @@ def test_in_flight_sox_emissions():
 
 
 def test_in_flight_h2o_emissions():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fuel_consumed_t",
@@ -701,7 +660,6 @@ def test_in_flight_h2o_emissions():
 
 
 def test_in_flight_hc_emissions():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fuel_consumed_t",
@@ -736,7 +694,6 @@ def test_in_flight_hc_emissions():
 
 
 def test_in_flight_emissions_sum():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "CO2_emissions",
@@ -840,7 +797,6 @@ def test_in_flight_emissions_sum():
 
 
 def test_in_flight_emissions():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fuel_consumed_t",

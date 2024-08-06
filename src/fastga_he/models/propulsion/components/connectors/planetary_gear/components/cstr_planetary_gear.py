@@ -23,7 +23,6 @@ class ConstraintsPlanetaryGear(om.Group):
         )
 
     def setup(self):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         option_planetary_gear_id = {"planetary_gear_id": planetary_gear_id}

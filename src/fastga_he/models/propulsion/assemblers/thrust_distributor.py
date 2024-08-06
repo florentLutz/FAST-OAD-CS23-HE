@@ -28,7 +28,6 @@ class ThrustDistributor(om.ExplicitComponent):
         self.propulsor_connected = None
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -40,7 +39,6 @@ class ThrustDistributor(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         self.propulsor_names = self.configurator.get_thrust_element_list()
@@ -79,7 +77,6 @@ class ThrustDistributor(om.ExplicitComponent):
                 )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         untouched_thrust_distributor = inputs["data:propulsion:he_power_train:thrust_distribution"]
 
         # First we force to zero all the propeller that are not connected if we are not using
@@ -105,7 +102,6 @@ class ThrustDistributor(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
         number_of_propulsor = len(self.propulsor_names)
 

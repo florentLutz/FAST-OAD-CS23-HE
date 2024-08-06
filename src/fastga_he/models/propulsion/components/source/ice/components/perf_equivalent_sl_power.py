@@ -19,13 +19,11 @@ class PerformancesEquivalentSeaLevelPower(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
@@ -42,7 +40,6 @@ class PerformancesEquivalentSeaLevelPower(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         shaft_power_out = inputs["shaft_power_out"]
         rho = inputs["density"]
         sigma = rho / RHO_SL
@@ -52,7 +49,6 @@ class PerformancesEquivalentSeaLevelPower(om.ExplicitComponent):
         outputs["equivalent_SL_power"] = shaft_power_out / corrective_factor
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         shaft_power_out = inputs["shaft_power_out"]
         rho = inputs["density"]
         sigma = rho / RHO_SL
@@ -61,5 +57,5 @@ class PerformancesEquivalentSeaLevelPower(om.ExplicitComponent):
 
         partials["equivalent_SL_power", "shaft_power_out"] = 1.0 / corrective_factor
         partials["equivalent_SL_power", "density"] = -(
-            shaft_power_out / corrective_factor ** 2.0 * (8.55 / 7.55) / RHO_SL
+            shaft_power_out / corrective_factor**2.0 * (8.55 / 7.55) / RHO_SL
         )

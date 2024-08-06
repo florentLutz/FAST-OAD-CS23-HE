@@ -38,7 +38,6 @@ def power_train_network_viewer(
     power_train_file_path: str,
     network_file_path: str,
 ):
-
     # Notebook is at True to prevent him from opening a browser
     net = Network(
         notebook=True,

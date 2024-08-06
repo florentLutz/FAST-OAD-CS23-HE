@@ -16,7 +16,6 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -30,7 +29,6 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
 
         # Leaving an unused inputs for test, because test can't run without at least an input
@@ -43,7 +41,6 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
         )
 
         if self.options["position"] == "on_the_wing":
-
             self.add_input(
                 name="data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
                 val=np.nan,
@@ -60,11 +57,9 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         if self.options["position"] == "on_the_wing":
-
             flap_span_ratio = inputs["data:geometry:flap:span_ratio"]
             prop_y_ratio = inputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio"
@@ -81,16 +76,14 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
         else:
             flapped_ratio = 0.0
 
-        outputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio"
-        ] = flapped_ratio
+        outputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio"] = (
+            flapped_ratio
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         if self.options["position"] == "on_the_wing":
-
             flap_span_ratio = inputs["data:geometry:flap:span_ratio"]
             prop_y_ratio = inputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio"
@@ -120,7 +113,6 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
                     + ":diameter_to_span_ratio",
                 ] = 0.0
             else:
-
                 partials[
                     "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
                     "data:geometry:flap:span_ratio",
@@ -128,14 +120,10 @@ class SizingPropellerFlappedRatio(om.ExplicitComponent):
                 partials[
                     "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
                     "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
-                ] = (
-                    -flap_span_ratio / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio) ** 2.0
-                )
+                ] = -flap_span_ratio / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio) ** 2.0
                 partials[
                     "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
                     "data:propulsion:he_power_train:propeller:"
                     + propeller_id
                     + ":diameter_to_span_ratio",
-                ] = (
-                    -flap_span_ratio / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio) ** 2.0 * 0.5
-                )
+                ] = -flap_span_ratio / (prop_y_ratio + 0.5 * prop_span_to_dia_ratio) ** 2.0 * 0.5

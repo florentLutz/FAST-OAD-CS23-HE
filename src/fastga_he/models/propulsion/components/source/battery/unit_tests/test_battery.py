@@ -54,7 +54,6 @@ NB_POINTS_TEST = 10
 
 
 def test_module_weight():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBatteryModuleWeight(battery_pack_id="battery_pack_1")),
@@ -75,7 +74,6 @@ def test_module_weight():
 
 
 def test_battery_weight():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBatteryWeight(battery_pack_id="battery_pack_1")),
@@ -96,7 +94,6 @@ def test_battery_weight():
 
 
 def test_battery_cell_number():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBatteryNumberCells(battery_pack_id="battery_pack_1")),
@@ -117,7 +114,6 @@ def test_battery_cell_number():
 
 
 def test_module_volume():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBatteryModuleVolume(battery_pack_id="battery_pack_1")),
@@ -138,7 +134,6 @@ def test_module_volume():
 
 
 def test_battery_volume():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBatteryVolume(battery_pack_id="battery_pack_1")),
@@ -159,7 +154,6 @@ def test_battery_volume():
 
 
 def test_battery_dimensions():
-
     expected_length = [0.511, 7.03, 0.81, 0.81, 1.48]
     expected_width = [3.69, 0.47, 1.67, 1.67, 0.95]
     expected_height = [0.82, 0.47, 1.14, 1.14, 1.09]
@@ -193,7 +187,6 @@ def test_battery_dimensions():
 
 
 def test_battery_cg_x():
-
     expected_values = [2.88, 2.88, 0.095, 2.38, 1.24]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -217,7 +210,6 @@ def test_battery_cg_x():
 
 
 def test_battery_cg_y():
-
     expected_values = [1.57, 1.57, 0.0, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -241,7 +233,6 @@ def test_battery_cg_y():
 
 
 def test_battery_drag():
-
     expected_ls_drag = [0.0, 0.021, 0.0, 0.0, 3.77e-3]
     expected_cruise_drag = [0.0, 0.021, 0.0, 0.0, 3.72e-3]
 
@@ -269,25 +260,18 @@ def test_battery_drag():
             )
 
             if ls_option:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:battery_pack:battery_pack_1:low_speed:CD0",
-                    )
-                    == pytest.approx(ls_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:battery_pack:battery_pack_1:low_speed:CD0",
+                ) == pytest.approx(ls_drag, rel=1e-2)
             else:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cruise:CD0",
-                    )
-                    == pytest.approx(cruise_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:battery_pack:battery_pack_1:cruise:CD0",
+                ) == pytest.approx(cruise_drag, rel=1e-2)
 
             problem.check_partials(compact_print=True)
 
 
 def test_battery_prep_for_loads():
-
     expected_y_ratios_start = [0.216]
     expected_y_ratios_end = [0.463]
     expected_chords_start = [0.767]
@@ -316,13 +300,10 @@ def test_battery_prep_for_loads():
         assert problem.get_val(
             "data:propulsion:he_power_train:battery_pack:battery_pack_1:distributed_mass:y_ratio_end"
         ) == pytest.approx(expected_y_ratio_end, rel=1e-2)
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:battery_pack:battery_pack_1:distributed_mass:start_chord",
-                units="m",
-            )
-            == pytest.approx(expected_chord_start, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:distributed_mass:start_chord",
+            units="m",
+        ) == pytest.approx(expected_chord_start, rel=1e-2)
         assert problem.get_val(
             "data:propulsion:he_power_train:battery_pack:battery_pack_1:distributed_mass:chord_slope"
         ) == pytest.approx(0.0, rel=1e-2)
@@ -331,7 +312,6 @@ def test_battery_prep_for_loads():
 
 
 def test_constraints_enforce_soc():
-
     inputs_list = list_inputs(ConstraintsSOCEnforce(battery_pack_id="battery_pack_1"))
     inputs_list.remove("data:propulsion:he_power_train:battery_pack:battery_pack_1:c_rate_max")
 
@@ -354,12 +334,9 @@ def test_constraints_enforce_soc():
         ConstraintsSOCEnforce(battery_pack_id="battery_pack_1"),
         ivc_capacity_con,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
-        )
-        == pytest.approx(42.66, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
+    ) == pytest.approx(42.66, rel=1e-2)
 
     # The error on the capacity multiplier not retained is due to the fact that I've had bad
     # experiences with putting 0 in partials do I take something close enough to 0
@@ -378,12 +355,9 @@ def test_constraints_enforce_soc():
         ConstraintsSOCEnforce(battery_pack_id="battery_pack_1"),
         ivc_c_rate_con,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
-        )
-        == pytest.approx(66.67, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
+    ) == pytest.approx(66.67, rel=1e-2)
 
     # Partials will be hard to justify here since there is a rounding inside the module
     problem.check_partials(compact_print=True)
@@ -401,19 +375,15 @@ def test_constraints_enforce_soc():
         ConstraintsSOCEnforce(battery_pack_id="battery_pack_1"),
         ivc_c_rate_con,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
-        )
-        == pytest.approx(80.0, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules",
+    ) == pytest.approx(80.0, rel=1e-2)
 
     # Partials will be hard to justify here since there is a rounding inside the module
     problem.check_partials(compact_print=True)
 
 
 def test_constraints_ensure_soc():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsSOCEnsure(battery_pack_id="battery_pack_1")),
@@ -426,26 +396,19 @@ def test_constraints_ensure_soc():
         ConstraintsSOCEnsure(battery_pack_id="battery_pack_1"),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "constraints:propulsion:he_power_train:battery_pack:battery_pack_1:min_safe_SOC",
-            units="percent",
-        )
-        == pytest.approx(-20.0, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "constraints:propulsion:he_power_train:battery_pack:battery_pack_1:cell:max_c_rate",
-            units="percent",
-        )
-        == pytest.approx(-1.7, rel=1e-2)
-    )
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:battery_pack:battery_pack_1:min_safe_SOC",
+        units="percent",
+    ) == pytest.approx(-20.0, rel=1e-2)
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:battery_pack:battery_pack_1:cell:max_c_rate",
+        units="percent",
+    ) == pytest.approx(-1.7, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_battery_pack_sizing():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBatteryPack(battery_pack_id="battery_pack_1")),
@@ -467,24 +430,17 @@ def test_battery_pack_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:CG:y", units="m"
     ) == pytest.approx(1.57, rel=1e-2)
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:battery_pack:battery_pack_1:low_speed:CD0",
-        )
-        == pytest.approx(0.0, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:battery_pack:battery_pack_1:cruise:CD0",
-        )
-        == pytest.approx(0.0, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:low_speed:CD0",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cruise:CD0",
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_cell_temperature_mission():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell_temperature_mission",
@@ -528,7 +484,6 @@ def test_cell_temperature_mission():
 
 
 def test_current_module():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -557,7 +512,6 @@ def test_current_module():
 
 
 def test_open_circuit_voltage():
-
     ivc = om.IndepVarComp()
     ivc.add_output("state_of_charge", val=np.linspace(100, 40, NB_POINTS_TEST), units="percent")
 
@@ -574,7 +528,6 @@ def test_open_circuit_voltage():
 
 
 def test_internal_resistance():
-
     ivc = om.IndepVarComp()
     ivc.add_output("state_of_charge", val=np.linspace(100, 40, NB_POINTS_TEST), units="percent")
     ivc.add_output(
@@ -598,7 +551,6 @@ def test_internal_resistance():
 
 
 def test_cell_voltage():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "current_one_module",
@@ -629,7 +581,6 @@ def test_cell_voltage():
 
 
 def test_module_voltage():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -661,7 +612,6 @@ def test_module_voltage():
 
 
 def test_battery_voltage():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "module_voltage",
@@ -721,7 +671,6 @@ def test_module_c_rate():
 
 
 def test_module_relative_capacity():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "current_one_module",
@@ -768,7 +717,6 @@ def test_module_soc_decrease():
 
 
 def test_update_soc():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "state_of_charge_decrease",
@@ -790,7 +738,6 @@ def test_update_soc():
 
 
 def test_cell_joules_losses():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "current_one_module",
@@ -816,7 +763,6 @@ def test_cell_joules_losses():
 
 
 def test_cell_entropic_heat_coefficient():
-
     ivc = om.IndepVarComp()
     ivc.add_output("state_of_charge", val=np.linspace(100, 40, NB_POINTS_TEST), units="percent")
 
@@ -866,7 +812,6 @@ def test_cell_entropic_losses():
 
 
 def test_cell_total_losses():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "entropic_losses_cell",
@@ -896,7 +841,6 @@ def test_cell_total_losses():
 
 
 def test_battery_losses():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -929,7 +873,6 @@ def test_battery_losses():
 
 
 def test_maximum():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -989,7 +932,6 @@ def test_maximum():
 
 
 def test_battery_power():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -1013,7 +955,6 @@ def test_battery_power():
 
 
 def test_battery_efficiency():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -1043,7 +984,6 @@ def test_battery_efficiency():
 
 
 def test_energy_consumption():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "voltage_out",
@@ -1065,7 +1005,6 @@ def test_energy_consumption():
 
 
 def test_performances_battery_pack():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(

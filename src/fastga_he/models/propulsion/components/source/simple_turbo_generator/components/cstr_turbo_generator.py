@@ -18,7 +18,6 @@ class ConstraintsTurboGenerator(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="turbo_generator_id",
             default=None,
@@ -27,7 +26,6 @@ class ConstraintsTurboGenerator(om.Group):
         )
 
     def setup(self):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         option_turbo_generator_id = {"turbo_generator_id": turbo_generator_id}
@@ -63,7 +61,6 @@ class ConstraintTurboGeneratorPowerRateMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         self.add_input(
@@ -86,7 +83,6 @@ class ConstraintTurboGeneratorPowerRateMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         outputs[

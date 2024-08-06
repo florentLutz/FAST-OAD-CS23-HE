@@ -38,7 +38,6 @@ class ComputePayloadRangeInnerGroup(om.Group):
         )
 
     def setup(self):
-
         if self.options["generate_sample"]:
             self.add_subsystem(
                 name="generate_sample",

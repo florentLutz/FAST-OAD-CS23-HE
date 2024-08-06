@@ -28,7 +28,6 @@ def cleanup():
 
 
 def test_fuel_and_battery(cleanup):
-
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -69,7 +68,6 @@ def test_fuel_and_battery(cleanup):
 
 
 def test_sizing_fuel_and_battery_share(cleanup):
-
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -112,7 +110,6 @@ def test_sizing_fuel_and_battery_share(cleanup):
 
 
 def test_dep_aircraft(cleanup):
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "dep_assembly.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "dep_assembly.html")
 
@@ -161,7 +158,6 @@ def test_dep_aircraft(cleanup):
 
 
 def test_read_case_recorder():
-
     recorder_data_file_path = pth.join(DATA_FOLDER_PATH, "cases_oscillate.sql")
 
     cr = om.CaseReader(recorder_data_file_path)
@@ -178,7 +174,6 @@ def test_read_case_recorder():
     battery_pack_2_mass = []
 
     for i in range(1, 49):
-
         case = cr.get_case("rank0:root._solve_nonlinear|0|NonlinearBlockGS|" + str(i))
 
         mtow_array.append(float(case.outputs["data:weight:aircraft:MTOW"]))

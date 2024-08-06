@@ -13,7 +13,6 @@ class SizingBusBarDimensions(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_bus_id",
             default=None,
@@ -23,7 +22,6 @@ class SizingBusBarDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         self.add_input(
@@ -89,7 +87,6 @@ class SizingBusBarDimensions(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         # One plate conducting and one plate for return of current
@@ -115,7 +112,6 @@ class SizingBusBarDimensions(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         partials[

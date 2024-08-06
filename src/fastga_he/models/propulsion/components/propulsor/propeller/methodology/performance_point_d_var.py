@@ -20,7 +20,6 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 
 class ComputePropellerPointPerformanceDVar(om.Group):
-
     """Computes propeller profiles aerodynamic coefficient and propeller behaviour."""
 
     def initialize(self):
@@ -151,7 +150,6 @@ class _ComputeSimilarityParameters(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_diameter = inputs["data:geometry:propeller:diameter"]
         radius_max = propeller_diameter / 2.0
         radius_min = 0.2 * radius_max
@@ -167,12 +165,12 @@ class _ComputeSimilarityParameters(om.ExplicitComponent):
 
         chord_array = np.interp(radius, radius_vect, chord_vect)
 
-        solidity = n_blades / np.pi / radius_max ** 2.0 * np.sum(chord_array * element_length)
+        solidity = n_blades / np.pi / radius_max**2.0 * np.sum(chord_array * element_length)
         activity_factor = (
-            100000 / 32 / radius_max ** 5.0 * np.sum(chord_array * radius ** 3.0 * element_length)
+            100000 / 32 / radius_max**5.0 * np.sum(chord_array * radius**3.0 * element_length)
         )
-        c_star = np.sum(chord_array * radius ** 2.0 * element_length) / np.sum(
-            radius ** 2.0 * element_length
+        c_star = np.sum(chord_array * radius**2.0 * element_length) / np.sum(
+            radius**2.0 * element_length
         )
         aspect_ratio = radius_max / c_star
 
@@ -208,7 +206,6 @@ class _PrepareChordToDiameterLaw(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         chord_to_diameter_root = inputs["data:geometry:propeller:root_chord_ratio"]
         root_radius_ratio = 0.2
         chord_to_diameter_tip = 0.0380
@@ -223,12 +220,12 @@ class _PrepareChordToDiameterLaw(om.ExplicitComponent):
 
         matrix_to_inv = np.array(
             [
-                [root_radius_ratio ** 2.0, root_radius_ratio, 1.0, 0.0, 0.0, 0.0],
-                [radius_ratio_mid ** 2.0, radius_ratio_mid, 1.0, 0.0, 0.0, 0.0],
+                [root_radius_ratio**2.0, root_radius_ratio, 1.0, 0.0, 0.0, 0.0],
+                [radius_ratio_mid**2.0, radius_ratio_mid, 1.0, 0.0, 0.0, 0.0],
                 [2.0 * radius_ratio_mid, 1.0, 0.0, 0.0, 0.0, 0.0],
                 [0.0, 0.0, 0.0, 2.0 * radius_ratio_mid, 1.0, 0.0],
-                [0.0, 0.0, 0.0, radius_ratio_mid ** 2.0, radius_ratio_mid, 1.0],
-                [0.0, 0.0, 0.0, tip_radius_ratio ** 2.0, tip_radius_ratio, 1.0],
+                [0.0, 0.0, 0.0, radius_ratio_mid**2.0, radius_ratio_mid, 1.0],
+                [0.0, 0.0, 0.0, tip_radius_ratio**2.0, tip_radius_ratio, 1.0],
             ]
         )
         result_matrix = np.array(
@@ -253,8 +250,8 @@ class _PrepareChordToDiameterLaw(om.ExplicitComponent):
         ).transpose()[0]
         chord_distribution = np.where(
             radius_ratio_vect < radius_ratio_mid,
-            k12 * radius_ratio_vect ** 2.0 + k11 * radius_ratio_vect + k10,
-            k22 * radius_ratio_vect ** 2.0 + k21 * radius_ratio_vect + k20,
+            k12 * radius_ratio_vect**2.0 + k11 * radius_ratio_vect + k10,
+            k22 * radius_ratio_vect**2.0 + k21 * radius_ratio_vect + k20,
         )
 
         chord_distribution[0] = chord_distribution[1]
@@ -281,7 +278,6 @@ class _PreparePropellerDVariation(om.ExplicitComponent):
         self.add_output("data:geometry:propeller:hub_diameter", val=np.nan, units="m")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["data:geometry:propeller:hub_diameter"] = (
             0.2 * inputs["data:geometry:propeller:diameter"]
         )
@@ -314,7 +310,6 @@ class _PreparePropellerTwist(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         twist_75_ref = inputs["data:aerodynamics:propeller:point_performance:twist_75_ref"]
         twist_vect_ref = inputs["data:geometry:propeller:twist_vect_ref"]
         radius_ratio_vect = inputs["data:geometry:propeller:radius_ratio_vect"]
@@ -327,7 +322,6 @@ class _PreparePropellerTwist(om.ExplicitComponent):
 
 class _ComputePropellerPointPerformanceDVar(PropellerCoreModule):
     def setup(self):
-
         super().setup()
 
         self.add_input(
@@ -349,7 +343,6 @@ class _ComputePropellerPointPerformanceDVar(PropellerCoreModule):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # Define init values
         omega = inputs["data:geometry:propeller:average_rpm"]
         density = inputs["data:aerodynamics:propeller:point_performance:rho"]
@@ -378,7 +371,6 @@ class _ComputePropellerPointPerformanceDVar(PropellerCoreModule):
         cd_list = np.zeros((len(radius), len(alpha_interp)))
 
         for idx, _ in enumerate(radius):
-
             index = np.where(sections_profile_position_list < (radius[idx] / radius_max))[0]
             if index is None:
                 profile_name = sections_profile_name_list[0]
@@ -406,18 +398,15 @@ class _ComputePropellerPointPerformanceDVar(PropellerCoreModule):
         outputs["data:aerodynamics:propeller:point_performance:power"] = power
 
     def find_altitude(self, density):
-
         alt = fsolve(self.diff_to_density, x0=np.array([0.0]), args=density)
         return max(float(alt[0]), 0.0)
 
     @staticmethod
     def diff_to_density(altitude, target_density):
-
         return Atmosphere(altitude, altitude_in_feet=False).density - target_density
 
 
 if __name__ == "__main__":
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:geometry:propeller:radius_ratio_vect",

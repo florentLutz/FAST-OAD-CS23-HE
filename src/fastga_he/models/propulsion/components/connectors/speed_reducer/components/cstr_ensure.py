@@ -31,7 +31,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         self.add_input(
@@ -111,7 +110,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         outputs[
@@ -148,7 +146,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         partials[

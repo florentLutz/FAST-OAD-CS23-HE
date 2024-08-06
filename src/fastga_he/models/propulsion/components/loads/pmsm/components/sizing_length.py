@@ -20,7 +20,6 @@ class SizingMotorLength(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -41,7 +40,6 @@ class SizingMotorLength(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         l_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length"]
@@ -51,7 +49,6 @@ class SizingMotorLength(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":length"] = l_ref * l_scaling
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         l_ref = self.options["length_ref"]

@@ -21,7 +21,6 @@ class SizingInverterWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -71,7 +70,6 @@ class SizingInverterWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":mass"] = (
@@ -87,7 +85,6 @@ class SizingInverterWeight(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         partials[

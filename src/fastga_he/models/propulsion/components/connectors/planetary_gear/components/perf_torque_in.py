@@ -13,13 +13,11 @@ class PerformancesTorqueIn(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         for input_number in ("1", "2"):
@@ -43,7 +41,6 @@ class PerformancesTorqueIn(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         for input_number in ("1", "2"):
             power = inputs["shaft_power_in_" + input_number]
             rpm = inputs["rpm_in_" + input_number]
@@ -52,7 +49,6 @@ class PerformancesTorqueIn(om.ExplicitComponent):
             outputs["torque_in_" + input_number] = power / omega
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         for input_number in ("1", "2"):
             power = inputs["shaft_power_in_" + input_number]
             rpm = inputs["rpm_in_" + input_number]
@@ -60,5 +56,5 @@ class PerformancesTorqueIn(om.ExplicitComponent):
 
             partials["torque_in_" + input_number, "shaft_power_in_" + input_number] = 1.0 / omega
             partials["torque_in_" + input_number, "rpm_in_" + input_number] = (
-                -power / omega ** 2.0 * 2.0 * np.pi / 60
+                -power / omega**2.0 * 2.0 * np.pi / 60
             )

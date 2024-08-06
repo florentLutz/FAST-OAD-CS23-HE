@@ -9,9 +9,9 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_DC_DC_CONVERTER_WEIGHT
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_DC_DC_CONVERTER_WEIGHT
-] = "fastga_he.submodel.propulsion.dc_dc_converter.weight.sum"
+oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_WEIGHT] = (
+    "fastga_he.submodel.propulsion.dc_dc_converter.weight.sum"
+)
 
 
 @oad.RegisterSubmodel(
@@ -32,7 +32,6 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -70,7 +69,6 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -94,7 +92,6 @@ class SizingDCDCConverterWeight(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[
@@ -175,7 +172,6 @@ class SizingDCDCConverterWeightBySum(om.Group):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_subsystem(
@@ -205,7 +201,6 @@ class _SizingDCDCConverterWeightBySum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -267,7 +262,6 @@ class _SizingDCDCConverterWeightBySum(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -320,7 +314,6 @@ class _SizingDCDCConverterPowerDensity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -356,7 +349,6 @@ class _SizingDCDCConverterPowerDensity(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -383,7 +375,6 @@ class _SizingDCDCConverterPowerDensity(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[

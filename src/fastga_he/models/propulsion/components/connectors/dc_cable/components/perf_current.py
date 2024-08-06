@@ -11,13 +11,11 @@ CUTOFF_CABLE_VOLTAGE = 0.5  # in V
 
 class PerformancesCurrent(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be " "treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -61,7 +59,6 @@ class PerformancesCurrent(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         voltage_out = inputs["dc_voltage_out"]
         voltage_in = inputs["dc_voltage_in"]
         resistance_per_cable = inputs["resistance_per_cable"]
@@ -83,7 +80,6 @@ class PerformancesCurrent(om.ExplicitComponent):
         outputs["dc_current_one_cable"] = current
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         voltage_out = inputs["dc_voltage_out"]
         voltage_in = inputs["dc_voltage_in"]
         resistance_per_cable = inputs["resistance_per_cable"]
@@ -91,13 +87,12 @@ class PerformancesCurrent(om.ExplicitComponent):
         partials["dc_current_one_cable", "dc_voltage_in"] = 1.0 / resistance_per_cable
         partials["dc_current_one_cable", "dc_voltage_out"] = -1.0 / resistance_per_cable
         partials["dc_current_one_cable", "resistance_per_cable"] = (
-            -(voltage_in - voltage_out) / resistance_per_cable ** 2.0
+            -(voltage_in - voltage_out) / resistance_per_cable**2.0
         )
 
 
 class PerformancesHarnessCurrent(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be " "treated"
         )

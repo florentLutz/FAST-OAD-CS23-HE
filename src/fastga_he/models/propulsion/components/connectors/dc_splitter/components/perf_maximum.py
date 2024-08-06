@@ -12,7 +12,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_splitter_id",
             default=None,
@@ -24,7 +23,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_splitter_id = self.options["dc_splitter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -86,12 +84,11 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":voltage_max"
-        ] = np.max(inputs["dc_voltage"])
+        outputs["data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":voltage_max"] = (
+            np.max(inputs["dc_voltage"])
+        )
 
         element_wise_max_current = np.maximum(
             inputs["dc_current_in_1"],
@@ -99,12 +96,11 @@ class PerformancesMaximum(om.ExplicitComponent):
             inputs["dc_current_out"],
         )
 
-        outputs[
-            "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":current_max"
-        ] = np.max(element_wise_max_current)
+        outputs["data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":current_max"] = (
+            np.max(element_wise_max_current)
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
         number_of_points = self.options["number_of_points"]
 

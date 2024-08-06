@@ -13,12 +13,12 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_GENERATOR_TORQUE
-] = "fastga_he.submodel.propulsion.constraints.generator.torque.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_GENERATOR_RPM
-] = "fastga_he.submodel.propulsion.constraints.generator.rpm.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_GENERATOR_TORQUE] = (
+    "fastga_he.submodel.propulsion.constraints.generator.torque.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_GENERATOR_RPM] = (
+    "fastga_he.submodel.propulsion.constraints.generator.rpm.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -32,13 +32,11 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="generator_id", default=None, desc="Identifier of the generator", allow_none=False
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
 
         self.add_input(
@@ -61,12 +59,11 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":torque_rating"
-        ] = inputs["data:propulsion:he_power_train:generator:" + generator_id + ":torque_max"]
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":torque_rating"] = (
+            inputs["data:propulsion:he_power_train:generator:" + generator_id + ":torque_max"]
+        )
 
 
 @oad.RegisterSubmodel(
@@ -80,13 +77,11 @@ class ConstraintsRPMEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="generator_id", default=None, desc="Identifier of the generator", allow_none=False
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
 
         self.add_input(
@@ -108,12 +103,11 @@ class ConstraintsRPMEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating"
-        ] = inputs["data:propulsion:he_power_train:generator:" + generator_id + ":rpm_max"]
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating"] = (
+            inputs["data:propulsion:he_power_train:generator:" + generator_id + ":rpm_max"]
+        )
 
 
 @oad.RegisterSubmodel(
@@ -132,7 +126,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
 
         self.add_input(
@@ -154,9 +147,8 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":voltage_caliber"
-        ] = inputs["data:propulsion:he_power_train:generator:" + generator_id + ":voltage_ac_max"]
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":voltage_caliber"] = (
+            inputs["data:propulsion:he_power_train:generator:" + generator_id + ":voltage_ac_max"]
+        )

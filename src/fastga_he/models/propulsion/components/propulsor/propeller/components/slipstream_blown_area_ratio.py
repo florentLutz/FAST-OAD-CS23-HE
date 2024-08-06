@@ -13,7 +13,6 @@ class SlipstreamPropellerBlownAreaRatio(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -22,7 +21,6 @@ class SlipstreamPropellerBlownAreaRatio(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -73,7 +71,6 @@ class SlipstreamPropellerBlownAreaRatio(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         wing_area = inputs["data:geometry:wing:area"]
@@ -88,7 +85,6 @@ class SlipstreamPropellerBlownAreaRatio(om.ExplicitComponent):
         outputs["blown_area_ratio"] = k_b
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -100,7 +96,7 @@ class SlipstreamPropellerBlownAreaRatio(om.ExplicitComponent):
         ]
 
         partials["blown_area_ratio", "data:geometry:wing:area"] = (
-            -contraction_ratio * prop_dia * ref_chord / wing_area ** 2.0
+            -contraction_ratio * prop_dia * ref_chord / wing_area**2.0
         )
         partials["blown_area_ratio", "contraction_ratio"] = np.ones(number_of_points) * (
             prop_dia * ref_chord / wing_area
@@ -108,12 +104,8 @@ class SlipstreamPropellerBlownAreaRatio(om.ExplicitComponent):
         partials[
             "blown_area_ratio",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-        ] = (
-            contraction_ratio * ref_chord / wing_area
-        )
+        ] = contraction_ratio * ref_chord / wing_area
         partials[
             "blown_area_ratio",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
-        ] = (
-            contraction_ratio * prop_dia / wing_area
-        )
+        ] = contraction_ratio * prop_dia / wing_area

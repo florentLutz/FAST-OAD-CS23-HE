@@ -25,7 +25,6 @@ KWH_TO_MJ = 3.6
 @oad.RegisterOpenMDAOSystem("fastga_he.environmental.energy_simple", domain=ModelDomain.OTHER)
 class SimpleEnergyImpacts(om.ExplicitComponent):
     def __init__(self, **kwargs):
-
         super().__init__(**kwargs)
 
         self.energy_content_fuel = None
@@ -33,7 +32,6 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
         self.carbon_intensity_fuel = None
 
     def initialize(self):
-
         mission_possible_option = ["design", "operational", "both"]
         self.options.declare(
             name="mission",
@@ -61,11 +59,9 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
         )
 
     def setup(self):
-
         mission_option = self.options["mission"]
 
         if mission_option == "design" or mission_option == "both":
-
             self.add_input("data:mission:sizing:fuel", units="kg", val=np.nan)
             self.add_input("data:mission:sizing:energy", units="kW*h", val=np.nan)
 
@@ -123,7 +119,6 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             )
 
         if mission_option == "operational" or mission_option == "both":
-
             self.add_input("data:mission:operational:fuel", units="kg", val=np.nan)
             self.add_input("data:mission:operational:energy", units="kW*h", val=np.nan)
 
@@ -182,34 +177,27 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             )
 
         if self.options["fuel_type"] == "biofuel_ft_pathway":
-
             self.energy_content_fuel = ENERGY_CONTENT_BIOFUEL
             self.carbon_intensity_fuel = CARBON_INTENSITY_BIOFUEL_FT
 
         elif self.options["fuel_type"] == "biofuel_hefa_pathway":
-
             self.energy_content_fuel = ENERGY_CONTENT_BIOFUEL
             self.carbon_intensity_fuel = CARBON_INTENSITY_BIOFUEL_HEFA
 
         else:
-
             self.energy_content_fuel = ENERGY_CONTENT_JET_FUEL
             self.carbon_intensity_fuel = CARBON_INTENSITY_JET_FUEL
 
         if self.options["electricity_mix"] == "france":
-
             self.carbon_intensity_electricity = CARBON_INTENSITY_ELECTRICITY_FRANCE
 
         else:
-
             self.carbon_intensity_electricity = CARBON_INTENSITY_ELECTRICITY_EUROPE
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         mission_option = self.options["mission"]
 
         if mission_option == "design" or mission_option == "both":
-
             fuel_consumed = inputs["data:mission:sizing:fuel"]
             electricity_consumed = inputs["data:mission:sizing:energy"]
 
@@ -231,7 +219,6 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             )
 
         if mission_option == "operational" or mission_option == "both":
-
             fuel_consumed = inputs["data:mission:operational:fuel"]
             electricity_consumed = inputs["data:mission:operational:energy"]
 
@@ -244,9 +231,9 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             )
 
             outputs["data:environmental_impact:operational:fuel_emissions"] = emissions_fuel
-            outputs[
-                "data:environmental_impact:operational:energy_emissions"
-            ] = emissions_electricity
+            outputs["data:environmental_impact:operational:energy_emissions"] = (
+                emissions_electricity
+            )
             outputs["data:environmental_impact:operational:emissions"] = (
                 emissions_electricity + emissions_fuel
             )
@@ -255,11 +242,9 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         mission_option = self.options["mission"]
 
         if mission_option == "design" or mission_option == "both":
-
             fuel_consumed = inputs["data:mission:sizing:fuel"]
             electricity_consumed = inputs["data:mission:sizing:energy"]
 
@@ -268,30 +253,30 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
 
             partials[
                 "data:environmental_impact:sizing:fuel_emissions", "data:mission:sizing:fuel"
-            ] = (self.energy_content_fuel * self.carbon_intensity_fuel)
+            ] = self.energy_content_fuel * self.carbon_intensity_fuel
             partials["data:environmental_impact:sizing:emissions", "data:mission:sizing:fuel"] = (
                 self.energy_content_fuel * self.carbon_intensity_fuel
             )
 
             partials[
                 "data:environmental_impact:sizing:energy_emissions", "data:mission:sizing:energy"
-            ] = (self.carbon_intensity_electricity * KWH_TO_MJ)
+            ] = self.carbon_intensity_electricity * KWH_TO_MJ
             partials["data:environmental_impact:sizing:emissions", "data:mission:sizing:energy"] = (
                 self.carbon_intensity_electricity * KWH_TO_MJ
             )
 
             partials[
                 "data:environmental_impact:sizing:emission_factor", "data:mission:sizing:energy"
-            ] = (self.carbon_intensity_electricity * KWH_TO_MJ / design_range / payload)
+            ] = self.carbon_intensity_electricity * KWH_TO_MJ / design_range / payload
             partials[
                 "data:environmental_impact:sizing:emission_factor", "data:mission:sizing:fuel"
-            ] = (self.energy_content_fuel * self.carbon_intensity_fuel / design_range / payload)
+            ] = self.energy_content_fuel * self.carbon_intensity_fuel / design_range / payload
             partials["data:environmental_impact:sizing:emission_factor", "data:TLAR:range"] = (
                 -(
                     electricity_consumed * self.carbon_intensity_electricity * KWH_TO_MJ
                     + self.energy_content_fuel * self.carbon_intensity_fuel * fuel_consumed
                 )
-                / design_range ** 2.0
+                / design_range**2.0
                 / payload
             )
             partials[
@@ -302,11 +287,10 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
                     + self.energy_content_fuel * self.carbon_intensity_fuel * fuel_consumed
                 )
                 / design_range
-                / payload ** 2.0
+                / payload**2.0
             )
 
         if mission_option == "operational" or mission_option == "both":
-
             fuel_consumed = inputs["data:mission:operational:fuel"]
             electricity_consumed = inputs["data:mission:operational:energy"]
 
@@ -316,38 +300,28 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             partials[
                 "data:environmental_impact:operational:fuel_emissions",
                 "data:mission:operational:fuel",
-            ] = (
-                self.energy_content_fuel * self.carbon_intensity_fuel
-            )
+            ] = self.energy_content_fuel * self.carbon_intensity_fuel
             partials[
                 "data:environmental_impact:operational:emissions", "data:mission:operational:fuel"
-            ] = (self.energy_content_fuel * self.carbon_intensity_fuel)
+            ] = self.energy_content_fuel * self.carbon_intensity_fuel
 
             partials[
                 "data:environmental_impact:operational:energy_emissions",
                 "data:mission:operational:energy",
-            ] = (
-                self.carbon_intensity_electricity * KWH_TO_MJ
-            )
+            ] = self.carbon_intensity_electricity * KWH_TO_MJ
             partials[
                 "data:environmental_impact:operational:emissions",
                 "data:mission:operational:energy",
-            ] = (
-                self.carbon_intensity_electricity * KWH_TO_MJ
-            )
+            ] = self.carbon_intensity_electricity * KWH_TO_MJ
 
             partials[
                 "data:environmental_impact:operational:emission_factor",
                 "data:mission:operational:energy",
-            ] = (
-                self.carbon_intensity_electricity * KWH_TO_MJ / op_range / payload
-            )
+            ] = self.carbon_intensity_electricity * KWH_TO_MJ / op_range / payload
             partials[
                 "data:environmental_impact:operational:emission_factor",
                 "data:mission:operational:fuel",
-            ] = (
-                self.energy_content_fuel * self.carbon_intensity_fuel / op_range / payload
-            )
+            ] = self.energy_content_fuel * self.carbon_intensity_fuel / op_range / payload
             partials[
                 "data:environmental_impact:operational:emission_factor",
                 "data:mission:operational:range",
@@ -356,7 +330,7 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
                     electricity_consumed * self.carbon_intensity_electricity * KWH_TO_MJ
                     + self.energy_content_fuel * self.carbon_intensity_fuel * fuel_consumed
                 )
-                / op_range ** 2.0
+                / op_range**2.0
                 / payload
             )
             partials[
@@ -368,5 +342,5 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
                     + self.energy_content_fuel * self.carbon_intensity_fuel * fuel_consumed
                 )
                 / op_range
-                / payload ** 2.0
+                / payload**2.0
             )

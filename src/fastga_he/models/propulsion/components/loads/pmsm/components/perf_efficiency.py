@@ -16,7 +16,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
     """Computation of the efficiency from shaft power and power losses."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         motor_id = self.options["motor_id"]
 
@@ -61,7 +59,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         unclipped_efficiency = np.where(
@@ -75,7 +72,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         outputs["efficiency"] = np.clip(unclipped_efficiency, CUTOFF_ETA_MIN, CUTOFF_ETA_MAX)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         unclipped_efficiency = np.where(

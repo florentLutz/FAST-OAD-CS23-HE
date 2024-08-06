@@ -6,7 +6,6 @@ import numpy as np
 
 
 if __name__ == "__main__":
-
     diameter = np.array([188, 208, 228, 268, 348])
     diameter_star = diameter / diameter[0]
 
@@ -28,7 +27,7 @@ if __name__ == "__main__":
     print(x[1])
 
     a_sol, b_sol = x[0]
-    print(diameter_star ** a_sol * length_star ** b_sol)
+    print(diameter_star**a_sol * length_star**b_sol)
     print(torque_star)
 
     # log_k, a_sol, b_sol = x[0]

@@ -9,7 +9,6 @@ import plotly.graph_objects as go
 
 
 def curve_reading(file_path, threshold=0.0):
-
     fig = go.Figure()
 
     efficiency_data = pd.read_csv(file_path)
@@ -23,7 +22,6 @@ def curve_reading(file_path, threshold=0.0):
     efficiency_array = np.array([])
 
     for idx, name in enumerate(efficiency_data.columns):
-
         if idx % 2 == 0:
             efficiency = float(name) / 100.0
             x = np.array(efficiency_data[name][1:]).astype(float)

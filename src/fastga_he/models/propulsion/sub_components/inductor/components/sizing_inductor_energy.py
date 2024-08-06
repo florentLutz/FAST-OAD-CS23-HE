@@ -22,7 +22,6 @@ class SizingInductorEnergy(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -48,18 +47,16 @@ class SizingInductorEnergy(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         current_caliber = inputs[prefix + ":inductor:current_caliber"]
         inductance = inputs[prefix + ":inductor:inductance"]
 
         outputs[prefix + ":inductor:magnetic_energy_rating"] = (
-            0.5 * inductance * current_caliber ** 2.0
+            0.5 * inductance * current_caliber**2.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
         current_caliber = inputs[prefix + ":inductor:current_caliber"]
@@ -68,9 +65,8 @@ class SizingInductorEnergy(om.ExplicitComponent):
         partials[
             prefix + ":inductor:magnetic_energy_rating",
             prefix + ":inductor:current_caliber",
-        ] = (
-            inductance * current_caliber
-        )
-        partials[prefix + ":inductor:magnetic_energy_rating", prefix + ":inductor:inductance",] = (
-            0.5 * current_caliber ** 2.0
-        )
+        ] = inductance * current_caliber
+        partials[
+            prefix + ":inductor:magnetic_energy_rating",
+            prefix + ":inductor:inductance",
+        ] = 0.5 * current_caliber**2.0

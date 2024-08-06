@@ -6,7 +6,6 @@ import numpy as np
 
 
 if __name__ == "__main__":
-
     resistances = np.array([12.0, 5, 0.8, 12, 5, 0.9, 16.7, 7, 1.1, 22.9, 10.5, 1.8])
     resistance_star = resistances / resistances[0]
 
@@ -34,7 +33,7 @@ if __name__ == "__main__":
     print(x[1])
 
     b_sol, c_sol = x[0]
-    print(voltage_star ** 2.0 * diameter_star ** b_sol * length_star ** c_sol)
+    print(voltage_star**2.0 * diameter_star**b_sol * length_star**c_sol)
     print(resistance_star)
 
     # log_k, a_sol, b_sol = x[0]

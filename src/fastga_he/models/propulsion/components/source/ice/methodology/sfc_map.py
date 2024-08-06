@@ -6,7 +6,6 @@ import numpy as np
 import plotly.graph_objects as go
 
 if __name__ == "__main__":
-
     np.set_printoptions(suppress=True)
 
     rpm_data = np.array(
@@ -476,13 +475,13 @@ if __name__ == "__main__":
         np.ones_like(rpm_for_regression),
         rpm_for_regression,
         pme_for_regression,
-        rpm_for_regression ** 2.0,
+        rpm_for_regression**2.0,
         pme_for_regression * rpm_for_regression,
-        pme_for_regression ** 2.0,
-        rpm_for_regression ** 3.0,
-        rpm_for_regression ** 2.0 * pme_for_regression,
-        rpm_for_regression * pme_for_regression ** 2.0,
-        pme_for_regression ** 3.0,
+        pme_for_regression**2.0,
+        rpm_for_regression**3.0,
+        rpm_for_regression**2.0 * pme_for_regression,
+        rpm_for_regression * pme_for_regression**2.0,
+        pme_for_regression**3.0,
     ]
     B = sfc_for_regression
 
@@ -495,13 +494,13 @@ if __name__ == "__main__":
         a * np.ones_like(rpm_for_regression)
         + b * rpm_for_regression
         + c * pme_for_regression
-        + d * rpm_for_regression ** 2.0
+        + d * rpm_for_regression**2.0
         + e * pme_for_regression * rpm_for_regression
-        + f * pme_for_regression ** 2.0
-        + g * rpm_for_regression ** 3.0
-        + h * rpm_for_regression ** 2.0 * pme_for_regression
-        + i * rpm_for_regression * pme_for_regression ** 2.0
-        + j * pme_for_regression ** 3.0
+        + f * pme_for_regression**2.0
+        + g * rpm_for_regression**3.0
+        + h * rpm_for_regression**2.0 * pme_for_regression
+        + i * rpm_for_regression * pme_for_regression**2.0
+        + j * pme_for_regression**3.0
     )
     error_percent = (sfc_test - sfc_for_regression) / sfc_for_regression * 100.0
     print(np.mean(abs(error_percent)))
@@ -511,13 +510,13 @@ if __name__ == "__main__":
         a * np.ones_like(rpm_mesh_grid)
         + b * rpm_mesh_grid
         + c * pme_mesh_grid
-        + d * rpm_mesh_grid ** 2.0
+        + d * rpm_mesh_grid**2.0
         + e * pme_mesh_grid * rpm_mesh_grid
-        + f * pme_mesh_grid ** 2.0
-        + g * rpm_mesh_grid ** 3.0
-        + h * rpm_mesh_grid ** 2.0 * pme_mesh_grid
-        + i * rpm_mesh_grid * pme_mesh_grid ** 2.0
-        + j * pme_mesh_grid ** 3.0
+        + f * pme_mesh_grid**2.0
+        + g * rpm_mesh_grid**3.0
+        + h * rpm_mesh_grid**2.0 * pme_mesh_grid
+        + i * rpm_mesh_grid * pme_mesh_grid**2.0
+        + j * pme_mesh_grid**3.0
     )
 
     fig2 = go.Figure()

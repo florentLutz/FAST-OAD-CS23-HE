@@ -20,13 +20,11 @@ class ConstraintsGenerator(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="generator_id", default=None, desc="Identifier of the generator", allow_none=False
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
 
         option_generator_id = {"generator_id": generator_id}
@@ -73,7 +71,6 @@ class ConstraintGeneratorPowerRateMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
 
         self.add_input(
@@ -92,7 +89,6 @@ class ConstraintGeneratorPowerRateMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
         outputs[

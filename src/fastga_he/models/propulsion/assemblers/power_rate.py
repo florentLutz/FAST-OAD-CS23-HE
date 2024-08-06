@@ -27,7 +27,6 @@ class PowerRate(om.ExplicitComponent):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -39,7 +38,6 @@ class PowerRate(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         (
@@ -63,7 +61,6 @@ class PowerRate(om.ExplicitComponent):
             propulsive_load_names,
             propulsive_load_types,
         ):
-
             self.add_input(
                 "data:propulsion:he_power_train:"
                 + propulsive_load_type
@@ -99,7 +96,6 @@ class PowerRate(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         (
             propulsive_load_names,
             propulsive_load_types,
@@ -126,7 +122,6 @@ class PowerRate(om.ExplicitComponent):
         outputs["thrust_rate_t_econ"] = mission_power / max_power
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         (
             propulsive_load_names,
             propulsive_load_types,
@@ -154,7 +149,6 @@ class PowerRate(om.ExplicitComponent):
             propulsive_load_names,
             propulsive_load_types,
         ):
-
             partials["thrust_rate_t_econ", propulsive_load_name + "_shaft_power_out"] = (
                 np.ones(number_of_points) / max_power
             )
@@ -165,6 +159,4 @@ class PowerRate(om.ExplicitComponent):
                 + ":"
                 + propulsive_load_name
                 + ":shaft_power_rating",
-            ] = (
-                -mission_power / max_power ** 2.0
-            )
+            ] = -mission_power / max_power**2.0

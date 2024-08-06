@@ -21,7 +21,6 @@ class SizingPlanetaryGearWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         self.add_input(
@@ -58,7 +57,6 @@ class SizingPlanetaryGearWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         gear_ratio = inputs[
@@ -75,14 +73,13 @@ class SizingPlanetaryGearWeight(om.ExplicitComponent):
             + ":tech_level_constant"
         ]
 
-        mass = k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio ** 0.13
+        mass = k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio**0.13
 
-        outputs[
-            "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":mass"
-        ] = mass
+        outputs["data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":mass"] = (
+            mass
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         gear_ratio = inputs[
@@ -102,20 +99,16 @@ class SizingPlanetaryGearWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":mass",
             "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":gear_ratio",
-        ] = (
-            0.13 * k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio ** -0.87
-        )
+        ] = 0.13 * k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio**-0.87
         partials[
             "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":mass",
             "data:propulsion:he_power_train:planetary_gear:"
             + planetary_gear_id
             + ":torque_out_rating",
-        ] = (
-            0.76 * k_gb * torque_rating ** -0.24 * gear_ratio ** 0.13 / 745.7 ** 0.76
-        )
+        ] = 0.76 * k_gb * torque_rating**-0.24 * gear_ratio**0.13 / 745.7**0.76
         partials[
             "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":mass",
             "data:propulsion:he_power_train:planetary_gear:"
             + planetary_gear_id
             + ":tech_level_constant",
-        ] = (torque_rating / 745.7) ** 0.76 * gear_ratio ** 0.13
+        ] = (torque_rating / 745.7) ** 0.76 * gear_ratio**0.13

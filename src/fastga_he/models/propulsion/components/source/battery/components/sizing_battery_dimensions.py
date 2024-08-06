@@ -21,7 +21,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -38,7 +37,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
@@ -69,7 +67,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
         )
 
         if position in ["in_the_front", "in_the_back"]:
-
             # If in the fuselage, more of a box shape
             self.add_input(
                 "data:propulsion:he_power_train:battery_pack:"
@@ -87,7 +84,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
             )
 
         elif position == "wing_pod":
-
             # If in the fuselage, more of a box shape
             self.add_input(
                 "data:propulsion:he_power_train:battery_pack:"
@@ -98,12 +94,10 @@ class SizingBatteryDimensions(om.ExplicitComponent):
             )
 
         elif position == "underbelly":
-
             self.add_input("data:geometry:fuselage:maximum_width", val=np.nan, units="m")
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
 
         else:
-
             self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
             self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
             self.add_input("data:geometry:wing:span", val=np.nan, units="m")
@@ -111,7 +105,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
@@ -120,7 +113,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
         ]
 
         if position in ["in_the_front", "in_the_back"]:
-
             hl_ratio = inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -149,7 +141,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
             ] = (battery_volume / wl_ratio) ** (1.0 / 3.0) * hl_ratio ** (2.0 / 3.0)
 
         elif position == "wing_pod":
-
             fineness = inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -160,7 +151,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:length"
-            ] = (battery_volume * fineness ** 2.0) ** (1.0 / 3.0)
+            ] = (battery_volume * fineness**2.0) ** (1.0 / 3.0)
             outputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -173,7 +164,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
             ] = (battery_volume / fineness) ** (1.0 / 3.0)
 
         elif position == "underbelly":
-
             cabin_length = inputs["data:geometry:cabin:length"]
             max_width = inputs["data:geometry:fuselage:maximum_width"]
 
@@ -187,7 +177,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:width"
-            ] = (UNDERBELLY_RATIO * max_width)
+            ] = UNDERBELLY_RATIO * max_width
             outputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -195,7 +185,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
             ] = battery_volume / (cabin_length * UNDERBELLY_RATIO * max_width)
 
         else:
-
             tip_chord = inputs["data:geometry:wing:tip:chord"]
             root_chord = inputs["data:geometry:wing:root:chord"]
 
@@ -206,12 +195,12 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:length"
-            ] = ((tip_chord + root_chord) / 2.0 * CHORD_RATIO)
+            ] = (tip_chord + root_chord) / 2.0 * CHORD_RATIO
             outputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:width"
-            ] = (SPAN_RATIO * half_span)
+            ] = SPAN_RATIO * half_span
             outputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -221,7 +210,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
@@ -230,7 +218,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
         ]
 
         if position in ["in_the_front", "in_the_back"]:
-
             hl_ratio = inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -248,9 +235,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 + battery_pack_id
                 + ":dimension:length",
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":volume",
-            ] = (
-                1.0 / 3.0 * (hl_ratio * wl_ratio) ** (-1.0 / 3.0) * battery_volume ** (-2.0 / 3.0)
-            )
+            ] = 1.0 / 3.0 * (hl_ratio * wl_ratio) ** (-1.0 / 3.0) * battery_volume ** (-2.0 / 3.0)
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -258,9 +243,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:height_length_ratio",
-            ] = (
-                -1.0 / 3.0 * (battery_volume / wl_ratio) ** (1.0 / 3.0) * hl_ratio ** (-4.0 / 3.0)
-            )
+            ] = -1.0 / 3.0 * (battery_volume / wl_ratio) ** (1.0 / 3.0) * hl_ratio ** (-4.0 / 3.0)
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -268,9 +251,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:width_length_ratio",
-            ] = (
-                -1.0 / 3.0 * (battery_volume / hl_ratio) ** (1.0 / 3.0) * wl_ratio ** (-4.0 / 3.0)
-            )
+            ] = -1.0 / 3.0 * (battery_volume / hl_ratio) ** (1.0 / 3.0) * wl_ratio ** (-4.0 / 3.0)
 
             # Partials for width
             partials[
@@ -292,9 +273,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:width_length_ratio",
-            ] = (
-                2.0 / 3.0 * (battery_volume / hl_ratio) ** (1.0 / 3.0) * wl_ratio ** (-1.0 / 3.0)
-            )
+            ] = 2.0 / 3.0 * (battery_volume / hl_ratio) ** (1.0 / 3.0) * wl_ratio ** (-1.0 / 3.0)
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -306,7 +285,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 -1.0
                 / 3.0
                 * battery_volume ** (1.0 / 3.0)
-                * (wl_ratio / hl_ratio ** 2.0) ** (2.0 / 3.0)
+                * (wl_ratio / hl_ratio**2.0) ** (2.0 / 3.0)
             )
 
             # Partials for height
@@ -329,9 +308,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:height_length_ratio",
-            ] = (
-                2.0 / 3.0 * (battery_volume / wl_ratio) ** (1.0 / 3.0) * hl_ratio ** (-1.0 / 3.0)
-            )
+            ] = 2.0 / 3.0 * (battery_volume / wl_ratio) ** (1.0 / 3.0) * hl_ratio ** (-1.0 / 3.0)
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -343,11 +320,10 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 -1.0
                 / 3.0
                 * battery_volume ** (1.0 / 3.0)
-                * (hl_ratio / wl_ratio ** 2.0) ** (2.0 / 3.0)
+                * (hl_ratio / wl_ratio**2.0) ** (2.0 / 3.0)
             )
 
         elif position == "wing_pod":
-
             fineness = inputs[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -360,9 +336,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 + battery_pack_id
                 + ":dimension:length",
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":volume",
-            ] = (
-                1.0 / 3.0 * (fineness / battery_volume) ** (2.0 / 3.0)
-            )
+            ] = 1.0 / 3.0 * (fineness / battery_volume) ** (2.0 / 3.0)
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -370,9 +344,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:fineness_ratio",
-            ] = (
-                2.0 / 3.0 * (battery_volume * fineness ** -1.0) ** (1.0 / 3.0)
-            )
+            ] = 2.0 / 3.0 * (battery_volume * fineness**-1.0) ** (1.0 / 3.0)
 
             # Partials for width
             partials[
@@ -380,9 +352,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 + battery_pack_id
                 + ":dimension:width",
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":volume",
-            ] = (
-                1.0 / 3.0 * (battery_volume ** -2.0 / fineness) ** (1.0 / 3.0)
-            )
+            ] = 1.0 / 3.0 * (battery_volume**-2.0 / fineness) ** (1.0 / 3.0)
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -390,9 +360,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:fineness_ratio",
-            ] = (
-                -1.0 / 3.0 * (battery_volume * fineness ** -4.0) ** (1.0 / 3.0)
-            )
+            ] = -1.0 / 3.0 * (battery_volume * fineness**-4.0) ** (1.0 / 3.0)
 
             # Partials for height
             partials[
@@ -400,9 +368,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 + battery_pack_id
                 + ":dimension:height",
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":volume",
-            ] = (
-                1.0 / 3.0 * (battery_volume ** -2.0 / fineness) ** (1.0 / 3.0)
-            )
+            ] = 1.0 / 3.0 * (battery_volume**-2.0 / fineness) ** (1.0 / 3.0)
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -410,12 +376,9 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:fineness_ratio",
-            ] = (
-                -1.0 / 3.0 * (battery_volume * fineness ** -4.0) ** (1.0 / 3.0)
-            )
+            ] = -1.0 / 3.0 * (battery_volume * fineness**-4.0) ** (1.0 / 3.0)
 
         elif position == "underbelly":
-
             cabin_length = inputs["data:geometry:cabin:length"]
             max_width = inputs["data:geometry:fuselage:maximum_width"]
 
@@ -470,16 +433,15 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 + battery_pack_id
                 + ":dimension:height",
                 "data:geometry:cabin:length",
-            ] = -battery_volume / (cabin_length ** 2.0 * UNDERBELLY_RATIO * max_width)
+            ] = -battery_volume / (cabin_length**2.0 * UNDERBELLY_RATIO * max_width)
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:height",
                 "data:geometry:fuselage:maximum_width",
-            ] = -battery_volume / (cabin_length * UNDERBELLY_RATIO * max_width ** 2.0)
+            ] = -battery_volume / (cabin_length * UNDERBELLY_RATIO * max_width**2.0)
 
         else:
-
             tip_chord = inputs["data:geometry:wing:tip:chord"]
             root_chord = inputs["data:geometry:wing:root:chord"]
 
@@ -497,17 +459,13 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 + battery_pack_id
                 + ":dimension:length",
                 "data:geometry:wing:tip:chord",
-            ] = (
-                CHORD_RATIO / 2.0
-            )
+            ] = CHORD_RATIO / 2.0
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:length",
                 "data:geometry:wing:root:chord",
-            ] = (
-                CHORD_RATIO / 2.0
-            )
+            ] = CHORD_RATIO / 2.0
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -539,9 +497,7 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 + battery_pack_id
                 + ":dimension:width",
                 "data:geometry:wing:span",
-            ] = (
-                SPAN_RATIO / 2.0
-            )
+            ] = SPAN_RATIO / 2.0
 
             # Partials for height
             partials[
@@ -573,6 +529,6 @@ class SizingBatteryDimensions(om.ExplicitComponent):
                 "data:geometry:wing:span",
             ] = (
                 -battery_volume
-                / ((tip_chord + root_chord) / 2.0 * CHORD_RATIO * half_span ** 2.0 * SPAN_RATIO)
+                / ((tip_chord + root_chord) / 2.0 * CHORD_RATIO * half_span**2.0 * SPAN_RATIO)
                 * 0.5
             )

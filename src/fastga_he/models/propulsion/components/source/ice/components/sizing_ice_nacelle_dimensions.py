@@ -16,7 +16,6 @@ class SizingICENacelleDimensions(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -33,7 +32,6 @@ class SizingICENacelleDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
 
         self.add_input(
@@ -91,17 +89,14 @@ class SizingICENacelleDimensions(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         if self.options["position"] == "on_the_wing":
-
             outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length"] = (
                 inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":engine:length"] * 2.0
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length"] = (
                 inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":engine:length"] * 1.15
             )
@@ -114,18 +109,15 @@ class SizingICENacelleDimensions(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         ice_id = self.options["ice_id"]
 
         if self.options["position"] == "on_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length",
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":engine:length",
             ] = 2.0
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length",
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":engine:length",

@@ -20,7 +20,6 @@ class PerformancesConverterRelations(om.ImplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -88,14 +87,12 @@ class PerformancesConverterRelations(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         residuals["voltage_out_rel"] = outputs["voltage_out_rel"] - inputs["voltage_out_target"]
         residuals["power_rel"] = (inputs["dc_voltage_out"] * inputs["dc_current_out"]) - outputs[
             "power_rel"
         ] * inputs["efficiency"]
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-
         jacobian["power_rel", "power_rel"] = -inputs["efficiency"]
         jacobian["power_rel", "efficiency"] = -outputs["power_rel"]
         jacobian["power_rel", "dc_voltage_out"] = inputs["dc_current_out"]

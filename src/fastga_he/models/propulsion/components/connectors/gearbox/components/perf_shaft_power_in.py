@@ -14,7 +14,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
@@ -26,7 +25,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         gearbox_id = self.options["gearbox_id"]
 
@@ -56,7 +54,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         power_out = inputs["shaft_power_out_1"] + inputs["shaft_power_out_2"]
@@ -65,7 +62,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         outputs["shaft_power_in"] = power_out / eta
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         gearbox_id = self.options["gearbox_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -77,6 +73,4 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         partials[
             "shaft_power_in",
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":efficiency",
-        ] = (
-            -power_out / eta ** 2.0
-        )
+        ] = -power_out / eta**2.0

@@ -32,7 +32,6 @@ NB_POINTS_TEST = 10
 
 
 def test_power_in_mission():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:aux_load:aux_load_1:power_in_mission",
@@ -69,7 +68,6 @@ def test_power_in_mission():
 
 
 def test_current_in():
-
     ivc = om.IndepVarComp()
     ivc.add_output("power_in", units="kW", val=np.linspace(8.0, 12.0, NB_POINTS_TEST))
     ivc.add_output("dc_voltage_in", units="V", val=np.full(NB_POINTS_TEST, 400.0))
@@ -84,7 +82,6 @@ def test_current_in():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
     ivc.add_output("power_in", units="kW", val=np.linspace(8.0, 12.0, NB_POINTS_TEST))
 
@@ -100,7 +97,6 @@ def test_maximum():
 
 
 def test_performances():
-
     input_list = ["data:propulsion:he_power_train:aux_load:aux_load_1:power_in_mission"]
     ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
     ivc.add_output("dc_voltage_in", units="V", val=np.full(NB_POINTS_TEST, 400.0))
@@ -118,7 +114,6 @@ def test_performances():
 
 
 def test_constraint_enforce():
-
     input_list = ["data:propulsion:he_power_train:aux_load:aux_load_1:power_max"]
     ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
 
@@ -133,7 +128,6 @@ def test_constraint_enforce():
 
 
 def test_constraint_ensure():
-
     input_list = [
         "data:propulsion:he_power_train:aux_load:aux_load_1:power_max",
         "data:propulsion:he_power_train:aux_load:aux_load_1:power_rating",
@@ -151,7 +145,6 @@ def test_constraint_ensure():
 
 
 def test_constraints():
-
     input_list = ["data:propulsion:he_power_train:aux_load:aux_load_1:power_max"]
     ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
 
@@ -166,7 +159,6 @@ def test_constraints():
 
 
 def test_sizing_weight():
-
     input_list = [
         "data:propulsion:he_power_train:aux_load:aux_load_1:power_rating",
         "data:propulsion:he_power_train:aux_load:aux_load_1:power_density",
@@ -184,7 +176,6 @@ def test_sizing_weight():
 
 
 def test_generator_cg_y():
-
     expected_cg = [2.0, 0.0, 0.0]
 
     input_list = [
@@ -195,7 +186,6 @@ def test_generator_cg_y():
     ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(SizingDCAuxLoadCGY(aux_load_id="aux_load_1", position=option), ivc)
 
@@ -207,7 +197,6 @@ def test_generator_cg_y():
 
 
 def test_generator_cg_x():
-
     expected_cg = [2.69, 0.25, 2.54]
 
     input_list = [
@@ -222,7 +211,6 @@ def test_generator_cg_x():
     ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(SizingDCAuxLoadCGX(aux_load_id="aux_load_1", position=option), ivc)
 
@@ -234,7 +222,6 @@ def test_generator_cg_x():
 
 
 def test_sizing():
-
     input_list = [
         "data:geometry:wing:span",
         "data:propulsion:he_power_train:aux_load:aux_load_1:power_max",

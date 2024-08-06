@@ -15,7 +15,6 @@ class SizingDCSSPCCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_sspc_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingDCSSPCCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         dc_sspc_id = self.options["dc_sspc_id"]
 
@@ -47,7 +45,6 @@ class SizingDCSSPCCGY(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing":
-
             self.add_input(
                 "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:y_ratio",
                 val=np.nan,
@@ -57,12 +54,10 @@ class SizingDCSSPCCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         dc_sspc_id = self.options["dc_sspc_id"]
 
         if position == "inside_the_wing":
-
             outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
                 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:y_ratio"]
@@ -70,25 +65,18 @@ class SizingDCSSPCCGY(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:y",
                 "data:geometry:wing:span",
-            ] = (
-                inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:y_ratio"] / 2.0
-            )
+            ] = inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:y_ratio"] / 2.0
             partials[
                 "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:y",
                 "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

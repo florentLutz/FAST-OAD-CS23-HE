@@ -13,7 +13,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -153,27 +151,26 @@ class PerformancesMaximum(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         rectifier_id = self.options["rectifier_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_max"
-        ] = np.max(inputs["ac_current_rms_in_one_phase"])
-        outputs[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_max"
-        ] = np.max(inputs["ac_voltage_peak_in"])
-        outputs[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_dc_max"
-        ] = np.max(inputs["dc_current_out"])
-        outputs[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_dc_max"
-        ] = np.max(inputs["dc_voltage_out"])
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_max"] = (
+            np.max(inputs["ac_current_rms_in_one_phase"])
+        )
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_max"] = (
+            np.max(inputs["ac_voltage_peak_in"])
+        )
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_dc_max"] = (
+            np.max(inputs["dc_current_out"])
+        )
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_dc_max"] = (
+            np.max(inputs["dc_voltage_out"])
+        )
         outputs[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency_max"
         ] = np.max(inputs["switching_frequency"])
-        outputs[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max"
-        ] = np.max(inputs["losses_rectifier"])
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max"] = (
+            np.max(inputs["losses_rectifier"])
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[

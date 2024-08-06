@@ -26,7 +26,6 @@ class SizingDCSSPCEfficiency(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         self.add_input(
@@ -71,7 +70,6 @@ class SizingDCSSPCEfficiency(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         current_caliber = inputs[
@@ -90,7 +88,7 @@ class SizingDCSSPCEfficiency(om.ExplicitComponent):
             + inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":diode:resistance"]
         )
 
-        losses = gate_voltage * current_caliber + module_level_resistance * current_caliber ** 2.0
+        losses = gate_voltage * current_caliber + module_level_resistance * current_caliber**2.0
         power_caliber = voltage_caliber * current_caliber
 
         outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency"] = (
@@ -119,34 +117,24 @@ class SizingDCSSPCEfficiency(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
-        ] = (
-            -module_level_resistance / voltage_caliber
-        )
+        ] = -module_level_resistance / voltage_caliber
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber",
-        ] = (gate_voltage + module_level_resistance * current_caliber) / voltage_caliber ** 2.0
+        ] = (gate_voltage + module_level_resistance * current_caliber) / voltage_caliber**2.0
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":igbt:gate_voltage",
-        ] = (
-            -1.0 / voltage_caliber
-        )
+        ] = -1.0 / voltage_caliber
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":diode:gate_voltage",
-        ] = (
-            -1.0 / voltage_caliber
-        )
+        ] = -1.0 / voltage_caliber
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":igbt:resistance",
-        ] = (
-            -current_caliber / voltage_caliber
-        )
+        ] = -current_caliber / voltage_caliber
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":efficiency",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":diode:resistance",
-        ] = (
-            -current_caliber / voltage_caliber
-        )
+        ] = -current_caliber / voltage_caliber

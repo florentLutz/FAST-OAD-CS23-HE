@@ -7,7 +7,6 @@ import openmdao.api as om
 
 
 def curve_fit_openmdao(speed_array, torque_array, efficiency_target):
-
     size = len(speed_array)
 
     ivc = om.IndepVarComp()
@@ -70,7 +69,6 @@ class PowerLossPolito(om.ExplicitComponent):
         self.options.declare("number_of_points", default=1)
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("torque", units="N*m", val=np.full(number_of_points, np.nan))
@@ -87,40 +85,38 @@ class PowerLossPolito(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         speed = inputs["speed"]
         torque = inputs["torque"]
 
         power_losses = (
             inputs["c_0"]
-            + inputs["c_20"] * speed ** 2.0
-            + inputs["c_02"] * torque ** 2.0
+            + inputs["c_20"] * speed**2.0
+            + inputs["c_02"] * torque**2.0
             + inputs["c_22"] * (speed * torque) ** 2.0
-            + inputs["c_30"] * speed ** 3.0
+            + inputs["c_30"] * speed**3.0
         )
 
         outputs["power_losses"] = power_losses
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         speed = inputs["speed"]
         torque = inputs["torque"]
 
         partials["power_losses", "c_0"] = np.full(number_of_points, 1.0)
-        partials["power_losses", "c_20"] = speed ** 2.0
-        partials["power_losses", "c_02"] = torque ** 2.0
+        partials["power_losses", "c_20"] = speed**2.0
+        partials["power_losses", "c_02"] = torque**2.0
         partials["power_losses", "c_22"] = (speed * torque) ** 2.0
-        partials["power_losses", "c_30"] = speed ** 3.0
+        partials["power_losses", "c_30"] = speed**3.0
 
         partials["power_losses", "speed"] = np.diag(
             +2.0 * inputs["c_20"] * speed
-            + 2.0 * inputs["c_22"] * speed * torque ** 2.0
-            + 3.0 * inputs["c_30"] * speed ** 2.0
+            + 2.0 * inputs["c_22"] * speed * torque**2.0
+            + 3.0 * inputs["c_30"] * speed**2.0
         )
         partials["power_losses", "torque"] = np.diag(
-            +2.0 * inputs["c_02"] * torque + 2.0 * inputs["c_22"] * torque * speed ** 2.0
+            +2.0 * inputs["c_02"] * torque + 2.0 * inputs["c_22"] * torque * speed**2.0
         )
 
 
@@ -129,7 +125,6 @@ class PowerLoss(om.ExplicitComponent):
         self.options.declare("number_of_points", default=1)
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("torque", units="N*m", val=np.full(number_of_points, np.nan))
@@ -143,7 +138,6 @@ class PowerLoss(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         power_losses = (
             inputs["alpha"] * inputs["torque"] ** 2.0 + inputs["beta"] * inputs["speed"] ** 1.5
         )
@@ -151,7 +145,6 @@ class PowerLoss(om.ExplicitComponent):
         outputs["power_losses"] = power_losses
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["power_losses", "alpha"] = inputs["torque"] ** 2.0
         partials["power_losses", "beta"] = inputs["speed"] ** 1.5
         partials["power_losses", "torque"] = np.diag(2.0 * inputs["alpha"] * inputs["torque"])
@@ -177,7 +170,6 @@ class Efficiency(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         computed_efficiency = (inputs["torque"] * inputs["speed"]) / (
             inputs["torque"] * inputs["speed"] + inputs["power_losses"]
         )
@@ -185,7 +177,6 @@ class Efficiency(om.ExplicitComponent):
         outputs["computed_efficiency"] = computed_efficiency
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["computed_efficiency", "torque"] = np.diag(
             inputs["speed"]
             * inputs["power_losses"]
@@ -218,7 +209,6 @@ class DifferenceToTarget(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["difference"] = np.sqrt(
             np.mean((inputs["computed_efficiency"] - inputs["target_efficiency"]) ** 2.0)
         )

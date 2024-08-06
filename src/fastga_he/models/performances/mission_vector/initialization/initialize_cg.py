@@ -10,7 +10,6 @@ class InitializeCoG(om.ExplicitComponent):
     """Computes the center of gravity at each time step."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -31,7 +30,6 @@ class InitializeCoG(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -83,7 +81,6 @@ class InitializeCoG(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_mass_t = inputs["fuel_mass_t"]
         fuel_mass_t = np.clip(fuel_mass_t, 0.0, None)
 
@@ -100,7 +97,6 @@ class InitializeCoG(om.ExplicitComponent):
         outputs["x_cg"] = x_cg
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_mass_t = inputs["fuel_mass_t"]
         fuel_mass_t = np.clip(fuel_mass_t, 0.0, None)
 

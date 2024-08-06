@@ -17,13 +17,11 @@ class SizingPropellerWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
 
         self.add_input(
@@ -62,7 +60,6 @@ class SizingPropellerWeight(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         torque_cont = inputs[
@@ -78,7 +75,7 @@ class SizingPropellerWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":material"
         ]
 
-        blade_weight = (9.03 + 1.074e-3 * torque_cont + 2.841e-7 * prop_diameter ** 3.0) / (
+        blade_weight = (9.03 + 1.074e-3 * torque_cont + 2.841e-7 * prop_diameter**3.0) / (
             1.0 + 0.66 * prop_material
         )
 
@@ -87,7 +84,6 @@ class SizingPropellerWeight(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         torque_cont = inputs[
@@ -106,7 +102,7 @@ class SizingPropellerWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":mass",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":number_blades",
-        ] = (9.03 + 1.074e-3 * torque_cont + 2.841e-7 * prop_diameter ** 3.0) / (
+        ] = (9.03 + 1.074e-3 * torque_cont + 2.841e-7 * prop_diameter**3.0) / (
             1.0 + 0.66 * prop_material
         )
         partials[
@@ -115,18 +111,14 @@ class SizingPropellerWeight(om.ExplicitComponent):
         ] = (
             -0.66
             * nb_blades
-            * (9.03 + 1.074e-3 * torque_cont + 2.841e-7 * prop_diameter ** 3.0)
+            * (9.03 + 1.074e-3 * torque_cont + 2.841e-7 * prop_diameter**3.0)
             / (1.0 + 0.66 * prop_material) ** 2.0
         )
         partials[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":mass",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-        ] = (
-            nb_blades * 2.841e-7 * 3.0 * prop_diameter ** 2.0 / (1.0 + 0.66 * prop_material)
-        )
+        ] = nb_blades * 2.841e-7 * 3.0 * prop_diameter**2.0 / (1.0 + 0.66 * prop_material)
         partials[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":mass",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
-        ] = (
-            nb_blades * 1.074e-3 / (1.0 + 0.66 * prop_material)
-        )
+        ] = nb_blades * 1.074e-3 / (1.0 + 0.66 * prop_material)

@@ -11,7 +11,6 @@ class EquilibriumAlpha(om.ImplicitComponent):
     """Find the conditions necessary for the aircraft equilibrium."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be " "treated"
         )
@@ -22,7 +21,6 @@ class EquilibriumAlpha(om.ImplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("mass", val=np.full(number_of_points, 1500.0), units="kg")
@@ -100,7 +98,6 @@ class EquilibriumAlpha(om.ImplicitComponent):
             )
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         mass = inputs["mass"]
@@ -119,7 +116,7 @@ class EquilibriumAlpha(om.ImplicitComponent):
 
         rho = inputs["density"]
 
-        dynamic_pressure = 0.5 * rho * true_airspeed ** 2.0
+        dynamic_pressure = 0.5 * rho * true_airspeed**2.0
 
         # ------------------ Derivatives wrt alpha residuals ------------------ #
 
@@ -140,17 +137,17 @@ class EquilibriumAlpha(om.ImplicitComponent):
         )
         jacobian["alpha", "gamma"] = d_alpha_d_gamma_vector
         d_alpha_d_q_vector = -(thrust * np.sin(alpha) - mass * g * np.cos(gamma)) / (
-            wing_area * dynamic_pressure ** 2.0
+            wing_area * dynamic_pressure**2.0
         )
         jacobian["alpha", "true_airspeed"] = d_alpha_d_q_vector * rho * true_airspeed
         d_alpha_d_s_vector = -(thrust * np.sin(alpha) - mass * g * np.cos(gamma)) / (
-            dynamic_pressure * wing_area ** 2.0
+            dynamic_pressure * wing_area**2.0
         )
         jacobian["alpha", "data:geometry:wing:area"] = d_alpha_d_s_vector
         d_alpha_d_alpha_vector = (
             cl_alpha_wing + cl_alpha_htp + thrust * np.cos(alpha) / (dynamic_pressure * wing_area)
         )
-        jacobian["alpha", "density"] = d_alpha_d_q_vector * 0.5 * true_airspeed ** 2.0
+        jacobian["alpha", "density"] = d_alpha_d_q_vector * 0.5 * true_airspeed**2.0
         jacobian["alpha", "alpha"] = d_alpha_d_alpha_vector * np.pi / 180.0
         jacobian["alpha", "delta_m"] = np.ones(number_of_points) * cl_delta_m * np.pi / 180.0
 
@@ -162,7 +159,6 @@ class EquilibriumAlpha(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         mass = inputs["mass"]
         gamma = inputs["gamma"] * np.pi / 180.0
         true_airspeed = inputs["true_airspeed"]
@@ -190,7 +186,7 @@ class EquilibriumAlpha(om.ImplicitComponent):
 
         rho = inputs["density"]
 
-        dynamic_pressure = 0.5 * rho * true_airspeed ** 2.0
+        dynamic_pressure = 0.5 * rho * true_airspeed**2.0
 
         cl_wing = cl0_wing + cl_alpha_wing * alpha + delta_cl_flaps + delta_cl
         cl_htp = cl0_htp + cl_alpha_htp * alpha + cl_delta_m * delta_m

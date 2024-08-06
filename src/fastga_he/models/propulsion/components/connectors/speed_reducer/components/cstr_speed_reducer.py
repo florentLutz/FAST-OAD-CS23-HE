@@ -24,7 +24,6 @@ class ConstraintsSpeedReducer(om.Group):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         option_speed_reducer_id = {"speed_reducer_id": speed_reducer_id}

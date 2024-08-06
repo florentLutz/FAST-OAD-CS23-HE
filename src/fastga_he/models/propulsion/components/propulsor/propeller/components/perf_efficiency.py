@@ -15,13 +15,11 @@ class PerformancesEfficiency(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("thrust_coefficient", val=KILMER, shape=number_of_points)
@@ -39,7 +37,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         j = inputs["advance_ratio"]
         ct = inputs["thrust_coefficient"]
         cp = inputs["power_coefficient"]
@@ -48,11 +45,10 @@ class PerformancesEfficiency(om.ExplicitComponent):
         outputs["efficiency"] = np.where(cp != 0, j * ct / cp, 1.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         j = inputs["advance_ratio"]
         ct = inputs["thrust_coefficient"]
         cp = inputs["power_coefficient"]
 
         partials["efficiency", "advance_ratio"] = np.where(cp != 0, ct / cp, 1e-6)
         partials["efficiency", "thrust_coefficient"] = np.where(cp != 0, j / cp, 1e-6)
-        partials["efficiency", "power_coefficient"] = np.where(cp != 0, -j * ct / cp ** 2.0, 1e-6)
+        partials["efficiency", "power_coefficient"] = np.where(cp != 0, -j * ct / cp**2.0, 1e-6)

@@ -30,7 +30,6 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
         self.right_submodel_slip_effect = False
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -42,7 +41,6 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
         )
 
     def setup(self):
-
         """
         This component is only added to the problem when we are sure that we want to save the
         performances of the power train inside a file (watcher_file_path field is not empty).
@@ -73,7 +71,6 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
             components_performances_watchers_names,
             components_performances_watchers_units,
         ):
-
             self.add_input(
                 component_name + "_" + component_performances_watcher_name,
                 units=component_performances_watcher_unit,
@@ -106,7 +103,6 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
             )
 
         if self.right_submodel_slip_effect:
-
             (
                 components_slip_names,
                 components_slip_performances_watchers_names,
@@ -122,7 +118,6 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
                 components_slip_performances_watchers_names,
                 components_slip_performances_watchers_units,
             ):
-
                 self.add_input(
                     components_slip_name + "_" + components_slip_performances_watchers_name,
                     units=components_slip_performances_watchers_unit,
@@ -148,7 +143,6 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
         self.add_output("dummy_output", val=1337.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         file_path = self.configurator.get_watcher_file_path()
 
         if os.path.exists(file_path):
@@ -172,7 +166,6 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
         is_slip_list = [False] * len(components_name) + [False] * len(mission_variable_names)
 
         if self.right_submodel_slip_effect:
-
             (
                 components_slip_names,
                 components_slip_performances_watchers_names,
@@ -191,7 +184,6 @@ class PowerTrainPerformancesWatcher(om.ExplicitComponent):
             corresponding_header,
             is_slip,
         ) in zip(components_name_with_mission, inputs_names, self.header_name, is_slip_list):
-
             if not component_name:
                 value_to_save = inputs[component_performances_watcher_name]
             elif not is_slip:

@@ -9,7 +9,6 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingPropellerDrag(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )

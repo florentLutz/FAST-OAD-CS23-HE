@@ -14,7 +14,6 @@ class SizingBatteryDrag(om.ExplicitComponent):
     in a pod."""
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -34,7 +33,6 @@ class SizingBatteryDrag(om.ExplicitComponent):
         self.options.declare("low_speed_aero", default=False, types=bool)
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
         # For refractoring purpose we just match the option to the tag in the variable name and
@@ -50,7 +48,6 @@ class SizingBatteryDrag(om.ExplicitComponent):
         )
 
         if position in ["wing_pod", "underbelly"]:
-
             self.add_input(
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -61,7 +58,6 @@ class SizingBatteryDrag(om.ExplicitComponent):
             )
 
         if position == "underbelly":
-
             self.add_input(
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -74,7 +70,6 @@ class SizingBatteryDrag(om.ExplicitComponent):
             self.add_input("data:aerodynamics:fuselage:" + ls_tag + ":CD0", val=np.nan)
 
         if position == "wing_pod":
-
             self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
         self.add_output(
@@ -91,13 +86,11 @@ class SizingBatteryDrag(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=0.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         if position == "wing_pod":
-
             # According to :cite:`gudmundsson:2013`. the drag of a streamlined external tank,
             # which more or less resemble a podded battery can be computed using the following
             # formula. It highly depends on the tank/wing interface so we will take a middle.
@@ -123,7 +116,6 @@ class SizingBatteryDrag(om.ExplicitComponent):
             cd0 = 0.10 * frontal_area / wing_area
 
         elif position == "underbelly":
-
             # For now we will just consider the addition of wetted area and not the change in
             # form factor, ...
 
@@ -153,7 +145,6 @@ class SizingBatteryDrag(om.ExplicitComponent):
             cd0 = added_wet_area / wet_area * cd0_fus
 
         else:
-
             cd0 = 0.0
 
         outputs[
@@ -161,14 +152,12 @@ class SizingBatteryDrag(om.ExplicitComponent):
         ] = cd0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
         low_speed_aero = self.options["low_speed_aero"]
         ls_tag = "low_speed" if low_speed_aero else "cruise"
 
         if position == "wing_pod":
-
             frontal_area = (
                 np.pi
                 * inputs[
@@ -191,9 +180,7 @@ class SizingBatteryDrag(om.ExplicitComponent):
                 + ls_tag
                 + ":CD0",
                 "data:geometry:wing:area",
-            ] = (
-                -0.10 * frontal_area / inputs["data:geometry:wing:area"] ** 2.0
-            )
+            ] = -0.10 * frontal_area / inputs["data:geometry:wing:area"] ** 2.0
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -234,7 +221,6 @@ class SizingBatteryDrag(om.ExplicitComponent):
             )
 
         elif position == "underbelly":
-
             # For now we will just consider the addition of wetted area and not the change in
             # form factor, ...
 
@@ -271,9 +257,7 @@ class SizingBatteryDrag(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:width",
-            ] = (
-                (belly_length + 2.0 * belly_height) / wet_area * cd0_fus
-            )
+            ] = (belly_length + 2.0 * belly_height) / wet_area * cd0_fus
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -283,9 +267,7 @@ class SizingBatteryDrag(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:height",
-            ] = (
-                (2.0 * belly_width + 2.0 * belly_length) / wet_area * cd0_fus
-            )
+            ] = (2.0 * belly_width + 2.0 * belly_length) / wet_area * cd0_fus
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -295,9 +277,7 @@ class SizingBatteryDrag(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:length",
-            ] = (
-                (belly_width + 2.0 * belly_height) / wet_area * cd0_fus
-            )
+            ] = (belly_width + 2.0 * belly_height) / wet_area * cd0_fus
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -305,9 +285,7 @@ class SizingBatteryDrag(om.ExplicitComponent):
                 + ls_tag
                 + ":CD0",
                 "data:geometry:fuselage:wet_area",
-            ] = (
-                -added_wet_area / wet_area ** 2.0 * cd0_fus
-            )
+            ] = -added_wet_area / wet_area**2.0 * cd0_fus
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -315,12 +293,9 @@ class SizingBatteryDrag(om.ExplicitComponent):
                 + ls_tag
                 + ":CD0",
                 "data:aerodynamics:fuselage:" + ls_tag + ":CD0",
-            ] = (
-                added_wet_area / wet_area
-            )
+            ] = added_wet_area / wet_area
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id

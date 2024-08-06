@@ -13,7 +13,6 @@ class PerformancesElectricalNodePercentSplit(om.ImplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -122,7 +121,6 @@ class PerformancesElectricalNodePercentSplit(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         dc_current_out = inputs["dc_current_out"]
 
         dc_current_in_1 = inputs["dc_current_in_1"]

@@ -18,7 +18,6 @@ class SizingHeatCapacityCable(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -45,7 +44,6 @@ class SizingHeatCapacityCable(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         heat_capacity = (
@@ -63,7 +61,6 @@ class SizingHeatCapacityCable(om.ExplicitComponent):
         ] = heat_capacity
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         partials[

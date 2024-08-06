@@ -8,7 +8,6 @@ import openmdao.api as om
 
 class PerformancesResistance(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -20,7 +19,6 @@ class PerformancesResistance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -168,7 +166,6 @@ class PerformancesResistance(om.ExplicitComponent):
         outputs["resistance_diode"] = resistance_diode
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -213,9 +210,7 @@ class PerformancesResistance(om.ExplicitComponent):
         partials[
             "resistance_igbt",
             "settings:propulsion:he_power_train:inverter:" + inverter_id + ":reference_temperature",
-        ] = (
-            -reference_resistance_igbt * alpha_igbt
-        )
+        ] = -reference_resistance_igbt * alpha_igbt
 
         partials[
             "resistance_diode",
@@ -233,6 +228,4 @@ class PerformancesResistance(om.ExplicitComponent):
         partials[
             "resistance_diode",
             "settings:propulsion:he_power_train:inverter:" + inverter_id + ":reference_temperature",
-        ] = (
-            -reference_resistance_diode * alpha_diode
-        )
+        ] = -reference_resistance_diode * alpha_diode

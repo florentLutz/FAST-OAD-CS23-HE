@@ -60,7 +60,6 @@ class AerodynamicDeltasFromPTFile(om.Group):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -78,7 +77,6 @@ class AerodynamicDeltasFromPTFile(om.Group):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         number_of_points = self.options["number_of_points"]
@@ -133,7 +131,6 @@ class AerodynamicDeltasFromPTFile(om.Group):
             components_slipstream_promotes,
             components_slipstream_flap,
         ):
-
             klass = globals()["Slipstream" + component_om_type]
             local_sub_sys = klass()
             local_sub_sys.options[component_name_id] = component_name
@@ -205,13 +202,11 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         # Need some mock-up interface because the slipstream of some components requires data
@@ -249,7 +244,6 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cl0_wing = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
         cl_alpha_wing = inputs["data:aerodynamics:wing:cruise:CL_alpha"]
         alpha = inputs["alpha"]
@@ -259,7 +253,6 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
         outputs["cl_wing_clean"] = cl_wing
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         partials["cl_wing_clean", "data:aerodynamics:wing:cruise:CL_alpha"] = inputs["alpha"]
@@ -275,7 +268,6 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -287,7 +279,6 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         flaps_position = self.options["flaps_position"]
 
@@ -327,7 +318,6 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         flaps_position = self.options["flaps_position"]
 
         cl_wing_clean = inputs["cl_wing_clean"]
@@ -352,13 +342,11 @@ class SlipstreamDeltaCdi(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(name="cl_airframe", val=np.full(number_of_points, np.nan))
@@ -383,17 +371,15 @@ class SlipstreamDeltaCdi(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cl_airframe = inputs["cl_airframe"]
         delta_cl_wing = inputs["delta_Cl_wing"]
         k = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
 
-        delta_cdi = k * (delta_cl_wing ** 2.0 + 2.0 * cl_airframe * delta_cl_wing)
+        delta_cdi = k * (delta_cl_wing**2.0 + 2.0 * cl_airframe * delta_cl_wing)
 
         outputs["delta_Cdi"] = delta_cdi
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         cl_airframe = inputs["cl_airframe"]
         delta_cl_wing = inputs["delta_Cl_wing"]
         k = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
@@ -401,5 +387,5 @@ class SlipstreamDeltaCdi(om.ExplicitComponent):
         partials["delta_Cdi", "cl_airframe"] = 2.0 * k * delta_cl_wing
         partials["delta_Cdi", "delta_Cl_wing"] = 2.0 * k * (delta_cl_wing + cl_airframe)
         partials["delta_Cdi", "data:aerodynamics:wing:cruise:induced_drag_coefficient"] = (
-            delta_cl_wing ** 2.0 + 2.0 * cl_airframe * delta_cl_wing
+            delta_cl_wing**2.0 + 2.0 * cl_airframe * delta_cl_wing
         )

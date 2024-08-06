@@ -13,7 +13,6 @@ class PerformancesFuelOutput(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_system_id",
             default=None,
@@ -33,7 +32,6 @@ class PerformancesFuelOutput(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         fuel_system_id = self.options["fuel_system_id"]
 
@@ -71,7 +69,6 @@ class PerformancesFuelOutput(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         fuel_output = np.zeros(number_of_points)

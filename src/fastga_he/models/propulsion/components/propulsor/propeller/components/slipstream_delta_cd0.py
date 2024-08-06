@@ -14,7 +14,6 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -29,7 +28,6 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
@@ -117,7 +115,6 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
 
@@ -145,12 +142,11 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
         ]
         a_w = inputs["axial_induction_factor_wing_ac"]
 
-        delta_cd0 = delta_y * a_w ** 2.0 * (cf + delta_cd0_flaps)
+        delta_cd0 = delta_y * a_w**2.0 * (cf + delta_cd0_flaps)
 
         outputs["delta_Cd"] = delta_cd0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
 
@@ -173,11 +169,9 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
             partials[
                 "delta_Cd",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
-            ] = (
-                delta_y * a_w ** 2.0 * delta_cd0_2d_flaps
-            )
+            ] = delta_y * a_w**2.0 * delta_cd0_2d_flaps
             partials["delta_Cd", "data:aerodynamics:flaps:takeoff:CD_2D"] = (
-                delta_y * a_w ** 2.0 * flapped_ratio
+                delta_y * a_w**2.0 * flapped_ratio
             )
 
         elif flaps_position == "landing":
@@ -190,27 +184,25 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
             partials[
                 "delta_Cd",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio",
-            ] = (
-                delta_y * a_w ** 2.0 * delta_cd0_2d_flaps
-            )
+            ] = delta_y * a_w**2.0 * delta_cd0_2d_flaps
             partials["delta_Cd", "data:aerodynamics:flaps:landing:CD_2D"] = (
-                delta_y * a_w ** 2.0 * flapped_ratio
+                delta_y * a_w**2.0 * flapped_ratio
             )
 
         else:
             delta_cd0_flaps = 0.0
 
         partials["delta_Cd", "data:geometry:wing:wet_area"] = (
-            -delta_y * a_w ** 2.0 * cd0 * wing_dry_area / wing_wet_area ** 2.0
+            -delta_y * a_w**2.0 * cd0 * wing_dry_area / wing_wet_area**2.0
         )
-        partials["delta_Cd", "data:geometry:wing:area"] = delta_y * a_w ** 2.0 * cd0 / wing_wet_area
+        partials["delta_Cd", "data:geometry:wing:area"] = delta_y * a_w**2.0 * cd0 / wing_wet_area
         partials["delta_Cd", "data:aerodynamics:wing:cruise:CD0"] = (
-            delta_y * a_w ** 2.0 * wing_dry_area / wing_wet_area
+            delta_y * a_w**2.0 * wing_dry_area / wing_wet_area
         )
         partials[
             "delta_Cd",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter_to_span_ratio",
-        ] = a_w ** 2.0 * (cd0 * wing_dry_area / wing_wet_area + delta_cd0_flaps)
+        ] = a_w**2.0 * (cd0 * wing_dry_area / wing_wet_area + delta_cd0_flaps)
         partials["delta_Cd", "axial_induction_factor_wing_ac"] = (
             2.0 * delta_y * a_w * (cd0 * wing_dry_area / wing_wet_area + delta_cd0_flaps)
         )

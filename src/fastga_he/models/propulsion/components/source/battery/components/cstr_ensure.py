@@ -10,9 +10,9 @@ import numpy as np
 import fastoad.api as oad
 
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_BATTERY_SOC
-] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_BATTERY_SOC] = (
+    "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure"
+)
 
 
 @oad.RegisterSubmodel(
@@ -26,7 +26,6 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -35,7 +34,6 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_input(
@@ -109,7 +107,6 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         outputs[
@@ -137,7 +134,6 @@ class ConstraintsSOCEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         partials[

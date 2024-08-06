@@ -9,12 +9,12 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_CURRENT_DC_SSPC
-] = "fastga_he.submodel.propulsion.constraints.dc_sspc.current.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_VOLTAGE_DC_SSPC
-] = "fastga_he.submodel.propulsion.constraints.dc_sspc.voltage.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_CURRENT_DC_SSPC] = (
+    "fastga_he.submodel.propulsion.constraints.dc_sspc.current.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_VOLTAGE_DC_SSPC] = (
+    "fastga_he.submodel.propulsion.constraints.dc_sspc.voltage.enforce"
+)
 
 # If value of sizing current and voltage are too low, like in the case of an inactive SSPC,
 # these value should be chosen
@@ -64,7 +64,6 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         current_max = max(
@@ -72,9 +71,9 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"],
         )
 
-        outputs[
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber"
-        ] = current_max
+        outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber"] = (
+            current_max
+        )
 
 
 @oad.RegisterSubmodel(
@@ -119,7 +118,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         voltage_max = max(
@@ -127,6 +125,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_max"],
         )
 
-        outputs[
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber"
-        ] = voltage_max
+        outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber"] = (
+            voltage_max
+        )

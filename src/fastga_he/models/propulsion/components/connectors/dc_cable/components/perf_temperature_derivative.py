@@ -8,7 +8,6 @@ import openmdao.api as om
 
 class PerformancesTemperatureDerivative(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -20,7 +19,6 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -104,7 +102,6 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         cable_radius = inputs[
@@ -130,7 +127,6 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         outputs["cable_temperature_time_derivative"] = d_temp_d_t
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -184,6 +180,4 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":cable:heat_capacity",
-        ] = (
-            -(q_c - q_inf) / cable_heat_capacity ** 2.0
-        )
+        ] = -(q_c - q_inf) / cable_heat_capacity**2.0

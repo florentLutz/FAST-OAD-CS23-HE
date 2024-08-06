@@ -25,7 +25,6 @@ class SizingBatteryPack(om.Group):
     """Class that regroups all of the sub components for the sizing of the battery pack."""
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -42,7 +41,6 @@ class SizingBatteryPack(om.Group):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
@@ -108,7 +106,6 @@ class SizingBatteryPack(om.Group):
             )
 
         if position == "inside_the_wing":
-
             self.add_subsystem(
                 name="preparation_for_loads",
                 subsys=SizingBatteryPreparationForLoads(

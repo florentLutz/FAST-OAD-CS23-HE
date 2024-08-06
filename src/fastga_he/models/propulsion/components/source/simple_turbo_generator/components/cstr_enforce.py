@@ -11,9 +11,9 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_TURBO_GENERATOR_POWER
-] = "fastga_he.submodel.propulsion.constraints.turbo_generator.power.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_TURBO_GENERATOR_POWER] = (
+    "fastga_he.submodel.propulsion.constraints.turbo_generator.power.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -35,7 +35,6 @@ class ConstraintsPowerEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         self.add_input(
@@ -66,7 +65,6 @@ class ConstraintsPowerEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         outputs[

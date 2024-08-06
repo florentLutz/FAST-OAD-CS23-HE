@@ -21,7 +21,6 @@ class SizingInductorReluctance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -54,7 +53,6 @@ class SizingInductorReluctance(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -67,7 +65,6 @@ class SizingInductorReluctance(om.ExplicitComponent):
         outputs[prefix + ":inductor:reluctance"] = reluctance
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -78,13 +75,11 @@ class SizingInductorReluctance(om.ExplicitComponent):
         partials[
             prefix + ":inductor:reluctance",
             settings_prefix + ":inductor:iron_permeability",
-        ] = (
-            -2.0 * air_gap / (mu ** 2.0 * iron_area) * 1e-6
-        )
+        ] = -2.0 * air_gap / (mu**2.0 * iron_area) * 1e-6
         partials[
             prefix + ":inductor:reluctance",
             prefix + ":inductor:air_gap",
         ] = 2.0 / (mu * iron_area)
         partials[prefix + ":inductor:reluctance", prefix + ":inductor:iron_surface"] = (
-            -2.0 * air_gap / (mu * iron_area ** 2.0)
+            -2.0 * air_gap / (mu * iron_area**2.0)
         )

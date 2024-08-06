@@ -39,7 +39,6 @@ class SizingSpeedReducer(om.Group):
         )
 
     def setup(self):
-
         position = self.options["position"]
         speed_reducer_id = self.options["speed_reducer_id"]
 

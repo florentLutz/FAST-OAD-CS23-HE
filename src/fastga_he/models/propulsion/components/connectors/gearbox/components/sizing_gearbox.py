@@ -38,7 +38,6 @@ class SizingGearbox(om.Group):
         )
 
     def setup(self):
-
         position = self.options["position"]
         gearbox_id = self.options["gearbox_id"]
 

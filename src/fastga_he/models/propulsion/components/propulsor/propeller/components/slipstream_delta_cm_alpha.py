@@ -17,7 +17,6 @@ class SlipstreamPropellerDeltaCMAlpha(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -29,7 +28,6 @@ class SlipstreamPropellerDeltaCMAlpha(om.ExplicitComponent):
         )
 
     def setup(self):
-
         flaps_position = self.options["flaps_position"]
         number_of_points = self.options["number_of_points"]
 
@@ -82,7 +80,6 @@ class SlipstreamPropellerDeltaCMAlpha(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         flaps_position = self.options["flaps_position"]
 
         if flaps_position == "takeoff":
@@ -104,7 +101,6 @@ class SlipstreamPropellerDeltaCMAlpha(om.ExplicitComponent):
         outputs["delta_Cm_alpha"] = delta_cm_alpha
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         flaps_position = self.options["flaps_position"]
         number_of_points = self.options["number_of_points"]
 

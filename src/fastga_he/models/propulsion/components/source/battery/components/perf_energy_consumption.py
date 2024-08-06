@@ -14,13 +14,11 @@ class PerformancesEnergyConsumption(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
@@ -43,13 +41,11 @@ class PerformancesEnergyConsumption(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["non_consumable_energy_t"] = (
             inputs["dc_current_out"] * inputs["voltage_out"] * inputs["time_step"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["non_consumable_energy_t", "dc_current_out"] = (
             inputs["voltage_out"] * inputs["time_step"]
         )

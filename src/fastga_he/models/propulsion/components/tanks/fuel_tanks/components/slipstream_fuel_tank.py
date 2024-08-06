@@ -14,7 +14,6 @@ class SlipstreamFuelTank(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -26,7 +25,6 @@ class SlipstreamFuelTank(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         ivc = om.IndepVarComp()

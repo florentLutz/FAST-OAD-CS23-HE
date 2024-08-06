@@ -17,7 +17,6 @@ class ConstraintsDCAuxLoad(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="aux_load_id",
             default=None,
@@ -26,7 +25,6 @@ class ConstraintsDCAuxLoad(om.Group):
         )
 
     def setup(self):
-
         aux_load_id = self.options["aux_load_id"]
 
         option_aux_load_id = {"aux_load_id": aux_load_id}

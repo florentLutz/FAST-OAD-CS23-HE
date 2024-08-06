@@ -15,7 +15,6 @@ class SizingBatteryModuleWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -30,7 +29,6 @@ class SizingBatteryModuleWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_input(
@@ -74,7 +72,6 @@ class SizingBatteryModuleWeight(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         outputs[
@@ -93,12 +90,11 @@ class SizingBatteryModuleWeight(om.ExplicitComponent):
             ]
         )
 
-        outputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:mass"
-        ] = self.options["cell_weight_ref"]
+        outputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:mass"] = (
+            self.options["cell_weight_ref"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         partials[

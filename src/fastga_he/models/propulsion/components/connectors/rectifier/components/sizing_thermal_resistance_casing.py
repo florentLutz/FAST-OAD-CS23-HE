@@ -27,7 +27,6 @@ class SizingRectifierCasingThermalResistance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -49,7 +48,6 @@ class SizingRectifierCasingThermalResistance(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         outputs[
@@ -59,7 +57,6 @@ class SizingRectifierCasingThermalResistance(om.ExplicitComponent):
         ] = 0.010
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[

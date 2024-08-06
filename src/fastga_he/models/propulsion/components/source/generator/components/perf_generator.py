@@ -27,7 +27,6 @@ class PerformancesGenerator(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -36,7 +35,6 @@ class PerformancesGenerator(om.Group):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
         number_of_points = self.options["number_of_points"]
 

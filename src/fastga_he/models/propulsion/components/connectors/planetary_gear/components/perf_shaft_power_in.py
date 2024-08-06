@@ -14,7 +14,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
@@ -26,7 +25,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         planetary_gear_id = self.options["planetary_gear_id"]
 
@@ -80,7 +78,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         outputs["shaft_power_in_2"] = power_out / eta * (1.0 - percent_split)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         power_out = inputs["shaft_power_out"]
@@ -93,16 +90,12 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         partials[
             "shaft_power_in_1",
             "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":efficiency",
-        ] = (
-            -power_out / eta ** 2.0 * percent_split
-        )
+        ] = -power_out / eta**2.0 * percent_split
         partials["shaft_power_in_1", "power_split"] = power_out / eta / 100.0
 
         partials["shaft_power_in_2", "shaft_power_out"] = (1.0 - percent_split) / eta
         partials[
             "shaft_power_in_2",
             "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":efficiency",
-        ] = (
-            -power_out / eta ** 2.0 * (1.0 - percent_split)
-        )
+        ] = -power_out / eta**2.0 * (1.0 - percent_split)
         partials["shaft_power_in_2", "power_split"] = -power_out / eta / 100.0

@@ -20,7 +20,6 @@ class SizingInductorResistance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -64,7 +63,6 @@ class SizingInductorResistance(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -87,7 +85,6 @@ class SizingInductorResistance(om.ExplicitComponent):
         outputs[prefix + ":inductor:resistance"] = resistance
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -97,28 +94,32 @@ class SizingInductorResistance(om.ExplicitComponent):
         copper_resistivity = inputs[settings_prefix + ":inductor:copper_resistivity"] / 1e6
         wire_section_area = inputs[prefix + ":inductor:wire_section_area"] / 1e4
 
-        partials[prefix + ":inductor:resistance", prefix + ":inductor:core_dimension:B",] = (
-            2.0 * np.pi / 4.0 * turn_number * copper_resistivity / wire_section_area
-        )
-        partials[prefix + ":inductor:resistance", prefix + ":inductor:core_dimension:C",] = (
-            2.0 * np.pi / 4.0 * turn_number * copper_resistivity / wire_section_area
-        )
-        partials[prefix + ":inductor:resistance", prefix + ":inductor:turn_number",] = (
-            2.0 * np.pi * (b_length + c_length) / 4.0 * copper_resistivity / wire_section_area
-        )
+        partials[
+            prefix + ":inductor:resistance",
+            prefix + ":inductor:core_dimension:B",
+        ] = 2.0 * np.pi / 4.0 * turn_number * copper_resistivity / wire_section_area
+        partials[
+            prefix + ":inductor:resistance",
+            prefix + ":inductor:core_dimension:C",
+        ] = 2.0 * np.pi / 4.0 * turn_number * copper_resistivity / wire_section_area
+        partials[
+            prefix + ":inductor:resistance",
+            prefix + ":inductor:turn_number",
+        ] = 2.0 * np.pi * (b_length + c_length) / 4.0 * copper_resistivity / wire_section_area
         partials[
             prefix + ":inductor:resistance",
             settings_prefix + ":inductor:copper_resistivity",
-        ] = (
-            2.0 * np.pi * (b_length + c_length) / 4.0 * turn_number / wire_section_area / 1e6
-        )
-        partials[prefix + ":inductor:resistance", prefix + ":inductor:wire_section_area",] = -(
+        ] = 2.0 * np.pi * (b_length + c_length) / 4.0 * turn_number / wire_section_area / 1e6
+        partials[
+            prefix + ":inductor:resistance",
+            prefix + ":inductor:wire_section_area",
+        ] = -(
             2.0
             * np.pi
             * (b_length + c_length)
             / 4.0
             * turn_number
             * copper_resistivity
-            / wire_section_area ** 2.0
+            / wire_section_area**2.0
             / 1e4
         )

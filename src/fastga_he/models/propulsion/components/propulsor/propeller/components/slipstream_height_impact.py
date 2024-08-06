@@ -23,7 +23,6 @@ class SlipstreamPropellerHeightImpact(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         propeller_id = self.options["propeller_id"]
 
@@ -93,7 +92,6 @@ class SlipstreamPropellerHeightImpact(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         f_0 = inputs["f_0"]
@@ -115,11 +113,10 @@ class SlipstreamPropellerHeightImpact(om.ExplicitComponent):
         # Fool proofing the results, just in case. Based on the graphs displayed in the source
         # material
         outputs["beta"] = np.clip(
-            f_0 + f_1 * r_c + f_2 * r_c ** 2.0 + f_3 * r_c ** 3.0 + f_4 * r_c ** 4.0, 0.3, 1.5
+            f_0 + f_1 * r_c + f_2 * r_c**2.0 + f_3 * r_c**3.0 + f_4 * r_c**4.0, 0.3, 1.5
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -138,9 +135,9 @@ class SlipstreamPropellerHeightImpact(om.ExplicitComponent):
         r_c = np.clip(r_c_unclipped, LIMIT_DIAMETER_RATIO[0], LIMIT_DIAMETER_RATIO[1])
 
         partials["beta", "f_1"] = np.ones(number_of_points) * r_c
-        partials["beta", "f_2"] = np.ones(number_of_points) * r_c ** 2.0
-        partials["beta", "f_3"] = np.ones(number_of_points) * r_c ** 3.0
-        partials["beta", "f_4"] = np.ones(number_of_points) * r_c ** 4.0
+        partials["beta", "f_2"] = np.ones(number_of_points) * r_c**2.0
+        partials["beta", "f_3"] = np.ones(number_of_points) * r_c**3.0
+        partials["beta", "f_4"] = np.ones(number_of_points) * r_c**4.0
 
         partials[
             "beta",
@@ -148,7 +145,7 @@ class SlipstreamPropellerHeightImpact(om.ExplicitComponent):
         ] = (
             np.where(
                 r_c == r_c_unclipped,
-                f_1 + 2.0 * f_2 * r_c + 3.0 * f_3 * r_c ** 2.0 + 4.0 * f_4 * r_c ** 3.0,
+                f_1 + 2.0 * f_2 * r_c + 3.0 * f_3 * r_c**2.0 + 4.0 * f_4 * r_c**3.0,
                 0.0,
             )
             / 2.0

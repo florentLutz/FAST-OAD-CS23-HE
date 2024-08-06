@@ -15,7 +15,6 @@ class SizingPMSMCGX(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -30,12 +29,10 @@ class SizingPMSMCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
         position = self.options["position"]
 
         if position == "on_the_wing":
-
             self.add_input(
                 name="data:propulsion:he_power_train:PMSM:" + motor_id + ":from_LE",
                 val=np.nan,
@@ -52,7 +49,6 @@ class SizingPMSMCGX(om.ExplicitComponent):
             )
 
         else:
-
             self.add_input(
                 name="data:propulsion:he_power_train:PMSM:" + motor_id + ":front_length_ratio",
                 val=np.nan,
@@ -70,12 +66,10 @@ class SizingPMSMCGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
         position = self.options["position"]
 
         if position == "on_the_wing":
-
             distance_from_le = inputs[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":from_LE"
             ]
@@ -88,7 +82,6 @@ class SizingPMSMCGX(om.ExplicitComponent):
             )
 
         else:
-
             lav = inputs["data:geometry:fuselage:front_length"]
             lav_ratio = inputs[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":front_length_ratio"
@@ -97,12 +90,10 @@ class SizingPMSMCGX(om.ExplicitComponent):
             outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:x"] = lav * lav_ratio
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
         position = self.options["position"]
 
         if position == "on_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:x",
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":from_LE",
@@ -121,7 +112,6 @@ class SizingPMSMCGX(om.ExplicitComponent):
             ] = 0.5
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:x",
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":front_length_ratio",

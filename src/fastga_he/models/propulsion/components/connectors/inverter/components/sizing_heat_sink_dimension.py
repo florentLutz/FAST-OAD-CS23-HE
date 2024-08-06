@@ -13,7 +13,6 @@ class SizingInverterHeatSinkDimension(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="inverter_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingInverterHeatSinkDimension(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -63,7 +61,6 @@ class SizingInverterHeatSinkDimension(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:length"] = (
@@ -77,15 +74,12 @@ class SizingInverterHeatSinkDimension(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:length",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":module:width",
-        ] = (
-            1.1 * 3.0
-        )
+        ] = 1.1 * 3.0
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":heat_sink:width",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":module:length",

@@ -22,7 +22,6 @@ NB_POINTS_TEST = 10
 
 
 def test_power_train_file_components_sizing():
-
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -45,7 +44,6 @@ def test_power_train_file_components_sizing():
 
 
 def test_power_train_file_components_performances():
-
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -78,7 +76,6 @@ def test_power_train_file_components_performances():
 
 
 def test_power_train_file_components_slipstream():
-
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -105,7 +102,6 @@ def test_power_train_file_components_slipstream():
 
 
 def test_power_train_file_components_performances_sspc_last():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_sspc_last.yml"
     )
@@ -126,7 +122,13 @@ def test_power_train_file_components_performances_sspc_last():
         _,
     ) = power_train_configurator.get_performances_element_lists()
 
-    (components_name, components_name_id, _, _, _,) = power_train_configurator.enforce_sspc_last(
+    (
+        components_name,
+        components_name_id,
+        _,
+        _,
+        _,
+    ) = power_train_configurator.enforce_sspc_last(
         cp_name,
         cp_id,
         cp_om_type,
@@ -146,7 +148,6 @@ def test_power_train_file_components_performances_sspc_last():
 
 
 def test_power_train_file_connections():
-
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -160,12 +161,10 @@ def test_power_train_file_connections():
         power_train_configurator._components_connection_outputs,
         power_train_configurator._components_connection_inputs,
     ):
-
         print("[" + om_output + ", " + om_input + "]")
 
 
 def test_power_train_file_direct_bus_battery_connection():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_direct_battery_bus_connection.yml"
     )
@@ -193,7 +192,6 @@ def test_power_train_file_direct_bus_battery_connection():
 
 
 def test_power_train_file_connections_splitter():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
@@ -209,12 +207,10 @@ def test_power_train_file_connections_splitter():
         power_train_configurator._components_connection_outputs,
         power_train_configurator._components_connection_inputs,
     ):
-
         print("[" + om_output + ", " + om_input + "]")
 
 
 def test_power_train_watcher_path():
-
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -225,7 +221,6 @@ def test_power_train_watcher_path():
 
 
 def test_power_train_logic_check():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_sspc_fail.yml"
     )
@@ -263,7 +258,6 @@ def test_power_train_logic_check():
 
 
 def test_distance_from_propulsive_load():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
@@ -336,7 +330,6 @@ def test_independent_voltage_subgraph():
 
 
 def test_voltage_setter_list():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
@@ -355,7 +348,6 @@ def test_voltage_setter_list():
 
 
 def test_wing_punctual_mass_identification():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter_position.yml"
     )
@@ -392,7 +384,6 @@ def test_wing_punctual_mass_identification():
 
 
 def test_wing_distributed_mass_identification():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter_position.yml"
     )
@@ -412,7 +403,6 @@ def test_wing_distributed_mass_identification():
 
 
 def test_no_distributed_mass():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_propeller_symmetrical.yml"
     )
@@ -431,7 +421,6 @@ def test_no_distributed_mass():
 
 
 def test_wing_punctual_mass_symmetrical():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_propeller_symmetrical.yml"
     )
@@ -453,7 +442,6 @@ def test_wing_punctual_mass_symmetrical():
 
 
 def test_wing_distributed_mass_symmetrical():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_battery_symmetrical.yml"
     )
@@ -479,7 +467,6 @@ def test_wing_distributed_mass_symmetrical():
 
 
 def test_bad_pair():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_bad_pair.yml"
     )
@@ -488,7 +475,6 @@ def test_bad_pair():
     )
 
     with pytest.raises(FASTGAHEImpossiblePair) as e_info:
-
         # This should prompt the error
         (
             _,
@@ -503,7 +489,6 @@ def test_bad_pair():
 
 
 def test_mass_variation_identification():
-
     # Mass should vary
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
@@ -526,7 +511,6 @@ def test_mass_variation_identification():
 
 
 def test_identification_unconsumable_source():
-
     # Mass should vary but there also is an unconsumable energy source
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
@@ -562,7 +546,6 @@ def test_identification_unconsumable_source():
 
 
 def test_get_power_on_each_node():
-
     # Very simple power train
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file.yml"
@@ -723,7 +706,6 @@ def test_get_power_on_each_node():
 
 
 def test_get_power_on_each_node_unequal_branches():
-
     # Very simple power train
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_quad_prop.yml"
@@ -749,7 +731,6 @@ def test_get_power_on_each_node_unequal_branches():
 
 
 def test_power_to_set():
-
     # Very simple power train
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file.yml"
@@ -854,7 +835,6 @@ def test_current_to_set():
 
 
 def test_control_parameter_identification():
-
     # Mass should vary
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
@@ -880,7 +860,6 @@ def test_control_parameter_identification():
 
 
 def test_propulsor_connection():
-
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_tri_prop.yml"
     )

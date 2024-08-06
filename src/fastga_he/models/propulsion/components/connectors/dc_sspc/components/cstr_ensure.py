@@ -55,7 +55,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         outputs[
@@ -66,7 +65,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         partials[
@@ -124,7 +122,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         outputs[
@@ -135,7 +132,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         partials[

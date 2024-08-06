@@ -14,7 +14,6 @@ class SizingPropellerWingACDistance(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -28,7 +27,6 @@ class SizingPropellerWingACDistance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         # TODO: All those formulas (including the one in other components) should include the
         #  sweep at some point
 
@@ -43,7 +41,6 @@ class SizingPropellerWingACDistance(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
-
             self.add_input(
                 name="data:propulsion:he_power_train:propeller:" + propeller_id + ":from_LE",
                 val=np.nan,
@@ -64,7 +61,6 @@ class SizingPropellerWingACDistance(om.ExplicitComponent):
             )
 
         else:
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
             self.declare_partials(
@@ -74,12 +70,10 @@ class SizingPropellerWingACDistance(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         propeller_id = self.options["propeller_id"]
 
         if position == "on_the_wing":
-
             outputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_AC"
             ] = (
@@ -88,7 +82,6 @@ class SizingPropellerWingACDistance(om.ExplicitComponent):
             )
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_AC"
             ] = inputs["data:geometry:wing:MAC:at25percent:x"]

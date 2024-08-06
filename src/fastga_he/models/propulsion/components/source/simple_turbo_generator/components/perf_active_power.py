@@ -10,7 +10,6 @@ class PerformancesActivePower(om.ExplicitComponent):
     """Computation of the electric active power required created by the turbo generator."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -22,7 +21,6 @@ class PerformancesActivePower(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         turbo_generator_id = self.options["turbo_generator_id"]
 
@@ -64,7 +62,6 @@ class PerformancesActivePower(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         outputs["active_power"] = (
@@ -77,7 +74,6 @@ class PerformancesActivePower(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
         number_of_points = self.options["number_of_points"]
 

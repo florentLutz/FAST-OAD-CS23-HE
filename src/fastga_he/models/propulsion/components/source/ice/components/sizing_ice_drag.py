@@ -17,7 +17,6 @@ class SizingICEDrag(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -35,7 +34,6 @@ class SizingICEDrag(om.ExplicitComponent):
         self.options.declare("low_speed_aero", default=False, types=bool)
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
@@ -43,7 +41,6 @@ class SizingICEDrag(om.ExplicitComponent):
         self.add_input("data:aerodynamics:" + ls_tag + ":unit_reynolds", val=np.nan, units="m**-1")
 
         if self.options["position"] == "on_the_wing":
-
             self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
             self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
 
@@ -80,12 +77,10 @@ class SizingICEDrag(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         if self.options["position"] == "on_the_wing":
-
             nacelle_length = inputs[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length"
             ]
@@ -105,7 +100,7 @@ class SizingICEDrag(om.ExplicitComponent):
             wing_area = inputs["data:geometry:wing:area"]
             l0_wing = inputs["data:geometry:wing:MAC:length"]
 
-            cf_nac = 0.455 / ((1 + 0.144 * mach ** 2) ** 0.65 * (np.log10(reynolds)) ** 2.58)
+            cf_nac = 0.455 / ((1 + 0.144 * mach**2) ** 0.65 * (np.log10(reynolds)) ** 2.58)
 
             fineness_ratio = nacelle_length / np.sqrt(4 * nacelle_height * nacelle_width / np.pi)
 
@@ -113,23 +108,20 @@ class SizingICEDrag(om.ExplicitComponent):
             interference_factor = 1.2
 
             cd0_form = cf_nac * form_factor * nacelle_wet_area * interference_factor
-            cd0_interference = 0.036 * l0_wing * nacelle_width * 0.2 ** 2.0
+            cd0_interference = 0.036 * l0_wing * nacelle_width * 0.2**2.0
 
             cd0 = (cd0_interference + cd0_form) / wing_area
 
             outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":" + ls_tag + ":CD0"] = cd0
 
         else:
-
             outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":" + ls_tag + ":CD0"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         ice_id = self.options["ice_id"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         if self.options["position"] == "on_the_wing":
-
             nacelle_length = inputs[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length"
             ]
@@ -154,18 +146,18 @@ class SizingICEDrag(om.ExplicitComponent):
             d_reynolds_d_unit_reynolds = nacelle_length
             d_reynolds_d_length = unit_reynolds
 
-            cf_nac = 0.455 / ((1 + 0.144 * mach ** 2) ** 0.65 * (np.log10(reynolds)) ** 2.58)
+            cf_nac = 0.455 / ((1 + 0.144 * mach**2) ** 0.65 * (np.log10(reynolds)) ** 2.58)
 
             d_cf_d_mach = -(
                 0.288
                 * 0.455
                 * 0.65
                 * (np.log10(reynolds)) ** -2.58
-                * (1 + 0.144 * mach ** 2) ** -1.65
+                * (1 + 0.144 * mach**2) ** -1.65
                 * mach
             )
             d_cf_d_reynolds = (
-                (-2.58 * 0.455 * (1 + 0.144 * mach ** 2) ** -0.65 * (np.log10(reynolds)) ** -3.58)
+                (-2.58 * 0.455 * (1 + 0.144 * mach**2) ** -0.65 * (np.log10(reynolds)) ** -3.58)
                 / reynolds
                 / np.log(10)
             )
@@ -186,15 +178,15 @@ class SizingICEDrag(om.ExplicitComponent):
 
             fineness_ratio = nacelle_length / np.sqrt(4 * nacelle_height * nacelle_width / np.pi)
 
-            d_form_d_fineness = -0.35 / fineness_ratio ** 2.0
+            d_form_d_fineness = -0.35 / fineness_ratio**2.0
 
-            d_cd_interference_d_width = 0.036 * l0_wing * 0.2 ** 2.0
+            d_cd_interference_d_width = 0.036 * l0_wing * 0.2**2.0
 
             form_factor = 1 + 0.35 / fineness_ratio
             interference_factor = 1.2
 
             cd0_form = cf_nac * form_factor * nacelle_wet_area * interference_factor
-            cd0_interference = 0.036 * l0_wing * nacelle_width * 0.2 ** 2.0
+            cd0_interference = 0.036 * l0_wing * nacelle_width * 0.2**2.0
 
             partials[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":" + ls_tag + ":CD0",
@@ -246,24 +238,17 @@ class SizingICEDrag(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":" + ls_tag + ":CD0",
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:wet_area",
-            ] = (
-                cf_nac * form_factor * interference_factor / wing_area
-            )
+            ] = cf_nac * form_factor * interference_factor / wing_area
             partials[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":" + ls_tag + ":CD0",
                 "data:geometry:wing:area",
-            ] = (
-                -(cd0_interference + cd0_form) / wing_area ** 2.0
-            )
+            ] = -(cd0_interference + cd0_form) / wing_area**2.0
             partials[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":" + ls_tag + ":CD0",
                 "data:geometry:wing:MAC:length",
-            ] = (
-                0.036 * nacelle_width * 0.2 ** 2.0 / wing_area
-            )
+            ] = 0.036 * nacelle_width * 0.2**2.0 / wing_area
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":" + ls_tag + ":CD0",
                 "data:aerodynamics:" + ls_tag + ":mach",

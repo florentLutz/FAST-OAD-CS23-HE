@@ -18,7 +18,6 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
         self.descent_idx = None
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -39,7 +38,6 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -106,7 +104,6 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_reserve = self.options["number_of_points_reserve"]
 
@@ -147,7 +144,6 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
         outputs["d_vx_dt"] = d_vx_dt
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         true_airspeed = inputs["true_airspeed"]
         equivalent_airspeed = inputs["equivalent_airspeed"]
         altitude = inputs["altitude"]

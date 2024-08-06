@@ -25,7 +25,6 @@ class SizingRectifierResistanceScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -45,7 +44,6 @@ class SizingRectifierResistanceScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         current_caliber_ref = self.options["current_caliber_ref"]
@@ -57,7 +55,7 @@ class SizingRectifierResistanceScaling(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance"
-        ] = (current_caliber_star ** -1)
+        ] = current_caliber_star**-1
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         rectifier_id = self.options["rectifier_id"]
@@ -69,6 +67,4 @@ class SizingRectifierResistanceScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber",
-        ] = (
-            -current_caliber_ref / current_ac_caliber ** 2.0
-        )
+        ] = -current_caliber_ref / current_ac_caliber**2.0

@@ -29,7 +29,6 @@ class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -76,7 +75,6 @@ class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         current_caliber = inputs[
@@ -141,11 +139,7 @@ class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":inductor:current_caliber",
-        ] = (
-            -0.25
-            * voltage_caliber
-            / (current_ripple * current_caliber ** 2.0 * switching_frequency)
-        )
+        ] = -0.25 * voltage_caliber / (current_ripple * current_caliber**2.0 * switching_frequency)
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -153,11 +147,7 @@ class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":current_ripple",
-        ] = (
-            -0.25
-            * voltage_caliber
-            / (current_ripple ** 2.0 * current_caliber * switching_frequency)
-        )
+        ] = -0.25 * voltage_caliber / (current_ripple**2.0 * current_caliber * switching_frequency)
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -173,8 +163,4 @@ class SizingDCDCConverterInductorInductance(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":switching_frequency",
-        ] = (
-            -0.25
-            * voltage_caliber
-            / (current_ripple * current_caliber * switching_frequency ** 2.0)
-        )
+        ] = -0.25 * voltage_caliber / (current_ripple * current_caliber * switching_frequency**2.0)

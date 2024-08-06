@@ -6,7 +6,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 if __name__ == "__main__":
-
     capacitance = np.array(
         [
             290,
@@ -189,8 +188,8 @@ if __name__ == "__main__":
     x = np.linalg.lstsq(A, B, rcond=-1)
     a, b, c = x[0]
 
-    print(np.exp(a) * rms_current ** b * capacitance ** c)
+    print(np.exp(a) * rms_current**b * capacitance**c)
     print(weight)
 
-    plt.plot(weight, np.exp(a) * rms_current ** b * capacitance ** c)
+    plt.plot(weight, np.exp(a) * rms_current**b * capacitance**c)
     plt.show()

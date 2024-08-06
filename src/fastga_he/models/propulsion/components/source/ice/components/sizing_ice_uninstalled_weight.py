@@ -12,7 +12,6 @@ class SizingICEUninstalledWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -21,7 +20,6 @@ class SizingICEUninstalledWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
 
         self.add_input(
@@ -41,23 +39,19 @@ class SizingICEUninstalledWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         max_power = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL"]
         uninstalled_mass = (max_power - 21.55) / 0.5515
 
-        outputs[
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":uninstalled_mass"
-        ] = uninstalled_mass
+        outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":uninstalled_mass"] = (
+            uninstalled_mass
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         ice_id = self.options["ice_id"]
 
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":uninstalled_mass",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
-        ] = (
-            1.0 / 0.5515
-        )
+        ] = 1.0 / 0.5515

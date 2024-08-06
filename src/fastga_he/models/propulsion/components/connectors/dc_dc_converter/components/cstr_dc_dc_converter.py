@@ -32,7 +32,6 @@ class ConstraintsDCDCConverter(om.Group):
         )
 
     def setup(self):
-
         option_dc_dc_converter_id = {"dc_dc_converter_id": self.options["dc_dc_converter_id"]}
 
         self.add_subsystem(

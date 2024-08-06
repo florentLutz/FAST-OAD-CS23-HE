@@ -12,7 +12,6 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -24,7 +23,6 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
@@ -88,7 +86,6 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         density_ratio = inputs["density_ratio"]
@@ -113,7 +110,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         design_power = power_rating * power_ratio
 
         fuel_consumption = (
-            10 ** 2.48320
+            10**2.48320
             * density_ratio
             ** (
                 2.42792 * np.log10(design_t41t) * np.log10(design_opr)
@@ -140,7 +137,6 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         outputs["fuel_consumption"] = fuel_consumption
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         density_ratio = inputs["density_ratio"]
@@ -166,7 +162,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         design_power = power_rating * power_ratio
 
         fuel_consumption = (
-            10 ** 2.48320
+            10**2.48320
             * density_ratio
             ** (
                 2.42792 * np.log10(design_t41t) * np.log10(design_opr)
@@ -265,9 +261,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         partials[
             "fuel_consumption",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t",
-        ] = (
-            d_fc_d_log_fc * d_log_fc_d_log_t41t * d_log_t41t_d_t41t * k_fc
-        )
+        ] = d_fc_d_log_fc * d_log_fc_d_log_t41t * d_log_t41t_d_t41t * k_fc
 
         # Partials derivative for design OPR
         d_log_fc_d_log_opr = (
@@ -280,9 +274,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         partials[
             "fuel_consumption",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:OPR",
-        ] = (
-            d_fc_d_log_fc * d_log_fc_d_log_opr * d_log_opr_d_opr * k_fc
-        )
+        ] = d_fc_d_log_fc * d_log_fc_d_log_opr * d_log_opr_d_opr * k_fc
 
         # Partials derivative for current shaft power
         d_log_fc_d_log_power = (

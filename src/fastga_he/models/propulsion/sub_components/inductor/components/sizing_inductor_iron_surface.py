@@ -21,7 +21,6 @@ class SizingInductorIronSurface(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -61,7 +60,6 @@ class SizingInductorIronSurface(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -70,12 +68,11 @@ class SizingInductorIronSurface(om.ExplicitComponent):
         magnetic_field = inputs[prefix + ":inductor:magnetic_field"]
         mu = inputs[settings_prefix + ":inductor:iron_permeability"] * 1e-6
 
-        iron_area = energy_rating * 2.0 * mu / (magnetic_field ** 2.0 * 2 * air_gap)
+        iron_area = energy_rating * 2.0 * mu / (magnetic_field**2.0 * 2 * air_gap)
 
         outputs[prefix + ":inductor:iron_surface"] = iron_area
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -87,18 +84,16 @@ class SizingInductorIronSurface(om.ExplicitComponent):
         partials[
             prefix + ":inductor:iron_surface",
             prefix + ":inductor:magnetic_energy_rating",
-        ] = (
-            2.0 * mu / (magnetic_field ** 2.0 * 2 * air_gap)
-        )
-        partials[prefix + ":inductor:iron_surface", prefix + ":inductor:air_gap",] = (
-            -energy_rating * 2.0 * mu / (magnetic_field ** 2.0 * 2 * air_gap ** 2.0)
-        )
-        partials[prefix + ":inductor:iron_surface", prefix + ":inductor:magnetic_field",] = (
-            -4.0 * energy_rating * mu / (magnetic_field ** 3.0 * 2 * air_gap)
-        )
+        ] = 2.0 * mu / (magnetic_field**2.0 * 2 * air_gap)
+        partials[
+            prefix + ":inductor:iron_surface",
+            prefix + ":inductor:air_gap",
+        ] = -energy_rating * 2.0 * mu / (magnetic_field**2.0 * 2 * air_gap**2.0)
+        partials[
+            prefix + ":inductor:iron_surface",
+            prefix + ":inductor:magnetic_field",
+        ] = -4.0 * energy_rating * mu / (magnetic_field**3.0 * 2 * air_gap)
         partials[
             prefix + ":inductor:iron_surface",
             settings_prefix + ":inductor:iron_permeability",
-        ] = (
-            energy_rating * 2.0 / (magnetic_field ** 2.0 * 2 * air_gap) * 1e-6
-        )
+        ] = energy_rating * 2.0 / (magnetic_field**2.0 * 2 * air_gap) * 1e-6

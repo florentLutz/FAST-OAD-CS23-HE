@@ -13,13 +13,11 @@ class SlipstreamPropellerAxialInductionFactorWingAC(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("axial_induction_factor", val=np.nan, shape=number_of_points)
@@ -47,7 +45,6 @@ class SlipstreamPropellerAxialInductionFactorWingAC(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         a_p = inputs["axial_induction_factor"]
         contraction_ratio_squared = inputs["contraction_ratio_squared"]
 
@@ -56,7 +53,6 @@ class SlipstreamPropellerAxialInductionFactorWingAC(om.ExplicitComponent):
         outputs["axial_induction_factor_wing_ac"] = a_w
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         a_p = inputs["axial_induction_factor"]
         contraction_ratio_squared = inputs["contraction_ratio_squared"]
 
@@ -64,5 +60,5 @@ class SlipstreamPropellerAxialInductionFactorWingAC(om.ExplicitComponent):
             1.0 / contraction_ratio_squared
         )
         partials["axial_induction_factor_wing_ac", "contraction_ratio_squared"] = (
-            -(a_p + 1.0) / contraction_ratio_squared ** 2.0
+            -(a_p + 1.0) / contraction_ratio_squared**2.0
         )

@@ -22,7 +22,6 @@ class SizingFuelTankHeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -39,7 +38,6 @@ class SizingFuelTankHeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
@@ -52,7 +50,6 @@ class SizingFuelTankHeight(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing":
-
             self.add_input(
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:ref_chord",
                 val=0.0,
@@ -64,7 +61,6 @@ class SizingFuelTankHeight(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
         elif position == "wing_pod":
-
             self.add_input(
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":volume",
                 units="m**3",
@@ -82,7 +78,6 @@ class SizingFuelTankHeight(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
         else:
-
             self.add_input("data:geometry:fuselage:maximum_height", val=np.nan, units="m")
 
             self.declare_partials(
@@ -90,12 +85,10 @@ class SizingFuelTankHeight(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             ref_chord = inputs[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:ref_chord"
             ]
@@ -103,10 +96,9 @@ class SizingFuelTankHeight(om.ExplicitComponent):
 
             outputs[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:height"
-            ] = (ref_chord * thickness_ratio * (1.0 - THICKNESS_MARGIN_RATIO))
+            ] = ref_chord * thickness_ratio * (1.0 - THICKNESS_MARGIN_RATIO)
 
         elif position == "wing_pod":
-
             fineness_ratio = inputs[
                 "data:propulsion:he_power_train:fuel_tank:"
                 + fuel_tank_id
@@ -121,18 +113,15 @@ class SizingFuelTankHeight(om.ExplicitComponent):
             ] = (tank_volume / fineness_ratio) ** (1.0 / 3.0)
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:height"
-            ] = (FLOOR_HEIGHT_RATIO * inputs["data:geometry:fuselage:maximum_height"])
+            ] = FLOOR_HEIGHT_RATIO * inputs["data:geometry:fuselage:maximum_height"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             ref_chord = inputs[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:ref_chord"
             ]
@@ -148,7 +137,6 @@ class SizingFuelTankHeight(om.ExplicitComponent):
             ] = ref_chord * (1.0 - THICKNESS_MARGIN_RATIO)
 
         elif position == "wing_pod":
-
             fineness_ratio = inputs[
                 "data:propulsion:he_power_train:fuel_tank:"
                 + fuel_tank_id
@@ -168,11 +156,9 @@ class SizingFuelTankHeight(om.ExplicitComponent):
                 / 3.0
                 * (tank_volume / fineness_ratio) ** (-2.0 / 3.0)
                 * tank_volume
-                / fineness_ratio ** 2.0
+                / fineness_ratio**2.0
             )
             partials[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:height",
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":volume",
-            ] = (
-                1.0 / 3.0 * (tank_volume / fineness_ratio) ** (-2.0 / 3.0) / fineness_ratio
-            )
+            ] = 1.0 / 3.0 * (tank_volume / fineness_ratio) ** (-2.0 / 3.0) / fineness_ratio

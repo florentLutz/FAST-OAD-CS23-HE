@@ -18,7 +18,6 @@ from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
 )
 class PerformancesTemperatureDynamics(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -30,7 +29,6 @@ class PerformancesTemperatureDynamics(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         harness_id = self.options["harness_id"]
 

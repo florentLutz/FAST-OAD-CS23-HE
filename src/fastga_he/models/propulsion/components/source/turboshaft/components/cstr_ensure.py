@@ -21,7 +21,6 @@ class ConstraintsRatedPowerEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="turboshaft_id",
             default=None,
@@ -30,7 +29,6 @@ class ConstraintsRatedPowerEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         self.add_input(
@@ -69,7 +67,6 @@ class ConstraintsRatedPowerEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         outputs[

@@ -13,7 +13,6 @@ from .perf_maximum import PerformancesMaximum
 
 class PerformancesDCSplitter(om.Group):
     def initialize(self):
-
         self.options.declare(
             name="dc_splitter_id",
             default=None,
@@ -31,7 +30,6 @@ class PerformancesDCSplitter(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         dc_splitter_id = self.options["dc_splitter_id"]
 

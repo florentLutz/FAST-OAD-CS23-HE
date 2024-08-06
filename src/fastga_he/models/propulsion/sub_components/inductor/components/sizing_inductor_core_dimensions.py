@@ -36,7 +36,6 @@ class SizingInductorCoreDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -61,7 +60,6 @@ class SizingInductorCoreDimensions(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         outputs[prefix + ":inductor:core_dimension:B"] = (
@@ -73,7 +71,6 @@ class SizingInductorCoreDimensions(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
         partials[

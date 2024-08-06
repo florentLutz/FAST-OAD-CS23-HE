@@ -14,7 +14,6 @@ class PerformancesDCSSPCPower(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -54,13 +53,11 @@ class PerformancesDCSSPCPower(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         voltage = np.maximum(inputs["dc_voltage_in"], inputs["dc_voltage_out"])
 
         outputs["power_flow"] = voltage * inputs["dc_current_in"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         voltage_in = inputs["dc_voltage_in"]
         voltage_out = inputs["dc_voltage_out"]
         voltage = np.maximum(voltage_in, voltage_out)

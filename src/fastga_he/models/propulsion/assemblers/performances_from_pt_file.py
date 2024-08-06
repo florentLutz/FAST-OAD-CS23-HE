@@ -49,7 +49,6 @@ class PowerTrainPerformancesFromFile(om.Group):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -92,7 +91,6 @@ class PowerTrainPerformancesFromFile(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.configurator.load(self.options["power_train_file_path"])
@@ -164,7 +162,6 @@ class PowerTrainPerformancesFromFile(om.Group):
             components_options,
             components_promotes,
         ):
-
             klass = globals()["Performances" + component_om_type]
             local_sub_sys = klass()
             local_sub_sys.options[component_name_id] = component_name
@@ -226,7 +223,6 @@ class PowerTrainPerformancesFromFile(om.Group):
     def guess_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         # We need to reinstate this check on the coherence of voltage because if we run it on its
         # own we prefer having a warning as well. Though it begs the question of pre
         # conditioning, voltage power and current here as well even if it is faster at mission

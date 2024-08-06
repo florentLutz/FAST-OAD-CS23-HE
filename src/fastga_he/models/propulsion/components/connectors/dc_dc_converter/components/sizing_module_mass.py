@@ -21,7 +21,6 @@ class SizingDCDCConverterCasingWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -45,7 +44,6 @@ class SizingDCDCConverterCasingWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         module_current_caliber = inputs[
@@ -56,10 +54,9 @@ class SizingDCDCConverterCasingWeight(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":module:mass"
-        ] = (0.175 + 4e-4 * module_current_caliber)
+        ] = 0.175 + 4e-4 * module_current_caliber
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[

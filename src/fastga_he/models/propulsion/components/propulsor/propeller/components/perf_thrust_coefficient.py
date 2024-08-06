@@ -10,7 +10,6 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
     """Computation of the thrust coefficient of the propeller."""
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -19,7 +18,6 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -51,7 +49,6 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
@@ -62,7 +59,7 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
         # want to do some energy recovery
         outputs["thrust_coefficient"] = np.maximum(
             inputs["thrust"], np.zeros_like(inputs["thrust"])
-        ) / (rho * rps ** 2.0 * diameter ** 4.0)
+        ) / (rho * rps**2.0 * diameter**4.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]
@@ -76,13 +73,11 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
             inputs["thrust"] > 0, np.ones_like(inputs["thrust"]), np.zeros_like(inputs["thrust"])
         )
 
-        partials["thrust_coefficient", "thrust"] = partial_thrust / (
-            rho * rps ** 2.0 * diameter ** 4.0
-        )
+        partials["thrust_coefficient", "thrust"] = partial_thrust / (rho * rps**2.0 * diameter**4.0)
         partials["thrust_coefficient", "rpm"] = (
             -2.0
             * np.maximum(inputs["thrust"], np.zeros_like(inputs["thrust"]))
-            / (rho * rps ** 3 * diameter ** 4.0)
+            / (rho * rps**3 * diameter**4.0)
             / 60.0
         )
         partials[
@@ -91,9 +86,9 @@ class PerformancesThrustCoefficient(om.ExplicitComponent):
         ] = (
             -4.0
             * np.maximum(inputs["thrust"], np.zeros_like(inputs["thrust"]))
-            / (rho * rps ** 2.0 * diameter ** 5.0)
+            / (rho * rps**2.0 * diameter**5.0)
         )
         partials["thrust_coefficient", "density"] = -(
             np.maximum(inputs["thrust"], np.zeros_like(inputs["thrust"]))
-            / (rho ** 2.0 * rps ** 2.0 * diameter ** 4.0)
+            / (rho**2.0 * rps**2.0 * diameter**4.0)
         )

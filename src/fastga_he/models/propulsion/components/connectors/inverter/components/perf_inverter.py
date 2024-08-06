@@ -26,7 +26,6 @@ from ..constants import SUBMODEL_INVERTER_JUNCTION_TEMPERATURE, SUBMODEL_INVERTE
 
 class PerformancesInverter(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -38,7 +37,6 @@ class PerformancesInverter(om.Group):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -117,7 +115,6 @@ class PerformancesInverterTemperature(om.Group):
             self.linear_solver = om.DirectSolver()
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -129,7 +126,6 @@ class PerformancesInverterTemperature(om.Group):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 

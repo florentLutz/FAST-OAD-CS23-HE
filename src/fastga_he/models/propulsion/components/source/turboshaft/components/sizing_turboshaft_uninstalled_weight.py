@@ -13,7 +13,6 @@ class SizingTurboshaftUninstalledWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="turboshaft_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingTurboshaftUninstalledWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         self.add_input(
@@ -42,7 +40,6 @@ class SizingTurboshaftUninstalledWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         power_rating = inputs[
@@ -56,7 +53,6 @@ class SizingTurboshaftUninstalledWeight(om.ExplicitComponent):
         ] = uninstalled_mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         partials[

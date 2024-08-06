@@ -9,7 +9,6 @@ import tabula
 
 
 def parsing_number(number_to_parse: str):
-
     number_of_number = how_many_number(number_to_parse)
     if number_of_number == 1:
         return [float(number_to_parse)]
@@ -33,7 +32,6 @@ def parsing_number(number_to_parse: str):
 
 
 def how_many_number(number_to_parse: str):
-
     split_number = number_to_parse.split(".")
     if len(split_number) == 1 or (len(split_number) == 2 and len(split_number[0]) == 1):
         return 1

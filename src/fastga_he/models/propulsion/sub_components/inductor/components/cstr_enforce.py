@@ -30,7 +30,6 @@ class ConstraintsInductorAirGapEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -52,7 +51,6 @@ class ConstraintsInductorAirGapEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         outputs[prefix + ":inductor:air_gap"] = 0.1 * inputs[prefix + ":inductor:core_dimension:C"]

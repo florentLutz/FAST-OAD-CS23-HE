@@ -8,7 +8,6 @@ from fastoad.model_base import Atmosphere
 
 class ComputeAerodynamics(om.Group):
     def setup(self):
-
         self.add_subsystem(name="compute_profile_drag", subsys=ComputeProfileDrag(), promotes=["*"])
         self.add_subsystem(
             name="compute_induced_drag", subsys=ComputeInducedDragCoefficient(), promotes=["*"]
@@ -24,7 +23,6 @@ class ComputeInducedDragCoefficient(om.ExplicitComponent):
     """
 
     def setup(self):
-
         # Defining the input(s)
 
         self.add_input(name="aspect_ratio", val=np.nan)
@@ -34,12 +32,11 @@ class ComputeInducedDragCoefficient(om.ExplicitComponent):
         self.add_output(name="induced_drag_coefficient")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # Assigning the input to local variable for clarity
         aspect_ratio = inputs["aspect_ratio"]
 
         # Computation of the Oswald efficiency factor
-        e = 1.78 * (1.0 - 0.045 * aspect_ratio ** 0.68) - 0.64
+        e = 1.78 * (1.0 - 0.045 * aspect_ratio**0.68) - 0.64
 
         # Computation of the lift induced drag coefficient
         k = 1.0 / (np.pi * aspect_ratio * e)
@@ -53,7 +50,6 @@ class ComputeProfileDrag(om.ExplicitComponent):
     """
 
     def setup(self):
-
         # Defining the input(s)
 
         self.add_input(name="wing_area", units="m**2", val=np.nan)
@@ -63,7 +59,6 @@ class ComputeProfileDrag(om.ExplicitComponent):
         self.add_output(name="profile_drag_coefficient")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # Assigning the input to local variable for clarity
         wing_area = inputs["wing_area"]
 
@@ -89,7 +84,6 @@ class ComputeLiftToDragRatio(om.ExplicitComponent):
     """
 
     def setup(self):
-
         # Defining the input(s)
 
         self.add_input(
@@ -113,7 +107,6 @@ class ComputeLiftToDragRatio(om.ExplicitComponent):
         self.add_output(name="l_d_ratio")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # Assigning the input to local variable for clarity
         cruise_altitude = inputs["cruise_altitude"]
         cruise_speed = inputs["cruise_speed"]
@@ -129,10 +122,10 @@ class ComputeLiftToDragRatio(om.ExplicitComponent):
         rho = atm.density
 
         # Computation of the cruise lift coefficient using a simple equilibrium
-        cl = (mtow * sc.g) / (0.5 * rho * cruise_speed ** 2.0 * wing_area)
+        cl = (mtow * sc.g) / (0.5 * rho * cruise_speed**2.0 * wing_area)
 
         # Computation of the cruise drag coefficient using the simple quadratic model
-        cd = cd0 + k * cl ** 2
+        cd = cd0 + k * cl**2
 
         # Computation of the ratio
         l_d = cl / cd

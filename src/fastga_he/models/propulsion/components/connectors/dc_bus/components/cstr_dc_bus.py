@@ -24,7 +24,6 @@ class ConstraintsDCBus(om.Group):
         )
 
     def setup(self):
-
         option_dc_bus_id = {"dc_bus_id": self.options["dc_bus_id"]}
 
         self.add_subsystem(

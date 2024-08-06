@@ -18,7 +18,6 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -63,7 +62,6 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         power_share = inputs["power_share"]
         dc_current_out = inputs["dc_current_out"]
         dc_voltage = inputs["dc_voltage"]
@@ -73,7 +71,6 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
         outputs["power_split"] = power_split
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         power_output = inputs["dc_voltage"] * inputs["dc_current_out"]
         power_share = inputs["power_share"]
 

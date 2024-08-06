@@ -26,7 +26,6 @@ class SizingDCBus(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_bus_id",
             default=None,

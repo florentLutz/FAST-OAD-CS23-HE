@@ -14,7 +14,6 @@ class SlipstreamPropellerThrustLoading(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -23,7 +22,6 @@ class SlipstreamPropellerThrustLoading(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -55,7 +53,6 @@ class SlipstreamPropellerThrustLoading(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         prop_dia = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
@@ -63,12 +60,11 @@ class SlipstreamPropellerThrustLoading(om.ExplicitComponent):
         tas = inputs["true_airspeed"]
         rho = inputs["density"]
 
-        thrust_loading = thrust / (rho * tas ** 2.0 * prop_dia ** 2.0)
+        thrust_loading = thrust / (rho * tas**2.0 * prop_dia**2.0)
 
         outputs["thrust_loading"] = thrust_loading
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         prop_dia = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
@@ -79,13 +75,9 @@ class SlipstreamPropellerThrustLoading(om.ExplicitComponent):
         partials[
             "thrust_loading",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-        ] = (
-            -2.0 * thrust / (rho * tas ** 2.0 * prop_dia ** 3.0)
-        )
-        partials["thrust_loading", "thrust"] = 1.0 / (rho * tas ** 2.0 * prop_dia ** 2.0)
+        ] = -2.0 * thrust / (rho * tas**2.0 * prop_dia**3.0)
+        partials["thrust_loading", "thrust"] = 1.0 / (rho * tas**2.0 * prop_dia**2.0)
         partials["thrust_loading", "true_airspeed"] = (
-            -2.0 * thrust / (rho * tas ** 3.0 * prop_dia ** 2.0)
+            -2.0 * thrust / (rho * tas**3.0 * prop_dia**2.0)
         )
-        partials["thrust_loading", "density"] = -thrust / (
-            rho ** 2.0 * tas ** 2.0 * prop_dia ** 2.0
-        )
+        partials["thrust_loading", "density"] = -thrust / (rho**2.0 * tas**2.0 * prop_dia**2.0)

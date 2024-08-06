@@ -76,7 +76,6 @@ class SizingInverterEnergyCoefficients(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -154,7 +153,6 @@ class SizingInverterEnergyCoefficients(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         a_star = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":scaling:a"]
@@ -170,15 +168,15 @@ class SizingInverterEnergyCoefficients(om.ExplicitComponent):
             a_star * self.options["a_off_ref"]
         )
 
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b"
-        ] = self.options["b_on_ref"]
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b"
-        ] = self.options["b_rr_ref"]
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b"
-        ] = self.options["b_off_ref"]
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:b"] = (
+            self.options["b_on_ref"]
+        )
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_rr:b"] = (
+            self.options["b_rr_ref"]
+        )
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_off:b"] = (
+            self.options["b_off_ref"]
+        )
 
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":energy_on:c"] = (
             c_star * self.options["c_on_ref"]
@@ -191,7 +189,6 @@ class SizingInverterEnergyCoefficients(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         partials[

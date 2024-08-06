@@ -11,9 +11,9 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_GEARBOX_TORQUE
-] = "fastga_he.submodel.propulsion.constraints.gearbox.torque.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_GEARBOX_TORQUE] = (
+    "fastga_he.submodel.propulsion.constraints.gearbox.torque.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -35,7 +35,6 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         gearbox_id = self.options["gearbox_id"]
 
         self.add_input(
@@ -59,9 +58,8 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating"
-        ] = inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_max"]
+        outputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating"] = (
+            inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_max"]
+        )

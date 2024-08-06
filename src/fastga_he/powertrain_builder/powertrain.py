@@ -65,7 +65,6 @@ class FASTGAHEPowerTrainConfigurator:
     """
 
     def __init__(self, power_train_file_path=None):
-
         self._power_train_file = None
 
         self._serializer = _YAMLSerializer()
@@ -224,7 +223,6 @@ class FASTGAHEPowerTrainConfigurator:
             return None
 
     def _get_components(self):
-
         # We will work under the assumption that is one list is empty, all are hence only one if
         # statement. This allows us to know whether or not retriggering the identification of
         # components is necessary
@@ -233,7 +231,6 @@ class FASTGAHEPowerTrainConfigurator:
             self._generate_components_list()
 
     def _generate_components_list(self):
-
         components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
 
         components_id = []
@@ -278,7 +275,6 @@ class FASTGAHEPowerTrainConfigurator:
                 component_symmetrical = component["symmetrical"]
 
                 if component_symmetrical not in components_name_list:
-
                     raise FASTGAHEImpossiblePair(
                         "Cannot pair "
                         + component_name
@@ -335,11 +331,9 @@ class FASTGAHEPowerTrainConfigurator:
             components_control_parameter.append(resources.DICTIONARY_CTRL_PARAM[component_id])
 
             if "options" in component.keys():
-
                 # SSPC is treated above, this way of doing things however makes no other option
                 # for SSPC can be set, may need to be changed
                 if component_id != "fastga_he.pt_component.dc_sspc":
-
                     components_options_list.append(component["options"])
 
                     # While we are at it, we also check that we have the right options and with the
@@ -404,7 +398,6 @@ class FASTGAHEPowerTrainConfigurator:
         openmdao_input_list = []
 
         for connection in connections_list:
-
             # Check in case the source or target is not a string but an array, meaning we are
             # dealing with a component which might have multiple inputs/outputs (bus, gearbox,
             # splitter, ...)
@@ -450,7 +443,6 @@ class FASTGAHEPowerTrainConfigurator:
                 source_id == "fastga_he.pt_component.dc_bus"
                 or source_id == "fastga_he.pt_component.dc_splitter"
             ):
-
                 # We reverse the SSPC outputs and input
                 target_outputs = resources.DICTIONARY_IN[target_id]
 
@@ -472,7 +464,6 @@ class FASTGAHEPowerTrainConfigurator:
                 or source_id == "fastga_he.pt_component.dc_splitter"
                 or source_id == "fastga_he.pt_component.dc_sspc"
             ):
-
                 # First we'll check if the option has already been set or no, just to avoid
                 # losing time
 
@@ -489,9 +480,7 @@ class FASTGAHEPowerTrainConfigurator:
                     target_outputs.append(tuple(reversed(current_output)))
 
             for system_input, system_output in zip(source_inputs, target_outputs):
-
                 if system_input[0]:
-
                     if system_input[0][-1] == "_":
                         system_input_str = system_input[0] + source_number
                     else:
@@ -506,7 +495,6 @@ class FASTGAHEPowerTrainConfigurator:
                     openmdao_output_list.append(target_name + "." + system_output_str)
 
                 else:
-
                     if system_input[1][-1] == "_":
                         system_input_str = system_input[1] + source_number
                     else:
@@ -524,14 +512,12 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_connection_inputs = openmdao_input_list
 
     def _construct_connection_graph(self):
-
         graph = nx.Graph()
 
         for component in self._components_name:
             graph.add_node(component)
 
         for connection in self._connection_list:
-
             # When the component is connected to a bus, the output number is also specified but it
             # isn't meaningful when drawing a graph, so we will just filter it
 
@@ -550,7 +536,6 @@ class FASTGAHEPowerTrainConfigurator:
         self._connection_graph = graph
 
     def get_distance_from_propulsive_load(self):
-
         propulsor_name = []
         propulsive_load_names = []
 
@@ -575,7 +560,6 @@ class FASTGAHEPowerTrainConfigurator:
 
             # This case will correspond to ICE/turbomachinery
             elif "propulsive_load" in component_type_class:
-
                 # Check whether or not at least one neighbor is a propulsor
                 neighbors = list(graph.neighbors(component_name))
                 if set(neighbors).intersection(propulsor_name):
@@ -598,7 +582,6 @@ class FASTGAHEPowerTrainConfigurator:
         connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
 
         for component_name in self._components_name:
-
             # When there are two separate sub propulsion chain in the same propulsion file,
             # these line will cause an issue because, as it will browse all propulsive load he
             # will attempt to reach loads he is not connected to and therefore not in
@@ -621,7 +604,6 @@ class FASTGAHEPowerTrainConfigurator:
         return distance_from_propulsive_load, propulsive_load_names
 
     def check_sspc_states(self, declared_state):
-
         self._construct_connection_graph()
         graph = self._connection_graph
 
@@ -830,7 +812,6 @@ class FASTGAHEPowerTrainConfigurator:
             components_promotes,
         ):
             if resources.DICTIONARY_CN_ID["fastga_he.pt_component.dc_sspc"] in component_name_id:
-
                 sspc_list_components_name.append(component_name)
                 sspc_list_components_name_id.append(component_name_id)
                 sspc_list_components_om_type.append(component_om_type)
@@ -838,7 +819,6 @@ class FASTGAHEPowerTrainConfigurator:
                 sspc_list_components_promotes.append(component_promotes)
 
             else:
-
                 other_components_name.append(component_name)
                 other_components_name_id.append(component_name_id)
                 other_components_om_type.append(component_om_type)
@@ -1021,7 +1001,6 @@ class FASTGAHEPowerTrainConfigurator:
         for component_name, components_perf_watchers in zip(
             self._components_name, self._components_perf_watchers
         ):
-
             component_perf_watchers_copy = copy.deepcopy(components_perf_watchers)
 
             # Need a more generic way to do this, here we will do it once because the battery is
@@ -1098,7 +1077,6 @@ class FASTGAHEPowerTrainConfigurator:
 
         # TODO: improve the way this is done, as I'm not satisfied with it
         for component_pair in self._components_symmetrical_pairs:
-
             if component_pair[0] in punctual_mass_names:
                 continue
 
@@ -1134,7 +1112,6 @@ class FASTGAHEPowerTrainConfigurator:
 
         # TODO: improve the way this is done, as I'm not satisfied with it
         for component_pair in self._components_symmetrical_pairs:
-
             if component_pair[0] in punctual_tank_names:
                 continue
 
@@ -1170,7 +1147,6 @@ class FASTGAHEPowerTrainConfigurator:
 
         # TODO: improve the way this is done, as I'm not satisfied with it
         for component_pair in self._components_symmetrical_pairs:
-
             if component_pair[0] in distributed_mass_names:
                 continue
 
@@ -1206,7 +1182,6 @@ class FASTGAHEPowerTrainConfigurator:
 
         # TODO: improve the way this is done, as I'm not satisfied with it
         for component_pair in self._components_symmetrical_pairs:
-
             if component_pair[0] in distributed_tanks_names:
                 continue
 
@@ -1313,7 +1288,6 @@ class FASTGAHEPowerTrainConfigurator:
             node_that_sets_voltage = []
 
             for node in nodes_list:
-
                 clean_node_name = node.replace("_in", "").replace("_out", "")
 
                 node_id = name_to_id_dict[clean_node_name]
@@ -1439,7 +1413,6 @@ class FASTGAHEPowerTrainConfigurator:
 
                 # The way we'll do it is a bit horrible but it is quick and works
                 for node in sub_graph.nodes:
-
                     component_name = node.replace("_in", "").replace("_out", "")
                     component_id = name_to_id[component_name]
 
@@ -1471,7 +1444,6 @@ class FASTGAHEPowerTrainConfigurator:
 
             nodes_list = list(sub_graph.nodes)
             for node in nodes_list:
-
                 component_name = node.replace("_in", "").replace("_out", "")
                 component_id = name_to_id[component_name]
 
@@ -1492,7 +1464,6 @@ class FASTGAHEPowerTrainConfigurator:
                     and "_out" in node
                     and not name_to_option[component_name]
                 ):
-
                     number_of_cell_in_series = self.get_number_of_cell_in_series(
                         component_name=component_name,
                         component_type=name_to_ct[component_name],
@@ -1616,14 +1587,11 @@ class FASTGAHEPowerTrainConfigurator:
         # between sspc in and sspc out if they are open (meaning no current goes through it so it
         # doesn't carry power).
         for sspc_name, sspc_default_state in self._sspc_default_state.items():
-
             # If not closed by default
             if not sspc_default_state:
-
                 undirected_graph.remove_edge(sspc_name + "_in", sspc_name + "_out")
 
         for propulsor in propulsor_list:
-
             # For each propulsor we check that its input is connected to a source output. The
             # should only be on input for each propulsor and one output for each source which allows
             # to do like this
@@ -1659,7 +1627,6 @@ class FASTGAHEPowerTrainConfigurator:
         distributor = inputs[input_name] / sum(inputs[input_name])
 
         for idx, value in enumerate(distributor):
-
             # Because we start at one :)
             output_dict["fuel_consumed_in_t_" + str(idx + 1)] = value * power_output
 
@@ -1701,7 +1668,6 @@ class FASTGAHEPowerTrainConfigurator:
             secondary_output = (100.0 - power_split) * power_output / 100.0
 
         else:
-
             input_name = (
                 "data:propulsion:he_power_train:DC_splitter:" + components_name + ":power_share"
             )
@@ -1750,7 +1716,6 @@ class FASTGAHEPowerTrainConfigurator:
             secondary_output = (100.0 - power_split) * power_output / 100.0
 
         else:
-
             input_name = (
                 "data:propulsion:he_power_train:planetary_gear:" + components_name + ":power_share"
             )
@@ -1764,7 +1729,6 @@ class FASTGAHEPowerTrainConfigurator:
         return primary_input, secondary_output
 
     def get_power_to_set(self, inputs, propulsive_power_dict: dict) -> Tuple[dict, dict]:
-
         """
         Returns a list of the power at each nodes of each subgraph. Also returns a list of the
         dict of current variable names and the value they should be set at for each of the
@@ -1821,11 +1785,9 @@ class FASTGAHEPowerTrainConfigurator:
         previous_treated_node_number = 1
 
         while len(untreated_nodes) != 0 and previous_treated_node_number != 0:
-
             previous_treated_node_number = 0
 
             for node in untreated_nodes:
-
                 # First check that we can treat the node. If we can't we move to the next node.
                 # A node can be treated if all its predecessor were treated
                 can_be_treated = True
@@ -1851,14 +1813,12 @@ class FASTGAHEPowerTrainConfigurator:
                 # we include the efficiency or its the output of a component connected to the
                 # input of another one.
                 if len(list(graph.pred[node])) == 1:
-
                     predecessor = list(graph.pred[node])[0]
                     if predecessor.endswith("_1"):
                         predecessor = predecessor.replace("_1", "")
                     predecessor_name = predecessor.replace("_out", "").replace("_in", "")
 
                     if len(list(graph.succ[predecessor])) == 1:
-
                         # To get the component name, we remove the "_in" the "_out" and the "_1".
                         # We should only have to remove the "_1" as we are ensure that there is
                         # only one predecessor it must be a "_1"
@@ -1879,19 +1839,16 @@ class FASTGAHEPowerTrainConfigurator:
                 # 2) If it only has one predecessor and that predecessor only more than successor it
                 # means its a component that splits_power (either planetary gear, splitter, ...).
                 if len(list(graph.pred[node])) == 1:
-
                     predecessor = list(graph.pred[node])[0]
                     if predecessor.endswith("_1"):
                         predecessor = predecessor.replace("_1", "")
                     predecessor_name = predecessor.replace("_out", "").replace("_in", "")
 
                     if len(list(graph.succ[predecessor])) > 1:
-
                         # Check the predecessor type
                         predecessor_type = name_to_id[predecessor_name]
 
                         if predecessor_type == "fastga_he.pt_component.dc_splitter":
-
                             (
                                 primary_input_power,
                                 secondary_power_output,
@@ -1925,7 +1882,6 @@ class FASTGAHEPowerTrainConfigurator:
                                 node_to_remove_at_the_end.append(predecessor)
 
                         elif predecessor_type == "fastga_he.pt_component.planetary_gear":
-
                             (
                                 primary_input_power,
                                 secondary_power_output,
@@ -1956,7 +1912,6 @@ class FASTGAHEPowerTrainConfigurator:
                                 node_to_remove_at_the_end.append(predecessor)
 
                         elif predecessor_type == "fastga_he.pt_component.fuel_system":
-
                             input_power_dict = self.fuel_system_power_inputs(
                                 inputs=inputs,
                                 components_name=predecessor_name,
@@ -1985,7 +1940,6 @@ class FASTGAHEPowerTrainConfigurator:
                 # system/gear. In this case we simply sum all the predecessor. We should be able
                 # to do so since we ensured to get there that all predecessor were already treated
                 if len(list(graph.pred[node])) > 1:
-
                     power = np.zeros_like(template_power)
                     for current_predecessor in graph.pred[node]:
                         power += power_at_each_node[current_predecessor]
@@ -2099,7 +2053,6 @@ class FASTGAHEPowerTrainConfigurator:
         cured_connection_list = copy.deepcopy(self._connection_list)
 
         for connection in self._connection_list:
-
             if type(connection["source"]) is str:
                 if connection["source"] not in retained_components:
                     cured_connection_list.remove(connection)
@@ -2173,7 +2126,6 @@ class FASTGAHEPowerTrainConfigurator:
         all_current_dict = {}
 
         for node in all_power_dict:
-
             # first a quick check on whether the component is a splitter or not. Since we are
             # iterating on the nodes in the power dictionary, if a components ends with either
             # "_in_1" or "_in_2" it is a splitter

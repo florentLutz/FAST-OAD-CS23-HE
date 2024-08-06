@@ -16,12 +16,11 @@ TWIST = 40  # 40, 35, 30, 25, 20, 15
 
 
 def cp_from_ct(j, tip_mach, re_d, solidity, ct, activity_factor, twist_blade):
-
     # Careful, new definition of the tip mach which should now be computed using the absolute
     # speed on the blades
 
     cp = (
-        10 ** 2.31538
+        10**2.31538
         * j
         ** (
             +0.05414 * np.log10(re_d)
@@ -116,9 +115,9 @@ if __name__ == "__main__":
     chord_array = (
         np.interp(radius_ratio, radius_ratio_chord, chord_to_diameter_ratio) * prop_diameter
     )
-    solidity_naca = n_blades / np.pi / radius_max ** 2.0 * np.sum(chord_array * element_length)
+    solidity_naca = n_blades / np.pi / radius_max**2.0 * np.sum(chord_array * element_length)
     activity_factor_naca = (
-        100000 / 32 / radius_max ** 5.0 * np.sum(chord_array * radius ** 3.0 * element_length)
+        100000 / 32 / radius_max**5.0 * np.sum(chord_array * radius**3.0 * element_length)
     )
     twist_blade_naca = 22.64504769 * np.pi / 180.0
 
@@ -553,8 +552,8 @@ if __name__ == "__main__":
     for idx, (j_loop, ct_loop) in enumerate(zip(j_list, ct_list)):
         cp_list[idx] = cp_from_ct(
             j_loop,
-            (j_loop ** 2.0 + np.pi ** 2.0) * (rpm / 60 * 3.048) ** 2.0 / atm.speed_of_sound ** 2.0,
-            np.sqrt((j_loop ** 2.0 + np.pi ** 2.0) * (rpm / 60 * 3.048) ** 2.0)
+            (j_loop**2.0 + np.pi**2.0) * (rpm / 60 * 3.048) ** 2.0 / atm.speed_of_sound**2.0,
+            np.sqrt((j_loop**2.0 + np.pi**2.0) * (rpm / 60 * 3.048) ** 2.0)
             * 3.048
             / atm.kinematic_viscosity,
             solidity_naca,

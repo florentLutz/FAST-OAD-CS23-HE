@@ -27,7 +27,6 @@ class SizingSpeedReducerDimensionScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         self.add_input(
@@ -49,7 +48,6 @@ class SizingSpeedReducerDimensionScaling(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         torque_ref = self.options["torque_out_ref"]
@@ -67,7 +65,6 @@ class SizingSpeedReducerDimensionScaling(om.ExplicitComponent):
         ] = (torque_rating / torque_ref) ** (1.0 / 3.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
         torque_ref = self.options["torque_out_ref"]
 
@@ -84,6 +81,4 @@ class SizingSpeedReducerDimensionScaling(om.ExplicitComponent):
             "data:propulsion:he_power_train:speed_reducer:"
             + speed_reducer_id
             + ":torque_out_rating",
-        ] = (
-            1.0 / 3.0 * torque_rating ** (-2.0 / 3.0) / torque_ref ** (1.0 / 3.0)
-        )
+        ] = 1.0 / 3.0 * torque_rating ** (-2.0 / 3.0) / torque_ref ** (1.0 / 3.0)

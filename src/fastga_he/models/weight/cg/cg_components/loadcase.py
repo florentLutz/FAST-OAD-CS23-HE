@@ -10,9 +10,9 @@ import fastoad.api as oad
 from fastga.models.weight.cg.cg_components.constants import SUBMODEL_LOADCASE_FLIGHT_X
 
 # For retro-compatibility reasons, we want the legacy submodel as default
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_LOADCASE_FLIGHT_X
-] = "fastga.submodel.weight.cg.loadcase.flight.legacy"
+oad.RegisterSubmodel.active_models[SUBMODEL_LOADCASE_FLIGHT_X] = (
+    "fastga.submodel.weight.cg.loadcase.flight.legacy"
+)
 
 
 @oad.RegisterSubmodel(
@@ -22,12 +22,10 @@ class ComputeFlightCGCase(om.ExplicitComponent):
     """Center of gravity estimation for all load cases in flight"""
 
     def initialize(self):
-
         # Not used but required for compatibility reasons
         self.options.declare("propulsion_id", default="", types=str)
 
     def setup(self):
-
         self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
         self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
         self.add_input("data:weight:aircraft_empty:CG:x", val=np.nan, units="m")
@@ -69,7 +67,6 @@ class ComputeFlightCGCase(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
         l0_wing = inputs["data:geometry:wing:MAC:length"]
         cg_aircraft_empty = inputs["data:weight:aircraft_empty:CG:x"]
@@ -87,7 +84,6 @@ class ComputeFlightCGCase(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
         l0_wing = inputs["data:geometry:wing:MAC:length"]
         cg_aircraft_empty = inputs["data:weight:aircraft_empty:CG:x"]
@@ -95,21 +91,15 @@ class ComputeFlightCGCase(om.ExplicitComponent):
         partials[
             "data:weight:aircraft:CG:flight_condition:min:MAC_position",
             "data:geometry:wing:MAC:at25percent:x",
-        ] = (
-            -1.0 / l0_wing
-        )
+        ] = -1.0 / l0_wing
         partials[
             "data:weight:aircraft:CG:flight_condition:min:MAC_position",
             "data:geometry:wing:MAC:length",
-        ] = (
-            -(cg_aircraft_empty - fa_length) / l0_wing ** 2.0
-        )
+        ] = -(cg_aircraft_empty - fa_length) / l0_wing**2.0
         partials[
             "data:weight:aircraft:CG:flight_condition:min:MAC_position",
             "data:weight:aircraft_empty:CG:x",
-        ] = (
-            1.0 / l0_wing
-        )
+        ] = 1.0 / l0_wing
         partials[
             "data:weight:aircraft:CG:flight_condition:min:MAC_position",
             "data:weight:aircraft:CG:fwd:MAC_limit",
@@ -118,21 +108,15 @@ class ComputeFlightCGCase(om.ExplicitComponent):
         partials[
             "data:weight:aircraft:CG:flight_condition:max:MAC_position",
             "data:geometry:wing:MAC:at25percent:x",
-        ] = (
-            -1.0 / l0_wing
-        )
+        ] = -1.0 / l0_wing
         partials[
             "data:weight:aircraft:CG:flight_condition:max:MAC_position",
             "data:geometry:wing:MAC:length",
-        ] = (
-            -(cg_aircraft_empty - fa_length) / l0_wing ** 2.0
-        )
+        ] = -(cg_aircraft_empty - fa_length) / l0_wing**2.0
         partials[
             "data:weight:aircraft:CG:flight_condition:max:MAC_position",
             "data:weight:aircraft_empty:CG:x",
-        ] = (
-            1.0 / l0_wing
-        )
+        ] = 1.0 / l0_wing
         partials[
             "data:weight:aircraft:CG:flight_condition:max:MAC_position",
             "data:weight:aircraft:CG:aft:MAC_limit",

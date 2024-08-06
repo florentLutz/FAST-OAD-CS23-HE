@@ -9,7 +9,6 @@ from fastoad.openmdao.variables import VariableList
 
 
 def write_outputs(file_path: str, problem: om.Problem):
-
     writer = VariableIO(file_path)
     variables = VariableList.from_problem(problem, promoted_only=True)
     writer.write(variables)

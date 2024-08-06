@@ -21,7 +21,6 @@ class SizingTurboshaftWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         self.add_input(
@@ -45,7 +44,6 @@ class SizingTurboshaftWeight(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         # We take 1.2 for the installed mass as now, the propeller weight is properly computed as

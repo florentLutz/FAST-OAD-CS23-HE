@@ -59,7 +59,6 @@ class SystemsWeight(om.Group):
 
 class SystemsWeightSum(om.ExplicitComponent):
     def setup(self):
-
         self.add_input("data:weight:systems:power:electric_systems:mass", val=np.nan, units="kg")
         self.add_input("data:weight:systems:power:hydraulic_systems:mass", val=np.nan, units="kg")
         self.add_input(
@@ -87,5 +86,4 @@ class SystemsWeightSum(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["data:weight:systems:mass"] = np.sum(inputs.values())

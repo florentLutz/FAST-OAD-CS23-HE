@@ -13,7 +13,6 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -25,7 +24,6 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -60,7 +58,6 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         volume = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume"]
@@ -73,7 +70,6 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
         outputs["mean_effective_pressure"] = mep * 1e-5
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         ice_id = self.options["ice_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -84,15 +80,11 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
         partials[
             "mean_effective_pressure",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume",
-        ] = (
-            -(2.0 * np.pi * strokes_nb * torque_out / volume ** 2.0) * 1e-5
-        )
+        ] = -(2.0 * np.pi * strokes_nb * torque_out / volume**2.0) * 1e-5
         partials[
             "mean_effective_pressure",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":strokes_number",
-        ] = (
-            2.0 * np.pi * torque_out / volume * 1e-5
-        )
+        ] = 2.0 * np.pi * torque_out / volume * 1e-5
         partials["mean_effective_pressure", "torque_out"] = (
             np.ones(number_of_points) * 2.0 * np.pi * strokes_nb / volume * 1e-5
         )

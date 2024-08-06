@@ -25,7 +25,6 @@ class PowerTrainPunctualLoadsFromFile(om.ExplicitComponent):
         self.curated_type_list = None
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -34,7 +33,6 @@ class PowerTrainPunctualLoadsFromFile(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         # First we get the list of punctual masses and the pairs
@@ -71,7 +69,6 @@ class PowerTrainPunctualLoadsFromFile(om.ExplicitComponent):
         for punctual_mass_name, punctual_mass_type in zip(
             wing_punctual_mass_list, wing_punctual_mass_type_list
         ):
-
             y_ratio_name = (
                 PT_DATA_PREFIX + punctual_mass_type + ":" + punctual_mass_name + ":CG:y_ratio"
             )
@@ -90,7 +87,6 @@ class PowerTrainPunctualLoadsFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         punctual_masses_y_ratio = []
         punctual_masses_masses = []
 
@@ -109,7 +105,6 @@ class PowerTrainPunctualLoadsFromFile(om.ExplicitComponent):
         outputs["data:weight:airframe:wing:punctual_mass:mass"] = punctual_masses_masses
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         name_and_type_array = np.rec.fromarrays([self.curated_name_list, self.curated_type_list])
         nb_punctual_masses = len(self.curated_name_list)
 
@@ -125,7 +120,7 @@ class PowerTrainPunctualLoadsFromFile(om.ExplicitComponent):
             partials_value = np.zeros(nb_punctual_masses)
             partials_value[idx] = 1.0
 
-            partials[
-                "data:weight:airframe:wing:punctual_mass:y_ratio", y_ratio_name
-            ] = partials_value
+            partials["data:weight:airframe:wing:punctual_mass:y_ratio", y_ratio_name] = (
+                partials_value
+            )
             partials["data:weight:airframe:wing:punctual_mass:mass", mass_name] = partials_value

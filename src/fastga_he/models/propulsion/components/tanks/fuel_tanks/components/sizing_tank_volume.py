@@ -25,7 +25,6 @@ class SizingFuelTankVolume(om.ExplicitComponent):
         self.rho_fuel = None
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -34,7 +33,6 @@ class SizingFuelTankVolume(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         self.add_input(
@@ -63,7 +61,6 @@ class SizingFuelTankVolume(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         fuel_mass = inputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity"]
@@ -86,12 +83,9 @@ class SizingFuelTankVolume(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         partials[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":volume",
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity",
-        ] = (
-            1.0 / self.rho_fuel
-        )
+        ] = 1.0 / self.rho_fuel

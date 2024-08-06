@@ -20,7 +20,6 @@ class PerformancesFuelInput(om.ExplicitComponent):
         self.fuel_distribution = None
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_system_id",
             default=None,
@@ -40,7 +39,6 @@ class PerformancesFuelInput(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         fuel_system_id = self.options["fuel_system_id"]
         number_of_tanks = self.options["number_of_tanks"]
@@ -58,7 +56,6 @@ class PerformancesFuelInput(om.ExplicitComponent):
         )
 
         for i in range(number_of_tanks):
-
             self.add_output(
                 name="fuel_consumed_in_t_" + str(i + 1),
                 units="kg",
@@ -83,7 +80,6 @@ class PerformancesFuelInput(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_system_id = self.options["fuel_system_id"]
         number_of_tanks = self.options["number_of_tanks"]
 
@@ -104,7 +100,6 @@ class PerformancesFuelInput(om.ExplicitComponent):
             outputs["fuel_consumed_in_t_" + str(i + 1)] = fuel_flow * self.fuel_distribution[i]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_system_id = self.options["fuel_system_id"]
         number_of_tanks = self.options["number_of_tanks"]
         number_of_points = self.options["number_of_points"]
@@ -119,7 +114,6 @@ class PerformancesFuelInput(om.ExplicitComponent):
         )
 
         for i in range(number_of_tanks):
-
             partials["fuel_consumed_in_t_" + str(i + 1), "fuel_flowing_t"] = self.fuel_distribution[
                 i
             ] * np.ones(number_of_points)

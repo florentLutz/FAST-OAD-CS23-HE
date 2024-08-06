@@ -8,13 +8,11 @@ import openmdao.api as om
 
 class PerformancesTemperatureIncrease(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -43,7 +41,6 @@ class PerformancesTemperatureIncrease(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cable_temperature_increase = (
             inputs["cable_temperature_time_derivative"] * inputs["time_step"]
         )
@@ -51,7 +48,6 @@ class PerformancesTemperatureIncrease(om.ExplicitComponent):
         outputs["cable_temperature_increase"] = cable_temperature_increase
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["cable_temperature_increase", "cable_temperature_time_derivative"] = inputs[
             "time_step"
         ]

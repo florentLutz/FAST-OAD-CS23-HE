@@ -40,7 +40,6 @@ IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def test_advanced_cl():
-
     xml_file = "pipistrel_like.xml"
 
     inputs_list = list_inputs(
@@ -88,16 +87,15 @@ def test_advanced_cl():
 
 
 def test_advanced_cl_with_proper_submodels():
-
     xml_file = "pipistrel_like.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
-    oad.RegisterSubmodel.active_models[
-        "submodel.performances_he.energy_consumption"
-    ] = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    oad.RegisterSubmodel.active_models[
-        "submodel.performances_he.dep_effect"
-    ] = "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
+        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+    )
+    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
+        "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    )
 
     inputs_list = list_inputs(
         UpdateWingAreaLiftDEPEquilibrium(
@@ -153,7 +151,6 @@ def test_advanced_cl_with_proper_submodels():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_inspect_octo_propulsion():
-
     propulsion_file = pth.join(DATA_FOLDER_PATH, "octo_assembly.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "octo_assembly.html")
 
@@ -162,16 +159,15 @@ def test_inspect_octo_propulsion():
 
 
 def test_advanced_cl_octo_propulsion():
-
     xml_file = "octo_assembly.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "octo_assembly.yml")
 
-    oad.RegisterSubmodel.active_models[
-        "submodel.performances_he.energy_consumption"
-    ] = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    oad.RegisterSubmodel.active_models[
-        "submodel.performances_he.dep_effect"
-    ] = "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
+        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+    )
+    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
+        "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    )
 
     inputs_list = list_inputs(
         UpdateWingAreaLiftDEPEquilibrium(
@@ -226,16 +222,15 @@ def test_advanced_cl_octo_propulsion():
 
 
 def test_advanced_cl_group():
-
     xml_file = "pipistrel_like.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
-    oad.RegisterSubmodel.active_models[
-        "submodel.performances_he.energy_consumption"
-    ] = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    oad.RegisterSubmodel.active_models[
-        "submodel.performances_he.dep_effect"
-    ] = "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
+        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+    )
+    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
+        "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    )
 
     inputs_list = list_inputs(
         UpdateWingAreaGroupDEP(
@@ -267,7 +262,6 @@ def test_advanced_cl_group():
 
 
 def test_advanced_cl_group_from_yml():
-
     # Define used files depending on options
     xml_file_name = "pipistrel_like.xml"
     process_file_name = "update_wing_area.yml"

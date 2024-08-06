@@ -79,7 +79,6 @@ class SizingDCDCConverterEnergyCoefficients(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -189,7 +188,6 @@ class SizingDCDCConverterEnergyCoefficients(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         a_star = inputs[
@@ -201,13 +199,13 @@ class SizingDCDCConverterEnergyCoefficients(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_on:a"
-        ] = (a_star * self.options["a_on_ref"])
+        ] = a_star * self.options["a_on_ref"]
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_rr:a"
-        ] = (a_star * self.options["a_rr_ref"])
+        ] = a_star * self.options["a_rr_ref"]
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_off:a"
-        ] = (a_star * self.options["a_off_ref"])
+        ] = a_star * self.options["a_off_ref"]
 
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_on:b"
@@ -221,16 +219,15 @@ class SizingDCDCConverterEnergyCoefficients(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_on:c"
-        ] = (c_star * self.options["c_on_ref"])
+        ] = c_star * self.options["c_on_ref"]
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_rr:c"
-        ] = (c_star * self.options["c_rr_ref"])
+        ] = c_star * self.options["c_rr_ref"]
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_off:c"
-        ] = (c_star * self.options["c_off_ref"])
+        ] = c_star * self.options["c_off_ref"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[

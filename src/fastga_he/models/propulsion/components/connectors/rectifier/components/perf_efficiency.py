@@ -9,9 +9,9 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_RECTIFIER_EFFICIENCY
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_RECTIFIER_EFFICIENCY
-] = "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
+oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
+    "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
+)
 
 
 @oad.RegisterSubmodel(
@@ -21,7 +21,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
     """Computation of the efficiency of the rectifier."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -33,7 +32,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -66,7 +64,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_current_out = inputs["dc_current_out"]
         dc_voltage_out = inputs["dc_voltage_out"]
         losses_rectifier = inputs["losses_rectifier"]
@@ -78,7 +75,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         outputs["efficiency"] = eta
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_current_out = inputs["dc_current_out"]
         dc_voltage_out = inputs["dc_voltage_out"]
         losses_rectifier = inputs["losses_rectifier"]

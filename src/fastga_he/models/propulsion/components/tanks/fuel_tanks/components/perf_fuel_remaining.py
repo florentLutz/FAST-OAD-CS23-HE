@@ -12,7 +12,6 @@ class PerformancesFuelRemainingMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -24,7 +23,6 @@ class PerformancesFuelRemainingMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -73,7 +71,6 @@ class PerformancesFuelRemainingMission(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         number_of_points = self.options["number_of_points"]
 

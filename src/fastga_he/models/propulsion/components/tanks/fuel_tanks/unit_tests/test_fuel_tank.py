@@ -37,7 +37,6 @@ NB_POINTS_TEST = 10
 
 
 def test_unusable_fuel_mission():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingFuelTankUnusableFuel(fuel_tank_id="fuel_tank_1")),
@@ -58,7 +57,6 @@ def test_unusable_fuel_mission():
 
 
 def test_total_fuel_mission():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingFuelTankTotalFuelMission(fuel_tank_id="fuel_tank_1")),
@@ -79,7 +77,6 @@ def test_total_fuel_mission():
 
 
 def test_volume_fuel_tank():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingFuelTankVolume(fuel_tank_id="fuel_tank_1")),
@@ -100,7 +97,6 @@ def test_volume_fuel_tank():
 
 
 def test_tank_cg_x():
-
     expected_values = [2.88, 2.88, 1.24]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -124,7 +120,6 @@ def test_tank_cg_x():
 
 
 def test_tank_cg_y():
-
     expected_values = [1.85, 1.85, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -148,7 +143,6 @@ def test_tank_cg_y():
 
 
 def test_tank_length():
-
     expected_values = [0.467, 2.68, 1.477]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -169,19 +163,15 @@ def test_tank_length():
         ) == pytest.approx(expected_value, rel=1e-2)
 
         if option == "inside_the_wing":
-            assert (
-                problem.get_val(
-                    "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:dimension:ref_chord",
-                    units="m",
-                )
-                == pytest.approx(0.9346, rel=1e-2)
-            )
+            assert problem.get_val(
+                "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:dimension:ref_chord",
+                units="m",
+            ) == pytest.approx(0.9346, rel=1e-2)
 
         problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_tank_height():
-
     expected_values = [0.127, 0.383, 0.133]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -205,7 +195,6 @@ def test_tank_height():
 
 
 def test_tank_width():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingFuelTankWidth(fuel_tank_id="fuel_tank_1")),
         __file__,
@@ -225,7 +214,6 @@ def test_tank_width():
 
 
 def test_fuel_tank_weight():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingFuelTankWeight(fuel_tank_id="fuel_tank_1")),
@@ -246,7 +234,6 @@ def test_fuel_tank_weight():
 
 
 def test_fuel_tank_drag():
-
     expected_ls_drag = [0.0, 0.00421, 0.0]
     expected_cruise_drag = [0.0, 0.00421, 0.0]
 
@@ -274,25 +261,18 @@ def test_fuel_tank_drag():
             )
 
             if ls_option:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:low_speed:CD0",
-                    )
-                    == pytest.approx(ls_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:low_speed:CD0",
+                ) == pytest.approx(ls_drag, rel=1e-2)
             else:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:cruise:CD0",
-                    )
-                    == pytest.approx(cruise_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:cruise:CD0",
+                ) == pytest.approx(cruise_drag, rel=1e-2)
 
             problem.check_partials(compact_print=True)
 
 
 def test_fuel_tank_preparation_for_loads():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -310,36 +290,23 @@ def test_fuel_tank_preparation_for_loads():
         ivc,
     )
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:y_ratio_start",
-        )
-        == pytest.approx(0.075, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:y_ratio_end",
-        )
-        == pytest.approx(0.725, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:chord_slope",
-        )
-        == pytest.approx(0.0, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:start_chord",
-        )
-        == pytest.approx(0.767, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:y_ratio_start",
+    ) == pytest.approx(0.075, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:y_ratio_end",
+    ) == pytest.approx(0.725, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:chord_slope",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:distributed_tanks:start_chord",
+    ) == pytest.approx(0.767, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_sizing_tank():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingFuelTank(fuel_tank_id="fuel_tank_1")),
@@ -366,7 +333,6 @@ def test_sizing_tank():
 
 
 def test_constraints_enforce_tank_capacity():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsFuelTankCapacityEnforce(fuel_tank_id="fuel_tank_1")),
@@ -387,7 +353,6 @@ def test_constraints_enforce_tank_capacity():
 
 
 def test_constraints_ensure_tank_capacity():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsFuelTankCapacityEnsure(fuel_tank_id="fuel_tank_1")),
@@ -408,7 +373,6 @@ def test_constraints_ensure_tank_capacity():
 
 
 def test_fuel_consumed_mission():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST))
@@ -429,7 +393,6 @@ def test_fuel_consumed_mission():
 
 
 def test_fuel_remaining_mission():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -457,7 +420,6 @@ def test_fuel_remaining_mission():
 
 
 def test_performances_fuel_tank():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST))

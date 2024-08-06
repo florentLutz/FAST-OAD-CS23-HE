@@ -17,7 +17,6 @@ class PerformancesLosses(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="generator_id", default=None, desc="Identifier of the generator", allow_none=False
         )
@@ -26,7 +25,6 @@ class PerformancesLosses(om.ExplicitComponent):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -83,7 +81,6 @@ class PerformancesLosses(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
         torque = inputs["torque_in"]
@@ -101,12 +98,11 @@ class PerformancesLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:generator:" + generator_id + ":loss_coefficient:gamma"
         ]
 
-        power_losses = alpha * torque ** 2.0 + beta * omega + gamma * omega ** 2.0
+        power_losses = alpha * torque**2.0 + beta * omega + gamma * omega**2.0
 
         outputs["power_losses"] = power_losses
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         generator_id = self.options["generator_id"]
 
         torque = inputs["torque_in"]
@@ -129,9 +125,7 @@ class PerformancesLosses(om.ExplicitComponent):
         partials[
             "power_losses",
             "data:propulsion:he_power_train:generator:" + generator_id + ":loss_coefficient:alpha",
-        ] = (
-            torque ** 2.0
-        )
+        ] = torque**2.0
         partials[
             "power_losses",
             "data:propulsion:he_power_train:generator:" + generator_id + ":loss_coefficient:beta",
@@ -139,6 +133,4 @@ class PerformancesLosses(om.ExplicitComponent):
         partials[
             "power_losses",
             "data:propulsion:he_power_train:generator:" + generator_id + ":loss_coefficient:gamma",
-        ] = (
-            omega ** 2.0
-        )
+        ] = omega**2.0

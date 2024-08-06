@@ -6,7 +6,6 @@ import pandas as pd
 import plotly.graph_objects as go
 
 if __name__ == "__main__":
-
     turboshaft_rated_power = 321.0
     gearbox_efficiency = 0.98
 

@@ -12,21 +12,20 @@ import plotly.graph_objects as go
 
 
 def discharge_curve_func(dod, current):
-
     open_circuit_voltage = (
-        -9.65121262e-10 * dod ** 5.0
-        + 1.81419058e-07 * dod ** 4.0
-        - 1.11814100e-05 * dod ** 3.0
-        + 2.26114438e-04 * dod ** 2.0
+        -9.65121262e-10 * dod**5.0
+        + 1.81419058e-07 * dod**4.0
+        - 1.11814100e-05 * dod**3.0
+        + 2.26114438e-04 * dod**2.0
         - 8.54619953e-03 * dod
         + 4.12
     )
     # We'll correct by putting a 4.2 since its the value in datasheet
     internal_resistance = (
-        2.62771800e-11 * dod ** 5.0
-        - 1.48987233e-08 * dod ** 4.0
-        + 2.03615618e-06 * dod ** 3.0
-        - 1.06451730e-04 * dod ** 2.0
+        2.62771800e-11 * dod**5.0
+        - 1.48987233e-08 * dod**4.0
+        + 2.03615618e-06 * dod**3.0
+        - 1.06451730e-04 * dod**2.0
         + 2.13818712e-03 * dod
         + 3.90444549e-02
     )
@@ -34,26 +33,22 @@ def discharge_curve_func(dod, current):
 
 
 def ocv_function_curve_fit(dod, p_1, alpha_1, p_2, alpha_2, p_3):
-
-    return p_1 * np.exp(alpha_1 * dod) + p_2 * np.exp(alpha_2 * dod) + p_3 * dod ** 2.0
+    return p_1 * np.exp(alpha_1 * dod) + p_2 * np.exp(alpha_2 * dod) + p_3 * dod**2.0
 
 
 def ocv_function(dod):
-
     return (
         94.94621784 * np.exp(-0.00177769 * dod)
         - 90.81194028 * np.exp(-0.00177768 * dod)
-        - 0.00002179 * dod ** 2.0
+        - 0.00002179 * dod**2.0
     )
 
 
 def internal_resistance_function(parameter, p_1, p_2, p_3, constant):
-
-    return constant + p_1 * parameter + p_2 * parameter ** 2.0 + p_3 * parameter ** 3.0
+    return constant + p_1 * parameter + p_2 * parameter**2.0 + p_3 * parameter**3.0
 
 
 if __name__ == "__main__":
-
     # source = "data/discharge_curve_new.csv"
     source = "data/discharge_curve_new_new.csv"
 

@@ -26,7 +26,6 @@ class SizingMotorLengthScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -55,7 +54,6 @@ class SizingMotorLengthScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         torque_cont_ref = self.options["torque_cont_ref"]
@@ -65,12 +63,11 @@ class SizingMotorLengthScaling(om.ExplicitComponent):
 
         torque_scaling = torque_cont / torque_cont_ref
 
-        l_scaling = torque_scaling * d_scaling ** -2.5
+        l_scaling = torque_scaling * d_scaling**-2.5
 
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length"] = l_scaling
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         torque_cont_ref = self.options["torque_cont_ref"]
@@ -83,12 +80,8 @@ class SizingMotorLengthScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating",
-        ] = (
-            1.0 / torque_cont_ref * d_scaling ** -2.5
-        )
+        ] = 1.0 / torque_cont_ref * d_scaling**-2.5
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter",
-        ] = (
-            -2.5 * torque_scaling * d_scaling ** -3.5
-        )
+        ] = -2.5 * torque_scaling * d_scaling**-3.5

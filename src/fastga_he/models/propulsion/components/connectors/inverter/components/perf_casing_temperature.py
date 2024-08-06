@@ -21,7 +21,6 @@ class PerformancesCasingTemperature(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -34,7 +33,6 @@ class PerformancesCasingTemperature(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -93,7 +91,6 @@ class PerformancesCasingTemperature(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
         temp_hs = inputs["heat_sink_temperature"]
         r_th_js = inputs[
@@ -107,7 +104,6 @@ class PerformancesCasingTemperature(om.ExplicitComponent):
         outputs["casing_temperature"] = temp_hs + losses_one_module * r_th_js
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 

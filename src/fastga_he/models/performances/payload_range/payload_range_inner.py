@@ -47,15 +47,14 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
         )
 
     def setup(self):
-
         # I'm not really happy with doing it here, but for that model to work we need to ensure
         # those submodels are active
-        oad.RegisterSubmodel.active_models[
-            HE_SUBMODEL_ENERGY_CONSUMPTION
-        ] = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-        oad.RegisterSubmodel.active_models[
-            HE_SUBMODEL_DEP_EFFECT
-        ] = "fastga_he.submodel.performances.dep_effect.from_pt_file"
+        oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
+            "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+        )
+        oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = (
+            "fastga_he.submodel.performances.dep_effect.from_pt_file"
+        )
 
         self.configurator.load(self.options["power_train_file_path"])
 
@@ -141,7 +140,6 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inner_payload_array = inputs["data:mission:inner_payload_range:payload"]
         inner_range_array = inputs["data:mission:inner_payload_range:range"]
 
@@ -194,14 +192,12 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
         self.cached_problem.setup()
 
         for idx, range_value in enumerate(inner_range_array):
-
             if self.is_in_payload_range_envelope(
                 payload_envelope=outer_payload_array,
                 range_envelope=outer_range_array,
                 payload_point=inner_payload_array[idx],
                 range_point=range_value,
             ):
-
                 self.cached_problem.set_val(
                     "data:mission:operational:payload:mass",
                     inner_payload_array[idx],
@@ -234,7 +230,6 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
                 inner_emission_factor_array[idx] = emission_factor_that_mission
 
             else:
-
                 inner_fuel_array[idx] = INVALID_COMPUTATION_RESULT
                 inner_energy_array[idx] = INVALID_COMPUTATION_RESULT
                 inner_emissions_array[idx] = INVALID_COMPUTATION_RESULT

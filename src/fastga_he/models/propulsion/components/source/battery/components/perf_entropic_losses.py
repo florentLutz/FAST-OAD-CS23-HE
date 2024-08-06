@@ -41,7 +41,6 @@ class PerformancesCellEntropicLosses(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["entropic_losses_cell"] = (
             -inputs["current_one_module"]
             * inputs["cell_temperature"]
@@ -49,7 +48,6 @@ class PerformancesCellEntropicLosses(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["entropic_losses_cell", "current_one_module"] = -(
             inputs["cell_temperature"] * inputs["entropic_heat_coefficient"]
         )

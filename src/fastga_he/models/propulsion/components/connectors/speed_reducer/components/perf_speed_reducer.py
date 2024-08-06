@@ -25,7 +25,6 @@ class PerformancesSpeedReducer(om.Group):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
         number_of_points = self.options["number_of_points"]
 

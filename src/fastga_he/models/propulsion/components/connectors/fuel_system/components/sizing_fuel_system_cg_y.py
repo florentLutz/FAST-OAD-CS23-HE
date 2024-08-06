@@ -15,7 +15,6 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_system_id",
             default=None,
@@ -33,7 +32,6 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         fuel_system_id = self.options["fuel_system_id"]
 
@@ -48,7 +46,6 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
         )
 
         if position == "in_the_wing":
-
             self.add_input(
                 "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y_ratio",
                 val=np.nan,
@@ -58,12 +55,10 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         fuel_system_id = self.options["fuel_system_id"]
 
         if position == "in_the_wing":
-
             outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
                 * inputs[
@@ -73,16 +68,13 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_system_id = self.options["fuel_system_id"]
         position = self.options["position"]
 
         if position == "in_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y",
                 "data:geometry:wing:span",
@@ -95,6 +87,4 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y",
                 "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

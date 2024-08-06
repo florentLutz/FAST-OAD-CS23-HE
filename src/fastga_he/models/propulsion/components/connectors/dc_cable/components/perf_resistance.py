@@ -9,9 +9,9 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_RESISTANCE_PROFILE
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_DC_LINE_PERFORMANCES_RESISTANCE_PROFILE
-] = "fastga_he.submodel.propulsion.performances.dc_line.resistance_profile.from_temperature"
+oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_RESISTANCE_PROFILE] = (
+    "fastga_he.submodel.propulsion.performances.dc_line.resistance_profile.from_temperature"
+)
 
 
 @oad.RegisterSubmodel(
@@ -20,7 +20,6 @@ oad.RegisterSubmodel.active_models[
 )
 class PerformancesResistance(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -32,7 +31,6 @@ class PerformancesResistance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -122,7 +120,6 @@ class PerformancesResistance(om.ExplicitComponent):
         outputs["resistance_per_cable"] = resistance
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         cable_temperature = inputs["cable_temperature"]

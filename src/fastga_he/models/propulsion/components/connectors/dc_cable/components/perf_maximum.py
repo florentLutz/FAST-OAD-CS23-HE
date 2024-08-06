@@ -8,7 +8,6 @@ import openmdao.api as om
 
 class PerformancesMaximum(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -20,7 +19,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -124,7 +122,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         outputs[
@@ -146,12 +143,11 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":temperature_max"
         ] = np.amax(inputs["cable_temperature"])
 
-        outputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":losses_max"
-        ] = np.amax(inputs["conduction_losses"])
+        outputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":losses_max"] = (
+            np.amax(inputs["conduction_losses"])
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         current = inputs["dc_current_one_cable"]

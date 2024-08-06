@@ -13,7 +13,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turbo_generator_id = self.options["turbo_generator_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -49,7 +47,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         outputs[
@@ -59,7 +56,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         ] = np.max(inputs["shaft_power_in"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         partials[

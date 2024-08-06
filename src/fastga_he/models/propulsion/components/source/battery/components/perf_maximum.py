@@ -12,7 +12,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -24,7 +23,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -105,7 +103,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         outputs[
@@ -114,9 +111,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:voltage_min"
         ] = np.min(inputs["terminal_voltage"])
-        outputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":SOC_min"
-        ] = np.min(inputs["state_of_charge"])
+        outputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":SOC_min"] = (
+            np.min(inputs["state_of_charge"])
+        )
         outputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max"
         ] = np.max(inputs["c_rate"])
@@ -125,7 +122,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         ] = np.max(inputs["losses_cell"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         partials[

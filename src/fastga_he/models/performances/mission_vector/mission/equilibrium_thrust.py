@@ -11,7 +11,6 @@ class EquilibriumThrust(om.ImplicitComponent):
     """Find the conditions necessary for the aircraft equilibrium along the X-axis only."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be " "treated"
         )
@@ -22,7 +21,6 @@ class EquilibriumThrust(om.ImplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("d_vx_dt", val=np.full(number_of_points, 0.0), units="m/s**2")
@@ -111,7 +109,6 @@ class EquilibriumThrust(om.ImplicitComponent):
             )
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-
         mass = inputs["mass"]
         d_vx_dt = inputs["d_vx_dt"]
         true_airspeed = inputs["true_airspeed"]
@@ -156,9 +153,9 @@ class EquilibriumThrust(om.ImplicitComponent):
             cd0
             + delta_cd
             + delta_cd_flaps
-            + coeff_k_wing * cl_wing ** 2
-            + coeff_k_htp * cl_htp ** 2
-            + (cd_delta_m * delta_m ** 2.0)
+            + coeff_k_wing * cl_wing**2
+            + coeff_k_htp * cl_htp**2
+            + (cd_delta_m * delta_m**2.0)
         )
 
         # ------------------ Derivatives wrt thrust residuals ------------------ #
@@ -168,20 +165,20 @@ class EquilibriumThrust(om.ImplicitComponent):
 
         jacobian["thrust", "d_vx_dt"] = -mass
         jacobian["thrust", "gamma"] = -mass * g * np.cos(gamma) * np.pi / 180.0
-        jacobian["thrust", "density"] = -wing_area * cd_tot * 0.5 * true_airspeed ** 2.0
+        jacobian["thrust", "density"] = -wing_area * cd_tot * 0.5 * true_airspeed**2.0
         jacobian["thrust", "mass"] = -d_vx_dt - g * np.sin(gamma)
         jacobian["thrust", "true_airspeed"] = -wing_area * cd_tot * rho * true_airspeed
         jacobian["thrust", "data:geometry:wing:area"] = -dynamic_pressure * cd_tot
         jacobian["thrust", "data:aerodynamics:aircraft:cruise:CD0"] = -dynamic_pressure * wing_area
         jacobian["thrust", "data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient"] = (
-            -dynamic_pressure * wing_area * cl_htp ** 2.0
+            -dynamic_pressure * wing_area * cl_htp**2.0
         )
         jacobian["thrust", "data:aerodynamics:wing:cruise:induced_drag_coefficient"] = (
-            -dynamic_pressure * wing_area * cl_wing ** 2.0
+            -dynamic_pressure * wing_area * cl_wing**2.0
         )
         jacobian["thrust", "delta_Cd"] = -dynamic_pressure * wing_area
         jacobian["thrust", "data:aerodynamics:elevator:low_speed:CD_delta"] = (
-            -dynamic_pressure * wing_area * delta_m ** 2.0
+            -dynamic_pressure * wing_area * delta_m**2.0
         )
         jacobian["thrust", "data:aerodynamics:elevator:low_speed:CL_delta"] = (
             d_thrust_d_cl_h * delta_m
@@ -220,7 +217,6 @@ class EquilibriumThrust(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         d_vx_dt = inputs["d_vx_dt"]
         mass = inputs["mass"]
         gamma = inputs["gamma"] * np.pi / 180.0
@@ -263,9 +259,9 @@ class EquilibriumThrust(om.ImplicitComponent):
             cd0
             + delta_cd
             + delta_cd_flaps
-            + coeff_k_wing * cl_wing_flaps ** 2.0
-            + coeff_k_htp * cl_htp ** 2.0
-            + cd_delta_m * delta_m ** 2.0
+            + coeff_k_wing * cl_wing_flaps**2.0
+            + coeff_k_htp * cl_htp**2.0
+            + cd_delta_m * delta_m**2.0
         )
 
         residuals["thrust"] = (

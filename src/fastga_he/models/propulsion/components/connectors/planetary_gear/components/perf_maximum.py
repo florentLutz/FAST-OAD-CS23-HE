@@ -12,7 +12,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -24,7 +23,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         planetary_gear_id = self.options["planetary_gear_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -49,7 +47,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         outputs[
@@ -57,7 +54,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         ] = np.max(inputs["torque_out"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         partials[

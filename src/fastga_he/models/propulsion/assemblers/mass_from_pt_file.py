@@ -19,7 +19,6 @@ class PowerTrainMassFromFile(om.ExplicitComponent):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -28,7 +27,6 @@ class PowerTrainMassFromFile(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         variables_names = self.configurator.get_mass_element_lists()
@@ -36,12 +34,10 @@ class PowerTrainMassFromFile(om.ExplicitComponent):
         self.add_output("data:propulsion:he_power_train:mass", val=350.0, units="kg")
 
         for variable_name in variables_names:
-
             self.add_input(variable_name, val=np.nan, units="kg")
             self.declare_partials(
                 of="data:propulsion:he_power_train:mass", wrt=variable_name, val=1.0
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["data:propulsion:he_power_train:mass"] = sum(inputs.values())

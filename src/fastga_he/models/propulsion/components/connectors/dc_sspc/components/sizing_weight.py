@@ -22,7 +22,6 @@ class SizingDCSSPCWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         self.add_input(
@@ -54,7 +53,6 @@ class SizingDCSSPCWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":mass"] = (
@@ -63,25 +61,22 @@ class SizingDCSSPCWeight(om.ExplicitComponent):
         ) / inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":power_density"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":mass",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
         ] = (
-            inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber"]
-        ) / inputs[
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":power_density"
-        ]
+            (inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber"])
+            / inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":power_density"]
+        )
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":mass",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber",
         ] = (
-            inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber"]
-        ) / inputs[
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":power_density"
-        ]
+            (inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber"])
+            / inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":power_density"]
+        )
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":mass",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":power_density",

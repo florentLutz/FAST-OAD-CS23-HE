@@ -21,7 +21,6 @@ class SizingRectifierCapacitorCapacity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -61,7 +60,6 @@ class SizingRectifierCapacitorCapacity(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         current_ac_caliber = inputs[
@@ -84,10 +82,9 @@ class SizingRectifierCapacitorCapacity(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":capacitor:capacity"
-        ] = (max_f_u / voltage_ripple_amplitude)
+        ] = max_f_u / voltage_ripple_amplitude
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         current_ac_caliber = inputs[
@@ -113,7 +110,7 @@ class SizingRectifierCapacitorCapacity(om.ExplicitComponent):
         ] = (
             -0.3506
             * current_ac_caliber
-            / (switching_frequency * voltage_ripple_percent * voltage_ac_caliber ** 2.0)
+            / (switching_frequency * voltage_ripple_percent * voltage_ac_caliber**2.0)
         )
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":capacitor:capacity",
@@ -121,7 +118,7 @@ class SizingRectifierCapacitorCapacity(om.ExplicitComponent):
         ] = (
             -0.3506
             * current_ac_caliber
-            / (switching_frequency * voltage_ripple_percent ** 2.0 * voltage_ac_caliber)
+            / (switching_frequency * voltage_ripple_percent**2.0 * voltage_ac_caliber)
         )
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":capacitor:capacity",
@@ -129,5 +126,5 @@ class SizingRectifierCapacitorCapacity(om.ExplicitComponent):
         ] = (
             -0.3506
             * current_ac_caliber
-            / (switching_frequency ** 2.0 * voltage_ripple_percent * voltage_ac_caliber)
+            / (switching_frequency**2.0 * voltage_ripple_percent * voltage_ac_caliber)
         )

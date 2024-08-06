@@ -14,7 +14,6 @@ class PerformancesCellVoltage(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -23,7 +22,6 @@ class PerformancesCellVoltage(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("open_circuit_voltage", units="V", val=np.full(number_of_points, np.nan))
@@ -49,7 +47,6 @@ class PerformancesCellVoltage(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["terminal_voltage"] = np.clip(
             (
                 inputs["open_circuit_voltage"]
@@ -60,6 +57,5 @@ class PerformancesCellVoltage(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["terminal_voltage", "internal_resistance"] = -inputs["current_one_module"]
         partials["terminal_voltage", "current_one_module"] = -inputs["internal_resistance"]

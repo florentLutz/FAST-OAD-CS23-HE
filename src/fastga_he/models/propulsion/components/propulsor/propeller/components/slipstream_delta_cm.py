@@ -13,13 +13,11 @@ class SlipstreamPropellerDeltaCM(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -58,5 +56,4 @@ class SlipstreamPropellerDeltaCM(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["delta_Cm"] = inputs["delta_Cm0"] + inputs["delta_Cm_alpha"]

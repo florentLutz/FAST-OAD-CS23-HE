@@ -31,7 +31,6 @@ COLORS = px.colors.qualitative.Prism
 
 
 def test_pipistrel_velis_electro():
-
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -86,7 +85,6 @@ def test_pipistrel_velis_electro():
 
 
 def test_pipistrel_detailed_mission():
-
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -120,7 +118,6 @@ def test_pipistrel_detailed_mission():
 
 
 def test_pipistrel_op_mission():
-
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -154,7 +151,6 @@ def test_pipistrel_op_mission():
 
 
 def test_pipistrel_not_detailed_mission():
-
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -205,7 +201,6 @@ def test_residuals_analyzer():
 
     solver_case = cr.get_cases("root.nonlinear_solver")
     for case in solver_case:
-
         max_residual_value = 0.0
         max_residual_name = ""
 
@@ -223,7 +218,6 @@ def test_residuals_analyzer():
 
 
 def test_residuals_plotter():
-
     fig = go.Figure()
 
     cr = om.CaseReader("results/pipistrel_cases.sql")
@@ -232,7 +226,6 @@ def test_residuals_plotter():
     data_to_plot = []
 
     for case in solver_case:
-
         data_to_plot.append(
             float(
                 case.outputs[
@@ -255,7 +248,6 @@ def test_residuals_plotter():
 
 
 def test_comparison_with_data():
-
     fig = go.Figure()
     datafile = oad.DataFile("results/pipistrel_out.xml")
 
@@ -342,7 +334,6 @@ def test_comparison_with_data():
 
 
 def scatter_compare_mass(actual_mass, computed_mass, axes_name, graph_number, fig):
-
     color = COLORS[graph_number % len(COLORS)]
 
     fig.add_trace(
@@ -375,7 +366,6 @@ def scatter_compare_mass(actual_mass, computed_mass, axes_name, graph_number, fi
 
 
 def test_pipistrel_network_viewer():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "pipistrel_assembly.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "pipistrel_assembly.html")
 
@@ -384,7 +374,6 @@ def test_pipistrel_network_viewer():
 
 
 def test_mass_bar_plot():
-
     results_pipistrel_file_path = pth.join(RESULTS_FOLDER_PATH, "pipistrel_out.xml")
     data_pipistrel_file_path = pth.join(DATA_FOLDER_PATH, "pipistrel_data.xml")
 
@@ -400,7 +389,6 @@ def test_mass_bar_plot():
 
 
 def test_aircraft_geometry_plot():
-
     results_pipistrel_file_path = pth.join(DATA_FOLDER_PATH, "pipistrel_for_postprocessing.xml")
 
     fig = aircraft_geometry_plot(results_pipistrel_file_path, name="Pipistrel")

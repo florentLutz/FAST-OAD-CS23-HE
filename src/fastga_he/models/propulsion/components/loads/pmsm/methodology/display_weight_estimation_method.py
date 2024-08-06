@@ -6,7 +6,6 @@ import plotly.graph_objects as go
 import numpy as np
 
 if __name__ == "__main__":
-
     d_star = np.array(
         [
             1,

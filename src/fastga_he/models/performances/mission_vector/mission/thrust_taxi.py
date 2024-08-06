@@ -20,7 +20,6 @@ class ThrustTaxi(om.ExplicitComponent):
         self.below_min_thrust_to = None
 
     def setup(self):
-
         self.add_input("data:aerodynamics:aircraft:low_speed:CD0", np.nan)
         self.add_input("data:aerodynamics:wing:low_speed:CL0_clean", val=np.nan)
         self.add_input("data:aerodynamics:wing:low_speed:induced_drag_coefficient", np.nan)
@@ -56,7 +55,6 @@ class ThrustTaxi(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cd0 = inputs["data:aerodynamics:aircraft:low_speed:CD0"]
         coeff_k_wing = inputs["data:aerodynamics:wing:low_speed:induced_drag_coefficient"]
         cl0_wing = inputs["data:aerodynamics:wing:low_speed:CL0_clean"]
@@ -66,7 +64,7 @@ class ThrustTaxi(om.ExplicitComponent):
         speed_to = inputs["data:mission:sizing:taxi_out:speed"]
         speed_ti = inputs["data:mission:sizing:taxi_in:speed"]
 
-        cd = cd0 + coeff_k_wing * cl0_wing ** 2.0
+        cd = cd0 + coeff_k_wing * cl0_wing**2.0
         density = Atmosphere(altitude=0.0).density
 
         # To avoid issue with the convergence of the power train, we will ensure that the thrust
@@ -75,20 +73,19 @@ class ThrustTaxi(om.ExplicitComponent):
         min_thrust_ti = MIN_POWER_TAXI / speed_ti
 
         outputs["data:mission:sizing:taxi_out:thrust"] = np.maximum(
-            0.5 * density * speed_to ** 2.0 * wing_area * cd, min_thrust_to
+            0.5 * density * speed_to**2.0 * wing_area * cd, min_thrust_to
         )
         self.below_min_thrust_to = (
             0 if outputs["data:mission:sizing:taxi_out:thrust"] == min_thrust_to else 1
         )
         outputs["data:mission:sizing:taxi_in:thrust"] = np.maximum(
-            0.5 * density * speed_ti ** 2.0 * wing_area * cd, min_thrust_ti
+            0.5 * density * speed_ti**2.0 * wing_area * cd, min_thrust_ti
         )
         self.below_min_thrust_ti = (
             0 if outputs["data:mission:sizing:taxi_in:thrust"] == min_thrust_ti else 1
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         cd0 = inputs["data:aerodynamics:aircraft:low_speed:CD0"]
         coeff_k_wing = inputs["data:aerodynamics:wing:low_speed:induced_drag_coefficient"]
         cl0_wing = inputs["data:aerodynamics:wing:low_speed:CL0_clean"]
@@ -98,71 +95,57 @@ class ThrustTaxi(om.ExplicitComponent):
         speed_to = inputs["data:mission:sizing:taxi_out:speed"]
         speed_ti = inputs["data:mission:sizing:taxi_in:speed"]
 
-        cd = cd0 + coeff_k_wing * cl0_wing ** 2.0
+        cd = cd0 + coeff_k_wing * cl0_wing**2.0
         density = Atmosphere(altitude=0.0).density
 
         # Taxi-out
         partials[
             "data:mission:sizing:taxi_out:thrust",
             "data:aerodynamics:aircraft:low_speed:CD0",
-        ] = (
-            0.5 * density * speed_to ** 2.0 * wing_area * self.below_min_thrust_to
-        )
+        ] = 0.5 * density * speed_to**2.0 * wing_area * self.below_min_thrust_to
         partials[
             "data:mission:sizing:taxi_out:thrust",
             "data:aerodynamics:wing:low_speed:CL0_clean",
-        ] = (
-            density
-            * speed_to ** 2.0
-            * wing_area
-            * coeff_k_wing
-            * cl0_wing
-            * self.below_min_thrust_to
-        )
+        ] = density * speed_to**2.0 * wing_area * coeff_k_wing * cl0_wing * self.below_min_thrust_to
         partials[
             "data:mission:sizing:taxi_out:thrust",
             "data:aerodynamics:wing:low_speed:induced_drag_coefficient",
+        ] = 0.5 * density * speed_to**2.0 * wing_area * cl0_wing**2.0 * self.below_min_thrust_to
+        partials[
+            "data:mission:sizing:taxi_out:thrust",
+            "data:geometry:wing:area",
+        ] = 0.5 * density * speed_to**2.0 * cd * self.below_min_thrust_to
+        partials[
+            "data:mission:sizing:taxi_out:thrust",
+            "data:mission:sizing:taxi_out:speed",
         ] = (
-            0.5 * density * speed_to ** 2.0 * wing_area * cl0_wing ** 2.0 * self.below_min_thrust_to
-        )
-        partials["data:mission:sizing:taxi_out:thrust", "data:geometry:wing:area",] = (
-            0.5 * density * speed_to ** 2.0 * cd * self.below_min_thrust_to
-        )
-        partials["data:mission:sizing:taxi_out:thrust", "data:mission:sizing:taxi_out:speed",] = (
             (density * speed_to * wing_area * cd * self.below_min_thrust_to)
             if self.below_min_thrust_to
-            else -MIN_POWER_TAXI / speed_to ** 2.0
+            else -MIN_POWER_TAXI / speed_to**2.0
         )
 
         # Taxi-in
         partials[
             "data:mission:sizing:taxi_in:thrust",
             "data:aerodynamics:aircraft:low_speed:CD0",
-        ] = (
-            0.5 * density * speed_ti ** 2.0 * wing_area * self.below_min_thrust_ti
-        )
+        ] = 0.5 * density * speed_ti**2.0 * wing_area * self.below_min_thrust_ti
         partials[
             "data:mission:sizing:taxi_in:thrust",
             "data:aerodynamics:wing:low_speed:CL0_clean",
-        ] = (
-            density
-            * speed_ti ** 2.0
-            * wing_area
-            * coeff_k_wing
-            * cl0_wing
-            * self.below_min_thrust_ti
-        )
+        ] = density * speed_ti**2.0 * wing_area * coeff_k_wing * cl0_wing * self.below_min_thrust_ti
         partials[
             "data:mission:sizing:taxi_in:thrust",
             "data:aerodynamics:wing:low_speed:induced_drag_coefficient",
+        ] = 0.5 * density * speed_ti**2.0 * wing_area * cl0_wing**2.0 * self.below_min_thrust_ti
+        partials[
+            "data:mission:sizing:taxi_in:thrust",
+            "data:geometry:wing:area",
+        ] = 0.5 * density * speed_ti**2.0 * cd * self.below_min_thrust_ti
+        partials[
+            "data:mission:sizing:taxi_in:thrust",
+            "data:mission:sizing:taxi_in:speed",
         ] = (
-            0.5 * density * speed_ti ** 2.0 * wing_area * cl0_wing ** 2.0 * self.below_min_thrust_ti
-        )
-        partials["data:mission:sizing:taxi_in:thrust", "data:geometry:wing:area",] = (
-            0.5 * density * speed_ti ** 2.0 * cd * self.below_min_thrust_ti
-        )
-        partials["data:mission:sizing:taxi_in:thrust", "data:mission:sizing:taxi_in:speed",] = (
             (density * speed_ti * wing_area * cd * self.below_min_thrust_ti)
             if self.below_min_thrust_to
-            else -MIN_POWER_TAXI / speed_ti ** 2.0
+            else -MIN_POWER_TAXI / speed_ti**2.0
         )

@@ -12,14 +12,12 @@ from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
 
 class OperationalMissionVectorWithTargetFuel(OperationalMissionVector):
     def setup(self):
-
         super().setup()
         self.add_subsystem(name="distance_to_target", subsys=DistanceToTargetFuel(), promotes=["*"])
 
 
 class DistanceToTargetFuel(om.ImplicitComponent):
     def setup(self):
-
         self.add_input("data:mission:operational:fuel", val=np.nan, units="kg")
         self.add_input("data:mission:payload_range:target_fuel", val=np.nan, units="kg")
 
@@ -37,7 +35,6 @@ class DistanceToTargetFuel(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         residuals["data:mission:operational:range"] = (
             inputs["data:mission:operational:fuel"]
             - inputs["data:mission:payload_range:target_fuel"]

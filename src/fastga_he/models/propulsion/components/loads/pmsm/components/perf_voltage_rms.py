@@ -14,13 +14,11 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("ac_current_rms_in", units="A", val=np.nan, shape=number_of_points)
@@ -43,7 +41,6 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # Ones_like or Zeros_like ?
         outputs["ac_voltage_rms_in"] = np.where(
             inputs["ac_current_rms_in"] != 0.0,
@@ -52,7 +49,6 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["ac_voltage_rms_in", "apparent_power"] = np.where(
             inputs["ac_current_rms_in"] != 0.0,
             1.0 / (inputs["ac_current_rms_in"]),

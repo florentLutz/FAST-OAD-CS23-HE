@@ -17,7 +17,6 @@ class PerformancesModuleCRate(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -35,7 +34,6 @@ class PerformancesModuleCRate(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
 
@@ -59,7 +57,6 @@ class PerformancesModuleCRate(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         current = np.where(
@@ -72,7 +69,6 @@ class PerformancesModuleCRate(om.ExplicitComponent):
         ] = self.options["cell_capacity_ref"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials_current = np.where(
             np.abs(inputs["current_one_module"]) < 1e-2,
             1e-6,

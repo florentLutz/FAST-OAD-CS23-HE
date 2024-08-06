@@ -23,7 +23,6 @@ class ComputeMiscMass(om.ExplicitComponent):
     """Computes the misc mass based on the model developed in FLOPS."""
 
     def setup(self):
-
         self.add_input("data:geometry:wing:area", val=np.nan, units="ft**2")
         self.add_input("data:geometry:propulsion:engine:count", val=np.nan)
 
@@ -45,7 +44,7 @@ class ComputeMiscMass(om.ExplicitComponent):
         wing_area_sq_ft = inputs["data:geometry:wing:area"]
         f_comp = inputs["settings:wing:structure:F_COMP"]
 
-        misc_mass = (0.16 * (1.0 - 0.3 * f_comp) * wing_area_sq_ft ** 1.2) * 0.453592
+        misc_mass = (0.16 * (1.0 - 0.3 * f_comp) * wing_area_sq_ft**1.2) * 0.453592
 
         if inputs["data:geometry:propulsion:engine:count"] > 4:
             misc_mass *= 1.1

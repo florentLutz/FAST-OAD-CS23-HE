@@ -15,7 +15,6 @@ class SizingGearboxCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="gearbox_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingGearboxCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         gearbox_id = self.options["gearbox_id"]
 
@@ -47,7 +45,6 @@ class SizingGearboxCGY(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing":
-
             self.add_input(
                 "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:y_ratio",
                 val=np.nan,
@@ -57,12 +54,10 @@ class SizingGearboxCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         gearbox_id = self.options["gearbox_id"]
 
         if position == "inside_the_wing":
-
             outputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
                 * inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:y_ratio"]
@@ -70,25 +65,18 @@ class SizingGearboxCGY(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         gearbox_id = self.options["gearbox_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:y",
                 "data:geometry:wing:span",
-            ] = (
-                inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:y_ratio"] / 2.0
-            )
+            ] = inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:y_ratio"] / 2.0
             partials[
                 "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:y",
                 "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

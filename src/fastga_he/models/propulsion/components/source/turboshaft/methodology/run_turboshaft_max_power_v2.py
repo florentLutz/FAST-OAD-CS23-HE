@@ -23,7 +23,6 @@ from turboshaft_components.turboshaft_off_design_max_power import (
 def get_ivc_all_data(
     power_design, t41t_design, opr_design, altitude_design, mach_design, opr_limit, itt_limit
 ):
-
     ivc = om.IndepVarComp()
     ivc.add_output("compressor_bleed_mass_flow", val=0.04, units="kg/s")
     ivc.add_output("cooling_bleed_ratio", val=0.025)
@@ -83,7 +82,6 @@ def get_ivc_all_data(
 
 
 def run_design_point(ivc):
-
     prob = om.Problem()
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
@@ -117,7 +115,6 @@ def run_design_point(ivc):
 
 
 def run_max_power_opr_limit(altitude_off_design: list, mach_off_design: list, ivc: om.IndepVarComp):
-
     ivc.add_output("altitude", val=altitude_off_design, units="ft")
     ivc.add_output("mach_0", val=mach_off_design)
 
@@ -155,7 +152,6 @@ def run_max_power_opr_limit(altitude_off_design: list, mach_off_design: list, iv
 
 
 def run_max_power_itt_limit(altitude_off_design: list, mach_off_design: list, ivc: om.IndepVarComp):
-
     ivc.add_output("altitude", val=altitude_off_design, units="ft")
     ivc.add_output("mach_0", val=mach_off_design)
 
@@ -201,7 +197,6 @@ def run_turboshaft_max_power(
     altitude,
     mach,
 ):
-
     print("Design thermodynamic power: " + str(power_design) + " kW")
     print("Design TET: " + str(t41t_design) + " degK")
     print("Design OPR: " + str(opr_design))
@@ -234,7 +229,6 @@ def run_turboshaft_max_power(
 
 
 if __name__ == "__main__":
-
     path_to_current_file = pathlib.Path(__file__)
     parent_folder = path_to_current_file.parents[0]
     data_folder_path = parent_folder / "data"
@@ -285,7 +279,6 @@ if __name__ == "__main__":
     mach_list = []
 
     for turboshaft_design_parameter in doeX:
-
         try:
             t1 = time.time()
             with warnings.catch_warnings():
@@ -353,11 +346,9 @@ if __name__ == "__main__":
     )
 
     if result_file_path_max_power.exists():
-
         existing_data = pd.read_csv(result_file_path_max_power, index_col=0)
         stacked_dataframe = pd.concat([existing_data, result_dataframe_max_power], axis=0)
         stacked_dataframe.to_csv(result_file_path_max_power)
 
     else:
-
         result_dataframe_max_power.to_csv(result_file_path_max_power)

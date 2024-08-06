@@ -12,7 +12,6 @@ class SizingFuelTankCGX(om.ExplicitComponent):
     """Class that computes the CG of the battery according to the position given in the options."""
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -29,7 +28,6 @@ class SizingFuelTankCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
@@ -41,7 +39,6 @@ class SizingFuelTankCGX(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing" or position == "wing_pod":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
             self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
 
@@ -51,7 +48,6 @@ class SizingFuelTankCGX(om.ExplicitComponent):
         # We can do an else for the last option since we gave OpenMDAO the possible, ensuring it
         # is one among them
         else:
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
 
@@ -59,19 +55,16 @@ class SizingFuelTankCGX(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="data:geometry:cabin:length", val=0.5)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing" or position == "wing_pod":
-
             outputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":CG:x"] = (
                 inputs["data:geometry:wing:MAC:at25percent:x"]
                 + 0.25 * inputs["data:geometry:wing:MAC:length"]
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + 0.5 * inputs["data:geometry:cabin:length"]

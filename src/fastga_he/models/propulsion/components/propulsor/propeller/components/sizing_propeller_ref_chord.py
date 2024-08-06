@@ -23,7 +23,6 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
         self.spline = None
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -37,7 +36,6 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 
@@ -71,7 +69,6 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
-
             self.add_input(
                 name="data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
                 val=np.nan,
@@ -104,12 +101,10 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 
         if position == "on_the_wing":
-
             y_ratio = inputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio"
             ]
@@ -128,18 +123,15 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
             ] = self.spline(half_span * y_ratio)
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref"
             ] = inputs["data:aerodynamics:wing:low_speed:chord_vector"][0]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 
         if position == "on_the_wing":
-
             y_ratio = inputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio"
             ]
@@ -150,18 +142,13 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
-            ] = (
-                spline_value * half_span
-            )
+            ] = spline_value * half_span
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
                 "data:geometry:wing:span",
-            ] = (
-                spline_value * y_ratio / 2.0
-            )
+            ] = spline_value * y_ratio / 2.0
 
         else:
-
             partial_chord = np.zeros_like(inputs["data:aerodynamics:wing:low_speed:chord_vector"])
             partial_chord[0] = 1.0
             partials[

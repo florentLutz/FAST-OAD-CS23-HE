@@ -52,7 +52,6 @@ class PowerTrainSizingFromFile(om.Group):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -61,7 +60,6 @@ class PowerTrainSizingFromFile(om.Group):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         (
@@ -85,7 +83,6 @@ class PowerTrainSizingFromFile(om.Group):
             components_om_type,
             components_position,
         ):
-
             klass = globals()["Sizing" + component_om_type]
             local_sub_sys = klass()
             local_sub_sys.options[component_name_id] = component_name

@@ -23,15 +23,14 @@ def efficiency_for_curve_fit(
     delta_test,
     epsilon_test,
 ):
-
     speed, torque = parameter
 
     power = speed * torque
     power_losses = (
-        alpha_test * torque ** 2.0
+        alpha_test * torque**2.0
         + beta_test * speed
-        + gamma_test * speed ** 1.5
-        + delta_test * speed ** 3.0
+        + gamma_test * speed**1.5
+        + delta_test * speed**3.0
         + epsilon_test
     )
 
@@ -91,10 +90,10 @@ if __name__ == "__main__":
     alpha, beta, gamma, delta, epsilon = p_opt
 
     power_loss = (
-        alpha * torque_array_plot ** 2.0
+        alpha * torque_array_plot**2.0
         + beta * speed_array_plot
-        + gamma * speed_array_plot ** 1.5
-        + delta * speed_array_plot ** 3.0
+        + gamma * speed_array_plot**1.5
+        + delta * speed_array_plot**3.0
         + epsilon
     )
     efficiency_grid = (
@@ -102,10 +101,10 @@ if __name__ == "__main__":
     ).reshape((50, 50))
 
     power_loss_orig_data = (
-        alpha * torque_array ** 2.0
+        alpha * torque_array**2.0
         + beta * speed_array
-        + gamma * speed_array ** 1.5
-        + delta * speed_array ** 3.0
+        + gamma * speed_array**1.5
+        + delta * speed_array**3.0
         + epsilon
     )
     efficiency_grid_orig_data = (

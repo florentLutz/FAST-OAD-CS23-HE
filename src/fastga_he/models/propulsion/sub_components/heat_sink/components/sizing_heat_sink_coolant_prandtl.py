@@ -20,7 +20,6 @@ class SizingHeatSinkCoolantPrandtl(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -51,7 +50,6 @@ class SizingHeatSinkCoolantPrandtl(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         specific_heat_capacity_coolant = inputs[
@@ -78,20 +76,16 @@ class SizingHeatSinkCoolantPrandtl(om.ExplicitComponent):
         partials[
             prefix + ":heat_sink:coolant:Prandtl_number",
             prefix + ":heat_sink:coolant:specific_heat_capacity",
-        ] = (
-            dynamic_viscosity_coolant / thermal_conductivity_coolant
-        )
+        ] = dynamic_viscosity_coolant / thermal_conductivity_coolant
         partials[
             prefix + ":heat_sink:coolant:Prandtl_number",
             prefix + ":heat_sink:coolant:dynamic_viscosity",
-        ] = (
-            specific_heat_capacity_coolant / thermal_conductivity_coolant
-        )
+        ] = specific_heat_capacity_coolant / thermal_conductivity_coolant
         partials[
             prefix + ":heat_sink:coolant:Prandtl_number",
             prefix + ":heat_sink:coolant:thermal_conductivity",
         ] = -(
             specific_heat_capacity_coolant
             * dynamic_viscosity_coolant
-            / thermal_conductivity_coolant ** 2.0
+            / thermal_conductivity_coolant**2.0
         )

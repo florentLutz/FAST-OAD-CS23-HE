@@ -15,7 +15,6 @@ class SizingPropellerWingLEDistanceRatio(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -29,7 +28,6 @@ class SizingPropellerWingLEDistanceRatio(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         propeller_id = self.options["propeller_id"]
 
@@ -48,7 +46,6 @@ class SizingPropellerWingLEDistanceRatio(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
-
             self.add_input(
                 name="data:propulsion:he_power_train:propeller:" + propeller_id + ":from_LE",
                 val=np.nan,
@@ -57,24 +54,20 @@ class SizingPropellerWingLEDistanceRatio(om.ExplicitComponent):
             )
 
         else:
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         propeller_id = self.options["propeller_id"]
 
         if position == "on_the_wing":
-
             distance_from_le = inputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_LE"
             ]
 
         else:
-
             distance_from_le = inputs["data:geometry:wing:MAC:at25percent:x"]
 
         outputs[
@@ -85,7 +78,6 @@ class SizingPropellerWingLEDistanceRatio(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         position = self.options["position"]
         propeller_id = self.options["propeller_id"]
 
@@ -94,30 +86,22 @@ class SizingPropellerWingLEDistanceRatio(om.ExplicitComponent):
         ]
 
         if position == "on_the_wing":
-
             distance_from_le = inputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_LE"
             ]
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_LE",
-            ] = (
-                1.0 / c_ref
-            )
+            ] = 1.0 / c_ref
 
         else:
-
             distance_from_le = inputs["data:geometry:wing:MAC:at25percent:x"]
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
                 "data:geometry:wing:MAC:at25percent:x",
-            ] = (
-                1.0 / c_ref
-            )
+            ] = 1.0 / c_ref
 
         partials[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_wing_LE_ratio",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":wing_chord_ref",
-        ] = (
-            -distance_from_le / c_ref ** 2.0
-        )
+        ] = -distance_from_le / c_ref**2.0

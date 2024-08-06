@@ -55,7 +55,6 @@ class SizingTurboGeneratorWeight(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         outputs[
@@ -74,7 +73,6 @@ class SizingTurboGeneratorWeight(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         partials[

@@ -32,41 +32,33 @@ class SizingHarnessCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         elif position == "from_rear_to_front":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
 
         elif position == "from_rear_to_wing":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         elif position == "from_front_to_wing":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         elif position == "from_rear_to_nose":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
 
         elif position == "from_front_to_nose":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
         else:
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         self.add_output(
@@ -78,15 +70,13 @@ class SizingHarnessCGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
-            outputs[
-                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x"
-            ] = inputs["data:geometry:wing:MAC:at25percent:x"]
+            outputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x"] = (
+                inputs["data:geometry:wing:MAC:at25percent:x"]
+            )
 
         elif position == "from_rear_to_front":
             outputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x"] = (
@@ -95,7 +85,6 @@ class SizingHarnessCGX(om.ExplicitComponent):
             )
 
         elif position == "from_rear_to_wing":
-
             fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
             cabin_length = inputs["data:geometry:cabin:length"]
             lav = inputs["data:geometry:fuselage:front_length"]
@@ -109,7 +98,6 @@ class SizingHarnessCGX(om.ExplicitComponent):
             )
 
         elif position == "from_front_to_wing":
-
             fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
             lav = inputs["data:geometry:fuselage:front_length"]
 
@@ -120,30 +108,25 @@ class SizingHarnessCGX(om.ExplicitComponent):
             )
 
         elif position == "from_rear_to_nose":
-
             outputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"] + inputs["data:geometry:cabin:length"]
             ) / 2.0
 
         elif position == "from_front_to_nose":
-
             outputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"] / 2.0
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x"] = (
                 inputs["data:geometry:wing:MAC:at25percent:x"] / 2.0
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
@@ -160,43 +143,30 @@ class SizingHarnessCGX(om.ExplicitComponent):
             ] = 0.5
 
         elif position == "from_rear_to_wing":
-
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
-            ] = (
-                2.0 / 3.0
-            )
+            ] = 2.0 / 3.0
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x",
                 "data:geometry:cabin:length",
-            ] = (
-                1.0 / 3.0
-            )
+            ] = 1.0 / 3.0
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x",
                 "data:geometry:fuselage:front_length",
-            ] = (
-                1.0 / 3.0
-            )
+            ] = 1.0 / 3.0
 
         elif position == "from_front_to_wing":
-
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
-            ] = (
-                2.0 / 3.0
-            )
+            ] = 2.0 / 3.0
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x",
                 "data:geometry:fuselage:front_length",
-            ] = (
-                1.0 / 3.0
-            )
+            ] = 1.0 / 3.0
 
         elif position == "from_rear_to_nose":
-
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x",
                 "data:geometry:fuselage:front_length",
@@ -207,14 +177,12 @@ class SizingHarnessCGX(om.ExplicitComponent):
             ] = 0.5
 
         elif position == "from_front_to_nose":
-
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x",
                 "data:geometry:fuselage:front_length",
             ] = 0.5
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",

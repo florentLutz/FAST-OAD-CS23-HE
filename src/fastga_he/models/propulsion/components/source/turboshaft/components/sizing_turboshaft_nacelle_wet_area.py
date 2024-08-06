@@ -15,7 +15,6 @@ class SizingTurboshaftNacelleWetArea(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="turboshaft_id",
             default=None,
@@ -24,7 +23,6 @@ class SizingTurboshaftNacelleWetArea(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         self.add_input(
@@ -56,7 +54,6 @@ class SizingTurboshaftNacelleWetArea(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         outputs[
@@ -77,7 +74,6 @@ class SizingTurboshaftNacelleWetArea(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         partials[

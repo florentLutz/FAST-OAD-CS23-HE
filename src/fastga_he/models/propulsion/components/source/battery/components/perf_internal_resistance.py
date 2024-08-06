@@ -18,7 +18,6 @@ class PerformancesInternalResistance(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -30,7 +29,6 @@ class PerformancesInternalResistance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
 
@@ -65,7 +63,6 @@ class PerformancesInternalResistance(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         temperature_ref = inputs[
@@ -82,10 +79,10 @@ class PerformancesInternalResistance(om.ExplicitComponent):
         dod = 100.0 - soc
 
         internal_resistance = (
-            2.62771800e-11 * dod ** 5.0
-            - 1.48987233e-08 * dod ** 4.0
-            + 2.03615618e-06 * dod ** 3.0
-            - 1.06451730e-04 * dod ** 2.0
+            2.62771800e-11 * dod**5.0
+            - 1.48987233e-08 * dod**4.0
+            + 2.03615618e-06 * dod**3.0
+            - 1.06451730e-04 * dod**2.0
             + 2.13818712e-03 * dod
             + 3.90444549e-02
         ) * np.exp(
@@ -96,7 +93,6 @@ class PerformancesInternalResistance(om.ExplicitComponent):
         outputs["internal_resistance"] = internal_resistance
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         temperature_ref = inputs[
@@ -117,19 +113,19 @@ class PerformancesInternalResistance(om.ExplicitComponent):
             / ((cell_temperature - 254.33) * (temperature_ref - 254.33))
         )
         soc_effect = (
-            2.62771800e-11 * dod ** 5.0
-            - 1.48987233e-08 * dod ** 4.0
-            + 2.03615618e-06 * dod ** 3.0
-            - 1.06451730e-04 * dod ** 2.0
+            2.62771800e-11 * dod**5.0
+            - 1.48987233e-08 * dod**4.0
+            + 2.03615618e-06 * dod**3.0
+            - 1.06451730e-04 * dod**2.0
             + 2.13818712e-03 * dod
             + 3.90444549e-02
         )
 
         partials["internal_resistance", "state_of_charge"] = -(
             (
-                5.0 * 2.62771800e-11 * dod ** 4.0
-                - 4.0 * 1.48987233e-08 * dod ** 3.0
-                + 3.0 * 2.03615618e-06 * dod ** 2.0
+                5.0 * 2.62771800e-11 * dod**4.0
+                - 4.0 * 1.48987233e-08 * dod**3.0
+                + 3.0 * 2.03615618e-06 * dod**2.0
                 - 2.0 * 1.06451730e-04 * dod
                 + 2.13818712e-03
             )
@@ -143,6 +139,4 @@ class PerformancesInternalResistance(om.ExplicitComponent):
             "settings:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":reference_temperature",
-        ] = (
-            soc_effect * temperature_effect * 46.39 / (temperature_ref - 254.33) ** 2.0
-        )
+        ] = soc_effect * temperature_effect * 46.39 / (temperature_ref - 254.33) ** 2.0

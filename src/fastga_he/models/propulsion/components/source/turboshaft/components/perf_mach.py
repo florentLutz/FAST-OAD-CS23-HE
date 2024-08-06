@@ -12,13 +12,11 @@ class PerformancesMach(om.ExplicitComponent):
     """Computation of free-stream Mach number."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("true_airspeed", units="m/s", val=np.nan, shape=number_of_points)
@@ -35,7 +33,6 @@ class PerformancesMach(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         true_airspeed = inputs["true_airspeed"]
         altitude = inputs["altitude"]
 
@@ -44,7 +41,6 @@ class PerformancesMach(om.ExplicitComponent):
         outputs["mach"] = true_airspeed / speed_of_sound
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         true_airspeed = inputs["true_airspeed"]
         altitude = inputs["altitude"]
 
@@ -54,4 +50,4 @@ class PerformancesMach(om.ExplicitComponent):
         d_sos_d_altitude = atm.partial_speed_of_sound_altitude
 
         partials["mach", "true_airspeed"] = 1.0 / speed_of_sound
-        partials["mach", "altitude"] = -true_airspeed / speed_of_sound ** 2.0 * d_sos_d_altitude
+        partials["mach", "altitude"] = -true_airspeed / speed_of_sound**2.0 * d_sos_d_altitude

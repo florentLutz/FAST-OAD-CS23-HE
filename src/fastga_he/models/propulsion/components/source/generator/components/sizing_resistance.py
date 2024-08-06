@@ -22,7 +22,6 @@ class SizingGeneratorPhaseResistance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
 
         self.add_input(
@@ -47,7 +46,6 @@ class SizingGeneratorPhaseResistance(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
         resistance_scaling = inputs[
@@ -58,10 +56,9 @@ class SizingGeneratorPhaseResistance(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:generator:" + generator_id + ":phase_resistance"
-        ] = (resistance_ref * 1e-3 * resistance_scaling)
+        ] = resistance_ref * 1e-3 * resistance_scaling
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         generator_id = self.options["generator_id"]
 
         resistance_ref = self.options["resistance_ref"]
@@ -71,6 +68,4 @@ class SizingGeneratorPhaseResistance(om.ExplicitComponent):
             "data:propulsion:he_power_train:generator:"
             + generator_id
             + ":scaling:phase_resistance",
-        ] = (
-            resistance_ref * 1e-3
-        )
+        ] = resistance_ref * 1e-3

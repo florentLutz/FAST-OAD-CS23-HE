@@ -13,7 +13,6 @@ from ..components.perf_maximum import PerformancesMaximum
 
 class PerformancesGearbox(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesGearbox(om.Group):
         )
 
     def setup(self):
-
         gearbox_id = self.options["gearbox_id"]
         number_of_points = self.options["number_of_points"]
 

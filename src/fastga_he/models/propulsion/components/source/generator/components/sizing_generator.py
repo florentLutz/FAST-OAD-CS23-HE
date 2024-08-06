@@ -41,7 +41,6 @@ class SizingGenerator(om.Group):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
         position = self.options["position"]
 

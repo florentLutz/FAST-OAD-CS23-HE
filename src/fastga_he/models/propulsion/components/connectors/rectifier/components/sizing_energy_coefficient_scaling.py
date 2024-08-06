@@ -25,7 +25,6 @@ class SizingRectifierEnergyCoefficientScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -48,7 +47,6 @@ class SizingRectifierEnergyCoefficientScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         current_caliber_ref = self.options["current_caliber_ref"]
@@ -58,11 +56,11 @@ class SizingRectifierEnergyCoefficientScaling(om.ExplicitComponent):
 
         current_caliber_star = current_ac_caliber / current_caliber_ref
 
-        outputs[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:a"
-        ] = current_caliber_star
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:a"] = (
+            current_caliber_star
+        )
         outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:c"] = (
-            current_caliber_star ** -1
+            current_caliber_star**-1
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -75,12 +73,8 @@ class SizingRectifierEnergyCoefficientScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:a",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber",
-        ] = (
-            1.0 / current_caliber_ref
-        )
+        ] = 1.0 / current_caliber_ref
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:c",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber",
-        ] = (
-            -current_caliber_ref / current_ac_caliber ** 2.0
-        )
+        ] = -current_caliber_ref / current_ac_caliber**2.0

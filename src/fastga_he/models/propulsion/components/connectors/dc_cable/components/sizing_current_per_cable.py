@@ -10,7 +10,6 @@ class SizingCurrentPerCable(om.ExplicitComponent):
     """Computation of max current per cable ."""
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -19,7 +18,6 @@ class SizingCurrentPerCable(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -45,7 +43,6 @@ class SizingCurrentPerCable(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         outputs[
@@ -62,7 +59,6 @@ class SizingCurrentPerCable(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         partials[

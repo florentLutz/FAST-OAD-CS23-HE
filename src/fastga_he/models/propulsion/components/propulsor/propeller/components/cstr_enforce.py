@@ -9,9 +9,9 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE
-] = "fastga_he.submodel.propulsion.constraints.propeller.torque.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE] = (
+    "fastga_he.submodel.propulsion.constraints.propeller.torque.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -25,13 +25,11 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
 
         self.add_input(
@@ -55,9 +53,8 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating"
-        ] = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_max"]
+        outputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating"] = (
+            inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_max"]
+        )

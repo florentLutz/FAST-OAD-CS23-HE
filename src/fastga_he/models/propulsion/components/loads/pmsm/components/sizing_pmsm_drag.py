@@ -22,7 +22,6 @@ class SizingPMSMDrag(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -40,7 +39,6 @@ class SizingPMSMDrag(om.ExplicitComponent):
         self.options.declare("low_speed_aero", default=False, types=bool)
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
         position = self.options["position"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
@@ -52,7 +50,6 @@ class SizingPMSMDrag(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
-
             self.add_input(
                 name="data:propulsion:he_power_train:PMSM:" + motor_id + ":length",
                 val=np.nan,
@@ -87,7 +84,6 @@ class SizingPMSMDrag(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
         position = self.options["position"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
@@ -95,7 +91,6 @@ class SizingPMSMDrag(om.ExplicitComponent):
         motor_diameter = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":diameter"]
 
         if position == "on_the_wing":
-
             motor_length = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":length"]
             fineness = inputs[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":fairing:fineness"
@@ -114,13 +109,13 @@ class SizingPMSMDrag(om.ExplicitComponent):
             )
 
             # Complete turbulent flow with compressibility correction, from Gudmundsson page 678
-            cf = 0.455 / (np.log10(reynolds) ** 2.58 * (1.0 + 0.144 * mach ** 2.0) ** 0.65)
+            cf = 0.455 / (np.log10(reynolds) ** 2.58 * (1.0 + 0.144 * mach**2.0) ** 0.65)
             interference_factor = 1.1
 
             # From Gudmundsson page 703
             form_factor = 1.0 + 0.35 / fineness
 
-            fairing_wet_area = np.pi * motor_diameter ** 2.0 * (1.0 / 4.0 + fineness)
+            fairing_wet_area = np.pi * motor_diameter**2.0 * (1.0 / 4.0 + fineness)
             cd0 = interference_factor * cf * form_factor * fairing_wet_area / wing_area
 
             # TODO: This coefficient is for the nacelle alone, to account for installation on the
@@ -130,11 +125,9 @@ class SizingPMSMDrag(om.ExplicitComponent):
             outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":" + ls_tag + ":CD0"] = cd0
 
         else:
-
             outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":" + ls_tag + ":CD0"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
         position = self.options["position"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
@@ -142,7 +135,6 @@ class SizingPMSMDrag(om.ExplicitComponent):
         motor_diameter = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":diameter"]
 
         if position == "on_the_wing":
-
             fineness = inputs[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":fairing:fineness"
             ]
@@ -152,11 +144,11 @@ class SizingPMSMDrag(om.ExplicitComponent):
             reynolds = unit_reynolds * fineness * motor_diameter
 
             # Complete turbulent flow with compressibility correction, from Gudmundsson page 678
-            cf = 0.455 / (np.log10(reynolds) ** 2.58 * (1.0 + 0.144 * mach ** 2.0) ** 0.65)
+            cf = 0.455 / (np.log10(reynolds) ** 2.58 * (1.0 + 0.144 * mach**2.0) ** 0.65)
             d_cf_d_reynolds = (
                 -2.58
                 * 0.455
-                / (1.0 + 0.144 * mach ** 2.0) ** 0.65
+                / (1.0 + 0.144 * mach**2.0) ** 0.65
                 * np.log10(reynolds) ** -3.58
                 / (np.log(10) * reynolds)
             )
@@ -165,7 +157,7 @@ class SizingPMSMDrag(om.ExplicitComponent):
             # From Gudmundsson page 703
             form_factor = 1.0 + 0.35 / fineness
 
-            fairing_wet_area = np.pi * motor_diameter ** 2.0 * (1.0 / 4.0 + fineness)
+            fairing_wet_area = np.pi * motor_diameter**2.0 * (1.0 / 4.0 + fineness)
 
             partials[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":" + ls_tag + ":CD0",
@@ -191,16 +183,14 @@ class SizingPMSMDrag(om.ExplicitComponent):
                     * d_cf_d_reynolds
                     * form_factor
                     * fairing_wet_area
-                    - 0.35 * cf / fineness ** 2.0 * fairing_wet_area
-                    + cf * form_factor * np.pi * motor_diameter ** 2.0
+                    - 0.35 * cf / fineness**2.0 * fairing_wet_area
+                    + cf * form_factor * np.pi * motor_diameter**2.0
                 )
             )
             partials[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":" + ls_tag + ":CD0",
                 "data:geometry:wing:area",
-            ] = (
-                -interference_factor * cf * form_factor * fairing_wet_area / wing_area ** 2.0
-            )
+            ] = -interference_factor * cf * form_factor * fairing_wet_area / wing_area**2.0
             partials[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":" + ls_tag + ":CD0",
                 "data:aerodynamics:" + ls_tag + ":mach",
@@ -212,7 +202,7 @@ class SizingPMSMDrag(om.ExplicitComponent):
                 / wing_area
                 * 0.455
                 / np.log10(reynolds) ** 2.58
-                * (1.0 + 0.144 * mach ** 2.0) ** -1.65
+                * (1.0 + 0.144 * mach**2.0) ** -1.65
                 * 0.144
                 * 2.0
                 * mach

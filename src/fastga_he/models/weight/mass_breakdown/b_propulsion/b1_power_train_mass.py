@@ -18,7 +18,6 @@ class PowerTrainMass(om.ExplicitComponent):
         self.options.declare("propulsion_id", default="", types=str)
 
     def setup(self):
-
         self.add_input("data:propulsion:he_power_train:mass", val=np.nan, units="kg")
 
         self.add_output("data:weight:propulsion:mass", val=350.0, units="kg")
@@ -28,5 +27,4 @@ class PowerTrainMass(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["data:weight:propulsion:mass"] = inputs["data:propulsion:he_power_train:mass"]

@@ -13,7 +13,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         turbo_generator_id = self.options["turbo_generator_id"]
 
@@ -57,7 +55,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
 
         outputs["shaft_power_in"] = (
@@ -70,7 +67,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
         turbo_generator_id = self.options["turbo_generator_id"]
 

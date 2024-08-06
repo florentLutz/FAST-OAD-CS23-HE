@@ -12,7 +12,6 @@ class PerformancesDCSSPCMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -24,7 +23,6 @@ class PerformancesDCSSPCMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         dc_sspc_id = self.options["dc_sspc_id"]
 
@@ -73,7 +71,6 @@ class PerformancesDCSSPCMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"] = np.amax(
@@ -85,7 +82,6 @@ class PerformancesDCSSPCMaximum(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         current = inputs["dc_current_in"]

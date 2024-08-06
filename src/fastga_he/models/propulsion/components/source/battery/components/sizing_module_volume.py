@@ -14,7 +14,6 @@ class SizingBatteryModuleVolume(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -29,7 +28,6 @@ class SizingBatteryModuleVolume(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_input(
@@ -73,7 +71,6 @@ class SizingBatteryModuleVolume(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         outputs[
@@ -97,7 +94,6 @@ class SizingBatteryModuleVolume(om.ExplicitComponent):
         ] = self.options["cell_volume_ref"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         partials[

@@ -14,7 +14,6 @@ class SizingICEDisplacementVolume(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -23,7 +22,6 @@ class SizingICEDisplacementVolume(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
 
         self.add_input(
@@ -55,7 +53,6 @@ class SizingICEDisplacementVolume(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         pme_max = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":pme_max"] * 1e5  # In Pa
@@ -69,7 +66,6 @@ class SizingICEDisplacementVolume(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume"] = volume
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         ice_id = self.options["ice_id"]
 
         pme_max = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":pme_max"]
@@ -81,12 +77,12 @@ class SizingICEDisplacementVolume(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":pme_max",
-        ] = -(max_power * 2.0 * np.pi * strokes_nb) / (pme_max ** 2.0 * 1e5 * omega_max)
+        ] = -(max_power * 2.0 * np.pi * strokes_nb) / (pme_max**2.0 * 1e5 * omega_max)
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":rpm_max",
         ] = -(max_power * 2.0 * np.pi * strokes_nb) / (
-            pme_max * 1e5 * rpm_max ** 2.0 * 2.0 * np.pi / 60.0
+            pme_max * 1e5 * rpm_max**2.0 * 2.0 * np.pi / 60.0
         )
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume",

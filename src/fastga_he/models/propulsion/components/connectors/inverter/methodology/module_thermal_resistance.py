@@ -6,7 +6,6 @@ import numpy as np
 import plotly.express as px
 
 if __name__ == "__main__":
-
     I_cal = np.array(
         [
             200,

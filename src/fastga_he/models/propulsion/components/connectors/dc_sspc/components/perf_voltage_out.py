@@ -13,7 +13,6 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -26,7 +25,6 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -55,7 +53,6 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # Let's talk about that option, shall we ?
         # Because the input/output of electrical components not always matching inputs/outputs at
         # the OpenMDAO format as part of the load flow analysis, there sometimes is very strange
@@ -82,7 +79,6 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
             else:
                 outputs["dc_voltage_out"] = inputs["dc_voltage_in"] / inputs["efficiency"]
         else:
-
             # If we start from the principle that there will be a logic for the opening of SSPC (
             # which for instance will open both SSPC at the side of a cable if either one side
             # was to fail or if the cable was to fail, to ensure that no current flows through
@@ -91,7 +87,6 @@ class PerformancesDCSSPCVoltageOut(om.ExplicitComponent):
             outputs["dc_voltage_out"] = inputs["dc_voltage_in"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         if self.options["closed"]:

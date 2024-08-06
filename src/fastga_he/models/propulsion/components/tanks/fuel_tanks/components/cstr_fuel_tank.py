@@ -24,7 +24,6 @@ class ConstraintsFuelTank(om.Group):
         )
 
     def setup(self):
-
         option_fuel_tank_id = {"fuel_tank_id": self.options["fuel_tank_id"]}
 
         self.add_subsystem(

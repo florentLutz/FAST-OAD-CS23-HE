@@ -14,7 +14,6 @@ class InitializeGamma(om.ExplicitComponent):
     """Initializes the climb angle at each time step."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -35,7 +34,6 @@ class InitializeGamma(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -67,7 +65,6 @@ class InitializeGamma(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         true_airspeed = inputs["true_airspeed"]
         vertical_speed = inputs["vertical_speed"]
 
@@ -76,7 +73,6 @@ class InitializeGamma(om.ExplicitComponent):
         outputs["gamma"] = gamma
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         true_airspeed = inputs["true_airspeed"]
         vertical_speed = inputs["vertical_speed"]
 
@@ -84,7 +80,7 @@ class InitializeGamma(om.ExplicitComponent):
             -1.0
             / np.sqrt(1.0 - np.square(vertical_speed / true_airspeed))
             * vertical_speed
-            / true_airspeed ** 2.0
+            / true_airspeed**2.0
         )
         partials["gamma", "vertical_speed"] = (
             1.0 / np.sqrt(1.0 - np.square(vertical_speed / true_airspeed)) / true_airspeed

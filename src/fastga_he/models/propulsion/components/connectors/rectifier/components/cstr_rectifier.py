@@ -28,7 +28,6 @@ class ConstraintsRectifier(om.Group):
         )
 
     def setup(self):
-
         option_rectifier_id = {"rectifier_id": self.options["rectifier_id"]}
 
         self.add_subsystem(

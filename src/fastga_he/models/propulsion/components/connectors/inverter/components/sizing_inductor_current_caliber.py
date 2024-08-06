@@ -22,7 +22,6 @@ class SizingInverterInductorCurrentCaliber(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -50,7 +49,6 @@ class SizingInverterInductorCurrentCaliber(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
         outputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:current_caliber"
