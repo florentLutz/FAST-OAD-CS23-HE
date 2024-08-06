@@ -4,7 +4,6 @@
 
 import openmdao.api as om
 
-from fastga.command.api import list_inputs
 
 from ..components.slipstream_delta_cl_group import SlipstreamPropellerDeltaClGroup
 from ..components.slipstream_delta_cd0 import SlipstreamPropellerDeltaCD0

@@ -16,7 +16,7 @@ from fastga_he.models.propulsion.components.propulsor.propeller.methodology.perf
 )
 from fastga_he.models.aerodynamics.external.xfoil.xfoil_polar import XfoilPolarMod
 
-from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
+from tests.testing_utilities import run_system
 
 
 class ComputePropellerPointPerformanceDVar(om.Group):

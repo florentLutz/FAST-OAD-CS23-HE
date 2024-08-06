@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 from ...components.loads.pmsm import PerformancesPMSM
 from ...components.propulsor.propeller import PerformancesPropeller
@@ -12,7 +11,6 @@ from ...components.connectors.dc_cable import PerformancesHarness
 from ...components.connectors.dc_sspc import PerformancesDCSSPC
 from ...components.connectors.dc_bus import PerformancesDCBus
 from ...components.connectors.dc_dc_converter import PerformancesDCDCConverter
-from ...components.connectors.dc_sspc import PerformancesDCSSPC
 from ...components.source.battery import PerformancesBatteryPack
 
 

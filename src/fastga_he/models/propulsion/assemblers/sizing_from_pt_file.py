@@ -10,28 +10,6 @@ from fastoad.module_management.constants import ModelDomain
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 # noinspection PyUnresolvedReferences
-from fastga_he.models.propulsion.components import (
-    SizingPropeller,
-    SizingPMSM,
-    SizingInverter,
-    SizingDCBus,
-    SizingHarness,
-    SizingDCDCConverter,
-    SizingBatteryPack,
-    SizingDCSSPC,
-    SizingDCSplitter,
-    SizingRectifier,
-    SizingGenerator,
-    SizingICE,
-    SizingFuelTank,
-    SizingFuelSystem,
-    SizingTurboshaft,
-    SizingSpeedReducer,
-    SizingPlanetaryGear,
-    SizingTurboGenerator,
-    SizingGearbox,
-    SizingDCAuxLoad,
-)
 
 from .constants import (
     SUBMODEL_POWER_TRAIN_MASS,

@@ -5,7 +5,6 @@
 import openmdao.api as om
 import numpy as np
 
-from ..constants import POSSIBLE_POSITION
 
 
 class SizingTurboshaftNacelleWetArea(om.ExplicitComponent):

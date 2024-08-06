@@ -10,7 +10,6 @@ import openmdao.api as om
 import numpy as np
 import pandas as pd
 
-import plotly.graph_objects as go
 
 from pyDOE2 import lhs
 

@@ -4,8 +4,6 @@
 
 import numpy as np
 import plotly.graph_objects as go
-import pandas as pd
-from pyvplm.addon.variablepowerlaw import regression_models, perform_regression
 
 if __name__ == "__main__":
     # Data correspond to what is found inside data/FourCylindersAtmospheric.csv

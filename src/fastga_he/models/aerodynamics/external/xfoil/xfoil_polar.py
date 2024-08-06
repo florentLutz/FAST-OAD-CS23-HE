@@ -147,7 +147,7 @@ class XfoilPolarMod(ExternalCodeComp):
             near_mach = []
             distance_to_mach = []
             for index in index_near_mach:
-                if not (saved_mach_list[index] in near_mach):
+                if saved_mach_list[index] not in near_mach:
                     near_mach.append(saved_mach_list[index])
                     distance_to_mach.append(abs(saved_mach_list[index] - mach))
             if not near_mach:

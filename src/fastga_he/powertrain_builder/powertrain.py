@@ -26,7 +26,6 @@ import networkx as nx
 from .exceptions import (
     FASTGAHEUnknownComponentID,
     FASTGAHEUnknownOption,
-    FASTGAHEComponentsNotIdentified,
     FASTGAHESingleSSPCAtEndOfLine,
     FASTGAHEIncoherentVoltage,
     FASTGAHEImpossiblePair,

@@ -1,7 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
-import copy
 import pathlib
 import time
 import warnings
@@ -10,15 +9,10 @@ import openmdao.api as om
 import numpy as np
 import pandas as pd
 
-import plotly.graph_objects as go
 
 from pyDOE2 import lhs
 
 from turboshaft_components.turboshaft_geometry_computation import DesignPointCalculation
-from turboshaft_components.turboshaft_off_design_max_power import (
-    TurboshaftMaxPowerOPRLimit,
-    TurboshaftMaxPowerITTLimit,
-)
 from turboshaft_components.turboshaft_off_design_fuel import Turboshaft
 
 

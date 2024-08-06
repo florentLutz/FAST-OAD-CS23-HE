@@ -370,17 +370,17 @@ def test_wing_punctual_mass_identification():
     assert "ice_1" in wing_punctual_mass_list
     assert "ICE" in wing_punctual_mass_type_list
 
-    assert not ("battery_pack_1" in wing_punctual_mass_list)
+    assert "battery_pack_1" not in wing_punctual_mass_list
 
-    assert not ("propeller_1" in wing_punctual_mass_list)
-    assert not ("motor_1" in wing_punctual_mass_list)
-    assert not ("inverter_1" in wing_punctual_mass_list)
-    assert not ("dc_sspc_1" in wing_punctual_mass_list)
-    assert not ("dc_bus_1" in wing_punctual_mass_list)
-    assert not ("dc_sspc_2" in wing_punctual_mass_list)
-    assert not ("dc_line_1" in wing_punctual_mass_list)
-    assert not ("dc_sspc_3" in wing_punctual_mass_list)
-    assert not ("dc_splitter_1" in wing_punctual_mass_list)
+    assert "propeller_1" not in wing_punctual_mass_list
+    assert "motor_1" not in wing_punctual_mass_list
+    assert "inverter_1" not in wing_punctual_mass_list
+    assert "dc_sspc_1" not in wing_punctual_mass_list
+    assert "dc_bus_1" not in wing_punctual_mass_list
+    assert "dc_sspc_2" not in wing_punctual_mass_list
+    assert "dc_line_1" not in wing_punctual_mass_list
+    assert "dc_sspc_3" not in wing_punctual_mass_list
+    assert "dc_splitter_1" not in wing_punctual_mass_list
 
 
 def test_wing_distributed_mass_identification():

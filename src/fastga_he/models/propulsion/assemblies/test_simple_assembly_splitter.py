@@ -7,7 +7,6 @@ import os.path as pth
 import numpy as np
 import pytest
 
-import openmdao.api as om
 
 import fastoad.api as oad
 from stdatm import Atmosphere

@@ -17,7 +17,6 @@ from .perf_currents import PerformancesCurrents
 from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_conduction_losses import PerformancesConductionLosses
 from .perf_total_losses import PerformancesLosses
-from .perf_efficiency import PerformancesEfficiency
 from .perf_maximum import PerformancesMaximum
 
 from ..constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY

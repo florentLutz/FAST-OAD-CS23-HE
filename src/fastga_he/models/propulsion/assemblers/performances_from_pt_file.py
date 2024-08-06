@@ -13,28 +13,6 @@ from fastga_he.models.propulsion.assemblers.energy_consumption_from_pt_file impo
 )
 
 # noinspection PyUnresolvedReferences
-from fastga_he.models.propulsion.components import (
-    PerformancesPropeller,
-    PerformancesPMSM,
-    PerformancesInverter,
-    PerformancesDCBus,
-    PerformancesHarness,
-    PerformancesDCDCConverter,
-    PerformancesBatteryPack,
-    PerformancesDCSSPC,
-    PerformancesDCSplitter,
-    PerformancesRectifier,
-    PerformancesGenerator,
-    PerformancesICE,
-    PerformancesFuelTank,
-    PerformancesFuelSystem,
-    PerformancesTurboshaft,
-    PerformancesSpeedReducer,
-    PerformancesPlanetaryGear,
-    PerformancesTurboGenerator,
-    PerformancesGearbox,
-    PerformancesDCAuxLoad,
-)
 
 from .constants import SUBMODEL_POWER_TRAIN_PERF, SUBMODEL_THRUST_DISTRIBUTOR
 

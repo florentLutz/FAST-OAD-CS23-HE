@@ -7,7 +7,7 @@ import numpy as np
 
 import fastoad.api as oad
 
-from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator, PT_DATA_PREFIX
+from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
     OperationalMissionVector,

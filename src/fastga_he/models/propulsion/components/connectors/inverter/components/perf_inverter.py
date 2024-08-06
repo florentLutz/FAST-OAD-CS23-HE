@@ -15,7 +15,6 @@ from .perf_conduction_loss import PerformancesConductionLosses
 from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_total_loss import PerformancesLosses
 from .perf_casing_temperature import PerformancesCasingTemperature
-from .perf_efficiency import PerformancesEfficiency
 from .perf_dc_current import PerformancesDCCurrent
 from .perf_maximum import PerformancesMaximum
 

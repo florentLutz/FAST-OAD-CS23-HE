@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import numpy as np
-from scipy.interpolate import InterpolatedUnivariateSpline
 
 import openmdao.api as om
 
