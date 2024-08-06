@@ -34,7 +34,8 @@ jobs:
 
       - name: Check with Ruff
         run: |
-          poetry run ruff format --check .  # Check format but not coding rules for now
+          poetry run ruff format --check .  # Check format but not  for now
+          poetry run ruff check .           # Check coding rules
         shell: bash
 
       - name: Component unit tests
