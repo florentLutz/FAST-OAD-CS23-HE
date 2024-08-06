@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
 from .components.perf_harness import PerformancesHarness
 from .components.sizing_harness import SizingHarness
 from .components.slipstream_harness import SlipstreamHarness

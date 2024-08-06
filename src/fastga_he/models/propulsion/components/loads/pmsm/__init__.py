@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
 from .components.sizing_pmsm import SizingPMSM
 from .components.perf_pmsm import PerformancesPMSM
 from .components.slipstream_pmsm import SlipstreamPMSM

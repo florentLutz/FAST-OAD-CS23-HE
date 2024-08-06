@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
 from .components.sizing_planetary_gear import SizingPlanetaryGear
 from .components.perf_planetary_gear import PerformancesPlanetaryGear
 from .components.slipstream_planetary_gear import SlipstreamPlanetaryGear

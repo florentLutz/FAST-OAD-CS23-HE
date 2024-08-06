@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
 from .connectors.dc_bus import SizingDCBus, PerformancesDCBus, SlipstreamDCBus
 from .connectors.dc_cable import SizingHarness, PerformancesHarness, SlipstreamHarness
 from .connectors.dc_dc_converter import (
