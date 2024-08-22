@@ -5,6 +5,7 @@ import logging
 import pytest
 
 import numpy as np
+import pandas as pd
 
 import plotly.graph_objects as go
 import plotly.express as px
@@ -20,6 +21,9 @@ from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 from fastga_he.gui.analysis_and_plots import (
     aircraft_geometry_plot,
 )
+from fastga_he.gui.performances_viewer import MARKER_DICTIONARY, COLOR_DICTIONARY
+
+from fastga_he.powertrain_builder.powertrain import PROMOTION_FROM_MISSION
 
 from utils.filter_residuals import filter_residuals
 
@@ -394,10 +398,9 @@ def test_aircraft_geometry_plot():
     fig = aircraft_geometry_plot(results_pipistrel_file_path, name="Pipistrel")
 
     fig.update_layout(
-        title_text="Comparison of computed aircraft geometry with top view of the Pipistrel",
-        title_x=0.5,
         height=800,
         width=1600,
+        font_size=18,
     )
 
     pipistrel_top_view = Image.open("data/Top_view_clean.JPG")
@@ -418,4 +421,132 @@ def test_aircraft_geometry_plot():
     )
 
     # fig.show()
+    fig.write_image(pth.join(RESULTS_FOLDER_PATH, "pipistrel_geometry.svg"))
     fig.write_image(pth.join(RESULTS_FOLDER_PATH, "pipistrel_geometry.pdf"))
+
+
+def test_plot_power_profile_results():
+    mission_data_file = pth.join(RESULTS_FOLDER_PATH, "mission_data.csv")
+    pt_data_file = pth.join(RESULTS_FOLDER_PATH, "pipistrel_power_train_data.csv")
+
+    columns_to_drop = []
+    for mission_variable_name in list(PROMOTION_FROM_MISSION.keys()):
+        columns_to_drop.append(
+            mission_variable_name + " [" + PROMOTION_FROM_MISSION[mission_variable_name] + "]"
+        )
+
+    # Read the two CSV and concatenate them so that all data can be displayed against all
+    # data
+    power_train_data = pd.read_csv(pt_data_file, index_col=0)
+    # Remove the taxi power train data because they are not stored in the mission data
+    # either
+    power_train_data = power_train_data.drop([0]).iloc[:-1]
+    # We readjust the index
+    power_train_data = power_train_data.set_index(np.arange(len(power_train_data.index)))
+    power_train_data = power_train_data.drop(columns_to_drop, axis=1)
+
+    mission_data = pd.read_csv(mission_data_file, index_col=0)
+    all_data = pd.concat([power_train_data, mission_data], axis=1)
+
+    fig = go.Figure()
+
+    x_name = "time"
+    y_name = "propeller_1 shaft_power_in [kW]"
+
+    name_to_flight_phase = {
+        "sizing:main_route:climb": "Climb",
+        "sizing:main_route:cruise": "Cruise",
+        "sizing:main_route:descent": "Descent",
+        "sizing:main_route:reserve": "Reserve",
+    }
+
+    for name in [
+        "sizing:main_route:climb",
+        "sizing:main_route:cruise",
+        "sizing:main_route:descent",
+        "sizing:main_route:reserve",
+    ]:
+        # pylint: disable=invalid-name # that's a common naming
+        x = all_data.loc[all_data["name"] == name, x_name]
+        # pylint: disable=invalid-name # that's a common naming
+        y = all_data.loc[all_data["name"] == name, y_name]
+
+        scatter = go.Scatter(
+            x=x,
+            y=y,
+            mode="markers",
+            marker={
+                "color": COLOR_DICTIONARY[name],
+                "symbol": MARKER_DICTIONARY[name],
+                "size": 8,
+            },
+            name=name_to_flight_phase[name],
+            legendgroup="Primary axis",
+            legendgrouptitle_text="Flight phase",
+        )
+
+        fig.add_trace(scatter)
+
+    fig.update_layout(
+        xaxis_title="time [s]",
+        yaxis_title=y_name,
+        showlegend=True,
+    )
+    fig.update_layout(
+        height=800,
+        width=1600,
+        font_size=18,
+    )
+    fig.update_layout(
+        annotations=[
+            go.layout.Annotation(
+                text=" <u><b>Climb @ 650 ft/min, in ISA conditions:</b></u> <br>"
+                + "POH: 48kW (Maximum Continuous Power) <br>"
+                + "Computed: Around 50 kW",
+                align="left",
+                font=dict(size=25),
+                showarrow=False,
+                xref="paper",
+                yref="paper",
+                x=0.15,
+                y=0.97,
+                bordercolor="black",
+                borderwidth=1,
+                bgcolor="white",
+            ),
+            go.layout.Annotation(
+                text=" <u><b>Cruise @ 2000 ft, 92 KIAS:</b></u> <br>"
+                + "POH: 35kW <br>"
+                + "Computed: 33,7kW",
+                align="left",
+                font=dict(size=25),
+                showarrow=False,
+                xref="paper",
+                yref="paper",
+                x=0.53,
+                y=0.69,
+                bordercolor="black",
+                borderwidth=1,
+                bgcolor="white",
+            ),
+            go.layout.Annotation(
+                text=" <u><b>Reserve @ 2000 ft, 71 KIAS:</b></u> <br>"
+                + "POH: 20kW <br>"
+                + "Computed: 20,05kW",
+                align="left",
+                font=dict(size=25),
+                showarrow=False,
+                xref="paper",
+                yref="paper",
+                x=0.10,
+                y=0.26,
+                bordercolor="black",
+                borderwidth=1,
+                bgcolor="white",
+            ),
+        ]
+    )
+
+    # fig.show()
+    # fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_performances comparison.pdf"))
+    fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_performances comparison.svg"))
