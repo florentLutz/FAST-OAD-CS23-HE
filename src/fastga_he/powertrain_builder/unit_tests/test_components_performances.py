@@ -14,6 +14,30 @@ from fastga_he.powertrain_builder import resources
 from fastga_he.models.propulsion.assemblers import performances_from_pt_file
 
 # noinspection PyUnresolvedReferences
+# pylint: disable=unused-import
+# flake8: noqa
+from fastga_he.models.propulsion.components import (
+    PerformancesPropeller,
+    PerformancesPMSM,
+    PerformancesInverter,
+    PerformancesDCBus,
+    PerformancesHarness,
+    PerformancesDCDCConverter,
+    PerformancesBatteryPack,
+    PerformancesDCSSPC,
+    PerformancesDCSplitter,
+    PerformancesRectifier,
+    PerformancesGenerator,
+    PerformancesICE,
+    PerformancesFuelTank,
+    PerformancesFuelSystem,
+    PerformancesTurboshaft,
+    PerformancesSpeedReducer,
+    PerformancesPlanetaryGear,
+    PerformancesTurboGenerator,
+    PerformancesGearbox,
+    PerformancesDCAuxLoad,
+)
 
 from tests.testing_utilities import VariableListLocal
 

@@ -10,6 +10,30 @@ import fastoad.api as oad
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 # noinspection PyUnresolvedReferences
+# pylint: disable=unused-import
+# flake8: noqa
+from fastga_he.models.propulsion.components import (
+    SlipstreamPropeller,
+    SlipstreamPMSM,
+    SlipstreamInverter,
+    SlipstreamDCBus,
+    SlipstreamHarness,
+    SlipstreamDCDCConverter,
+    SlipstreamBatteryPack,
+    SlipstreamDCSSPC,
+    SlipstreamDCSplitter,
+    SlipstreamRectifier,
+    SlipstreamGenerator,
+    SlipstreamICE,
+    SlipstreamFuelTank,
+    SlipstreamFuelSystem,
+    SlipstreamTurboshaft,
+    SlipstreamSpeedReducer,
+    SlipstreamPlanetaryGear,
+    SlipstreamTurboGenerator,
+    SlipstreamGearbox,
+    SlipstreamDCAuxLoad,
+)
 
 from .constants import (
     SUBMODEL_THRUST_DISTRIBUTOR,

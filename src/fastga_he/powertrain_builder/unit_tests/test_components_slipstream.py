@@ -12,6 +12,30 @@ from fastga_he.powertrain_builder import resources
 from fastga_he.models.propulsion.assemblers import delta_from_pt_file
 
 # noinspection PyUnresolvedReferences
+# pylint: disable=unused-import
+# flake8: noqa
+from fastga_he.models.propulsion.components import (
+    SlipstreamPropeller,
+    SlipstreamPMSM,
+    SlipstreamInverter,
+    SlipstreamDCBus,
+    SlipstreamHarness,
+    SlipstreamDCDCConverter,
+    SlipstreamBatteryPack,
+    SlipstreamDCSSPC,
+    SlipstreamDCSplitter,
+    SlipstreamRectifier,
+    SlipstreamGenerator,
+    SlipstreamICE,
+    SlipstreamFuelTank,
+    SlipstreamFuelSystem,
+    SlipstreamTurboshaft,
+    SlipstreamSpeedReducer,
+    SlipstreamPlanetaryGear,
+    SlipstreamTurboGenerator,
+    SlipstreamGearbox,
+    SlipstreamDCAuxLoad,
+)
 
 from tests.testing_utilities import VariableListLocal
 

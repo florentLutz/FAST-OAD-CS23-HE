@@ -12,6 +12,30 @@ from fastga_he.powertrain_builder import resources
 from fastga_he.models.propulsion.assemblers import sizing_from_pt_file
 
 # noinspection PyUnresolvedReferences
+# pylint: disable=unused-import
+# flake8: noqa
+from fastga_he.models.propulsion.components import (
+    SizingPropeller,
+    SizingPMSM,
+    SizingInverter,
+    SizingDCBus,
+    SizingHarness,
+    SizingDCDCConverter,
+    SizingBatteryPack,
+    SizingDCSSPC,
+    SizingDCSplitter,
+    SizingRectifier,
+    SizingGenerator,
+    SizingICE,
+    SizingFuelTank,
+    SizingFuelSystem,
+    SizingTurboshaft,
+    SizingSpeedReducer,
+    SizingPlanetaryGear,
+    SizingTurboGenerator,
+    SizingGearbox,
+    SizingDCAuxLoad,
+)
 
 from tests.testing_utilities import VariableListLocal
 
