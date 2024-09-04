@@ -14,7 +14,6 @@ class PerformancesEquivalentRatedPowerOPRLimit(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -26,7 +25,6 @@ class PerformancesEquivalentRatedPowerOPRLimit(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
@@ -74,7 +72,6 @@ class PerformancesEquivalentRatedPowerOPRLimit(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         outputs["equivalent_rated_power_opr_limit"] = (
@@ -87,7 +84,6 @@ class PerformancesEquivalentRatedPowerOPRLimit(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
         number_of_points = self.options["number_of_points"]
 

@@ -20,13 +20,11 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -60,7 +58,6 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # If power is too low, we consider that there is no current, may prevent some convergence
         # issue
         current_in = np.where(
@@ -70,7 +67,6 @@ class PerformancesRectifierLoadSide(om.ExplicitComponent):
         outputs["ac_current_rms_in_one_phase"] = current_in
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials_voltage_in = np.where(
             inputs["power"] < 10.0,
             1e-6,

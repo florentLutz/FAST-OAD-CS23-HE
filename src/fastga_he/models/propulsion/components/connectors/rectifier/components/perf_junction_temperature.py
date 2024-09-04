@@ -9,9 +9,9 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE
-] = "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
+oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
+    "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
+)
 
 
 @oad.RegisterSubmodel(
@@ -32,7 +32,6 @@ class PerformancesJunctionTemperature(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -45,7 +44,6 @@ class PerformancesJunctionTemperature(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -158,7 +156,6 @@ class PerformancesJunctionTemperature(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         temp_c = inputs["casing_temperature"]
@@ -178,7 +175,6 @@ class PerformancesJunctionTemperature(om.ExplicitComponent):
         outputs["IGBT_temperature"] = temp_c + igbt_losses * r_th_jc_igbt
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         rectifier_id = self.options["rectifier_id"]

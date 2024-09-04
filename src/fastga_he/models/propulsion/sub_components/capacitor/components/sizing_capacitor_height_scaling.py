@@ -27,7 +27,6 @@ class SizingCapacitorHeightScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -46,7 +45,6 @@ class SizingCapacitorHeightScaling(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0 / self.options["height_ref"])
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         outputs[prefix + ":capacitor:scaling:height"] = (

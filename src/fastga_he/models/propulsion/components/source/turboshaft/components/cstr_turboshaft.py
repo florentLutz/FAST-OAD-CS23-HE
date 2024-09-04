@@ -16,7 +16,6 @@ class ConstraintsTurboshaft(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="turboshaft_id",
             default=None,
@@ -25,7 +24,6 @@ class ConstraintsTurboshaft(om.Group):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         option_turboshaft_id = {"turboshaft_id": turboshaft_id}
@@ -61,7 +59,6 @@ class ConstraintTurboshaftPowerRateMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         self.add_input(
@@ -81,7 +78,6 @@ class ConstraintTurboshaftPowerRateMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         outputs[

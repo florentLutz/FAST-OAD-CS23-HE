@@ -12,7 +12,6 @@ class SizingBusBarCrossSectionDimensions(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_bus_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingBusBarCrossSectionDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         self.add_input(
@@ -49,7 +47,6 @@ class SizingBusBarCrossSectionDimensions(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         cross_section_area = inputs[
@@ -62,12 +59,11 @@ class SizingBusBarCrossSectionDimensions(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:thickness"
         ] = np.sqrt(cross_section_area / w_t_ratio)
-        outputs[
-            "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:width"
-        ] = np.sqrt(cross_section_area * w_t_ratio)
+        outputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:width"] = (
+            np.sqrt(cross_section_area * w_t_ratio)
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         cross_section_area = inputs[
@@ -80,25 +76,17 @@ class SizingBusBarCrossSectionDimensions(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:thickness",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:area",
-        ] = (
-            1.0 / 2.0 * np.sqrt(1.0 / (w_t_ratio * cross_section_area))
-        )
+        ] = 1.0 / 2.0 * np.sqrt(1.0 / (w_t_ratio * cross_section_area))
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:thickness",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:w_t_ratio",
-        ] = (
-            -1.0 / 2.0 * np.sqrt(cross_section_area / w_t_ratio ** 3.0)
-        )
+        ] = -1.0 / 2.0 * np.sqrt(cross_section_area / w_t_ratio**3.0)
 
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:width",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:area",
-        ] = (
-            1.0 / 2.0 * np.sqrt(w_t_ratio / cross_section_area)
-        )
+        ] = 1.0 / 2.0 * np.sqrt(w_t_ratio / cross_section_area)
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:width",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:w_t_ratio",
-        ] = (
-            1.0 / 2.0 * np.sqrt(cross_section_area / w_t_ratio)
-        )
+        ] = 1.0 / 2.0 * np.sqrt(cross_section_area / w_t_ratio)

@@ -12,7 +12,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -24,7 +23,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -64,7 +62,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         outputs[
@@ -75,7 +72,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         ] = np.max(inputs["torque_out"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         partials[

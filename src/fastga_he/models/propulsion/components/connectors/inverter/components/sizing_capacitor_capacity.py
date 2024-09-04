@@ -21,7 +21,6 @@ class SizingInverterCapacitorCapacity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -59,7 +58,6 @@ class SizingInverterCapacitorCapacity(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         current_caliber = inputs[
@@ -82,10 +80,9 @@ class SizingInverterCapacitorCapacity(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:capacity"
-        ] = (max_f_u / voltage_ripple_amplitude)
+        ] = max_f_u / voltage_ripple_amplitude
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         current_caliber = inputs[
@@ -111,7 +108,7 @@ class SizingInverterCapacitorCapacity(om.ExplicitComponent):
         ] = (
             -0.3506
             * current_caliber
-            / (switching_frequency * voltage_ripple_percent * voltage_caliber ** 2.0)
+            / (switching_frequency * voltage_ripple_percent * voltage_caliber**2.0)
         )
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:capacity",
@@ -119,7 +116,7 @@ class SizingInverterCapacitorCapacity(om.ExplicitComponent):
         ] = (
             -0.3506
             * current_caliber
-            / (switching_frequency * voltage_ripple_percent ** 2.0 * voltage_caliber)
+            / (switching_frequency * voltage_ripple_percent**2.0 * voltage_caliber)
         )
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":capacitor:capacity",
@@ -127,5 +124,5 @@ class SizingInverterCapacitorCapacity(om.ExplicitComponent):
         ] = (
             -0.3506
             * current_caliber
-            / (switching_frequency ** 2.0 * voltage_ripple_percent * voltage_caliber)
+            / (switching_frequency**2.0 * voltage_ripple_percent * voltage_caliber)
         )

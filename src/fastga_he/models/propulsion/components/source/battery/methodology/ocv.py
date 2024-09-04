@@ -12,16 +12,12 @@ import plotly.graph_objects as go
 
 
 def open_circuit_function(parameter, p_1, alpha_1, p_2, alpha_2, p_3):
-
     return (
-        p_1 * np.exp(alpha_1 * parameter)
-        + p_2 * np.exp(alpha_2 * parameter)
-        + p_3 * parameter ** 2.0
+        p_1 * np.exp(alpha_1 * parameter) + p_2 * np.exp(alpha_2 * parameter) + p_3 * parameter**2.0
     )
 
 
 if __name__ == "__main__":
-
     data_file = pth.join(pth.dirname(__file__), "data/OCV.csv")
 
     ocv_data = pd.read_csv(data_file)

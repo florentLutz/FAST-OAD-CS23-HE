@@ -32,7 +32,6 @@ from ..constants import SUBMODEL_WING_SKIN_MASS
 )
 class ComputeSkinMass(om.ExplicitComponent):
     def setup(self):
-
         self.add_input("data:geometry:fuselage:maximum_width", val=np.nan, units="m")
         self.add_input("data:geometry:fuselage:maximum_height", val=np.nan, units="m")
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
@@ -185,15 +184,15 @@ class ComputeSkinMass(om.ExplicitComponent):
             )
         )
 
-        f_theta_vc = f_theta * vc ** 2.0
-        f_theta_vd = f_theta * vd ** 2.0
-        f_theta_va = f_theta * va ** 2.0
+        f_theta_vc = f_theta * vc**2.0
+        f_theta_vd = f_theta * vd**2.0
+        f_theta_va = f_theta * va**2.0
 
-        k_max1 = (vc ** 3.0 * f_theta_vc - va ** 3.0 * f_theta_va) / (
-            (vc - va) * (vc ** 2.0 + vc * va + va ** 2.0)
+        k_max1 = (vc**3.0 * f_theta_vc - va**3.0 * f_theta_va) / (
+            (vc - va) * (vc**2.0 + vc * va + va**2.0)
         )
-        k_max2 = (27.0 * vd ** 3.0 * f_theta_vd - va ** 3.0 * f_theta_va) / (
-            (3.0 * vd - va) * (9.0 * vd ** 2.0 + 3.0 * vd * va + va ** 2.0)
+        k_max2 = (27.0 * vd**3.0 * f_theta_vd - va**3.0 * f_theta_va) / (
+            (3.0 * vd - va) * (9.0 * vd**2.0 + 3.0 * vd * va + va**2.0)
         )
         k_max = max(k_max1, k_max2)
 
@@ -201,8 +200,8 @@ class ComputeSkinMass(om.ExplicitComponent):
             6.0 * np.log(taper_ratio) * (wing_span / 2.0 - fus_radius * taper_ratio)
             + wing_span
             / 2.0
-            * (2.0 * taper_ratio ** 3.0 - 3.0 * taper_ratio ** 2.0 - 6.0 * taper_ratio + 7.0)
-            + fus_radius * (taper_ratio ** 3.0 + 3.0 * taper_ratio - 4.0)
+            * (2.0 * taper_ratio**3.0 - 3.0 * taper_ratio**2.0 - 6.0 * taper_ratio + 7.0)
+            + fus_radius * (taper_ratio**3.0 + 3.0 * taper_ratio - 4.0)
         )
         q2 = (
             dist_aileron
@@ -210,7 +209,7 @@ class ComputeSkinMass(om.ExplicitComponent):
             * cl_aileron
             * aileron_max_deflection
             * np.cos(sweep_e)
-            * root_chord ** 2.0
+            * root_chord**2.0
             * (taper_ratio - 1.0) ** 3.0
         )
         e_def = (

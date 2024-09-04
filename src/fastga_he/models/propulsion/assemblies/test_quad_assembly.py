@@ -48,13 +48,11 @@ class PerformancesAssembly(om.Group):
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         # Propellers
@@ -331,7 +329,6 @@ class PerformancesAssembly(om.Group):
 
 
 def test_assembly():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -541,7 +538,6 @@ def test_assembly():
 
 
 def test_assembly_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly.yml")
 
     ivc = get_indep_var_comp(
@@ -646,7 +642,6 @@ def test_assembly_from_pt_file():
 
 
 def test_assembly_no_cross_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly_no_cross.yml")
 
     ivc = get_indep_var_comp(
@@ -751,7 +746,6 @@ def test_assembly_no_cross_from_pt_file():
 
 
 def test_thrust_distributor():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly.yml")
 
     ivc = get_indep_var_comp(
@@ -786,7 +780,6 @@ def test_thrust_distributor():
 
 
 def test_power_rate():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly.yml")
 
     ivc = get_indep_var_comp(
@@ -824,7 +817,6 @@ def test_power_rate():
 
 
 def test_slipstream_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly.yml")
 
     ivc = get_indep_var_comp(

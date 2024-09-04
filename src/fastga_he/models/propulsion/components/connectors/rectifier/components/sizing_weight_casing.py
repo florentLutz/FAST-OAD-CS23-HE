@@ -21,7 +21,6 @@ class SizingRectifierCasingsWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -41,19 +40,17 @@ class SizingRectifierCasingsWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         current_ac_caliber = inputs[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber"
         ]
 
-        outputs[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":casing:mass"
-        ] = 3.0 * (0.175 + 4e-4 * current_ac_caliber)
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":casing:mass"] = (
+            3.0 * (0.175 + 4e-4 * current_ac_caliber)
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[

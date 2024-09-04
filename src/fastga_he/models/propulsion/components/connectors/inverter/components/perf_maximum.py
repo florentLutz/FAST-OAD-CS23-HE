@@ -13,7 +13,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         inverter_id = self.options["inverter_id"]
 
@@ -217,21 +215,20 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max"
-        ] = np.max(inputs["ac_current_rms_out_one_phase"])
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max"
-        ] = np.max(inputs["ac_voltage_peak_out"])
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_dc_max"
-        ] = np.max(inputs["dc_current_in"])
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_dc_max"
-        ] = np.max(inputs["dc_voltage_in"])
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max"] = (
+            np.max(inputs["ac_current_rms_out_one_phase"])
+        )
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max"] = (
+            np.max(inputs["ac_voltage_peak_out"])
+        )
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_dc_max"] = (
+            np.max(inputs["dc_current_in"])
+        )
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_dc_max"] = (
+            np.max(inputs["dc_voltage_in"])
+        )
         outputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:temperature_max"
         ] = np.max(inputs["IGBT_temperature"])
@@ -252,7 +249,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         ] = np.max(inputs["modulation_index"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         partials[

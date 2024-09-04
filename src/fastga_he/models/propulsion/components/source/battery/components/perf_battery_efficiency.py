@@ -28,7 +28,6 @@ class PerformancesBatteryEfficiency(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         efficiency = np.where(
             np.abs(inputs["power_out"]) < 200.0,
             1.0,
@@ -37,7 +36,6 @@ class PerformancesBatteryEfficiency(om.ExplicitComponent):
         outputs["efficiency"] = efficiency
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials_losses = np.where(
             np.abs(inputs["power_out"]) < 200.0,
             1e-6,

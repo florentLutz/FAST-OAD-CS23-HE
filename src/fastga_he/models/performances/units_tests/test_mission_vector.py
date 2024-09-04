@@ -96,7 +96,6 @@ IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def test_initialize_altitude():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -161,7 +160,6 @@ def test_initialize_altitude():
 
 
 def test_initialize_density():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
 
@@ -251,7 +249,6 @@ def test_initialize_density():
 
 
 def test_initialize_temperature():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
 
@@ -343,7 +340,6 @@ def test_initialize_temperature():
 
 
 def test_climb_speed():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -446,7 +442,6 @@ def test_descent_speed():
 
 
 def test_reserve_speed():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -821,7 +816,6 @@ def test_initialize_airspeed_derivatives():
 
 
 def test_initialize_vertical_airspeed():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -926,7 +920,6 @@ def test_initialize_vertical_airspeed():
 
 
 def test_initialize_gamma():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -1056,7 +1049,6 @@ def test_initialize_gamma():
 
 
 def test_initialize_time_and_position():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -1270,7 +1262,6 @@ def test_initialize_time_and_position():
 
 
 def test_initialize_time_step():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "time",
@@ -1426,7 +1417,6 @@ def test_initialize_cog():
 
 
 def test_performances_per_phase():
-
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -1564,7 +1554,6 @@ def test_performances_per_phase():
 
 
 def test_mission_vector():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -1604,7 +1593,6 @@ def test_mission_vector():
 
 
 def test_mission_vector_from_yml():
-
     # Define used files depending on options
     xml_file_name = "sample_ac.xml"
     process_file_name = "mission_vector.yml"
@@ -1646,7 +1634,6 @@ def test_mission_vector_from_yml():
 
 
 def test_op_mission_vector_from_yml():
-
     # Define used files depending on options
     xml_file_name = "op_mission_inputs.xml"
     process_file_name = "op_mission_vector.yml"
@@ -1692,7 +1679,6 @@ def test_op_mission_vector_from_yml():
 
 
 def test_update_tow():
-
     ivc = get_indep_var_comp(list_inputs(UpdateTOW()), __file__, XML_FILE)
 
     problem = run_system(UpdateTOW(), ivc)
@@ -1703,7 +1689,6 @@ def test_update_tow():
 
 
 def test_mission_vector_from_yml_gearbox():
-
     # Define used files depending on options
     xml_file_name = "sample_ac.xml"
     process_file_name = "mission_vector_gearbox.yml"
@@ -1753,21 +1738,20 @@ def test_mission_vector_from_yml_gearbox():
 
 
 def test_mission_vector_from_yml_simplified_models():
-
     previously_active_models = copy.deepcopy(oad.RegisterSubmodel.active_models)
 
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.performances.dc_line.temperature_profile"
     ] = "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.constant"
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.dc_dc_converter.efficiency"
-    ] = "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.fixed"
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.inverter.junction_temperature"
-    ] = "fastga_he.submodel.propulsion.inverter.junction_temperature.fixed"
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.inverter.efficiency"
-    ] = "fastga_he.submodel.propulsion.inverter.efficiency.fixed"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.dc_dc_converter.efficiency"] = (
+        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.fixed"
+    )
+    oad.RegisterSubmodel.active_models["submodel.propulsion.inverter.junction_temperature"] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.fixed"
+    )
+    oad.RegisterSubmodel.active_models["submodel.propulsion.inverter.efficiency"] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.fixed"
+    )
 
     # Define used files depending on options
     xml_file_name = "sample_ac.xml"
@@ -1809,19 +1793,18 @@ def test_mission_vector_from_yml_simplified_models():
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.performances.dc_line.temperature_profile"
     ] = previously_active_models["submodel.propulsion.performances.dc_line.temperature_profile"]
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.dc_dc_converter.efficiency"
-    ] = previously_active_models["submodel.propulsion.dc_dc_converter.efficiency"]
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.inverter.junction_temperature"
-    ] = previously_active_models["submodel.propulsion.inverter.junction_temperature"]
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.inverter.efficiency"
-    ] = previously_active_models["submodel.propulsion.inverter.efficiency"]
+    oad.RegisterSubmodel.active_models["submodel.propulsion.dc_dc_converter.efficiency"] = (
+        previously_active_models["submodel.propulsion.dc_dc_converter.efficiency"]
+    )
+    oad.RegisterSubmodel.active_models["submodel.propulsion.inverter.junction_temperature"] = (
+        previously_active_models["submodel.propulsion.inverter.junction_temperature"]
+    )
+    oad.RegisterSubmodel.active_models["submodel.propulsion.inverter.efficiency"] = (
+        previously_active_models["submodel.propulsion.inverter.efficiency"]
+    )
 
 
 def test_mission_vector_direct_bus_battery_connection():
-
     # Define used files depending on options
     xml_file_name = "sample_ac.xml"
     process_file_name = "mission_vector_direct_bus_battery.yml"
@@ -1863,7 +1846,6 @@ def test_mission_vector_direct_bus_battery_connection():
 
 
 def test_mission_vector_direct_sspc_battery_connection():
-
     # Define used files depending on options
     xml_file_name = "sample_ac.xml"
     process_file_name = "mission_vector_direct_sspc_battery.yml"
@@ -1905,7 +1887,6 @@ def test_mission_vector_direct_sspc_battery_connection():
 
 
 def test_mission_vector_from_yml_fuel():
-
     # Define used files depending on options
     xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
     process_file_name = "fuel_propulsion_mission_vector.yml"
@@ -1941,7 +1922,6 @@ def test_mission_vector_from_yml_fuel():
 
 
 def test_mission_vector_from_yml_two_fuel():
-
     # Define used files depending on options
     xml_file_name = "sample_ac_fuel_and_battery_propulsion_criss_cross.xml"
     process_file_name = "two_fuel_propulsion_mission_vector.yml"
@@ -1977,7 +1957,6 @@ def test_mission_vector_from_yml_two_fuel():
 
 
 def test_mission_vector_from_yml_fuel_turbo():
-
     # Define used files depending on options
     xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
     process_file_name = "fuel_turbo_propulsion_mission_vector.yml"
@@ -2013,7 +1992,6 @@ def test_mission_vector_from_yml_fuel_turbo():
 
 
 def test_mission_vector_from_yml_fuel_and_battery():
-
     # Define used files depending on options
     xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
     process_file_name = "fuel_and_battery_propulsion_mission_vector.yml"
@@ -2061,7 +2039,6 @@ def test_mission_vector_from_yml_fuel_and_battery():
 
 
 def test_mission_vector_from_yml_fuel_and_battery_gear():
-
     # Define used files depending on options
     xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
     process_file_name = "fuel_and_battery_propulsion_gear_mission_vector.yml"
@@ -2106,31 +2083,30 @@ def test_mission_vector_from_yml_fuel_and_battery_gear():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_recording():
-
-    oad.RegisterSubmodel.active_models[
-        "submodel.performances_he.energy_consumption"
-    ] = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
+        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+    )
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    )
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.battery.state_of_charge"
     ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce"
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.performances.dc_line.temperature_profile"
     ] = "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics"
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.inverter.current"
-    ] = "fastga_he.submodel.propulsion.constraints.inverter.current.enforce"
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.torque"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce"
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.generator.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.generator.rpm.ensure"
-    oad.RegisterSubmodel.active_models[
-        "submodel.performances_he.dep_effect"
-    ] = "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.inverter.current"] = (
+        "fastga_he.submodel.propulsion.constraints.inverter.current.enforce"
+    )
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.torque"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce"
+    )
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.generator.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.generator.rpm.ensure"
+    )
+    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
+        "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    )
 
     # Define used files depending on options
     xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
@@ -2192,13 +2168,11 @@ def test_recording():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_case_reader():
-
     fig = go.Figure()
     cr = om.CaseReader("results/cases.sql")
 
     solver_case = cr.get_cases("root.nonlinear_solver")
     for i, case in enumerate(solver_case):
-
         battery_soc = case[
             "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances.battery_pack_1.state_of_charge"
         ]
@@ -2216,16 +2190,13 @@ def test_case_reader():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_case_analyzer():
-
     cr = om.CaseReader("results/cases.sql")
 
     solver_case = cr.get_cases("root.nonlinear_solver")
     for case in solver_case:
-
         residuals_dict = {}
 
         for residual in case.residuals:
-
             residuals_dict[residual] = sum(np.square(case.residuals[residual]))
 
         top_residuals = max(residuals_dict, key=residuals_dict.get)
@@ -2237,7 +2208,6 @@ def test_case_analyzer():
 
 
 def test_criss_cross_network_viewer():
-
     # Define used files depending on options
     pt_file_name = "fuel_and_battery_propulsion_criss_cross.yml"
 
@@ -2287,7 +2257,6 @@ def test_mission_criss_cross():
 
 
 def test_mission_vector_turboshaft():
-
     # Define used files depending on options
     xml_file_name = "sample_turboshaft_propulsion.xml"
     process_file_name = "turboshaft_propulsion_mission_vector.yml"
@@ -2324,7 +2293,6 @@ def test_mission_vector_turboshaft():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_mission_vector_eight_propeller_with_turned_off_sspc():
-
     # Define used files depending on options
     xml_file_name = "octo_assembly.xml"
     process_file_name = "octo_propulsion_mission_vector.yml"
@@ -2371,19 +2339,16 @@ def test_mission_vector_eight_propeller_with_turned_off_sspc():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
-def test_case_analyzer():
-
+def test_case_analyzer_octo_prop():
     cr = om.CaseReader(pth.join(RESULTS_FOLDER_PATH, "cases_octo_prop.sql"))
 
     solver_case = cr.get_cases(
         "root.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver"
     )
     for case in solver_case:
-
         residuals_dict = {}
 
         for residual in case.residuals:
-
             residuals_dict[residual] = sum(np.square(case.residuals[residual]))
 
         top_residuals = max(residuals_dict, key=residuals_dict.get)
@@ -2404,7 +2369,6 @@ def test_residuals_viewer():
         "root.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver"
     )
     for case in solver_case:
-
         print(
             "AC Voltage IN",
             case.outputs[
@@ -2420,7 +2384,6 @@ def test_residuals_viewer():
 
 
 def test_payload_range_elec():
-
     xml_file = "input_payload_range.xml"
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
@@ -2445,7 +2408,6 @@ def test_payload_range_elec():
 
 
 def test_payload_range_fuel():
-
     oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.climb_speed"] = None
     oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.descent_speed"] = None
 
@@ -2473,7 +2435,6 @@ def test_payload_range_fuel():
 
 
 def test_payload_range_hybrid():
-
     oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.climb_speed"] = None
     oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.descent_speed"] = None
 
@@ -2501,7 +2462,6 @@ def test_payload_range_hybrid():
 
 
 def test_sample_payload_range_space():
-
     xml_file = "input_payload_range_hybrid.xml"
 
     input_list = list_inputs(ComputePayloadRangeInnerSampling(number_of_sample=15))
@@ -2610,7 +2570,6 @@ def test_sample_payload_range_space():
 
 
 def test_payload_range_inner():
-
     oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.climb_speed"] = None
     oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.descent_speed"] = None
 
@@ -2799,7 +2758,6 @@ def test_payload_range_inner():
 
 
 def test_payload_range_inner_with_impossible_ranges():
-
     oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.climb_speed"] = None
     oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.descent_speed"] = None
 
@@ -2860,7 +2818,6 @@ def test_payload_range_inner_with_impossible_ranges():
 
 
 def test_payload_range_inner_with_builtin_sampling():
-
     oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.climb_speed"] = None
     oad.RegisterSubmodel.active_models["submodel.performances.mission_vector.descent_speed"] = None
 

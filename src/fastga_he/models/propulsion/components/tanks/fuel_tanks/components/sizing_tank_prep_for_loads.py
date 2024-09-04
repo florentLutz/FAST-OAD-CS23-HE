@@ -36,12 +36,10 @@ class SizingFuelTankPreparationForLoads(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
             self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
             self.add_input("data:geometry:wing:span", val=np.nan, units="m")
@@ -114,12 +112,10 @@ class SizingFuelTankPreparationForLoads(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             root_chord = inputs["data:geometry:wing:root:chord"]
             tip_chord = inputs["data:geometry:wing:tip:chord"]
             half_span = inputs["data:geometry:wing:span"] / 2.0
@@ -159,7 +155,6 @@ class SizingFuelTankPreparationForLoads(om.ExplicitComponent):
             ] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
@@ -175,9 +170,7 @@ class SizingFuelTankPreparationForLoads(om.ExplicitComponent):
                 + fuel_tank_id
                 + ":distributed_tanks:y_ratio_start",
                 "data:geometry:wing:span",
-            ] = (
-                0.25 * tank_width / half_span ** 2.0
-            )
+            ] = 0.25 * tank_width / half_span**2.0
             partials[
                 "data:propulsion:he_power_train:fuel_tank:"
                 + fuel_tank_id
@@ -189,18 +182,14 @@ class SizingFuelTankPreparationForLoads(om.ExplicitComponent):
                 + fuel_tank_id
                 + ":distributed_tanks:y_ratio_start",
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:width",
-            ] = (
-                -0.5 / half_span
-            )
+            ] = -0.5 / half_span
 
             partials[
                 "data:propulsion:he_power_train:fuel_tank:"
                 + fuel_tank_id
                 + ":distributed_tanks:y_ratio_end",
                 "data:geometry:wing:span",
-            ] = (
-                -0.25 * tank_width / half_span ** 2.0
-            )
+            ] = -0.25 * tank_width / half_span**2.0
             partials[
                 "data:propulsion:he_power_train:fuel_tank:"
                 + fuel_tank_id
@@ -212,6 +201,4 @@ class SizingFuelTankPreparationForLoads(om.ExplicitComponent):
                 + fuel_tank_id
                 + ":distributed_tanks:y_ratio_end",
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:width",
-            ] = (
-                0.5 / half_span
-            )
+            ] = 0.5 / half_span

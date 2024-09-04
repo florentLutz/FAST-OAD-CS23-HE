@@ -15,7 +15,6 @@ class SizingPMSMCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -30,7 +29,6 @@ class SizingPMSMCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         motor_id = self.options["motor_id"]
 
@@ -45,7 +43,6 @@ class SizingPMSMCGY(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
-
             self.add_input(
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:y_ratio",
                 val=np.nan,
@@ -55,12 +52,10 @@ class SizingPMSMCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         motor_id = self.options["motor_id"]
 
         if position == "on_the_wing":
-
             outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
                 * inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:y_ratio"]
@@ -68,25 +63,18 @@ class SizingPMSMCGY(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
         position = self.options["position"]
 
         if position == "on_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:y",
                 "data:geometry:wing:span",
-            ] = (
-                inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:y_ratio"] / 2.0
-            )
+            ] = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:y_ratio"] / 2.0
             partials[
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:y",
                 "data:propulsion:he_power_train:PMSM:" + motor_id + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

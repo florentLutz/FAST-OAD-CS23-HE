@@ -2,7 +2,6 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO.
 
-import numpy as np
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -18,7 +17,6 @@ class MissionCore(om.Group):
     """Find the conditions necessary for the aircraft equilibrium."""
 
     def initialize(self):
-
         # We have to declare them even if not used to preserve compatibility
         self.options.declare("propulsion_id", default="", types=str)
         self.options.declare(
@@ -60,7 +58,6 @@ class MissionCore(om.Group):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]

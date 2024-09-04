@@ -52,7 +52,6 @@ class ToCSV(om.ExplicitComponent):
         self.previous_iter_count_apply = 0
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -74,7 +73,6 @@ class ToCSV(om.ExplicitComponent):
         self.options.declare("out_file", default="", types=str)
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -178,7 +176,6 @@ class ToCSV(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -218,9 +215,9 @@ class ToCSV(om.ExplicitComponent):
         cd_tot = (
             cd0
             + delta_cd
-            + coeff_k_wing * cl_wing ** 2.0
-            + coeff_k_htp * cl_htp ** 2.0
-            + (cd_delta_m * delta_m ** 2.0)
+            + coeff_k_wing * cl_wing**2.0
+            + coeff_k_htp * cl_htp**2.0
+            + (cd_delta_m * delta_m**2.0)
         )
 
         thrust = inputs["thrust"]
@@ -243,7 +240,6 @@ class ToCSV(om.ExplicitComponent):
         )
 
         if self.options["out_file"] != "":
-
             results_df = pd.DataFrame(columns=CSV_DATA_LABELS)
             results_df["time"] = time
             results_df["altitude"] = altitude
@@ -295,11 +291,10 @@ class ToCSV(om.ExplicitComponent):
         outputs["tsfc"] = tsfc
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         thrust = inputs["thrust"]
         fuel_consumed_t = inputs["fuel_consumed_t"]
         time_step = inputs["time_step"]
 
-        partials["tsfc", "thrust"] = np.diag(-fuel_consumed_t / time_step / thrust ** 2.0)
+        partials["tsfc", "thrust"] = np.diag(-fuel_consumed_t / time_step / thrust**2.0)
         partials["tsfc", "fuel_consumed_t"] = np.diag(1.0 / time_step / thrust)
-        partials["tsfc", "time_step"] = np.diag(-fuel_consumed_t / time_step ** 2.0 / thrust)
+        partials["tsfc", "time_step"] = np.diag(-fuel_consumed_t / time_step**2.0 / thrust)

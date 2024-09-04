@@ -14,7 +14,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="speed_reducer_id",
             default=None,
@@ -26,7 +25,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -55,7 +53,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         outputs["shaft_power_in"] = (
@@ -66,7 +63,6 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
         number_of_points = self.options["number_of_points"]
 

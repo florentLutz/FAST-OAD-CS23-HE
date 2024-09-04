@@ -27,7 +27,6 @@ class InitializeReserveAirspeed(om.ExplicitComponent):
         self.reserve_idx = None
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -48,7 +47,6 @@ class InitializeReserveAirspeed(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -100,7 +98,6 @@ class InitializeReserveAirspeed(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cl_max_clean = inputs["data:aerodynamics:wing:low_speed:CL_max_clean"]
         wing_area = inputs["data:geometry:wing:area"]
         reserve_altitude = inputs["data:mission:sizing:main_route:reserve:altitude"]
@@ -116,7 +113,6 @@ class InitializeReserveAirspeed(om.ExplicitComponent):
         outputs["data:mission:sizing:main_route:reserve:v_tas"] = stall_speed_margin * vs_1
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         cl_max_clean = inputs["data:aerodynamics:wing:low_speed:CL_max_clean"]
         wing_area = inputs["data:geometry:wing:area"]
         reserve_altitude = inputs["data:mission:sizing:main_route:reserve:altitude"]
@@ -137,7 +133,10 @@ class InitializeReserveAirspeed(om.ExplicitComponent):
             * np.sqrt((mass_reserve * g) / (0.5 * density_reserve * wing_area))
             * cl_max_clean ** (-3.0 / 2.0)
         )
-        partials["data:mission:sizing:main_route:reserve:v_tas", "data:geometry:wing:area",] = (
+        partials[
+            "data:mission:sizing:main_route:reserve:v_tas",
+            "data:geometry:wing:area",
+        ] = (
             -0.5
             * stall_speed_margin
             * np.sqrt((mass_reserve * g) / (0.5 * density_reserve * cl_max_clean))
@@ -160,7 +159,5 @@ class InitializeReserveAirspeed(om.ExplicitComponent):
         ] = (
             -0.5
             * stall_speed_margin
-            * np.sqrt(
-                (mass_reserve * g) / (0.5 * density_reserve ** 3.0 * wing_area * cl_max_clean)
-            )
+            * np.sqrt((mass_reserve * g) / (0.5 * density_reserve**3.0 * wing_area * cl_max_clean))
         ) * atm.partial_density_altitude

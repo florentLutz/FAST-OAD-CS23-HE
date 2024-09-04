@@ -22,7 +22,6 @@ class SizingRectifierCapacitorWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -42,7 +41,6 @@ class SizingRectifierCapacitorWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         # We need the capacity in microF
@@ -54,11 +52,10 @@ class SizingRectifierCapacitorWeight(om.ExplicitComponent):
         )
 
         outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":capacitor:mass"] = (
-            10.524 * capacity ** 0.7749
+            10.524 * capacity**0.7749
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[
@@ -66,7 +63,7 @@ class SizingRectifierCapacitorWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":capacitor:capacity",
         ] = (
             10.524
-            * 1e6 ** 0.7749
+            * 1e6**0.7749
             * 0.7749
             * inputs[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":capacitor:capacity"

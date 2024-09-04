@@ -26,6 +26,6 @@ def test_performances_viewer(cleanup):
     mission_data_filename = pth.join(DATA_FOLDER_PATH, "mission_data.csv")
     pt_data_filename = pth.join(DATA_FOLDER_PATH, "power_train_data.csv")
 
-    performances_viewer = PerformancesViewer(
+    PerformancesViewer(
         power_train_data_file_path=pt_data_filename, mission_data_file_path=mission_data_filename
     )

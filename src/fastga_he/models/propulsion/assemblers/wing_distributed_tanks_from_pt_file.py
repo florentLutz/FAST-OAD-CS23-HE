@@ -25,7 +25,6 @@ class PowerTrainDistributedTanksFromFile(om.ExplicitComponent):
         self.curated_type_list = None
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -34,7 +33,6 @@ class PowerTrainDistributedTanksFromFile(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         # First we get the list of punctual masses and the pairs
@@ -87,7 +85,6 @@ class PowerTrainDistributedTanksFromFile(om.ExplicitComponent):
         for distributed_tank_name, distributed_tank_type in zip(
             wing_distributed_tanks_list, wing_distributed_tanks_type_list
         ):
-
             y_ratio_start_name = (
                 PT_DATA_PREFIX
                 + distributed_tank_type
@@ -158,7 +155,6 @@ class PowerTrainDistributedTanksFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         distributed_tanks_y_ratio_start = []
         distributed_tanks_y_ratio_end = []
         distributed_tanks_chord_start = []
@@ -210,24 +206,23 @@ class PowerTrainDistributedTanksFromFile(om.ExplicitComponent):
             distributed_tanks_chord_slope.append(float(inputs[chord_slope_name]))
             distributed_tanks_masses.append(float(inputs[mass_name]))
 
-        outputs[
-            "data:weight:airframe:wing:distributed_tanks:y_ratio_start"
-        ] = distributed_tanks_y_ratio_start
-        outputs[
-            "data:weight:airframe:wing:distributed_tanks:y_ratio_end"
-        ] = distributed_tanks_y_ratio_end
-        outputs[
-            "data:weight:airframe:wing:distributed_tanks:start_chord"
-        ] = distributed_tanks_chord_start
-        outputs[
-            "data:weight:airframe:wing:distributed_tanks:chord_slope"
-        ] = distributed_tanks_chord_slope
-        outputs[
-            "data:weight:airframe:wing:distributed_tanks:fuel_inside"
-        ] = distributed_tanks_masses
+        outputs["data:weight:airframe:wing:distributed_tanks:y_ratio_start"] = (
+            distributed_tanks_y_ratio_start
+        )
+        outputs["data:weight:airframe:wing:distributed_tanks:y_ratio_end"] = (
+            distributed_tanks_y_ratio_end
+        )
+        outputs["data:weight:airframe:wing:distributed_tanks:start_chord"] = (
+            distributed_tanks_chord_start
+        )
+        outputs["data:weight:airframe:wing:distributed_tanks:chord_slope"] = (
+            distributed_tanks_chord_slope
+        )
+        outputs["data:weight:airframe:wing:distributed_tanks:fuel_inside"] = (
+            distributed_tanks_masses
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         name_and_type_array = np.rec.fromarrays([self.curated_name_list, self.curated_type_list])
         nb_punctual_masses = len(self.curated_name_list)
 
@@ -286,6 +281,6 @@ class PowerTrainDistributedTanksFromFile(om.ExplicitComponent):
             partials[
                 "data:weight:airframe:wing:distributed_tanks:chord_slope", chord_slope_name
             ] = partials_value
-            partials[
-                "data:weight:airframe:wing:distributed_tanks:fuel_inside", mass_name
-            ] = partials_value
+            partials["data:weight:airframe:wing:distributed_tanks:fuel_inside", mass_name] = (
+                partials_value
+            )

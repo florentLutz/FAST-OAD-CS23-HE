@@ -9,12 +9,12 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_CURRENT_DC_BUS
-] = "fastga_he.submodel.propulsion.constraints.dc_bus.current.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_VOLTAGE_DC_BUS
-] = "fastga_he.submodel.propulsion.constraints.dc_bus.voltage.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_CURRENT_DC_BUS] = (
+    "fastga_he.submodel.propulsion.constraints.dc_bus.current.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_VOLTAGE_DC_BUS] = (
+    "fastga_he.submodel.propulsion.constraints.dc_bus.voltage.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -28,7 +28,6 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_bus_id",
             default=None,
@@ -38,7 +37,6 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         self.add_input(
@@ -60,7 +58,6 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         outputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":current_caliber"] = inputs[
@@ -79,7 +76,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_bus_id",
             default=None,
@@ -89,7 +85,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         self.add_input(
@@ -111,7 +106,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         outputs["data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":voltage_caliber"] = inputs[

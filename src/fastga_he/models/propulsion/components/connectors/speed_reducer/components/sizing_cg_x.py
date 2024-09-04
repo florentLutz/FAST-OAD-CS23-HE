@@ -31,16 +31,13 @@ class SizingSpeedReducerCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         speed_reducer_id = self.options["speed_reducer_id"]
 
         if position == "inside_the_wing":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         elif position == "in_the_front":
-
             self.add_input(
                 name="data:propulsion:he_power_train:speed_reducer:"
                 + speed_reducer_id
@@ -72,18 +69,15 @@ class SizingSpeedReducerCGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         speed_reducer_id = self.options["speed_reducer_id"]
 
         if position == "inside_the_wing":
-
             outputs[
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:x"
             ] = inputs["data:geometry:wing:MAC:at25percent:x"]
 
         elif position == "in_the_front":
-
             outputs[
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:x"
             ] = (
@@ -96,7 +90,6 @@ class SizingSpeedReducerCGX(om.ExplicitComponent):
             )
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:x"
             ] = (
@@ -111,19 +104,16 @@ class SizingSpeedReducerCGX(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         position = self.options["position"]
         speed_reducer_id = self.options["speed_reducer_id"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
             ] = 1.0
 
         elif position == "in_the_front":
-
             partials[
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:x",
                 "data:propulsion:he_power_train:speed_reducer:"
@@ -140,7 +130,6 @@ class SizingSpeedReducerCGX(om.ExplicitComponent):
             ]
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":CG:x",
                 "data:geometry:fuselage:front_length",

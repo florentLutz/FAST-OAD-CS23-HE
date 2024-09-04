@@ -20,7 +20,6 @@ class InitializeClimbAirspeed(om.ExplicitComponent):
     """Computes the equivalent airspeed at which the climb will be done."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -41,7 +40,6 @@ class InitializeClimbAirspeed(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -70,7 +68,6 @@ class InitializeClimbAirspeed(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cd0 = inputs["data:aerodynamics:aircraft:cruise:CD0"]
 
         coeff_k_wing = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
@@ -92,7 +89,6 @@ class InitializeClimbAirspeed(om.ExplicitComponent):
         outputs["data:mission:sizing:main_route:climb:v_eas"] = v_eas_climb
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         cd0 = inputs["data:aerodynamics:aircraft:cruise:CD0"]
 
         coeff_k_wing = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
@@ -114,16 +110,15 @@ class InitializeClimbAirspeed(om.ExplicitComponent):
         mass_partials[0] = mass[0]
 
         if v_y > 1.3 * vs1:
-
             d_c_l_d_k = -0.5 * np.sqrt(3.0 * cd0) * coeff_k_wing ** (-3.0 / 2.0)
             d_c_l_d_cd_0 = np.sqrt(3 / (coeff_k_wing * cd0))
 
             partials["data:mission:sizing:main_route:climb:v_eas", "mass"] = 0.5 * np.sqrt(
                 g / (0.5 * density_sl * wing_area * c_l * mass_partials)
             )
-            partials[
-                "data:mission:sizing:main_route:climb:v_eas", "data:geometry:wing:area"
-            ] = -0.5 * np.sqrt(mass[0] * g / (0.5 * density_sl * c_l) * wing_area ** (-3.0 / 2.0))
+            partials["data:mission:sizing:main_route:climb:v_eas", "data:geometry:wing:area"] = (
+                -0.5 * np.sqrt(mass[0] * g / (0.5 * density_sl * c_l) * wing_area ** (-3.0 / 2.0))
+            )
             partials[
                 "data:mission:sizing:main_route:climb:v_eas",
                 "data:aerodynamics:wing:cruise:induced_drag_coefficient",
@@ -138,7 +133,7 @@ class InitializeClimbAirspeed(om.ExplicitComponent):
                 "data:aerodynamics:aircraft:cruise:CD0",
             ] = (
                 -0.5
-                * (mass[0] * g / (0.5 * density_sl * wing_area * c_l ** 2.0))
+                * (mass[0] * g / (0.5 * density_sl * wing_area * c_l**2.0))
                 * c_l ** (-3.0 / 2.0)
                 * d_c_l_d_cd_0
             )
@@ -148,7 +143,6 @@ class InitializeClimbAirspeed(om.ExplicitComponent):
             ] = 0
 
         else:
-
             partials["data:mission:sizing:main_route:climb:v_eas", "mass"] = 0.65 * np.sqrt(
                 g / (0.5 * density_sl * wing_area * cl_max_clean * mass_partials)
             )

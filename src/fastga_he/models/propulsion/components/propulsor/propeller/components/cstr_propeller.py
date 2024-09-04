@@ -20,7 +20,6 @@ class ConstraintsPropeller(om.Group):
         )
 
     def setup(self):
-
         option_propeller_id = {"propeller_id": self.options["propeller_id"]}
 
         self.add_subsystem(

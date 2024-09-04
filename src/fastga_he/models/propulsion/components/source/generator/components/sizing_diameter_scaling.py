@@ -26,7 +26,6 @@ class SizingGeneratorDiameterScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
 
         self.add_input(
@@ -46,7 +45,6 @@ class SizingGeneratorDiameterScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
         rpm_max_ref = self.options["rpm_max_ref"]
@@ -63,7 +61,6 @@ class SizingGeneratorDiameterScaling(om.ExplicitComponent):
         ] = d_scaling
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         generator_id = self.options["generator_id"]
 
         rpm_max_ref = self.options["rpm_max_ref"]
@@ -73,6 +70,4 @@ class SizingGeneratorDiameterScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:generator:" + generator_id + ":scaling:diameter",
             "data:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating",
-        ] = (
-            -1.0 * rpm_max_ref / rpm_max ** 2.0
-        )
+        ] = -1.0 * rpm_max_ref / rpm_max**2.0

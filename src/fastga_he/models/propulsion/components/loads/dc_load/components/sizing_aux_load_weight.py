@@ -12,7 +12,6 @@ class SizingDCAuxLoadWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="aux_load_id",
             default=None,
@@ -21,7 +20,6 @@ class SizingDCAuxLoadWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         aux_load_id = self.options["aux_load_id"]
 
         self.add_input(
@@ -47,7 +45,6 @@ class SizingDCAuxLoadWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         aux_load_id = self.options["aux_load_id"]
 
         outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":mass"] = (
@@ -56,7 +53,6 @@ class SizingDCAuxLoadWeight(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         aux_load_id = self.options["aux_load_id"]
 
         partials[

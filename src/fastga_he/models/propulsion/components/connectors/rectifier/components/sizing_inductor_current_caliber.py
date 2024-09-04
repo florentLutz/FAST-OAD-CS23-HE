@@ -22,7 +22,6 @@ class SizingRectifierInductorCurrentCaliber(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -50,7 +49,6 @@ class SizingRectifierInductorCurrentCaliber(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
         outputs[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":inductor:current_caliber"

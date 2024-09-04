@@ -34,7 +34,6 @@ class SizingDCSSPCResistances(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         self.add_input(
@@ -63,7 +62,6 @@ class SizingDCSSPCResistances(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":igbt:resistance"] = (
@@ -77,7 +75,6 @@ class SizingDCSSPCResistances(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_sspc_id = self.options["dc_sspc_id"]
 
         partials[

@@ -10,7 +10,6 @@ class InitializeTimeStep(om.ExplicitComponent):
     """Computes the time step size for the energy consumption later."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -31,7 +30,6 @@ class InitializeTimeStep(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -53,7 +51,6 @@ class InitializeTimeStep(om.ExplicitComponent):
         self.declare_partials(of="time_step", wrt="time", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -81,7 +78,6 @@ class InitializeTimeStep(om.ExplicitComponent):
         outputs["time_step"] = time_step
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]

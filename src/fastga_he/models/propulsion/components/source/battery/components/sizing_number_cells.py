@@ -13,7 +13,6 @@ class SizingBatteryNumberCells(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingBatteryNumberCells(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_input(
@@ -47,7 +45,6 @@ class SizingBatteryNumberCells(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         outputs[
@@ -64,7 +61,6 @@ class SizingBatteryNumberCells(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         partials[

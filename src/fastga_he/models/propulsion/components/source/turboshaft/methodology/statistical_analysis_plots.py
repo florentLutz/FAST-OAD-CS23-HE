@@ -11,7 +11,6 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 if __name__ == "__main__":
-
     path_to_current_file = pathlib.Path(__file__)
     parent_folder = path_to_current_file.parents[0]
     data_file_path = parent_folder / "data_pt6_reduced.csv"
@@ -68,7 +67,7 @@ if __name__ == "__main__":
         row=1,
         col=2,
     )
-    diameter_trend_y = 2961.3 * trend_x ** -0.272
+    diameter_trend_y = 2961.3 * trend_x**-0.272
     trend_scatter_diameter = go.Scatter(
         x=trend_x,
         y=diameter_trend_y,

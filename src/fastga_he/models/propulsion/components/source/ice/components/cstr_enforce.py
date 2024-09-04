@@ -9,9 +9,9 @@ from ..constants import SUBMODEL_CONSTRAINTS_ICE_SL_POWER
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_ICE_SL_POWER
-] = "fastga_he.submodel.propulsion.constraints.ice.sea_level_power.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_ICE_SL_POWER] = (
+    "fastga_he.submodel.propulsion.constraints.ice.sea_level_power.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -25,7 +25,6 @@ class ConstraintsSeaLevelPowerEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -34,7 +33,6 @@ class ConstraintsSeaLevelPowerEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
 
         self.add_input(
@@ -58,7 +56,6 @@ class ConstraintsSeaLevelPowerEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL"] = inputs[

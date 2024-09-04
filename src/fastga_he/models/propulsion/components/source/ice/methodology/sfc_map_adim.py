@@ -4,11 +4,8 @@
 
 import numpy as np
 import plotly.graph_objects as go
-import pandas as pd
-from pyvplm.addon.variablepowerlaw import regression_models, perform_regression
 
 if __name__ == "__main__":
-
     # Data correspond to what is found inside data/FourCylindersAtmospheric.csv
 
     np.set_printoptions(suppress=True)
@@ -457,13 +454,13 @@ if __name__ == "__main__":
         np.ones_like(rpm_for_regression),
         rpm_for_regression,
         pme_for_regression,
-        rpm_for_regression ** 2.0,
+        rpm_for_regression**2.0,
         pme_for_regression * rpm_for_regression,
-        pme_for_regression ** 2.0,
-        rpm_for_regression ** 3.0,
-        rpm_for_regression ** 2.0 * pme_for_regression,
-        rpm_for_regression * pme_for_regression ** 2.0,
-        pme_for_regression ** 3.0,
+        pme_for_regression**2.0,
+        rpm_for_regression**3.0,
+        rpm_for_regression**2.0 * pme_for_regression,
+        rpm_for_regression * pme_for_regression**2.0,
+        pme_for_regression**3.0,
     ]
     B = sfc_for_regression
 
@@ -476,13 +473,13 @@ if __name__ == "__main__":
         a * np.ones_like(rpm_for_regression)
         + b * rpm_for_regression
         + c * pme_for_regression
-        + d * rpm_for_regression ** 2.0
+        + d * rpm_for_regression**2.0
         + e * pme_for_regression * rpm_for_regression
-        + f * pme_for_regression ** 2.0
-        + g * rpm_for_regression ** 3.0
-        + h * rpm_for_regression ** 2.0 * pme_for_regression
-        + i * rpm_for_regression * pme_for_regression ** 2.0
-        + j * pme_for_regression ** 3.0
+        + f * pme_for_regression**2.0
+        + g * rpm_for_regression**3.0
+        + h * rpm_for_regression**2.0 * pme_for_regression
+        + i * rpm_for_regression * pme_for_regression**2.0
+        + j * pme_for_regression**3.0
     )
     error_percent = (sfc_test - sfc_for_regression) / sfc_for_regression * 100.0
     print(np.mean(abs(error_percent)))

@@ -18,7 +18,6 @@ class PerformancesCellLosses(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("joule_losses_cell", units="W", val=np.full(number_of_points, np.nan))
@@ -36,5 +35,4 @@ class PerformancesCellLosses(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["losses_cell"] = inputs["joule_losses_cell"] + inputs["entropic_losses_cell"]

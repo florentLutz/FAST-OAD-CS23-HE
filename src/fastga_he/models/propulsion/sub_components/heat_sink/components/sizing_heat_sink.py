@@ -33,7 +33,6 @@ class SizingHeatSink(om.Group):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_subsystem(

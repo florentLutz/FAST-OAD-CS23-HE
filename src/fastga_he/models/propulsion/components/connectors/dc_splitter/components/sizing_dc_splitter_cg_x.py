@@ -31,16 +31,13 @@ class SizingDCSplitterCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         dc_splitter_id = self.options["dc_splitter_id"]
 
         if position == "inside_the_wing":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         elif position == "in_the_front":
-
             self.add_input(
                 name="data:propulsion:he_power_train:DC_splitter:"
                 + dc_splitter_id
@@ -72,18 +69,15 @@ class SizingDCSplitterCGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         dc_splitter_id = self.options["dc_splitter_id"]
 
         if position == "inside_the_wing":
-
-            outputs[
-                "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x"
-            ] = inputs["data:geometry:wing:MAC:at25percent:x"]
+            outputs["data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x"] = (
+                inputs["data:geometry:wing:MAC:at25percent:x"]
+            )
 
         elif position == "in_the_front":
-
             outputs["data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x"] = (
                 inputs[
                     "data:propulsion:he_power_train:DC_splitter:"
@@ -94,7 +88,6 @@ class SizingDCSplitterCGX(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + inputs["data:geometry:cabin:length"]
@@ -107,19 +100,16 @@ class SizingDCSplitterCGX(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         position = self.options["position"]
         dc_splitter_id = self.options["dc_splitter_id"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
             ] = 1.0
 
         elif position == "in_the_front":
-
             partials[
                 "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
                 "data:propulsion:he_power_train:DC_splitter:"
@@ -136,7 +126,6 @@ class SizingDCSplitterCGX(om.ExplicitComponent):
             ]
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":CG:x",
                 "data:geometry:fuselage:front_length",

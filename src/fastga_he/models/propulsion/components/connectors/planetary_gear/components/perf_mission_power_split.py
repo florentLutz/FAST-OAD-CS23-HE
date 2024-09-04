@@ -21,7 +21,6 @@ class PerformancesMissionPowerSplit(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="planetary_gear_id",
             default=None,
@@ -33,7 +32,6 @@ class PerformancesMissionPowerSplit(om.ExplicitComponent):
         )
 
     def setup(self):
-
         planetary_gear_id = self.options["planetary_gear_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -59,7 +57,6 @@ class PerformancesMissionPowerSplit(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -83,7 +80,6 @@ class PerformancesMissionPowerSplit(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
         number_of_points = self.options["number_of_points"]
 

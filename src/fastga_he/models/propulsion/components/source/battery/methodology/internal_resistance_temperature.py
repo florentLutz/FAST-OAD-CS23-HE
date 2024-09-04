@@ -7,7 +7,7 @@ SOC and a function of temperature under the form of an exponential (R_int(SOC, T
 T)). :cite:`lai:2019` gives the evolution of internal resistance for the temperature for a 18650
 cell (NCR 18650-type cylindrical Li-ion). We will make the assumption that the coefficient in the
 exponential do not vary too much from one Li-ion cell to another (Linked to chemistry, catalytic
-speed ?). """
+speed ?)."""
 
 import os.path as pth
 
@@ -19,12 +19,10 @@ import plotly.graph_objects as go
 
 
 def temperature_function(temperature_value, scaling_factor, ref_temperature):
-
     return np.exp(scaling_factor / (temperature_value + ref_temperature))
 
 
 def ratio(temperature_value, scaling_factor, ref_temperature):
-
     return temperature_function(
         temperature_value, scaling_factor, ref_temperature
     ) / temperature_function(
@@ -35,7 +33,6 @@ def ratio(temperature_value, scaling_factor, ref_temperature):
 
 
 def ratio_expanded(temperature_value):
-
     return np.exp(
         (46.386005 * (293.0 - temperature_value))
         / ((temperature_value - 254.33423266) * (293.0 - 254.33423266))
@@ -43,7 +40,6 @@ def ratio_expanded(temperature_value):
 
 
 if __name__ == "__main__":
-
     data_file = pth.join(pth.dirname(__file__), "data/internal_resistance_temperature.csv")
     temp_dependency = pd.read_csv(data_file)
 
@@ -69,7 +65,6 @@ if __name__ == "__main__":
     fig = go.Figure()
 
     for x, y, temperature in zip(x_list, y_list, temperatures):
-
         scatter = go.Scatter(x=x, y=y, name=str(temperature), mode="lines+markers")
         fig.add_trace(scatter)
 

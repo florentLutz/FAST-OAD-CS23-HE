@@ -15,7 +15,6 @@ class SlipstreamExhaustThrust(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("true_airspeed", units="m/s", val=np.nan, shape=number_of_points)
@@ -33,7 +32,6 @@ class SlipstreamExhaustThrust(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         exhaust_mass_flow = self.smooth_array(inputs["exhaust_mass_flow"])
         exhaust_velocity = self.smooth_array(inputs["exhaust_velocity"])
         true_airspeed = inputs["true_airspeed"]
@@ -49,7 +47,6 @@ class SlipstreamExhaustThrust(om.ExplicitComponent):
         outputs["exhaust_thrust"] = exhaust_thrust
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         exhaust_mass_flow = self.smooth_array(inputs["exhaust_mass_flow"])
         exhaust_velocity = self.smooth_array(inputs["exhaust_velocity"])
         true_airspeed = inputs["true_airspeed"]

@@ -16,7 +16,6 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -28,7 +27,6 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
@@ -92,7 +90,6 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         density_ratio = inputs["density_ratio"]
@@ -120,7 +117,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
         design_power = power_rating * power_ratio
 
         fuel_consumption = (
-            10 ** -3.60160
+            10**-3.60160
             * density_ratio
             ** (
                 +4.25222 * np.log10(design_t41t) ** 2 * np.log10(power)
@@ -146,8 +143,8 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
                 + 3.81275 * np.log10(design_t41t) * np.log10(design_opr) ** 2
                 + 2.28445 * np.log10(design_t41t) ** 2 * np.log10(power)
             )
-            * design_opr ** 9.27470
-            * power ** -0.10030
+            * design_opr**9.27470
+            * power**-0.10030
         ) * k_fc
 
         outputs["fuel_consumption"] = fuel_consumption

@@ -21,7 +21,6 @@ class SizingCapacitorDiameterScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -44,7 +43,6 @@ class SizingCapacitorDiameterScaling(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         capacity_star = inputs[prefix + ":capacitor:scaling:capacity"]
@@ -55,15 +53,14 @@ class SizingCapacitorDiameterScaling(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
         capacity_star = inputs[prefix + ":capacitor:scaling:capacity"]
         aspect_ratio = inputs[prefix + ":capacitor:aspect_ratio"]
 
         partials[prefix + ":capacitor:scaling:diameter", prefix + ":capacitor:scaling:capacity"] = (
-            1.0 / 3.0 * (capacity_star ** -2.0 * aspect_ratio) ** (1.0 / 3.0)
+            1.0 / 3.0 * (capacity_star**-2.0 * aspect_ratio) ** (1.0 / 3.0)
         )
         partials[prefix + ":capacitor:scaling:diameter", prefix + ":capacitor:aspect_ratio"] = (
-            1.0 / 3.0 * (capacity_star * aspect_ratio ** -2.0) ** (1.0 / 3.0)
+            1.0 / 3.0 * (capacity_star * aspect_ratio**-2.0) ** (1.0 / 3.0)
         )

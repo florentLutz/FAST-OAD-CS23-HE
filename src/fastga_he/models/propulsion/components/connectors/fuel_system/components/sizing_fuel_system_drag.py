@@ -16,7 +16,6 @@ class SizingFuelSystemDrag(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_system_id",
             default=None,

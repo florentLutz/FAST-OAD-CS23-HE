@@ -25,7 +25,6 @@ class PowerTrainDistributedLoadsFromFile(om.ExplicitComponent):
         self.curated_type_list = None
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -34,7 +33,6 @@ class PowerTrainDistributedLoadsFromFile(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         # First we get the list of punctual masses and the pairs
@@ -87,7 +85,6 @@ class PowerTrainDistributedLoadsFromFile(om.ExplicitComponent):
         for distributed_mass_name, distributed_mass_type in zip(
             wing_distributed_mass_list, wing_distributed_mass_type_list
         ):
-
             y_ratio_start_name = (
                 PT_DATA_PREFIX
                 + distributed_mass_type
@@ -152,7 +149,6 @@ class PowerTrainDistributedLoadsFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         distributed_masses_y_ratio_start = []
         distributed_masses_y_ratio_end = []
         distributed_masses_chord_start = []
@@ -200,22 +196,21 @@ class PowerTrainDistributedLoadsFromFile(om.ExplicitComponent):
             distributed_masses_chord_slope.append(float(inputs[chord_slope_name]))
             distributed_masses_masses.append(float(inputs[mass_name]))
 
-        outputs[
-            "data:weight:airframe:wing:distributed_mass:y_ratio_start"
-        ] = distributed_masses_y_ratio_start
-        outputs[
-            "data:weight:airframe:wing:distributed_mass:y_ratio_end"
-        ] = distributed_masses_y_ratio_end
-        outputs[
-            "data:weight:airframe:wing:distributed_mass:start_chord"
-        ] = distributed_masses_chord_start
-        outputs[
-            "data:weight:airframe:wing:distributed_mass:chord_slope"
-        ] = distributed_masses_chord_slope
+        outputs["data:weight:airframe:wing:distributed_mass:y_ratio_start"] = (
+            distributed_masses_y_ratio_start
+        )
+        outputs["data:weight:airframe:wing:distributed_mass:y_ratio_end"] = (
+            distributed_masses_y_ratio_end
+        )
+        outputs["data:weight:airframe:wing:distributed_mass:start_chord"] = (
+            distributed_masses_chord_start
+        )
+        outputs["data:weight:airframe:wing:distributed_mass:chord_slope"] = (
+            distributed_masses_chord_slope
+        )
         outputs["data:weight:airframe:wing:distributed_mass:mass"] = distributed_masses_masses
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         name_and_type_array = np.rec.fromarrays([self.curated_name_list, self.curated_type_list])
         nb_punctual_masses = len(self.curated_name_list)
 
@@ -261,13 +256,13 @@ class PowerTrainDistributedLoadsFromFile(om.ExplicitComponent):
             partials[
                 "data:weight:airframe:wing:distributed_mass:y_ratio_start", y_ratio_start_name
             ] = partials_value
-            partials[
-                "data:weight:airframe:wing:distributed_mass:y_ratio_end", y_ratio_end_name
-            ] = partials_value
-            partials[
-                "data:weight:airframe:wing:distributed_mass:start_chord", chord_start_name
-            ] = partials_value
-            partials[
-                "data:weight:airframe:wing:distributed_mass:chord_slope", chord_slope_name
-            ] = partials_value
+            partials["data:weight:airframe:wing:distributed_mass:y_ratio_end", y_ratio_end_name] = (
+                partials_value
+            )
+            partials["data:weight:airframe:wing:distributed_mass:start_chord", chord_start_name] = (
+                partials_value
+            )
+            partials["data:weight:airframe:wing:distributed_mass:chord_slope", chord_slope_name] = (
+                partials_value
+            )
             partials["data:weight:airframe:wing:distributed_mass:mass", mass_name] = partials_value

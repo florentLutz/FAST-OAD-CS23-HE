@@ -10,7 +10,6 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingFuelSystemCGX(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             name="fuel_system_id",
             default=None,
@@ -28,7 +27,6 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_system_id = self.options["fuel_system_id"]
         position = self.options["position"]
 
@@ -40,43 +38,36 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
         )
 
         if position == "in_the_wing":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         elif position == "in_the_front":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
         else:
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
 
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_system_id = self.options["fuel_system_id"]
         position = self.options["position"]
 
         if position == "in_the_wing":
-
             fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
 
-            outputs[
-                "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:x"
-            ] = fa_length
+            outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:x"] = (
+                fa_length
+            )
 
         elif position == "in_the_front":
-
             front_length = inputs["data:geometry:fuselage:front_length"]
 
-            outputs[
-                "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:x"
-            ] = front_length
+            outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:x"] = (
+                front_length
+            )
 
         else:
-
             front_length = inputs["data:geometry:fuselage:front_length"]
             cabin_length = inputs["data:geometry:cabin:length"]
 

@@ -21,7 +21,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -30,7 +29,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -70,7 +68,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         outputs[
@@ -85,7 +82,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         partials[
@@ -113,7 +109,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -122,7 +117,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -162,7 +156,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         outputs[
@@ -177,7 +170,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         partials[

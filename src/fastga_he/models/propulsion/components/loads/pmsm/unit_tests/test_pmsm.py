@@ -56,7 +56,6 @@ NB_POINTS_TEST = 10
 
 
 def test_diameter_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingMotorDiameterScaling(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -71,7 +70,6 @@ def test_diameter_scaling():
 
 
 def test_diameter():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingMotorDiameter(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -86,7 +84,6 @@ def test_diameter():
 
 
 def test_length_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingMotorLengthScaling(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -101,7 +98,6 @@ def test_length_scaling():
 
 
 def test_length():
-
     ivc = get_indep_var_comp(list_inputs(SizingMotorLength(motor_id="motor_1")), __file__, XML_FILE)
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingMotorLength(motor_id="motor_1"), ivc)
@@ -114,7 +110,6 @@ def test_length():
 
 
 def test_weight():
-
     ivc = get_indep_var_comp(list_inputs(SizingMotorWeight(motor_id="motor_1")), __file__, XML_FILE)
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingMotorWeight(motor_id="motor_1"), ivc)
@@ -127,7 +122,6 @@ def test_weight():
 
 
 def test_resistance_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingMotorPhaseResistanceScaling(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -142,7 +136,6 @@ def test_resistance_scaling():
 
 
 def test_resistance():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingMotorPhaseResistance(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -157,7 +150,6 @@ def test_resistance():
 
 
 def test_torque_constant_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingMotorTorqueConstantScaling(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -172,7 +164,6 @@ def test_torque_constant_scaling():
 
 
 def test_torque_constant():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingMotorTorqueConstant(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -187,7 +178,6 @@ def test_torque_constant():
 
 
 def test_loss_coefficient_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingMotorLossCoefficientScaling(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -208,7 +198,6 @@ def test_loss_coefficient_scaling():
 
 
 def test_loss_coefficient():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingMotorLossCoefficient(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -229,11 +218,9 @@ def test_loss_coefficient():
 
 
 def test_motor_cg_x():
-
     expected_cg = [2.39, 0.25]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingPMSMCGX(motor_id="motor_1", position=option)),
             __file__,
@@ -250,11 +237,9 @@ def test_motor_cg_x():
 
 
 def test_motor_cg_y():
-
     expected_cg = [1.5, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingPMSMCGY(motor_id="motor_1", position=option)),
             __file__,
@@ -271,7 +256,6 @@ def test_motor_cg_y():
 
 
 def test_motor_drag():
-
     expected_drag_ls = [0.357, 0.0]
     expected_drag_cruise = [0.352, 0.0]
 
@@ -292,28 +276,19 @@ def test_motor_drag():
             )
 
             if ls_option:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:PMSM:motor_1:low_speed:CD0",
-                    )
-                    * 1e3
-                    == pytest.approx(ls_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:PMSM:motor_1:low_speed:CD0",
+                ) * 1e3 == pytest.approx(ls_drag, rel=1e-2)
             else:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:PMSM:motor_1:cruise:CD0",
-                    )
-                    * 1e3
-                    == pytest.approx(cruise_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:PMSM:motor_1:cruise:CD0",
+                ) * 1e3 == pytest.approx(cruise_drag, rel=1e-2)
 
             # Slight error on reynolds is due to step
             problem.check_partials(compact_print=True)
 
 
 def test_constraints_torque_enforce():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnforce(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -328,7 +303,6 @@ def test_constraints_torque_enforce():
 
 
 def test_constraints_rpm_enforce():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsRPMEnforce(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -343,7 +317,6 @@ def test_constraints_rpm_enforce():
 
 
 def test_constraints_voltage_enforce():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsVoltageEnforce(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -358,7 +331,6 @@ def test_constraints_voltage_enforce():
 
 
 def test_constraints_torque_ensure():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnsure(motor_id="motor_1")), __file__, XML_FILE
     )
@@ -438,7 +410,6 @@ def test_torque():
 
 
 def test_losses():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesLosses(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -464,7 +435,6 @@ def test_losses():
 
 
 def test_efficiency():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesEfficiency(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -490,7 +460,6 @@ def test_efficiency():
 
 
 def test_active_power():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesActivePower(number_of_points=NB_POINTS_TEST)), __file__, XML_FILE
     )
@@ -511,7 +480,6 @@ def test_active_power():
 
 
 def test_apparent_power():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesApparentPower(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -536,7 +504,6 @@ def test_apparent_power():
 
 
 def test_rms_current():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesCurrentRMS(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -562,7 +529,6 @@ def test_rms_current():
 
 
 def test_rms_current_1_phase():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesCurrentRMS1Phase(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -586,7 +552,6 @@ def test_rms_current_1_phase():
 
 
 def test_rms_voltage():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesVoltageRMS(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -615,7 +580,6 @@ def test_rms_voltage():
 
 
 def test_peak_voltage():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesVoltagePeak(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -638,7 +602,6 @@ def test_peak_voltage():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "torque_out",
@@ -691,7 +654,6 @@ def test_maximum():
 
 
 def test_sizing_pmsm():
-
     ivc = get_indep_var_comp(list_inputs(SizingPMSM(motor_id="motor_1")), __file__, XML_FILE)
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingPMSM(motor_id="motor_1"), ivc)
@@ -716,13 +678,9 @@ def test_sizing_pmsm():
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:loss_coefficient:gamma", units="W*s**2/rad**2"
     ) == pytest.approx(0.0237, rel=1e-2)
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:PMSM:motor_1:low_speed:CD0",
-        )
-        * 1e3
-        == pytest.approx(0.357, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:low_speed:CD0",
+    ) * 1e3 == pytest.approx(0.357, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:CG:x", units="m"
     ) == pytest.approx(2.39, rel=1e-2)
@@ -734,7 +692,6 @@ def test_sizing_pmsm():
 
 
 def test_performance_pmsm():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesPMSM(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
         __file__,

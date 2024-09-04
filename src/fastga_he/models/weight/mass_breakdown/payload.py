@@ -10,9 +10,9 @@ import fastoad.api as oad
 from fastga.models.weight.mass_breakdown.constants import SUBMODEL_PAYLOAD_MASS
 
 # Register FAST-GA submodel as defaults
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_PAYLOAD_MASS
-] = "fastga.submodel.weight.mass.payload.legacy"
+oad.RegisterSubmodel.active_models[SUBMODEL_PAYLOAD_MASS] = (
+    "fastga.submodel.weight.mass.payload.legacy"
+)
 
 
 @oad.RegisterSubmodel(SUBMODEL_PAYLOAD_MASS, "fastga_he.weight.payload_for_retrofit")
@@ -24,7 +24,6 @@ class ComputePayloadForRetrofit(om.ExplicitComponent):
     """
 
     def setup(self):
-
         self.add_input("data:weight:aircraft:target_MTOW", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:OWE", val=np.nan, units="kg")
         self.add_input("data:mission:sizing:fuel", val=np.nan, units="kg")
@@ -35,7 +34,6 @@ class ComputePayloadForRetrofit(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["data:weight:aircraft:payload"] = min(
             inputs["data:weight:aircraft:target_MTOW"]
             - inputs["data:weight:aircraft:OWE"]
@@ -44,7 +42,6 @@ class ComputePayloadForRetrofit(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         if (
             inputs["data:weight:aircraft:target_MTOW"]
             - inputs["data:weight:aircraft:OWE"]

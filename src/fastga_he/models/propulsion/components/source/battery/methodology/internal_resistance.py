@@ -12,38 +12,31 @@ import plotly.graph_objects as go
 
 
 def internal_resistance_result(dod):
-
     return (
         7.94693564e-05 * dod
-        - 1.18383130e-06 * dod ** 2.0
-        + 5.75440812e-09 * dod ** 3.0
+        - 1.18383130e-06 * dod**2.0
+        + 5.75440812e-09 * dod**3.0
         + 2.96477143e-03
     )
 
 
 def voltage_curve(dod, c_rate):
-
     current = 20 * c_rate
 
     return open_circuit_voltage(100.0 - dod) - internal_resistance_result(dod) * current
 
 
 def internal_resistance_function(parameter, p_1, p_2, p_3, constant):
-
-    return p_1 * parameter + p_2 * parameter ** 2.0 + p_3 * parameter ** 3.0 + constant
+    return p_1 * parameter + p_2 * parameter**2.0 + p_3 * parameter**3.0 + constant
 
 
 def open_circuit_voltage(soc):
-
     return (
-        94.50 * np.exp(-0.01292712 * soc)
-        - 91.349 * np.exp(-0.01362893 * soc)
-        + 1.472e-4 * soc ** 2.0
+        94.50 * np.exp(-0.01292712 * soc) - 91.349 * np.exp(-0.01362893 * soc) + 1.472e-4 * soc**2.0
     )
 
 
 if __name__ == "__main__":
-
     data_file = pth.join(pth.dirname(__file__), "data/discharge_curve.csv")
 
     discharge_curve = pd.read_csv(data_file)

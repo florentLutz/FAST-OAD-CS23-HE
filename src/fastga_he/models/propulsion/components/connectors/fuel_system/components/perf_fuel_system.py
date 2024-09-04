@@ -15,7 +15,6 @@ class PerformancesFuelSystem(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_system_id",
             default=None,
@@ -42,7 +41,6 @@ class PerformancesFuelSystem(om.Group):
         )
 
     def setup(self):
-
         fuel_system_id = self.options["fuel_system_id"]
         number_of_points = self.options["number_of_points"]
         number_of_tanks = self.options["number_of_tanks"]

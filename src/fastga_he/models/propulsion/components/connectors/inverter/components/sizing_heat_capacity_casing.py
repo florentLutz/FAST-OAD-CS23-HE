@@ -22,7 +22,6 @@ class SizingInverterCasingHeatCapacity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -50,7 +49,6 @@ class SizingInverterCasingHeatCapacity(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         outputs[
@@ -65,7 +63,6 @@ class SizingInverterCasingHeatCapacity(om.ExplicitComponent):
         ) / 3.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         partials[
@@ -82,6 +79,4 @@ class SizingInverterCasingHeatCapacity(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:heat_capacity",
             "settings:propulsion:he_power_train:inverter:" + inverter_id + ":casing:specific_heat",
-        ] = (
-            inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:mass"] / 3.0
-        )
+        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:mass"] / 3.0

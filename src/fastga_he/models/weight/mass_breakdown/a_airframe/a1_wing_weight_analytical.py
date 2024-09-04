@@ -23,7 +23,6 @@ import fastoad.api as oad
 from .wing_components.compute_web_mass import ComputeWebMass
 from .wing_components.compute_upper_flange import ComputeUpperFlange
 from .wing_components.compute_lower_flange import ComputeLowerFlange
-from .wing_components.compute_skin_mass import ComputeSkinMass
 from .wing_components.compute_ribs_mass import ComputeRibsMass
 from .wing_components.compute_misc_mass import ComputeMiscMass
 from .wing_components.compute_primary_mass import ComputePrimaryMass

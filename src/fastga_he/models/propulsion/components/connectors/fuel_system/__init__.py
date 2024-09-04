@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
 from .components.sizing_fuel_system import SizingFuelSystem
 from .components.perf_fuel_system import PerformancesFuelSystem
 from .components.slipstream_fuel_system import SlipstreamFuelSystem

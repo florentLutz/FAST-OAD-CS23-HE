@@ -18,7 +18,6 @@ from ..components.perf_temperature_constant import SUBMODEL_DC_LINE_TEMPERATURE_
 
 class PerformancesHarness(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -30,7 +29,6 @@ class PerformancesHarness(om.Group):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -68,7 +66,6 @@ class PerformancesHarnessTemperature(om.Group):
             oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE]
             != SUBMODEL_DC_LINE_TEMPERATURE_CONSTANT
         ):
-
             # Solvers setup
             self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
             self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
@@ -80,7 +77,6 @@ class PerformancesHarnessTemperature(om.Group):
             self.linear_solver = om.DirectSolver()
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -92,7 +88,6 @@ class PerformancesHarnessTemperature(om.Group):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 

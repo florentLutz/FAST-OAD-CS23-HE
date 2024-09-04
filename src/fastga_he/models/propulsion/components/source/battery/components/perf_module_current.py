@@ -13,7 +13,6 @@ class PerformancesModuleCurrent(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesModuleCurrent(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -56,7 +54,6 @@ class PerformancesModuleCurrent(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         # The tolerance on the convergence might cause the code to consider that value of current
@@ -77,7 +74,6 @@ class PerformancesModuleCurrent(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         number_of_points = self.options["number_of_points"]
 

@@ -21,7 +21,6 @@ class PowerTrainDeltaCmFromFile(om.ExplicitComponent):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -33,7 +32,6 @@ class PowerTrainDeltaCmFromFile(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         self.configurator.load(self.options["power_train_file_path"])
 
@@ -50,7 +48,6 @@ class PowerTrainDeltaCmFromFile(om.ExplicitComponent):
         self.add_output("delta_Cm", val=0.0, shape=number_of_points)
 
         for component_name in components_name:
-
             component_delta_cm = component_name + "_delta_Cm"
 
             self.add_input(component_delta_cm, val=np.full(number_of_points, np.nan))
@@ -64,7 +61,6 @@ class PowerTrainDeltaCmFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         (
             components_name,
             _,
@@ -78,7 +74,6 @@ class PowerTrainDeltaCmFromFile(om.ExplicitComponent):
         total_cm = 0.0
 
         for component_name in components_name:
-
             component_delta_cm = component_name + "_delta_Cm"
 
             total_cm += inputs[component_delta_cm]

@@ -10,7 +10,6 @@ class PerformancesActivePower(om.ExplicitComponent):
     """Computation of the electric active power required created by the generator."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -19,7 +18,6 @@ class PerformancesActivePower(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         generator_id = self.options["generator_id"]
 
@@ -57,7 +55,6 @@ class PerformancesActivePower(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
         outputs["active_power"] = (
@@ -68,7 +65,6 @@ class PerformancesActivePower(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         generator_id = self.options["generator_id"]
         number_of_points = self.options["number_of_points"]
 

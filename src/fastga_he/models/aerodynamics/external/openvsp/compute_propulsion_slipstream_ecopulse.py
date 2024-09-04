@@ -23,7 +23,6 @@ class PropulsionForDPComputationEcoPulse(om.ExplicitComponent):
         self.options.declare("propulsion_id", default="", types=str)
 
     def setup(self):
-
         # Dummy variables
         self.add_input("data:geometry:wing:area", val=np.nan, units="ft**2")
         self.add_input("mach", val=np.nan)
@@ -33,7 +32,6 @@ class PropulsionForDPComputationEcoPulse(om.ExplicitComponent):
         self.add_output("shaft_power", val=1, units="W")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # 6 engine of 100 kW
         shaft_power = 100e3
         true_airspeed = (

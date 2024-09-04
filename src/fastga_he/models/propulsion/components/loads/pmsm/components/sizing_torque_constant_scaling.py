@@ -22,7 +22,6 @@ class SizingMotorTorqueConstantScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -54,7 +53,6 @@ class SizingMotorTorqueConstantScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         resistance_scaling = inputs[
@@ -63,14 +61,13 @@ class SizingMotorTorqueConstantScaling(om.ExplicitComponent):
         l_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length"]
         d_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter"]
 
-        k_t_scaling = resistance_scaling ** 0.5 * d_scaling ** 2.0 * l_scaling ** 0.5
+        k_t_scaling = resistance_scaling**0.5 * d_scaling**2.0 * l_scaling**0.5
 
-        outputs[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:torque_constant"
-        ] = k_t_scaling
+        outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:torque_constant"] = (
+            k_t_scaling
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         resistance_scaling = inputs[
@@ -82,18 +79,12 @@ class SizingMotorTorqueConstantScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:torque_constant",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:phase_resistance",
-        ] = (
-            0.5 * resistance_scaling ** -0.5 * d_scaling ** 2.0 * l_scaling ** 0.5
-        )
+        ] = 0.5 * resistance_scaling**-0.5 * d_scaling**2.0 * l_scaling**0.5
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:torque_constant",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter",
-        ] = (
-            2.0 * resistance_scaling ** 0.5 * d_scaling * l_scaling ** 0.5
-        )
+        ] = 2.0 * resistance_scaling**0.5 * d_scaling * l_scaling**0.5
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:torque_constant",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length",
-        ] = (
-            0.5 * resistance_scaling ** 0.5 * d_scaling ** 2.0 * l_scaling ** -0.5
-        )
+        ] = 0.5 * resistance_scaling**0.5 * d_scaling**2.0 * l_scaling**-0.5

@@ -35,7 +35,6 @@ class SizingDCDCConverterResistances(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -76,7 +75,6 @@ class SizingDCDCConverterResistances(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -106,7 +104,6 @@ class SizingDCDCConverterResistances(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[

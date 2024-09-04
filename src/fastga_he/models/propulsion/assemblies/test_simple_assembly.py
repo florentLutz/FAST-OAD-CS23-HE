@@ -40,7 +40,6 @@ NB_POINTS_TEST = 10
 
 
 def test_assembly_performances():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -149,7 +148,6 @@ def test_assembly_performances():
 
 
 def test_assembly_sizing():
-
     ivc = get_indep_var_comp(list_inputs(SizingAssembly()), __file__, XML_FILE)
 
     problem = oad.FASTOADProblem(reports=False)
@@ -207,10 +205,9 @@ def test_assembly_sizing():
 
 
 def test_performances_sizing_assembly_battery_enforce():
-
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    )
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.battery.state_of_charge"
     ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce"
@@ -261,10 +258,9 @@ def test_performances_sizing_assembly_battery_enforce():
 
 
 def test_performances_sizing_assembly_battery_ensure():
-
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    )
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.battery.state_of_charge"
     ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure"
@@ -314,10 +310,9 @@ def test_performances_sizing_assembly_battery_ensure():
 
 
 def test_assembly_sizing_from_pt_file():
-
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    )
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
@@ -455,7 +450,6 @@ def test_performances_from_pt_file():
 
 
 def test_performances_from_pt_file_aux_load():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_load.yml")
 
     ivc = get_indep_var_comp(
@@ -581,7 +575,6 @@ def test_drag_from_pt_file():
 
 
 def test_delta_cls_summer():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
     ivc = om.IndepVarComp()
@@ -613,7 +606,6 @@ def test_delta_cls_summer():
 
 
 def test_delta_cds_summer():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
     ivc = om.IndepVarComp()
@@ -647,7 +639,6 @@ def test_delta_cds_summer():
 
 
 def test_delta_cms_summer():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
     ivc = om.IndepVarComp()
@@ -679,7 +670,6 @@ def test_delta_cms_summer():
 
 
 def test_slipstream_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
     ivc = get_indep_var_comp(

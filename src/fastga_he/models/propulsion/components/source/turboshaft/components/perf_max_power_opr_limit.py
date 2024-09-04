@@ -17,7 +17,6 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -29,7 +28,6 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
@@ -82,7 +80,6 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         density_ratio = inputs["density_ratio"]
@@ -103,7 +100,7 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         ]
 
         design_power = (
-            10 ** 1.09582
+            10**1.09582
             * density_ratio
             ** (3.80751 * np.log10(design_t41t) ** 2 - 4.53509 * np.log10(design_t41t))
             * mach
@@ -133,7 +130,6 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         outputs["design_power_opr_limit"] = design_power
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         density_ratio = inputs["density_ratio"]
@@ -153,7 +149,7 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         ]
 
         design_power = (
-            10 ** 1.09582
+            10**1.09582
             * density_ratio
             ** (3.80751 * np.log10(design_t41t) ** 2 - 4.53509 * np.log10(design_t41t))
             * mach
@@ -239,9 +235,7 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         partials[
             "design_power_opr_limit",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t",
-        ] = (
-            d_power_d_log_power * d_log_power_d_log_t41t * d_log_t41t_d_t41t / T0
-        )
+        ] = d_power_d_log_power * d_log_power_d_log_t41t * d_log_t41t_d_t41t / T0
 
         # Partials derivative for design OPR
         d_log_power_d_log_opr_des = (
@@ -255,9 +249,7 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         partials[
             "design_power_opr_limit",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:OPR",
-        ] = (
-            d_power_d_log_power * d_log_power_d_log_opr_des * d_log_opr_des_d_opr_des
-        )
+        ] = d_power_d_log_power * d_log_power_d_log_opr_des * d_log_opr_des_d_opr_des
 
         # Partials derivative for limit OPR
         d_log_power_d_log_opr_limit = (
@@ -272,6 +264,4 @@ class PerformancesMaxPowerOPRLimit(om.ExplicitComponent):
         partials[
             "design_power_opr_limit",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":limit:OPR",
-        ] = (
-            d_power_d_log_power * d_log_power_d_log_opr_limit * d_log_opr_limit_d_opr_limit
-        )
+        ] = d_power_d_log_power * d_log_power_d_log_opr_limit * d_log_opr_limit_d_opr_limit

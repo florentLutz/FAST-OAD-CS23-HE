@@ -12,7 +12,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -24,7 +23,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         gearbox_id = self.options["gearbox_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -46,17 +44,15 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         torque_out = inputs["torque_out_1"] + inputs["torque_out_2"]
 
-        outputs[
-            "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_max"
-        ] = np.max(torque_out)
+        outputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_max"] = (
+            np.max(torque_out)
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         torque_out = inputs["torque_out_1"] + inputs["torque_out_2"]

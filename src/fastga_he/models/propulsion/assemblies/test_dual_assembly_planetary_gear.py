@@ -47,7 +47,6 @@ class PerformancesAssembly(om.Group):
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -59,7 +58,6 @@ class PerformancesAssembly(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         gear_mode = self.options["gear_mode"]
 
@@ -225,7 +223,6 @@ class PerformancesAssembly(om.Group):
 
 
 def test_assembly():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -328,7 +325,6 @@ def test_assembly():
 
 
 def test_assembly_power_share():
-
     system = PerformancesAssembly(number_of_points=NB_POINTS_TEST, gear_mode="power_share")
 
     ivc = get_indep_var_comp(
@@ -425,7 +421,6 @@ def test_assembly_power_share():
 
 
 def test_assembly_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "dual_assembly.yml")
     network_file_path = pth.join(OUT_FOLDER_PATH, "dual_assembly.html")
 

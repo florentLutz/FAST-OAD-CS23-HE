@@ -15,7 +15,6 @@ class SizingGearboxCGX(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="gearbox_id",
             default=None,
@@ -32,16 +31,13 @@ class SizingGearboxCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         gearbox_id = self.options["gearbox_id"]
 
         if position == "inside_the_wing":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         elif position == "in_the_front":
-
             self.add_input(
                 name="data:propulsion:he_power_train:gearbox:" + gearbox_id + ":front_length_ratio",
                 val=0.9,
@@ -69,18 +65,15 @@ class SizingGearboxCGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         gearbox_id = self.options["gearbox_id"]
 
         if position == "inside_the_wing":
-
             outputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:x"] = inputs[
                 "data:geometry:wing:MAC:at25percent:x"
             ]
 
         elif position == "in_the_front":
-
             outputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:x"] = (
                 inputs[
                     "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":front_length_ratio"
@@ -89,7 +82,6 @@ class SizingGearboxCGX(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + inputs["data:geometry:cabin:length"]
@@ -100,19 +92,16 @@ class SizingGearboxCGX(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         position = self.options["position"]
         gearbox_id = self.options["gearbox_id"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
             ] = 1.0
 
         elif position == "in_the_front":
-
             partials[
                 "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:x",
                 "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":front_length_ratio",
@@ -125,7 +114,6 @@ class SizingGearboxCGX(om.ExplicitComponent):
             ]
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":CG:x",
                 "data:geometry:fuselage:front_length",

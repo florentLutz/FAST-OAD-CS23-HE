@@ -12,7 +12,6 @@ class SizingBusBarWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_bus_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingBusBarWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         self.add_input(
@@ -80,7 +78,6 @@ class SizingBusBarWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         conductor_thickness = inputs[
@@ -132,46 +129,32 @@ class SizingBusBarWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":mass",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:thickness",
-        ] = (
-            2.0 * conductor_width * conductor_length * (conductor_density - insulation_density)
-        )
+        ] = 2.0 * conductor_width * conductor_length * (conductor_density - insulation_density)
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":mass",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:width",
-        ] = (
-            2.0 * conductor_thickness * conductor_length * (conductor_density - insulation_density)
-        )
+        ] = 2.0 * conductor_thickness * conductor_length * (conductor_density - insulation_density)
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":mass",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:length",
-        ] = (
-            2.0 * conductor_width * conductor_thickness * (conductor_density - insulation_density)
-        )
+        ] = 2.0 * conductor_width * conductor_thickness * (conductor_density - insulation_density)
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":mass",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":cross_section:density",
-        ] = (
-            2.0 * conductor_width * conductor_thickness * conductor_length
-        )
+        ] = 2.0 * conductor_width * conductor_thickness * conductor_length
 
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":mass",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":height",
-        ] = (
-            bus_bar_width * bus_bar_length * insulation_density
-        )
+        ] = bus_bar_width * bus_bar_length * insulation_density
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":mass",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":width",
-        ] = (
-            bus_bar_height * bus_bar_length * insulation_density
-        )
+        ] = bus_bar_height * bus_bar_length * insulation_density
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":mass",
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":length",
-        ] = (
-            bus_bar_width * bus_bar_height * insulation_density
-        )
+        ] = bus_bar_width * bus_bar_height * insulation_density
         partials[
             "data:propulsion:he_power_train:DC_bus:" + dc_bus_id + ":mass",
             "settings:propulsion:he_power_train:DC_bus:insulation:density",

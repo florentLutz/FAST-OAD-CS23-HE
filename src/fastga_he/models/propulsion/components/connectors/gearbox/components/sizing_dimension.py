@@ -37,7 +37,6 @@ class SizingGearboxDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         gearbox_id = self.options["gearbox_id"]
 
         self.add_input(
@@ -64,7 +63,6 @@ class SizingGearboxDimensions(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         scaling_factor = inputs[
@@ -82,7 +80,6 @@ class SizingGearboxDimensions(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         partials[

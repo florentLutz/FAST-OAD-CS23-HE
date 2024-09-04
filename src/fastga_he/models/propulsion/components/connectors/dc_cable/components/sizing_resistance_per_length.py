@@ -13,7 +13,6 @@ class SizingResistancePerLength(om.ExplicitComponent):
     """Computation of max current per cable ."""
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingResistancePerLength(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -49,7 +47,6 @@ class SizingResistancePerLength(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
         area = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section"
@@ -67,7 +64,6 @@ class SizingResistancePerLength(om.ExplicitComponent):
         ] = resistance_per_length
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         area = inputs[
@@ -82,9 +78,7 @@ class SizingResistancePerLength(om.ExplicitComponent):
             + harness_id
             + ":cable:resistance_per_length",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section",
-        ] = (
-            -np.exp((POWER_ALU + (POWER_COPPER - POWER_ALU) * material)) / area ** 2.0
-        )
+        ] = -np.exp((POWER_ALU + (POWER_COPPER - POWER_ALU) * material)) / area**2.0
 
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:"

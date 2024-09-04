@@ -15,7 +15,6 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingDCAuxLoad(om.Group):
     def initialize(self):
-
         self.options.declare(
             name="aux_load_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingDCAuxLoad(om.Group):
         )
 
     def setup(self):
-
         position = self.options["position"]
         aux_load_id = self.options["aux_load_id"]
 

@@ -27,7 +27,6 @@ class SizingCapacitorDiameter(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -50,7 +49,6 @@ class SizingCapacitorDiameter(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         outputs[prefix + ":capacitor:diameter"] = (

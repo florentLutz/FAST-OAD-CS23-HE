@@ -16,7 +16,6 @@ class PerformancesGateVoltage(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -28,7 +27,6 @@ class PerformancesGateVoltage(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -138,7 +136,6 @@ class PerformancesGateVoltage(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         diode_temperature = inputs["diode_temperature"]
@@ -180,7 +177,6 @@ class PerformancesGateVoltage(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
         inverter_id = self.options["inverter_id"]
 
@@ -222,9 +218,7 @@ class PerformancesGateVoltage(om.ExplicitComponent):
         partials[
             "gate_voltage_igbt",
             "settings:propulsion:he_power_train:inverter:" + inverter_id + ":reference_temperature",
-        ] = (
-            -reference_gate_voltage_igbt * alpha_v_igbt
-        )
+        ] = -reference_gate_voltage_igbt * alpha_v_igbt
         partials["gate_voltage_igbt", "IGBT_temperature"] = np.ones(number_of_points) * (
             reference_gate_voltage_igbt * alpha_v_igbt
         )
@@ -242,9 +236,7 @@ class PerformancesGateVoltage(om.ExplicitComponent):
         partials[
             "gate_voltage_diode",
             "settings:propulsion:he_power_train:inverter:" + inverter_id + ":reference_temperature",
-        ] = (
-            -alpha_v_diode * reference_gate_voltage_diode
-        )
+        ] = -alpha_v_diode * reference_gate_voltage_diode
         partials["gate_voltage_diode", "diode_temperature"] = np.ones(number_of_points) * (
             alpha_v_diode * reference_gate_voltage_diode
         )

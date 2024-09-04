@@ -8,13 +8,11 @@ import openmdao.api as om
 
 class PerformancesVoltageRMS(om.ImplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("voltage_out_target", units="V", val=np.nan, shape=number_of_points)
@@ -47,7 +45,6 @@ class PerformancesVoltageRMS(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         residuals["ac_voltage_rms_out"] = (
             outputs["ac_voltage_rms_out"] - inputs["voltage_out_target"]
         )

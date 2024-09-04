@@ -12,9 +12,9 @@ SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE = (
     "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
 )
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
-] = SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE
+oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+    SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE
+)
 
 
 @oad.RegisterSubmodel(
@@ -23,7 +23,6 @@ oad.RegisterSubmodel.active_models[
 )
 class PerformancesTemperature(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -35,7 +34,6 @@ class PerformancesTemperature(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -110,7 +108,6 @@ class PerformancesTemperature(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         cable_radius = inputs[
@@ -131,7 +128,6 @@ class PerformancesTemperature(om.ExplicitComponent):
         outputs["cable_temperature"] = temperature_profile
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         cable_radius = inputs[
@@ -148,13 +144,13 @@ class PerformancesTemperature(om.ExplicitComponent):
         partials[
             "cable_temperature",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
-        ] = -q_c / (2.0 * np.pi * cable_radius ** 2.0 * cable_length * h)
+        ] = -q_c / (2.0 * np.pi * cable_radius**2.0 * cable_length * h)
         partials[
             "cable_temperature",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
-        ] = -q_c / (2.0 * np.pi * cable_radius * cable_length ** 2.0 * h)
+        ] = -q_c / (2.0 * np.pi * cable_radius * cable_length**2.0 * h)
         partials["cable_temperature", "heat_transfer_coefficient"] = -q_c / (
-            2.0 * np.pi * cable_radius * cable_length * h ** 2.0
+            2.0 * np.pi * cable_radius * cable_length * h**2.0
         )
         partials["cable_temperature", "conduction_losses"] = 1.0 / (
             2.0 * np.pi * cable_radius * cable_length * h

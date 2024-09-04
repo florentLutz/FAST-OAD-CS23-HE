@@ -50,7 +50,6 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
     """
 
     def __init__(self, **kwargs):
-
         super().__init__(**kwargs)
 
         self.configurator = FASTGAHEPowerTrainConfigurator()
@@ -66,7 +65,6 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         )
 
     def setup(self):
-
         if self.options["power_train_file_path"]:
             self.configurator.load(self.options["power_train_file_path"])
             self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
@@ -133,7 +131,6 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             os.remove(self.simplified_file_path)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         if self.options["power_train_file_path"]:
             self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
 
@@ -143,7 +140,7 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         mlw = inputs["data:weight:aircraft:MLW"]
         max_cl = inputs["data:aerodynamics:aircraft:landing:CL_max"]
 
-        wing_area_landing_init_guess = 2 * mlw * g / (stall_speed ** 2) / (1.225 * max_cl)
+        wing_area_landing_init_guess = 2 * mlw * g / (stall_speed**2) / (1.225 * max_cl)
 
         wing_area_approach = compute_wing_area(
             inputs,
@@ -161,7 +158,6 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             wing_area_approach > 1.2 * wing_area_landing_init_guess
             or wing_area_approach < 1.1 * MIN_WING_AREA
         ):
-
             wing_area_approach = wing_area_landing_init_guess
             _LOGGER.info(
                 "Wing area too far from potential data, taking backup value for this iteration"
@@ -195,7 +191,6 @@ class ConstraintWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.add_input("data:TLAR:v_approach", val=np.nan, units="m/s")
         self.add_input("data:weight:aircraft:MLW", val=np.nan, units="kg")
 
@@ -208,7 +203,6 @@ class ConstraintWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         self.declare_partials("*", "*", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         v_stall = inputs["data:TLAR:v_approach"] / 1.3
         mlw = inputs["data:weight:aircraft:MLW"]
         wing_area_actual = inputs["data:geometry:wing:area"]
@@ -217,7 +211,7 @@ class ConstraintWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
 
         additional_cl = (
             (2.0 * mlw * g)
-            / (1.225 * v_stall ** 2.0)
+            / (1.225 * v_stall**2.0)
             * (1.0 / wing_area_constraint - 1.0 / wing_area_actual)
         )
 
@@ -235,13 +229,11 @@ class _IDThrustRate(om.ExplicitComponent):
         outputs["thrust_rate"] = inputs["thrust_rate_t_econ"][1]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         d_t_r_econ_d_t_r = np.array([1, 0, 1])
         partials["thrust_rate", "thrust_rate_t_econ"] = d_t_r_econ_d_t_r
 
 
 def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_list) -> float:
-
     # To deactivate all the logging messages from matplotlib
     logging.getLogger("matplotlib.font_manager").disabled = True
     logging.getLogger("matplotlib.pyplot").disabled = True
@@ -270,7 +262,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
         inputs["data:mission:sizing:takeoff:elevator_angle"],
     )
 
-    wing_area_landing_init_guess = 2 * mlw * g / (stall_speed ** 2) / (1.225 * max_cl)
+    wing_area_landing_init_guess = 2 * mlw * g / (stall_speed**2) / (1.225 * max_cl)
 
     # For some reasons that I don't understand, the driver can sometime fail even with
     # coherent value (at the 6 iteration of the MDA) while it works with absurd value (first
@@ -278,7 +270,6 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
     # with matplotlib come from
 
     try:
-
         input_zip, inputs_name_for_promotion = zip_equilibrium_input(
             propulsion_id, pt_file_path, control_parameter_list
         )
@@ -416,14 +407,11 @@ def zip_equilibrium_input(propulsion_id, pt_file_path, control_parameter_list=No
 
     # If there are control parameters
     if control_parameter_list:
-
         # We check the name we need to add to see if it is the name of a control parameter. If it
         # is we replace it with a new name
         for idx, var_name in enumerate(name):
-
             if var_name[:5] == "data:" and var_name != "data:geometry:wing:area":
                 if var_name in control_parameter_list:
-
                     # If "_mission" is already in the name we replace it with "_landing", otherwise
                     # we simply add "_landing at the end
                     if "_mission" in var_name:
@@ -434,7 +422,6 @@ def zip_equilibrium_input(propulsion_id, pt_file_path, control_parameter_list=No
                     name[idx] = new_var_name
                     names_for_promotion.append((var_name, new_var_name))
                 else:
-
                     names_for_promotion.append(var_name)
             else:
                 names_for_promotion.append(var_name)

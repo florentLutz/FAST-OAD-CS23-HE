@@ -24,7 +24,6 @@ COEFF_DIFF = 0.0
 
 
 def test_assembly_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "dual_assembly_single_motor.yml")
     network_file_path = pth.join(OUT_FOLDER_PATH, "dual_assembly.html")
 

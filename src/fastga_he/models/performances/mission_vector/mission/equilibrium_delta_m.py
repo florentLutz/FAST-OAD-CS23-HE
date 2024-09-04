@@ -10,7 +10,6 @@ class EquilibriumDeltaM(om.ImplicitComponent):
     """Find the conditions necessary for the aircraft equilibrium."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be " "treated"
         )
@@ -21,7 +20,6 @@ class EquilibriumDeltaM(om.ImplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("x_cg", val=np.full(number_of_points, 5.0), units="m")
@@ -96,7 +94,6 @@ class EquilibriumDeltaM(om.ImplicitComponent):
             )
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         x_cg = inputs["x_cg"]
@@ -180,7 +177,6 @@ class EquilibriumDeltaM(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         x_cg = inputs["x_cg"]
 
         l0_wing = inputs["data:geometry:wing:MAC:length"]

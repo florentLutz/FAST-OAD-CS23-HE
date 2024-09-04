@@ -20,7 +20,6 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingTurboshaft(om.Group):
     def initialize(self):
-
         self.options.declare(
             name="turboshaft_id",
             default=None,
@@ -37,7 +36,6 @@ class SizingTurboshaft(om.Group):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
         position = self.options["position"]
 

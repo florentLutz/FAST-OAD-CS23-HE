@@ -18,7 +18,6 @@ from .perf_maximum import PerformancesMaximum
 
 class PerformancesPropeller(om.Group):
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -27,7 +26,6 @@ class PerformancesPropeller(om.Group):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 

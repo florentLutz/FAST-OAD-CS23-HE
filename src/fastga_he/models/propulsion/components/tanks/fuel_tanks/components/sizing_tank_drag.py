@@ -16,7 +16,6 @@ class SizingFuelTankDrag(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -36,7 +35,6 @@ class SizingFuelTankDrag(om.ExplicitComponent):
         self.options.declare("low_speed_aero", default=False, types=bool)
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
         # For refractoring purpose we just match the option to the tag in the variable name and
@@ -52,7 +50,6 @@ class SizingFuelTankDrag(om.ExplicitComponent):
         )
 
         if position == "wing_pod":
-
             self.add_input(
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:height",
                 units="m",
@@ -71,13 +68,11 @@ class SizingFuelTankDrag(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=0.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         if position == "wing_pod":
-
             # According to :cite:`gudmundsson:2013`. the drag of a streamlined external tank can
             # be computed using the following formula. It highly depends on the tank/wing
             # interface so we will take a middle. Also, there is no dependency on the tank length
@@ -98,7 +93,6 @@ class SizingFuelTankDrag(om.ExplicitComponent):
             cd0 = 0.10 * frontal_area / wing_area
 
         else:
-
             cd0 = 0.0
 
         outputs[
@@ -106,13 +100,11 @@ class SizingFuelTankDrag(om.ExplicitComponent):
         ] = cd0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         if position == "wing_pod":
-
             frontal_area = (
                 np.pi
                 * inputs[
@@ -127,9 +119,7 @@ class SizingFuelTankDrag(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":" + ls_tag + ":CD0",
                 "data:geometry:wing:area",
-            ] = (
-                -0.10 * frontal_area / inputs["data:geometry:wing:area"] ** 2.0
-            )
+            ] = -0.10 * frontal_area / inputs["data:geometry:wing:area"] ** 2.0
             partials[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":" + ls_tag + ":CD0",
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:width",
@@ -154,7 +144,6 @@ class SizingFuelTankDrag(om.ExplicitComponent):
             )
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":" + ls_tag + ":CD0",
                 "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":dimension:width",

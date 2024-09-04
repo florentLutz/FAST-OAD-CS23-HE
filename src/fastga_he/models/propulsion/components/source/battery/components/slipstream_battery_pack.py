@@ -14,7 +14,6 @@ class SlipstreamBatteryPack(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -26,7 +25,6 @@ class SlipstreamBatteryPack(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         ivc = om.IndepVarComp()

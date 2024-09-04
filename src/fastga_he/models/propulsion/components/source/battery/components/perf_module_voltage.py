@@ -13,7 +13,6 @@ class PerformancesModuleVoltage(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesModuleVoltage(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
 
@@ -58,7 +56,6 @@ class PerformancesModuleVoltage(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         outputs["module_voltage"] = (
@@ -71,7 +68,6 @@ class PerformancesModuleVoltage(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
 
@@ -81,7 +77,7 @@ class PerformancesModuleVoltage(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":module:number_cells"
-            ]
+            ],
         )
         partials[
             "module_voltage",

@@ -14,13 +14,11 @@ class PerformancesDensityRatio(om.ExplicitComponent):
     """Computation of the density ratio, often called sigma in literature used in the surrogate."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         # RPM is not used to compute anything but is needed for compatibility reasons
@@ -45,5 +43,4 @@ class PerformancesDensityRatio(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["density_ratio"] = inputs["density"] / DENSITY_SL

@@ -15,7 +15,6 @@ class SizingDCAuxLoadCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="aux_load_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingDCAuxLoadCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         aux_load_id = self.options["aux_load_id"]
 
@@ -47,7 +45,6 @@ class SizingDCAuxLoadCGY(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing":
-
             self.add_input(
                 "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:y_ratio",
                 val=np.nan,
@@ -57,12 +54,10 @@ class SizingDCAuxLoadCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         aux_load_id = self.options["aux_load_id"]
 
         if position == "inside_the_wing":
-
             outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
                 * inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:y_ratio"]
@@ -70,16 +65,13 @@ class SizingDCAuxLoadCGY(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         aux_load_id = self.options["aux_load_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:y",
                 "data:geometry:wing:span",
@@ -90,6 +82,4 @@ class SizingDCAuxLoadCGY(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:y",
                 "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

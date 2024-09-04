@@ -10,7 +10,6 @@ class SizingMassPerLength(om.ExplicitComponent):
     """Computation of mass per length of cable."""
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -19,7 +18,6 @@ class SizingMassPerLength(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -85,7 +83,6 @@ class SizingMassPerLength(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         r_c = inputs[
@@ -112,7 +109,7 @@ class SizingMassPerLength(om.ExplicitComponent):
         ]
         rho_sheath = inputs["settings:propulsion:he_power_train:DC_cable_harness:sheath:density"]
 
-        m_conductor = np.pi * rho_c * (r_c ** 2.0)
+        m_conductor = np.pi * rho_c * (r_c**2.0)
         m_i = np.pi * rho_in * ((2.0 * r_c + t_in) * t_in)
         m_shield = np.pi * rho_shield * ((2.0 * (r_c + t_in) + t_shield) * t_shield)
         m_sheath = np.pi * rho_sheath * ((2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath)
@@ -161,7 +158,7 @@ class SizingMassPerLength(om.ExplicitComponent):
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":properties:density",
-        ] = np.pi * (r_c ** 2.0)
+        ] = np.pi * (r_c**2.0)
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:density",
@@ -188,18 +185,12 @@ class SizingMassPerLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":insulation:thickness",
-        ] = (
-            2.0 * np.pi * (rho_in * (t_in + r_c) + rho_shield * t_shield + rho_sheath * t_sheath)
-        )
+        ] = 2.0 * np.pi * (rho_in * (t_in + r_c) + rho_shield * t_shield + rho_sheath * t_sheath)
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
-        ] = (
-            2.0 * np.pi * (rho_shield * (t_shield + r_c + t_in) + rho_sheath * t_sheath)
-        )
+        ] = 2.0 * np.pi * (rho_shield * (t_shield + r_c + t_in) + rho_sheath * t_sheath)
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
-        ] = (
-            2.0 * np.pi * rho_sheath * (r_c + t_in + t_shield + t_sheath)
-        )
+        ] = 2.0 * np.pi * rho_sheath * (r_c + t_in + t_shield + t_sheath)

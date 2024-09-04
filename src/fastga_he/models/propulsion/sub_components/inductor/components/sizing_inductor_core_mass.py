@@ -27,7 +27,6 @@ class SizingInductorCoreMass(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -46,7 +45,6 @@ class SizingInductorCoreMass(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         outputs[prefix + ":inductor:core_mass"] = (
@@ -54,9 +52,8 @@ class SizingInductorCoreMass(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
-        partials[
-            prefix + ":inductor:core_mass", prefix + ":inductor:scaling:core_mass"
-        ] = self.options["core_mass_ref"]
+        partials[prefix + ":inductor:core_mass", prefix + ":inductor:scaling:core_mass"] = (
+            self.options["core_mass_ref"]
+        )

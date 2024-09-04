@@ -14,13 +14,11 @@ class PerformancesCurrents(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("duty_cycle", val=np.full(number_of_points, np.nan))
@@ -81,7 +79,6 @@ class PerformancesCurrents(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # We will clip the duty cycle to avoid any problems in the first loop of converging
         duty_cycle = np.clip(
             inputs["duty_cycle"],
@@ -96,7 +93,6 @@ class PerformancesCurrents(om.ExplicitComponent):
         outputs["current_inductor"] = 1.0 / (1.0 - duty_cycle) * current_out
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         duty_cycle = np.clip(
             inputs["duty_cycle"],
             np.full_like(inputs["duty_cycle"], 1e-3),

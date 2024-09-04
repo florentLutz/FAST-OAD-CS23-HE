@@ -27,7 +27,6 @@ class ConstraintsInverter(om.Group):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         option_inverter_id = {"inverter_id": inverter_id}

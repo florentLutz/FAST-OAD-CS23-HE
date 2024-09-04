@@ -15,7 +15,6 @@ class SizingRectifierCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="rectifier_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingRectifierCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         rectifier_id = self.options["rectifier_id"]
 
@@ -47,7 +45,6 @@ class SizingRectifierCGY(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing":
-
             self.add_input(
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":CG:y_ratio",
                 val=np.nan,
@@ -57,12 +54,10 @@ class SizingRectifierCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         rectifier_id = self.options["rectifier_id"]
 
         if position == "inside_the_wing":
-
             outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
                 * inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":CG:y_ratio"]
@@ -70,16 +65,13 @@ class SizingRectifierCGY(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":CG:y",
                 "data:geometry:wing:span",
@@ -90,6 +82,4 @@ class SizingRectifierCGY(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":CG:y",
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

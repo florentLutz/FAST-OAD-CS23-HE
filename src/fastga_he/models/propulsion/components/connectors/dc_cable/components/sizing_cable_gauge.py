@@ -31,7 +31,6 @@ class SizingCableGauge(om.Group):
     """Computation of the cable gauge."""
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -40,7 +39,6 @@ class SizingCableGauge(om.Group):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_subsystem(
@@ -70,7 +68,6 @@ class _LogSolution(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -91,7 +88,6 @@ class _LogSolution(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         current = inputs[
@@ -119,10 +115,10 @@ class _LogSolution(om.ExplicitComponent):
         c_5 = C5_ALU + (C5_COPPER - C5_ALU) * material
 
         log_solution = (
-            c_5 * current ** 5.0
-            + c_4 * current ** 4.0
-            + c_3 * current ** 3.0
-            + c_2 * current ** 2.0
+            c_5 * current**5.0
+            + c_4 * current**4.0
+            + c_3 * current**3.0
+            + c_2 * current**2.0
             + c_1 * current
             + c_0
         )
@@ -130,7 +126,6 @@ class _LogSolution(om.ExplicitComponent):
         outputs["log_solution"] = log_solution
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         current = inputs[
@@ -154,9 +149,9 @@ class _LogSolution(om.ExplicitComponent):
             + harness_id
             + ":cable:current_caliber",
         ] = (
-            5.0 * c_5 * current ** 4.0
-            + 4.0 * c_4 * current ** 3.0
-            + 3.0 * c_3 * current ** 2.0
+            5.0 * c_5 * current**4.0
+            + 4.0 * c_4 * current**3.0
+            + 3.0 * c_3 * current**2.0
             + 2.0 * c_2 * current
             + c_1
         )
@@ -164,10 +159,10 @@ class _LogSolution(om.ExplicitComponent):
             "log_solution",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material",
         ] = (
-            (C5_COPPER - C5_ALU) * current ** 5.0
-            + (C4_COPPER - C4_ALU) * current ** 4.0
-            + (C3_COPPER - C3_ALU) * current ** 3.0
-            + (C2_COPPER - C2_ALU) * current ** 2.0
+            (C5_COPPER - C5_ALU) * current**5.0
+            + (C4_COPPER - C4_ALU) * current**4.0
+            + (C3_COPPER - C3_ALU) * current**3.0
+            + (C2_COPPER - C2_ALU) * current**2.0
             + (C1_COPPER - C1_ALU) * current
             + (C0_COPPER - C0_ALU)
         )
@@ -177,7 +172,6 @@ class _SolutionGauge(om.ExplicitComponent):
     """Computation the of the area to find the cable gauge based on its log."""
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -186,7 +180,6 @@ class _SolutionGauge(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input("log_solution")
@@ -216,7 +209,6 @@ class _SolutionGauge(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         section = np.exp(inputs["log_solution"])
@@ -228,14 +220,13 @@ class _SolutionGauge(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section"
-        ] = (section * k_factor ** 2.0)
+        ] = section * k_factor**2.0
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius"
-        ] = (np.sqrt(section / np.pi) * k_factor)
+        ] = np.sqrt(section / np.pi) * k_factor
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         section = np.exp(inputs["log_solution"])
@@ -250,24 +241,18 @@ class _SolutionGauge(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section",
             "log_solution",
-        ] = (
-            d_section_d_log_solution * k_factor ** 2.0
-        )
+        ] = d_section_d_log_solution * k_factor**2.0
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section",
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":conductor:k_factor_radius",
-        ] = (
-            section * 2.0 * k_factor
-        )
+        ] = section * 2.0 * k_factor
 
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
             "log_solution",
-        ] = (
-            0.5 * np.sqrt(1.0 / (section * np.pi)) * d_section_d_log_solution * k_factor
-        )
+        ] = 0.5 * np.sqrt(1.0 / (section * np.pi)) * d_section_d_log_solution * k_factor
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
             "data:propulsion:he_power_train:DC_cable_harness:"

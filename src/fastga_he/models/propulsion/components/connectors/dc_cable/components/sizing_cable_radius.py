@@ -10,7 +10,6 @@ class SizingCableRadius(om.ExplicitComponent):
     """Computation of mass per length of cable."""
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -19,7 +18,6 @@ class SizingCableRadius(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -56,7 +54,6 @@ class SizingCableRadius(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         r_c = inputs[

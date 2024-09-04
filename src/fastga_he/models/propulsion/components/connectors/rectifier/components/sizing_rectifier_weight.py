@@ -9,9 +9,9 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_CONSTRAINTS_RECTIFIER_WEIGHT
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_RECTIFIER_WEIGHT
-] = "fastga_he.submodel.propulsion.rectifier.weight.sum"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_RECTIFIER_WEIGHT] = (
+    "fastga_he.submodel.propulsion.rectifier.weight.sum"
+)
 
 
 @oad.RegisterSubmodel(
@@ -25,7 +25,6 @@ class SizingRectifierWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="rectifier_id",
             default=None,
@@ -35,7 +34,6 @@ class SizingRectifierWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -63,7 +61,6 @@ class SizingRectifierWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         current_rms_1_phase = inputs[
@@ -81,7 +78,6 @@ class SizingRectifierWeight(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         current_rms_1_phase = inputs[
@@ -97,19 +93,15 @@ class SizingRectifierWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber",
-        ] = (
-            3.0 * voltage_rms / (power_density * 1000.0)
-        )
+        ] = 3.0 * voltage_rms / (power_density * 1000.0)
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_caliber",
-        ] = (
-            3.0 * current_rms_1_phase / (power_density * np.sqrt(2.0) * 1000.0)
-        )
+        ] = 3.0 * current_rms_1_phase / (power_density * np.sqrt(2.0) * 1000.0)
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":power_density",
-        ] = -(3.0 * current_rms_1_phase * voltage_rms / (1000.0 * power_density ** 2.0))
+        ] = -(3.0 * current_rms_1_phase * voltage_rms / (1000.0 * power_density**2.0))
 
 
 @oad.RegisterSubmodel(
@@ -132,7 +124,6 @@ class SizingRectifierWeightBySum(om.Group):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_subsystem(
@@ -256,7 +247,6 @@ class _SizingRectifierPowerDensity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -288,14 +278,13 @@ class _SizingRectifierPowerDensity(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         # Voltage AC caliber is peak voltage so V_rms = sqrt(2.0/3.0) * V_peak and P_in = 3.0 *
         # V_rms * I_rms = sqrt(6.0) * V_peak * I_rms
 
         outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":power_density"] = (
-            6.0 ** 0.5
+            6.0**0.5
             * inputs[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber"
             ]
@@ -305,14 +294,13 @@ class _SizingRectifierPowerDensity(om.ExplicitComponent):
         ) / (1000.0 * inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":power_density",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber",
         ] = (
-            6.0 ** 0.5
+            6.0**0.5
             * inputs[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_caliber"
             ]
@@ -325,7 +313,7 @@ class _SizingRectifierPowerDensity(om.ExplicitComponent):
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":power_density",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_caliber",
         ] = (
-            6.0 ** 0.5
+            6.0**0.5
             * inputs[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber"
             ]
@@ -338,7 +326,7 @@ class _SizingRectifierPowerDensity(om.ExplicitComponent):
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":power_density",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass",
         ] = -(
-            6.0 ** 0.5
+            6.0**0.5
             * inputs[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber"
             ]

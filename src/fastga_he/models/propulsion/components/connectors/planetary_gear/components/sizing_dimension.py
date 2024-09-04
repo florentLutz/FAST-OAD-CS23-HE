@@ -37,7 +37,6 @@ class SizingPlanetaryGearDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         self.add_input(
@@ -66,7 +65,6 @@ class SizingPlanetaryGearDimensions(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         scaling_factor = inputs[
@@ -80,13 +78,12 @@ class SizingPlanetaryGearDimensions(om.ExplicitComponent):
         )
         outputs[
             "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":height"
-        ] = (self.options["height_ref"] * scaling_factor)
+        ] = self.options["height_ref"] * scaling_factor
         outputs[
             "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":length"
-        ] = (self.options["length_ref"] * scaling_factor)
+        ] = self.options["length_ref"] * scaling_factor
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         partials[

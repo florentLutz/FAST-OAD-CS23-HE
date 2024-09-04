@@ -15,7 +15,6 @@ class SizingTurboGeneratorCGX(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="turbo_generator_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingTurboGeneratorCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turbo_generator_id = self.options["turbo_generator_id"]
         position = self.options["position"]
 
@@ -44,11 +42,9 @@ class SizingTurboGeneratorCGX(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         elif position == "in_the_front":
-
             self.add_input(
                 name="data:propulsion:he_power_train:turbo_generator:"
                 + turbo_generator_id
@@ -59,7 +55,6 @@ class SizingTurboGeneratorCGX(om.ExplicitComponent):
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
         else:
-
             self.add_input(
                 name="data:propulsion:he_power_train:turbo_generator:"
                 + turbo_generator_id
@@ -74,18 +69,15 @@ class SizingTurboGeneratorCGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             outputs[
                 "data:propulsion:he_power_train:turbo_generator:" + turbo_generator_id + ":CG:x"
             ] = inputs["data:geometry:wing:MAC:at25percent:x"]
 
         elif position == "in_the_front":
-
             lav = inputs["data:geometry:fuselage:front_length"]
 
             outputs[
@@ -100,7 +92,6 @@ class SizingTurboGeneratorCGX(om.ExplicitComponent):
             )
 
         else:
-
             cabin_length = inputs["data:geometry:cabin:length"]
             lav = inputs["data:geometry:fuselage:front_length"]
             lar = inputs["data:geometry:fuselage:rear_length"]
@@ -119,19 +110,16 @@ class SizingTurboGeneratorCGX(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:turbo_generator:" + turbo_generator_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
             ] = 1.0
 
         elif position == "in_the_front":
-
             partials[
                 "data:propulsion:he_power_train:turbo_generator:" + turbo_generator_id + ":CG:x",
                 "data:geometry:fuselage:front_length",
@@ -148,7 +136,6 @@ class SizingTurboGeneratorCGX(om.ExplicitComponent):
             ] = inputs["data:geometry:fuselage:front_length"]
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:turbo_generator:" + turbo_generator_id + ":CG:x",
                 "data:geometry:fuselage:front_length",

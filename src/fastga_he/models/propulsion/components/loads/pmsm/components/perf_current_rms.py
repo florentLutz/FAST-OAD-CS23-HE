@@ -10,7 +10,6 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
     """Computation of the rms current in all phases based on the torque and torque constant."""
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -19,7 +18,6 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -54,7 +52,6 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         torque = inputs["torque_out"]
@@ -65,7 +62,6 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         outputs["ac_current_rms_in"] = rms_current
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -76,6 +72,4 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         partials[
             "ac_current_rms_in",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant",
-        ] = (
-            -torque / k_t ** 2.0
-        )
+        ] = -torque / k_t**2.0

@@ -32,7 +32,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         gearbox_id = self.options["gearbox_id"]
 
         self.add_input(
@@ -65,7 +64,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         outputs[
@@ -76,7 +74,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         partials[

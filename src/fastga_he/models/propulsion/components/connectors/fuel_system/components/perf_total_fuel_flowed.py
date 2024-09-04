@@ -14,7 +14,6 @@ class PerformancesTotalFuelFlowed(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -27,7 +26,6 @@ class PerformancesTotalFuelFlowed(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         fuel_system_id = self.options["fuel_system_id"]
 
@@ -54,7 +52,6 @@ class PerformancesTotalFuelFlowed(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_system_id = self.options["fuel_system_id"]
 
         outputs[

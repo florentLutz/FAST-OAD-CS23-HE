@@ -73,7 +73,6 @@ NB_POINTS_TEST = 10
 
 
 def test_input_weight():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingPropellerInputWeight(propeller_id="propeller_1")), __file__, XML_FILE
     )
@@ -82,15 +81,12 @@ def test_input_weight():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_1:mass", units="lbm"
-    ) == pytest.approx(
-        75.0, rel=1e-2
-    )  # Real value for Cirrus SR22 prop is 75 lbs
+    ) == pytest.approx(75.0, rel=1e-2)  # Real value for Cirrus SR22 prop is 75 lbs
 
     problem.check_partials(compact_print=True)
 
 
 def test_weight():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingPropellerWeight(propeller_id="propeller_1")), __file__, XML_FILE
     )
@@ -99,15 +95,12 @@ def test_weight():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_1:mass", units="lbm"
-    ) == pytest.approx(
-        80.1, rel=1e-2
-    )  # Real value for Cirrus SR22 prop is 75 lbs
+    ) == pytest.approx(80.1, rel=1e-2)  # Real value for Cirrus SR22 prop is 75 lbs
 
     problem.check_partials(compact_print=True)
 
 
 def test_depth():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingPropellerDepth(propeller_id="propeller_1")), __file__, XML_FILE
     )
@@ -122,11 +115,9 @@ def test_depth():
 
 
 def test_propeller_cg_x():
-
     expected_cg = [2.2, 0.15]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingPropellerCGX(propeller_id="propeller_1", position=option)),
             __file__,
@@ -143,11 +134,9 @@ def test_propeller_cg_x():
 
 
 def test_propeller_cg_y():
-
     expected_cg = [4.19, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingPropellerCGY(propeller_id="propeller_1", position=option)),
             __file__,
@@ -164,11 +153,9 @@ def test_propeller_cg_y():
 
 
 def test_propeller_ref_cl():
-
     expected_cl = [1.011, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cl):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingPropellerReferenceCl(propeller_id="propeller_1", position=option)),
             __file__,
@@ -187,11 +174,9 @@ def test_propeller_ref_cl():
 
 
 def test_propeller_ref_chord():
-
     expected_chords = [0.88, 1.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_chords):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingPropellerReferenceChord(propeller_id="propeller_1", position=option)),
             __file__,
@@ -202,19 +187,15 @@ def test_propeller_ref_chord():
             SizingPropellerReferenceChord(propeller_id="propeller_1", position=option), ivc
         )
 
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:propeller:propeller_1:wing_chord_ref",
-                units="m",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:propeller:propeller_1:wing_chord_ref",
+            units="m",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_diameter_to_span_ratio():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingPropellerDiameterToSpanRatio(propeller_id="propeller_1")),
         __file__,
@@ -231,7 +212,6 @@ def test_diameter_to_span_ratio():
 
 
 def test_diameter_to_chord_ratio():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingPropellerDiameterToChordRatio(propeller_id="propeller_1")),
         __file__,
@@ -248,11 +228,9 @@ def test_diameter_to_chord_ratio():
 
 
 def test_propeller_flapped_ratio():
-
     expected_values = [0.5514, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingPropellerFlappedRatio(propeller_id="propeller_1", position=option)),
             __file__,
@@ -263,22 +241,17 @@ def test_propeller_flapped_ratio():
             SizingPropellerFlappedRatio(propeller_id="propeller_1", position=option), ivc
         )
 
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:propeller:propeller_1:flapped_ratio",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:propeller:propeller_1:flapped_ratio",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_propeller_distance_from_wing_ac():
-
     expected_values = [0.341, 2.69]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingPropellerWingACDistance(propeller_id="propeller_1", position=option)),
             __file__,
@@ -289,22 +262,17 @@ def test_propeller_distance_from_wing_ac():
             SizingPropellerWingACDistance(propeller_id="propeller_1", position=option), ivc
         )
 
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:propeller:propeller_1:from_wing_AC",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:propeller:propeller_1:from_wing_AC",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
 
 
 def test_propeller_distance_from_wing_le_ratio():
-
     expected_values = [0.1617, 2.9]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
-
         ivc = get_indep_var_comp(
             list_inputs(
                 SizingPropellerWingLEDistanceRatio(propeller_id="propeller_1", position=option)
@@ -317,18 +285,14 @@ def test_propeller_distance_from_wing_le_ratio():
             SizingPropellerWingLEDistanceRatio(propeller_id="propeller_1", position=option), ivc
         )
 
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:propeller:propeller_1:from_wing_LE_ratio",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:propeller:propeller_1:from_wing_LE_ratio",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
 
 
 def test_constraints_torque_enforce():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnforce(propeller_id="propeller_1")), __file__, XML_FILE
     )
@@ -343,7 +307,6 @@ def test_constraints_torque_enforce():
 
 
 def test_constraints_torque_ensure():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnsure(propeller_id="propeller_1")), __file__, XML_FILE
     )
@@ -358,7 +321,6 @@ def test_constraints_torque_ensure():
 
 
 def test_rpm_mission():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:propeller:propeller_1:rpm_mission",
@@ -396,7 +358,6 @@ def test_rpm_mission():
 
 
 def test_advance_ratio():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesAdvanceRatio(propeller_id="propeller_1", number_of_points=NB_POINTS_TEST)
@@ -420,7 +381,6 @@ def test_advance_ratio():
 
 
 def test_tip_mach():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesTipMach(propeller_id="propeller_1", number_of_points=NB_POINTS_TEST)
@@ -445,7 +405,6 @@ def test_tip_mach():
 
 
 def test_thrust_coefficient():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesThrustCoefficient(
@@ -475,7 +434,6 @@ def test_thrust_coefficient():
 
 
 def test_blade_reynolds_number():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesBladeReynoldsNumber(
@@ -518,7 +476,6 @@ def test_blade_reynolds_number():
 
 
 def test_power_coefficient():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesPowerCoefficient(
@@ -615,7 +572,6 @@ def test_efficiency():
 
 
 def test_shaft_power():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesShaftPower(propeller_id="propeller_1", number_of_points=NB_POINTS_TEST)
@@ -648,7 +604,6 @@ def test_shaft_power():
 
 
 def test_torque():
-
     ivc = om.IndepVarComp()
     ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500), units="min**-1")
     ivc.add_output(
@@ -672,7 +627,6 @@ def test_torque():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
     ivc.add_output("rpm", val=np.full(NB_POINTS_TEST, 2500), units="min**-1")
     ivc.add_output(
@@ -712,7 +666,6 @@ def test_maximum():
 
 
 def test_thrust_loading():
-
     ivc = get_indep_var_comp(
         list_inputs(
             SlipstreamPropellerThrustLoading(
@@ -745,7 +698,6 @@ def test_thrust_loading():
 
 
 def test_axial_induction_factor():
-
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -770,7 +722,6 @@ def test_axial_induction_factor():
 
 
 def test_contraction_ratio_square():
-
     ivc = get_indep_var_comp(
         list_inputs(
             SlipstreamPropellerContractionRatioSquared(
@@ -805,7 +756,6 @@ def test_contraction_ratio_square():
 
 
 def test_contraction_ratio():
-
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -830,7 +780,6 @@ def test_contraction_ratio():
 
 
 def test_axial_induction_factor_ac():
-
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -861,7 +810,6 @@ def test_axial_induction_factor_ac():
 
 
 def test_velocity_ratio_downstream():
-
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -886,7 +834,6 @@ def test_velocity_ratio_downstream():
 
 
 def test_height_impact_coefficients():
-
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -945,7 +892,6 @@ def test_height_impact_coefficients():
 
 
 def test_height_impact():
-
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -1055,7 +1001,6 @@ def test_verification_height_impact_overflow():
 
 
 def test_lift_increase_ratio():
-
     ivc = get_indep_var_comp(
         list_inputs(
             SlipstreamPropellerLiftIncreaseRatio(
@@ -1097,7 +1042,6 @@ def test_lift_increase_ratio():
 
 
 def test_section_lift():
-
     flaps_positions = ["cruise", "landing", "takeoff"]
     expected_values = (
         np.full(NB_POINTS_TEST, 0.7157),
@@ -1113,7 +1057,6 @@ def test_section_lift():
     for flaps_position, expected_value, expected_value_0 in zip(
         flaps_positions, expected_values, expected_values_0
     ):
-
         ivc = get_indep_var_comp(
             list_inputs(
                 SlipstreamPropellerSectionLift(
@@ -1146,7 +1089,6 @@ def test_section_lift():
 
 
 def test_blown_section_lift():
-
     ivc = om.IndepVarComp()
     ivc.add_output("unblown_section_lift", val=np.full(NB_POINTS_TEST, 0.7157))
     ivc.add_output("unblown_section_lift_AOA_0", val=np.full(NB_POINTS_TEST, 0.274))
@@ -1175,7 +1117,6 @@ def test_blown_section_lift():
 
 
 def test_blown_area_ratio():
-
     ivc = get_indep_var_comp(
         list_inputs(
             SlipstreamPropellerBlownAreaRatio(
@@ -1211,7 +1152,6 @@ def test_blown_area_ratio():
 
 
 def test_blown_wing_lift_increase():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "blown_area_ratio",
@@ -1249,7 +1189,6 @@ def test_blown_wing_lift_increase():
 
 
 def test_blown_wing_lift_increase_group():
-
     ivc = get_indep_var_comp(
         list_inputs(
             SlipstreamPropellerDeltaClGroup(
@@ -1329,7 +1268,6 @@ def test_blown_wing_profile_drag_increase():
 
 
 def test_blown_wing_pitching_moment_increase():
-
     flaps_positions = ["cruise", "landing", "takeoff"]
     expected_values = (
         np.array([-7.591, -7.173, -6.767, -6.408, -5.99, -5.653, -5.357, -5.007, -4.76, -4.489]),
@@ -1372,7 +1310,6 @@ def test_blown_wing_pitching_moment_increase():
 
 
 def test_blown_wing_delta_cm_alpha():
-
     flaps_positions = ["cruise", "landing", "takeoff"]
     expected_values = (
         np.zeros(NB_POINTS_TEST),
@@ -1415,7 +1352,6 @@ def test_blown_wing_delta_cm_alpha():
 
 
 def test_blown_wing_delta_cm():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "delta_Cm0",
@@ -1457,7 +1393,6 @@ def test_blown_wing_delta_cm():
 
 
 def test_slipstream_propeller():
-
     flaps_positions = ["cruise", "landing"]
     expected_delta_cds = (
         np.array([1.2371, 1.1654, 1.0983, 1.0355, 0.9766, 0.9213, 0.8695, 0.8209, 0.7752, 0.7323])
@@ -1507,7 +1442,6 @@ def test_slipstream_propeller():
     for flaps_position, expected_delta_cd, expected_delta_cl, expected_delta_cm in zip(
         flaps_positions, expected_delta_cds, expected_delta_cls, expected_delta_cms
     ):
-
         ivc = get_indep_var_comp(
             list_inputs(
                 SlipstreamPropeller(
@@ -1544,7 +1478,6 @@ def test_slipstream_propeller():
 
 
 def test_sizing_propeller():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingPropeller(propeller_id="propeller_1")),
         __file__,
@@ -1556,9 +1489,7 @@ def test_sizing_propeller():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_1:mass", units="lbm"
-    ) == pytest.approx(
-        80.1, rel=1e-2
-    )  # Real value for Cirrus SR22 prop is 75 lbs
+    ) == pytest.approx(80.1, rel=1e-2)  # Real value for Cirrus SR22 prop is 75 lbs
     assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_1:depth", units="m"
     ) == pytest.approx(0.30, rel=1e-2)
@@ -1576,7 +1507,6 @@ def test_sizing_propeller():
 
 
 def test_propeller_performances():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesPropeller(propeller_id="propeller_1", number_of_points=NB_POINTS_TEST)

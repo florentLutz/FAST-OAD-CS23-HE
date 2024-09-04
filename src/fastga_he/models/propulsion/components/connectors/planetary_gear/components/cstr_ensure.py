@@ -32,7 +32,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         self.add_input(
@@ -77,7 +76,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         outputs[
@@ -98,7 +96,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         partials[

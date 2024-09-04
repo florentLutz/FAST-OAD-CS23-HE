@@ -28,7 +28,6 @@ class SizingMotorLossCoefficientScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -70,26 +69,24 @@ class SizingMotorLossCoefficientScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         d_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter"]
         l_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length"]
 
-        alpha_scaling = d_scaling ** -4 * l_scaling ** -1
-        beta_scaling = d_scaling ** 6.89 * l_scaling ** -1.96
-        gamma_scaling = d_scaling ** 6.08 * l_scaling ** -1.60
+        alpha_scaling = d_scaling**-4 * l_scaling**-1
+        beta_scaling = d_scaling**6.89 * l_scaling**-1.96
+        gamma_scaling = d_scaling**6.08 * l_scaling**-1.60
 
-        outputs[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:alpha"
-        ] = alpha_scaling
+        outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:alpha"] = (
+            alpha_scaling
+        )
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:beta"] = beta_scaling
-        outputs[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:gamma"
-        ] = gamma_scaling
+        outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:gamma"] = (
+            gamma_scaling
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         d_scaling = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter"]
@@ -99,40 +96,28 @@ class SizingMotorLossCoefficientScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:alpha",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter",
-        ] = (
-            -4.0 * d_scaling ** -5.0 * l_scaling ** -1.0
-        )
+        ] = -4.0 * d_scaling**-5.0 * l_scaling**-1.0
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:alpha",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length",
-        ] = (
-            -(d_scaling ** -4.0) * l_scaling ** -2.0
-        )
+        ] = -(d_scaling**-4.0) * l_scaling**-2.0
 
         # Partials of beta
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:beta",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter",
-        ] = (
-            6.89 * d_scaling ** 5.89 * l_scaling ** -1.96
-        )
+        ] = 6.89 * d_scaling**5.89 * l_scaling**-1.96
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:beta",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length",
-        ] = (
-            -1.96 * d_scaling ** 6.89 * l_scaling ** -2.96
-        )
+        ] = -1.96 * d_scaling**6.89 * l_scaling**-2.96
 
         # Partials of gamma
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:gamma",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter",
-        ] = (
-            6.08 * d_scaling ** 5.08 * l_scaling ** -1.60
-        )
+        ] = 6.08 * d_scaling**5.08 * l_scaling**-1.60
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:gamma",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length",
-        ] = (
-            -1.60 * d_scaling ** 6.08 * l_scaling ** -2.60
-        )
+        ] = -1.60 * d_scaling**6.08 * l_scaling**-2.60

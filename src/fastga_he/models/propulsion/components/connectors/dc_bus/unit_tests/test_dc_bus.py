@@ -34,7 +34,6 @@ NB_POINTS_TEST = 10
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
     voltage = np.array([539.1, 506.3, 588.2, 425.0, 572.7, 512.8, 483.4, 466.9, 497.9, 511.4])
     ivc.add_output("dc_voltage", units="V", val=voltage)
@@ -62,7 +61,6 @@ def test_maximum():
 
 
 def test_bus_bar_cross_section_area():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBusBarCrossSectionArea(dc_bus_id="dc_bus_1")),
@@ -81,7 +79,6 @@ def test_bus_bar_cross_section_area():
 
 
 def test_bus_bar_cross_section_dimensions():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBusBarCrossSectionDimensions(dc_bus_id="dc_bus_1")),
@@ -103,7 +100,6 @@ def test_bus_bar_cross_section_dimensions():
 
 
 def test_bus_bar_insulation_thickness():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBusBarInsulationThickness(dc_bus_id="dc_bus_1")),
@@ -122,7 +118,6 @@ def test_bus_bar_insulation_thickness():
 
 
 def test_bus_bar_dimensions():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBusBarDimensions(dc_bus_id="dc_bus_1")),
@@ -147,7 +142,6 @@ def test_bus_bar_dimensions():
 
 
 def test_bus_bar_weight():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBusBarWeight(dc_bus_id="dc_bus_1")), __file__, XML_FILE
@@ -164,7 +158,6 @@ def test_bus_bar_weight():
 
 
 def test_bus_bar_self_inductance():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBusBarSelfInductance(dc_bus_id="dc_bus_1")), __file__, XML_FILE
@@ -181,7 +174,6 @@ def test_bus_bar_self_inductance():
 
 
 def test_bus_bar_mutual_inductance():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingBusBarMutualInductance(dc_bus_id="dc_bus_1")), __file__, XML_FILE
@@ -198,7 +190,6 @@ def test_bus_bar_mutual_inductance():
 
 
 def test_dc_bus_cg_x():
-
     expected_cg = [2.69, 0.45, 2.54]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -219,7 +210,6 @@ def test_dc_bus_cg_x():
 
 
 def test_dc_bus_cg_y():
-
     expected_cg = [2.04, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -261,18 +251,12 @@ def test_dc_bus_bar_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_bus:dc_bus_1:CG:y", units="m"
     ) == pytest.approx(2.04, rel=1e-2)
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:DC_bus:dc_bus_1:low_speed:CD0",
-        )
-        == pytest.approx(0.0, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:DC_bus:dc_bus_1:cruise:CD0",
-        )
-        == pytest.approx(0.0, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_bus:dc_bus_1:low_speed:CD0",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_bus:dc_bus_1:cruise:CD0",
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

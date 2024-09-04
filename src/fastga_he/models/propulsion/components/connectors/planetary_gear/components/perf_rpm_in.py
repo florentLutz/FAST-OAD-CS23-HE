@@ -13,7 +13,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="planetary_gear_id",
             default=None,
@@ -25,7 +24,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
         )
 
     def setup(self):
-
         planetary_gear_id = self.options["planetary_gear_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -61,7 +59,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         input_rpm = (
@@ -75,7 +72,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
         outputs["rpm_in_2"] = input_rpm
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
         number_of_points = self.options["number_of_points"]
 

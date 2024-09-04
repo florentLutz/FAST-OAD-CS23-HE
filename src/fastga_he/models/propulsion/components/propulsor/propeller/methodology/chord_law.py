@@ -16,19 +16,18 @@ def generic_chord_law(
     hub_radius,
     tip_radius,
 ):
-
     c_linear_mid = (tip_chord - root_chord) / (tip_radius - hub_radius) * (
         radius_mid - hub_radius
     ) + root_chord
 
     matrix_to_inv = np.array(
         [
-            [hub_radius ** 2.0, hub_radius, 1.0, 0.0, 0.0, 0.0],
-            [radius_mid ** 2.0, radius_mid, 1.0, 0.0, 0.0, 0.0],
+            [hub_radius**2.0, hub_radius, 1.0, 0.0, 0.0, 0.0],
+            [radius_mid**2.0, radius_mid, 1.0, 0.0, 0.0, 0.0],
             [2.0 * radius_mid, 1.0, 0.0, 0.0, 0.0, 0.0],
             [0.0, 0.0, 0.0, 2.0 * radius_mid, 1.0, 0.0],
-            [0.0, 0.0, 0.0, radius_mid ** 2.0, radius_mid, 1.0],
-            [0.0, 0.0, 0.0, tip_radius ** 2.0, tip_radius, 1.0],
+            [0.0, 0.0, 0.0, radius_mid**2.0, radius_mid, 1.0],
+            [0.0, 0.0, 0.0, tip_radius**2.0, tip_radius, 1.0],
         ]
     )
     result_matrix = np.array(
@@ -47,15 +46,14 @@ def generic_chord_law(
     ]
     chord_distribution = np.where(
         radius_distribution < radius_mid,
-        k12 * radius_distribution ** 2.0 + k11 * radius_distribution + k10,
-        k22 * radius_distribution ** 2.0 + k21 * radius_distribution + k20,
+        k12 * radius_distribution**2.0 + k11 * radius_distribution + k10,
+        k22 * radius_distribution**2.0 + k21 * radius_distribution + k20,
     )
 
     return chord_distribution
 
 
 if __name__ == "__main__":
-
     radius_tbm900 = np.array([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]) * 2.31 / 2.0
     chord_tbm900 = np.array([0.1, 0.17, 0.23, 0.26, 0.275, 0.28, 0.265, 0.22, 0.158])
 

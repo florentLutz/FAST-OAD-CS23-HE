@@ -36,7 +36,6 @@ NB_POINTS_TEST = 10
 
 
 def test_assembly_performances():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesAssemblyDirectBusBatteryConnection(number_of_points=NB_POINTS_TEST)
@@ -131,7 +130,6 @@ def test_assembly_performances():
 
 
 def test_assembly_performances_constant_demand():
-
     # We now check with a constant power demand, this way we will see that the dc bus 2 voltage
     # still drops and that the efficiency of the inverter varies.
 
@@ -291,7 +289,6 @@ def test_performances_from_pt_file():
 
 
 def test_read_recording():
-
     recorder_data_file_path = pth.join(OUTPUT_FOLDER_PATH, "cases.sql")
 
     cr = om.CaseReader(recorder_data_file_path)
@@ -303,7 +300,6 @@ def test_read_recording():
     y_axis = []
 
     for case in cases:
-
         y_axis.append(np.mean(case.residuals["dc_bus_2.dc_voltage"]))
 
     scatter = go.Scatter(y=y_axis)
@@ -312,7 +308,6 @@ def test_read_recording():
 
 
 def test_assembly_performances_with_direct_sspc_battery_connection():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesAssemblyDirectSSPCBatteryConnection(number_of_points=NB_POINTS_TEST)
@@ -425,7 +420,6 @@ def test_assembly_performances_with_direct_sspc_battery_connection():
 
 
 def test_direct_sspc_battery_connection_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_direct_sspc_battery_connection.yml")
 
     ivc = get_indep_var_comp(

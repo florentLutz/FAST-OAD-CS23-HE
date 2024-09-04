@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 from .cstr_generator import ConstraintsGenerator
 
@@ -41,7 +40,6 @@ class SizingGenerator(om.Group):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
         position = self.options["position"]
 

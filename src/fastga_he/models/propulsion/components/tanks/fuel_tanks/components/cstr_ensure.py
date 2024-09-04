@@ -21,7 +21,6 @@ class ConstraintsFuelTankCapacityEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -30,7 +29,6 @@ class ConstraintsFuelTankCapacityEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         self.add_input(
@@ -56,7 +54,6 @@ class ConstraintsFuelTankCapacityEnsure(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         outputs["constraints:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity"] = (
@@ -67,7 +64,6 @@ class ConstraintsFuelTankCapacityEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         partials[

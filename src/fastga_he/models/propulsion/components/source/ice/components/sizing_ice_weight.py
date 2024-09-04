@@ -13,7 +13,6 @@ class SizingICEWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingICEWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
 
         self.add_input(
@@ -46,7 +44,6 @@ class SizingICEWeight(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         # We take 1.2 for the installed mass as now, the propeller weight is properly computed as

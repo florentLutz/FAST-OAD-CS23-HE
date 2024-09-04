@@ -28,7 +28,6 @@ from ..constants import SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE, SUBMODEL_RECTIF
 
 class PerformancesRectifier(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -40,7 +39,6 @@ class PerformancesRectifier(om.Group):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -123,7 +121,6 @@ class PerformancesRectifier(om.Group):
     def guess_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         rectifier_id = self.options["rectifier_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -159,7 +156,6 @@ class PerformancesRectifierTemperature(om.Group):
             self.linear_solver = om.DirectSolver()
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -171,7 +167,6 @@ class PerformancesRectifierTemperature(om.Group):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
         number_of_points = self.options["number_of_points"]
 

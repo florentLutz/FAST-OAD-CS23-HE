@@ -34,7 +34,6 @@ NB_POINTS_TEST = 10
 
 
 def test_rpm_in():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesRPMIn(speed_reducer_id="speed_reducer_1", number_of_points=NB_POINTS_TEST)
@@ -57,7 +56,6 @@ def test_rpm_in():
 
 
 def test_shaft_power_in():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesShaftPowerIn(
@@ -85,7 +83,6 @@ def test_shaft_power_in():
 
 
 def test_torque_in():
-
     ivc = om.IndepVarComp()
     ivc.add_output("shaft_power_in", val=np.linspace(103.1, 206.2, NB_POINTS_TEST), units="kW")
     ivc.add_output("rpm_in", val=np.linspace(4000.0, 5000.0, NB_POINTS_TEST), units="min**-1")
@@ -102,7 +99,6 @@ def test_torque_in():
 
 
 def test_torque_out():
-
     ivc = om.IndepVarComp()
     ivc.add_output("shaft_power_out", val=np.linspace(100.0, 200.0, NB_POINTS_TEST), units="kW")
     ivc.add_output("rpm_out", val=np.linspace(2000.0, 2500.0, NB_POINTS_TEST), units="min**-1")
@@ -119,7 +115,6 @@ def test_torque_out():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "torque_out",
@@ -149,7 +144,6 @@ def test_maximum():
 
 
 def test_performances_speed_reducer():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesSpeedReducer(
@@ -182,7 +176,6 @@ def test_performances_speed_reducer():
 
 
 def test_torque_constraint_enforce():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnforce(speed_reducer_id="speed_reducer_1")),
         __file__,
@@ -195,19 +188,15 @@ def test_torque_constraint_enforce():
     assert problem.get_val(
         "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_in_rating", units="N*m"
     ) == pytest.approx(393.8, rel=1e-3)
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_out_rating",
-            units="N*m",
-        )
-        == pytest.approx(763.9, rel=1e-3)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_out_rating",
+        units="N*m",
+    ) == pytest.approx(763.9, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_torque_constraint_ensure():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnsure(speed_reducer_id="speed_reducer_1")),
         __file__,
@@ -217,26 +206,19 @@ def test_torque_constraint_ensure():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(ConstraintsTorqueEnsure(speed_reducer_id="speed_reducer_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "constraints:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_in_rating",
-            units="N*m",
-        )
-        == pytest.approx(-6.2, rel=1e-3)
-    )
-    assert (
-        problem.get_val(
-            "constraints:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_out_rating",
-            units="N*m",
-        )
-        == pytest.approx(-36.1, rel=1e-3)
-    )
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_in_rating",
+        units="N*m",
+    ) == pytest.approx(-6.2, rel=1e-3)
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:speed_reducer:speed_reducer_1:torque_out_rating",
+        units="N*m",
+    ) == pytest.approx(-36.1, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_sizing_weight():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingSpeedReducerWeight(speed_reducer_id="speed_reducer_1")),
         __file__,
@@ -254,7 +236,6 @@ def test_sizing_weight():
 
 
 def test_sizing_dimension_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingSpeedReducerDimensionScaling(speed_reducer_id="speed_reducer_1")),
         __file__,
@@ -274,7 +255,6 @@ def test_sizing_dimension_scaling():
 
 
 def test_sizing_dimension():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingSpeedReducerDimensions(speed_reducer_id="speed_reducer_1")),
         __file__,
@@ -298,7 +278,6 @@ def test_sizing_dimension():
 
 
 def test_cg_x():
-
     expected_cg = [2.69, 0.4, 4.80]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -313,19 +292,15 @@ def test_cg_x():
             SizingSpeedReducerCGX(speed_reducer_id="speed_reducer_1", position=option), ivc
         )
 
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:CG:x",
-                units="m",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:CG:x",
+            units="m",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
 
 
 def test_cg_y():
-
     expected_cg = [3.25, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -340,19 +315,15 @@ def test_cg_y():
             SizingSpeedReducerCGY(speed_reducer_id="speed_reducer_1", position=option), ivc
         )
 
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:CG:y",
-                units="m",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:CG:y",
+            units="m",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
 
 
 def test_speed_reducer_sizing():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingSpeedReducer(speed_reducer_id="speed_reducer_1")),
@@ -362,30 +333,21 @@ def test_speed_reducer_sizing():
 
     problem = run_system(SizingSpeedReducer(speed_reducer_id="speed_reducer_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:mass",
-            units="kg",
-        )
-        == pytest.approx(3.11, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:mass",
+        units="kg",
+    ) == pytest.approx(3.11, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:CG:x", units="m"
     ) == pytest.approx(2.69, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:CG:y", units="m"
     ) == pytest.approx(3.25, rel=1e-2)
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:low_speed:CD0",
-        )
-        == pytest.approx(0.0, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:cruise:CD0",
-        )
-        == pytest.approx(0.0, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:low_speed:CD0",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:cruise:CD0",
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

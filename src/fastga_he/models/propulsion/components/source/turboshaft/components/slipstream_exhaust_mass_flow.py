@@ -10,7 +10,6 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
     """Computation of the air mass flow at the exhaust of the turboshaft."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -22,7 +21,6 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
@@ -79,7 +77,6 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         density_ratio = inputs["density_ratio"]
@@ -103,7 +100,7 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
         design_power = power_rating * power_ratio
 
         exhaust_mass_flow = (
-            10 ** 2.26440
+            10**2.26440
             * density_ratio
             ** (-1.11652 * np.log10(design_t41t) - 0.00080 * np.log10(design_power) + 4.25022)
             * design_power
@@ -115,7 +112,6 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
         outputs["exhaust_mass_flow"] = exhaust_mass_flow
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         density_ratio = inputs["density_ratio"]
@@ -139,7 +135,7 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
         design_power = power_rating * power_ratio
 
         exhaust_mass_flow = (
-            10 ** 2.26440
+            10**2.26440
             * density_ratio
             ** (-1.11652 * np.log10(design_t41t) - 0.00080 * np.log10(design_power) + 4.25022)
             * design_power
@@ -198,9 +194,7 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
         partials[
             "exhaust_mass_flow",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t",
-        ] = (
-            d_m_dot_8_d_log_m_dot_8 * d_log_m_dot_8_d_log_t41t * d_log_t41t_d_t41t
-        )
+        ] = d_m_dot_8_d_log_m_dot_8 * d_log_m_dot_8_d_log_t41t * d_log_t41t_d_t41t
 
         # Partials derivative for design OPR
         d_log_m_dot_8_d_log_opr = (
@@ -213,9 +207,7 @@ class SlipstreamExhaustMassFlow(om.ExplicitComponent):
         partials[
             "exhaust_mass_flow",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:OPR",
-        ] = (
-            d_m_dot_8_d_log_m_dot_8 * d_log_m_dot_8_d_log_opr * d_log_opr_d_opr
-        )
+        ] = d_m_dot_8_d_log_m_dot_8 * d_log_m_dot_8_d_log_opr * d_log_opr_d_opr
 
         # Partials derivative for current shaft power
         d_log_m_dot_8_d_log_power = 0.21593 * np.log10(design_opr)

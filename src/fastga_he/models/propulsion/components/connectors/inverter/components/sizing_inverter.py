@@ -58,7 +58,6 @@ class SizingInverter(om.Group):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
         position = self.options["position"]
 

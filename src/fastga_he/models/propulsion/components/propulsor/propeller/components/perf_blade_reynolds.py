@@ -12,7 +12,6 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
     """Computation of the reynolds number corresponding to the diameter of the propeller."""
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -21,7 +20,6 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -53,7 +51,6 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
@@ -65,11 +62,10 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
         omega = inputs["rpm"] * 2.0 * np.pi / 60.0
 
         outputs["reynolds_D"] = (
-            np.sqrt(true_airspeed ** 2.0 + (omega * diameter / 2.0) ** 2.0) * diameter / viscosity
+            np.sqrt(true_airspeed**2.0 + (omega * diameter / 2.0) ** 2.0) * diameter / viscosity
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
@@ -82,10 +78,10 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
         omega = inputs["rpm"] * 2.0 * np.pi / 60.0
 
         partials["reynolds_D", "true_airspeed"] = (
-            diameter / viscosity / np.sqrt(true_airspeed ** 2.0 + (omega * diameter / 2.0) ** 2.0)
+            diameter / viscosity / np.sqrt(true_airspeed**2.0 + (omega * diameter / 2.0) ** 2.0)
         ) * true_airspeed
         partials["reynolds_D", "rpm"] = (
-            (diameter / viscosity / np.sqrt(true_airspeed ** 2.0 + (omega * diameter / 2.0) ** 2.0))
+            (diameter / viscosity / np.sqrt(true_airspeed**2.0 + (omega * diameter / 2.0) ** 2.0))
             * (diameter / 2.0) ** 2.0
             * omega
             * 2.0
@@ -97,15 +93,15 @@ class PerformancesBladeReynoldsNumber(om.ExplicitComponent):
         ] = (
             1.0
             / viscosity
-            / np.sqrt((true_airspeed * diameter) ** 2.0 + (omega * diameter ** 2.0 / 2.0) ** 2.0)
-            * (2.0 * true_airspeed ** 2.0 * diameter + 4.0 * (omega / 2.0) ** 2.0 * diameter ** 3.0)
+            / np.sqrt((true_airspeed * diameter) ** 2.0 + (omega * diameter**2.0 / 2.0) ** 2.0)
+            * (2.0 * true_airspeed**2.0 * diameter + 4.0 * (omega / 2.0) ** 2.0 * diameter**3.0)
             / 2.0
         )
         partials["reynolds_D", "altitude"] = (
             -(
-                np.sqrt(true_airspeed ** 2.0 + (omega * diameter / 2.0) ** 2.0)
+                np.sqrt(true_airspeed**2.0 + (omega * diameter / 2.0) ** 2.0)
                 * diameter
-                / viscosity ** 2.0
+                / viscosity**2.0
             )
             * d_viscosity_d_altitude
         )

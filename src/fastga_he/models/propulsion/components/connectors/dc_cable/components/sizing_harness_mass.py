@@ -19,7 +19,6 @@ class SizingHarnessMass(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
 
         self.add_input(
@@ -56,7 +55,6 @@ class SizingHarnessMass(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         mass = (
@@ -78,7 +76,6 @@ class SizingHarnessMass(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         partials[

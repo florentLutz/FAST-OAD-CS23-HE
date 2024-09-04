@@ -18,7 +18,6 @@ from .perf_maximum import PerformancesMaximum
 
 class PerformancesPMSM(om.Group):
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -27,7 +26,6 @@ class PerformancesPMSM(om.Group):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 

@@ -11,9 +11,9 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_AUX_LOAD_POWER
-] = "fastga_he.submodel.propulsion.constraints.aux_load.power.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_AUX_LOAD_POWER] = (
+    "fastga_he.submodel.propulsion.constraints.aux_load.power.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -27,7 +27,6 @@ class ConstraintsPowerEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="aux_load_id",
             default=None,
@@ -36,7 +35,6 @@ class ConstraintsPowerEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         aux_load_id = self.options["aux_load_id"]
 
         self.add_input(
@@ -59,9 +57,8 @@ class ConstraintsPowerEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         aux_load_id = self.options["aux_load_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_rating"
-        ] = inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max"]
+        outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_rating"] = (
+            inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max"]
+        )

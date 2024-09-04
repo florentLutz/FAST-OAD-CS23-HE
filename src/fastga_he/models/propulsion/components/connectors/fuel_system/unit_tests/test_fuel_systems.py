@@ -27,7 +27,6 @@ NB_POINTS_TEST = 10
 
 
 def test_fuel_system_cg_x():
-
     expected_cg = [2.69, 0.5, 1.98]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -50,7 +49,6 @@ def test_fuel_system_cg_x():
 
 
 def test_fuel_system_cg_y():
-
     expected_cg = [1.344, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
@@ -73,7 +71,6 @@ def test_fuel_system_cg_y():
 
 
 def test_fuel_system_volume():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingFuelSystemCapacityVolume(fuel_system_id="fuel_system_1")),
@@ -91,7 +88,6 @@ def test_fuel_system_volume():
 
 
 def test_fuel_system_weight():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingFuelSystemWeight(fuel_system_id="fuel_system_1")),
@@ -109,7 +105,6 @@ def test_fuel_system_weight():
 
 
 def test_fuel_system_weight_jet_fuel():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output("data:propulsion:he_power_train:fuel_system:fuel_system_1:fuel_type", val=3.0)
@@ -132,7 +127,6 @@ def test_fuel_system_weight_jet_fuel():
 
 
 def test_fuel_output():
-
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_consumed_out_t_1", val=np.linspace(1.0, 2.0, NB_POINTS_TEST), units="kg")
     ivc.add_output("fuel_consumed_out_t_2", val=np.linspace(4.0, 2.0, NB_POINTS_TEST), units="kg")
@@ -155,7 +149,6 @@ def test_fuel_output():
 
 
 def test_fuel_input():
-
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_flowing_t", val=np.linspace(5.0, 4.0, NB_POINTS_TEST), units="kg")
 
@@ -196,7 +189,6 @@ def test_fuel_input():
 
 
 def test_total_fuel_flowed():
-
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_flowing_t", val=np.linspace(5.0, 4.0, NB_POINTS_TEST), units="kg")
 
@@ -213,7 +205,6 @@ def test_total_fuel_flowed():
 
 
 def test_fuel_system_performances():
-
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_consumed_out_t_1", val=np.linspace(1.0, 2.0, NB_POINTS_TEST), units="kg")
     ivc.add_output("fuel_consumed_out_t_2", val=np.linspace(4.0, 2.0, NB_POINTS_TEST), units="kg")
@@ -242,7 +233,6 @@ def test_fuel_system_performances():
 
 
 def test_sizing_tank():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingFuelSystem(fuel_system_id="fuel_system_1")), __file__, XML_FILE

@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
 from .components.sizing_propeller import SizingPropeller
 from .components.perf_propeller import PerformancesPropeller
 from .components.slipstream_propeller import SlipstreamPropeller

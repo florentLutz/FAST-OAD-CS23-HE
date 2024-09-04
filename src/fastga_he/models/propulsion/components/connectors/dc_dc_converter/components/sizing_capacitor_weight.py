@@ -22,7 +22,6 @@ class SizingDCDCConverterCapacitorWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -46,7 +45,6 @@ class SizingDCDCConverterCapacitorWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         # We need the capacity in microF
@@ -63,10 +61,9 @@ class SizingDCDCConverterCapacitorWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":capacitor:mass"
-        ] = (10.524 * capacity ** 0.7749)
+        ] = 10.524 * capacity**0.7749
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[
@@ -78,7 +75,7 @@ class SizingDCDCConverterCapacitorWeight(om.ExplicitComponent):
             + ":capacitor:capacity",
         ] = (
             10.524
-            * 1e6 ** 0.7749
+            * 1e6**0.7749
             * 0.7749
             * inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"

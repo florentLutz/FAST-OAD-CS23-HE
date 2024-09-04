@@ -43,7 +43,6 @@ class SizingFuelTank(om.Group):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
         position = self.options["position"]
 
@@ -115,7 +114,6 @@ class SizingFuelTank(om.Group):
             )
 
         if position == "inside_the_wing":
-
             self.add_subsystem(
                 name="preparation_for_loads",
                 subsys=SizingFuelTankPreparationForLoads(

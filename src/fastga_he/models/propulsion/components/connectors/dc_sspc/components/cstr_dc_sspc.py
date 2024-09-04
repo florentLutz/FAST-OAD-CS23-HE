@@ -23,7 +23,6 @@ class ConstraintsDCSSPC(om.Group):
         )
 
     def setup(self):
-
         option_dc_sspc_id = {"dc_sspc_id": self.options["dc_sspc_id"]}
 
         self.add_subsystem(

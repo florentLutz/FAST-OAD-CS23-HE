@@ -13,7 +13,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="gearbox_id",
             default=None,
@@ -25,7 +24,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
         )
 
     def setup(self):
-
         gearbox_id = self.options["gearbox_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -54,7 +52,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         input_rpm = (
@@ -65,7 +62,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
         outputs["rpm_in"] = input_rpm
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         gearbox_id = self.options["gearbox_id"]
         number_of_points = self.options["number_of_points"]
 

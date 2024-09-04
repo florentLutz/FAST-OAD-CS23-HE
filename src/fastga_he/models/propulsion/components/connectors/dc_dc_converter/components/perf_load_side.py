@@ -15,13 +15,11 @@ class PerformancesConverterLoadSide(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         batman = np.full(number_of_points, np.nan)
 
@@ -53,7 +51,6 @@ class PerformancesConverterLoadSide(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # If power is too low, we consider that there is no current, may prevent some convergence
         # issue
         current_in = np.where(
@@ -63,7 +60,6 @@ class PerformancesConverterLoadSide(om.ExplicitComponent):
         outputs["dc_current_in"] = current_in
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials_voltage = np.where(
             np.abs(inputs["power"]) < 10.0, 1e-8, -inputs["power"] / inputs["dc_voltage_in"] ** 2
         )

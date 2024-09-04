@@ -21,7 +21,6 @@ class SizingInductorCopperMass(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -65,7 +64,6 @@ class SizingInductorCopperMass(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 
@@ -88,7 +86,6 @@ class SizingInductorCopperMass(om.ExplicitComponent):
         outputs[prefix + ":inductor:copper_mass"] = copper_weight
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
         settings_prefix = prefix.replace("data", "settings")
 

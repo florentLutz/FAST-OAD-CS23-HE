@@ -63,7 +63,6 @@ def list_inputs_metadata(component: Union[om.ExplicitComponent, om.Group]) -> tu
     # inputs
     var_outputs = []
     for variable_out_name in variables_out:
-
         variable = variables_out[variable_out_name]
         var_prom_name = variable["prom_name"]
 
@@ -82,7 +81,6 @@ def list_inputs_metadata(component: Union[om.ExplicitComponent, om.Group]) -> tu
     var_copy_shape = []
 
     for variable_name in variables:
-
         variable = variables[variable_name]
         var_prom_name = variable["prom_name"]
 

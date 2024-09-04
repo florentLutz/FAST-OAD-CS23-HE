@@ -40,7 +40,6 @@ def power_train_mass_breakdown(
     # Create a dictionary with names and value and the right units, also identify the component
     # type so we can do a breakdown by type
     for variable_name in variables_names:
-
         component_type = variable_name.replace(PT_DATA_PREFIX, "").split(":")[0]
         component_types.append(component_type)
 
@@ -94,7 +93,6 @@ def power_train_mass_breakdown(
         figure_values.append(component_type_weight)
 
     for component in component_level_breakdown:
-
         component_weight = component_level_breakdown[component][0]
         component_type = component_level_breakdown[component][1]
         component_type_weight = component_types_level_breakdown[component_type]

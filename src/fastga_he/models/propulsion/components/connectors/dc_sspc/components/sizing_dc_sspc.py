@@ -23,7 +23,6 @@ class SizingDCSSPC(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_sspc_id",
             default=None,
@@ -40,7 +39,6 @@ class SizingDCSSPC(om.Group):
         )
 
     def setup(self):
-
         dc_sspc_id = self.options["dc_sspc_id"]
         position = self.options["position"]
 

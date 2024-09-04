@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
 from .components.sizing_turboshaft import SizingTurboshaft
 from .components.perf_turboshaft import PerformancesTurboshaft
 from .components.slipstream_turboshaft import SlipstreamTurboshaft

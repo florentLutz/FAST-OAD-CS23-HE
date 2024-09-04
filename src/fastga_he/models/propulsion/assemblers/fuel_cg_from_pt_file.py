@@ -24,7 +24,6 @@ class FuelCGFromPTFile(om.ExplicitComponent):
         self._tank_types = None
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -36,7 +35,6 @@ class FuelCGFromPTFile(om.ExplicitComponent):
         )
 
     def setup(self):
-
         self.configurator.load(self.options["power_train_file_path"])
 
         self._tank_names, self._tank_types = self.configurator.get_fuel_tank_list()
@@ -60,7 +58,6 @@ class FuelCGFromPTFile(om.ExplicitComponent):
         )
 
         for tank_name, tank_type in zip(self._tank_names, self._tank_types):
-
             self.add_input(
                 tank_name + "_fuel_remaining_t",
                 units="kg",
@@ -95,14 +92,12 @@ class FuelCGFromPTFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         fuel_mass_t_econ = np.zeros(number_of_points)
         fuel_lever_arm_t_econ = np.zeros(number_of_points)
 
         for tank_name, tank_type in zip(self._tank_names, self._tank_types):
-
             fuel_mass_t_econ += inputs[tank_name + "_fuel_remaining_t"]
             fuel_lever_arm_t_econ += (
                 inputs[tank_name + "_fuel_remaining_t"]
@@ -113,11 +108,9 @@ class FuelCGFromPTFile(om.ExplicitComponent):
         outputs["fuel_lever_arm_t_econ"] = fuel_lever_arm_t_econ
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         for tank_name, tank_type in zip(self._tank_names, self._tank_types):
-
             partials["fuel_lever_arm_t_econ", tank_name + "_fuel_remaining_t"] = np.full(
                 number_of_points, inputs[PT_DATA_PREFIX + tank_type + ":" + tank_name + ":CG:x"]
             )

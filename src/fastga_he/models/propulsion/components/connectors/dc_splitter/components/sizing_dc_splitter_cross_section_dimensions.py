@@ -12,7 +12,6 @@ class SizingSplitterCrossSectionDimensions(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_splitter_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingSplitterCrossSectionDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         self.add_input(
@@ -57,7 +55,6 @@ class SizingSplitterCrossSectionDimensions(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         cross_section_area = inputs[
@@ -79,7 +76,6 @@ class SizingSplitterCrossSectionDimensions(om.ExplicitComponent):
         ] = np.sqrt(cross_section_area * w_t_ratio)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         cross_section_area = inputs[
@@ -96,9 +92,7 @@ class SizingSplitterCrossSectionDimensions(om.ExplicitComponent):
             + dc_splitter_id
             + ":cross_section:thickness",
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":cross_section:area",
-        ] = (
-            1.0 / 2.0 * np.sqrt(1.0 / (w_t_ratio * cross_section_area))
-        )
+        ] = 1.0 / 2.0 * np.sqrt(1.0 / (w_t_ratio * cross_section_area))
         partials[
             "data:propulsion:he_power_train:DC_splitter:"
             + dc_splitter_id
@@ -106,21 +100,15 @@ class SizingSplitterCrossSectionDimensions(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_splitter:"
             + dc_splitter_id
             + ":cross_section:w_t_ratio",
-        ] = (
-            -1.0 / 2.0 * np.sqrt(cross_section_area / w_t_ratio ** 3.0)
-        )
+        ] = -1.0 / 2.0 * np.sqrt(cross_section_area / w_t_ratio**3.0)
 
         partials[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":cross_section:width",
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":cross_section:area",
-        ] = (
-            1.0 / 2.0 * np.sqrt(w_t_ratio / cross_section_area)
-        )
+        ] = 1.0 / 2.0 * np.sqrt(w_t_ratio / cross_section_area)
         partials[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":cross_section:width",
             "data:propulsion:he_power_train:DC_splitter:"
             + dc_splitter_id
             + ":cross_section:w_t_ratio",
-        ] = (
-            1.0 / 2.0 * np.sqrt(cross_section_area / w_t_ratio)
-        )
+        ] = 1.0 / 2.0 * np.sqrt(cross_section_area / w_t_ratio)

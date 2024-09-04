@@ -46,11 +46,9 @@ class PerformancesViewer:
         plot_height: int = None,
         plot_width: int = None,
     ):
-
         if power_train_data_file_path.endswith(".csv") and not mission_data_file_path.endswith(
             ".csv"
         ):
-
             power_train_data = pd.read_csv(power_train_data_file_path, index_col=0)
             # Remove the taxi power train data because they are not stored in the mission data
             # either
@@ -63,7 +61,6 @@ class PerformancesViewer:
         elif power_train_data_file_path.endswith(".csv") and mission_data_file_path.endswith(
             ".csv"
         ):
-
             columns_to_drop = []
             for mission_variable_name in list(PROMOTION_FROM_MISSION.keys()):
                 columns_to_drop.append(
@@ -126,9 +123,7 @@ class PerformancesViewer:
         output = widgets.Output()
 
         def show_plots(change=None):
-
             with output:
-
                 clear_output(wait=True)
 
                 # Reset axis_range
@@ -191,7 +186,6 @@ class PerformancesViewer:
                         else:
                             fig.add_trace(scatter)
                 else:
-
                     # pylint: disable=invalid-name # that's a common naming
                     x = self.data[x_name]
                     # pylint: disable=invalid-name # that's a common naming
@@ -233,7 +227,6 @@ class PerformancesViewer:
                     fig.update_yaxes(title_text=y2_name, secondary_y=True)
 
                     if self._axis_ensurer.value:
-
                         fig.update_yaxes(
                             range=[0.95 * self.y_min, 1.05 * self.y_max], secondary_y=False
                         )

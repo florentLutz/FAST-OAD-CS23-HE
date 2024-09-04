@@ -15,7 +15,6 @@ class PerformancesDCSSPCLosses(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -27,7 +26,6 @@ class PerformancesDCSSPCLosses(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -61,7 +59,6 @@ class PerformancesDCSSPCLosses(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         # We may encounter a problem with the computation of losses if the SSPC is open,
@@ -69,21 +66,17 @@ class PerformancesDCSSPCLosses(om.ExplicitComponent):
         # that the losses are nil in this which is what we will output
 
         if not self.options["closed"]:
-
             outputs["power_losses"] = np.zeros(number_of_points)
 
         else:
-
             outputs["power_losses"] = (
                 np.abs(inputs["dc_voltage_in"] - inputs["dc_voltage_out"]) * inputs["dc_current_in"]
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         if not self.options["closed"]:
-
             partials["power_losses", "dc_current_in"] = np.zeros(number_of_points)
             partials["power_losses", "dc_voltage_in"] = np.zeros(number_of_points)
             partials["power_losses", "dc_voltage_out"] = np.zeros(number_of_points)

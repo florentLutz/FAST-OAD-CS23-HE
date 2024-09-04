@@ -18,30 +18,30 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_CAPACITOR
-] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.current.capacitor.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_INDUCTOR
-] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.current.inductor.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_MODULE
-] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.current.module.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_IN
-] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.current.input.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE
-] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.voltage.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN
-] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.voltage.input.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES
-] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.losses.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY
-] = "fastga_he.submodel.propulsion.constraints.dc_dc_converter.frequency.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_CAPACITOR] = (
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.current.capacitor.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_INDUCTOR] = (
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.current.inductor.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_MODULE] = (
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.current.module.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_IN] = (
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.current.input.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE] = (
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.voltage.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN] = (
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.voltage.input.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES] = (
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.losses.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY] = (
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.frequency.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -63,7 +63,6 @@ class ConstraintsCurrentCapacitorEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -92,7 +91,6 @@ class ConstraintsCurrentCapacitorEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -125,7 +123,6 @@ class ConstraintsCurrentInductorEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -154,7 +151,6 @@ class ConstraintsCurrentInductorEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -187,7 +183,6 @@ class ConstraintsCurrentModuleEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -228,7 +223,6 @@ class ConstraintsCurrentModuleEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -249,7 +243,6 @@ class ConstraintsCurrentModuleEnforce(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         if (
@@ -264,7 +257,6 @@ class ConstraintsCurrentModuleEnforce(om.ExplicitComponent):
                 + ":igbt:current_max"
             ]
         ):
-
             partials[
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
@@ -319,7 +311,6 @@ class ConstraintsCurrentInputEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -348,7 +339,6 @@ class ConstraintsCurrentInputEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -381,7 +371,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -422,7 +411,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -443,7 +431,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         if (
@@ -458,7 +445,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
                 + ":voltage_out_max"
             ]
         ):
-
             partials[
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
@@ -477,7 +463,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
             ] = 0.0
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
@@ -515,7 +500,6 @@ class ConstraintsVoltageInputEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -544,7 +528,6 @@ class ConstraintsVoltageInputEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -577,7 +560,6 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -605,7 +587,6 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -636,7 +617,6 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -666,7 +646,6 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[

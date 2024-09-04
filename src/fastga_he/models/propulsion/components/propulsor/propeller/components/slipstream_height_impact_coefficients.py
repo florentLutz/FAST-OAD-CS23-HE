@@ -31,7 +31,6 @@ class SlipstreamPropellerHeightImpactCoefficients(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         propeller_id = self.options["propeller_id"]
 
@@ -90,7 +89,6 @@ class SlipstreamPropellerHeightImpactCoefficients(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -113,10 +111,10 @@ class SlipstreamPropellerHeightImpactCoefficients(om.ExplicitComponent):
         x_matrix = np.empty(shape=(6, number_of_points))
         x_matrix[0, :] = np.ones(number_of_points)
         x_matrix[1, :] = distance_ratio
-        x_matrix[2, :] = distance_ratio ** 2.0
+        x_matrix[2, :] = distance_ratio**2.0
         x_matrix[3, :] = distance_ratio * v_ratio
         x_matrix[4, :] = v_ratio
-        x_matrix[5, :] = v_ratio ** 2.0
+        x_matrix[5, :] = v_ratio**2.0
 
         outputs["f_0"] = np.matmul(K0, x_matrix)
         outputs["f_1"] = np.matmul(K1, x_matrix)
@@ -125,7 +123,6 @@ class SlipstreamPropellerHeightImpactCoefficients(om.ExplicitComponent):
         outputs["f_4"] = np.matmul(K4, x_matrix)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 

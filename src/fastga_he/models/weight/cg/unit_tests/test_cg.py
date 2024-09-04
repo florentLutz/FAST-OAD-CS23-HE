@@ -32,13 +32,10 @@ def test_operation_cg_variation_comp():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(OperationalInFlightCGVariation(), ivc)
-    assert (
-        problem.get_val(
-            "data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:equivalent_moment",
-            units="kg*m",
-        )
-        == pytest.approx(5146.5, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:equivalent_moment",
+        units="kg*m",
+    ) == pytest.approx(5146.5, rel=1e-2)
     assert problem.get_val(
         "data:weight:aircraft:in_flight_variation:operational:fixed_mass_comp:mass", units="kg"
     ) == pytest.approx(1499.0, rel=1e-2)

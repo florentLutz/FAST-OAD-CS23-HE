@@ -56,7 +56,6 @@ NB_POINTS_TEST = 10
 
 
 def test_diameter_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorDiameterScaling(generator_id="generator_1")), __file__, XML_FILE
     )
@@ -72,7 +71,6 @@ def test_diameter_scaling():
 
 
 def test_diameter():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorDiameter(generator_id="generator_1")), __file__, XML_FILE
     )
@@ -88,7 +86,6 @@ def test_diameter():
 
 
 def test_length_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorLengthScaling(generator_id="generator_1")), __file__, XML_FILE
     )
@@ -104,7 +101,6 @@ def test_length_scaling():
 
 
 def test_length():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorLength(generator_id="generator_1")), __file__, XML_FILE
     )
@@ -120,7 +116,6 @@ def test_length():
 
 
 def test_loss_coefficients_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorLossCoefficientScaling(generator_id="generator_1")),
         __file__,
@@ -144,7 +139,6 @@ def test_loss_coefficients_scaling():
 
 
 def test_loss_coefficients():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorLossCoefficient(generator_id="generator_1")),
         __file__,
@@ -154,33 +148,23 @@ def test_loss_coefficients():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingGeneratorLossCoefficient(generator_id="generator_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:generator:generator_1:loss_coefficient:alpha",
-            units="W/N**2/m**2",
-        )
-        == pytest.approx(0.008, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:generator:generator_1:loss_coefficient:beta",
-            units="W*s/rad",
-        )
-        == pytest.approx(26.56, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:generator:generator_1:loss_coefficient:gamma",
-            units="W*s**2/rad**2",
-        )
-        == pytest.approx(0.0375, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:loss_coefficient:alpha",
+        units="W/N**2/m**2",
+    ) == pytest.approx(0.008, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:loss_coefficient:beta",
+        units="W*s/rad",
+    ) == pytest.approx(26.56, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:loss_coefficient:gamma",
+        units="W*s**2/rad**2",
+    ) == pytest.approx(0.0375, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_resistance_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorPhaseResistanceScaling(generator_id="generator_1")),
         __file__,
@@ -198,7 +182,6 @@ def test_resistance_scaling():
 
 
 def test_resistance():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorPhaseResistance(generator_id="generator_1")),
         __file__,
@@ -216,7 +199,6 @@ def test_resistance():
 
 
 def test_torque_constant_scaling():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorTorqueConstantScaling(generator_id="generator_1")),
         __file__,
@@ -234,7 +216,6 @@ def test_torque_constant_scaling():
 
 
 def test_torque_constant():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorTorqueConstant(generator_id="generator_1")),
         __file__,
@@ -252,7 +233,6 @@ def test_torque_constant():
 
 
 def test_weight():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGeneratorWeight(generator_id="generator_1")), __file__, XML_FILE
     )
@@ -268,11 +248,9 @@ def test_weight():
 
 
 def test_generator_cg_x():
-
     expected_cg = [2.69, 0.48, 1.99]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingGeneratorCGX(generator_id="generator_1", position=option)),
             __file__,
@@ -289,11 +267,9 @@ def test_generator_cg_x():
 
 
 def test_generator_cg_y():
-
     expected_cg = [1.0, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingGeneratorCGY(generator_id="generator_1", position=option)),
             __file__,
@@ -310,7 +286,6 @@ def test_generator_cg_y():
 
 
 def test_sizing():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingGenerator(generator_id="generator_1")), __file__, XML_FILE
     )
@@ -338,7 +313,6 @@ def test_sizing():
 
 
 def test_rpm_mission():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesRPMMission(generator_id="generator_1", number_of_points=NB_POINTS_TEST)
@@ -359,7 +333,6 @@ def test_rpm_mission():
 
 
 def test_voltage_out_target():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesVoltageOutTargetMission(
@@ -385,7 +358,6 @@ def test_voltage_out_target():
 
 
 def test_rms_current_3_phases():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "ac_current_rms_out_one_phase", val=np.linspace(125, 145, NB_POINTS_TEST), units="A"
@@ -401,7 +373,6 @@ def test_rms_current_3_phases():
 
 
 def test_apparent_power():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "ac_current_rms_out",
@@ -426,7 +397,6 @@ def test_apparent_power():
 
 
 def test_active_power():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "apparent_power",
@@ -448,7 +418,6 @@ def test_active_power():
 
 
 def test_shaft_power_in():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "active_power",
@@ -472,7 +441,6 @@ def test_shaft_power_in():
 
 
 def test_torque():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "shaft_power_in",
@@ -492,7 +460,6 @@ def test_torque():
 
 
 def test_losses():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesLosses(generator_id="generator_1", number_of_points=NB_POINTS_TEST)
@@ -521,7 +488,6 @@ def test_losses():
 
 
 def test_efficiency():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "shaft_power_in",
@@ -546,7 +512,6 @@ def test_efficiency():
 
 
 def test_voltage_peak():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "ac_voltage_rms_out",
@@ -568,7 +533,6 @@ def test_voltage_peak():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -621,7 +585,6 @@ def test_maximum():
 
 
 def test_constraints_enforce_torque():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnforce(generator_id="generator_1")),
         __file__,
@@ -635,7 +598,6 @@ def test_constraints_enforce_torque():
 
 
 def test_constraints_enforce_rpm():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsRPMEnforce(generator_id="generator_1")),
         __file__,
@@ -649,7 +611,6 @@ def test_constraints_enforce_rpm():
 
 
 def test_constraints_voltage_enforce():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsVoltageEnforce(generator_id="generator_1")), __file__, XML_FILE
     )
@@ -664,7 +625,6 @@ def test_constraints_voltage_enforce():
 
 
 def test_constraints_ensure_torque():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnsure(generator_id="generator_1")),
         __file__,
@@ -678,7 +638,6 @@ def test_constraints_ensure_torque():
 
 
 def test_constraints_ensure_rpm():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsRPMEnsure(generator_id="generator_1")),
         __file__,

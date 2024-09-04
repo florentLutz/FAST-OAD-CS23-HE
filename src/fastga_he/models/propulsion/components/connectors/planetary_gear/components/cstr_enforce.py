@@ -11,9 +11,9 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_PLANETARY_GEAR_TORQUE
-] = "fastga_he.submodel.propulsion.constraints.planetary_gear.torque.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PLANETARY_GEAR_TORQUE] = (
+    "fastga_he.submodel.propulsion.constraints.planetary_gear.torque.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -35,7 +35,6 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         self.add_input(
@@ -67,7 +66,6 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         outputs[

@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
 from .components.sizing_battery_pack import SizingBatteryPack
 from .components.perf_battery_pack import PerformancesBatteryPack
 from .components.slipstream_battery_pack import SlipstreamBatteryPack

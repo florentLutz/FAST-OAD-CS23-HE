@@ -14,7 +14,6 @@ from fastga_he.models.aerodynamics.external.xfoil.xfoil_polar import XfoilPolarM
 
 
 class ComputePropellerPointPerformance(om.Group):
-
     """Computes propeller profiles aerodynamic coefficient and propeller behaviour."""
 
     def initialize(self):
@@ -127,7 +126,6 @@ class _AdjustTwistLaw(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         radius_ratio_ref = np.array(
             [0.0, 0.197, 0.297, 0.400, 0.584, 0.597, 0.708, 0.803, 0.900, 0.949, 0.99]
         )
@@ -181,7 +179,6 @@ class _PreparePropellerTwist(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         twist_75_ref = inputs["data:aerodynamics:propeller:point_performance:twist_75_ref"]
         twist_vect_ref = inputs["data:geometry:propeller:twist_vect_ref"]
         radius_ratio_vect = inputs["data:geometry:propeller:radius_ratio_vect"]
@@ -194,7 +191,6 @@ class _PreparePropellerTwist(om.ExplicitComponent):
 
 class _ComputePropellerPointPerformance(PropellerCoreModule):
     def setup(self):
-
         super().setup()
 
         for profile in self.options["sections_profile_name_list"]:
@@ -220,7 +216,6 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # Define init values
         omega = inputs["data:geometry:propeller:average_rpm"]
         density = inputs["data:aerodynamics:propeller:point_performance:rho"]
@@ -251,7 +246,6 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         cd_min_list = np.zeros(len(radius))
 
         for idx, _ in enumerate(radius):
-
             index = np.where(sections_profile_position_list < (radius[idx] / radius_max))[0]
             if index is None:
                 profile_name = sections_profile_name_list[0]
@@ -296,13 +290,11 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         outputs["data:aerodynamics:propeller:point_performance:power"] = power
 
     def find_altitude(self, density):
-
         alt = fsolve(self.diff_to_density, x0=np.array([0.0]), args=density)
         return max(float(alt[0]), 0.0)
 
     @staticmethod
     def diff_to_density(altitude, target_density):
-
         return Atmosphere(altitude, altitude_in_feet=False).density - target_density
 
     def compute_pitch_performance_mod(
@@ -319,7 +311,6 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         cl_inv_list,
         cd_min_list,
     ):
-
         """
         This function calculates the thrust, efficiency and power at a given flight speed,
         altitude h and propeller angular speed.
@@ -377,7 +368,6 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
 
         # Loop on element number to compute equations
         for idx, _ in enumerate(radius):
-
             # Solve BEM vs. disk theory system of equations
             speed_vect = fsolve(
                 self.delta_mod,
@@ -489,7 +479,7 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         # Calculate speed composition and relative air angle (in deg.)
         v_ax = v_inf + v_i
         v_t = (omega * radius - v_t) * np.cos(sweep * np.pi / 180.0)
-        rel_fluid_speed = np.sqrt(v_ax ** 2.0 + v_t ** 2.0)
+        rel_fluid_speed = np.sqrt(v_ax**2.0 + v_t**2.0)
         phi = np.arctan(v_ax / v_t)
         alpha = theta - phi * 180.0 / np.pi
 
@@ -505,15 +495,15 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
         c_d = np.interp(alpha, alpha_element, cd_element)
 
         if mach_local < 1:
-            beta = np.sqrt(1 - mach_local ** 2.0)
-            c_l = c_l / (beta + c_l * mach_local ** 2.0 / (2.0 + 2.0 * beta))
-            c_l_inv = c_l_inv / (beta + c_l_inv * mach_local ** 2.0 / (2.0 + 2.0 * beta))
-            c_d = c_d / (beta + c_d * mach_local ** 2.0 / (2.0 + 2.0 * beta))
+            beta = np.sqrt(1 - mach_local**2.0)
+            c_l = c_l / (beta + c_l * mach_local**2.0 / (2.0 + 2.0 * beta))
+            c_l_inv = c_l_inv / (beta + c_l_inv * mach_local**2.0 / (2.0 + 2.0 * beta))
+            c_d = c_d / (beta + c_d * mach_local**2.0 / (2.0 + 2.0 * beta))
             c_d_min = cd_min_element / (
-                beta + cd_min_element * mach_local ** 2.0 / (2.0 + 2.0 * beta)
+                beta + cd_min_element * mach_local**2.0 / (2.0 + 2.0 * beta)
             )
         else:
-            beta = np.sqrt(mach_local ** 2.0 - 1)
+            beta = np.sqrt(mach_local**2.0 - 1)
             c_l = c_l / beta
             c_l_inv = c_l_inv / beta
             c_d = c_d / beta
@@ -536,14 +526,14 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
             0.5
             * blades_number
             * chord
-            * rel_fluid_speed ** 2.0
+            * rel_fluid_speed**2.0
             * (c_l_3d * np.cos(phi) - c_d_3d * np.sin(phi))
         )
         torque_element = (
             0.5
             * blades_number
             * chord
-            * rel_fluid_speed ** 2.0
+            * rel_fluid_speed**2.0
             * (c_l_3d * np.sin(phi) + c_d_3d * np.cos(phi))
             * radius
         )
@@ -626,7 +616,7 @@ class _ComputePropellerPointPerformance(PropellerCoreModule):
 
         # Calculate force and momentum
         thrust_element = 4.0 * np.pi * radius * (v_inf + v_i) * v_i * f_tip * f_hub
-        torque_element = 4.0 * np.pi * radius ** 2.0 * (v_inf + v_i) * v_t * f_tip * f_hub
+        torque_element = 4.0 * np.pi * radius**2.0 * (v_inf + v_i) * v_t * f_tip * f_hub
 
         # Store results
         output = np.empty(2)

@@ -17,7 +17,6 @@ class PerformancesLosses(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -26,7 +25,6 @@ class PerformancesLosses(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -71,7 +69,6 @@ class PerformancesLosses(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         torque = inputs["torque_out"]
@@ -87,12 +84,11 @@ class PerformancesLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":loss_coefficient:gamma"
         ]
 
-        power_losses = alpha * torque ** 2.0 + beta * omega + gamma * omega ** 2.0
+        power_losses = alpha * torque**2.0 + beta * omega + gamma * omega**2.0
 
         outputs["power_losses"] = power_losses
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         torque = inputs["torque_out"]
@@ -113,9 +109,7 @@ class PerformancesLosses(om.ExplicitComponent):
         partials[
             "power_losses",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":loss_coefficient:alpha",
-        ] = (
-            torque ** 2.0
-        )
+        ] = torque**2.0
         partials[
             "power_losses",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":loss_coefficient:beta",
@@ -123,6 +117,4 @@ class PerformancesLosses(om.ExplicitComponent):
         partials[
             "power_losses",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":loss_coefficient:gamma",
-        ] = (
-            omega ** 2.0
-        )
+        ] = omega**2.0

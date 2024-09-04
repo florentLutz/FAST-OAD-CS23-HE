@@ -32,7 +32,6 @@ class ConstraintsPowerEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         aux_load_id = self.options["aux_load_id"]
 
         self.add_input(
@@ -67,7 +66,6 @@ class ConstraintsPowerEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         aux_load_id = self.options["aux_load_id"]
 
         outputs[

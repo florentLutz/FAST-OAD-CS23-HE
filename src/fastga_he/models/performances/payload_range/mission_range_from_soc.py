@@ -12,7 +12,6 @@ from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
 
 class OperationalMissionVectorWithTargetSoC(OperationalMissionVector):
     def initialize(self):
-
         super().initialize()
 
         self.options.declare(
@@ -24,7 +23,6 @@ class OperationalMissionVectorWithTargetSoC(OperationalMissionVector):
         )
 
     def setup(self):
-
         super().setup()
         self.add_subsystem(
             name="distance_to_target",
@@ -37,7 +35,6 @@ class OperationalMissionVectorWithTargetSoC(OperationalMissionVector):
 
 class DistanceToTargetSoc(om.ImplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "variable_name_target_SoC",
             types=str,
@@ -47,7 +44,6 @@ class DistanceToTargetSoc(om.ImplicitComponent):
         )
 
     def setup(self):
-
         variable_name_target_soc = self.options["variable_name_target_SoC"]
 
         self.add_input(variable_name_target_soc, val=np.nan, units="percent")
@@ -67,7 +63,6 @@ class DistanceToTargetSoc(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         variable_name_target_soc = self.options["variable_name_target_SoC"]
 
         residuals["data:mission:operational:range"] = (

@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 from ..components.sizing_weight import SizingSpeedReducerWeight
 from ..components.sizing_dimension_scaling import SizingSpeedReducerDimensionScaling
@@ -39,7 +38,6 @@ class SizingSpeedReducer(om.Group):
         )
 
     def setup(self):
-
         position = self.options["position"]
         speed_reducer_id = self.options["speed_reducer_id"]
 

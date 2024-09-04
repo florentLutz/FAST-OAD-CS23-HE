@@ -13,13 +13,11 @@ class PerformancesModulationIndex(om.ImplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -50,13 +48,11 @@ class PerformancesModulationIndex(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         residuals["modulation_index"] = (
             inputs["ac_voltage_peak_out"] - outputs["modulation_index"] * inputs["dc_voltage_in"]
         )
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         jacobian["modulation_index", "ac_voltage_peak_out"] = np.ones(number_of_points)
@@ -66,12 +62,10 @@ class PerformancesModulationIndex(om.ImplicitComponent):
     def guess_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         if any(
             np.clip(inputs["ac_voltage_peak_out"] / inputs["dc_voltage_in"], 0, 1.0)
             != inputs["ac_voltage_peak_out"] / inputs["dc_voltage_in"]
         ):
-
             outputs["modulation_index"] = np.clip(
                 inputs["ac_voltage_peak_out"] / inputs["dc_voltage_in"], 0, 1.0
             )

@@ -22,7 +22,6 @@ class SizingRectifierContactorWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -42,7 +41,6 @@ class SizingRectifierContactorWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         current_ac_caliber = inputs[
@@ -50,7 +48,7 @@ class SizingRectifierContactorWeight(om.ExplicitComponent):
         ]
 
         outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":contactor:mass"] = (
-            3.0 * 0.0239 * current_ac_caliber ** 0.6942
+            3.0 * 0.0239 * current_ac_caliber**0.6942
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -63,6 +61,4 @@ class SizingRectifierContactorWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":contactor:mass",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber",
-        ] = (
-            3.0 * 0.0239 * 0.6942 * current_ac_caliber ** (0.6942 - 1.0)
-        )
+        ] = 3.0 * 0.0239 * 0.6942 * current_ac_caliber ** (0.6942 - 1.0)

@@ -15,7 +15,6 @@ class PerformancesLossesOneCable(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -48,13 +47,11 @@ class PerformancesLossesOneCable(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["conduction_losses"] = (
             inputs["resistance_per_cable"] * inputs["dc_current_one_cable"] ** 2.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["conduction_losses", "resistance_per_cable"] = (
             inputs["dc_current_one_cable"] ** 2.0
         )

@@ -14,7 +14,6 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -29,7 +28,6 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
         flaps_position = self.options["flaps_position"]
@@ -99,7 +97,6 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
 
@@ -129,7 +126,6 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
         outputs["unblown_section_lift_AOA_0"] = cl_section_0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
         flaps_position = self.options["flaps_position"]
@@ -154,41 +150,37 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
         )
 
         partials["unblown_section_lift", "data:aerodynamics:wing:low_speed:CL_ref"] = (
-            -cl_wing_clean * cl_section_ref / cl_wing_ref ** 2.0
+            -cl_wing_clean * cl_section_ref / cl_wing_ref**2.0
         )
         partials["unblown_section_lift_AOA_0", "data:aerodynamics:wing:low_speed:CL_ref"] = (
-            -cl0 * cl_section_ref / cl_wing_ref ** 2.0
+            -cl0 * cl_section_ref / cl_wing_ref**2.0
         )
 
         partials[
             "unblown_section_lift",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
-        ] = (
-            cl_wing_clean / cl_wing_ref
-        )
+        ] = cl_wing_clean / cl_wing_ref
         partials[
             "unblown_section_lift_AOA_0",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
-        ] = (
-            cl0 / cl_wing_ref
-        )
+        ] = cl0 / cl_wing_ref
 
         if flaps_position == "takeoff":
             delta_cl_flaps = inputs["data:aerodynamics:flaps:takeoff:CL_2D"]
             partials["unblown_section_lift", "data:aerodynamics:flaps:takeoff:CL_2D"] = np.full(
                 number_of_points, flapped_ratio
             )
-            partials[
-                "unblown_section_lift_AOA_0", "data:aerodynamics:flaps:takeoff:CL_2D"
-            ] = np.full(number_of_points, flapped_ratio)
+            partials["unblown_section_lift_AOA_0", "data:aerodynamics:flaps:takeoff:CL_2D"] = (
+                np.full(number_of_points, flapped_ratio)
+            )
         elif flaps_position == "landing":
             delta_cl_flaps = inputs["data:aerodynamics:flaps:landing:CL_2D"]
             partials["unblown_section_lift", "data:aerodynamics:flaps:landing:CL_2D"] = np.full(
                 number_of_points, flapped_ratio
             )
-            partials[
-                "unblown_section_lift_AOA_0", "data:aerodynamics:flaps:landing:CL_2D"
-            ] = np.full(number_of_points, flapped_ratio)
+            partials["unblown_section_lift_AOA_0", "data:aerodynamics:flaps:landing:CL_2D"] = (
+                np.full(number_of_points, flapped_ratio)
+            )
         else:
             delta_cl_flaps = 0.0
 

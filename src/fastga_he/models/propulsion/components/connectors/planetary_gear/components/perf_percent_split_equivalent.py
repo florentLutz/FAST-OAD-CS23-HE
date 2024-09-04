@@ -13,7 +13,6 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         planetary_gear_id = self.options["planetary_gear_id"]
 
@@ -74,7 +72,6 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         power_share = inputs["power_share"]
@@ -88,7 +85,6 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
         outputs["power_split"] = power_split
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         power_share = inputs["power_share"]
@@ -107,7 +103,7 @@ class PerformancesPercentSplitEquivalent(om.ExplicitComponent):
         partials["power_split", "power_share"] = partials_power_share
 
         partials["power_split", "shaft_power_out"] = np.where(
-            power_share < power_in, -100.0 * power_share / (power_out ** 2.0 / eta), -1e-6
+            power_share < power_in, -100.0 * power_share / (power_out**2.0 / eta), -1e-6
         )
         partials[
             "power_split",

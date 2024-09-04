@@ -33,7 +33,6 @@ def cleanup():
 
 
 def test_sizing_tbm900():
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -116,7 +115,6 @@ def test_operational_mission_tbm_900():
 
 
 def test_ecopulse_powertrain_network():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "turbo_electric_propulsion.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "turbo_electric_propulsion.html")
 
@@ -125,7 +123,6 @@ def test_ecopulse_powertrain_network():
 
 
 def test_retrofit_ecopulse():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -168,7 +165,6 @@ def test_retrofit_ecopulse():
 
 
 def test_ecopulse_new_wing():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -214,7 +210,6 @@ def test_ecopulse_new_wing():
 
 
 def test_ecopulse_new_wing_pt_mass_breakdown():
-
     path_to_result_file = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ecopulse_new_wing.xml")
     path_to_pt_file = pth.join(DATA_FOLDER_PATH, "ecopulse_powertrain_new_wing.yml")
 
@@ -225,7 +220,6 @@ def test_ecopulse_new_wing_pt_mass_breakdown():
 
 
 def test_ecopulse_new_wing_mission_analysis():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -259,7 +253,6 @@ def test_ecopulse_new_wing_mission_analysis():
 
 
 def test_weight_comparison():
-
     ref_aircraft = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_op.xml")
     ref_aircraft_sizing = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ref.xml")
     ref_datafile = oad.DataFile(ref_aircraft_sizing)
@@ -309,7 +302,6 @@ def test_weight_comparison():
 
 
 def test_geometry_comparison():
-
     ref_aircraft_sizing = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ref.xml")
     new_wing_aircraft = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ecopulse_new_wing.xml")
 

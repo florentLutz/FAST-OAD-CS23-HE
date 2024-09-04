@@ -16,7 +16,6 @@ class SizingGeneratorWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="generator_id", default=None, desc="Identifier of the generator", allow_none=False
         )
@@ -46,7 +45,6 @@ class SizingGeneratorWeight(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
         torque_cont = inputs[
@@ -58,7 +56,6 @@ class SizingGeneratorWeight(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:generator:" + generator_id + ":mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         generator_id = self.options["generator_id"]
 
         torque_cont = inputs[

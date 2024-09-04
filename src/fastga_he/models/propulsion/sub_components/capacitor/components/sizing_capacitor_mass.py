@@ -27,7 +27,6 @@ class SizingCapacitorMass(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -46,7 +45,6 @@ class SizingCapacitorMass(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=self.options["mass_ref"])
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         outputs[prefix + ":capacitor:mass"] = (

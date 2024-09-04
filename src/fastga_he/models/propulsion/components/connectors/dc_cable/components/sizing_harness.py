@@ -45,7 +45,6 @@ class SizingHarness(om.Group):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
         position = self.options["position"]
 

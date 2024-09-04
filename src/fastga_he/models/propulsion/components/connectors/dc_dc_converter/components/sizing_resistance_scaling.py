@@ -28,7 +28,6 @@ class SizingDCDCConverterResistanceScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -56,7 +55,6 @@ class SizingDCDCConverterResistanceScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
         current_caliber_ref = self.options["current_caliber_ref"]
 
@@ -72,10 +70,9 @@ class SizingDCDCConverterResistanceScaling(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":scaling:resistance"
-        ] = (current_caliber_star ** -1)
+        ] = current_caliber_star**-1
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
         current_caliber_ref = self.options["current_caliber_ref"]
 
@@ -92,6 +89,4 @@ class SizingDCDCConverterResistanceScaling(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":module:current_caliber",
-        ] = (
-            -current_caliber_ref / current_caliber ** 2.0
-        )
+        ] = -current_caliber_ref / current_caliber**2.0

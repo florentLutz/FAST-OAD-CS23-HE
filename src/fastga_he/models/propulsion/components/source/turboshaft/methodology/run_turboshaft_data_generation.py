@@ -10,7 +10,6 @@ import openmdao.api as om
 import numpy as np
 import pandas as pd
 
-import plotly.graph_objects as go
 
 from pyDOE2 import lhs
 
@@ -25,7 +24,6 @@ from turboshaft_components.turboshaft_off_design_fuel import Turboshaft
 def get_ivc_all_data(
     power_design, t41t_design, opr_design, altitude_design, mach_design, opr_limit, itt_limit
 ):
-
     ivc = om.IndepVarComp()
     ivc.add_output("compressor_bleed_mass_flow", val=0.04, units="kg/s")
     ivc.add_output("cooling_bleed_ratio", val=0.025)
@@ -85,7 +83,6 @@ def get_ivc_all_data(
 
 
 def run_design_point(ivc):
-
     prob = om.Problem()
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
@@ -119,7 +116,6 @@ def run_design_point(ivc):
 
 
 def get_fuel_problem(ivc):
-
     prob = om.Problem()
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
@@ -148,7 +144,6 @@ def run_off_design_fuel(
     mach_off_design: list,
     ivc: om.IndepVarComp,
 ):
-
     fuel_consumed = []
     exhaust_thrust = []
     p3t = []
@@ -224,7 +219,6 @@ def run_off_design_fuel(
 
 
 def run_max_power_opr_limit(altitude_off_design: list, mach_off_design: list, ivc: om.IndepVarComp):
-
     max_power = []
     converged = []
 
@@ -291,7 +285,6 @@ def run_max_power_opr_limit(altitude_off_design: list, mach_off_design: list, iv
 
 
 def run_max_power_itt_limit(altitude_off_design: list, mach_off_design: list, ivc: om.IndepVarComp):
-
     max_power = []
     converged = []
 
@@ -366,7 +359,6 @@ def run_and_save_turboshaft_full_performances(
     shaft_power_limit,
     data_folder_pth,
 ):
-
     print("Design thermodynamic power: " + str(power_design) + " kW")
     print("Design TET: " + str(t41t_design) + " degK")
     print("Design OPR: " + str(opr_design))
@@ -487,13 +479,11 @@ def run_and_save_turboshaft_full_performances(
     )
 
     if result_file_path_max_power.exists():
-
         existing_data = pd.read_csv(result_file_path_max_power, index_col=0)
         stacked_dataframe = pd.concat([existing_data, result_dataframe_max_power], axis=0)
         stacked_dataframe.to_csv(result_file_path_max_power)
 
     else:
-
         result_dataframe_max_power.to_csv(result_file_path_max_power)
 
     max_power_array = np.minimum(
@@ -582,18 +572,15 @@ def run_and_save_turboshaft_full_performances(
     result_file_path_fc = data_folder_pth / "fuel_consumed.csv"
 
     if result_file_path_fc.exists():
-
         existing_data = pd.read_csv(result_file_path_fc, index_col=0)
         stacked_dataframe = pd.concat([existing_data, result_dataframe_fc], axis=0)
         stacked_dataframe.to_csv(result_file_path_fc)
 
     else:
-
         result_dataframe_fc.to_csv(result_file_path_fc)
 
 
 if __name__ == "__main__":
-
     path_to_current_file = pathlib.Path(__file__)
     parent_folder = path_to_current_file.parents[0]
     data_folder_path = parent_folder / "data"

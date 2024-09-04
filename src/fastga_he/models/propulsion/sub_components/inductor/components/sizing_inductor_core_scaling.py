@@ -27,7 +27,6 @@ class SizingInductorCoreScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -51,7 +50,6 @@ class SizingInductorCoreScaling(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         iron_area_ref = self.options["iron_surface_ref"]
@@ -62,16 +60,15 @@ class SizingInductorCoreScaling(om.ExplicitComponent):
         outputs[prefix + ":inductor:scaling:core_mass"] = (iron_area / iron_area_ref) ** (3.0 / 2.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
         iron_area_ref = self.options["iron_surface_ref"]
         iron_area = inputs[prefix + ":inductor:iron_surface"]
 
-        partials[
-            prefix + ":inductor:scaling:core_dimension", prefix + ":inductor:iron_surface"
-        ] = 0.5 * np.sqrt(1.0 / (iron_area_ref * iron_area))
+        partials[prefix + ":inductor:scaling:core_dimension", prefix + ":inductor:iron_surface"] = (
+            0.5 * np.sqrt(1.0 / (iron_area_ref * iron_area))
+        )
 
         partials[prefix + ":inductor:scaling:core_mass", prefix + ":inductor:iron_surface"] = (
-            3.0 / 2.0 * np.sqrt(iron_area / iron_area_ref ** 3.0)
+            3.0 / 2.0 * np.sqrt(iron_area / iron_area_ref**3.0)
         )

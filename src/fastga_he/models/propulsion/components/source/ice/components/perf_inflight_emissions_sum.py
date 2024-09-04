@@ -12,7 +12,6 @@ class PerformancesICEInFlightEmissionsSum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -24,7 +23,6 @@ class PerformancesICEInFlightEmissionsSum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         ice_id = self.options["ice_id"]
 
@@ -103,7 +101,6 @@ class PerformancesICEInFlightEmissionsSum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         outputs["data:LCA:operation:he_power_train:ICE:" + ice_id + ":CO2"] = np.sum(

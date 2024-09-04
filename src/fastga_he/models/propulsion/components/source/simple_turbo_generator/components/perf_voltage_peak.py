@@ -14,13 +14,11 @@ class PerformancesVoltagePeak(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -49,5 +47,4 @@ class PerformancesVoltagePeak(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["ac_voltage_peak_out"] = inputs["ac_voltage_rms_out"] * np.sqrt(3.0 / 2.0)

@@ -12,6 +12,8 @@ from fastga_he.powertrain_builder import resources
 from fastga_he.models.propulsion.assemblers import delta_from_pt_file
 
 # noinspection PyUnresolvedReferences
+# pylint: disable=unused-import
+# flake8: noqa
 from fastga_he.models.propulsion.components import (
     SlipstreamPropeller,
     SlipstreamPMSM,
@@ -41,33 +43,27 @@ UNIQUE_STRING = "ca_part_sur_un_depart"
 
 
 def test_all_slipstream_components_exist():
-
     # Component existing mean that they are imported in the right place (the __init__ of the
     # components folder) and that it can be created
 
     module = __import__("fastga_he.models.propulsion.components", fromlist=[""])
 
     for component_om_name in resources.DICTIONARY_CN:
-
         slipstream_group_name = "Slipstream" + resources.DICTIONARY_CN[component_om_name]
 
         try:
-
             klass = getattr(module, slipstream_group_name)
             assert klass
 
         except AttributeError:
-
             assert False
 
 
 def test_all_components_output_required_value():
-
     # Originally I planned on doing each delta on their own but since it takes so much bloody
     # time to list output, we will do everything at once
 
     for component_om_name in resources.DICTIONARY_CN:
-
         slipstream_group_name = "Slipstream" + resources.DICTIONARY_CN[component_om_name]
         slipstream_group_id = resources.DICTIONARY_CN_ID[component_om_name]
 
@@ -93,7 +89,6 @@ def test_all_components_output_required_value():
 
 
 def test_all_sizing_components_are_imported():
-
     slipstream_assembler_file_path = delta_from_pt_file.__file__
 
     r = open(slipstream_assembler_file_path, "r")

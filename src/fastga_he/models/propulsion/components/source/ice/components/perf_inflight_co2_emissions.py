@@ -13,7 +13,6 @@ class PerformancesICEInFlightCO2Emissions(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesICEInFlightCO2Emissions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -54,7 +52,6 @@ class PerformancesICEInFlightCO2Emissions(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         outputs["CO2_emissions"] = (
@@ -63,7 +60,6 @@ class PerformancesICEInFlightCO2Emissions(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         ice_id = self.options["ice_id"]
 
         partials["CO2_emissions", "fuel_consumed_t"] = np.full_like(

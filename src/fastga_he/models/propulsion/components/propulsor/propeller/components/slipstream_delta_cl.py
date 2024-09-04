@@ -13,13 +13,11 @@ class SlipstreamPropellerDeltaCl(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -70,12 +68,10 @@ class SlipstreamPropellerDeltaCl(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["delta_Cl"] = inputs["delta_Cl_2D"] * inputs["blown_area_ratio"]
         outputs["delta_Cl_AOA_0"] = inputs["delta_Cl_2D_AOA_0"] * inputs["blown_area_ratio"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["delta_Cl", "delta_Cl_2D"] = inputs["blown_area_ratio"]
         partials["delta_Cl", "blown_area_ratio"] = inputs["delta_Cl_2D"]
 

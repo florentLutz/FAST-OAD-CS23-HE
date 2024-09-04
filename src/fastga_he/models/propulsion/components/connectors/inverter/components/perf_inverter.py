@@ -15,7 +15,6 @@ from .perf_conduction_loss import PerformancesConductionLosses
 from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_total_loss import PerformancesLosses
 from .perf_casing_temperature import PerformancesCasingTemperature
-from .perf_efficiency import PerformancesEfficiency
 from .perf_dc_current import PerformancesDCCurrent
 from .perf_maximum import PerformancesMaximum
 
@@ -26,7 +25,6 @@ from ..constants import SUBMODEL_INVERTER_JUNCTION_TEMPERATURE, SUBMODEL_INVERTE
 
 class PerformancesInverter(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -38,7 +36,6 @@ class PerformancesInverter(om.Group):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -117,7 +114,6 @@ class PerformancesInverterTemperature(om.Group):
             self.linear_solver = om.DirectSolver()
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -129,7 +125,6 @@ class PerformancesInverterTemperature(om.Group):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 

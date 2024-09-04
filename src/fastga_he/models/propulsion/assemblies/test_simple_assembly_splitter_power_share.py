@@ -38,7 +38,6 @@ NB_POINTS_TEST = 10
 
 
 def test_assembly_performances_splitter_150_kw():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitterPowerShare(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -138,7 +137,6 @@ def test_assembly_performances_splitter_150_kw():
 
 
 def test_assembly_performances_splitter_150_kw_low_requirement():
-
     # Same test as above except the thrust required will be much lower to check if it indeed
     # output zero current in the secondary branch and primary branch is equal to the output
 
@@ -255,7 +253,6 @@ def test_assembly_performances_splitter_150_kw_low_requirement():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitterPowerShare(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -372,7 +369,6 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_case_reader():
-
     fig = api_he.residuals_viewer(
         recorder_data_file_path=pth.join(OUTPUT_FOLDER_PATH, "cases.sql"),
         case="root.performances.nonlinear_solver",
@@ -383,7 +379,6 @@ def test_case_reader():
 
 
 def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_splitter_power_share.yml")
 
     ivc = get_indep_var_comp(
@@ -484,7 +479,6 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
 
 
 def test_incoherent_voltage():
-
     # Small test to see if the check that prevent the problem from running with incoherent value
     # works
 
@@ -527,7 +521,7 @@ def test_incoherent_voltage():
     )
 
     # Should work
-    problem = run_system(
+    run_system(
         PowerTrainPerformancesFromFile(
             power_train_file_path=pt_file_path,
             number_of_points=NB_POINTS_TEST,
@@ -545,7 +539,7 @@ def test_incoherent_voltage():
     )
     # Should return an exception
     with pytest.raises(FASTGAHEIncoherentVoltage) as e_info:
-        problem = run_system(
+        run_system(
             PowerTrainPerformancesFromFile(
                 power_train_file_path=pt_file_path,
                 number_of_points=NB_POINTS_TEST,
@@ -564,7 +558,6 @@ def test_incoherent_voltage():
 
 
 def test_slipstream_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
     ivc = get_indep_var_comp(

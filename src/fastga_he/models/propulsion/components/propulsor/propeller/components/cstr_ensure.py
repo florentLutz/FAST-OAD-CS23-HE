@@ -21,13 +21,11 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
 
         self.add_input(
@@ -60,7 +58,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         outputs[
@@ -71,7 +68,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         partials[

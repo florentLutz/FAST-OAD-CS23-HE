@@ -16,7 +16,6 @@ class SizingDCSplitterInsulationThickness(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_splitter_id",
             default=None,
@@ -26,7 +25,6 @@ class SizingDCSplitterInsulationThickness(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         self.add_input(
@@ -71,7 +69,6 @@ class SizingDCSplitterInsulationThickness(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         thickness_conductor = inputs[
@@ -109,7 +106,6 @@ class SizingDCSplitterInsulationThickness(om.ExplicitComponent):
         ] = t_i
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         thickness_conductor = inputs[
@@ -142,8 +138,8 @@ class SizingDCSplitterInsulationThickness(om.ExplicitComponent):
         factor_exp = (shape_factor * v_max * t_v) / (alpha * thickness_conductor)
         d_factor_d_sf = v_max * t_v / (alpha * thickness_conductor)
         d_factor_d_t_v = shape_factor * v_max / (alpha * thickness_conductor)
-        d_factor_d_alpha = -(shape_factor * v_max * t_v) / (alpha ** 2.0 * thickness_conductor)
-        d_factor_d_r_c = -(shape_factor * v_max * t_v) / (alpha * thickness_conductor ** 2.0)
+        d_factor_d_alpha = -(shape_factor * v_max * t_v) / (alpha**2.0 * thickness_conductor)
+        d_factor_d_r_c = -(shape_factor * v_max * t_v) / (alpha * thickness_conductor**2.0)
 
         partials[
             "data:propulsion:he_power_train:DC_splitter:"
@@ -158,38 +154,28 @@ class SizingDCSplitterInsulationThickness(om.ExplicitComponent):
             + dc_splitter_id
             + ":insulation:thickness",
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":voltage_caliber",
-        ] = (
-            thickness_conductor * np.exp(factor_exp) * d_factor_d_v_max
-        )
+        ] = thickness_conductor * np.exp(factor_exp) * d_factor_d_v_max
         partials[
             "data:propulsion:he_power_train:DC_splitter:"
             + dc_splitter_id
             + ":insulation:thickness",
             "settings:propulsion:he_power_train:DC_splitter:insulation:dielectric_permittivity",
-        ] = (
-            thickness_conductor * np.exp(factor_exp) * d_factor_d_sf * d_sf_d_permittivity
-        )
+        ] = thickness_conductor * np.exp(factor_exp) * d_factor_d_sf * d_sf_d_permittivity
         partials[
             "data:propulsion:he_power_train:DC_splitter:"
             + dc_splitter_id
             + ":insulation:thickness",
             "settings:propulsion:he_power_train:DC_splitter:insulation:void_thickness",
-        ] = (
-            thickness_conductor * np.exp(factor_exp) * d_factor_d_t_v
-        )
+        ] = thickness_conductor * np.exp(factor_exp) * d_factor_d_t_v
         partials[
             "data:propulsion:he_power_train:DC_splitter:"
             + dc_splitter_id
             + ":insulation:thickness",
             "settings:propulsion:he_power_train:DC_splitter:insulation:breakdown_voltage",
-        ] = (
-            thickness_conductor * np.exp(factor_exp) * d_factor_d_alpha
-        )
+        ] = thickness_conductor * np.exp(factor_exp) * d_factor_d_alpha
         partials[
             "data:propulsion:he_power_train:DC_splitter:"
             + dc_splitter_id
             + ":insulation:thickness",
             "settings:propulsion:he_power_train:DC_splitter:insulation:breakdown_voltage",
-        ] = (
-            thickness_conductor * np.exp(factor_exp) * d_factor_d_alpha
-        )
+        ] = thickness_conductor * np.exp(factor_exp) * d_factor_d_alpha

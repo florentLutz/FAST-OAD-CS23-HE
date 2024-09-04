@@ -14,7 +14,6 @@ class SizingBusBarMutualInductance(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_bus_id",
             default=None,
@@ -24,7 +23,6 @@ class SizingBusBarMutualInductance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         self.add_input(
@@ -56,7 +54,6 @@ class SizingBusBarMutualInductance(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         conductor_length = inputs[
@@ -78,13 +75,10 @@ class SizingBusBarMutualInductance(om.ExplicitComponent):
             * (
                 conductor_length
                 * np.log(
-                    (
-                        np.sqrt(conductor_length ** 2.0 + insulation_thickness ** 2.0)
-                        + conductor_length
-                    )
+                    (np.sqrt(conductor_length**2.0 + insulation_thickness**2.0) + conductor_length)
                     / insulation_thickness
                 )
-                - np.sqrt(conductor_length ** 2.0 + insulation_thickness ** 2.0)
+                - np.sqrt(conductor_length**2.0 + insulation_thickness**2.0)
                 + insulation_thickness
             )
         )
@@ -112,10 +106,10 @@ class SizingBusBarMutualInductance(om.ExplicitComponent):
         ] = 2.0e-7 * (
             conductor_length
             * np.log(
-                (np.sqrt(conductor_length ** 2.0 + insulation_thickness ** 2.0) + conductor_length)
+                (np.sqrt(conductor_length**2.0 + insulation_thickness**2.0) + conductor_length)
                 / insulation_thickness
             )
-            - np.sqrt(conductor_length ** 2.0 + insulation_thickness ** 2.0)
+            - np.sqrt(conductor_length**2.0 + insulation_thickness**2.0)
             + insulation_thickness
         )
         partials[
@@ -125,7 +119,7 @@ class SizingBusBarMutualInductance(om.ExplicitComponent):
             2.0e-7
             * mu_r
             * np.log(
-                (np.sqrt(conductor_length ** 2.0 + insulation_thickness ** 2.0) + conductor_length)
+                (np.sqrt(conductor_length**2.0 + insulation_thickness**2.0) + conductor_length)
                 / insulation_thickness
             )
         )
@@ -135,9 +129,6 @@ class SizingBusBarMutualInductance(om.ExplicitComponent):
         ] = (
             2.0e-7
             * mu_r
-            * (
-                -np.sqrt(conductor_length ** 2.0 + insulation_thickness ** 2.0)
-                - insulation_thickness
-            )
+            * (-np.sqrt(conductor_length**2.0 + insulation_thickness**2.0) - insulation_thickness)
             / insulation_thickness
         )

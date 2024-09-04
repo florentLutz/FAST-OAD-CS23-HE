@@ -15,7 +15,6 @@ from fastga_he.models.propulsion.components.propulsor.propeller.methodology.perf
 warnings.filterwarnings(action="ignore")
 
 if __name__ == "__main__":
-
     rpm = 700.0
     j_list = np.array(
         [
@@ -58,14 +57,12 @@ if __name__ == "__main__":
         ]
     )
     for j, ct_target in zip(j_list, ct_list):
-
         ct = ct_target / 2.0
         speed = j * rpm / 60 * 3.048
         iter_count = 0
         twist_75 = 40
 
         while abs(ct - ct_target) / ct_target > 1e-4 and iter_count < 50:
-
             ivc = om.IndepVarComp()
             ivc.add_output("data:geometry:propeller:diameter", val=3.048, units="m")
             ivc.add_output("data:geometry:propeller:hub_diameter", val=0.6096, units="m")
@@ -157,8 +154,8 @@ if __name__ == "__main__":
             )
             efficiency = problem.get_val("data:aerodynamics:propeller:point_performance:efficiency")
 
-            ct = thrust / 1.225 / (rpm / 60) ** 2.0 / 3.048 ** 4
-            cp = power / 1.225 / (rpm / 60) ** 3.0 / 3.048 ** 5
+            ct = thrust / 1.225 / (rpm / 60) ** 2.0 / 3.048**4
+            cp = power / 1.225 / (rpm / 60) ** 3.0 / 3.048**5
 
             twist_75 *= 1.0 - 2.0 * ct_target * (ct - ct_target) / ct_target
             iter_count += 1

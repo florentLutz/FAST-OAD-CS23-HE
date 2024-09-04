@@ -22,7 +22,6 @@ NB_POINTS_TEST = 1
 
 
 def test_slipstream_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "verif_de_vries.yml")
 
     ivc = get_indep_var_comp(

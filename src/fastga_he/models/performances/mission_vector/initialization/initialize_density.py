@@ -12,7 +12,6 @@ class InitializeDensity(om.ExplicitComponent):
     """Initializes the density at each time step."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -33,7 +32,6 @@ class InitializeDensity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -59,13 +57,11 @@ class InitializeDensity(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["density"] = AtmosphereWithPartials(
             inputs["altitude"], altitude_in_feet=False
         ).density
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["density", "altitude"] = AtmosphereWithPartials(
             inputs["altitude"], altitude_in_feet=False
         ).partial_density_altitude

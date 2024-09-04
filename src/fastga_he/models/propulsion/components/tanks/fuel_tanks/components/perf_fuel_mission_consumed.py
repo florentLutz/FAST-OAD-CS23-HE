@@ -13,7 +13,6 @@ class PerformancesFuelConsumedMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesFuelConsumedMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         fuel_tank_id = self.options["fuel_tank_id"]
 
@@ -53,7 +51,6 @@ class PerformancesFuelConsumedMission(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         outputs[

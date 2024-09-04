@@ -12,7 +12,6 @@ class PerformancesSFC(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -24,7 +23,6 @@ class PerformancesSFC(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -56,7 +54,6 @@ class PerformancesSFC(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         # Formula was established with dimensionless parameters, the division in the following
@@ -73,13 +70,13 @@ class PerformancesSFC(om.ExplicitComponent):
             -1663.04917125
             + 6507.41622273 * rpm
             + 829.44035557 * pme
-            - 6292.54999479 * rpm ** 2.0
+            - 6292.54999479 * rpm**2.0
             - 4236.01419045 * pme * rpm
-            + 1116.74781595 * pme ** 2.0
-            + 2037.26111092 * rpm ** 3.0
-            + 2217.65637191 * rpm ** 2.0 * pme
-            + 253.52716382 * rpm * pme ** 2.0
-            - 490.36976312 * pme ** 3.0
+            + 1116.74781595 * pme**2.0
+            + 2037.26111092 * rpm**3.0
+            + 2217.65637191 * rpm**2.0 * pme
+            + 253.52716382 * rpm * pme**2.0
+            - 490.36976312 * pme**3.0
         )
 
         # The upper value is completely arbitrary, but is here to prevent the code looking for
@@ -91,7 +88,6 @@ class PerformancesSFC(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         ice_id = self.options["ice_id"]
 
         rpm = inputs["rpm"] / 2700.0
@@ -107,9 +103,9 @@ class PerformancesSFC(om.ExplicitComponent):
                 +829.44035557
                 - 4236.01419045 * rpm
                 + 2.0 * 1116.74781595 * pme
-                + 2217.65637191 * rpm ** 2.0
+                + 2217.65637191 * rpm**2.0
                 + 2.0 * 253.52716382 * rpm * pme
-                - 3.0 * 490.36976312 * pme ** 2.0
+                - 3.0 * 490.36976312 * pme**2.0
             )
             * d_pme_d_input_pme
             * inputs["settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc"],
@@ -123,9 +119,9 @@ class PerformancesSFC(om.ExplicitComponent):
                 +6507.41622273
                 - 2.0 * 6292.54999479 * rpm
                 - 4236.01419045 * pme
-                + 3.0 * 2037.26111092 * rpm ** 2.0
+                + 3.0 * 2037.26111092 * rpm**2.0
                 + 2.0 * 2217.65637191 * rpm * pme
-                + 253.52716382 * pme ** 2.0
+                + 253.52716382 * pme**2.0
             )
             * d_rpm_d_input_rpm
             * inputs["settings:propulsion:he_power_train:ICE:" + ice_id + ":k_sfc"]
@@ -137,11 +133,11 @@ class PerformancesSFC(om.ExplicitComponent):
             -1663.04917125
             + 6507.41622273 * rpm
             + 829.44035557 * pme
-            - 6292.54999479 * rpm ** 2.0
+            - 6292.54999479 * rpm**2.0
             - 4236.01419045 * pme * rpm
-            + 1116.74781595 * pme ** 2.0
-            + 2037.26111092 * rpm ** 3.0
-            + 2217.65637191 * rpm ** 2.0 * pme
-            + 253.52716382 * rpm * pme ** 2.0
-            - 490.36976312 * pme ** 3.0
+            + 1116.74781595 * pme**2.0
+            + 2037.26111092 * rpm**3.0
+            + 2217.65637191 * rpm**2.0 * pme
+            + 253.52716382 * rpm * pme**2.0
+            - 490.36976312 * pme**3.0
         )

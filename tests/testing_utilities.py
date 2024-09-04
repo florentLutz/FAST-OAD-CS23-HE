@@ -9,7 +9,6 @@ import logging
 import os.path as pth
 from copy import deepcopy
 from typing import Union, List
-import time
 
 import numpy as np
 

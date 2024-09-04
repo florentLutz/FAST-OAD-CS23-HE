@@ -11,7 +11,6 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingPropellerCGX(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -25,7 +24,6 @@ class SizingPropellerCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 
@@ -37,7 +35,6 @@ class SizingPropellerCGX(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
-
             self.add_input(
                 name="data:propulsion:he_power_train:propeller:" + propeller_id + ":from_LE",
                 val=np.nan,
@@ -57,14 +54,12 @@ class SizingPropellerCGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 
         prop_depth = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":depth"]
 
         if position == "on_the_wing":
-
             distance_from_le = inputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":from_LE"
             ]
@@ -82,12 +77,10 @@ class SizingPropellerCGX(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 
         if position == "on_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:x",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":depth",

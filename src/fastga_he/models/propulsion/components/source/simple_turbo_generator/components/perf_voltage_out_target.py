@@ -21,7 +21,6 @@ class PerformancesVoltageOutTargetMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="turbo_generator_id",
             default=None,
@@ -33,7 +32,6 @@ class PerformancesVoltageOutTargetMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turbo_generator_id = self.options["turbo_generator_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -52,7 +50,6 @@ class PerformancesVoltageOutTargetMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -78,7 +75,6 @@ class PerformancesVoltageOutTargetMission(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turbo_generator_id = self.options["turbo_generator_id"]
         number_of_points = self.options["number_of_points"]
 

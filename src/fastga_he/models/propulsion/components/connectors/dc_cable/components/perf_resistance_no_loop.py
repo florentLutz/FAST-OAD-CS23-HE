@@ -41,7 +41,6 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -53,7 +52,6 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -175,7 +173,6 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         alpha_r = inputs[
@@ -212,12 +209,12 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             alpha_r
             * reference_resistance
             * (voltage_in - voltage_out) ** 2.0
-            * number_cables ** 2.0
+            * number_cables**2.0
             / h
             / (2.0 * np.pi * cable_radius * cable_length)
         )
 
-        resistance = (b_term + np.sqrt(b_term ** 2.0 + 4.0 * c_term)) / 2.0
+        resistance = (b_term + np.sqrt(b_term**2.0 + 4.0 * c_term)) / 2.0
 
         outputs["resistance_per_cable"] = resistance
 
@@ -258,19 +255,19 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             alpha_r
             * reference_resistance
             * (voltage_in - voltage_out) ** 2.0
-            * number_cables ** 2.0
+            * number_cables**2.0
             / h
             / (2.0 * np.pi * cable_radius * cable_length)
         )
 
-        d_resistance_d_b_term = 0.5 * (1.0 + b_term / np.sqrt(b_term ** 2 + 4.0 * c_term))
-        d_resistance_d_c_term = 1.0 / np.sqrt(b_term ** 2 + 4.0 * c_term)
+        d_resistance_d_b_term = 0.5 * (1.0 + b_term / np.sqrt(b_term**2 + 4.0 * c_term))
+        d_resistance_d_c_term = 1.0 / np.sqrt(b_term**2 + 4.0 * c_term)
 
         d_b_term_d_alpha_r = reference_resistance * (temp_ext - reference_temperature)
         d_c_term_d_alpha_r = (
             reference_resistance
             * (voltage_in - voltage_out) ** 2.0
-            * number_cables ** 2.0
+            * number_cables**2.0
             / h
             / (2.0 * np.pi * cable_radius * cable_length)
         )
@@ -279,24 +276,20 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":properties:resistance_temperature_scale_factor",
-        ] = (
-            d_resistance_d_b_term * d_b_term_d_alpha_r + d_resistance_d_c_term * d_c_term_d_alpha_r
-        )
+        ] = d_resistance_d_b_term * d_b_term_d_alpha_r + d_resistance_d_c_term * d_c_term_d_alpha_r
 
         d_b_term_d_r_ref = 1.0 + alpha_r * (temp_ext - reference_temperature)
         d_c_term_d_r_ref = (
             alpha_r
             * (voltage_in - voltage_out) ** 2.0
-            * number_cables ** 2.0
+            * number_cables**2.0
             / h
             / (2.0 * np.pi * cable_radius * cable_length)
         )
         partials[
             "resistance_per_cable",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:resistance",
-        ] = (
-            d_resistance_d_b_term * d_b_term_d_r_ref + d_resistance_d_c_term * d_c_term_d_r_ref
-        )
+        ] = d_resistance_d_b_term * d_b_term_d_r_ref + d_resistance_d_c_term * d_c_term_d_r_ref
 
         d_b_term_d_t_ext = reference_resistance * alpha_r
         d_c_term_d_t_ext = 0.0
@@ -311,9 +304,7 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             "settings:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":cable:reference_temperature",
-        ] = (
-            d_resistance_d_b_term * d_b_term_d_t_ref + d_resistance_d_c_term * d_c_term_d_t_ref
-        )
+        ] = d_resistance_d_b_term * d_b_term_d_t_ref + d_resistance_d_c_term * d_c_term_d_t_ref
 
         d_b_term_d_nc = 0.0
         d_c_term_d_nc = (
@@ -328,9 +319,7 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
         partials[
             "resistance_per_cable",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
-        ] = (
-            d_resistance_d_b_term * d_b_term_d_nc + d_resistance_d_c_term * d_c_term_d_nc
-        )
+        ] = d_resistance_d_b_term * d_b_term_d_nc + d_resistance_d_c_term * d_c_term_d_nc
 
         d_b_term_d_v_out = 0.0
         d_c_term_d_v_out = -(
@@ -338,7 +327,7 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             * reference_resistance
             * 2.0
             * (voltage_in - voltage_out)
-            * number_cables ** 2.0
+            * number_cables**2.0
             / h
             / (2.0 * np.pi * cable_radius * cable_length)
         )
@@ -352,7 +341,7 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             * reference_resistance
             * 2.0
             * (voltage_in - voltage_out)
-            * number_cables ** 2.0
+            * number_cables**2.0
             / h
             / (2.0 * np.pi * cable_radius * cable_length)
         )
@@ -365,8 +354,8 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             alpha_r
             * reference_resistance
             * (voltage_in - voltage_out) ** 2.0
-            * number_cables ** 2.0
-            / h ** 2.0
+            * number_cables**2.0
+            / h**2.0
             / (2.0 * np.pi * cable_radius * cable_length)
         )
         partials["resistance_per_cable", "heat_transfer_coefficient"] = (
@@ -378,29 +367,25 @@ class PerformancesResistanceNoLoop(om.ExplicitComponent):
             alpha_r
             * reference_resistance
             * (voltage_in - voltage_out) ** 2.0
-            * number_cables ** 2.0
+            * number_cables**2.0
             / h
-            / (2.0 * np.pi * cable_radius ** 2.0 * cable_length)
+            / (2.0 * np.pi * cable_radius**2.0 * cable_length)
         )
         partials[
             "resistance_per_cable",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cable:radius",
-        ] = (
-            d_resistance_d_b_term * d_b_term_d_r + d_resistance_d_c_term * d_c_term_d_r
-        )
+        ] = d_resistance_d_b_term * d_b_term_d_r + d_resistance_d_c_term * d_c_term_d_r
 
         d_b_term_d_l = 0.0
         d_c_term_d_l = -(
             alpha_r
             * reference_resistance
             * (voltage_in - voltage_out) ** 2.0
-            * number_cables ** 2.0
+            * number_cables**2.0
             / h
-            / (2.0 * np.pi * cable_radius * cable_length ** 2.0)
+            / (2.0 * np.pi * cable_radius * cable_length**2.0)
         )
         partials[
             "resistance_per_cable",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
-        ] = (
-            d_resistance_d_b_term * d_b_term_d_l + d_resistance_d_c_term * d_c_term_d_l
-        )
+        ] = d_resistance_d_b_term * d_b_term_d_l + d_resistance_d_c_term * d_c_term_d_l

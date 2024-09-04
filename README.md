@@ -15,5 +15,5 @@ Install
 
 * Clone the repository locally
 * Preferably and although it is not mandatory, create a new virtual environment ([conda](https://docs.conda.io/en/latest/) is preferred).
-* Install [Poetry](https://python-poetry.org/docs/) with a version greater than 1.4.2. We recommend installing poetry using the pipx method and making use of suffixes.
+* Install [Poetry](https://python-poetry.org/docs/) with a version greater than 1.8.3. We recommend installing poetry using the pipx method and making use of suffixes.
 * At root of the project folder, do `poetry install`

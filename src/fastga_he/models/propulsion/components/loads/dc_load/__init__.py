@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
 from .components.sizing_aux_load import SizingDCAuxLoad
 from .components.perf_aux_load import PerformancesDCAuxLoad
 from .components.slipstream_aux_load import SlipstreamDCAuxLoad

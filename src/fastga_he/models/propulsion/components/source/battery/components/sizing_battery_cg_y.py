@@ -14,7 +14,6 @@ class SizingBatteryCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -31,7 +30,6 @@ class SizingBatteryCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
@@ -46,7 +44,6 @@ class SizingBatteryCGY(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing" or position == "wing_pod":
-
             self.add_input(
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:y_ratio",
                 val=np.nan,
@@ -56,12 +53,10 @@ class SizingBatteryCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing" or position == "wing_pod":
-
             outputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
                 * inputs[
@@ -71,18 +66,15 @@ class SizingBatteryCGY(om.ExplicitComponent):
             )
 
         else:
-
-            outputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:y"
-            ] = 0.0
+            outputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:y"] = (
+                0.0
+            )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing" or position == "wing_pod":
-
             partials[
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:y",
                 "data:geometry:wing:span",
@@ -95,6 +87,4 @@ class SizingBatteryCGY(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:y",
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

@@ -5,8 +5,6 @@
 import openmdao.api as om
 import numpy as np
 
-from ..constants import POSSIBLE_POSITION
-
 
 class SizingICENacelleWetArea(om.ExplicitComponent):
     """
@@ -15,7 +13,6 @@ class SizingICENacelleWetArea(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -24,7 +21,6 @@ class SizingICENacelleWetArea(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
 
         self.add_input(
@@ -56,7 +52,6 @@ class SizingICENacelleWetArea(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:wet_area"] = (
@@ -69,21 +64,16 @@ class SizingICENacelleWetArea(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         ice_id = self.options["ice_id"]
 
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:wet_area",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:height",
-        ] = (
-            2.0 * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length"]
-        )
+        ] = 2.0 * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length"]
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:wet_area",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:width",
-        ] = (
-            2.0 * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length"]
-        )
+        ] = 2.0 * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length"]
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:wet_area",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":nacelle:length",

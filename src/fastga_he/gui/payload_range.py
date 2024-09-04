@@ -6,14 +6,9 @@ import numpy as np
 
 from scipy.interpolate import griddata
 
-import plotly
 import plotly.graph_objects as go
 
 from fastoad.io import VariableIO
-
-from fastga_he.models.performances.payload_range.payload_range_inner import (
-    INVALID_COMPUTATION_RESULT,
-)
 
 
 def payload_range_outer(

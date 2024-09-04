@@ -12,13 +12,10 @@ from stdatm import Atmosphere
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
-from utils.filter_residuals import filter_residuals
 
-from .simple_assembly.performances_simple_assembly_splitter import PerformancesAssemblySplitter
 
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 from ..assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
-from ..assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
 
 from . import outputs
 
@@ -146,10 +143,9 @@ def test_performances_from_pt_file():
 
 
 def test_assembly_sizing_from_pt_file():
-
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    )
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_simple_generator.yml")
 

@@ -31,7 +31,6 @@ class SizingDCDCConverterEnergyCoefficientScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -68,7 +67,6 @@ class SizingDCDCConverterEnergyCoefficientScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
         current_caliber_ref = self.options["current_caliber_ref"]
 
@@ -82,13 +80,12 @@ class SizingDCDCConverterEnergyCoefficientScaling(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":scaling:a"
-        ] = (current_caliber_star ** -1)
+        ] = current_caliber_star**-1
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":scaling:c"
         ] = current_caliber_star
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
         current_caliber_ref = self.options["current_caliber_ref"]
 
@@ -103,14 +100,10 @@ class SizingDCDCConverterEnergyCoefficientScaling(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":module:current_caliber",
-        ] = (
-            -current_caliber_ref / current_caliber ** 2.0
-        )
+        ] = -current_caliber_ref / current_caliber**2.0
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":scaling:c",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":module:current_caliber",
-        ] = (
-            1.0 / current_caliber_ref
-        )
+        ] = 1.0 / current_caliber_ref

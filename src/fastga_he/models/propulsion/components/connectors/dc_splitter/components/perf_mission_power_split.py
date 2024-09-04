@@ -21,7 +21,6 @@ class PerformancesMissionPowerSplit(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_splitter_id",
             default=None,
@@ -33,7 +32,6 @@ class PerformancesMissionPowerSplit(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_splitter_id = self.options["dc_splitter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -57,7 +55,6 @@ class PerformancesMissionPowerSplit(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -81,7 +78,6 @@ class PerformancesMissionPowerSplit(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
         number_of_points = self.options["number_of_points"]
 

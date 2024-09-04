@@ -12,7 +12,6 @@ class SizingBatteryCGX(om.ExplicitComponent):
     """Class that computes the CG of the battery according to the position given in the options."""
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -29,7 +28,6 @@ class SizingBatteryCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
@@ -41,7 +39,6 @@ class SizingBatteryCGX(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing" or position == "wing_pod":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
             self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
 
@@ -49,7 +46,6 @@ class SizingBatteryCGX(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="data:geometry:wing:MAC:length", val=0.25)
 
         elif position == "in_the_front":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input(
                 "data:propulsion:he_power_train:battery_pack:"
@@ -70,7 +66,6 @@ class SizingBatteryCGX(om.ExplicitComponent):
             )
 
         elif position == "in_the_back":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
             self.add_input(
@@ -95,7 +90,6 @@ class SizingBatteryCGX(om.ExplicitComponent):
         # We can do an else for the last option since we gave OpenMDAO the possible, ensuring it
         # is one among them
         else:
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
 
@@ -103,19 +97,16 @@ class SizingBatteryCGX(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="data:geometry:cabin:length", val=0.5)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing" or position == "wing_pod":
-
             outputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:x"] = (
                 inputs["data:geometry:wing:MAC:at25percent:x"]
                 + 0.25 * inputs["data:geometry:wing:MAC:length"]
             )
 
         elif position == "in_the_front":
-
             outputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 - 0.5
@@ -127,7 +118,6 @@ class SizingBatteryCGX(om.ExplicitComponent):
             )
 
         elif position == "in_the_back":
-
             outputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + inputs["data:geometry:cabin:length"]
@@ -140,7 +130,6 @@ class SizingBatteryCGX(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + 0.5 * inputs["data:geometry:cabin:length"]

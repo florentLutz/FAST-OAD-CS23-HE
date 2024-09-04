@@ -14,7 +14,6 @@ class SlipstreamDCBus(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_bus_id",
             default=None,
@@ -27,7 +26,6 @@ class SlipstreamDCBus(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         ivc = om.IndepVarComp()

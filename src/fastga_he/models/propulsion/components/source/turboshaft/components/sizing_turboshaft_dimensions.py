@@ -13,7 +13,6 @@ class SizingTurboshaftDimensions(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="turboshaft_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingTurboshaftDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         self.add_input(
@@ -54,28 +52,26 @@ class SizingTurboshaftDimensions(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         power_rating = inputs[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"
         ]
 
-        diameter = 2961.3 * power_rating ** -0.272
+        diameter = 2961.3 * power_rating**-0.272
         length = 0.6119 * power_rating + 1314.9
 
-        outputs[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:height"
-        ] = diameter
-        outputs[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:width"
-        ] = diameter
-        outputs[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:length"
-        ] = length
+        outputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:height"] = (
+            diameter
+        )
+        outputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:width"] = (
+            diameter
+        )
+        outputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:length"] = (
+            length
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         power_rating = inputs[
@@ -85,15 +81,11 @@ class SizingTurboshaftDimensions(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:height",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
-        ] = (
-            2961.3 * -0.272 * power_rating ** -1.272
-        )
+        ] = 2961.3 * -0.272 * power_rating**-1.272
         partials[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:width",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
-        ] = (
-            2961.3 * -0.272 * power_rating ** -1.272
-        )
+        ] = 2961.3 * -0.272 * power_rating**-1.272
         partials[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":engine:length",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",

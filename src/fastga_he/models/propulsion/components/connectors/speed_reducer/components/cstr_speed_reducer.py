@@ -2,7 +2,6 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
 
 import fastoad.api as oad
@@ -24,7 +23,6 @@ class ConstraintsSpeedReducer(om.Group):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         option_speed_reducer_id = {"speed_reducer_id": speed_reducer_id}

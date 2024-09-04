@@ -37,7 +37,6 @@ NB_POINTS_TEST = 10
 
 
 def test_weight():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingTurboGeneratorWeight(turbo_generator_id="turbo_generator_1")),
         __file__,
@@ -55,11 +54,9 @@ def test_weight():
 
 
 def test_turbo_generator_cg_x():
-
     expected_cg = [2.69, 0.4, 4.8]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(
                 SizingTurboGeneratorCGX(turbo_generator_id="turbo_generator_1", position=option)
@@ -80,11 +77,9 @@ def test_turbo_generator_cg_x():
 
 
 def test_turbo_generator_cg_y():
-
     expected_cg = [2.0, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(
                 SizingTurboGeneratorCGY(turbo_generator_id="turbo_generator_1", position=option)
@@ -105,7 +100,6 @@ def test_turbo_generator_cg_y():
 
 
 def test_sizing():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingTurboGenerator(turbo_generator_id="turbo_generator_1")),
         __file__,
@@ -135,7 +129,6 @@ def test_sizing():
 
 
 def test_constraints_enforce_power():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsPowerEnforce(turbo_generator_id="turbo_generator_1")),
         __file__,
@@ -143,17 +136,13 @@ def test_constraints_enforce_power():
     )
     problem = run_system(ConstraintsPowerEnforce(turbo_generator_id="turbo_generator_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:power_rating",
-            units="kW",
-        )
-        == pytest.approx(750, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:power_rating",
+        units="kW",
+    ) == pytest.approx(750, rel=1e-2)
 
 
 def test_constraints_ensure_power():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsPowerEnsure(turbo_generator_id="turbo_generator_1")),
         __file__,
@@ -161,13 +150,10 @@ def test_constraints_ensure_power():
     )
     problem = run_system(ConstraintsPowerEnsure(turbo_generator_id="turbo_generator_1"), ivc)
 
-    assert (
-        problem.get_val(
-            "constraints:propulsion:he_power_train:turbo_generator:turbo_generator_1:power_rating",
-            units="kW",
-        )
-        == pytest.approx(-50.0, rel=1e-2)
-    )
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:turbo_generator:turbo_generator_1:power_rating",
+        units="kW",
+    ) == pytest.approx(-50.0, rel=1e-2)
 
 
 def test_constraint_power_for_power_rate():
@@ -183,19 +169,15 @@ def test_constraint_power_for_power_rate():
         ConstraintTurboGeneratorPowerRateMission(turbo_generator_id="turbo_generator_1"), ivc
     )
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:shaft_power_rating",
-            units="kW",
-        )
-        == pytest.approx(750, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:shaft_power_rating",
+        units="kW",
+    ) == pytest.approx(750, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_rpm_mission():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesRPMMission(
@@ -221,7 +203,6 @@ def test_rpm_mission():
 
 
 def test_voltage_out_target():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesVoltageOutTargetMission(
@@ -247,7 +228,6 @@ def test_voltage_out_target():
 
 
 def test_rms_current_3_phases():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "ac_current_rms_out_one_phase", val=np.linspace(250, 275, NB_POINTS_TEST), units="A"
@@ -263,7 +243,6 @@ def test_rms_current_3_phases():
 
 
 def test_apparent_power():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "ac_current_rms_out",
@@ -288,7 +267,6 @@ def test_apparent_power():
 
 
 def test_active_power():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesActivePower(
@@ -353,7 +331,6 @@ def test_shaft_power_in():
 
 
 def test_torque():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "shaft_power_in",
@@ -373,7 +350,6 @@ def test_torque():
 
 
 def test_voltage_peak():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "ac_voltage_rms_out",
@@ -393,7 +369,6 @@ def test_voltage_peak():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -409,12 +384,9 @@ def test_maximum():
         ),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:shaft_power_max",
-            units="W",
-        )
-        == pytest.approx(633.33e3, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:shaft_power_max",
+        units="W",
+    ) == pytest.approx(633.33e3, rel=1e-2)
 
     problem.check_partials(compact_print=True)

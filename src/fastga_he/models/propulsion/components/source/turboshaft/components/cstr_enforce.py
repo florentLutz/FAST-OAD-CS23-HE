@@ -9,9 +9,9 @@ from ..constants import SUBMODEL_CONSTRAINTS_TURBOSHAFT_RATED_POWER
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_TURBOSHAFT_RATED_POWER
-] = "fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_TURBOSHAFT_RATED_POWER] = (
+    "fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -25,7 +25,6 @@ class ConstraintsRatedPowerEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="turboshaft_id",
             default=None,
@@ -34,7 +33,6 @@ class ConstraintsRatedPowerEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         self.add_input(
@@ -58,9 +56,8 @@ class ConstraintsRatedPowerEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"
-        ] = inputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_max"]
+        outputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"] = (
+            inputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_max"]
+        )

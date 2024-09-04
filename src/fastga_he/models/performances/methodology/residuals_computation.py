@@ -12,7 +12,6 @@ from modules.mtow_loop import SizingLoopMTOW
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
 if __name__ == "__main__":
-
     input_ivc = om.IndepVarComp()
 
     input_ivc.add_output(name="wing_loading", val=115.0, units="kg/m**2")
@@ -60,25 +59,19 @@ if __name__ == "__main__":
     cases = cr.get_cases("root.nonlinear_solver")
 
     for case in cases:
-
         output_to_print = []
         residuals_to_print = []
 
         for residual in case.residuals:
-
             if any(case.residuals[residual]) != 0:
-
                 value = case.residuals[residual]
 
                 if len(value) == 1:
-
                     residuals_to_print.append(float(value))
                     output_to_print.append(float(case.outputs[residual]))
 
                 else:
-
                     for val, out in zip(value, case.outputs[residual]):
-
                         residuals_to_print.append(float(val))
                         output_to_print.append(float(out))
 

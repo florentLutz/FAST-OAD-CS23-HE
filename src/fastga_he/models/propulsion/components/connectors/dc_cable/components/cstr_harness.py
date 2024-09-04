@@ -23,7 +23,6 @@ class ConstraintsHarness(om.Group):
         )
 
     def setup(self):
-
         option_harness_id = {"harness_id": self.options["harness_id"]}
 
         self.add_subsystem(

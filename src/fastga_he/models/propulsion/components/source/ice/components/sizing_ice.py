@@ -22,7 +22,6 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingICE(om.Group):
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -39,7 +38,6 @@ class SizingICE(om.Group):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
         position = self.options["position"]
 

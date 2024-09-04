@@ -23,7 +23,6 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
         self.reserve_idx = None
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -44,7 +43,6 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -159,7 +157,6 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_reserve = self.options["number_of_points_reserve"]
 
@@ -250,7 +247,6 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
         outputs["time"] = time
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -351,9 +347,9 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
         d_time_d_cruise_v_tas = np.zeros(number_of_points)
         d_time_d_cruise_v_tas[
             number_of_points_climb : number_of_points_climb + number_of_points_cruise
-        ] = (-(position_cruise - position_climb[-1]) / v_tas_cruise ** 2.0)
+        ] = -(position_cruise - position_climb[-1]) / v_tas_cruise**2.0
         d_time_d_cruise_v_tas[number_of_points_climb + number_of_points_cruise :] = (
             -np.full(number_of_points_descent + number_of_points_reserve, cruise_range)
-            / v_tas_cruise ** 2.0
+            / v_tas_cruise**2.0
         )
         partials["time", "data:TLAR:v_cruise"] = d_time_d_cruise_v_tas

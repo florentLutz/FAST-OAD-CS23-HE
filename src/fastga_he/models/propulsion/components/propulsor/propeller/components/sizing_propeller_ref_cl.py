@@ -29,7 +29,6 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
         self.spline = None
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -43,7 +42,6 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 
@@ -69,7 +67,6 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
-
             self.add_input(
                 name="data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
                 val=np.nan,
@@ -96,12 +93,10 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 
         if position == "on_the_wing":
-
             y_ratio = inputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio"
             ]
@@ -120,19 +115,16 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
             ] = self.spline(half_span * y_ratio)
 
         else:
-
             # "Cheap" way to turn off slipstream effects in case the propeller is not on the wing
             outputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref"
             ] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
         position = self.options["position"]
 
         if position == "on_the_wing":
-
             y_ratio = inputs[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio"
             ]
@@ -143,12 +135,8 @@ class SizingPropellerReferenceCl(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":CG:y_ratio",
-            ] = (
-                spline_value * half_span
-            )
+            ] = spline_value * half_span
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref",
                 "data:geometry:wing:span",
-            ] = (
-                spline_value * y_ratio / 2.0
-            )
+            ] = spline_value * y_ratio / 2.0

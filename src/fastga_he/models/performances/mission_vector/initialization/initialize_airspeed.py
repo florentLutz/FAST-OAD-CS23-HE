@@ -33,7 +33,6 @@ class InitializeAirspeed(om.ExplicitComponent):
         self.reserve_idx = None
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -54,7 +53,6 @@ class InitializeAirspeed(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -160,7 +158,6 @@ class InitializeAirspeed(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         v_tas_cruise = inputs["data:TLAR:v_cruise"]
         v_tas_reserve = inputs["data:mission:sizing:main_route:reserve:v_tas"]
 
@@ -211,7 +208,6 @@ class InitializeAirspeed(om.ExplicitComponent):
         self.eas = outputs["equivalent_airspeed"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         atm = AtmosphereWithPartials(altitude=inputs["altitude"], altitude_in_feet=False)
         eas_over_tas = np.sqrt(atm.density / RHO_SL)
         factor_tas_alt = -0.5 / eas_over_tas * 1.0 / atm.density * atm.partial_density_altitude
@@ -223,20 +219,20 @@ class InitializeAirspeed(om.ExplicitComponent):
         partials["true_airspeed", "data:mission:sizing:main_route:reserve:v_tas"] = np.ones_like(
             self.reserve_idx
         )
-        partials[
-            "equivalent_airspeed", "data:mission:sizing:main_route:reserve:v_tas"
-        ] = eas_over_tas[self.reserve_idx]
+        partials["equivalent_airspeed", "data:mission:sizing:main_route:reserve:v_tas"] = (
+            eas_over_tas[self.reserve_idx]
+        )
 
-        partials[
-            "equivalent_airspeed", "data:mission:sizing:main_route:climb:v_eas"
-        ] = np.ones_like(self.climb_idx)
+        partials["equivalent_airspeed", "data:mission:sizing:main_route:climb:v_eas"] = (
+            np.ones_like(self.climb_idx)
+        )
         partials["true_airspeed", "data:mission:sizing:main_route:climb:v_eas"] = (
             1.0 / eas_over_tas[self.climb_idx]
         )
 
-        partials[
-            "equivalent_airspeed", "data:mission:sizing:main_route:descent:v_eas"
-        ] = np.ones_like(self.descent_idx)
+        partials["equivalent_airspeed", "data:mission:sizing:main_route:descent:v_eas"] = (
+            np.ones_like(self.descent_idx)
+        )
         partials["true_airspeed", "data:mission:sizing:main_route:descent:v_eas"] = (
             1.0 / eas_over_tas[self.descent_idx]
         )

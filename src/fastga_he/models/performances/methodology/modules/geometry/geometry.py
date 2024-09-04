@@ -4,7 +4,6 @@ import openmdao.api as om
 
 class ComputeGeometry(om.Group):
     def setup(self):
-
         self.add_subsystem(name="compute_wing_area", subsys=ComputeWingArea(), promotes=["*"])
 
 
@@ -14,7 +13,6 @@ class ComputeWingArea(om.ExplicitComponent):
     """
 
     def setup(self):
-
         # Defining the input(s)
 
         self.add_input(name="mtow", units="kg", val=np.nan)
@@ -26,7 +24,6 @@ class ComputeWingArea(om.ExplicitComponent):
         self.add_output(name="dummy_vector", units="m**2", shape=3)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # Assigning the input to local variable for clarity
         mtow = inputs["mtow"]
 

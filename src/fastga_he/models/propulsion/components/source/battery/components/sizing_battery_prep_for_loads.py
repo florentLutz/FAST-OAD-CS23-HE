@@ -36,12 +36,10 @@ class SizingBatteryPreparationForLoads(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
             self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
             self.add_input("data:geometry:wing:span", val=np.nan, units="m")
@@ -119,12 +117,10 @@ class SizingBatteryPreparationForLoads(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             root_chord = inputs["data:geometry:wing:root:chord"]
             tip_chord = inputs["data:geometry:wing:tip:chord"]
             half_span = inputs["data:geometry:wing:span"] / 2.0
@@ -166,7 +162,6 @@ class SizingBatteryPreparationForLoads(om.ExplicitComponent):
             ] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]
 
@@ -184,9 +179,7 @@ class SizingBatteryPreparationForLoads(om.ExplicitComponent):
                 + battery_pack_id
                 + ":distributed_mass:y_ratio_start",
                 "data:geometry:wing:span",
-            ] = (
-                0.25 * battery_width / half_span ** 2.0
-            )
+            ] = 0.25 * battery_width / half_span**2.0
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -200,18 +193,14 @@ class SizingBatteryPreparationForLoads(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:width",
-            ] = (
-                -0.5 / half_span
-            )
+            ] = -0.5 / half_span
 
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":distributed_mass:y_ratio_end",
                 "data:geometry:wing:span",
-            ] = (
-                -0.25 * battery_width / half_span ** 2.0
-            )
+            ] = -0.25 * battery_width / half_span**2.0
             partials[
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
@@ -225,6 +214,4 @@ class SizingBatteryPreparationForLoads(om.ExplicitComponent):
                 "data:propulsion:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":dimension:width",
-            ] = (
-                0.5 / half_span
-            )
+            ] = 0.5 / half_span

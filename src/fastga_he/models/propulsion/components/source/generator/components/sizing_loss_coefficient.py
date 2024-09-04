@@ -37,7 +37,6 @@ class SizingGeneratorLossCoefficient(om.ExplicitComponent):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
 
         self.add_input(
@@ -98,7 +97,6 @@ class SizingGeneratorLossCoefficient(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
         alpha_ref = self.options["alpha_ref"]
@@ -130,7 +128,6 @@ class SizingGeneratorLossCoefficient(om.ExplicitComponent):
         ] = gamma
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         generator_id = self.options["generator_id"]
 
         alpha_ref = self.options["alpha_ref"]

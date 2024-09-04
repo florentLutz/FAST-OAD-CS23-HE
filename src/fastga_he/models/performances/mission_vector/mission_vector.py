@@ -18,7 +18,6 @@ from typing import Tuple
 from .initialization.initialize import Initialize
 from .mission.mission_core import MissionCore
 from .to_csv import ToCSV
-from fastga_he.models.weight.cg.cg_variation import InFlightCGVariation
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from fastga_he.models.propulsion.assemblers.performances_watcher import (
@@ -68,7 +67,6 @@ class MissionVector(om.Group):
         self._last_mtow = 0.0
 
     def initialize(self):
-
         self.options.declare("out_file", default="", types=str)
         self.options.declare(
             "number_of_points_climb",
@@ -119,7 +117,6 @@ class MissionVector(om.Group):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -324,7 +321,6 @@ class MissionVector(om.Group):
             oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION]
             == ENERGY_CONSUMPTION_FROM_PT_FILE
         ):
-
             self.configurator.load(pt_file_path)
 
             # If necessary connect the variables from the performances computation to the
@@ -344,7 +340,6 @@ class MissionVector(om.Group):
                 self.connect(perf_out_full_name, slip_in_full_name)
 
             if self.configurator.get_watcher_file_path():
-
                 number_of_points = (
                     1
                     + number_of_points_climb
@@ -367,10 +362,9 @@ class MissionVector(om.Group):
                     _,
                 ) = self.configurator.get_performance_watcher_elements_list()
 
-                for (component_name, component_performances_watcher_name) in zip(
+                for component_name, component_performances_watcher_name in zip(
                     components_name, components_performances_watchers_names
                 ):
-
                     self.connect(
                         "solve_equilibrium.compute_dep_equilibrium.compute_energy_consumed.power_train_performances."
                         + component_name
@@ -392,14 +386,13 @@ class MissionVector(om.Group):
                     oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT]
                     == DEP_EFFECT_FROM_PT_FILE
                 ):
-
                     (
                         components_slip_name,
                         components_slip_performances_watchers_names,
                         _,
                     ) = self.configurator.get_slipstream_performance_watcher_elements_list()
 
-                    for (component_slip_name, component_slip_performances_watcher_name) in zip(
+                    for component_slip_name, component_slip_performances_watcher_name in zip(
                         components_slip_name, components_slip_performances_watchers_names
                     ):
                         self.connect(
@@ -436,7 +429,6 @@ class MissionVector(om.Group):
                 )
 
         else:
-
             _LOGGER.warning(
                 "Power train builder is not used for the performances computation. If "
                 "this was intended, you can ignore this warning. Else, make sure to select the "
@@ -525,7 +517,6 @@ class MissionVector(om.Group):
             and self.options["power_train_file_path"]
             and run_guesses
         ):
-
             # Then we check that there is indeed a powertrain and that the right submodels are used
 
             voltage_to_set = self.configurator.get_voltage_to_set(
@@ -636,13 +627,11 @@ class MissionVector(om.Group):
 
         if self.options["power_train_file_path"]:
             if self.configurator.will_aircraft_mass_vary():
-
-                outputs[
-                    "solve_equilibrium.performance_per_phase.fuel_consumed_t"
-                ] = dummy_fuel_consumed
+                outputs["solve_equilibrium.performance_per_phase.fuel_consumed_t"] = (
+                    dummy_fuel_consumed
+                )
 
             else:
-
                 outputs["solve_equilibrium.performance_per_phase.fuel_consumed_t"] = np.zeros(
                     number_of_points_total
                 )
@@ -651,7 +640,6 @@ class MissionVector(om.Group):
                 )
 
         else:
-
             outputs["solve_equilibrium.performance_per_phase.fuel_consumed_t"] = dummy_fuel_consumed
 
     def set_initial_guess_mass(self, inputs, outputs):
@@ -682,7 +670,6 @@ class MissionVector(om.Group):
 
         if self.options["power_train_file_path"]:
             if self.configurator.will_aircraft_mass_vary():
-
                 outputs["solve_equilibrium.update_mass.mass"] = np.full(
                     number_of_points_total, mtow
                 ) - np.cumsum(dummy_fuel_consumed)
@@ -692,7 +679,6 @@ class MissionVector(om.Group):
                     number_of_points_total, mtow
                 )
         else:
-
             outputs["solve_equilibrium.update_mass.mass"] = np.full(
                 number_of_points_total, mtow
             ) - np.cumsum(dummy_fuel_consumed)
@@ -734,9 +720,9 @@ class MissionVector(om.Group):
 
         dummy_thrust = self._get_initial_guess_thrust(mtow=mtow)
 
-        outputs[
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.thrust"
-        ] = dummy_thrust
+        outputs["solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_thrust.thrust"] = (
+            dummy_thrust
+        )
 
     def _get_initial_guess_alpha(self) -> np.ndarray:
         """
@@ -770,9 +756,9 @@ class MissionVector(om.Group):
 
         dummy_aoa = self._get_initial_guess_alpha()
 
-        outputs[
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.alpha"
-        ] = dummy_aoa
+        outputs["solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.alpha"] = (
+            dummy_aoa
+        )
 
     def _get_initial_guess_delta_m(self) -> np.ndarray:
         """
@@ -807,9 +793,9 @@ class MissionVector(om.Group):
 
         dummy_delta_m = self._get_initial_guess_delta_m()
 
-        outputs[
-            "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.delta_m"
-        ] = dummy_delta_m
+        outputs["solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_delta_m.delta_m"] = (
+            dummy_delta_m
+        )
 
     def _get_initial_guess_true_airspeed(
         self,
@@ -959,12 +945,12 @@ class MissionVector(om.Group):
             ],
         )
 
-        outputs[
-            "solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_out:thrust"
-        ] = thrust_to
-        outputs[
-            "solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_in:thrust"
-        ] = thrust_ti
+        outputs["solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_out:thrust"] = (
+            thrust_to
+        )
+        outputs["solve_equilibrium.compute_taxi_thrust.data:mission:sizing:taxi_in:thrust"] = (
+            thrust_ti
+        )
 
     @staticmethod
     def _get_initial_guess_speed_econ(
@@ -1168,17 +1154,17 @@ class MissionVector(om.Group):
 
         if self.options["power_train_file_path"]:
             if self.configurator.will_aircraft_mass_vary():
-                outputs[
-                    "solve_equilibrium.sizing_fuel.data:mission:sizing:fuel"
-                ] = DUMMY_FUEL_CONSUMED
+                outputs["solve_equilibrium.sizing_fuel.data:mission:sizing:fuel"] = (
+                    DUMMY_FUEL_CONSUMED
+                )
 
             else:
                 outputs["solve_equilibrium.sizing_fuel.data:mission:sizing:fuel"] = 0.0
 
             if self.configurator.has_fuel_non_consumable_energy_source():
-                outputs[
-                    "solve_equilibrium.sizing_fuel.data:mission:sizing:energy"
-                ] = DUMMY_ENERGY_CONSUMED
+                outputs["solve_equilibrium.sizing_fuel.data:mission:sizing:energy"] = (
+                    DUMMY_ENERGY_CONSUMED
+                )
 
             else:
                 outputs["solve_equilibrium.sizing_fuel.data:mission:sizing:energy"] = 0.0
@@ -1245,19 +1231,16 @@ class MissionVector(om.Group):
 
         if self.options["power_train_file_path"]:
             if self.configurator.has_fuel_non_consumable_energy_source():
-
-                outputs[
-                    "solve_equilibrium.performance_per_phase.non_consumable_energy_t"
-                ] = dummy_energy_consumed
+                outputs["solve_equilibrium.performance_per_phase.non_consumable_energy_t"] = (
+                    dummy_energy_consumed
+                )
 
             else:
-
-                outputs[
-                    "solve_equilibrium.performance_per_phase.non_consumable_energy_t"
-                ] = np.zeros(number_of_points_total)
+                outputs["solve_equilibrium.performance_per_phase.non_consumable_energy_t"] = (
+                    np.zeros(number_of_points_total)
+                )
 
         else:
-
             # If no pt file we assumed full fuel
             outputs["solve_equilibrium.performance_per_phase.non_consumable_energy_t"] = np.zeros(
                 number_of_points_total

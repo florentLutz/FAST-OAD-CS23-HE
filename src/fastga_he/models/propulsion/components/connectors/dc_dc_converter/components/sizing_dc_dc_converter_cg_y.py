@@ -15,7 +15,6 @@ class SizingDCDCConverterCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_dc_converter_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingDCDCConverterCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         position = self.options["position"]
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
@@ -47,7 +45,6 @@ class SizingDCDCConverterCGY(om.ExplicitComponent):
         )
 
         if position == "inside_the_wing":
-
             self.add_input(
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
@@ -59,12 +56,10 @@ class SizingDCDCConverterCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         position = self.options["position"]
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         if position == "inside_the_wing":
-
             outputs[
                 "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":CG:y"
             ] = (
@@ -78,18 +73,15 @@ class SizingDCDCConverterCGY(om.ExplicitComponent):
             )
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":CG:y"
             ] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
         position = self.options["position"]
 
         if position == "inside_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":CG:y",
                 "data:geometry:wing:span",
@@ -106,6 +98,4 @@ class SizingDCDCConverterCGY(om.ExplicitComponent):
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
                 + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

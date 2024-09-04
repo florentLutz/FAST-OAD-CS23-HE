@@ -19,7 +19,6 @@ class ComputePayloadRangeInnerSampling(om.ExplicitComponent):
         self.number_of_payload = 0
 
     def initialize(self):
-
         self.options.declare(
             name="number_of_sample",
             types=int,
@@ -28,7 +27,6 @@ class ComputePayloadRangeInnerSampling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_sample = self.options["number_of_sample"]
 
         starting_point = int(np.sqrt(number_of_sample))
@@ -58,7 +56,6 @@ class ComputePayloadRangeInnerSampling(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outer_range_array = inputs["data:mission:payload_range:range"]
         outer_payload_array = inputs["data:mission:payload_range:payload"]
 

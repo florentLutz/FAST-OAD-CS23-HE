@@ -8,13 +8,11 @@ import numpy as np
 
 class SizingPropellerDepth(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
 
         self.add_input(
@@ -41,7 +39,6 @@ class SizingPropellerDepth(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         outputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":depth"] = (
@@ -54,7 +51,6 @@ class SizingPropellerDepth(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         partials[

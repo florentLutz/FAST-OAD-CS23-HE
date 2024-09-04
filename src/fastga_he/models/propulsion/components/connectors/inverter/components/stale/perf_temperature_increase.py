@@ -8,13 +8,11 @@ import openmdao.api as om
 
 class PerformancesTemperatureIncrease(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -37,13 +35,11 @@ class PerformancesTemperatureIncrease(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["inverter_temperature_increase"] = (
             inputs["inverter_temperature_time_derivative"] * inputs["time_step"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["inverter_temperature_increase", "inverter_temperature_time_derivative"] = np.diag(
             inputs["time_step"]
         )

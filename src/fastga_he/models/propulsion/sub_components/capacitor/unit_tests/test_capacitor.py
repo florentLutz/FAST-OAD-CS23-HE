@@ -30,7 +30,6 @@ PREFIX = PT_DATA_PREFIX + "inverter:inverter_1"
 
 
 def test_capacity_scaling():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorCapacityScaling(prefix=PREFIX)),
@@ -46,7 +45,6 @@ def test_capacity_scaling():
 
 
 def test_diameter_scaling():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorDiameterScaling(prefix=PREFIX)),
@@ -62,7 +60,6 @@ def test_diameter_scaling():
 
 
 def test_diameter():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorDiameter(prefix=PREFIX)),
@@ -80,7 +77,6 @@ def test_diameter():
 
 
 def test_height():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorHeight(prefix=PREFIX)),
@@ -98,7 +94,6 @@ def test_height():
 
 
 def test_height_scaling():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorHeightScaling(prefix=PREFIX)),
@@ -114,7 +109,6 @@ def test_height_scaling():
 
 
 def test_thermal_resistance_scaling():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorThermalResistanceScaling(prefix=PREFIX)),
@@ -132,7 +126,6 @@ def test_thermal_resistance_scaling():
 
 
 def test_thermal_resistance():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorThermalResistance(prefix=PREFIX)),
@@ -150,7 +143,6 @@ def test_thermal_resistance():
 
 
 def test_resistance_scaling():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorResistanceScaling(prefix=PREFIX)),
@@ -168,7 +160,6 @@ def test_resistance_scaling():
 
 
 def test_resistance():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorResistance(prefix=PREFIX)),
@@ -186,7 +177,6 @@ def test_resistance():
 
 
 def test_mass_scaling():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorMassScaling(prefix=PREFIX)),
@@ -202,7 +192,6 @@ def test_mass_scaling():
 
 
 def test_mass():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingCapacitorMass(prefix=PREFIX)),
@@ -218,7 +207,6 @@ def test_mass():
 
 
 def test_full_sizing_capacitor():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(PREFIX + ":capacitor:capacity", units="F", val=2.27e-04)

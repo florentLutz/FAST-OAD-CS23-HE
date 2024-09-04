@@ -39,13 +39,11 @@ class PerformancesAssembly(om.Group):
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_subsystem(
@@ -67,7 +65,6 @@ class PerformancesAssembly(om.Group):
 
 
 def test_simple_turboshaft_assembly():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -177,7 +174,6 @@ def test_simple_turboshaft_assembly():
 
 
 def test_assembly_via_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_turboshaft_assembly.yml")
 
     ivc = get_indep_var_comp(

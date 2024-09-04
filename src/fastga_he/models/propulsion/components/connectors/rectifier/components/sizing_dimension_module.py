@@ -21,7 +21,6 @@ class SizingRectifierModuleDimension(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -56,7 +55,6 @@ class SizingRectifierModuleDimension(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         current_ac_caliber = inputs[
@@ -66,15 +64,14 @@ class SizingRectifierModuleDimension(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":module:length"] = (
             1.73e-1 * current_ac_caliber + 81
         ) * 1e-3
-        outputs[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":module:height"
-        ] = 0.021
-        outputs[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":module:width"
-        ] = 0.065
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":module:height"] = (
+            0.021
+        )
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":module:width"] = (
+            0.065
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[

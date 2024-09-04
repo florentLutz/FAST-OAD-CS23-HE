@@ -11,7 +11,6 @@ from .perf_maximum import PerformancesMaximum
 
 class PerformancesDCAuxLoad(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -23,7 +22,6 @@ class PerformancesDCAuxLoad(om.Group):
         )
 
     def setup(self):
-
         aux_load_id = self.options["aux_load_id"]
         number_of_points = self.options["number_of_points"]
 

@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 from ...components.loads.pmsm import PerformancesPMSM
 from ...components.propulsor.propeller import PerformancesPropeller
@@ -12,7 +11,6 @@ from ...components.connectors.dc_cable import PerformancesHarness
 from ...components.connectors.dc_sspc import PerformancesDCSSPC
 from ...components.connectors.dc_bus import PerformancesDCBus
 from ...components.connectors.dc_dc_converter import PerformancesDCDCConverter
-from ...components.connectors.dc_sspc import PerformancesDCSSPC
 from ...components.source.battery import PerformancesBatteryPack
 
 
@@ -29,13 +27,11 @@ class PerformancesAssembly(om.Group):
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_subsystem(

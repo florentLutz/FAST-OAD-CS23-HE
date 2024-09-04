@@ -24,7 +24,6 @@ class ConstraintsICE(om.Group):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
 
         option_ice_id = {"ice_id": ice_id}
@@ -61,7 +60,6 @@ class ConstraintICEPowerRateMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
 
         self.add_input(
@@ -81,7 +79,6 @@ class ConstraintICEPowerRateMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":shaft_power_rating"] = inputs[

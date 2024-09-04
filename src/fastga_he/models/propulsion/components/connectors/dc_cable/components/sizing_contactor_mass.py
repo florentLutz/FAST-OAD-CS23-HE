@@ -49,7 +49,6 @@ class SizingHarnessContactorMass(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         current_caliber = inputs[
@@ -63,10 +62,9 @@ class SizingHarnessContactorMass(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":contactor:mass"
-        ] = (2.0 * nb_of_cables * 0.0239 * current_caliber ** 0.6942)
+        ] = 2.0 * nb_of_cables * 0.0239 * current_caliber**0.6942
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         current_caliber = inputs[
@@ -83,12 +81,8 @@ class SizingHarnessContactorMass(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":cable:current_caliber",
-        ] = (
-            2.0 * nb_of_cables * 0.0239 * 0.6942 * current_caliber ** (0.6942 - 1.0)
-        )
+        ] = 2.0 * nb_of_cables * 0.0239 * 0.6942 * current_caliber ** (0.6942 - 1.0)
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":contactor:mass",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":number_cables",
-        ] = (
-            2.0 * 0.0239 * current_caliber ** 0.6942
-        )
+        ] = 2.0 * 0.0239 * current_caliber**0.6942

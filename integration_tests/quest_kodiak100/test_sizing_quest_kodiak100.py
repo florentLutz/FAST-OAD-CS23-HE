@@ -25,7 +25,6 @@ def cleanup():
 
 
 def test_sizing_kodiak_100():
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -71,7 +70,6 @@ def test_sizing_kodiak_100():
 
 
 def test_operational_mission_kodiak_100():
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -113,7 +111,6 @@ def test_operational_mission_kodiak_100():
 
 
 def test_retrofit_hybrid_kodiak():
-
     """
 
     We'll take a new turboshaft that correspond to the PW206B as it seems to have a fairly good
@@ -183,7 +180,6 @@ def test_retrofit_hybrid_kodiak():
 
 
 def test_retrofit_hybrid_kodiak_european_mix():
-
     """
     Computation of the emissions factor with the Europe electricity index.
     """
@@ -219,7 +215,6 @@ def test_retrofit_hybrid_kodiak_european_mix():
 
 
 def test_retrofit_hybrid_kodiak_eu_mix_ft():
-
     """
 
     Computation of the emissions factor with the french electricity emission index and biofuel
@@ -294,7 +289,6 @@ def test_operational_mission_kodiak_100_ft():
 
 
 def test_retrofit_hybrid_kodiak_eu_mix_hefa():
-
     """
 
     Computation of the emissions factor with the french electricity emission index and biofuel

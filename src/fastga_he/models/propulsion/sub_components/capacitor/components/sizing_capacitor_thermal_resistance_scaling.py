@@ -21,7 +21,6 @@ class SizingCapacitorThermalResistanceScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -44,7 +43,6 @@ class SizingCapacitorThermalResistanceScaling(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         outputs[prefix + ":capacitor:scaling:thermal_resistance"] = inputs[
@@ -52,7 +50,6 @@ class SizingCapacitorThermalResistanceScaling(om.ExplicitComponent):
         ] ** (-2.0 / 3.0) * inputs[prefix + ":capacitor:scaling:height"] ** (-1.0 / 3.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
         partials[

@@ -28,7 +28,6 @@ class SizingMotorPhaseResistanceScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -63,7 +62,6 @@ class SizingMotorPhaseResistanceScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         max_voltage_ref = self.options["max_voltage_ref"]
@@ -74,14 +72,13 @@ class SizingMotorPhaseResistanceScaling(om.ExplicitComponent):
 
         voltage_scaling = max_voltage / max_voltage_ref
 
-        resistance_scaling = voltage_scaling ** 2.0 * l_scaling ** -2.62 * d_scaling ** -1.12
+        resistance_scaling = voltage_scaling**2.0 * l_scaling**-2.62 * d_scaling**-1.12
 
-        outputs[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:phase_resistance"
-        ] = resistance_scaling
+        outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:phase_resistance"] = (
+            resistance_scaling
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         max_voltage_ref = self.options["max_voltage_ref"]
@@ -95,18 +92,12 @@ class SizingMotorPhaseResistanceScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:phase_resistance",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
-        ] = (
-            2.0 * max_voltage / max_voltage_ref ** 2.0 * l_scaling ** -2.62 * d_scaling ** -1.12
-        )
+        ] = 2.0 * max_voltage / max_voltage_ref**2.0 * l_scaling**-2.62 * d_scaling**-1.12
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:phase_resistance",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:diameter",
-        ] = (
-            -1.12 * voltage_scaling ** 2.0 * l_scaling ** -2.62 * d_scaling ** -2.12
-        )
+        ] = -1.12 * voltage_scaling**2.0 * l_scaling**-2.62 * d_scaling**-2.12
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:phase_resistance",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":scaling:length",
-        ] = (
-            -2.62 * voltage_scaling ** 2.0 * l_scaling ** -3.62 * d_scaling ** -1.12
-        )
+        ] = -2.62 * voltage_scaling**2.0 * l_scaling**-3.62 * d_scaling**-1.12

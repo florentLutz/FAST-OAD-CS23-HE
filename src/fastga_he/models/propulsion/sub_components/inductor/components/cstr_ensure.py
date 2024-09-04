@@ -9,9 +9,9 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_INDUCTOR_AIR_GAP
-] = "fastga_he.submodel.propulsion.constraints.inductor.air_gap.ensure"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_INDUCTOR_AIR_GAP] = (
+    "fastga_he.submodel.propulsion.constraints.inductor.air_gap.ensure"
+)
 
 
 @oad.RegisterSubmodel(
@@ -33,7 +33,6 @@ class ConstraintsInductorAirGapEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -67,7 +66,6 @@ class ConstraintsInductorAirGapEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
         constraints_prefix = prefix.replace("data", "constraints")
 

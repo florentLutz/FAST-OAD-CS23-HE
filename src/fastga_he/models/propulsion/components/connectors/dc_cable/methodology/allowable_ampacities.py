@@ -11,7 +11,6 @@ import pandas as pd
 ORDER = 5
 
 if __name__ == "__main__":
-
     data_file = pth.join(pth.dirname(__file__), "data/allowable_ampacities.csv")
 
     ampacities_data = pd.read_csv(data_file)

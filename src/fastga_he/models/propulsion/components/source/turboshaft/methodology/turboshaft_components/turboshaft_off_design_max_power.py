@@ -23,7 +23,6 @@ from .turboshaft_off_design_fuel import Turboshaft
 
 class TurboshaftMaxPowerOPRLimit(Turboshaft):
     def setup(self):
-
         n = self.options["number_of_points"]
 
         self.add_subsystem(
@@ -37,11 +36,9 @@ class TurboshaftMaxPowerOPRLimit(Turboshaft):
 
 class DistanceToLimitOPRLimit(om.ImplicitComponent):
     def initialize(self):
-
         self.options.declare("number_of_points", types=int, default=250)
 
     def setup(self):
-
         n = self.options["number_of_points"]
 
         self.add_input("opr", shape=n, val=np.nan)
@@ -54,19 +51,17 @@ class DistanceToLimitOPRLimit(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         opr = inputs["opr"]
         opr_limit = inputs["opr_limit"]
 
         residuals["required_shaft_power"] = opr / opr_limit - 1.0
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-
         opr = inputs["opr"]
         opr_limit = inputs["opr_limit"]
 
         jacobian["required_shaft_power", "opr"] = np.diag(1.0 / opr_limit)
-        jacobian["required_shaft_power", "opr_limit"] = np.diag(-opr / opr_limit ** 2.0)
+        jacobian["required_shaft_power", "opr_limit"] = np.diag(-opr / opr_limit**2.0)
 
         jacobian["required_shaft_power", "required_shaft_power"] = np.diag(np.zeros_like(opr))
 
@@ -76,7 +71,6 @@ class DistanceToLimitOPRLimit(om.ImplicitComponent):
 
 class TurboshaftMaxPowerITTLimit(Turboshaft):
     def setup(self):
-
         n = self.options["number_of_points"]
 
         self.add_subsystem(
@@ -90,11 +84,9 @@ class TurboshaftMaxPowerITTLimit(Turboshaft):
 
 class DistanceToLimitITTLimit(om.ImplicitComponent):
     def initialize(self):
-
         self.options.declare("number_of_points", types=int, default=250)
 
     def setup(self):
-
         n = self.options["number_of_points"]
 
         self.add_input("total_temperature_45", units="degK", shape=n, val=np.nan)
@@ -107,20 +99,18 @@ class DistanceToLimitITTLimit(om.ImplicitComponent):
     def apply_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         total_temperature_45 = inputs["total_temperature_45"]
         itt_limit = inputs["itt_limit"]
 
         residuals["required_shaft_power"] = total_temperature_45 / itt_limit - 1.0
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
-
         total_temperature_45 = inputs["total_temperature_45"]
         itt_limit = inputs["itt_limit"]
 
         jacobian["required_shaft_power", "total_temperature_45"] = np.diag(1.0 / itt_limit)
         jacobian["required_shaft_power", "itt_limit"] = np.diag(
-            -total_temperature_45 / itt_limit ** 2.0
+            -total_temperature_45 / itt_limit**2.0
         )
 
         jacobian["required_shaft_power", "required_shaft_power"] = np.diag(

@@ -32,7 +32,6 @@ class PerformancesTemperatureConstant(om.ExplicitComponent):
         )
 
     def setup(self):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -77,7 +76,6 @@ class PerformancesTemperatureConstant(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -103,7 +101,6 @@ class PerformancesTemperatureConstant(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
         number_of_points = self.options["number_of_points"]
 

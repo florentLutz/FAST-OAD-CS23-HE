@@ -12,12 +12,11 @@ from stdatm import Atmosphere
 
 
 def cp_from_ct_new_new(j, tip_mach, re_d, solidity, ct, activity_factor, twist_blade):
-
     # Careful, new definition of the tip mach which should now be computed using the absolute
     # speed on the blades
 
     cp = (
-        10 ** 2.43553
+        10**2.43553
         * j
         ** (
             0.61554
@@ -56,12 +55,11 @@ def cp_from_ct_new_new(j, tip_mach, re_d, solidity, ct, activity_factor, twist_b
 
 
 def cp_from_ct_new(j, tip_mach, re_d, solidity, ct, activity_factor, twist_blade):
-
     # Careful, new definition of the tip mach which should now be computed using the absolute
     # speed on the blades
 
     cp = (
-        10 ** 2.31538
+        10**2.31538
         * j
         ** (
             +0.05414 * np.log10(re_d)
@@ -97,7 +95,6 @@ def cp_from_ct_new(j, tip_mach, re_d, solidity, ct, activity_factor, twist_blade
 
 
 if __name__ == "__main__":
-
     file_path = pth.join(pth.dirname(__file__), "data/mtv1a_180_51.csv")
     orig_data = pd.read_csv(file_path)
 
@@ -116,10 +113,10 @@ if __name__ == "__main__":
 
     airspeed = j_orig * n_rot * diameter
     m_tip = (
-        airspeed ** 2.0 + (n_rot * 2.0 * np.pi) ** 2.0 * (diameter / 2.0) ** 2.0
-    ) / atm.speed_of_sound ** 2.0
+        airspeed**2.0 + (n_rot * 2.0 * np.pi) ** 2.0 * (diameter / 2.0) ** 2.0
+    ) / atm.speed_of_sound**2.0
     reynolds_d = (
-        np.sqrt(airspeed ** 2.0 + (n_rot * 2.0 * np.pi) ** 2.0 * (diameter / 2.0) ** 2.0)
+        np.sqrt(airspeed**2.0 + (n_rot * 2.0 * np.pi) ** 2.0 * (diameter / 2.0) ** 2.0)
         * diameter
         / atm.kinematic_viscosity
     )

@@ -27,7 +27,6 @@ class SizingPlanetaryGearDimensionScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         self.add_input(
@@ -49,7 +48,6 @@ class SizingPlanetaryGearDimensionScaling(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
 
         torque_ref = self.options["torque_out_ref"]
@@ -67,7 +65,6 @@ class SizingPlanetaryGearDimensionScaling(om.ExplicitComponent):
         ] = (torque_rating / torque_ref) ** (1.0 / 3.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         planetary_gear_id = self.options["planetary_gear_id"]
         torque_ref = self.options["torque_out_ref"]
 
@@ -84,6 +81,4 @@ class SizingPlanetaryGearDimensionScaling(om.ExplicitComponent):
             "data:propulsion:he_power_train:planetary_gear:"
             + planetary_gear_id
             + ":torque_out_rating",
-        ] = (
-            1.0 / 3.0 * torque_rating ** (-2.0 / 3.0) / torque_ref ** (1.0 / 3.0)
-        )
+        ] = 1.0 / 3.0 * torque_rating ** (-2.0 / 3.0) / torque_ref ** (1.0 / 3.0)

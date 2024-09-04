@@ -14,13 +14,11 @@ class PerformancesDutyCycle(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -53,7 +51,6 @@ class PerformancesDutyCycle(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         duty_cycle = inputs["dc_voltage_out"] / (inputs["dc_voltage_out"] + inputs["dc_voltage_in"])
 
         outputs["duty_cycle"] = np.clip(
@@ -61,7 +58,6 @@ class PerformancesDutyCycle(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["duty_cycle", "dc_voltage_out"] = (
             inputs["dc_voltage_in"] / (inputs["dc_voltage_out"] + inputs["dc_voltage_in"]) ** 2.0
         )

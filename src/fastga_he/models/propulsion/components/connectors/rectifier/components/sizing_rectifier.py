@@ -37,7 +37,6 @@ from ..constants import POSSIBLE_POSITION, SUBMODEL_CONSTRAINTS_RECTIFIER_WEIGHT
 
 class SizingRectifier(om.Group):
     def initialize(self):
-
         self.options.declare(
             name="rectifier_id",
             default=None,
@@ -54,7 +53,6 @@ class SizingRectifier(om.Group):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
         position = self.options["position"]
 
@@ -170,7 +168,6 @@ class SizingRectifier(om.Group):
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:
-
             system_name = "rectifier_drag_ls" if low_speed_aero else "rectifier_drag_cruise"
 
             self.add_subsystem(

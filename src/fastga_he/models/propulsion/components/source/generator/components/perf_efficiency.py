@@ -10,13 +10,11 @@ class PerformancesEfficiency(om.ExplicitComponent):
     """Computation of the efficiency from shaft power and power losses."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("shaft_power_in", units="W", val=np.nan, shape=number_of_points)
@@ -39,7 +37,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # To avoid dividing by zero
         power_shaft_in = np.clip(inputs["shaft_power_in"], 1.0, None)
 
@@ -50,7 +47,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
         outputs["efficiency"] = efficiency
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         # To avoid dividing by zero
         power_shaft_in = np.clip(inputs["shaft_power_in"], 1.0, None)
 
@@ -59,7 +55,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         partials_shaft_power = np.where(
             np.clip(efficiency_untouched, 0.75, 1.0) != efficiency_untouched,
             1e-6,
-            inputs["power_losses"] / power_shaft_in ** 2.0,
+            inputs["power_losses"] / power_shaft_in**2.0,
         )
         partials["efficiency", "shaft_power_in"] = partials_shaft_power
 

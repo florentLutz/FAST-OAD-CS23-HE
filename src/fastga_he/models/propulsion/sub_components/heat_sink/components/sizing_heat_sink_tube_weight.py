@@ -21,7 +21,6 @@ class SizingHeatSinkTubeWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -65,7 +64,6 @@ class SizingHeatSinkTubeWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         length_hs = inputs[prefix + ":heat_sink:length"]
@@ -83,7 +81,7 @@ class SizingHeatSinkTubeWeight(om.ExplicitComponent):
                 + number_of_passes * length_hs
                 + outer_diameter * np.pi * (number_of_passes - 1.0)
             )
-            * (np.pi / 4 * (outer_diameter ** 2.0 - inner_diameter ** 2.0))
+            * (np.pi / 4 * (outer_diameter**2.0 - inner_diameter**2.0))
             * tube_density
         )
 
@@ -99,13 +97,13 @@ class SizingHeatSinkTubeWeight(om.ExplicitComponent):
         tube_density = inputs[prefix + ":heat_sink:tube:density"]
 
         partials[prefix + ":heat_sink:tube:mass", prefix + ":heat_sink:length"] = (
-            (np.pi / 4 * (outer_diameter ** 2.0 - inner_diameter ** 2.0))
+            (np.pi / 4 * (outer_diameter**2.0 - inner_diameter**2.0))
             * tube_density
             * (0.2 + number_of_passes)
         )
         partials[prefix + ":heat_sink:tube:mass", prefix + ":tube:number_of_passes"] = (
             (length_hs + outer_diameter * np.pi)
-            * (np.pi / 4 * (outer_diameter ** 2.0 - inner_diameter ** 2.0))
+            * (np.pi / 4 * (outer_diameter**2.0 - inner_diameter**2.0))
             * tube_density
         )
         partials[prefix + ":heat_sink:tube:mass", prefix + ":heat_sink:tube:inner_diameter"] = -(
@@ -117,20 +115,21 @@ class SizingHeatSinkTubeWeight(om.ExplicitComponent):
             * (np.pi / 2 * inner_diameter)
             * tube_density
         )
-        partials[
-            prefix + ":heat_sink:tube:mass", prefix + ":heat_sink:tube:outer_diameter"
-        ] = tube_density * (
-            (np.pi * (number_of_passes - 1.0))
-            * (np.pi / 4 * (outer_diameter ** 2.0 - inner_diameter ** 2.0))
-            + (
-                2.0 * 0.1 * length_hs
-                + number_of_passes * length_hs
-                + outer_diameter * np.pi * (number_of_passes - 1.0)
+        partials[prefix + ":heat_sink:tube:mass", prefix + ":heat_sink:tube:outer_diameter"] = (
+            tube_density
+            * (
+                (np.pi * (number_of_passes - 1.0))
+                * (np.pi / 4 * (outer_diameter**2.0 - inner_diameter**2.0))
+                + (
+                    2.0 * 0.1 * length_hs
+                    + number_of_passes * length_hs
+                    + outer_diameter * np.pi * (number_of_passes - 1.0)
+                )
+                * (np.pi / 2 * outer_diameter)
             )
-            * (np.pi / 2 * outer_diameter)
         )
         partials[prefix + ":heat_sink:tube:mass", prefix + ":heat_sink:tube:density"] = (
             2.0 * 0.1 * length_hs
             + number_of_passes * length_hs
             + outer_diameter * np.pi * (number_of_passes - 1.0)
-        ) * (np.pi / 4 * (outer_diameter ** 2.0 - inner_diameter ** 2.0))
+        ) * (np.pi / 4 * (outer_diameter**2.0 - inner_diameter**2.0))

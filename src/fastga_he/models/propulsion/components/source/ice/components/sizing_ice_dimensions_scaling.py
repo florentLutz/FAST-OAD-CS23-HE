@@ -15,7 +15,6 @@ class SizingICEDimensionsScaling(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="ice_id",
             default=None,
@@ -29,7 +28,6 @@ class SizingICEDimensionsScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
 
         self.add_input(
@@ -58,7 +56,6 @@ class SizingICEDimensionsScaling(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
 
         power_rating_sl = inputs[
@@ -77,7 +74,6 @@ class SizingICEDimensionsScaling(om.ExplicitComponent):
         ) ** (1.0 / 3.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         ice_id = self.options["ice_id"]
 
         power_rating_sl = inputs[
@@ -88,18 +84,12 @@ class SizingICEDimensionsScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":scaling:length",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
-        ] = (
-            1.0 / 3.0 * power_rating_sl_ref ** (-1.0 / 3.0) * power_rating_sl ** (-2.0 / 3.0)
-        )
+        ] = 1.0 / 3.0 * power_rating_sl_ref ** (-1.0 / 3.0) * power_rating_sl ** (-2.0 / 3.0)
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":scaling:width",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
-        ] = (
-            1.0 / 3.0 * power_rating_sl_ref ** (-1.0 / 3.0) * power_rating_sl ** (-2.0 / 3.0)
-        )
+        ] = 1.0 / 3.0 * power_rating_sl_ref ** (-1.0 / 3.0) * power_rating_sl ** (-2.0 / 3.0)
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":scaling:height",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
-        ] = (
-            1.0 / 3.0 * power_rating_sl_ref ** (-1.0 / 3.0) * power_rating_sl ** (-2.0 / 3.0)
-        )
+        ] = 1.0 / 3.0 * power_rating_sl_ref ** (-1.0 / 3.0) * power_rating_sl ** (-2.0 / 3.0)

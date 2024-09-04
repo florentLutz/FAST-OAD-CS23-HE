@@ -13,13 +13,11 @@ class PerformancesBatteryPower(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("voltage_out", units="V", val=np.full(number_of_points, np.nan))
@@ -36,10 +34,8 @@ class PerformancesBatteryPower(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["power_out"] = inputs["voltage_out"] * inputs["dc_current_out"] / 1000.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["power_out", "voltage_out"] = inputs["dc_current_out"] / 1000.0
         partials["power_out", "dc_current_out"] = inputs["voltage_out"] / 1000.0

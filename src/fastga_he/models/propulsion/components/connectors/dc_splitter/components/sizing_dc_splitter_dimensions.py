@@ -13,7 +13,6 @@ class SizingDCSplitterDimensions(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_splitter_id",
             default=None,
@@ -23,7 +22,6 @@ class SizingDCSplitterDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         self.add_input(
@@ -109,7 +107,6 @@ class SizingDCSplitterDimensions(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         # One plate conducting and one plate for return of current
@@ -157,7 +154,6 @@ class SizingDCSplitterDimensions(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         partials[

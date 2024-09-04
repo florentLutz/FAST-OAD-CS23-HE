@@ -21,7 +21,6 @@ class PerformancesVoltageOutTargetMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="generator_id", default=None, desc="Identifier of the generator", allow_none=False
         )
@@ -30,7 +29,6 @@ class PerformancesVoltageOutTargetMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -49,7 +47,6 @@ class PerformancesVoltageOutTargetMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -75,7 +72,6 @@ class PerformancesVoltageOutTargetMission(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         generator_id = self.options["generator_id"]
         number_of_points = self.options["number_of_points"]
 

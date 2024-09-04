@@ -6,7 +6,6 @@ import numpy as np
 import plotly.graph_objects as go
 
 if __name__ == "__main__":
-
     weight = np.array(
         [
             12.5,
@@ -1270,7 +1269,6 @@ if __name__ == "__main__":
     fig_weight = go.Figure()
 
     for materials_loop in np.unique(materials):
-
         idx_loop = np.where(materials_loop == materials)
 
         if materials_loop == 1:
@@ -1313,13 +1311,13 @@ if __name__ == "__main__":
         [
             np.ones_like(weight_per_blade_aluminium),
             max_cont_torque_aluminium,
-            diameter_aluminium ** 3.0,
+            diameter_aluminium**3.0,
         ]
     )
     x = np.linalg.lstsq(A, B, rcond=None)
     constant, a, b = x[0]
     print(constant, a * 1000, b)
-    estimated_weight = constant + a * max_cont_torque_aluminium + b * diameter_aluminium ** 3
+    estimated_weight = constant + a * max_cont_torque_aluminium + b * diameter_aluminium**3
     print(
         np.mean(
             np.abs(

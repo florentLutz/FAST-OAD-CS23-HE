@@ -14,7 +14,6 @@ from .perf_efficiency import PerformancesDCSSPCEfficiency
 
 class PerformancesDCSSPC(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -38,7 +37,6 @@ class PerformancesDCSSPC(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         dc_sspc_id = self.options["dc_sspc_id"]
         closed = self.options["closed"]

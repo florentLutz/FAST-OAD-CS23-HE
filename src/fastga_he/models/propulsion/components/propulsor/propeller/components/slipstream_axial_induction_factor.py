@@ -13,13 +13,11 @@ class SlipstreamPropellerAxialInductionFactor(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("thrust_loading", val=np.nan, shape=number_of_points)
@@ -35,7 +33,6 @@ class SlipstreamPropellerAxialInductionFactor(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         t_c = inputs["thrust_loading"]
 
         a_p = 0.5 * (np.sqrt(1.0 + 8.0 / np.pi * t_c) - 1.0)
@@ -43,7 +40,6 @@ class SlipstreamPropellerAxialInductionFactor(om.ExplicitComponent):
         outputs["axial_induction_factor"] = a_p
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         # To avoid unwanted division by 0
         t_c = np.clip(inputs["thrust_loading"], 1e-6, None)
 

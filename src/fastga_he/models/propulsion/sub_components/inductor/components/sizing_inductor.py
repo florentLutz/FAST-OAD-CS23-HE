@@ -35,7 +35,6 @@ class SizingInductor(om.Group):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         # It was decided to add the constraints computation at the beginning of the sizing of the

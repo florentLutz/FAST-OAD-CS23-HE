@@ -20,7 +20,6 @@ class PerformancesHeatSinkTemperatureMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -32,7 +31,6 @@ class PerformancesHeatSinkTemperatureMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -51,7 +49,6 @@ class PerformancesHeatSinkTemperatureMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -77,7 +74,6 @@ class PerformancesHeatSinkTemperatureMission(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
         number_of_points = self.options["number_of_points"]
 

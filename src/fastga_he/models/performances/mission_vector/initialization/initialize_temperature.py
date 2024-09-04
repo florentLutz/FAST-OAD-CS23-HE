@@ -12,7 +12,6 @@ class InitializeTemperature(om.ExplicitComponent):
     """Initializes the temperature at each time step."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -33,7 +32,6 @@ class InitializeTemperature(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -59,13 +57,11 @@ class InitializeTemperature(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["exterior_temperature"] = AtmosphereWithPartials(
             inputs["altitude"], altitude_in_feet=False
         ).temperature
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["exterior_temperature", "altitude"] = AtmosphereWithPartials(
             inputs["altitude"], altitude_in_feet=False
         ).partial_temperature_altitude

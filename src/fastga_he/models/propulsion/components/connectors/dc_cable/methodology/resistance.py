@@ -11,7 +11,6 @@ import pandas as pd
 ORDER = 1
 
 if __name__ == "__main__":
-
     # Based on the data from
     # https://www.engineeringtoolbox.com/copper-aluminum-conductor-resistance-d_1877.html
 

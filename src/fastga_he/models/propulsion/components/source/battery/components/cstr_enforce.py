@@ -22,7 +22,6 @@ class ConstraintsSOCEnforce(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -31,7 +30,6 @@ class ConstraintsSOCEnforce(om.Group):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_subsystem(
@@ -59,7 +57,6 @@ class ConstraintsSOCCapacity(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -68,7 +65,6 @@ class ConstraintsSOCCapacity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_input(
@@ -96,7 +92,6 @@ class ConstraintsSOCCapacity(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         soc_min_mission = inputs[
@@ -115,7 +110,6 @@ class ConstraintsSOCCapacity(om.ExplicitComponent):
         ] = multiplicative_factor
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         partials[
@@ -123,17 +117,13 @@ class ConstraintsSOCCapacity(om.ExplicitComponent):
             + battery_pack_id
             + ":capacity_multiplier",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":SOC_min",
-        ] = (
-            -1.0 / 100.0
-        )
+        ] = -1.0 / 100.0
         partials[
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":capacity_multiplier",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":min_safe_SOC",
-        ] = (
-            1.0 / 100.0
-        )
+        ] = 1.0 / 100.0
 
 
 class ConstraintsSOCCRate(om.ExplicitComponent):
@@ -144,7 +134,6 @@ class ConstraintsSOCCRate(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="battery_pack_id",
             default=None,
@@ -153,7 +142,6 @@ class ConstraintsSOCCRate(om.ExplicitComponent):
         )
 
     def setup(self):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_input(
@@ -181,7 +169,6 @@ class ConstraintsSOCCRate(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         max_c_rate = inputs[
@@ -200,7 +187,6 @@ class ConstraintsSOCCRate(om.ExplicitComponent):
         ] = multiplicative_factor
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         max_c_rate = inputs[
@@ -215,17 +201,13 @@ class ConstraintsSOCCRate(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_multiplier",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_max",
-        ] = (
-            1.0 / c_rate_caliber
-        )
+        ] = 1.0 / c_rate_caliber
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_multiplier",
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":cell:c_rate_caliber",
-        ] = (
-            -max_c_rate / c_rate_caliber ** 2.0
-        )
+        ] = -max_c_rate / c_rate_caliber**2.0
 
 
 class ConstraintsSOCPicker(om.ExplicitComponent):
@@ -289,7 +271,6 @@ class ConstraintsSOCPicker(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         battery_pack_id = self.options["battery_pack_id"]
 
         number_cells_tot = inputs[
@@ -327,7 +308,7 @@ class ConstraintsSOCPicker(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules"
-        ] = (number_of_module_before * multiplicative_factor)
+        ] = number_of_module_before * multiplicative_factor
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         battery_pack_id = self.options["battery_pack_id"]
@@ -370,7 +351,7 @@ class ConstraintsSOCPicker(om.ExplicitComponent):
         elif multiplicative_factor == 1.0 / reduction_limiter:
             partials_capa = 1e-6
             partials_c_rate = 1e-6
-            partials_limiter = -number_cells_tot / number_cells_module / reduction_limiter ** 2.0
+            partials_limiter = -number_cells_tot / number_cells_module / reduction_limiter**2.0
         elif multiplicative_factor_capa > multiplicative_factor_c_rate:
             partials_capa = number_cells_tot / number_cells_module
             partials_c_rate = 1e-6
@@ -385,15 +366,11 @@ class ConstraintsSOCPicker(om.ExplicitComponent):
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":module:number_cells",
-        ] = (
-            -number_cells_tot / number_cells_module ** 2.0 * multiplicative_factor
-        )
+        ] = -number_cells_tot / number_cells_module**2.0 * multiplicative_factor
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_cells",
-        ] = (
-            multiplicative_factor / number_cells_module
-        )
+        ] = multiplicative_factor / number_cells_module
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":number_modules",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":c_rate_multiplier",

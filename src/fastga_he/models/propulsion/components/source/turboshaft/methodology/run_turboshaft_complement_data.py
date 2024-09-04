@@ -34,7 +34,6 @@ def identify_design(df: pd.DataFrame):
     itt_limit = []
 
     for design_power in unique_design_powers:
-
         current_design_df = df.loc[df[THERMODYNAMIC_POWER_COLUMN_NAME] == design_power]
         design_opr.append(current_design_df[OPR_COLUMN_NAME].to_numpy()[0])
         design_tet.append(current_design_df[T41T_COLUMN_NAME].to_numpy()[0])
@@ -47,7 +46,6 @@ def identify_design(df: pd.DataFrame):
 def get_ivc_all_data(
     power_design, t41t_design, opr_design, altitude_design, mach_design, opr_limit, itt_limit
 ):
-
     ivc = om.IndepVarComp()
     ivc.add_output("compressor_bleed_mass_flow", val=0.04, units="kg/s")
     ivc.add_output("cooling_bleed_ratio", val=0.025)
@@ -107,7 +105,6 @@ def get_ivc_all_data(
 
 
 def get_fuel_problem(ivc):
-
     prob = om.Problem()
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
@@ -131,7 +128,6 @@ def get_fuel_problem(ivc):
 
 
 def get_missing_turboshaft_data(ivc, altitudes, machs, shaft_powers):
-
     # First get the turboshaft geometry parameters from design
     prob = om.Problem()
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
@@ -247,7 +243,6 @@ def get_missing_turboshaft_data(ivc, altitudes, machs, shaft_powers):
 
 
 if __name__ == "__main__":
-
     path_to_current_file = pathlib.Path(__file__)
     parent_folder = path_to_current_file.parents[0]
     data_folder_path = parent_folder / "data"
@@ -265,7 +260,6 @@ if __name__ == "__main__":
     )
 
     for index, power in enumerate(design_power_list):
-
         ivc_data = get_ivc_all_data(
             power,
             design_t41ts[index],

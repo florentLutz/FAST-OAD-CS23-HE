@@ -21,7 +21,6 @@ class SizingHeatSinkHeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -45,7 +44,6 @@ class SizingHeatSinkHeight(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         outputs[prefix + ":heat_sink:height"] = (
@@ -53,7 +51,6 @@ class SizingHeatSinkHeight(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
         partials[prefix + ":heat_sink:height", prefix + ":heat_sink:tube:outer_diameter"] = 1.5

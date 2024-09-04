@@ -10,7 +10,6 @@ class PerformancesConductionLosses(om.ExplicitComponent):
     """Computation of Conduction losses for the IGBT and the diode."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -22,7 +21,6 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -190,7 +188,6 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         r_igbt = inputs[
@@ -227,10 +224,10 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         ]
         i_capacitor = inputs["current_capacitor"]
 
-        conduction_loss_igbt = r_igbt * i_igbt ** 2.0
-        conduction_loss_diode = current_out * v_d0 + r_d * i_d ** 2.0
-        conduction_losses_inductor = i_inductor ** 2.0 * r_inductor
-        conduction_losses_capacitor = i_capacitor ** 2.0 * r_capacitor
+        conduction_loss_igbt = r_igbt * i_igbt**2.0
+        conduction_loss_diode = current_out * v_d0 + r_d * i_d**2.0
+        conduction_losses_inductor = i_inductor**2.0 * r_inductor
+        conduction_losses_capacitor = i_capacitor**2.0 * r_capacitor
 
         outputs["conduction_losses_diode"] = conduction_loss_diode
         outputs["conduction_losses_IGBT"] = conduction_loss_igbt
@@ -238,7 +235,6 @@ class PerformancesConductionLosses(om.ExplicitComponent):
         outputs["conduction_losses_capacitor"] = conduction_losses_capacitor
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
@@ -287,9 +283,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":diode:resistance",
-        ] = (
-            i_d ** 2.0
-        )
+        ] = i_d**2.0
         partials["conduction_losses_diode", "current_diode"] = 2.0 * r_d * i_d
         partials["conduction_losses_diode", "dc_current_out"] = np.ones(number_of_points) * v_d0
 
@@ -298,9 +292,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":igbt:resistance",
-        ] = (
-            i_igbt ** 2.0
-        )
+        ] = i_igbt**2.0
         partials["conduction_losses_IGBT", "current_IGBT"] = 2.0 * r_igbt * i_igbt
 
         partials[
@@ -308,9 +300,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":inductor:resistance",
-        ] = (
-            i_inductor ** 2.0
-        )
+        ] = i_inductor**2.0
         partials["conduction_losses_inductor", "current_inductor"] = 2.0 * r_inductor * i_inductor
 
         partials[
@@ -318,9 +308,7 @@ class PerformancesConductionLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":capacitor:resistance",
-        ] = (
-            i_capacitor ** 2.0
-        )
+        ] = i_capacitor**2.0
         partials["conduction_losses_capacitor", "current_capacitor"] = (
             2.0 * r_capacitor * i_capacitor
         )

@@ -21,7 +21,6 @@ class SizingInverterInductorWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -47,7 +46,6 @@ class SizingInverterInductorWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         current_caliber = inputs[
@@ -60,11 +58,11 @@ class SizingInverterInductorWeight(om.ExplicitComponent):
             * 1e6
         )
 
-        inductors_weight = 1.45e-4 * inductance ** 0.85 * current_caliber ** 1.68
+        inductors_weight = 1.45e-4 * inductance**0.85 * current_caliber**1.68
 
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:mass"
-        ] = inductors_weight
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:mass"] = (
+            inductors_weight
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         inverter_id = self.options["inverter_id"]
@@ -82,17 +80,15 @@ class SizingInverterInductorWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:mass",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
-        ] = (
-            1.68 * 1.45e-4 * inductance ** 0.85 * current_caliber ** 0.68
-        )
+        ] = 1.68 * 1.45e-4 * inductance**0.85 * current_caliber**0.68
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:mass",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:inductance",
         ] = (
             0.85
             * 1.45e-4
-            * 1e6 ** 0.85
-            * current_caliber ** 1.68
+            * 1e6**0.85
+            * current_caliber**1.68
             * inputs[
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:inductance"
             ]

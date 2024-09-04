@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+# pylint: disable=unused-import
+# flake8: noqa
+
 from .components.sizing_gearbox import SizingGearbox
 from .components.perf_gearbox import PerformancesGearbox
 from .components.slipstream_gearbox import SlipstreamGearbox

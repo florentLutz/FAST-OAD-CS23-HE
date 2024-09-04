@@ -13,7 +13,6 @@ class SizingCableSheathThickness(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="harness_id",
             default=None,
@@ -53,7 +52,6 @@ class SizingCableSheathThickness(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         harness_id = self.options["harness_id"]
 
         bare_cable_diameter = 2.0 * (
@@ -72,29 +70,22 @@ class SizingCableSheathThickness(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
-        ] = (0.035 * bare_cable_diameter + 1e-3)
+        ] = 0.035 * bare_cable_diameter + 1e-3
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         harness_id = self.options["harness_id"]
 
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
-        ] = (
-            0.035 * 2.0
-        )
+        ] = 0.035 * 2.0
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":insulation:thickness",
-        ] = (
-            0.035 * 2.0
-        )
+        ] = 0.035 * 2.0
         partials[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
-        ] = (
-            0.035 * 2.0
-        )
+        ] = 0.035 * 2.0

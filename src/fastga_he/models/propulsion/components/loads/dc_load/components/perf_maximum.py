@@ -12,7 +12,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -48,7 +47,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         aux_load_id = self.options["aux_load_id"]
 
         outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max"] = np.max(
@@ -56,7 +54,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         aux_load_id = self.options["aux_load_id"]
 
         partials[

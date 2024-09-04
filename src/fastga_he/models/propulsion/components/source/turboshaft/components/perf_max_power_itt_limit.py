@@ -17,7 +17,6 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -29,7 +28,6 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
@@ -82,7 +80,6 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         density_ratio = inputs["density_ratio"]
@@ -132,7 +129,6 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
         outputs["design_power_itt_limit"] = design_power
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
 
         density_ratio = inputs["density_ratio"]
@@ -232,9 +228,7 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
         partials[
             "design_power_itt_limit",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:T41t",
-        ] = (
-            d_power_d_log_power * d_log_power_d_log_t41t * d_log_t41t_d_t41t / T0
-        )
+        ] = d_power_d_log_power * d_log_power_d_log_t41t * d_log_t41t_d_t41t / T0
 
         # Partials derivative for design OPR
         d_log_power_d_log_opr_des = (
@@ -252,9 +246,7 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
         partials[
             "design_power_itt_limit",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":design_point:OPR",
-        ] = (
-            d_power_d_log_power * d_log_power_d_log_opr_des * d_log_opr_des_d_opr_des
-        )
+        ] = d_power_d_log_power * d_log_power_d_log_opr_des * d_log_opr_des_d_opr_des
 
         # Partials derivative for limit ITT
         d_log_power_d_log_itt_limit = (
@@ -272,6 +264,4 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
         partials[
             "design_power_itt_limit",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":limit:ITT",
-        ] = (
-            d_power_d_log_power * d_log_power_d_log_itt_limit * d_log_itt_limit_d_itt_limit / T0
-        )
+        ] = d_power_d_log_power * d_log_power_d_log_itt_limit * d_log_itt_limit_d_itt_limit / T0

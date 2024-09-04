@@ -12,7 +12,6 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_sspc_id",
             default=None,
@@ -30,7 +29,6 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         dc_sspc_id = self.options["dc_sspc_id"]
 
@@ -65,7 +63,6 @@ class PerformancesDCSSPCEfficiency(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points = self.options["number_of_points"]
         dc_sspc_id = self.options["dc_sspc_id"]
 

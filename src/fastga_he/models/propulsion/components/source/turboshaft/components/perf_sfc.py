@@ -8,13 +8,11 @@ import numpy as np
 
 class PerformancesSFC(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("power_required", units="kW", val=np.nan, shape=number_of_points)
@@ -33,11 +31,9 @@ class PerformancesSFC(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["specific_fuel_consumption"] = inputs["fuel_consumption"] / inputs["power_required"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["specific_fuel_consumption", "fuel_consumption"] = 1.0 / inputs["power_required"]
         partials["specific_fuel_consumption", "power_required"] = -(
             inputs["fuel_consumption"] / inputs["power_required"] ** 2.0

@@ -14,18 +14,18 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_INVERTER_CURRENT
-] = "fastga_he.submodel.propulsion.constraints.inverter.current.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_INVERTER_VOLTAGE
-] = "fastga_he.submodel.propulsion.constraints.inverter.voltage.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_INVERTER_LOSSES
-] = "fastga_he.submodel.propulsion.constraints.inverter.losses.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY
-] = "fastga_he.submodel.propulsion.constraints.inverter.frequency.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_INVERTER_CURRENT] = (
+    "fastga_he.submodel.propulsion.constraints.inverter.current.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_INVERTER_VOLTAGE] = (
+    "fastga_he.submodel.propulsion.constraints.inverter.voltage.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_INVERTER_LOSSES] = (
+    "fastga_he.submodel.propulsion.constraints.inverter.losses.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY] = (
+    "fastga_he.submodel.propulsion.constraints.inverter.frequency.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -39,7 +39,6 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="inverter_id",
             default=None,
@@ -48,7 +47,6 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -68,12 +66,11 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"
-        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max"]
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"] = (
+            inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max"]
+        )
 
 
 @oad.RegisterSubmodel(
@@ -87,7 +84,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="inverter_id",
             default=None,
@@ -96,7 +92,6 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -116,12 +111,11 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber"
-        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max"]
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber"] = (
+            inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max"]
+        )
 
 
 @oad.RegisterSubmodel(
@@ -135,7 +129,6 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="inverter_id",
             default=None,
@@ -144,7 +137,6 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -164,12 +156,11 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat"
-        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max"]
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat"] = (
+            inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max"]
+        )
 
 
 @oad.RegisterSubmodel(
@@ -183,7 +174,6 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="inverter_id",
             default=None,
@@ -192,7 +182,6 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -219,7 +208,6 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         outputs[

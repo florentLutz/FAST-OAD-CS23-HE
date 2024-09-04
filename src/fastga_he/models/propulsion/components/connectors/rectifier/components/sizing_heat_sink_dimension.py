@@ -13,7 +13,6 @@ class SizingRectifierHeatSinkDimension(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="rectifier_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingRectifierHeatSinkDimension(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -63,7 +61,6 @@ class SizingRectifierHeatSinkDimension(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         outputs[
@@ -79,15 +76,12 @@ class SizingRectifierHeatSinkDimension(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":heat_sink:length",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":module:width",
-        ] = (
-            1.1 * 3.0
-        )
+        ] = 1.1 * 3.0
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":heat_sink:width",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":module:length",

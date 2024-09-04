@@ -28,7 +28,6 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
         self.v_descent = None
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -49,7 +48,6 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -99,7 +97,6 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
         # number_of_points_cruise-th position
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
 
@@ -123,7 +120,6 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
         outputs["data:mission:sizing:main_route:descent:v_eas"] = v_eas_descent
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
 
@@ -145,7 +141,6 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
         mass_partials[number_of_points_climb + number_of_points_cruise] = mass_descent
 
         if self.v_descent > 1.3 * self.vs1:
-
             partials["data:mission:sizing:main_route:descent:v_eas", "mass"] = 0.5 * np.sqrt(
                 g / (0.5 * density_cruise * wing_area * cl_opt * mass_partials)
             )
@@ -169,12 +164,11 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
 
             partials["data:mission:sizing:main_route:descent:v_eas", "altitude"] = (
                 -0.5
-                * np.sqrt((mass_descent * g) / (0.5 * density_cruise ** 3.0 * wing_area * cl_opt))
+                * np.sqrt((mass_descent * g) / (0.5 * density_cruise**3.0 * wing_area * cl_opt))
                 * atm.partial_density_altitude
             )
 
         else:
-
             partials["data:mission:sizing:main_route:descent:v_eas", "mass"] = 0.65 * np.sqrt(
                 g / (0.5 * density_cruise * wing_area * cl_max_clean * mass_partials)
             )
@@ -197,6 +191,6 @@ class InitializeDescentAirspeed(om.ExplicitComponent):
             )
             partials["data:mission:sizing:main_route:descent:v_eas", "altitude"] = -0.65 * np.sqrt(
                 (mass_descent * g)
-                / (0.5 * density_cruise ** 3.0 * wing_area * cl_max_clean)
+                / (0.5 * density_cruise**3.0 * wing_area * cl_max_clean)
                 * atm.partial_density_altitude
             )

@@ -21,7 +21,6 @@ class SizingInverterInductorInductance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -60,7 +59,6 @@ class SizingInverterInductorInductance(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         current_caliber = inputs[
@@ -105,15 +103,11 @@ class SizingInverterInductorInductance(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:inductance",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
-        ] = (
-            -voltage_caliber * delta_t_des / (current_caliber ** 2.0 * current_ripple)
-        )
+        ] = -voltage_caliber * delta_t_des / (current_caliber**2.0 * current_ripple)
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:inductance",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ripple",
-        ] = (
-            -voltage_caliber * delta_t_des / (current_caliber * current_ripple ** 2.0)
-        )
+        ] = -voltage_caliber * delta_t_des / (current_caliber * current_ripple**2.0)
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":inductor:inductance",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",

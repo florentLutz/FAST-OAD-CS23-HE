@@ -14,13 +14,11 @@ class PerformancesSOCDecrease(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("c_rate", units="h**-1", val=np.full(number_of_points, np.nan))
@@ -42,13 +40,11 @@ class PerformancesSOCDecrease(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["state_of_charge_decrease"] = (
             inputs["c_rate"] * inputs["time_step"] * 100.0 / inputs["relative_capacity"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["state_of_charge_decrease", "c_rate"] = 100.0 * (
             inputs["time_step"] / inputs["relative_capacity"]
         )

@@ -16,11 +16,9 @@ NB_LOOPS_TEST = 15
 
 class PartialDerivationOldWay(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare("number_of_points", default=1, desc="number of points")
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("input_1", shape=number_of_points, val=np.nan)
@@ -32,13 +30,11 @@ class PartialDerivationOldWay(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["output_1"] = (
             np.square(1.0 / inputs["input_1"]) * inputs["input_2"] + 3.0 * inputs["input_3"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         partials["output_1", "input_1"] = np.diag(
@@ -50,11 +46,9 @@ class PartialDerivationOldWay(om.ExplicitComponent):
 
 class PartialDerivationNewWay(om.ExplicitComponent):
     def initialize(self):
-
         self.options.declare("number_of_points", default=1, desc="number of points")
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("input_1", shape=number_of_points, val=np.nan)
@@ -68,13 +62,11 @@ class PartialDerivationNewWay(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact", rows=idx, cols=idx)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["output_1"] = (
             np.square(1.0 / inputs["input_1"]) * inputs["input_2"] + 3.0 * inputs["input_3"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         partials["output_1", "input_1"] = -2.0 * inputs["input_2"] / inputs["input_1"] ** 3.0
@@ -84,11 +76,9 @@ class PartialDerivationNewWay(om.ExplicitComponent):
 
 
 if __name__ == "__main__":
-
     init_time_old_way = time.time()
 
     for i in range(NB_LOOPS_TEST):
-
         ivc = om.IndepVarComp()
         ivc.add_output("input_1", val=1.0 + 3.0 * np.random.random(NB_POINTS))
         ivc.add_output("input_2", val=1.0e-3 + np.random.random(NB_POINTS))

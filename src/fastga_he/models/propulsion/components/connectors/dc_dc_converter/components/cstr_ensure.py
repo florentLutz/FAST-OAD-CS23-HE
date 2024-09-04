@@ -39,7 +39,6 @@ class ConstraintsCurrentCapacitorEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -82,7 +81,6 @@ class ConstraintsCurrentCapacitorEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -103,7 +101,6 @@ class ConstraintsCurrentCapacitorEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[
@@ -144,7 +141,6 @@ class ConstraintsCurrentInductorEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -186,7 +182,6 @@ class ConstraintsCurrentInductorEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -207,7 +202,6 @@ class ConstraintsCurrentInductorEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[
@@ -248,7 +242,6 @@ class ConstraintsCurrentModuleEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -300,7 +293,6 @@ class ConstraintsCurrentModuleEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -328,7 +320,6 @@ class ConstraintsCurrentModuleEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[
@@ -351,7 +342,6 @@ class ConstraintsCurrentModuleEnsure(om.ExplicitComponent):
                 + ":igbt:current_max"
             ]
         ):
-
             partials[
                 "constraints:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
@@ -407,7 +397,6 @@ class ConstraintsCurrentInputEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -449,7 +438,6 @@ class ConstraintsCurrentInputEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -470,7 +458,6 @@ class ConstraintsCurrentInputEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[
@@ -511,7 +498,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -562,7 +548,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -590,7 +575,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[
@@ -613,7 +597,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
                 + ":voltage_in_max"
             ]
         ):
-
             partials[
                 "constraints:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
@@ -669,7 +652,6 @@ class ConstraintsVoltageInputEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -711,7 +693,6 @@ class ConstraintsVoltageInputEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -732,7 +713,6 @@ class ConstraintsVoltageInputEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[
@@ -773,7 +753,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -814,7 +793,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -835,7 +813,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[
@@ -874,7 +851,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.add_input(
@@ -918,7 +894,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         outputs[
@@ -939,7 +914,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         partials[

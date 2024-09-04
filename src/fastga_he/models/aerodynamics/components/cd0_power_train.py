@@ -25,7 +25,6 @@ class Cd0PowerTrain(om.ExplicitComponent):
         self.options.declare("propulsion_id", default="", types=str)
 
     def setup(self):
-
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_input("data:propulsion:he_power_train:" + ls_tag + ":CD0", val=np.nan)
@@ -37,7 +36,6 @@ class Cd0PowerTrain(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         outputs["data:aerodynamics:nacelles:" + ls_tag + ":CD0"] = inputs[

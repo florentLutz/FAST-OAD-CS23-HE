@@ -25,7 +25,6 @@ def cleanup():
 
 
 def test_sizing_sr22(cleanup):
-
     # TODO: Check why he needs the propulsion data as inputs
     # ANS: still used for the Z_cg of the aircraft which is assumed to have only a minor influence
 

@@ -6,7 +6,6 @@ import numpy as np
 
 
 if __name__ == "__main__":
-
     conductor_area = np.array(
         [
             1.02e-5,
@@ -50,7 +49,7 @@ if __name__ == "__main__":
     print(x[1])
 
     a_sol, b_sol, c_sol = x[0]
-    print(current_star ** a_sol * diameter_star ** b_sol * length_star ** c_sol)
+    print(current_star**a_sol * diameter_star**b_sol * length_star**c_sol)
 
     # log_k, a_sol, b_sol = x[0]
     # print(np.exp(log_k) * currents ** a_sol * torques ** b_sol)

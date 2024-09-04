@@ -13,7 +13,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -22,7 +21,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         generator_id = self.options["generator_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -125,30 +123,28 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         generator_id = self.options["generator_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":current_ac_max"
-        ] = np.max(inputs["ac_current_rms_out_one_phase"])
-        outputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":voltage_ac_max"
-        ] = np.max(inputs["ac_voltage_peak_out"])
-        outputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":torque_max"
-        ] = np.max(inputs["torque_in"])
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":current_ac_max"] = (
+            np.max(inputs["ac_current_rms_out_one_phase"])
+        )
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":voltage_ac_max"] = (
+            np.max(inputs["ac_voltage_peak_out"])
+        )
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":torque_max"] = (
+            np.max(inputs["torque_in"])
+        )
         outputs["data:propulsion:he_power_train:generator:" + generator_id + ":rpm_max"] = np.max(
             inputs["rpm"]
         )
-        outputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":losses_max"
-        ] = np.max(inputs["power_losses"])
-        outputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_max"
-        ] = np.max(inputs["shaft_power_in"])
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":losses_max"] = (
+            np.max(inputs["power_losses"])
+        )
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_max"] = (
+            np.max(inputs["shaft_power_in"])
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         generator_id = self.options["generator_id"]
 
         partials[
@@ -169,9 +165,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:generator:" + generator_id + ":torque_max", "torque_in"
         ] = np.where(inputs["torque_in"] == np.max(inputs["torque_in"]), 1.0, 0.0)
-        partials[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":rpm_max", "rpm"
-        ] = np.where(inputs["rpm"] == np.max(inputs["rpm"]), 1.0, 0.0)
+        partials["data:propulsion:he_power_train:generator:" + generator_id + ":rpm_max", "rpm"] = (
+            np.where(inputs["rpm"] == np.max(inputs["rpm"]), 1.0, 0.0)
+        )
         partials[
             "data:propulsion:he_power_train:generator:" + generator_id + ":losses_max",
             "power_losses",

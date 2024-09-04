@@ -12,7 +12,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="speed_reducer_id",
             default=None,
@@ -24,7 +23,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -53,7 +51,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         outputs["rpm_in"] = (
@@ -64,7 +61,6 @@ class PerformancesRPMIn(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
         number_of_points = self.options["number_of_points"]
 

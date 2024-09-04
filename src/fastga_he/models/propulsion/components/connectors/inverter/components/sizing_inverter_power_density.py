@@ -21,7 +21,6 @@ class SizingInverterPowerDensity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
@@ -53,7 +52,6 @@ class SizingInverterPowerDensity(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_density"] = (
@@ -63,7 +61,6 @@ class SizingInverterPowerDensity(om.ExplicitComponent):
         ) / (1000.0 * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":mass"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         partials[

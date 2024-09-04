@@ -14,18 +14,18 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_RECTIFIER_LOSSES,
 )
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_RECTIFIER_CURRENT_IN_RMS_1_PHASE
-] = "fastga_he.submodel.propulsion.constraints.rectifier.current.input.rms_one_phase.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_RECTIFIER_VOLTAGE_IN
-] = "fastga_he.submodel.propulsion.constraints.rectifier.voltage.input.peak.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_RECTIFIER_FREQUENCY
-] = "fastga_he.submodel.propulsion.constraints.rectifier.frequency.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_RECTIFIER_LOSSES
-] = "fastga_he.submodel.propulsion.constraints.rectifier.losses.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_RECTIFIER_CURRENT_IN_RMS_1_PHASE] = (
+    "fastga_he.submodel.propulsion.constraints.rectifier.current.input.rms_one_phase.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_RECTIFIER_VOLTAGE_IN] = (
+    "fastga_he.submodel.propulsion.constraints.rectifier.voltage.input.peak.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_RECTIFIER_FREQUENCY] = (
+    "fastga_he.submodel.propulsion.constraints.rectifier.frequency.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_RECTIFIER_LOSSES] = (
+    "fastga_he.submodel.propulsion.constraints.rectifier.losses.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -39,7 +39,6 @@ class ConstraintsCurrentRMS1PhaseEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="rectifier_id",
             default=None,
@@ -48,7 +47,6 @@ class ConstraintsCurrentRMS1PhaseEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -67,7 +65,6 @@ class ConstraintsCurrentRMS1PhaseEnforce(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         outputs[
@@ -86,7 +83,6 @@ class ConstraintsVoltagePeakEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="rectifier_id",
             default=None,
@@ -95,7 +91,6 @@ class ConstraintsVoltagePeakEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -114,7 +109,6 @@ class ConstraintsVoltagePeakEnforce(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         outputs[
@@ -133,7 +127,6 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="rectifier_id",
             default=None,
@@ -142,7 +135,6 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -171,7 +163,6 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
         outputs[
@@ -192,7 +183,6 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="rectifier_id",
             default=None,
@@ -201,7 +191,6 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
@@ -221,9 +210,8 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         rectifier_id = self.options["rectifier_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat"
-        ] = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max"]
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat"] = (
+            inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max"]
+        )

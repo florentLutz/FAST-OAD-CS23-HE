@@ -27,7 +27,6 @@ class SizingTurboshaftCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         turboshaft_id = self.options["turboshaft_id"]
         position = self.options["position"]
 
@@ -45,7 +44,6 @@ class SizingTurboshaftCGX(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
-
             self.add_input(
                 name="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":from_LE",
                 val=np.nan,
@@ -56,7 +54,6 @@ class SizingTurboshaftCGX(om.ExplicitComponent):
             self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
 
         elif position == "in_the_back":
-
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
@@ -70,7 +67,6 @@ class SizingTurboshaftCGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
         position = self.options["position"]
 
@@ -82,7 +78,6 @@ class SizingTurboshaftCGX(om.ExplicitComponent):
         ]
 
         if position == "on_the_wing":
-
             distance_from_le = inputs[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":from_LE"
             ]
@@ -94,13 +89,11 @@ class SizingTurboshaftCGX(om.ExplicitComponent):
             )
 
         elif position == "in_the_front":
-
             outputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":CG:x"] = (
                 cg_in_nacelle * motor_length
             )
 
         else:
-
             front_length = inputs["data:geometry:fuselage:front_length"]
             cabin_length = inputs["data:geometry:cabin:length"]
 
@@ -109,7 +102,6 @@ class SizingTurboshaftCGX(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         turboshaft_id = self.options["turboshaft_id"]
         position = self.options["position"]
 
@@ -130,7 +122,6 @@ class SizingTurboshaftCGX(om.ExplicitComponent):
         ] = motor_length
 
         if position == "on_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":CG:x",
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":from_LE",
@@ -145,7 +136,6 @@ class SizingTurboshaftCGX(om.ExplicitComponent):
             ] = 1.0
 
         elif position == "in_the_back":
-
             partials[
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":CG:x",
                 "data:geometry:fuselage:front_length",

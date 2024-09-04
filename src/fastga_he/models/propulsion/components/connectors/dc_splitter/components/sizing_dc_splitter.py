@@ -26,7 +26,6 @@ class SizingDCSplitter(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_splitter_id",
             default=None,
@@ -43,7 +42,6 @@ class SizingDCSplitter(om.Group):
         )
 
     def setup(self):
-
         position = self.options["position"]
         dc_splitter_id = self.options["dc_splitter_id"]
 

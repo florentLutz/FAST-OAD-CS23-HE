@@ -13,7 +13,6 @@ import plotly.graph_objects as go
 
 
 if __name__ == "__main__":
-
     current = np.array([680, 3400, 6800, 8000])
     relative_capacity = np.array([1, 0.97, 0.95, 0.92])
 

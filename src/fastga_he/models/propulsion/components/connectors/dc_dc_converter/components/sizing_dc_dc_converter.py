@@ -59,7 +59,6 @@ class SizingDCDCConverter(om.Group):
         )
 
     def setup(self):
-
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
         position = self.options["position"]
 

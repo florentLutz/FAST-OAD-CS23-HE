@@ -10,13 +10,11 @@ class PerformancesActivePower(om.ExplicitComponent):
     """Computation of the electric active power required to run the motor."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
@@ -35,11 +33,9 @@ class PerformancesActivePower(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["active_power"] = inputs["shaft_power_out"] / inputs["efficiency"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["active_power", "shaft_power_out"] = 1.0 / inputs["efficiency"]
         partials["active_power", "efficiency"] = -(
             inputs["shaft_power_out"] / inputs["efficiency"] ** 2.0

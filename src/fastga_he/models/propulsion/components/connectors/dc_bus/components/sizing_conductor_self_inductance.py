@@ -15,7 +15,6 @@ class SizingBusBarSelfInductance(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="dc_bus_id",
             default=None,
@@ -25,7 +24,6 @@ class SizingBusBarSelfInductance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         self.add_input(
@@ -57,7 +55,6 @@ class SizingBusBarSelfInductance(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         conductor_thickness = inputs[
@@ -85,7 +82,6 @@ class SizingBusBarSelfInductance(om.ExplicitComponent):
         ] = self_inductance
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         dc_bus_id = self.options["dc_bus_id"]
 
         conductor_thickness = inputs[

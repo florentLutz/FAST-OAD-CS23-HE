@@ -10,13 +10,11 @@ class UpdateMass(om.ExplicitComponent):
     """Update mass for next iteration."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("data:weight:aircraft:MTOW", val=np.nan, units="kg")
@@ -68,7 +66,6 @@ class UpdateMass(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         mtow = inputs["data:weight:aircraft:MTOW"]
         fuel_taxi_out = inputs["data:mission:sizing:taxi_out:fuel"]
         fuel_takeoff = inputs["data:mission:sizing:takeoff:fuel"]

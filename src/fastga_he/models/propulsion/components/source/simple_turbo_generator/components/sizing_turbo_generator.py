@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 from .cstr_turbo_generator import ConstraintsTurboGenerator
 
@@ -34,7 +33,6 @@ class SizingTurboGenerator(om.Group):
         )
 
     def setup(self):
-
         turbo_generator_id = self.options["turbo_generator_id"]
         position = self.options["position"]
 

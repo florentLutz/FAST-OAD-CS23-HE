@@ -8,9 +8,9 @@ import fastoad.api as oad
 
 from ..constants import HE_SUBMODEL_DEP_EFFECT
 
-oad.RegisterSubmodel.active_models[
-    HE_SUBMODEL_DEP_EFFECT
-] = "fastga_he.submodel.performances.dep_effect.none"
+oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = (
+    "fastga_he.submodel.performances.dep_effect.none"
+)
 
 
 @oad.RegisterSubmodel(HE_SUBMODEL_DEP_EFFECT, "fastga_he.submodel.performances.dep_effect.none")
@@ -22,7 +22,6 @@ class NoDEPEffect(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -92,7 +91,6 @@ class NoDEPEffect(om.ExplicitComponent):
         self.add_output("delta_Cm", val=np.full(number_of_points, 0.0))
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["delta_Cl"] = 0.0
         outputs["delta_Cd"] = 0.0
         outputs["delta_Cm"] = 0.0

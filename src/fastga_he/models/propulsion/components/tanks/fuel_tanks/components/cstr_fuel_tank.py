@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 import fastoad.api as oad
 
@@ -24,7 +23,6 @@ class ConstraintsFuelTank(om.Group):
         )
 
     def setup(self):
-
         option_fuel_tank_id = {"fuel_tank_id": self.options["fuel_tank_id"]}
 
         self.add_subsystem(

@@ -14,7 +14,6 @@ class InitializeVerticalAirspeed(om.ExplicitComponent):
     """Initializes the vertical airspeed from mission requirement."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points_climb", default=1, desc="number of equilibrium to be treated in climb"
         )
@@ -35,7 +34,6 @@ class InitializeVerticalAirspeed(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -102,7 +100,6 @@ class InitializeVerticalAirspeed(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
         number_of_points_cruise = self.options["number_of_points_cruise"]
         number_of_points_descent = self.options["number_of_points_descent"]
@@ -122,8 +119,7 @@ class InitializeVerticalAirspeed(om.ExplicitComponent):
             number_of_points_climb : number_of_points_climb + number_of_points_cruise
         ]
         altitude_descent = altitude[
-            number_of_points_climb
-            + number_of_points_cruise : number_of_points_climb
+            number_of_points_climb + number_of_points_cruise : number_of_points_climb
             + number_of_points_cruise
             + number_of_points_descent
         ]
@@ -147,7 +143,6 @@ class InitializeVerticalAirspeed(om.ExplicitComponent):
         outputs["vertical_speed"] = vertical_speed
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points_climb = self.options["number_of_points_climb"]
 
         cruise_altitude = inputs["data:mission:sizing:main_route:cruise:altitude"]
@@ -159,7 +154,7 @@ class InitializeVerticalAirspeed(om.ExplicitComponent):
         altitude_climb = altitude[:number_of_points_climb]
 
         d_vz_climb_d_cruise_altitude = (
-            -(climb_rate_cl - climb_rate_sl) / cruise_altitude ** 2.0 * altitude_climb
+            -(climb_rate_cl - climb_rate_sl) / cruise_altitude**2.0 * altitude_climb
         )
         d_vz_climb_d_climb_rate_sl = 1.0 - altitude_climb / cruise_altitude
         d_vz_climb_d_climb_rate_cl = altitude_climb / cruise_altitude
@@ -167,9 +162,9 @@ class InitializeVerticalAirspeed(om.ExplicitComponent):
         partials["vertical_speed", "data:mission:sizing:main_route:cruise:altitude"] = np.full_like(
             altitude_climb, d_vz_climb_d_cruise_altitude
         )
-        partials[
-            "vertical_speed", "data:mission:sizing:main_route:climb:climb_rate:sea_level"
-        ] = np.full_like(altitude_climb, d_vz_climb_d_climb_rate_sl)
+        partials["vertical_speed", "data:mission:sizing:main_route:climb:climb_rate:sea_level"] = (
+            np.full_like(altitude_climb, d_vz_climb_d_climb_rate_sl)
+        )
         partials[
             "vertical_speed", "data:mission:sizing:main_route:climb:climb_rate:cruise_level"
         ] = np.full_like(altitude_climb, d_vz_climb_d_climb_rate_cl)

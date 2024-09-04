@@ -20,7 +20,6 @@ class PerformancesRelativeCapacity(om.ExplicitComponent):
         self.der_poly = None
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -36,7 +35,6 @@ class PerformancesRelativeCapacity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("current_one_module", units="mA", val=np.full(number_of_points, np.nan))
@@ -59,7 +57,6 @@ class PerformancesRelativeCapacity(om.ExplicitComponent):
         self.der_poly = np.polyder(self.poly)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         current = inputs["current_one_module"]
         relative_capacity = np.polyval(self.poly, current)
 
@@ -74,7 +71,6 @@ class PerformancesRelativeCapacity(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         current = inputs["current_one_module"]
 
         relative_capacity = np.polyval(self.poly, current)

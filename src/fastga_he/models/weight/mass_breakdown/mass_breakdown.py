@@ -26,9 +26,9 @@ from .constants import SUBMODEL_MZFW_MLW
 from fastga.models.options import PAYLOAD_FROM_NPAX
 
 # For retro-compatibility reasons, we want the legacy submodel as default
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_MASS_BREAKDOWN
-] = "fastga.submodel.weight.mass_breakdown.legacy"
+oad.RegisterSubmodel.active_models[SUBMODEL_MASS_BREAKDOWN] = (
+    "fastga.submodel.weight.mass_breakdown.legacy"
+)
 
 
 @oad.RegisterSubmodel(SUBMODEL_MASS_BREAKDOWN, "fastga_he.submodel.weight.mass_breakdown.modular")

@@ -27,7 +27,6 @@ class SizingICECGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         ice_id = self.options["ice_id"]
         position = self.options["position"]
 
@@ -43,7 +42,6 @@ class SizingICECGX(om.ExplicitComponent):
         )
 
         if position == "on_the_wing":
-
             self.add_input(
                 name="data:propulsion:he_power_train:ICE:" + ice_id + ":from_LE",
                 val=np.nan,
@@ -54,7 +52,6 @@ class SizingICECGX(om.ExplicitComponent):
             self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
 
         elif position == "in_the_back":
-
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
@@ -68,7 +65,6 @@ class SizingICECGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         ice_id = self.options["ice_id"]
         position = self.options["position"]
 
@@ -78,7 +74,6 @@ class SizingICECGX(om.ExplicitComponent):
         ]
 
         if position == "on_the_wing":
-
             distance_from_le = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":from_LE"]
             l0_wing = inputs["data:geometry:wing:MAC:length"]
             fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
@@ -88,13 +83,11 @@ class SizingICECGX(om.ExplicitComponent):
             )
 
         elif position == "in_the_front":
-
             outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":CG:x"] = (
                 cg_in_nacelle * motor_length
             )
 
         else:
-
             front_length = inputs["data:geometry:fuselage:front_length"]
             cabin_length = inputs["data:geometry:cabin:length"]
 
@@ -103,7 +96,6 @@ class SizingICECGX(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         ice_id = self.options["ice_id"]
         position = self.options["position"]
 
@@ -122,7 +114,6 @@ class SizingICECGX(om.ExplicitComponent):
         ] = motor_length
 
         if position == "on_the_wing":
-
             partials[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":CG:x",
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":from_LE",
@@ -137,7 +128,6 @@ class SizingICECGX(om.ExplicitComponent):
             ] = 1.0
 
         elif position == "in_the_back":
-
             partials[
                 "data:propulsion:he_power_train:ICE:" + ice_id + ":CG:x",
                 "data:geometry:fuselage:front_length",

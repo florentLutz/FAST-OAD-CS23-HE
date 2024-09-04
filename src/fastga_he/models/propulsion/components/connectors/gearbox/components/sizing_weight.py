@@ -21,7 +21,6 @@ class SizingGearboxWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         gearbox_id = self.options["gearbox_id"]
 
         self.add_input(
@@ -52,7 +51,6 @@ class SizingGearboxWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         gear_ratio = inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":gear_ratio"]
@@ -63,12 +61,11 @@ class SizingGearboxWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":tech_level_constant"
         ]
 
-        mass = k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio ** 0.13
+        mass = k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio**0.13
 
         outputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         gearbox_id = self.options["gearbox_id"]
 
         gear_ratio = inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":gear_ratio"]
@@ -82,16 +79,12 @@ class SizingGearboxWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":mass",
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":gear_ratio",
-        ] = (
-            0.13 * k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio ** -0.87
-        )
+        ] = 0.13 * k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio**-0.87
         partials[
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":mass",
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating",
-        ] = (
-            0.76 * k_gb * torque_rating ** -0.24 * gear_ratio ** 0.13 / 745.7 ** 0.76
-        )
+        ] = 0.76 * k_gb * torque_rating**-0.24 * gear_ratio**0.13 / 745.7**0.76
         partials[
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":mass",
             "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":tech_level_constant",
-        ] = (torque_rating / 745.7) ** 0.76 * gear_ratio ** 0.13
+        ] = (torque_rating / 745.7) ** 0.76 * gear_ratio**0.13

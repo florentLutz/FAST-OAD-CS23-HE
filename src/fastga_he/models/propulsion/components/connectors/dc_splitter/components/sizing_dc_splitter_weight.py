@@ -20,7 +20,6 @@ class SizingDCSplitterWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         dc_splitter_id = self.options["dc_splitter_id"]
 
         self.add_input(
@@ -163,50 +162,36 @@ class SizingDCSplitterWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_splitter:"
             + dc_splitter_id
             + ":cross_section:thickness",
-        ] = (
-            2.0 * conductor_width * conductor_length * (conductor_density - insulation_density)
-        )
+        ] = 2.0 * conductor_width * conductor_length * (conductor_density - insulation_density)
         partials[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":mass",
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":cross_section:width",
-        ] = (
-            2.0 * conductor_thickness * conductor_length * (conductor_density - insulation_density)
-        )
+        ] = 2.0 * conductor_thickness * conductor_length * (conductor_density - insulation_density)
         partials[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":mass",
             "data:propulsion:he_power_train:DC_splitter:"
             + dc_splitter_id
             + ":cross_section:length",
-        ] = (
-            2.0 * conductor_width * conductor_thickness * (conductor_density - insulation_density)
-        )
+        ] = 2.0 * conductor_width * conductor_thickness * (conductor_density - insulation_density)
         partials[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":mass",
             "data:propulsion:he_power_train:DC_splitter:"
             + dc_splitter_id
             + ":cross_section:density",
-        ] = (
-            2.0 * conductor_width * conductor_thickness * conductor_length
-        )
+        ] = 2.0 * conductor_width * conductor_thickness * conductor_length
 
         partials[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":mass",
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":height",
-        ] = (
-            splitter_width * splitter_length * insulation_density
-        )
+        ] = splitter_width * splitter_length * insulation_density
         partials[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":mass",
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":width",
-        ] = (
-            splitter_height * splitter_length * insulation_density
-        )
+        ] = splitter_height * splitter_length * insulation_density
         partials[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":mass",
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":length",
-        ] = (
-            splitter_width * splitter_height * insulation_density
-        )
+        ] = splitter_width * splitter_height * insulation_density
         partials[
             "data:propulsion:he_power_train:DC_splitter:" + dc_splitter_id + ":mass",
             "settings:propulsion:he_power_train:DC_splitter:insulation:density",

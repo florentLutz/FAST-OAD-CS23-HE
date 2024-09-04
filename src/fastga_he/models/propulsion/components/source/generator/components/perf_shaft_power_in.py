@@ -10,13 +10,11 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
     """Computation of the shaft power at the input of the generator."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -35,11 +33,9 @@ class PerformancesShaftPowerIn(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["shaft_power_in"] = inputs["active_power"] / inputs["efficiency"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["shaft_power_in", "active_power"] = 1.0 / inputs["efficiency"]
         partials["shaft_power_in", "efficiency"] = (
             -inputs["active_power"] / inputs["efficiency"] ** 2.0

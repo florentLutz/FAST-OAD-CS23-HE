@@ -13,7 +13,6 @@ class SizingFuelTankTotalFuelMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingFuelTankTotalFuelMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         self.add_input(
@@ -48,7 +46,6 @@ class SizingFuelTankTotalFuelMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         outputs[

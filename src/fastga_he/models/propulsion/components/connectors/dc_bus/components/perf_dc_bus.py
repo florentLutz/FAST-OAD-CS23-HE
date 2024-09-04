@@ -10,7 +10,6 @@ from .perf_maximum import PerformancesMaximum
 
 class PerformancesDCBus(om.Group):
     def initialize(self):
-
         self.options.declare(
             name="dc_bus_id",
             default=None,
@@ -37,7 +36,6 @@ class PerformancesDCBus(om.Group):
         )
 
     def setup(self):
-
         dc_bus_id = self.options["dc_bus_id"]
         number_of_points = self.options["number_of_points"]
         number_of_inputs = self.options["number_of_inputs"]

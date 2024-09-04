@@ -10,9 +10,9 @@ import fastoad.api as oad
 from ..constants import SUBMODEL_CONSTRAINTS_FUEL_TANK_CAPACITY
 
 # This choice was made. "Why ? Because I can" (Katarina from LoL)
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_FUEL_TANK_CAPACITY
-] = "fastga_he.submodel.propulsion.constraints.fuel_tank.capacity.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_FUEL_TANK_CAPACITY] = (
+    "fastga_he.submodel.propulsion.constraints.fuel_tank.capacity.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -26,7 +26,6 @@ class ConstraintsFuelTankCapacityEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="fuel_tank_id",
             default=None,
@@ -35,7 +34,6 @@ class ConstraintsFuelTankCapacityEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         self.add_input(
@@ -55,7 +53,6 @@ class ConstraintsFuelTankCapacityEnforce(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         fuel_tank_id = self.options["fuel_tank_id"]
 
         outputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity"] = inputs[

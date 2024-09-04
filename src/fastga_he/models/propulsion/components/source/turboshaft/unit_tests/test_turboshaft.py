@@ -57,7 +57,6 @@ NB_POINTS_TEST = 10
 
 
 def test_fuel_consumption_pw206b():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_rating", units="kW", val=308
@@ -91,7 +90,6 @@ def test_fuel_consumption_pw206b():
 
 
 def test_constraint_power_enforce():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsRatedPowerEnforce(turboshaft_id="turboshaft_1")), __file__, XML_FILE
     )
@@ -107,7 +105,6 @@ def test_constraint_power_enforce():
 
 
 def test_constraint_power_ensure():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsRatedPowerEnsure(turboshaft_id="turboshaft_1")), __file__, XML_FILE
     )
@@ -123,7 +120,6 @@ def test_constraint_power_ensure():
 
 
 def test_constraint_power_for_power_rate():
-
     ivc = get_indep_var_comp(
         list_inputs(ConstraintTurboshaftPowerRateMission(turboshaft_id="turboshaft_1")),
         __file__,
@@ -141,7 +137,6 @@ def test_constraint_power_for_power_rate():
 
 
 def test_uninstalled_weight():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingTurboshaftUninstalledWeight(turboshaft_id="turboshaft_1")),
         __file__,
@@ -159,7 +154,6 @@ def test_uninstalled_weight():
 
 
 def test_installed_weight():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingTurboshaftWeight(turboshaft_id="turboshaft_1")),
         __file__,
@@ -177,7 +171,6 @@ def test_installed_weight():
 
 
 def test_turboshaft_dimensions():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingTurboshaftDimensions(turboshaft_id="turboshaft_1")),
         __file__,
@@ -201,7 +194,6 @@ def test_turboshaft_dimensions():
 
 
 def test_turboshaft_nacelle_dimensions():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingTurboshaftNacelleDimensions(turboshaft_id="turboshaft_1")),
         __file__,
@@ -251,7 +243,6 @@ def test_turboshaft_nacelle_dimensions():
 
 
 def test_nacelle_wet_area():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingTurboshaftNacelleWetArea(turboshaft_id="turboshaft_1")),
         __file__,
@@ -269,7 +260,6 @@ def test_nacelle_wet_area():
 
 
 def test_nacelle_drag():
-
     expected_drag_ls = [4.26, 0.0, 0.0]
     expected_drag_cruise = [4.217, 0.0, 0.0]
 
@@ -295,32 +285,22 @@ def test_nacelle_drag():
             )
 
             if ls_option:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:turboshaft:turboshaft_1:low_speed:CD0",
-                    )
-                    * 1e3
-                    == pytest.approx(ls_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:turboshaft:turboshaft_1:low_speed:CD0",
+                ) * 1e3 == pytest.approx(ls_drag, rel=1e-2)
             else:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cruise:CD0",
-                    )
-                    * 1e3
-                    == pytest.approx(cruise_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:turboshaft:turboshaft_1:cruise:CD0",
+                ) * 1e3 == pytest.approx(cruise_drag, rel=1e-2)
 
             # Slight error on reynolds is due to step
             problem.check_partials(compact_print=True)
 
 
 def test_turboshaft_cg_x():
-
     expected_cg = [3.703, 1.702, 3.679]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingTurboshaftCGX(turboshaft_id="turboshaft_1", position=option)),
             __file__,
@@ -339,11 +319,9 @@ def test_turboshaft_cg_x():
 
 
 def test_turboshaft_cg_y():
-
     expected_cg = [1.7, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-
         ivc = get_indep_var_comp(
             list_inputs(SizingTurboshaftCGY(turboshaft_id="turboshaft_1", position=option)),
             __file__,
@@ -362,7 +340,6 @@ def test_turboshaft_cg_y():
 
 
 def test_ice_sizing():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingTurboshaft(turboshaft_id="turboshaft_1")), __file__, XML_FILE
     )
@@ -379,19 +356,14 @@ def test_ice_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:CG:y", units="m"
     ) == pytest.approx(1.7, rel=1e-2)
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:turboshaft:turboshaft_1:low_speed:CD0",
-        )
-        * 1e3
-        == pytest.approx(4.273, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:low_speed:CD0",
+    ) * 1e3 == pytest.approx(4.273, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_density_ratio():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "density",
@@ -412,7 +384,6 @@ def test_density_ratio():
 
 
 def test_mach_number():
-
     ivc = om.IndepVarComp()
     ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
@@ -429,7 +400,6 @@ def test_mach_number():
 
 
 def test_required_power():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesRequiredPower(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)
@@ -454,7 +424,6 @@ def test_required_power():
 
 
 def test_power_for_power_rate():
-
     ivc = om.IndepVarComp()
     ivc.add_output("power_required", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
 
@@ -473,7 +442,6 @@ def test_power_for_power_rate():
 
 
 def test_max_power_opr_limit():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesMaxPowerOPRLimit(
@@ -511,7 +479,6 @@ def test_max_power_opr_limit():
 
 
 def test_max_power_opr_limit_ref_point():
-
     # Same test as above but on a point close to the original model to see if it matches
 
     ivc = om.IndepVarComp()
@@ -537,7 +504,6 @@ def test_max_power_opr_limit_ref_point():
 
 
 def test_max_power_itt_limit():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesMaxPowerITTLimit(
@@ -573,7 +539,6 @@ def test_max_power_itt_limit():
 
 
 def test_equivalent_power_itt_limit():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesEquivalentRatedPowerITTLimit(
@@ -608,7 +573,6 @@ def test_equivalent_power_itt_limit():
 
 
 def test_equivalent_power_opr_limit():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesEquivalentRatedPowerOPRLimit(
@@ -643,7 +607,6 @@ def test_equivalent_power_opr_limit():
 
 
 def test_maximum():
-
     ivc = om.IndepVarComp()
     ivc.add_output("power_required", val=np.linspace(300, 625.174, NB_POINTS_TEST), units="kW")
     ivc.add_output(
@@ -677,7 +640,6 @@ def test_maximum():
 
 
 def test_fuel_consumption():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesTurboshaftFuelConsumption(
@@ -715,7 +677,6 @@ def test_fuel_consumption():
 
 
 def test_fuel_consumed():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fuel_consumption",
@@ -741,7 +702,6 @@ def test_fuel_consumed():
 
 
 def test_sfc():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fuel_consumption",
@@ -767,7 +727,6 @@ def test_sfc():
 
 
 def test_performances_turboshaft():
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesTurboshaft(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)
@@ -808,7 +767,6 @@ def test_performances_turboshaft():
 
 
 def test_slipstream_density_ratio():
-
     ivc = om.IndepVarComp()
     ivc.add_output(
         "density",
@@ -828,7 +786,6 @@ def test_slipstream_density_ratio():
 
 
 def test_slipstream_mach():
-
     ivc = om.IndepVarComp()
     ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="m")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
@@ -845,7 +802,6 @@ def test_slipstream_mach():
 
 
 def test_slipstream_required_power_bigger_power():
-
     # This component is meant to work in conjunction with the variable being outputed from the
     # mission so the shaft power will be longer than the other variables likes altitude and mach
 
@@ -879,7 +835,6 @@ def test_slipstream_required_power_bigger_power():
 
 
 def test_exhaust_velocity():
-
     ivc = get_indep_var_comp(
         list_inputs(
             SlipstreamExhaustVelocity(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)
@@ -913,7 +868,6 @@ def test_exhaust_velocity():
 
 
 def test_exhaust_mass_flow():
-
     ivc = get_indep_var_comp(
         list_inputs(
             SlipstreamExhaustMassFlow(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)
@@ -943,7 +897,6 @@ def test_exhaust_mass_flow():
 
 
 def test_exhaust_thrust():
-
     ivc = om.IndepVarComp()
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 300.0, NB_POINTS_TEST), units="m/s")
     ivc.add_output(
@@ -973,7 +926,6 @@ def test_exhaust_thrust():
 
 
 def test_delta_cd():
-
     ivc = get_indep_var_comp(
         list_inputs(SlipstreamTurboshaftDeltaCd(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -1002,7 +954,6 @@ def test_delta_cd():
 
 
 def test_slipstream():
-
     ivc = get_indep_var_comp(
         list_inputs(
             SlipstreamTurboshaft(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST)

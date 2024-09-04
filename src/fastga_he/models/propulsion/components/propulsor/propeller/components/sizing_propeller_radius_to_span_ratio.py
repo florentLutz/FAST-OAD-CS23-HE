@@ -12,13 +12,11 @@ class SizingPropellerDiameterToSpanRatio(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
 
         self.add_input(
@@ -40,7 +38,6 @@ class SizingPropellerDiameterToSpanRatio(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         outputs[
@@ -52,15 +49,12 @@ class SizingPropellerDiameterToSpanRatio(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         partials[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter_to_span_ratio",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-        ] = (
-            2.0 / inputs["data:geometry:wing:span"]
-        )
+        ] = 2.0 / inputs["data:geometry:wing:span"]
         partials[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter_to_span_ratio",
             "data:geometry:wing:span",

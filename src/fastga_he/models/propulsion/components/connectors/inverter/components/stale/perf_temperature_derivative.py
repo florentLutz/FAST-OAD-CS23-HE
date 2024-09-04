@@ -11,7 +11,6 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
     and that all losses are dissipated as heat"""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -24,7 +23,6 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         )
 
     def setup(self):
-
         inverter_id = self.options["inverter_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -73,7 +71,6 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         temp_inv = inputs["inverter_temperature"]
@@ -96,7 +93,6 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         outputs["inverter_temperature_time_derivative"] = d_temp_d_t
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         inverter_id = self.options["inverter_id"]
 
         temp_inv = inputs["inverter_temperature"]
@@ -123,13 +119,11 @@ class PerformancesTemperatureDerivative(om.ExplicitComponent):
         partials[
             "inverter_temperature_time_derivative",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:thermal_resistance",
-        ] = (temp_inv - temp_hs) / (hc_casing * r_th_js ** 2.0)
+        ] = (temp_inv - temp_hs) / (hc_casing * r_th_js**2.0)
         partials[
             "inverter_temperature_time_derivative",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":casing:heat_capacity",
-        ] = (
-            -(losses_one_module - q_cool) / hc_casing ** 2.0
-        )
+        ] = -(losses_one_module - q_cool) / hc_casing**2.0
         partials[
             "inverter_temperature_time_derivative",
             "losses_inverter",

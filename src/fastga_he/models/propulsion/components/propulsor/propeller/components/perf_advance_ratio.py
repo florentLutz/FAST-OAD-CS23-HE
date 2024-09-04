@@ -10,7 +10,6 @@ class PerformancesAdvanceRatio(om.ExplicitComponent):
     """Computation of the advance ratio of the propeller."""
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -19,7 +18,6 @@ class PerformancesAdvanceRatio(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -62,7 +60,6 @@ class PerformancesAdvanceRatio(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
@@ -77,7 +74,6 @@ class PerformancesAdvanceRatio(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         diameter = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
@@ -96,9 +92,7 @@ class PerformancesAdvanceRatio(om.ExplicitComponent):
         partials[
             "advance_ratio",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-        ] = (
-            -inputs["true_airspeed"] / (inputs["rpm"] / 60.0 * diameter ** 2.0) * effective_j
-        )
+        ] = -inputs["true_airspeed"] / (inputs["rpm"] / 60.0 * diameter**2.0) * effective_j
         partials[
             "advance_ratio",
             "settings:propulsion:he_power_train:propeller:"

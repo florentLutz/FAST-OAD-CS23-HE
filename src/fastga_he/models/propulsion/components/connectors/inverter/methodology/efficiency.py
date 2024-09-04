@@ -9,7 +9,6 @@ import numpy as np
 import plotly.graph_objects as go
 
 if __name__ == "__main__":
-
     # Obtaining the reference parameters
     data_file = pth.join(pth.dirname(__file__), "data/new_reference_IGBT_module.csv")
 
@@ -25,21 +24,21 @@ if __name__ == "__main__":
     e_off_y = np.array(energy_data["E_off_Y"])
 
     B = e_on_y
-    A = np.column_stack([np.ones_like(e_on_x) / 2.0, e_on_x / np.pi, e_on_x ** 2.0 / 4.0])
+    A = np.column_stack([np.ones_like(e_on_x) / 2.0, e_on_x / np.pi, e_on_x**2.0 / 4.0])
     x = np.linalg.lstsq(A, B, rcond=None)
     a_on, b_on, c_on = x[0]
     print(x[1])
     print("ON Coefficient", a_on, b_on, c_on)
 
     B = e_rr_y
-    A = np.column_stack([np.ones_like(e_rr_x) / 2.0, e_rr_x / np.pi, e_rr_x ** 2.0 / 4.0])
+    A = np.column_stack([np.ones_like(e_rr_x) / 2.0, e_rr_x / np.pi, e_rr_x**2.0 / 4.0])
     x = np.linalg.lstsq(A, B, rcond=None)
     a_rr, b_rr, c_rr = x[0]
     print(x[1])
     print("RR Coefficient", a_rr, b_rr, c_rr)
 
     B = e_off_y
-    A = np.column_stack([np.ones_like(e_off_x) / 2.0, e_off_x / np.pi, e_off_x ** 2.0 / 4.0])
+    A = np.column_stack([np.ones_like(e_off_x) / 2.0, e_off_x / np.pi, e_off_x**2.0 / 4.0])
     x = np.linalg.lstsq(A, B, rcond=None)
     a_off, b_off, c_off = x[0]
     print(x[1])
@@ -60,7 +59,7 @@ if __name__ == "__main__":
     fig.add_trace(scatter_e_on_orig)
     scatter_e_on_interp = go.Scatter(
         x=e_on_x,
-        y=a_on / 2.0 + b_on * e_on_x / np.pi + c_on * e_on_x ** 2.0 / 4.0,
+        y=a_on / 2.0 + b_on * e_on_x / np.pi + c_on * e_on_x**2.0 / 4.0,
         mode="lines+markers",
         name="E_on interpolated data",
         legendgroup="e_on",
@@ -78,7 +77,7 @@ if __name__ == "__main__":
     fig.add_trace(scatter_e_rr_orig)
     scatter_e_rr_interp = go.Scatter(
         x=e_rr_x,
-        y=a_rr / 2.0 + b_rr * e_rr_x / np.pi + c_rr * e_rr_x ** 2.0 / 4.0,
+        y=a_rr / 2.0 + b_rr * e_rr_x / np.pi + c_rr * e_rr_x**2.0 / 4.0,
         mode="lines+markers",
         name="E_rr interpolated data",
         legendgroup="e_rr",
@@ -96,7 +95,7 @@ if __name__ == "__main__":
     fig.add_trace(scatter_e_off_orig)
     scatter_e_off_interp = go.Scatter(
         x=e_off_x,
-        y=a_off / 2.0 + b_off * e_off_x / np.pi + c_off * e_off_x ** 2.0 / 4.0,
+        y=a_off / 2.0 + b_off * e_off_x / np.pi + c_off * e_off_x**2.0 / 4.0,
         mode="lines+markers",
         name="E_off interpolated data",
         legendgroup="e_off",

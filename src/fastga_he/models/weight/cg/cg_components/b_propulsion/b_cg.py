@@ -18,7 +18,6 @@ class PowerTrainCG(om.ExplicitComponent):
     """
 
     def setup(self):
-
         self.add_input("data:propulsion:he_power_train:CG:x", val=np.nan, units="m")
 
         self.add_output("data:weight:propulsion:CG:x", units="m", val=2.5)
@@ -28,5 +27,4 @@ class PowerTrainCG(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["data:weight:propulsion:CG:x"] = inputs["data:propulsion:he_power_train:CG:x"]

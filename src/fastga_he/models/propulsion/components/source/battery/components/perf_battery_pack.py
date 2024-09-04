@@ -30,7 +30,6 @@ from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 
 class PerformancesBatteryPack(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -49,7 +48,6 @@ class PerformancesBatteryPack(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
         direct_bus_connection = self.options["direct_bus_connection"]
@@ -192,7 +190,6 @@ class PerformancesBatteryPack(om.Group):
     def guess_nonlinear(
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
-
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
 

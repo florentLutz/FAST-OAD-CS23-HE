@@ -21,7 +21,6 @@ class SizingSpeedReducerWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         self.add_input(
@@ -56,7 +55,6 @@ class SizingSpeedReducerWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         gear_ratio = inputs[
@@ -73,12 +71,11 @@ class SizingSpeedReducerWeight(om.ExplicitComponent):
             + ":tech_level_constant"
         ]
 
-        mass = k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio ** 0.13
+        mass = k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio**0.13
 
         outputs["data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         gear_ratio = inputs[
@@ -98,20 +95,16 @@ class SizingSpeedReducerWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":mass",
             "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":gear_ratio",
-        ] = (
-            0.13 * k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio ** -0.87
-        )
+        ] = 0.13 * k_gb * (torque_rating / 745.7) ** 0.76 * gear_ratio**-0.87
         partials[
             "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":mass",
             "data:propulsion:he_power_train:speed_reducer:"
             + speed_reducer_id
             + ":torque_out_rating",
-        ] = (
-            0.76 * k_gb * torque_rating ** -0.24 * gear_ratio ** 0.13 / 745.7 ** 0.76
-        )
+        ] = 0.76 * k_gb * torque_rating**-0.24 * gear_ratio**0.13 / 745.7**0.76
         partials[
             "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":mass",
             "data:propulsion:he_power_train:speed_reducer:"
             + speed_reducer_id
             + ":tech_level_constant",
-        ] = (torque_rating / 745.7) ** 0.76 * gear_ratio ** 0.13
+        ] = (torque_rating / 745.7) ** 0.76 * gear_ratio**0.13

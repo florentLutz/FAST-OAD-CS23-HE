@@ -20,7 +20,6 @@ class PerformancesPowerIn(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -32,7 +31,6 @@ class PerformancesPowerIn(om.ExplicitComponent):
         )
 
     def setup(self):
-
         aux_load_id = self.options["aux_load_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -49,7 +47,6 @@ class PerformancesPowerIn(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         aux_load_id = self.options["aux_load_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -73,7 +70,6 @@ class PerformancesPowerIn(om.ExplicitComponent):
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         aux_load_id = self.options["aux_load_id"]
         number_of_points = self.options["number_of_points"]
 

@@ -10,13 +10,11 @@ class PerformancesTorque(om.ExplicitComponent):
     """Computation of the torque from power and rpm."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
@@ -48,7 +46,6 @@ class PerformancesTorque(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         power = inputs["shaft_power_out"]
         rpm = inputs["rpm"]
         omega = rpm * 2.0 * np.pi / 60
@@ -59,11 +56,10 @@ class PerformancesTorque(om.ExplicitComponent):
         outputs["shaft_power_for_power_rate"] = power
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         power = inputs["shaft_power_out"]
         rpm = inputs["rpm"]
 
         omega = rpm * 2.0 * np.pi / 60
 
         partials["torque_out", "shaft_power_out"] = 1.0 / omega
-        partials["torque_out", "rpm"] = -power / omega ** 2.0 * 2.0 * np.pi / 60
+        partials["torque_out", "rpm"] = -power / omega**2.0 * 2.0 * np.pi / 60

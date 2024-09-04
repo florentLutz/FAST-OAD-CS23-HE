@@ -17,7 +17,6 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="propeller_id", default=None, desc="Identifier of the propeller", allow_none=False
         )
@@ -26,7 +25,6 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
         )
 
     def setup(self):
-
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -91,7 +89,6 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         i_p = inputs[
@@ -121,7 +118,6 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
         outputs["lift_increase_ratio_AOA_0"] = lift_increase_ratio_0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         propeller_id = self.options["propeller_id"]
 
         i_p = inputs[
@@ -150,12 +146,12 @@ class SlipstreamPropellerLiftIncreaseRatio(om.ExplicitComponent):
             alpha_0, beta, a_p, i_p, inside_square_0
         )
 
-        partials[
-            "lift_increase_ratio", "axial_induction_factor_wing_ac"
-        ] = partials_lift_increase_ratio_a_p(alpha, beta, a_p, i_p, inside_square)
-        partials[
-            "lift_increase_ratio_AOA_0", "axial_induction_factor_wing_ac"
-        ] = partials_lift_increase_ratio_a_p(alpha_0, beta, a_p, i_p, inside_square_0)
+        partials["lift_increase_ratio", "axial_induction_factor_wing_ac"] = (
+            partials_lift_increase_ratio_a_p(alpha, beta, a_p, i_p, inside_square)
+        )
+        partials["lift_increase_ratio_AOA_0", "axial_induction_factor_wing_ac"] = (
+            partials_lift_increase_ratio_a_p(alpha_0, beta, a_p, i_p, inside_square_0)
+        )
 
         partials[
             "lift_increase_ratio",
@@ -193,7 +189,7 @@ def partials_lift_increase_ratio_beta(
     :param inside_square: value of the coefficient inside the square root in the original formula
     """
 
-    d_inside_square_d_beta = 2.0 * a_p * np.cos(alpha + i_p) + 2.0 * beta * a_p ** 2.0
+    d_inside_square_d_beta = 2.0 * a_p * np.cos(alpha + i_p) + 2.0 * beta * a_p**2.0
 
     partials_ratio_beta = (
         -a_p * np.sin(i_p) / np.sin(alpha) * np.sqrt(inside_square)
@@ -221,7 +217,7 @@ def partials_lift_increase_ratio_a_p(
     :param inside_square: value of the coefficient inside the square root in the original formula
     """
 
-    d_inside_square_d_a_p = 2.0 * beta * np.cos(alpha + i_p) + 2.0 * a_p * beta ** 2.0
+    d_inside_square_d_a_p = 2.0 * beta * np.cos(alpha + i_p) + 2.0 * a_p * beta**2.0
 
     partials_ratio_a_p = (
         -beta * np.sin(i_p) / np.sin(alpha) * np.sqrt(inside_square)

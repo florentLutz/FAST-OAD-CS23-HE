@@ -21,7 +21,6 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
         )
 
     def setup(self):
-
         prefix = self.options["prefix"]
 
         self.add_input(
@@ -94,7 +93,6 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         prefix = self.options["prefix"]
 
         inverter_losses_max = inputs[prefix + ":dissipable_heat"]
@@ -116,7 +114,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             (
                 thermal_conductivity_coolant
                 * 0.023
-                * prandtl_coolant ** 0.4
+                * prandtl_coolant**0.4
                 * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
             )
             / (y_term * (dynamic_viscosity_coolant * np.pi) ** 0.8)
@@ -125,7 +123,6 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
         outputs[prefix + ":heat_sink:tube:inner_diameter"] = inner_diameter
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         prefix = self.options["prefix"]
 
         inverter_losses_max = inputs[prefix + ":dissipable_heat"]
@@ -144,7 +141,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
 
         d_y_d_losses = 1.0 / (tube_length * np.pi * (t_max_heat_sink - t_max_avg_coolant))
         d_y_d_length = -inverter_losses_max / (
-            tube_length ** 2.0 * np.pi * (t_max_heat_sink - t_max_avg_coolant)
+            tube_length**2.0 * np.pi * (t_max_heat_sink - t_max_avg_coolant)
         )
         d_y_d_t_max_hs = -inverter_losses_max / (
             tube_length * np.pi * (t_max_heat_sink - t_max_avg_coolant) ** 2.0
@@ -163,13 +160,11 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             (
                 thermal_conductivity_coolant
                 * 0.023
-                * prandtl_coolant ** 0.4
+                * prandtl_coolant**0.4
                 * (4.0 * density_coolant) ** 0.8
             )
             / (y_term * (dynamic_viscosity_coolant * np.pi) ** 0.8)
-        ) ** (
-            1.0 / 0.8
-        )
+        ) ** (1.0 / 0.8)
         partials[
             prefix + ":heat_sink:tube:inner_diameter",
             prefix + ":heat_sink:coolant:Prandtl_number",
@@ -196,14 +191,14 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                     (
                         thermal_conductivity_coolant
                         * 0.023
-                        * prandtl_coolant ** 0.4
+                        * prandtl_coolant**0.4
                         * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                     )
-                    / (y_term * np.pi ** 0.8)
+                    / (y_term * np.pi**0.8)
                 )
                 ** (1.0 / 0.8)
             )
-            / dynamic_viscosity_coolant ** 2.0
+            / dynamic_viscosity_coolant**2.0
         )
         partials[
             prefix + ":heat_sink:tube:inner_diameter",
@@ -212,13 +207,11 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             (
                 thermal_conductivity_coolant
                 * 0.023
-                * prandtl_coolant ** 0.4
+                * prandtl_coolant**0.4
                 * (4.0 * mass_flow_max_coolant) ** 0.8
             )
             / (y_term * (dynamic_viscosity_coolant * np.pi) ** 0.8)
-        ) ** (
-            1.0 / 0.8
-        )
+        ) ** (1.0 / 0.8)
         partials[
             prefix + ":heat_sink:tube:inner_diameter",
             prefix + ":heat_sink:coolant:thermal_conductivity",
@@ -226,7 +219,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             (
                 (
                     0.023
-                    * prandtl_coolant ** 0.4
+                    * prandtl_coolant**0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (y_term * (dynamic_viscosity_coolant * np.pi) ** 0.8)
@@ -243,7 +236,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                 (
                     thermal_conductivity_coolant
                     * 0.023
-                    * prandtl_coolant ** 0.4
+                    * prandtl_coolant**0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (dynamic_viscosity_coolant * np.pi) ** 0.8
@@ -262,7 +255,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                 (
                     thermal_conductivity_coolant
                     * 0.023
-                    * prandtl_coolant ** 0.4
+                    * prandtl_coolant**0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (dynamic_viscosity_coolant * np.pi) ** 0.8
@@ -281,7 +274,7 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
                 (
                     thermal_conductivity_coolant
                     * 0.023
-                    * prandtl_coolant ** 0.4
+                    * prandtl_coolant**0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (dynamic_viscosity_coolant * np.pi) ** 0.8
@@ -292,12 +285,15 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             / 0.8
             * d_y_d_t_max_hs
         )
-        partials[prefix + ":heat_sink:tube:inner_diameter", prefix + ":heat_sink:tube:length",] = -(
+        partials[
+            prefix + ":heat_sink:tube:inner_diameter",
+            prefix + ":heat_sink:tube:length",
+        ] = -(
             (
                 (
                     thermal_conductivity_coolant
                     * 0.023
-                    * prandtl_coolant ** 0.4
+                    * prandtl_coolant**0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (dynamic_viscosity_coolant * np.pi) ** 0.8
@@ -308,12 +304,15 @@ class SizingHeatSinkTubeInnerDiameter(om.ExplicitComponent):
             / 0.8
             * d_y_d_length
         )
-        partials[prefix + ":heat_sink:tube:inner_diameter", prefix + ":dissipable_heat",] = -(
+        partials[
+            prefix + ":heat_sink:tube:inner_diameter",
+            prefix + ":dissipable_heat",
+        ] = -(
             (
                 (
                     thermal_conductivity_coolant
                     * 0.023
-                    * prandtl_coolant ** 0.4
+                    * prandtl_coolant**0.4
                     * (4.0 * density_coolant * mass_flow_max_coolant) ** 0.8
                 )
                 / (dynamic_viscosity_coolant * np.pi) ** 0.8

@@ -39,7 +39,6 @@ class SizingPMSM(om.Group):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
         position = self.options["position"]
 

@@ -11,9 +11,9 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_SPEED_REDUCER_TORQUE
-] = "fastga_he.submodel.propulsion.constraints.speed_reducer.torque.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SPEED_REDUCER_TORQUE] = (
+    "fastga_he.submodel.propulsion.constraints.speed_reducer.torque.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -35,7 +35,6 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         self.add_input(
@@ -88,7 +87,6 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         speed_reducer_id = self.options["speed_reducer_id"]
 
         outputs[
