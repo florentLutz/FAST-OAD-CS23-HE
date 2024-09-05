@@ -36,6 +36,15 @@ from ..components.perf_fuel_consumption import PerformancesTurboshaftFuelConsump
 from ..components.perf_fuel_consumed import PerformancesTurboshaftFuelConsumed
 from ..components.perf_sfc import PerformancesSFC
 
+from ..components.perf_inflight_co2_emissions import PerformancesTurboshaftInFlightCO2Emissions
+from ..components.perf_inflight_h2o_emissions import PerformancesTurboshaftInFlightH2OEmissions
+from ..components.perf_inflight_sox_emissions import PerformancesTurboshaftInFlightSOxEmissions
+from ..components.perf_inflight_co_emissions import PerformancesTurboshaftInFlightCOEmissions
+from ..components.perf_inflight_hc_emissions import PerformancesTurboshaftInFlightHCEmissions
+from ..components.perf_inflight_nox_emissions import PerformancesTurboshaftInFlightNOxEmissions
+from ..components.perf_inflight_emissions_sum import PerformancesTurboshaftInFlightEmissionsSum
+from ..components.perf_inflight_emissions import PerformancesTurboshaftInFlightEmissions
+
 from ..components.slipstream_density_ratio import SlipstreamDensityRatio
 from ..components.slipstream_mach import SlipstreamMach
 from ..components.slipstream_required_power import SlipstreamRequiredPower
@@ -339,7 +348,7 @@ def test_turboshaft_cg_y():
         problem.check_partials(compact_print=True)
 
 
-def test_ice_sizing():
+def test_turboshaft_sizing():
     ivc = get_indep_var_comp(
         list_inputs(SizingTurboshaft(turboshaft_id="turboshaft_1")), __file__, XML_FILE
     )
@@ -722,6 +731,255 @@ def test_sfc():
         np.array([0.707, 0.634, 0.572, 0.519, 0.471, 0.429, 0.392, 0.358, 0.328, 0.300]),
         rel=1e-2,
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_co_emissions():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([29.46, 29.60, 29.58, 29.44, 29.13, 28.70, 28.19, 27.55, 26.84, 26.11]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftInFlightCOEmissions(
+            number_of_points=NB_POINTS_TEST, turboshaft_id="turboshaft_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("CO_emissions", units="g") == pytest.approx(
+        np.array([147.3, 148.0, 147.9, 147.2, 145.65, 143.5, 140.95, 137.75, 134.2, 130.55]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_co2_emissions():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([29.46, 29.60, 29.58, 29.44, 29.13, 28.70, 28.19, 27.55, 26.84, 26.11]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftInFlightCO2Emissions(
+            number_of_points=NB_POINTS_TEST, turboshaft_id="turboshaft_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("CO2_emissions", units="kg") == pytest.approx(
+        np.array([92.9, 93.3, 93.3, 92.8, 91.9, 90.5, 88.9, 86.9, 84.6, 82.3]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_h2o_emissions():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([29.46, 29.60, 29.58, 29.44, 29.13, 28.70, 28.19, 27.55, 26.84, 26.11]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftInFlightH2OEmissions(
+            number_of_points=NB_POINTS_TEST, turboshaft_id="turboshaft_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("H2O_emissions", units="kg") == pytest.approx(
+        np.array([36.4, 36.6, 36.5, 36.4, 36.0, 35.5, 34.8, 34.0, 33.2, 32.2]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_sox_emissions():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([29.46, 29.60, 29.58, 29.44, 29.13, 28.70, 28.19, 27.55, 26.84, 26.11]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftInFlightSOxEmissions(
+            number_of_points=NB_POINTS_TEST, turboshaft_id="turboshaft_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("SOx_emissions", units="g") == pytest.approx(
+        np.array([23.568, 23.68, 23.664, 23.552, 23.304, 22.96, 22.552, 22.04, 21.472, 20.888]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_hc_emissions():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([29.46, 29.60, 29.58, 29.44, 29.13, 28.70, 28.19, 27.55, 26.84, 26.11]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftInFlightHCEmissions(
+            number_of_points=NB_POINTS_TEST, turboshaft_id="turboshaft_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("HC_emissions", units="g") == pytest.approx(
+        np.array([14.73, 14.8, 14.79, 14.72, 14.565, 14.35, 14.095, 13.775, 13.42, 13.055]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_nox_emissions():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([29.46, 29.60, 29.58, 29.44, 29.13, 28.70, 28.19, 27.55, 26.84, 26.11]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftInFlightNOxEmissions(
+            number_of_points=NB_POINTS_TEST, turboshaft_id="turboshaft_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("NOx_emissions", units="g") == pytest.approx(
+        np.array(
+            [335.844, 337.44, 337.212, 335.616, 332.082, 327.18, 321.366, 314.07, 305.976, 297.654]
+        ),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_emissions_sum():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "CO2_emissions",
+        units="kg",
+        val=np.array([92.9, 93.3, 93.3, 92.8, 91.9, 90.5, 88.9, 86.9, 84.6, 82.3]),
+    )
+    ivc.add_output(
+        "CO_emissions",
+        units="g",
+        val=np.array([147.3, 148.0, 147.9, 147.2, 145.65, 143.5, 140.95, 137.75, 134.2, 130.55]),
+    )
+    ivc.add_output(
+        "NOx_emissions",
+        units="g",
+        val=np.array(
+            [335.844, 337.44, 337.212, 335.616, 332.082, 327.18, 321.366, 314.07, 305.976, 297.654]
+        ),
+    )
+    ivc.add_output(
+        "SOx_emissions",
+        units="g",
+        val=np.array([23.568, 23.68, 23.664, 23.552, 23.304, 22.96, 22.552, 22.04, 21.472, 20.888]),
+    )
+    ivc.add_output(
+        "H2O_emissions",
+        units="kg",
+        val=np.array([36.4, 36.6, 36.5, 36.4, 36.0, 35.5, 34.8, 34.0, 33.2, 32.2]),
+    )
+    ivc.add_output(
+        "HC_emissions",
+        units="g",
+        val=np.array([14.73, 14.8, 14.79, 14.72, 14.565, 14.35, 14.095, 13.775, 13.42, 13.055]),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftInFlightEmissionsSum(
+            turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO2", units="kg"
+    ) == pytest.approx(897.4, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO", units="kg"
+    ) == pytest.approx(1.423, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:NOx", units="kg"
+    ) == pytest.approx(3.244, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:SOx", units="g"
+    ) == pytest.approx(227.68, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:H2O", units="kg"
+    ) == pytest.approx(351.6, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:HC", units="g"
+    ) == pytest.approx(142.3, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_emissions():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([29.46, 29.60, 29.58, 29.44, 29.13, 28.70, 28.19, 27.55, 26.84, 26.11]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftInFlightEmissions(
+            turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO2", units="kg"
+    ) == pytest.approx(897.4, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO", units="kg"
+    ) == pytest.approx(1.423, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:NOx", units="kg"
+    ) == pytest.approx(3.244, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:SOx", units="g"
+    ) == pytest.approx(227.68, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:H2O", units="kg"
+    ) == pytest.approx(351.6, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:HC", units="g"
+    ) == pytest.approx(142.3, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
