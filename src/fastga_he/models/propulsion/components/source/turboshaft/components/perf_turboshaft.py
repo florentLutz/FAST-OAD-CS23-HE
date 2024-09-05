@@ -18,6 +18,8 @@ from .perf_max_power_opr_limit import PerformancesMaxPowerOPRLimit
 from .perf_equivalent_rated_power_opr_limit import PerformancesEquivalentRatedPowerOPRLimit
 from .perf_maximum import PerformancesMaximum
 
+from .perf_inflight_emissions import PerformancesTurboshaftInFlightEmissions
+
 
 class PerformancesTurboshaft(om.Group):
     def initialize(self):
@@ -111,6 +113,15 @@ class PerformancesTurboshaft(om.Group):
             ),
             promotes=["*"],
         )
+
+        self.add_subsystem(
+            name="emissions",
+            subsys=PerformancesTurboshaftInFlightEmissions(
+                number_of_points=number_of_points, turboshaft_id=turboshaft_id
+            ),
+            promotes=["*"],
+        )
+
         self.add_subsystem(
             name="maximum",
             subsys=PerformancesMaximum(

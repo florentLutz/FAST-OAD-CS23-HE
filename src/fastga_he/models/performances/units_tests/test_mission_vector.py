@@ -2289,6 +2289,10 @@ def test_mission_vector_turboshaft():
     assert sizing_fuel == pytest.approx(87.76, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
+    co2_emissions_ice = problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO2", units="kg"
+    )
+    assert co2_emissions_ice == pytest.approx(276.91, abs=1e-2)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
