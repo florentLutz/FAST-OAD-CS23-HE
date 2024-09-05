@@ -13,6 +13,7 @@ from ..components.perf_shaft_power_in import PerformancesShaftPowerIn
 from ..components.perf_active_power import PerformancesActivePower
 from ..components.perf_apparent_power import PerformancesApparentPower
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
+from ..components.perf_inflight_emissions import PerformancesTurboGeneratorInFlightEmissions
 from ..components.perf_maximum import PerformancesMaximum
 
 
@@ -88,6 +89,13 @@ class PerformancesTurboGenerator(om.Group):
         self.add_subsystem(
             name="voltage_peak",
             subsys=PerformancesVoltagePeak(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="emissions",
+            subsys=PerformancesTurboGeneratorInFlightEmissions(
+                number_of_points=number_of_points, turbo_generator_id=turbo_generator_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
