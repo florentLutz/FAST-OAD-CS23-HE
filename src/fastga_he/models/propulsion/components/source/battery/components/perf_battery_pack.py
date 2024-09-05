@@ -26,6 +26,7 @@ from ..components.perf_battery_power import PerformancesBatteryPower
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
+from ..components.perf_inflight_emissions import PerformancesBatteryPackInFlightEmissions
 
 
 class PerformancesBatteryPack(om.Group):
@@ -184,6 +185,13 @@ class PerformancesBatteryPack(om.Group):
         self.add_subsystem(
             "fuel_consumed",
             fuel_consumed,
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="emissions",
+            subsys=PerformancesBatteryPackInFlightEmissions(
+                number_of_points=number_of_points, battery_pack_id=battery_pack_id
+            ),
             promotes=["*"],
         )
 
