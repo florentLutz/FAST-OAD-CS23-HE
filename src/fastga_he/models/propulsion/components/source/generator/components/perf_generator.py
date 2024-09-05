@@ -15,6 +15,7 @@ from ..components.perf_active_power import PerformancesActivePower
 from ..components.perf_apparent_power import PerformancesApparentPower
 from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
+from ..components.perf_inflight_emissions import PerformancesGeneratorInFlightEmissions
 from ..components.perf_maximum import PerformancesMaximum
 
 
@@ -97,6 +98,13 @@ class PerformancesGenerator(om.Group):
         self.add_subsystem(
             name="voltage_peak",
             subsys=PerformancesVoltagePeak(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="emissions",
+            subsys=PerformancesGeneratorInFlightEmissions(
+                number_of_points=number_of_points, generator_id=generator_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
