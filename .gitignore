@@ -73,3 +73,5 @@ venv*/
 # Private files and workdir
 **/private/**
 **/workdir/**
+
+**/.env
