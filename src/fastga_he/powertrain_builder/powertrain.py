@@ -9,11 +9,13 @@ power train module with the aircraft sizing modules from FAST-OAD-GA based on th
 import copy
 import json
 import logging
+import sys
 import os.path as pth
+import pathlib
 
 from abc import ABC
 from importlib.resources import open_text
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 import re
 
@@ -30,6 +32,8 @@ from .exceptions import (
     FASTGAHEIncoherentVoltage,
     FASTGAHEImpossiblePair,
 )
+
+import fastga_he.models.propulsion.components as he_comp
 
 from . import resources
 
@@ -2190,6 +2194,48 @@ class FASTGAHEPowerTrainConfigurator:
                     all_current_dict[variable_name] = current
 
         return all_current_dict
+
+    def get_lca_production_element_list(self) -> Dict:
+        variables_names_mass = self.get_mass_element_lists()
+
+        # one possible way to get the path to the template LCA modules is to trace them back to
+        # one class we know is ner them such as the Sizing, Performances, ... The downside is
+        # that it will only work for package located with the component in the default delivery,
+        # so it won't work like fast-oad plugins. But for now it works
+
+        clean_dict = {}
+
+        for component_name, component_om_type, variable_name_mass in zip(
+            self._components_name, self._components_om_type, variables_names_mass
+        ):
+            sizing_group = he_comp.__dict__["Sizing" + component_om_type]
+            path_to_sizing_file = pathlib.Path(sys.modules[sizing_group.__module__].__file__)
+
+            # The sizing class is defined inside components/sizing...py and the lca template is in
+            # components/lca_resources/lca_conf.yml so:
+
+            path_to_lca_prod_conf_template = (
+                path_to_sizing_file.parents[0] / "lca_resources/lca_conf_prod.yml"
+            )
+
+            if pth.exists(path_to_lca_prod_conf_template):
+                # Now we open the file, convert each line to an element of a list and replace the
+                # anchors by whatever is required
+                clean_lines = []
+                with open(path_to_lca_prod_conf_template, "r") as template_file:
+                    for line in template_file.readlines():
+                        clean_lines.append(
+                            line.replace("ANCHOR_COMPONENT_NAME", component_name)
+                            .replace("ANCHOR_COMPONENT_MASS", variable_name_mass.replace(":", "__"))
+                            .replace(
+                                "ANCHOR_COMPONENT_MASS",
+                                variable_name_mass.replace("mass", "length").replace(":", "__"),
+                            )
+                        )
+
+                clean_dict[component_name] = clean_lines
+
+        return clean_dict
 
 
 class _YAMLSerializer(ABC):

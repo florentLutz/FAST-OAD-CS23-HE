@@ -1,4 +1,5 @@
 <FASTOAD_model>
+  <dummy_input units="kg">5.0</dummy_input>
   <data>
     <TLAR>
       <range units="NM">1140.0</range>
