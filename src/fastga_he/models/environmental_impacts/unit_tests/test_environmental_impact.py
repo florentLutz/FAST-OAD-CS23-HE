@@ -2,13 +2,16 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import pathlib
 import pytest
 
 from ..simple_energy_impact import SimpleEnergyImpacts
+from ..lca_without_fuel_burn import LCAWithoutFuelBurn
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "data.xml"
+DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
 
 
 def test_impact_sizing_jet_fuel():
@@ -115,3 +118,16 @@ def test_impact_both():
     ) == pytest.approx(0.5344, abs=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_lca_without_fuel_burn():
+    inputs_list = ["dummy_input"]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAWithoutFuelBurn(power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml"), ivc
+    )
+
+    assert problem.get_val("dummy_output") == pytest.approx(10.0, abs=1e-2)

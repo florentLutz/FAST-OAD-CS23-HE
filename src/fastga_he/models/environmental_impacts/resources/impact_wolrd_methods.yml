@@ -1,0 +1,6 @@
+methods:
+    - "('IMPACT World+ v2.0.1, footprint version', 'climate change', 'carbon footprint')"
+    - "('IMPACT World+ v2.0.1, footprint version', 'ecosystem quality', 'remaining ecosystem quality damage')"
+    - "('IMPACT World+ v2.0.1, footprint version', 'energy resources: non-renewable', 'fossil and nuclear energy use')"
+    - "('IMPACT World+ v2.0.1, footprint version', 'human health', 'remaining human health damage')"
+    - "('IMPACT World+ v2.0.1, footprint version', 'water use', 'water scarcity footprint')"

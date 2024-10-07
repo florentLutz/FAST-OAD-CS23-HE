@@ -50,6 +50,7 @@ kaleido = "0.2.1"
 click = "8.0.4"
 debugpy = "1.5.0"
 lcav = {git = "https://github.com/felixpollet/LCAv.git"}
+eight = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pyvplm = { git = "https://github.com/florentLutz/pyvplm.git", branch = "master" }
