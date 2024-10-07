@@ -28,7 +28,7 @@ model:
 
         harness_1:
             name: 'cable production, three-conductor cable'
-            amount: ANCHOR_COMPONENT_LENGTH
+            amount: data__propulsion__he_power_train__DC_cable_harness__harness_1__length
 
         dc_splitter_1:
             name: 'market for copper-rich materials'
@@ -40,6 +40,7 @@ model:
 
         battery_pack_1:
             name: 'battery production, Li-ion, NMC111, rechargeable, prismatic'
+            loc: 'RoW'
             amount: data__propulsion__he_power_train__battery_pack__battery_pack_1__mass
 
         dc_sspc_2:
@@ -48,6 +49,7 @@ model:
 
         battery_pack_2:
             name: 'battery production, Li-ion, NMC111, rechargeable, prismatic'
+            loc: 'RoW'
             amount: data__propulsion__he_power_train__battery_pack__battery_pack_2__mass
 
 

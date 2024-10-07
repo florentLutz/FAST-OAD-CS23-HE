@@ -33,8 +33,6 @@ from .exceptions import (
     FASTGAHEImpossiblePair,
 )
 
-import fastga_he.models.propulsion.components as he_comp
-
 from . import resources
 
 _LOGGER = logging.getLogger(__name__)  # Logger for this module
@@ -2196,6 +2194,9 @@ class FASTGAHEPowerTrainConfigurator:
         return all_current_dict
 
     def get_lca_production_element_list(self) -> Dict:
+        # I hate doing that here, but it prevents a circular import
+        import fastga_he.models.propulsion.components as he_comp
+
         variables_names_mass = self.get_mass_element_lists()
 
         # one possible way to get the path to the template LCA modules is to trace them back to
@@ -2228,7 +2229,7 @@ class FASTGAHEPowerTrainConfigurator:
                             line.replace("ANCHOR_COMPONENT_NAME", component_name)
                             .replace("ANCHOR_COMPONENT_MASS", variable_name_mass.replace(":", "__"))
                             .replace(
-                                "ANCHOR_COMPONENT_MASS",
+                                "ANCHOR_COMPONENT_LENGTH",
                                 variable_name_mass.replace("mass", "length").replace(":", "__"),
                             )
                         )

@@ -1,3 +1,4 @@
 ANCHOR_COMPONENT_NAME:
     name: 'battery production, Li-ion, NMC111, rechargeable, prismatic'
+    loc: 'RoW'
     amount: ANCHOR_COMPONENT_MASS

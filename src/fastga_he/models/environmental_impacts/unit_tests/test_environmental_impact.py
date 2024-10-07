@@ -6,7 +6,7 @@ import pathlib
 import pytest
 
 from ..simple_energy_impact import SimpleEnergyImpacts
-from ..lca_without_fuel_burn import LCAWithoutFuelBurn
+from ..lca_core import LCACore
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -121,13 +121,15 @@ def test_impact_both():
 
 
 def test_lca_without_fuel_burn():
-    inputs_list = ["dummy_input"]
-
-    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+    ivc = get_indep_var_comp(
+        list_inputs(LCACore(power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml")),
+        __file__,
+        XML_FILE,
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCAWithoutFuelBurn(power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml"), ivc
+        LCACore(power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml"), ivc
     )
 
     assert problem.get_val("dummy_output") == pytest.approx(10.0, abs=1e-2)
