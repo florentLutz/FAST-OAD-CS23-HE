@@ -4,7 +4,7 @@
 
 # This test file does not test the validity of the formulas used for the performances, rather it
 # check that the Performances components outputs what is expect of them i.e: sources must output
-# fuel_consumed_t, energy_consumed_t, propulsive load must output power rate, , propulsor must
+# fuel_consumed_t, energy_consumed_t, propulsive load must output power rate, propulsor must
 # have thrust as an input, ...
 
 from fastoad.openmdao.problem import AutoUnitsDefaultGroup
@@ -12,32 +12,7 @@ from fastoad.openmdao.problem import AutoUnitsDefaultGroup
 from fastga_he.powertrain_builder import resources
 
 from fastga_he.models.propulsion.assemblers import performances_from_pt_file
-
-# noinspection PyUnresolvedReferences
-# pylint: disable=unused-import
-# flake8: noqa
-from fastga_he.models.propulsion.components import (
-    PerformancesPropeller,
-    PerformancesPMSM,
-    PerformancesInverter,
-    PerformancesDCBus,
-    PerformancesHarness,
-    PerformancesDCDCConverter,
-    PerformancesBatteryPack,
-    PerformancesDCSSPC,
-    PerformancesDCSplitter,
-    PerformancesRectifier,
-    PerformancesGenerator,
-    PerformancesICE,
-    PerformancesFuelTank,
-    PerformancesFuelSystem,
-    PerformancesTurboshaft,
-    PerformancesSpeedReducer,
-    PerformancesPlanetaryGear,
-    PerformancesTurboGenerator,
-    PerformancesGearbox,
-    PerformancesDCAuxLoad,
-)
+import fastga_he.models.propulsion.components as he_comp
 
 from tests.testing_utilities import VariableListLocal
 
@@ -48,14 +23,12 @@ def test_all_performances_components_exist():
     # Component existing mean that they are import in the right place (the __init__ of the
     # components folder) and that it can be created
 
-    module = __import__("fastga_he.models.propulsion.components", fromlist=[""])
-
     for component_om_name in resources.DICTIONARY_CN:
         performances_group_name = "Performances" + resources.DICTIONARY_CN[component_om_name]
 
         try:
-            klass = getattr(module, performances_group_name)
-            assert klass
+            class_to_test = he_comp.__dict__[performances_group_name]()
+            assert class_to_test
 
         except AttributeError:
             assert False
@@ -89,8 +62,7 @@ def test_all_components_output_required_value():
         performances_group_id = resources.DICTIONARY_CN_ID[component_om_name]
         component_type = resources.DICTIONARY_CTC[component_om_name]
 
-        klass = globals()[performances_group_name]
-        component = klass()
+        component = he_comp.__dict__[performances_group_name]()
         # Need a unique string for the rest of the test
         component.options[performances_group_id] = UNIQUE_STRING
 

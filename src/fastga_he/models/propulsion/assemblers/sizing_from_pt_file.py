@@ -8,32 +8,7 @@ import fastoad.api as oad
 from fastoad.module_management.constants import ModelDomain
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
-
-# noinspection PyUnresolvedReferences
-# pylint: disable=unused-import
-# flake8: noqa
-from fastga_he.models.propulsion.components import (
-    SizingPropeller,
-    SizingPMSM,
-    SizingInverter,
-    SizingDCBus,
-    SizingHarness,
-    SizingDCDCConverter,
-    SizingBatteryPack,
-    SizingDCSSPC,
-    SizingDCSplitter,
-    SizingRectifier,
-    SizingGenerator,
-    SizingICE,
-    SizingFuelTank,
-    SizingFuelSystem,
-    SizingTurboshaft,
-    SizingSpeedReducer,
-    SizingPlanetaryGear,
-    SizingTurboGenerator,
-    SizingGearbox,
-    SizingDCAuxLoad,
-)
+import fastga_he.models.propulsion.components as he_comp
 
 from .constants import (
     SUBMODEL_POWER_TRAIN_MASS,
@@ -85,8 +60,7 @@ class PowerTrainSizingFromFile(om.Group):
             components_om_type,
             components_position,
         ):
-            klass = globals()["Sizing" + component_om_type]
-            local_sub_sys = klass()
+            local_sub_sys = he_comp.__dict__["Sizing" + component_om_type]()
             local_sub_sys.options[component_name_id] = component_name
             if component_position:
                 local_sub_sys.options["position"] = component_position

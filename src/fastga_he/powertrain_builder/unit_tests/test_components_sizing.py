@@ -10,32 +10,7 @@ from fastoad.openmdao.problem import AutoUnitsDefaultGroup
 from fastga_he.powertrain_builder import resources
 
 from fastga_he.models.propulsion.assemblers import sizing_from_pt_file
-
-# noinspection PyUnresolvedReferences
-# pylint: disable=unused-import
-# flake8: noqa
-from fastga_he.models.propulsion.components import (
-    SizingPropeller,
-    SizingPMSM,
-    SizingInverter,
-    SizingDCBus,
-    SizingHarness,
-    SizingDCDCConverter,
-    SizingBatteryPack,
-    SizingDCSSPC,
-    SizingDCSplitter,
-    SizingRectifier,
-    SizingGenerator,
-    SizingICE,
-    SizingFuelTank,
-    SizingFuelSystem,
-    SizingTurboshaft,
-    SizingSpeedReducer,
-    SizingPlanetaryGear,
-    SizingTurboGenerator,
-    SizingGearbox,
-    SizingDCAuxLoad,
-)
+import fastga_he.models.propulsion.components as he_comp
 
 from tests.testing_utilities import VariableListLocal
 
@@ -46,14 +21,12 @@ def test_all_sizing_components_exist():
     # Component existing mean that they are import in the right place (the __init__ of the
     # components folder) and that it can be created
 
-    module = __import__("fastga_he.models.propulsion.components", fromlist=[""])
-
     for component_om_name in resources.DICTIONARY_CN:
         sizing_group_name = "Sizing" + resources.DICTIONARY_CN[component_om_name]
 
         try:
-            klass = getattr(module, sizing_group_name)
-            assert klass
+            class_to_test = he_comp.__dict__[sizing_group_name]()
+            assert class_to_test
 
         except AttributeError:
             assert False
@@ -67,8 +40,7 @@ def test_all_components_output_required_value():
         sizing_group_name = "Sizing" + resources.DICTIONARY_CN[component_om_name]
         sizing_group_id = resources.DICTIONARY_CN_ID[component_om_name]
 
-        klass = globals()[sizing_group_name]
-        component = klass()
+        component = he_comp.__dict__[sizing_group_name]()
         # Need a unique string for the rest of the test
         component.options[sizing_group_id] = UNIQUE_STRING
 

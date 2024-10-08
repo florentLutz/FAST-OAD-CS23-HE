@@ -20,23 +20,23 @@
             <voltage_max units="V" is_input="False">886.330640018523<!--Maximum voltage at the terminals SSPC--></voltage_max>
           </dc_sspc_2>
           <dc_sspc_3>
-            <current_max units="A" is_input="False">250.10535270790388<!--Maximum current flowing through the SSPC--></current_max>
+            <current_max units="A" is_input="False">250.1053527079039<!--Maximum current flowing through the SSPC--></current_max>
             <efficiency is_input="True">0.99<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
             <voltage_max units="V" is_input="False">895.2834747661849<!--Maximum voltage at the terminals SSPC--></voltage_max>
           </dc_sspc_3>
           <dc_sspc_412>
-            <current_max units="A" is_input="False">250.10535270790388<!--Maximum current flowing through the SSPC--></current_max>
+            <current_max units="A" is_input="False">250.1053527079039<!--Maximum current flowing through the SSPC--></current_max>
             <efficiency is_input="True">0.99<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
             <voltage_max units="V" is_input="False">867.9598957271303<!--Maximum voltage at the terminals SSPC--></voltage_max>
           </dc_sspc_412>
         </DC_SSPC>
         <DC_bus>
           <dc_bus_1>
-            <current_max units="A" is_input="False">250.10535270790388</current_max>
+            <current_max units="A" is_input="False">250.1053527079039</current_max>
             <voltage_max units="V" is_input="False">867.9598957271303</voltage_max>
           </dc_bus_1>
           <dc_bus_2>
-            <current_max units="A" is_input="False">250.10535270790388</current_max>
+            <current_max units="A" is_input="False">250.1053527079039</current_max>
             <voltage_max units="V" is_input="False">886.330640018523</voltage_max>
           </dc_bus_2>
         </DC_bus>
@@ -75,7 +75,7 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <SOC_min units="percent" is_input="False">56.52722336464178<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <SOC_min units="percent" is_input="False">56.527223364641756<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">0.3732915712058267<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <number_modules is_input="True">200.0<!--Number of modules in parallel inside the battery pack--></number_modules>
@@ -83,7 +83,7 @@
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
               <losses_max units="W" is_input="False">0.07488062496650646<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <voltage_max units="V" is_input="False">4.069470339846296<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">3.682195080492352<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <voltage_min units="V" is_input="False">3.6821950804923516<!--Minimum voltage provided by the cells during the mission--></voltage_min>
             </cell>
             <module>
               <number_cells is_input="True">220.0<!--Number of cells in series inside one battery module--></number_cells>
@@ -93,7 +93,7 @@
         <inverter>
           <inverter_1>
             <current_ac_max units="A" is_input="False">186.98174220313672<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
-            <current_dc_max units="A" is_input="False">250.10535270790388<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <current_dc_max units="A" is_input="False">250.1053527079039<!--Maximum value of the current at the input of the inverter--></current_dc_max>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <losses_max units="W" is_input="False">5045.449465761653</losses_max>
             <modulation_idx_max is_input="False">0.5318978731969624<!--Maximum modulation index during the mission--></modulation_idx_max>
@@ -160,5 +160,21 @@
         </propeller>
       </he_power_train>
     </propulsion>
+    <LCA>
+      <operation>
+        <he_power_train>
+          <battery_pack>
+            <battery_pack_1>
+              <CO units="g" is_input="False">0.0</CO>
+              <CO2 units="g" is_input="False">0.0</CO2>
+              <H2O units="g" is_input="False">0.0</H2O>
+              <HC units="g" is_input="False">0.0</HC>
+              <NOx units="g" is_input="False">0.0</NOx>
+              <SOx units="g" is_input="False">0.0</SOx>
+            </battery_pack_1>
+          </battery_pack>
+        </he_power_train>
+      </operation>
+    </LCA>
   </data>
 </FASTOAD_model>

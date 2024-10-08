@@ -10,32 +10,7 @@ from fastoad.openmdao.problem import AutoUnitsDefaultGroup
 from fastga_he.powertrain_builder import resources
 
 from fastga_he.models.propulsion.assemblers import delta_from_pt_file
-
-# noinspection PyUnresolvedReferences
-# pylint: disable=unused-import
-# flake8: noqa
-from fastga_he.models.propulsion.components import (
-    SlipstreamPropeller,
-    SlipstreamPMSM,
-    SlipstreamInverter,
-    SlipstreamDCBus,
-    SlipstreamHarness,
-    SlipstreamDCDCConverter,
-    SlipstreamBatteryPack,
-    SlipstreamDCSSPC,
-    SlipstreamDCSplitter,
-    SlipstreamRectifier,
-    SlipstreamGenerator,
-    SlipstreamICE,
-    SlipstreamFuelTank,
-    SlipstreamFuelSystem,
-    SlipstreamTurboshaft,
-    SlipstreamSpeedReducer,
-    SlipstreamPlanetaryGear,
-    SlipstreamTurboGenerator,
-    SlipstreamGearbox,
-    SlipstreamDCAuxLoad,
-)
+import fastga_he.models.propulsion.components as he_comp
 
 from tests.testing_utilities import VariableListLocal
 
@@ -46,14 +21,12 @@ def test_all_slipstream_components_exist():
     # Component existing mean that they are imported in the right place (the __init__ of the
     # components folder) and that it can be created
 
-    module = __import__("fastga_he.models.propulsion.components", fromlist=[""])
-
     for component_om_name in resources.DICTIONARY_CN:
         slipstream_group_name = "Slipstream" + resources.DICTIONARY_CN[component_om_name]
 
         try:
-            klass = getattr(module, slipstream_group_name)
-            assert klass
+            class_to_test = he_comp.__dict__[slipstream_group_name]()
+            assert class_to_test
 
         except AttributeError:
             assert False
@@ -67,8 +40,7 @@ def test_all_components_output_required_value():
         slipstream_group_name = "Slipstream" + resources.DICTIONARY_CN[component_om_name]
         slipstream_group_id = resources.DICTIONARY_CN_ID[component_om_name]
 
-        klass = globals()[slipstream_group_name]
-        component = klass()
+        component = he_comp.__dict__[slipstream_group_name]()
         # Need a unique string for the rest of the test
         component.options[slipstream_group_id] = UNIQUE_STRING
 

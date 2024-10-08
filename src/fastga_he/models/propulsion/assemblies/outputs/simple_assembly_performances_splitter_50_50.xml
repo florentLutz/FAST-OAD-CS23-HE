@@ -104,6 +104,14 @@
             <power_max_SL units="W" is_input="False">107182.6641548735<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
             <shaft_power_max units="W" is_input="False">107182.6641548735<!--Maximum power seen during the mission, without accounting for altitude effect, only used for power rate--></shaft_power_max>
             <strokes_number is_input="True">4.0</strokes_number>
+            <emission_index>
+              <CO units="g/kg" is_input="True">798.0</CO>
+              <CO2 units="g/kg" is_input="True">3100.0</CO2>
+              <H2O units="g/kg" is_input="True">1237.0</H2O>
+              <HC units="g/kg" is_input="True">18.867</HC>
+              <NOx units="g/kg" is_input="True">3.14</NOx>
+              <SOx units="g/kg" is_input="True">0.42</SOx>
+            </emission_index>
           </ice_1>
         </ICE>
         <PMSM>
@@ -124,15 +132,15 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <SOC_min units="percent" is_input="False">33.20193551195521<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <SOC_min units="percent" is_input="False">33.2019355119552<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">0.5899685677404357<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <number_modules is_input="True">100.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">0.1963539590246384<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <losses_max units="W" is_input="False">0.19635395902463879<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <voltage_max units="V" is_input="False">4.045222446185835<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">3.430975632130525<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <voltage_min units="V" is_input="False">3.430975632130524<!--Minimum voltage provided by the cells during the mission--></voltage_min>
             </cell>
             <module>
               <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
@@ -148,7 +156,7 @@
         </fuel_system>
         <fuel_tank>
           <fuel_tank_1>
-            <fuel_consumed_mission units="kg" is_input="False">40.20921366244949<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
+            <fuel_consumed_mission units="kg" is_input="False">40.20921366244949<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
           </fuel_tank_1>
         </fuel_tank>
         <generator>
@@ -290,5 +298,41 @@
         </rectifier>
       </he_power_train>
     </propulsion>
+    <LCA>
+      <operation>
+        <he_power_train>
+          <ICE>
+            <ice_1>
+              <CO units="g" is_input="False">32086.95250263469</CO>
+              <CO2 units="g" is_input="False">124648.56235359341</CO2>
+              <H2O units="g" is_input="False">49738.79730045002</H2O>
+              <HC units="g" is_input="False">758.6272341694346</HC>
+              <NOx units="g" is_input="False">126.2569309000914</NOx>
+              <SOx units="g" is_input="False">16.887869738228787</SOx>
+            </ice_1>
+          </ICE>
+          <battery_pack>
+            <battery_pack_1>
+              <CO units="g" is_input="False">0.0</CO>
+              <CO2 units="g" is_input="False">0.0</CO2>
+              <H2O units="g" is_input="False">0.0</H2O>
+              <HC units="g" is_input="False">0.0</HC>
+              <NOx units="g" is_input="False">0.0</NOx>
+              <SOx units="g" is_input="False">0.0</SOx>
+            </battery_pack_1>
+          </battery_pack>
+          <generator>
+            <generator_1>
+              <CO units="g" is_input="False">0.0</CO>
+              <CO2 units="g" is_input="False">0.0</CO2>
+              <H2O units="g" is_input="False">0.0</H2O>
+              <HC units="g" is_input="False">0.0</HC>
+              <NOx units="g" is_input="False">0.0</NOx>
+              <SOx units="g" is_input="False">0.0</SOx>
+            </generator_1>
+          </generator>
+        </he_power_train>
+      </operation>
+    </LCA>
   </data>
 </FASTOAD_model>
