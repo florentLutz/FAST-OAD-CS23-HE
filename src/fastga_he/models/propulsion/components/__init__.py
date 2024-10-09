@@ -5,8 +5,8 @@
 # pylint: disable=unused-import
 # flake8: noqa
 
-from .connectors.dc_bus import SizingDCBus, PerformancesDCBus, SlipstreamDCBus
-from .connectors.dc_cable import SizingHarness, PerformancesHarness, SlipstreamHarness
+from .connectors.dc_bus import SizingDCBus, PerformancesDCBus, SlipstreamDCBus, PreLCADCBus
+from .connectors.dc_cable import SizingHarness, PerformancesHarness, SlipstreamHarness, PreLCAHarness
 from .connectors.dc_dc_converter import (
     SizingDCDCConverter,
     PerformancesDCDCConverter,

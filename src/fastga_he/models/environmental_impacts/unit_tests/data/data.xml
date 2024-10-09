@@ -7,6 +7,8 @@
       <v_approach units="knot" is_input="True">58.5<!--approach speed--></v_approach>
       <v_cruise units="knot" is_input="True">93.0<!--cruise speed--></v_cruise>
       <v_max_sl units="knot" is_input="True">110.0<!--maximum speed at sea level--></v_max_sl>
+      <aircraft_lifespan is_input="year">15.0<!--maximum speed at sea level--></aircraft_lifespan>
+      <flight_per_year>365.0<!--maximum speed at sea level--></flight_per_year>
     </TLAR>
     <geometry>
       <flap_type is_input="True">1.0<!--flap type (0.0 - plain flap, 2.0 - single slotted flap, 3.0 - split flap)--></flap_type>

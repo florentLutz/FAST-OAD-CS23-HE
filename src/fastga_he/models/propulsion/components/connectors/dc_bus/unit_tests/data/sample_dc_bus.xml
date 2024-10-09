@@ -30,6 +30,7 @@
                         <width units="cm">6.382</width>
                         <height units="cm">0.953</height>
                         <length units="cm">30.222</length>
+                        <mass units="kg">1.12</mass>
                         <cross_section>
                             <area units="cm**2">1.90</area>
                             <thickness units="cm">0.31</thickness>
@@ -45,5 +46,8 @@
                 </DC_bus>
             </he_power_train>
         </propulsion>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
     </data>
 </FASTOAD_model>

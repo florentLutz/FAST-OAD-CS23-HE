@@ -38,6 +38,7 @@ from ..components.perf_resistance_no_loop import PerformancesResistanceNoLoop
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
 from ..components.cstr_ensure import ConstraintsCurrentEnsure, ConstraintsVoltageEnsure
+from ..components.pre_lca_prod_length_per_fu import PreLCAHarnessProdLengthPerFU
 
 from ..components.perf_harness import PerformancesHarness
 from ..components.sizing_harness import SizingHarness
@@ -920,3 +921,22 @@ def test_sizing_cable():
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:cable:radius",
         units="mm",
     ) == pytest.approx(21.848, rel=1e-2)
+
+
+def test_length_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:length",
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:number_cables",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCAHarnessProdLengthPerFU(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:length_per_fu", units="m"
+    ) == pytest.approx(7e-6, rel=1e-3)
+
+    problem.check_partials(compact_print=True)

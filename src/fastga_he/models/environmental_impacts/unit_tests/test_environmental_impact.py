@@ -7,6 +7,7 @@ import pytest
 
 from ..simple_energy_impact import SimpleEnergyImpacts
 from ..lca_core import LCACore
+from ..lca_aircraft_per_fu import LCAAircraftPerFU
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -163,6 +164,33 @@ def test_lca_without_fuel_burn():
         + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_1")
         + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_2"),
         abs=1e-4,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_aircraft_per_fu_pax_km():
+    inputs_list = [
+        "data:TLAR:aircraft_lifespan",
+        "data:TLAR:flight_per_year",
+        "data:TLAR:range",
+        "data:weight:aircraft:payload",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAAircraftPerFU(),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
+        1.70306211e-06, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
