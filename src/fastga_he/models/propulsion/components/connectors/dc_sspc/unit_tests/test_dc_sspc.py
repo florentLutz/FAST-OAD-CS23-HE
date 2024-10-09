@@ -25,6 +25,8 @@ from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVolt
 from ..components.sizing_dc_sspc import SizingDCSSPC
 from ..components.perf_dc_sspc import PerformancesDCSSPC
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCADCSSPCProdWeightPerFU
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 from ..constants import POSSIBLE_POSITION
@@ -390,5 +392,23 @@ def test_performances():
 
     expected_efficiency = np.full(NB_POINTS_TEST, 0.98)
     assert problem.get_val("efficiency") == pytest.approx(expected_efficiency, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCADCSSPCProdWeightPerFU(dc_sspc_id="dc_sspc_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass_per_fu", units="kg"
+    ) == pytest.approx(8e-6, rel=1e-3)
 
     problem.check_partials(compact_print=True)

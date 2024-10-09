@@ -6,15 +6,30 @@
 # flake8: noqa
 
 from .connectors.dc_bus import SizingDCBus, PerformancesDCBus, SlipstreamDCBus, PreLCADCBus
-from .connectors.dc_cable import SizingHarness, PerformancesHarness, SlipstreamHarness, PreLCAHarness
+from .connectors.dc_cable import (
+    SizingHarness,
+    PerformancesHarness,
+    SlipstreamHarness,
+    PreLCAHarness,
+)
 from .connectors.dc_dc_converter import (
     SizingDCDCConverter,
     PerformancesDCDCConverter,
     SlipstreamDCDCConverter,
 )
-from .connectors.inverter import SizingInverter, PerformancesInverter, SlipstreamInverter
-from .connectors.dc_sspc import SizingDCSSPC, PerformancesDCSSPC, SlipstreamDCSSPC
-from .connectors.dc_splitter import SizingDCSplitter, PerformancesDCSplitter, SlipstreamDCSplitter
+from .connectors.inverter import (
+    SizingInverter,
+    PerformancesInverter,
+    SlipstreamInverter,
+    PreLCAInverter,
+)
+from .connectors.dc_sspc import SizingDCSSPC, PerformancesDCSSPC, SlipstreamDCSSPC, PreLCADCSSPC
+from .connectors.dc_splitter import (
+    SizingDCSplitter,
+    PerformancesDCSplitter,
+    SlipstreamDCSplitter,
+    PreLCADCSplitter,
+)
 from .connectors.rectifier import SizingRectifier, PerformancesRectifier, SlipstreamRectifier
 from .connectors.fuel_system import SizingFuelSystem, PerformancesFuelSystem, SlipstreamFuelSystem
 from .connectors.speed_reducer import (

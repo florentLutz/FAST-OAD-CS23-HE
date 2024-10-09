@@ -26,6 +26,8 @@ from ..components.cstr_ensure import ConstraintsCurrentEnsure, ConstraintsVoltag
 
 from ..components.sizing_dc_splitter import SizingDCSplitter
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCADCSplitterProdWeightPerFU
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 from ..constants import POSSIBLE_POSITION
@@ -446,5 +448,23 @@ def test_sizing_dc_splitter():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:cruise:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCADCSplitterProdWeightPerFU(dc_splitter_id="dc_splitter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_splitter:dc_splitter_1:mass_per_fu", units="kg"
+    ) == pytest.approx(5e-7, rel=1e-3)
 
     problem.check_partials(compact_print=True)

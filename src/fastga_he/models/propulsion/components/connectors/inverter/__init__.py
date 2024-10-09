@@ -8,3 +8,4 @@
 from .components.sizing_inverter import SizingInverter
 from .components.perf_inverter import PerformancesInverter
 from .components.slipstream_inverter import SlipstreamInverter
+from .components.pre_lca_inverter import PreLCAInverter

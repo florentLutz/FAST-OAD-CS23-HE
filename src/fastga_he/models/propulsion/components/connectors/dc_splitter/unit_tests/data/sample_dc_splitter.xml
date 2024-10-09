@@ -27,7 +27,7 @@
                         <current_caliber units="A">499.0</current_caliber>
                         <voltage_max units="V">635.0</voltage_max>
                         <voltage_caliber units="V">672.01</voltage_caliber>
-                        <weight units="kg">0.0</weight>
+                        <mass units="kg">0.5</mass>
                         <height units="cm">0.787</height>
                         <length units="cm">50.556</length>
                         <width units="cm">4.716</width>
@@ -47,5 +47,8 @@
                 </DC_splitter>
             </he_power_train>
         </propulsion>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
     </data>
 </FASTOAD_model>
