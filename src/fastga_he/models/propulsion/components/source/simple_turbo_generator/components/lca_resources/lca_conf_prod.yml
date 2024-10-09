@@ -1,3 +1,7 @@
 ANCHOR_COMPONENT_NAME:
+    custom_attributes:
+        - attribute: "component"
+          value: ANCHOR_COMPONENT_NAME
+
     name: 'electric motor production, vehicle (electric powertrain)'
     amount: ANCHOR_COMPONENT_MASS

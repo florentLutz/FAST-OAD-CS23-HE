@@ -5,7 +5,7 @@
 import pathlib
 import dotenv
 
-from typing import Dict
+from typing import Dict, List
 
 import yaml
 
@@ -13,9 +13,12 @@ import pandas as pd
 import numpy as np
 import sympy as sym
 
+import re
+
 import openmdao.api as om
 
 import lca_algebraic as agb
+import brightway2 as bw
 from lcav.io.configuration import LCAProblemConfigurator
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
@@ -28,6 +31,7 @@ METHODS_TO_FILE = {
     "ReCiPe 2016 v1.03": "recipe_methods.yml",
 }
 NAME_TO_UNIT = {"mass": "kg", "length": "m"}
+LCA_PREFIX = "data:environmental_impact:"
 
 
 class LCACore(om.ExplicitComponent):
@@ -38,8 +42,9 @@ class LCACore(om.ExplicitComponent):
         self.methods = None
         self.axis = None
         self.axis_keys = None
-        self.lambdas = None
-        self.partial_lambdas_dict = None
+        self.axis_keys_dict = None
+        self.lambdas_dict = None
+        self.partial_lambdas_dict_dict = None
         self.parameters = None
         self.params_dict = {}
 
@@ -56,10 +61,11 @@ class LCACore(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
-            name="axis",
-            default="phase",
-            desc="?",
-            values=["phase"],
+            name="component_level_breakdown",
+            default=False,
+            types=bool,
+            desc="If true in addition to a breakdown, phase by phase, adds a breakdown component "
+            "by component",
         )
         self.options.declare(
             name="impact_assessment_method",
@@ -78,24 +84,28 @@ class LCACore(om.ExplicitComponent):
         self.configurator.load(self.options["power_train_file_path"])
         lca_conf_file_path = self.write_lca_conf_file()
 
-        self.add_output("dummy_output", val=0.0, units="kg")
-
-        self.axis = self.options["axis"]
+        self.axis = ["phase"]
+        if self.options["component_level_breakdown"]:
+            self.axis.append("component")
 
         _, self.model, self.methods = LCAProblemConfigurator(lca_conf_file_path).generate(
             reset=False
         )
 
         # noinspection PyProtectedMember
-        self.lambdas = agb.lca._preMultiLCAAlgebric(self.model, self.methods, axis=self.axis)
+        self.lambdas_dict = {
+            axis: agb.lca._preMultiLCAAlgebric(self.model, self.methods, axis=axis)
+            for axis in self.axis
+        }
 
         # Compile expressions for partial derivatives of impacts w.r.t. parameters
-        self.partial_lambdas_dict = _preMultiLCAAlgebricPartials(
-            self.model, self.methods, axis=self.options["axis"]
-        )
+        self.partial_lambdas_dict_dict = {
+            axis: _preMultiLCAAlgebricPartials(self.model, self.methods, axis=axis)
+            for axis in self.axis
+        }
 
         # Get axis keys to ventilate results by e.g. life-cycle phase
-        self.axis_keys = self.lambdas[0].axis_keys
+        self.axis_keys_dict = {axis: self.lambdas_dict[axis][0].axis_keys for axis in self.axis}
 
         # Retrieve LCA parameters declared in model, required to do it after loading the
         # configuration
@@ -110,6 +120,49 @@ class LCACore(om.ExplicitComponent):
                     parameter_name, val=np.nan, units=NAME_TO_UNIT[parameter_name.split(":")[-1]]
                 )
 
+        for m in self.methods:
+            clean_method_name = re.sub(r": |/| ", "_", m[1])
+
+            # "Phase" is always inside the axis, so we can do that
+            for phase in self.axis_keys_dict["phase"]:
+                if phase != "_other_":
+                    # For each impact assessment method we give the impact by phase regardless of
+                    # the case
+                    self.add_output(
+                        LCA_PREFIX + clean_method_name + ":" + phase + ":sum",
+                        val=0.0,
+                        units=None,
+                        desc=bw.Method(m).metadata["unit"] + "for the whole " + phase + " phase",
+                    )
+
+            if "component" in self.axis:
+                # Components are tagged with the phase just in case, so we can do this. However,
+                # production seems like the only phase in which we can attribute impacts on the
+                # component themselves. So it is actually a bit dangerous to do it like this.
+                # Beware of only putting the "component" custom attribute only for production or for
+                # phase in which the impacts can be attributed to the component themselves.
+                for component_phase in self.axis_keys_dict["component"]:
+                    if component_phase != "_other_":
+                        # Now we give the value component by component
+                        clean_phase_name = component_phase.split("_")[-1]
+                        clean_component_name = "_".join(component_phase.split("_")[:-1])
+                        self.add_output(
+                            LCA_PREFIX
+                            + clean_method_name
+                            + ":"
+                            + clean_phase_name
+                            + ":"
+                            + clean_component_name,
+                            val=0.0,
+                            units=None,
+                            desc=bw.Method(m).metadata["unit"]
+                            + "for component "
+                            + clean_component_name
+                            + " in "
+                            + clean_phase_name
+                            + " phase",
+                        )
+
     def setup_partials(self):
         # TODO: Change that, if only to see how much faster it is to properly declare partials !
         self.declare_partials("*", "*", method="exact")
@@ -117,13 +170,44 @@ class LCACore(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         parameters = {name.replace(":", "__"): value[0] for name, value in inputs.items()}
 
-        res = self.compute_impacts_from_lambdas(**parameters)
-        print(res)
+        for axis_to_evaluate in self.axis:
+            res = self.compute_impacts_from_lambdas(
+                lambdas=self.lambdas_dict[axis_to_evaluate], axis=axis_to_evaluate, **parameters
+            )
 
-        outputs["dummy_output"] = 2.0 * 1.0
+            if axis_to_evaluate == "phase":
+                for m in res:  # for each LCIA method
+                    clean_method_name = re.sub(r": |/| ", "_", m.split(" - ")[0])
+
+                    for phase in self.axis_keys_dict["phase"]:
+                        if phase != "_other_":
+                            outputs[LCA_PREFIX + clean_method_name + ":" + phase + ":sum"] = res[m][
+                                phase
+                            ]
+
+            if axis_to_evaluate == "component":
+                for m in res:  # for each LCIA method
+                    clean_method_name = re.sub(r": |/| ", "_", m.split(" - ")[0])
+
+                    # Components are tagged with the phase just in case, so we can do this
+                    for component_phase in self.axis_keys_dict["component"]:
+                        if component_phase != "_other_":
+                            # Now we give the value component by component
+                            clean_phase_name = component_phase.split("_")[-1]
+                            clean_component_name = "_".join(component_phase.split("_")[:-1])
+                            outputs[
+                                LCA_PREFIX
+                                + clean_method_name
+                                + ":"
+                                + clean_phase_name
+                                + ":"
+                                + clean_component_name
+                            ] = res[m][component_phase]
 
     def compute_impacts_from_lambdas(
         self,
+        lambdas: List[agb.LambdaWithParamNames],
+        axis: str,
         **params: Dict[str, agb.SingleOrMultipleFloat],
     ):
         """
@@ -143,7 +227,7 @@ class LCACore(om.ExplicitComponent):
                     print("Param '%s' is marked as FIXED, but passed in parameters : ignored" % key)
 
             # noinspection PyProtectedMember
-            df = agb.lca._postMultiLCAAlgebric(self.methods, self.lambdas, **params)
+            df = agb.lca._postMultiLCAAlgebric(self.methods, lambdas, **params)
 
             # noinspection PyProtectedMember
             model_name = agb.base_utils._actName(self.model)
@@ -154,10 +238,10 @@ class LCACore(om.ExplicitComponent):
             list_params = {k: vals for k, vals in params.items() if isinstance(vals, list)}
 
             # Shapes the output / index according to the axis or multi param entry
-            if self.axis:
-                df[self.axis] = self.lambdas[0].axis_keys
-                df = df.set_index(self.axis)
-                df.index.set_names([self.axis])
+            if axis:
+                df[axis] = lambdas[0].axis_keys
+                df = df.set_index(axis)
+                df.index.set_names([axis])
 
                 # Filter out line with zero output
                 df = df.loc[

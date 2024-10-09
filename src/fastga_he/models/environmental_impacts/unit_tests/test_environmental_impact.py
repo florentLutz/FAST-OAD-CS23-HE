@@ -122,14 +122,45 @@ def test_impact_both():
 
 def test_lca_without_fuel_burn():
     ivc = get_indep_var_comp(
-        list_inputs(LCACore(power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml")),
+        list_inputs(
+            LCACore(
+                power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
+                component_level_breakdown=True,
+            )
+        ),
         __file__,
         XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCACore(power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml"), ivc
+        LCACore(
+            power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
+            component_level_breakdown=True,
+        ),
+        ivc,
     )
 
-    assert problem.get_val("dummy_output") == pytest.approx(10.0, abs=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:production:sum"
+    ) == pytest.approx(4706.81, abs=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:production:propeller_1"
+    ) == pytest.approx(1618.39, abs=1e-2)
+
+    # Sanity check
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:production:sum"
+    ) == pytest.approx(
+        problem.get_val("data:environmental_impact:climate_change:production:propeller_1")
+        + problem.get_val("data:environmental_impact:climate_change:production:motor_1")
+        + problem.get_val("data:environmental_impact:climate_change:production:inverter_1")
+        + problem.get_val("data:environmental_impact:climate_change:production:dc_bus_1")
+        + problem.get_val("data:environmental_impact:climate_change:production:harness_1")
+        + problem.get_val("data:environmental_impact:climate_change:production:dc_splitter_1")
+        + problem.get_val("data:environmental_impact:climate_change:production:dc_sspc_1")
+        + problem.get_val("data:environmental_impact:climate_change:production:dc_sspc_2")
+        + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_1")
+        + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_2"),
+        abs=1e-4,
+    )

@@ -1,3 +1,7 @@
 ANCHOR_COMPONENT_NAME:
+    custom_attributes:
+        - attribute: "component"
+          value: ANCHOR_COMPONENT_NAME
+    
     name: 'market for copper-rich materials'
     amount: ANCHOR_COMPONENT_MASS
