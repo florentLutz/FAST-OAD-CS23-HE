@@ -41,12 +41,10 @@ class LCACore(om.ExplicitComponent):
         self.model = None
         self.methods = None
         self.axis = None
-        self.axis_keys = None
         self.axis_keys_dict = None
         self.lambdas_dict = None
         self.partial_lambdas_dict_dict = None
         self.parameters = None
-        self.params_dict = {}
 
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
@@ -100,7 +98,7 @@ class LCACore(om.ExplicitComponent):
 
         # Compile expressions for partial derivatives of impacts w.r.t. parameters
         self.partial_lambdas_dict_dict = {
-            axis: _preMultiLCAAlgebricPartials(self.model, self.methods, axis=axis)
+            axis: self._preMultiLCAAlgebricPartials(self.model, self.methods, axis=axis)
             for axis in self.axis
         }
 
@@ -164,8 +162,62 @@ class LCACore(om.ExplicitComponent):
                         )
 
     def setup_partials(self):
-        # TODO: Change that, if only to see how much faster it is to properly declare partials !
-        self.declare_partials("*", "*", method="exact")
+        # Create a fake inputs list with constant value. It's not going to be relevant anyway
+        # since we will use it here for the partials and the partials are constant given the
+        # nature of LCA
+        parameters = {str(name): 1.0 for name in self.parameters}
+
+        # Then we run a "fake" computation of the partials, and if the value returned is nil,
+        # we simply don't declare the partial
+        for axis_to_evaluate in self.axis:
+            partial_lambda_dict = self.partial_lambdas_dict_dict[axis_to_evaluate]
+
+            # Compute partials from pre-compiled expressions and current parameters values
+            res = {
+                param_name: self.compute_impacts_from_lambdas(
+                    partial_lambdas, axis_to_evaluate, **parameters
+                )
+                for param_name, partial_lambdas in partial_lambda_dict.items()
+            }
+            if axis_to_evaluate == "phase":
+                for param_name, res_param in res.items():
+                    for m in res_param:
+                        clean_method_name = re.sub(r": |/| ", "_", m.split(" - ")[0])
+                        input_name = param_name.replace("__", ":")
+                        for phase in self.axis_keys_dict["phase"]:
+                            if phase != "_other_":
+                                partial_value = res_param[m][phase]
+                                if partial_value != 0:
+                                    self.declare_partials(
+                                        of=LCA_PREFIX + clean_method_name + ":" + phase + ":sum",
+                                        wrt=input_name,
+                                        val=partial_value,
+                                    )
+
+            if axis_to_evaluate == "component":
+                for param_name, res_param in res.items():
+                    for m in res_param:
+                        clean_method_name = re.sub(r": |/| ", "_", m.split(" - ")[0])
+                        input_name = param_name.replace("__", ":")
+
+                        for component_phase in self.axis_keys_dict["component"]:
+                            if component_phase != "_other_":
+                                # Now we give the value component by component
+                                clean_phase_name = component_phase.split("_")[-1]
+                                clean_component_name = "_".join(component_phase.split("_")[:-1])
+
+                                partial_value = res_param[m][component_phase]
+                                if partial_value != 0:
+                                    self.declare_partials(
+                                        of=LCA_PREFIX
+                                        + clean_method_name
+                                        + ":"
+                                        + clean_phase_name
+                                        + ":"
+                                        + clean_component_name,
+                                        wrt=input_name,
+                                        val=partial_value,
+                                    )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         parameters = {name.replace(":", "__"): value[0] for name, value in inputs.items()}
@@ -344,32 +396,36 @@ class LCACore(om.ExplicitComponent):
 
         return lca_conf_file_path
 
+    @staticmethod
+    def _preMultiLCAAlgebricPartials(model, methods, alpha=1, axis=None):
+        """
+        Modified version of _preMultiLCAAlgebric from lca_algebraic
+        to compute partial derivatives of impacts w.r.t. parameters instead of expressions of impacts.
+        """
+        with agb.DbContext(model):
+            # noinspection PyProtectedMember
+            expressions = agb.lca._modelToExpr(model, methods, alpha=alpha, axis=axis)
 
-def _preMultiLCAAlgebricPartials(model, methods, alpha=1, axis=None):
-    """
-    Modified version of _preMultiLCAAlgebric from lca_algebraic
-    to compute partial derivatives of impacts w.r.t. parameters instead of expressions of impacts.
-    """
-    with agb.DbContext(model):
-        # noinspection PyProtectedMember
-        expressions = agb.lca._modelToExpr(model, methods, alpha=alpha, axis=axis)
+            # Replace ceiling function by identity for better derivatives
+            expressions = [expr.replace(sym.ceiling, lambda x: x) for expr in expressions]
 
-        # Replace ceiling function by identity for better derivatives
-        expressions = [expr.replace(sym.ceiling, lambda x: x) for expr in expressions]
-
-        # Lambdify (compile) expressions
-        if isinstance(expressions[0], agb.AxisDict):
-            return {
-                param.name: [
-                    agb.lca.LambdaWithParamNames(
-                        agb.AxisDict({axis_tag: res.diff(param) for axis_tag, res in expr.items()})
-                    )
-                    for expr in expressions
-                ]
-                for param in agb.all_params().values()
-            }
-        else:
-            return {
-                param.name: [agb.lca.LambdaWithParamNames(expr.diff(param)) for expr in expressions]
-                for param in agb.all_params().values()
-            }
+            # Lambdify (compile) expressions
+            if isinstance(expressions[0], agb.AxisDict):
+                return {
+                    param.name: [
+                        agb.lca.LambdaWithParamNames(
+                            agb.AxisDict(
+                                {axis_tag: res.diff(param) for axis_tag, res in expr.items()}
+                            )
+                        )
+                        for expr in expressions
+                    ]
+                    for param in agb.all_params().values()
+                }
+            else:
+                return {
+                    param.name: [
+                        agb.lca.LambdaWithParamNames(expr.diff(param)) for expr in expressions
+                    ]
+                    for param in agb.all_params().values()
+                }

@@ -164,3 +164,5 @@ def test_lca_without_fuel_burn():
         + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_2"),
         abs=1e-4,
     )
+
+    problem.check_partials(compact_print=True)
