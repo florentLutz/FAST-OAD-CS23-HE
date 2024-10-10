@@ -2226,17 +2226,26 @@ class FASTGAHEPowerTrainConfigurator:
                 with open(path_to_lca_prod_conf_template, "r") as template_file:
                     for line in template_file.readlines():
                         # Important to add in the definition of the custom attribute, the name of
-                        # the phase as the code writes it in the lca conf file
+                        # the phase as the code writes it in the lca conf file.
+                        # Also need to make sure we ask for the mass per functional unit and not
+                        # the total mass
                         clean_lines.append(
                             line.replace(
                                 "value: ANCHOR_COMPONENT_NAME",
                                 "value: " + component_name + "_production",
                             )
                             .replace("ANCHOR_COMPONENT_NAME", component_name)
-                            .replace("ANCHOR_COMPONENT_MASS", variable_name_mass.replace(":", "__"))
+                            .replace(
+                                "ANCHOR_COMPONENT_MASS",
+                                variable_name_mass.replace("mass", "mass_per_fu").replace(
+                                    ":", "__"
+                                ),
+                            )
                             .replace(
                                 "ANCHOR_COMPONENT_LENGTH",
-                                variable_name_mass.replace("mass", "length").replace(":", "__"),
+                                variable_name_mass.replace("mass", "length_per_fu").replace(
+                                    ":", "__"
+                                ),
                             )
                         )
 

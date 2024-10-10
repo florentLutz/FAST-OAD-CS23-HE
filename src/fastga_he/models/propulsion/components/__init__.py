@@ -63,7 +63,7 @@ from .source.battery import (
     SizingBatteryPack,
     PerformancesBatteryPack,
     SlipstreamBatteryPack,
-    PreLCABattery,
+    PreLCABatteryPack,
 )
 from .source.generator import SizingGenerator, PerformancesGenerator, SlipstreamGenerator
 from .source.ice import SizingICE, PerformancesICE, SlipstreamICE

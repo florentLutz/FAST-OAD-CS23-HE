@@ -7,7 +7,7 @@ import openmdao.api as om
 from .pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
 
 
-class PreLCABattery(om.Group):
+class PreLCABatteryPack(om.Group):
     def initialize(self):
         self.options.declare(
             name="battery_pack_id",

@@ -16,7 +16,7 @@ model:
                   value: propeller_1_production
         
             name: 'market for carbon fibre reinforced plastic, injection moulded'
-            amount: data__propulsion__he_power_train__propeller__propeller_1__mass
+            amount: data__propulsion__he_power_train__propeller__propeller_1__mass_per_fu
 
         motor_1:
             custom_attributes:
@@ -24,7 +24,7 @@ model:
                   value: motor_1_production
         
             name: 'electric motor production, vehicle (electric powertrain)'
-            amount: data__propulsion__he_power_train__PMSM__motor_1__mass
+            amount: data__propulsion__he_power_train__PMSM__motor_1__mass_per_fu
 
         inverter_1:
             custom_attributes:
@@ -32,7 +32,7 @@ model:
                   value: inverter_1_production
         
             name: 'inverter production, for electric passenger car'
-            amount: data__propulsion__he_power_train__inverter__inverter_1__mass
+            amount: data__propulsion__he_power_train__inverter__inverter_1__mass_per_fu
 
         dc_bus_1:
             custom_attributes:
@@ -40,7 +40,7 @@ model:
                   value: dc_bus_1_production
         
             name: 'market for copper-rich materials'
-            amount: data__propulsion__he_power_train__DC_bus__dc_bus_1__mass
+            amount: data__propulsion__he_power_train__DC_bus__dc_bus_1__mass_per_fu
 
         harness_1:
             custom_attributes:
@@ -48,7 +48,7 @@ model:
                   value: harness_1_production
         
             name: 'cable production, three-conductor cable'
-            amount: data__propulsion__he_power_train__DC_cable_harness__harness_1__length
+            amount: data__propulsion__he_power_train__DC_cable_harness__harness_1__length_per_fu
 
         dc_splitter_1:
             custom_attributes:
@@ -56,7 +56,7 @@ model:
                   value: dc_splitter_1_production
             
             name: 'market for copper-rich materials'
-            amount: data__propulsion__he_power_train__DC_splitter__dc_splitter_1__mass
+            amount: data__propulsion__he_power_train__DC_splitter__dc_splitter_1__mass_per_fu
 
         dc_sspc_1:
             custom_attributes:
@@ -64,7 +64,7 @@ model:
                   value: dc_sspc_1_production
         
             name: 'market for copper-rich materials'
-            amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_1__mass
+            amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_1__mass_per_fu
 
         battery_pack_1:
             custom_attributes:
@@ -73,7 +73,7 @@ model:
         
             name: 'battery production, Li-ion, NMC111, rechargeable, prismatic'
             loc: 'RoW'
-            amount: data__propulsion__he_power_train__battery_pack__battery_pack_1__mass
+            amount: data__propulsion__he_power_train__battery_pack__battery_pack_1__mass_per_fu
 
         dc_sspc_2:
             custom_attributes:
@@ -81,7 +81,7 @@ model:
                   value: dc_sspc_2_production
         
             name: 'market for copper-rich materials'
-            amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_2__mass
+            amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_2__mass_per_fu
 
         battery_pack_2:
             custom_attributes:
@@ -90,7 +90,7 @@ model:
         
             name: 'battery production, Li-ion, NMC111, rechargeable, prismatic'
             loc: 'RoW'
-            amount: data__propulsion__he_power_train__battery_pack__battery_pack_2__mass
+            amount: data__propulsion__he_power_train__battery_pack__battery_pack_2__mass_per_fu
 
 
 methods:

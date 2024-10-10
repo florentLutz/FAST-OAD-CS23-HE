@@ -115,7 +115,9 @@ class LCACore(om.ExplicitComponent):
                     "__", ":"
                 )  # refactor names (':' is not supported in LCA parameters)
                 self.add_input(
-                    parameter_name, val=np.nan, units=NAME_TO_UNIT[parameter_name.split(":")[-1]]
+                    parameter_name,
+                    val=np.nan,
+                    units=NAME_TO_UNIT[parameter_name.split(":")[-1].replace("_per_fu", "")],
                 )
 
         for m in self.methods:
