@@ -1259,6 +1259,7 @@ def test_weight_per_fu():
     inputs_list = [
         "data:propulsion:he_power_train:rectifier:rectifier_1:mass",
         "data:environmental_impact:aircraft_per_fu",
+        "data:TLAR:aircraft_lifespan",
     ]
 
     ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
@@ -1268,6 +1269,6 @@ def test_weight_per_fu():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:mass_per_fu", units="kg"
-    ) == pytest.approx(1.718e-05, rel=1e-3)
+    ) == pytest.approx(3.436e-05, rel=1e-3)
 
     problem.check_partials(compact_print=True)
