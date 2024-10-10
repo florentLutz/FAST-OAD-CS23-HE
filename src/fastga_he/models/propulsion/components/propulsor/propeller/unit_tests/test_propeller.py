@@ -58,6 +58,7 @@ from ..components.slipstream_delta_cm import SlipstreamPropellerDeltaCM
 from ..components.slipstream_propeller import SlipstreamPropeller
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
+from ..components.pre_lca_prod_weight_per_fu import PreLCAPropellerProdWeightPerFU
 
 from ..components.perf_propeller import PerformancesPropeller
 from ..components.sizing_propeller import SizingPropeller
@@ -1530,5 +1531,23 @@ def test_propeller_performances():
         np.array([173.8, 174.8, 175.7, 176.7, 177.6, 178.6, 179.5, 180.4, 181.3, 182.1]),
         rel=1e-2,
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:propeller:propeller_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCAPropellerProdWeightPerFU(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:mass_per_fu", units="kg"
+    ) == pytest.approx(3.40194277e-05, rel=1e-3)
 
     problem.check_partials(compact_print=True)

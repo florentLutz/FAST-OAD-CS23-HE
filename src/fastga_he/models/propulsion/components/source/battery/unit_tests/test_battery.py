@@ -41,6 +41,7 @@ from ..components.perf_battery_power import PerformancesBatteryPower
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 from ..components.cstr_ensure import ConstraintsSOCEnsure
 from ..components.cstr_enforce import ConstraintsSOCEnforce
+from ..components.pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
 
 from ..components.sizing_battery_pack import SizingBatteryPack
 from ..components.perf_battery_pack import PerformancesBatteryPack
@@ -1041,5 +1042,23 @@ def test_performances_battery_pack():
     )
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryProdWeightPerFU(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.003, rel=1e-3)
 
     problem.check_partials(compact_print=True)

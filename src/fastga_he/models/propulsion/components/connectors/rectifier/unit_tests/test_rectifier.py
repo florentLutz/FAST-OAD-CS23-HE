@@ -38,6 +38,8 @@ from ..components.sizing_rectifier_weight import SizingRectifierWeight, SizingRe
 from ..components.sizing_rectifier_cg_x import SizingRectifierCGX
 from ..components.sizing_rectifier_cg_y import SizingRectifierCGY
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCARectifierProdWeightPerFU
+
 from ..components.sizing_rectifier import SizingRectifier
 from ..components.perf_rectifier import PerformancesRectifier
 
@@ -1249,5 +1251,23 @@ def test_performances_rectifier():
     )
 
     om.n2(problem, show_browser=False)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:rectifier:rectifier_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCARectifierProdWeightPerFU(rectifier_id="rectifier_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:mass_per_fu", units="kg"
+    ) == pytest.approx(1.718e-05, rel=1e-3)
 
     problem.check_partials(compact_print=True)

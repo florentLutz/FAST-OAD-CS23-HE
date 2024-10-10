@@ -30,7 +30,12 @@ from .connectors.dc_splitter import (
     SlipstreamDCSplitter,
     PreLCADCSplitter,
 )
-from .connectors.rectifier import SizingRectifier, PerformancesRectifier, SlipstreamRectifier
+from .connectors.rectifier import (
+    SizingRectifier,
+    PerformancesRectifier,
+    SlipstreamRectifier,
+    PreLCARectifier,
+)
 from .connectors.fuel_system import SizingFuelSystem, PerformancesFuelSystem, SlipstreamFuelSystem
 from .connectors.speed_reducer import (
     SizingSpeedReducer,
@@ -44,12 +49,22 @@ from .connectors.planetary_gear import (
 )
 from .connectors.gearbox import SizingGearbox, PerformancesGearbox, SlipstreamGearbox
 
-from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM
+from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM, PreLCAPMSM
 from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
 
-from .propulsor.propeller import SizingPropeller, PerformancesPropeller, SlipstreamPropeller
+from .propulsor.propeller import (
+    SizingPropeller,
+    PerformancesPropeller,
+    SlipstreamPropeller,
+    PreLCAPropeller,
+)
 
-from .source.battery import SizingBatteryPack, PerformancesBatteryPack, SlipstreamBatteryPack
+from .source.battery import (
+    SizingBatteryPack,
+    PerformancesBatteryPack,
+    SlipstreamBatteryPack,
+    PreLCABattery,
+)
 from .source.generator import SizingGenerator, PerformancesGenerator, SlipstreamGenerator
 from .source.ice import SizingICE, PerformancesICE, SlipstreamICE
 from .source.turboshaft import SizingTurboshaft, PerformancesTurboshaft, SlipstreamTurboshaft

@@ -1,5 +1,8 @@
 <FASTOAD_model>
     <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
         <aerodynamics>
           <cruise>
               <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
@@ -61,6 +64,7 @@
                         <number_modules>200.0</number_modules>
                         <number_cells>8000.0</number_cells>
                         <volume units="L">1550.0</volume>
+                        <mass units="kg">3000.0</mass>
                         <module>
                             <number_cells>150.0</number_cells>
                             <mass units="kg">15.0</mass>
