@@ -6,23 +6,23 @@ import numpy as np
 import openmdao.api as om
 
 
-class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
+class PreLCAGeneratorProdWeightPerFU(om.ExplicitComponent):
     """
     Computation of the weight per functional unit considering the replacement necessary
     during the lifespan of the aircraft. For the default value of the average lifespan of the
-    motor, the value is taken from :cite:`thonemann:2024` for short term technologies.
+    generator, the value is taken from :cite:`thonemann:2024` for short term technologies.
     """
 
     def initialize(self):
         self.options.declare(
-            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="generator_id", default=None, desc="Identifier of the generator", allow_none=False
         )
 
     def setup(self):
-        motor_id = self.options["motor_id"]
+        generator_id = self.options["generator_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":mass",
+            name="data:propulsion:he_power_train:generator:" + generator_id + ":mass",
             units="kg",
             val=np.nan,
         )
@@ -32,10 +32,10 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
             desc="Number of aircraft required for a functional unit",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan",
+            name="data:propulsion:he_power_train:generator:" + generator_id + ":lifespan",
             units="yr",
             val=15.0,
-            desc="Expected lifetime of the PMSM, typically around 15 year",
+            desc="Expected lifetime of the generator, typically around 15 year",
         )
         self.add_input(
             name="data:TLAR:aircraft_lifespan",
@@ -45,17 +45,17 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":mass_per_fu",
+            name="data:propulsion:he_power_train:generator:" + generator_id + ":mass_per_fu",
             units="kg",
             val=1e-6,
-            desc="Weight of the PMSM required for a functional unit",
+            desc="Weight of the generator required for a functional unit",
         )
 
         self.declare_partials(
             of="*",
             wrt=[
                 "data:environmental_impact:aircraft_per_fu",
-                "data:propulsion:he_power_train:PMSM:" + motor_id + ":mass",
+                "data:propulsion:he_power_train:generator:" + generator_id + ":mass",
             ],
             method="exact",
         )
@@ -63,37 +63,37 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
             of="*",
             wrt=[
                 "data:TLAR:aircraft_lifespan",
-                "data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan",
+                "data:propulsion:he_power_train:generator:" + generator_id + ":lifespan",
             ],
             method="fd",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        motor_id = self.options["motor_id"]
+        generator_id = self.options["generator_id"]
 
-        outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":mass_per_fu"] = (
-            inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":mass"]
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":mass_per_fu"] = (
+            inputs["data:propulsion:he_power_train:generator:" + generator_id + ":mass"]
             * inputs["data:environmental_impact:aircraft_per_fu"]
             * np.ceil(
                 inputs["data:TLAR:aircraft_lifespan"]
-                / inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan"]
+                / inputs["data:propulsion:he_power_train:generator:" + generator_id + ":lifespan"]
             )
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        motor_id = self.options["motor_id"]
+        generator_id = self.options["generator_id"]
 
         partials[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":mass_per_fu",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":mass",
+            "data:propulsion:he_power_train:generator:" + generator_id + ":mass_per_fu",
+            "data:propulsion:he_power_train:generator:" + generator_id + ":mass",
         ] = inputs["data:environmental_impact:aircraft_per_fu"] * np.ceil(
             inputs["data:TLAR:aircraft_lifespan"]
-            / inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan"]
+            / inputs["data:propulsion:he_power_train:generator:" + generator_id + ":lifespan"]
         )
         partials[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":mass_per_fu",
+            "data:propulsion:he_power_train:generator:" + generator_id + ":mass_per_fu",
             "data:environmental_impact:aircraft_per_fu",
-        ] = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":mass"] * np.ceil(
+        ] = inputs["data:propulsion:he_power_train:generator:" + generator_id + ":mass"] * np.ceil(
             inputs["data:TLAR:aircraft_lifespan"]
-            / inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan"]
+            / inputs["data:propulsion:he_power_train:generator:" + generator_id + ":lifespan"]
         )

@@ -8,3 +8,4 @@
 from .components.sizing_turbo_generator import SizingTurboGenerator
 from .components.perf_turbo_generator import PerformancesTurboGenerator
 from .components.slipstream_turbo_generator import SlipstreamTurboGenerator
+from .components.pre_lca_turbo_generator import PreLCATurboGenerator

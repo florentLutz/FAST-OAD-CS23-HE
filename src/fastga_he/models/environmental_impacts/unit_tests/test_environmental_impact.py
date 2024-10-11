@@ -14,6 +14,7 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "data.xml"
 DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
+RESULTS_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "results"
 
 
 def test_impact_sizing_jet_fuel():
@@ -219,16 +220,16 @@ def test_lca_pipistrel():
     )
 
     assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
-        1.70306211e-06, abs=1e-2
+        1.70306211e-06, rel=1e-2
     )
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu"
-    ) == pytest.approx(0.00012772965825, abs=1e-2)
+    ) == pytest.approx(0.00012772965825, rel=1e-2)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.00801599, abs=1e-2)
+    ) == pytest.approx(0.00801599, rel=1e-5)
 
     # Sanity check
     assert problem.get_val(
@@ -244,7 +245,10 @@ def test_lca_pipistrel():
         + problem.get_val("data:environmental_impact:climate_change:production:dc_sspc_2")
         + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_1")
         + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_2"),
-        abs=1e-4,
+        rel=1e-4,
     )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_lca.xml"
+    problem.write_outputs()
 
     problem.check_partials(compact_print=True)

@@ -122,6 +122,7 @@ class LCACore(om.ExplicitComponent):
 
         for m in self.methods:
             clean_method_name = re.sub(r": |/| ", "_", m[1])
+            clean_method_name = clean_method_name.replace(",_", "")
 
             # "Phase" is always inside the axis, so we can do that
             for phase in self.axis_keys_dict["phase"]:
@@ -185,6 +186,7 @@ class LCACore(om.ExplicitComponent):
                 for param_name, res_param in res.items():
                     for m in res_param:
                         clean_method_name = re.sub(r": |/| ", "_", m.split(" - ")[0])
+                        clean_method_name = clean_method_name.replace(",_", "")
                         input_name = param_name.replace("__", ":")
                         for phase in self.axis_keys_dict["phase"]:
                             if phase != "_other_":
@@ -200,6 +202,7 @@ class LCACore(om.ExplicitComponent):
                 for param_name, res_param in res.items():
                     for m in res_param:
                         clean_method_name = re.sub(r": |/| ", "_", m.split(" - ")[0])
+                        clean_method_name = clean_method_name.replace(",_", "")
                         input_name = param_name.replace("__", ":")
 
                         for component_phase in self.axis_keys_dict["component"]:
@@ -232,6 +235,7 @@ class LCACore(om.ExplicitComponent):
             if axis_to_evaluate == "phase":
                 for m in res:  # for each LCIA method
                     clean_method_name = re.sub(r": |/| ", "_", m.split(" - ")[0])
+                    clean_method_name = clean_method_name.replace(",_", "")
 
                     for phase in self.axis_keys_dict["phase"]:
                         if phase != "_other_":
@@ -242,6 +246,7 @@ class LCACore(om.ExplicitComponent):
             if axis_to_evaluate == "component":
                 for m in res:  # for each LCIA method
                     clean_method_name = re.sub(r": |/| ", "_", m.split(" - ")[0])
+                    clean_method_name = clean_method_name.replace(",_", "")
 
                     # Components are tagged with the phase just in case, so we can do this
                     for component_phase in self.axis_keys_dict["component"]:
