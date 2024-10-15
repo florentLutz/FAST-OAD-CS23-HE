@@ -219,6 +219,16 @@ def test_lca_pipistrel():
         ivc,
     )
 
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_lca.xml"
+    problem.write_outputs()
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:production:propeller_1"
+    ) == pytest.approx(0.00528819, rel=1e-4)
+    assert problem.get_val(
+        "data:environmental_impact:total_natural_resources:production:propeller_1"
+    ) == pytest.approx(0.00030415567672208426, rel=1e-4)
+
     assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
         1.70306211e-06, rel=1e-2
     )
@@ -229,7 +239,7 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.00801599, rel=1e-5)
+    ) == pytest.approx(0.010547953542528663, rel=1e-5)
 
     # Sanity check
     assert problem.get_val(
@@ -247,8 +257,5 @@ def test_lca_pipistrel():
         + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_2"),
         rel=1e-4,
     )
-
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_lca.xml"
-    problem.write_outputs()
 
     problem.check_partials(compact_print=True)

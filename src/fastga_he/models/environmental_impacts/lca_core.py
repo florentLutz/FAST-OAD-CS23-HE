@@ -133,7 +133,7 @@ class LCACore(om.ExplicitComponent):
                         LCA_PREFIX + clean_method_name + ":" + phase + ":sum",
                         val=0.0,
                         units=None,
-                        desc=bw.Method(m).metadata["unit"] + "for the whole " + phase + " phase",
+                        desc=bw.Method(m).metadata["unit"] + " for the whole " + phase + " phase",
                     )
 
             if "component" in self.axis:
@@ -157,7 +157,7 @@ class LCACore(om.ExplicitComponent):
                             val=0.0,
                             units=None,
                             desc=bw.Method(m).metadata["unit"]
-                            + "for component "
+                            + " for component "
                             + clean_component_name
                             + " in "
                             + clean_phase_name
