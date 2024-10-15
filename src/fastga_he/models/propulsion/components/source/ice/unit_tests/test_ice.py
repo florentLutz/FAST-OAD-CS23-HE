@@ -26,6 +26,8 @@ from ..components.sizing_ice_drag import SizingICEDrag
 from ..components.sizing_ice_cg_x import SizingICECGX
 from ..components.sizing_ice_cg_y import SizingICECGY
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCAICEProdWeightPerFU
+
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
 from ..components.perf_mean_effective_pressure import PerformancesMeanEffectivePressure
@@ -827,5 +829,23 @@ def test_in_flight_emissions():
     assert problem.get_val(
         "data:LCA:operation:he_power_train:ICE:ice_1:HC", units="g"
     ) == pytest.approx(1361.06, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:ICE:ice_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCAICEProdWeightPerFU(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.00036122, rel=1e-3)
 
     problem.check_partials(compact_print=True)

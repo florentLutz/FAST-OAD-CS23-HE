@@ -71,7 +71,7 @@ from .source.generator import (
     SlipstreamGenerator,
     PreLCAGenerator,
 )
-from .source.ice import SizingICE, PerformancesICE, SlipstreamICE
+from .source.ice import SizingICE, PerformancesICE, SlipstreamICE, PreLCAICE
 from .source.turboshaft import SizingTurboshaft, PerformancesTurboshaft, SlipstreamTurboshaft
 from .source.simple_turbo_generator import (
     SizingTurboGenerator,
