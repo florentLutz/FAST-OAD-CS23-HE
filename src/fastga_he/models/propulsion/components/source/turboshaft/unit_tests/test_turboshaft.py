@@ -19,6 +19,8 @@ from ..components.sizing_turboshaft_drag import SizingTurboshaftDrag
 from ..components.sizing_turboshaft_cg_x import SizingTurboshaftCGX
 from ..components.sizing_turboshaft_cg_y import SizingTurboshaftCGY
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCATurboshaftProdWeightPerFU
+
 from ..components.perf_density_ratio import PerformancesDensityRatio
 from ..components.perf_mach import PerformancesMach
 from ..components.perf_required_power import PerformancesRequiredPower
@@ -1247,5 +1249,23 @@ def test_slipstream():
     )
     assert problem.get_val("delta_Cl") == pytest.approx(np.zeros(NB_POINTS_TEST), rel=1e-2)
     assert problem.get_val("delta_Cm") == pytest.approx(np.zeros(NB_POINTS_TEST), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCATurboshaftProdWeightPerFU(turboshaft_id="turboshaft_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.00023157, rel=1e-3)
 
     problem.check_partials(compact_print=True)

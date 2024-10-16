@@ -8,3 +8,4 @@
 from .components.sizing_turboshaft import SizingTurboshaft
 from .components.perf_turboshaft import PerformancesTurboshaft
 from .components.slipstream_turboshaft import SlipstreamTurboshaft
+from .components.pre_lca_turboshaft import PreLCATurboshaft

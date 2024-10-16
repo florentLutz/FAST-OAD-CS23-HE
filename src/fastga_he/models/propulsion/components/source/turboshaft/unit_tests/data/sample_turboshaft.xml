@@ -1,5 +1,8 @@
 <FASTOAD_model>
     <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
         <aerodynamics>
             <cruise>
                   <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
@@ -33,6 +36,7 @@
             <he_power_train>
                 <turboshaft>
                     <turboshaft_1>
+                        <mass units="kg">231.57096</mass>
                         <power_max units="kW">625.0</power_max>
                         <from_LE units="m">0.5</from_LE>
                         <power_rating units="kW">634.0</power_rating>

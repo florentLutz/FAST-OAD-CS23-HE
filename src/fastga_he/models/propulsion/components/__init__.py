@@ -72,7 +72,12 @@ from .source.generator import (
     PreLCAGenerator,
 )
 from .source.ice import SizingICE, PerformancesICE, SlipstreamICE, PreLCAICE
-from .source.turboshaft import SizingTurboshaft, PerformancesTurboshaft, SlipstreamTurboshaft
+from .source.turboshaft import (
+    SizingTurboshaft,
+    PerformancesTurboshaft,
+    SlipstreamTurboshaft,
+    PreLCATurboshaft,
+)
 from .source.simple_turbo_generator import (
     SizingTurboGenerator,
     PerformancesTurboGenerator,
