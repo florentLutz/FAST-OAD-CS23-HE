@@ -77,6 +77,13 @@ model:
                     - 'lower stratosphere + upper troposphere'
         
                 NOx:
+                  amount: 2.356 / 333.9
+                  name: 'nitrogen oxides'
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                VOC:
                   amount: 11.154 / 333.9
                   name: 'VOC, volatile organic compounds'
                   categories:

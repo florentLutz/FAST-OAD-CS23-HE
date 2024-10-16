@@ -29,6 +29,23 @@ class PreLCABatteryProdWeightPerFU(om.ExplicitComponent):
             val=np.nan,
             desc="Number of aircraft required for a functional unit",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
+            val=500.0,
+            desc="Expected lifetime of the inverter, expressed in cycles. Default value is the "
+                 "number of cycle required for the reference cell to reach 60% nominal capacity",
+        )
+        self.add_input(
+            name="data:TLAR:aircraft_lifespan",
+            val=np.nan,
+            units="yr",
+            desc="Expected lifetime of the aircraft",
+        )
+        self.add_input(
+            name="data:TLAR:flight_per_year",
+            val=np.nan,
+            desc="Average number of flight per year",
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":mass_per_fu",
@@ -37,7 +54,23 @@ class PreLCABatteryProdWeightPerFU(om.ExplicitComponent):
             desc="Weight of the battery pack required for a functional unit",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":mass_per_fu",
+            wrt=[
+                "data:environmental_impact:aircraft_per_fu",
+                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":mass",
+            ],
+            method="exact",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":mass_per_fu",
+            wrt=[
+                "data:TLAR:aircraft_lifespan",
+                "data:TLAR:flight_per_year",
+                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
+            ],
+            method="fd",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         battery_pack_id = self.options["battery_pack_id"]
@@ -47,6 +80,13 @@ class PreLCABatteryProdWeightPerFU(om.ExplicitComponent):
         ] = (
             inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":mass"]
             * inputs["data:environmental_impact:aircraft_per_fu"]
+            * np.ceil(
+                inputs["data:TLAR:aircraft_lifespan"]
+                * inputs["data:TLAR:flight_per_year"]
+                / inputs[
+                    "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"
+                ]
+            )
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -55,8 +95,18 @@ class PreLCABatteryProdWeightPerFU(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":mass_per_fu",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":mass",
-        ] = inputs["data:environmental_impact:aircraft_per_fu"]
+        ] = inputs["data:environmental_impact:aircraft_per_fu"] * np.ceil(
+            inputs["data:TLAR:aircraft_lifespan"]
+            * inputs["data:TLAR:flight_per_year"]
+            / inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"]
+        )
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":mass_per_fu",
             "data:environmental_impact:aircraft_per_fu",
-        ] = inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":mass"]
+        ] = inputs[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":mass"
+        ] * np.ceil(
+            inputs["data:TLAR:aircraft_lifespan"]
+            * inputs["data:TLAR:flight_per_year"]
+            / inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"]
+        )

@@ -235,11 +235,11 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu"
-    ) == pytest.approx(0.00012772965825, rel=1e-2)
+    ) == pytest.approx(0.00140503, rel=1e-2)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.010547953542528663, rel=1e-5)
+    ) == pytest.approx(0.05650468284674854, rel=1e-5)
 
     # Sanity check
     assert problem.get_val(

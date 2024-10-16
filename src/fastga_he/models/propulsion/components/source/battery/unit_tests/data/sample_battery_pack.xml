@@ -1,5 +1,9 @@
 <FASTOAD_model>
     <data>
+        <TLAR>
+            <aircraft_lifespan is_input="year">15.0<!--maximum speed at sea level--></aircraft_lifespan>
+            <flight_per_year>365.0<!--maximum speed at sea level--></flight_per_year>
+        </TLAR>
         <environmental_impact>
             <aircraft_per_fu>1e-6</aircraft_per_fu>
         </environmental_impact>
