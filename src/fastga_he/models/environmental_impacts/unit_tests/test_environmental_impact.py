@@ -239,7 +239,7 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.05650468284674854, rel=1e-5)
+    ) == pytest.approx(0.05653022, rel=1e-5)
 
     # Sanity check
     assert problem.get_val(

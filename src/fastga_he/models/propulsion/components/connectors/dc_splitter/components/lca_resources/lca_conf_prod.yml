@@ -3,5 +3,5 @@ ANCHOR_COMPONENT_NAME:
         - attribute: "component"
           value: ANCHOR_COMPONENT_NAME
     
-    name: 'market for copper-rich materials'
+    name: 'power distribution unit production, for electric passenger car'
     amount: ANCHOR_COMPONENT_MASS

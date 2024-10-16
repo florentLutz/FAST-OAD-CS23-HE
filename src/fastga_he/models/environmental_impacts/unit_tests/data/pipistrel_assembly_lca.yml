@@ -110,7 +110,7 @@ model:
                 - attribute: "component"
                   value: dc_bus_1_production
         
-            name: 'market for copper-rich materials'
+            name: 'power distribution unit production, for electric passenger car'
             amount: data__propulsion__he_power_train__DC_bus__dc_bus_1__mass_per_fu
 
         harness_1:
@@ -126,7 +126,7 @@ model:
                 - attribute: "component"
                   value: dc_splitter_1_production
             
-            name: 'market for copper-rich materials'
+            name: 'power distribution unit production, for electric passenger car'
             amount: data__propulsion__he_power_train__DC_splitter__dc_splitter_1__mass_per_fu
 
         dc_sspc_1:
