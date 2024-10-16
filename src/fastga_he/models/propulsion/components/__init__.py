@@ -16,6 +16,7 @@ from .connectors.dc_dc_converter import (
     SizingDCDCConverter,
     PerformancesDCDCConverter,
     SlipstreamDCDCConverter,
+    PreLCADCDCConverter,
 )
 from .connectors.inverter import (
     SizingInverter,
