@@ -1325,7 +1325,9 @@ def test_weight_per_fu():
     ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PreLCADCDCConverterProdWeightPerFU(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+    problem = run_system(
+        PreLCADCDCConverterProdWeightPerFU(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass_per_fu", units="kg"

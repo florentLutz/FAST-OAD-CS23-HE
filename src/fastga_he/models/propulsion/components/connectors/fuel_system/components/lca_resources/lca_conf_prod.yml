@@ -1,0 +1,83 @@
+ANCHOR_COMPONENT_NAME:
+    custom_attributes:
+        - attribute: "component"
+          value: ANCHOR_COMPONENT_NAME
+
+    propeller:
+      amount: ANCHOR_COMPONENT_MASS
+      unit: kilogram
+
+      production:
+        cast_steel:
+          name: 'market for steel, unalloyed'
+          amount: 0.667
+
+        aluminium_alloy:
+          name: 'market for aluminium, cast alloy'
+          loc: 'GLO'
+          amount: 0.333
+
+        # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
+        # with the mass
+        electricity:
+          name: 'electricity, high voltage, European attribute mix'
+          amount: 918 / 22.9 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
+
+        gas:
+          name: 'natural gas, burned in gas turbine'  # Not sure about this one
+          loc: 'RoE'
+          amount: 923 / 22.9 * 3.6 # kWh to MJ
+
+        heat_and_steam:
+          name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
+          loc: 'RoW'
+          amount: 115 / 22.9 * 3.6 # kWh to MJ
+
+        diesel:
+          name: 'market for diesel'
+          loc: 'Europe without Switzerland'
+          amount: 244 / 22.9 * 3.6 / 45.6 # kWh to MJ to kg
+
+        kerosene: # SAF aggregated in here because the process does not exist
+          name: 'market for kerosene'
+          loc: 'RoW'
+          amount: 500 / 22.9 * 3.6 / 43.0 # kWh to MJ to kg
+
+        water_in:
+          name: 'market for water, decarbonised'
+          loc: 'RoW'
+          amount: 2 / 22.9 # In m**3 but since 1m**3 = 1kg
+
+        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+          amount: 2 / 22.9
+          name: 'water'
+          categories:
+            - 'water'
+            - 'ground-'
+
+        CO2:
+          amount: 954 / 22.9 # In kg
+          name: 'carbon dioxide, fossil'  # this is a biosphere process
+          categories:
+            - 'air'
+            - 'lower stratosphere + upper troposphere'
+
+        SOx:
+          amount: 0.01 / 22.9
+          name: 'sulfur dioxide'
+          categories:
+            - 'air'
+            - 'lower stratosphere + upper troposphere'
+
+        NOx:
+          amount: 0.162 / 22.9
+          name: 'nitrogen oxides'
+          categories:
+            - 'air'
+            - 'lower stratosphere + upper troposphere'
+
+        VOC:
+          amount: 0.766 / 22.9
+          name: 'VOC, volatile organic compounds'
+          categories:
+            - 'air'

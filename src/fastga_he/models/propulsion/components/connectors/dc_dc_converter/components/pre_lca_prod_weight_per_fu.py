@@ -36,7 +36,9 @@ class PreLCADCDCConverterProdWeightPerFU(om.ExplicitComponent):
             desc="Number of aircraft required for a functional unit",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan",
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":lifespan",
             units="yr",
             val=15.0,
             desc="Expected lifetime of the DC_DC_converter, typically around 15 year",
@@ -49,7 +51,9 @@ class PreLCADCDCConverterProdWeightPerFU(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass_per_fu",
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":mass_per_fu",
             units="kg",
             val=1e-6,
             desc="Mass of the DC_DC_converter required for a functional unit",
@@ -68,7 +72,9 @@ class PreLCADCDCConverterProdWeightPerFU(om.ExplicitComponent):
         self.declare_partials(
             of="*",
             wrt=[
-                "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan",
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":lifespan",
                 "data:TLAR:aircraft_lifespan",
             ],
             method="fd",
@@ -77,12 +83,18 @@ class PreLCADCDCConverterProdWeightPerFU(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
-        outputs["data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass_per_fu"] = (
+        outputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass_per_fu"
+        ] = (
             inputs["data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass"]
             * inputs["data:environmental_impact:aircraft_per_fu"]
             * np.ceil(
                 inputs["data:TLAR:aircraft_lifespan"]
-                / inputs["data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"]
+                / inputs[
+                    "data:propulsion:he_power_train:DC_DC_converter:"
+                    + dc_dc_converter_id
+                    + ":lifespan"
+                ]
             )
         )
 
@@ -94,12 +106,18 @@ class PreLCADCDCConverterProdWeightPerFU(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass",
         ] = inputs["data:environmental_impact:aircraft_per_fu"] * np.ceil(
             inputs["data:TLAR:aircraft_lifespan"]
-            / inputs["data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"]
+            / inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
+            ]
         )
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass_per_fu",
             "data:environmental_impact:aircraft_per_fu",
-        ] = inputs["data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass"] * np.ceil(
+        ] = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass"
+        ] * np.ceil(
             inputs["data:TLAR:aircraft_lifespan"]
-            / inputs["data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"]
+            / inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
+            ]
         )

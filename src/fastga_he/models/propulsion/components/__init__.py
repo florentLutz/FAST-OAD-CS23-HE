@@ -37,7 +37,12 @@ from .connectors.rectifier import (
     SlipstreamRectifier,
     PreLCARectifier,
 )
-from .connectors.fuel_system import SizingFuelSystem, PerformancesFuelSystem, SlipstreamFuelSystem
+from .connectors.fuel_system import (
+    SizingFuelSystem,
+    PerformancesFuelSystem,
+    SlipstreamFuelSystem,
+    PreLCAFuelSystem,
+)
 from .connectors.speed_reducer import (
     SizingSpeedReducer,
     PerformancesSpeedReducer,
