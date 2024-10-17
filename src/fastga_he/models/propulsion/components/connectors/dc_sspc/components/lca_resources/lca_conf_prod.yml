@@ -3,5 +3,6 @@ ANCHOR_COMPONENT_NAME:
         - attribute: "component"
           value: ANCHOR_COMPONENT_NAME
 
-    name: 'market for copper-rich materials'
+    name: 'silicon carbide production'
+    loc: 'RoW'
     amount: ANCHOR_COMPONENT_MASS

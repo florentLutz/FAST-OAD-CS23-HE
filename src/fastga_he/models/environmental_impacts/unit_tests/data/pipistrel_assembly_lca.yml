@@ -134,7 +134,8 @@ model:
                 - attribute: "component"
                   value: dc_sspc_1_production
         
-            name: 'market for copper-rich materials'
+            name: 'silicon carbide production'
+            loc: 'RoW'
             amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_1__mass_per_fu
 
         battery_pack_1:
@@ -151,7 +152,8 @@ model:
                 - attribute: "component"
                   value: dc_sspc_2_production
         
-            name: 'market for copper-rich materials'
+            name: 'silicon carbide production'
+            loc: 'RoW'
             amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_2__mass_per_fu
 
         battery_pack_2:
