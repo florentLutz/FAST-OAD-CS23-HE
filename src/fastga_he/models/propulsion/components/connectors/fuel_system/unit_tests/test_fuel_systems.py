@@ -255,6 +255,7 @@ def test_sizing_tank():
 
     problem.check_partials(compact_print=True)
 
+
 def test_weight_per_fu():
     inputs_list = [
         "data:propulsion:he_power_train:fuel_system:fuel_system_1:mass",

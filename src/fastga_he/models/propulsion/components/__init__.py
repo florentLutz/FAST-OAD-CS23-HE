@@ -47,13 +47,15 @@ from .connectors.speed_reducer import (
     SizingSpeedReducer,
     PerformancesSpeedReducer,
     SlipstreamSpeedReducer,
+    PreLCASpeedReducer,
 )
 from .connectors.planetary_gear import (
     SizingPlanetaryGear,
     PerformancesPlanetaryGear,
     SlipstreamPlanetaryGear,
+    PreLCAPlanetaryGear,
 )
-from .connectors.gearbox import SizingGearbox, PerformancesGearbox, SlipstreamGearbox
+from .connectors.gearbox import SizingGearbox, PerformancesGearbox, SlipstreamGearbox, PreLCAGearbox
 
 from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM, PreLCAPMSM
 from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad

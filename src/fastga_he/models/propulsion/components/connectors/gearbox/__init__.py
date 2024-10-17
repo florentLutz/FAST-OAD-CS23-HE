@@ -8,3 +8,4 @@
 from .components.sizing_gearbox import SizingGearbox
 from .components.perf_gearbox import PerformancesGearbox
 from .components.slipstream_gearbox import SlipstreamGearbox
+from .components.pre_lca_gearbox import PreLCAGearbox

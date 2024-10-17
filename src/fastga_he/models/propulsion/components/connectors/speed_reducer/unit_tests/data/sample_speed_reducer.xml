@@ -1,5 +1,8 @@
 <FASTOAD_model>
     <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
         <geometry>
             <cabin>
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
@@ -23,6 +26,7 @@
             <he_power_train>
                 <speed_reducer>
                     <speed_reducer_1>
+                        <mass units="kg">3.11</mass>
                         <front_length_ratio>0.8</front_length_ratio>
                         <rear_length_ratio>0.5</rear_length_ratio>
                         <CG>

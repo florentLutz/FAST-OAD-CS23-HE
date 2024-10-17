@@ -27,6 +27,8 @@ from ..components.sizing_dimension import SizingPlanetaryGearDimensions
 from ..components.sizing_cg_x import SizingPlanetaryGearCGX
 from ..components.sizing_cg_y import SizingPlanetaryGearCGY
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCAPlanetaryGearProdWeightPerFU
+
 from ..components.perf_planetary_gear import PerformancesPlanetaryGear
 from ..components.sizing_planetary_gear import SizingPlanetaryGear
 
@@ -578,5 +580,25 @@ def test_planetary_gear_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:cruise:CD0",
     ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PreLCAPlanetaryGearProdWeightPerFU(planetary_gear_id="planetary_gear_1"), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:mass_per_fu", units="kg"
+    ) == pytest.approx(1.622e-05, rel=1e-3)
 
     problem.check_partials(compact_print=True)
