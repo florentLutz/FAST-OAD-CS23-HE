@@ -30,7 +30,7 @@ METHODS_TO_FILE = {
     "IMPACT World+ v2.0.1": "impact_world_methods.yml",
     "ReCiPe 2016 v1.03": "recipe_methods.yml",
 }
-NAME_TO_UNIT = {"mass": "kg", "length": "m"}
+NAME_TO_UNIT = {"mass": "kg", "length": "m", "OWE": "kg"}
 LCA_PREFIX = "data:environmental_impact:"
 
 

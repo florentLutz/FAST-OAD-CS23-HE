@@ -14,6 +14,7 @@ from ..lca_htp_weight_per_fu import LCAHTPWeightPerFU
 from ..lca_vtp_weight_per_fu import LCAVTPWeightPerFU
 from ..lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
 from ..lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
+from ..lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
 from ..lca import LCA
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -355,6 +356,31 @@ def test_flight_controls_weight_per_fu():
     problem.check_partials(compact_print=True)
 
 
+def test_empty_aircraft_weight_per_fu():
+    inputs_list = [
+        "data:environmental_impact:aircraft_per_fu",
+        "data:weight:aircraft:OWE",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAEmptyAircraftWeightPerFU(),
+        ivc,
+    )
+
+    assert problem.get_val("data:weight:aircraft:OWE_per_fu", units="kg") == pytest.approx(
+        0.00042658, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_lca_pipistrel():
     ivc = get_indep_var_comp(
         list_inputs(
@@ -396,10 +422,6 @@ def test_lca_pipistrel():
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu"
     ) == pytest.approx(0.00140503, rel=1e-2)
 
-    assert problem.get_val(
-        "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.07961293, rel=1e-5)
-
     # Sanity check
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
@@ -419,8 +441,13 @@ def test_lca_pipistrel():
         + problem.get_val("data:environmental_impact:climate_change:production:horizontal_tail")
         + problem.get_val("data:environmental_impact:climate_change:production:vertical_tail")
         + problem.get_val("data:environmental_impact:climate_change:production:landing_gear")
-        + problem.get_val("data:environmental_impact:climate_change:production:flight_controls"),
+        + problem.get_val("data:environmental_impact:climate_change:production:flight_controls")
+        + problem.get_val("data:environmental_impact:climate_change:production:assembly"),
         rel=1e-4,
     )
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:production:sum"
+    ) == pytest.approx(0.11821691, rel=1e-5)
 
     problem.check_partials(compact_print=True)

@@ -15,6 +15,7 @@ from .lca_htp_weight_per_fu import LCAHTPWeightPerFU
 from .lca_vtp_weight_per_fu import LCAVTPWeightPerFU
 from .lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
 from .lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
+from .lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
 from .lca_core import LCACore, METHODS_TO_FILE
 
 
@@ -71,6 +72,9 @@ class LCA(om.Group):
         self.add_subsystem(name="pre_lca_lg", subsys=LCALandingGearWeightPerFU(), promotes=["*"])
         self.add_subsystem(
             name="pre_lca_flight_control", subsys=LCAFlightControlsWeightPerFU(), promotes=["*"]
+        )
+        self.add_subsystem(
+            name="pre_lca_empty_aircraft", subsys=LCAEmptyAircraftWeightPerFU(), promotes=["*"]
         )
 
         # For the most part we can reuse what is done for the sizing, no need to write a new
