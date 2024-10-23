@@ -77,6 +77,14 @@ class LCACore(om.ExplicitComponent):
             desc="EcoInvent version to use",
             values=["3.9.1"],
         )
+        self.options.declare(
+            name="airframe_material",
+            default="aluminium",
+            desc="Material used for the airframe which include wing, fuselage, HTP and VTP. LG will"
+            " always be in aluminium and flight controls in steel",
+            allow_none=False,
+            values=["aluminium", "composite"],
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
@@ -354,8 +362,7 @@ class LCACore(om.ExplicitComponent):
             for method in dict_with_methods["methods"]:
                 my_file.write('    - "' + method + '"\n')
 
-    @staticmethod
-    def write_production(path_to_yaml: pathlib.Path, dict_with_production):
+    def write_production(self, path_to_yaml: pathlib.Path, dict_with_production):
         with open(path_to_yaml, "a") as my_file:
             my_file.write("\n")
             my_file.write("model:\n")
@@ -364,6 +371,24 @@ class LCACore(om.ExplicitComponent):
             my_file.write('            - attribute: "phase"\n')
             my_file.write('              value: "production"\n')
             my_file.write("\n")
+
+            # Write the production of the aircraft.
+            airframe_material = self.options["airframe_material"]
+            if airframe_material == "aluminium":
+                airframe_material_str = "market for aluminium, cast alloy"
+            else:
+                airframe_material_str = (
+                    "market for carbon fibre reinforced plastic, injection moulded"
+                )
+
+            path_to_airframe_conf_file = RESOURCE_FOLDER_PATH / "lca_conf_airframe.yml"
+            with open(path_to_airframe_conf_file, "r") as airframe_conf:
+                for line_to_copy in airframe_conf.readlines():
+                    line_to_copy = line_to_copy.replace(
+                        "ANCHOR_AIRFRAME_MATERIAL", airframe_material_str
+                    )
+                    my_file.write("        " + line_to_copy)
+                my_file.write("\n")
 
             for component_name in dict_with_production.keys():
                 for line_to_copy in dict_with_production[component_name]:

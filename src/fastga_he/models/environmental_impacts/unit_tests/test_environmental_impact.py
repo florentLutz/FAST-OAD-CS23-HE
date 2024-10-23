@@ -8,6 +8,12 @@ import pytest
 from ..simple_energy_impact import SimpleEnergyImpacts
 from ..lca_core import LCACore
 from ..lca_aircraft_per_fu import LCAAircraftPerFU
+from ..lca_wing_weight_per_fu import LCAWingWeightPerFU
+from ..lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
+from ..lca_htp_weight_per_fu import LCAHTPWeightPerFU
+from ..lca_vtp_weight_per_fu import LCAVTPWeightPerFU
+from ..lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
+from ..lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from ..lca import LCA
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -198,12 +204,164 @@ def test_aircraft_per_fu_pax_km():
     problem.check_partials(compact_print=True)
 
 
+def test_wing_weight_per_fu():
+    inputs_list = [
+        "data:environmental_impact:aircraft_per_fu",
+        "data:weight:airframe:wing:mass",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAWingWeightPerFU(),
+        ivc,
+    )
+
+    assert problem.get_val("data:weight:airframe:wing:mass_per_fu", units="kg") == pytest.approx(
+        9.07426865e-05, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_fuselage_weight_per_fu():
+    inputs_list = [
+        "data:environmental_impact:aircraft_per_fu",
+        "data:weight:airframe:fuselage:mass",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAFuselageWeightPerFU(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:weight:airframe:fuselage:mass_per_fu", units="kg"
+    ) == pytest.approx(5.99973828e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_htp_weight_per_fu():
+    inputs_list = [
+        "data:environmental_impact:aircraft_per_fu",
+        "data:weight:airframe:horizontal_tail:mass",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAHTPWeightPerFU(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:weight:airframe:horizontal_tail:mass_per_fu", units="kg"
+    ) == pytest.approx(2.98789384e-06, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_vtp_weight_per_fu():
+    inputs_list = [
+        "data:environmental_impact:aircraft_per_fu",
+        "data:weight:airframe:vertical_tail:mass",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAVTPWeightPerFU(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:weight:airframe:vertical_tail:mass_per_fu", units="kg"
+    ) == pytest.approx(3.45032812e-06, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_lg_weight_per_fu():
+    inputs_list = [
+        "data:environmental_impact:aircraft_per_fu",
+        "data:weight:airframe:landing_gear:main:mass",
+        "data:weight:airframe:landing_gear:front:mass",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCALandingGearWeightPerFU(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:weight:airframe:landing_gear:mass_per_fu", units="kg"
+    ) == pytest.approx(1.87042076e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_flight_controls_weight_per_fu():
+    inputs_list = [
+        "data:environmental_impact:aircraft_per_fu",
+        "data:weight:airframe:flight_controls:mass",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAFlightControlsWeightPerFU(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:weight:airframe:flight_controls:mass_per_fu", units="kg"
+    ) == pytest.approx(8.25877812e-06, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_lca_pipistrel():
     ivc = get_indep_var_comp(
         list_inputs(
             LCA(
                 power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
                 component_level_breakdown=True,
+                airframe_material="composite",
             )
         ),
         __file__,
@@ -215,6 +373,7 @@ def test_lca_pipistrel():
         LCA(
             power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
             component_level_breakdown=True,
+            airframe_material="composite",
         ),
         ivc,
     )
@@ -239,7 +398,7 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.05654497, rel=1e-5)
+    ) == pytest.approx(0.07961293, rel=1e-5)
 
     # Sanity check
     assert problem.get_val(
@@ -254,7 +413,13 @@ def test_lca_pipistrel():
         + problem.get_val("data:environmental_impact:climate_change:production:dc_sspc_1")
         + problem.get_val("data:environmental_impact:climate_change:production:dc_sspc_2")
         + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_1")
-        + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_2"),
+        + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_2")
+        + problem.get_val("data:environmental_impact:climate_change:production:wing")
+        + problem.get_val("data:environmental_impact:climate_change:production:fuselage")
+        + problem.get_val("data:environmental_impact:climate_change:production:horizontal_tail")
+        + problem.get_val("data:environmental_impact:climate_change:production:vertical_tail")
+        + problem.get_val("data:environmental_impact:climate_change:production:landing_gear")
+        + problem.get_val("data:environmental_impact:climate_change:production:flight_controls"),
         rel=1e-4,
     )
 

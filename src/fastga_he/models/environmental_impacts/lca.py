@@ -9,6 +9,12 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 import fastga_he.models.propulsion.components as he_comp
 
 from .lca_aircraft_per_fu import LCAAircraftPerFU
+from .lca_wing_weight_per_fu import LCAWingWeightPerFU
+from .lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
+from .lca_htp_weight_per_fu import LCAHTPWeightPerFU
+from .lca_vtp_weight_per_fu import LCAVTPWeightPerFU
+from .lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
+from .lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from .lca_core import LCACore, METHODS_TO_FILE
 
 
@@ -44,11 +50,28 @@ class LCA(om.Group):
             desc="EcoInvent version to use",
             values=["3.9.1"],
         )
+        self.options.declare(
+            name="airframe_material",
+            default="aluminium",
+            desc="Material used for the airframe which include wing, fuselage, HTP and VTP. LG will"
+            " always be in aluminium and flight controls in steel",
+            allow_none=False,
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
 
         self.add_subsystem(name="aircraft_per_fu", subsys=LCAAircraftPerFU(), promotes=["*"])
+
+        # Adds all the LCA groups for the airframe which will be here regardless of the powertrain
+        self.add_subsystem(name="pre_lca_wing", subsys=LCAWingWeightPerFU(), promotes=["*"])
+        self.add_subsystem(name="pre_lca_fuselage", subsys=LCAFuselageWeightPerFU(), promotes=["*"])
+        self.add_subsystem(name="pre_lca_htp", subsys=LCAHTPWeightPerFU(), promotes=["*"])
+        self.add_subsystem(name="pre_lca_vtp", subsys=LCAVTPWeightPerFU(), promotes=["*"])
+        self.add_subsystem(name="pre_lca_lg", subsys=LCALandingGearWeightPerFU(), promotes=["*"])
+        self.add_subsystem(
+            name="pre_lca_flight_control", subsys=LCAFlightControlsWeightPerFU(), promotes=["*"]
+        )
 
         # For the most part we can reuse what is done for the sizing, no need to write a new
         # function
@@ -83,6 +106,7 @@ class LCA(om.Group):
                 component_level_breakdown=self.options["component_level_breakdown"],
                 impact_assessment_method=self.options["impact_assessment_method"],
                 ecoinvent_version=self.options["ecoinvent_version"],
+                airframe_material=self.options["airframe_material"],
             ),
             promotes=["*"],
         )

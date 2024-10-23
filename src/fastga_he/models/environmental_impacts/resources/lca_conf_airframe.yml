@@ -1,0 +1,47 @@
+wing:
+    custom_attributes:
+        - attribute: "component"
+          value: wing_production
+
+    name: ANCHOR_AIRFRAME_MATERIAL
+    amount: data__weight__airframe__wing__mass_per_fu
+
+fuselage:
+    custom_attributes:
+        - attribute: "component"
+          value: fuselage_production
+
+    name: ANCHOR_AIRFRAME_MATERIAL
+    amount: data__weight__airframe__fuselage__mass_per_fu
+
+horizontal_tail:
+    custom_attributes:
+        - attribute: "component"
+          value: horizontal_tail_production
+
+    name: ANCHOR_AIRFRAME_MATERIAL
+    amount: data__weight__airframe__horizontal_tail__mass_per_fu
+
+vertical_tail:
+    custom_attributes:
+        - attribute: "component"
+          value: vertical_tail_production
+
+    name: ANCHOR_AIRFRAME_MATERIAL
+    amount: data__weight__airframe__vertical_tail__mass_per_fu
+
+landing_gear:
+    custom_attributes:
+        - attribute: "component"
+          value: landing_gear_production
+
+    name: 'market for aluminium, cast alloy'
+    amount: data__weight__airframe__landing_gear__mass_per_fu
+
+flight_controls:
+    custom_attributes:
+        - attribute: "component"
+          value: flight_controls_production
+
+    name: 'market for steel, unalloyed'
+    amount: data__weight__airframe__landing_gear__mass_per_fu
