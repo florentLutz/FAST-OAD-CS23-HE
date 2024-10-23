@@ -93,4 +93,9 @@ from .source.simple_turbo_generator import (
     PreLCATurboGenerator,
 )
 
-from .tanks.fuel_tanks import SizingFuelTank, PerformancesFuelTank, SlipstreamFuelTank
+from .tanks.fuel_tanks import (
+    SizingFuelTank,
+    PerformancesFuelTank,
+    SlipstreamFuelTank,
+    PreLCAFuelTank,
+)

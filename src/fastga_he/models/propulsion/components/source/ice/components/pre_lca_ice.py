@@ -5,6 +5,7 @@
 import openmdao.api as om
 
 from .pre_lca_prod_weight_per_fu import PreLCAICEProdWeightPerFU
+from .pre_lca_use_emission_per_fu import PreLCAICEUseEmissionPerFU
 
 
 class PreLCAICE(om.Group):
@@ -22,5 +23,10 @@ class PreLCAICE(om.Group):
         self.add_subsystem(
             name="weight_per_fu",
             subsys=PreLCAICEProdWeightPerFU(ice_id=ice_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="emissions_per_fu",
+            subsys=PreLCAICEUseEmissionPerFU(ice_id=ice_id),
             promotes=["*"],
         )

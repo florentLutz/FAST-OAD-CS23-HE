@@ -1,5 +1,8 @@
 <FASTOAD_model>
     <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
         <geometry>
             <flap>
                 <chord_ratio>0.45</chord_ratio>
@@ -48,6 +51,7 @@
                         </CG>
                         <fuel_consumed_mission units="kg">140.0</fuel_consumed_mission>
                         <unusable_fuel_mission units="kg">1.4</unusable_fuel_mission>
+                        <mass units="kg">1.4</mass>
                         <fuel_total_mission units="kg">141.4</fuel_total_mission>
                         <capacity units="kg">282.8</capacity>
                         <volume units="L">393.0</volume>

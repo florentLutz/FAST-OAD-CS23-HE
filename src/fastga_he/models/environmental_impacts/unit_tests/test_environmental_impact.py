@@ -8,6 +8,7 @@ import pytest
 from ..simple_energy_impact import SimpleEnergyImpacts
 from ..lca_core import LCACore
 from ..lca_aircraft_per_fu import LCAAircraftPerFU
+from ..lca_use_flight_per_fu import LCAUseFlightPerFU
 from ..lca_wing_weight_per_fu import LCAWingWeightPerFU
 from ..lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
 from ..lca_htp_weight_per_fu import LCAHTPWeightPerFU
@@ -200,6 +201,31 @@ def test_aircraft_per_fu_pax_km():
 
     assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
         1.70306211e-06, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_use_flight_per_fu_pax_km():
+    inputs_list = [
+        "data:TLAR:range",
+        "data:weight:aircraft:payload",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAUseFlightPerFU(),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:flight_per_fu") == pytest.approx(
+        0.00932427, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -449,5 +475,38 @@ def test_lca_pipistrel():
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
     ) == pytest.approx(0.11821691, rel=1e-5)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_lca_tbm900():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCA(
+                power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
+                component_level_breakdown=True,
+                airframe_material="composite",
+            )
+        ),
+        __file__,
+        DATA_FOLDER_PATH / "tbm900.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCA(
+            power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
+            component_level_breakdown=True,
+            airframe_material="aluminium",
+        ),
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "tbm900_lca.xml"
+    problem.write_outputs()
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:production:sum"
+    ) == pytest.approx(0.00241945, rel=1e-5)
 
     problem.check_partials(compact_print=True)

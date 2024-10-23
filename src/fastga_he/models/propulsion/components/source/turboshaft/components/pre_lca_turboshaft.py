@@ -5,6 +5,7 @@
 import openmdao.api as om
 
 from .pre_lca_prod_weight_per_fu import PreLCATurboshaftProdWeightPerFU
+from .pre_lca_use_emission_per_fu import PreLCATurboshaftUseEmissionPerFU
 
 
 class PreLCATurboshaft(om.Group):
@@ -22,5 +23,10 @@ class PreLCATurboshaft(om.Group):
         self.add_subsystem(
             name="weight_per_fu",
             subsys=PreLCATurboshaftProdWeightPerFU(turboshaft_id=turboshaft_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="emission_per_fu",
+            subsys=PreLCATurboshaftUseEmissionPerFU(turboshaft_id=turboshaft_id),
             promotes=["*"],
         )
