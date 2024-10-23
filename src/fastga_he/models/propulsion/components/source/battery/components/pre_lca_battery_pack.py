@@ -5,6 +5,7 @@
 import openmdao.api as om
 
 from .pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
+from .pre_lca_use_emission_per_fu import PreLCABatteryUseEmissionPerFU
 
 
 class PreLCABatteryPack(om.Group):
@@ -22,5 +23,10 @@ class PreLCABatteryPack(om.Group):
         self.add_subsystem(
             name="weight_per_fu",
             subsys=PreLCABatteryProdWeightPerFU(battery_pack_id=battery_pack_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="emissions_per_fu",
+            subsys=PreLCABatteryUseEmissionPerFU(battery_pack_id=battery_pack_id),
             promotes=["*"],
         )
