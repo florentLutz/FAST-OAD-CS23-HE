@@ -410,6 +410,7 @@ def test_empty_aircraft_weight_per_fu():
 
     problem.check_partials(compact_print=True)
 
+
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_pipistrel():
     ivc = get_indep_var_comp(

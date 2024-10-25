@@ -899,3 +899,17 @@ def test_propulsor_connection():
     # They should all be connected
     assert not all(are_propulsor_connected.values())
     assert not are_propulsor_connected["propeller_1"]
+
+
+def test_tank_fuel_detection():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "turboshaft_propulsion.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    tank_name, _, tank_type = power_train_configurator.get_fuel_tank_list_and_fuel()
+
+    assert tank_name == ["fuel_tank_1", "fuel_tank_2"]
+    assert tank_type == ["jet_fuel", "jet_fuel"]

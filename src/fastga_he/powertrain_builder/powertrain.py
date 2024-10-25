@@ -53,6 +53,8 @@ PROMOTION_FROM_MISSION = {
     "true_airspeed": "m/s",
     "exterior_temperature": "degK",
 }
+# TODO: Find a more generic way to do that, as an attributes in registered_components.py maybe ?
+TYPE_TO_FUEL = {"turboshaft": "jet_fuel", "ICE": "avgas"}
 
 DEFAULT_VOLTAGE_VALUE = 737.800
 
@@ -955,16 +957,53 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._get_components()
         components_names = []
-        component_types = []
+        components_types = []
 
         for component_type_class, component_name, component_type in zip(
             self._components_type_class, self._components_name, self._components_type
         ):
             if "tank" in component_type_class:
                 components_names.append(component_name)
-                component_types.append(component_type)
+                components_types.append(component_type)
 
-        return components_names, component_types
+        return components_names, components_types
+
+    def get_fuel_tank_list_and_fuel(self) -> Tuple[list, list, list]:
+        """
+        Returns the list of components inside the power train which contain fuel and what type of
+        fuel they contain. To do so we'll analyse the source they are connected to.
+        """
+
+        fuel_tanks_names, fuel_tanks_types = self.get_fuel_tank_list()
+        source_names = self.get_energy_consumption_list()
+        name_to_type = dict(zip(self._components_name, self._components_type))
+
+        fuel_types = []
+
+        connected_graphs = self.get_connection_graph()
+
+        for fuel_tank_name in fuel_tanks_names:
+            for connected_graph in connected_graphs:
+                if fuel_tank_name not in list(connected_graph.nodes):
+                    continue
+                else:
+                    # We check which sources is the closest neighbor
+                    distance_closest_source = np.inf
+                    distances_in_graph = dict(nx.all_pairs_shortest_path_length(connected_graph))
+                    distances_to_tank = distances_in_graph[fuel_tank_name]
+
+                    for source_name in source_names:
+                        if source_name in distances_to_tank:
+                            if distances_to_tank[source_name] < distance_closest_source:
+                                closest_source = source_name
+                                distance_closest_source = distances_to_tank[source_name]
+
+            # I trust that there will always be at least one source connected to tank.
+            # I shouldn't
+            # But I do
+            fuel_types.append(TYPE_TO_FUEL[name_to_type[closest_source]])
+
+        return fuel_tanks_names, fuel_tanks_types, fuel_types
 
     def get_residuals_watcher_elements_list(self) -> tuple:
         """
@@ -1216,6 +1255,39 @@ class FASTGAHEPowerTrainConfigurator:
 
         return any(self._source_does_not_make_mass_vary)
 
+    def get_connection_graph(self) -> list:
+        """
+        This function returns a graph of connection inside the powertrain without doubling the
+        components like what get_graphs_connected_voltage() does
+        """
+
+        self._get_connections()
+
+        graph = nx.Graph()
+
+        for component_name in self._components_name:
+            graph.add_node(component_name)
+
+        for connection in self._connection_list:
+            # For bus and splitter, we don't really care about what number of input it is
+            # connected to, so we do the following
+
+            if type(connection["source"]) is list:
+                source = connection["source"][0]
+            else:
+                source = connection["source"]
+
+            if type(connection["target"]) is list:
+                target = connection["target"][0]
+            else:
+                target = connection["target"]
+
+            graph.add_edge(source, target)
+
+        sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+
+        return sub_graphs
+
     def get_graphs_connected_voltage(self) -> list:
         """
         This function returns a list of graphs of connected PT components that have more or less
@@ -1245,7 +1317,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         for connection in self._connection_list:
             # For bus and splitter, we don't really care about what number of input it is
-            # connected to so we do the following
+            # connected to, so we do the following
 
             if type(connection["source"]) is list:
                 source = connection["source"][0]
