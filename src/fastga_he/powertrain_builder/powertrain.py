@@ -110,11 +110,11 @@ class FASTGAHEPowerTrainConfigurator:
         # computations to slipstream computation
         self._components_performances_to_slipstream = None
 
-        # Contains a list with, for each component, a boolean telling whether or not the component
+        # Contains a list with, for each component, a boolean telling whether the component
         # needs the flaps position for the computation of the slipstream effects
         self._components_slipstream_flaps = None
 
-        # Contains a list with, for each component, a boolean telling whether or not the component
+        # Contains a list with, for each component, a boolean telling whether the component
         # lift increase is added to the wing. Will be used for the increase in induced drag
         self._components_slipstream_wing_lift = None
 
@@ -144,25 +144,25 @@ class FASTGAHEPowerTrainConfigurator:
         # computed as twice the weight of a half-wing
         self._components_symmetrical_pairs = None
 
-        # Contains the list of all boolean telling whether or not the components will make the
+        # Contains the list of all boolean telling whether the components will make the
         # aircraft weight vary during flight
         self._components_makes_mass_vary = None
 
-        # Contains the list of all boolean telling whether or not the components are energy
+        # Contains the list of all boolean telling whether the components are energy
         # sources that do not make the aircraft vary (ergo they will have a non-nil unconsumable
         # energy)
         self._source_does_not_make_mass_vary = None
 
-        # Contains the list of an initial guess of the components efficiency. Is used to compute
+        # Contains the list of an initial guess of the component's efficiency. Is used to compute
         # the initial of the currents and power of each component
         self._components_efficiency = None
 
-        # Contains the list of control parameters name for each components. Is used to detect
+        # Contains the list of control parameters name for each component. Is used to detect
         # them in cas we want to give them a different name during the mission
         self._components_control_parameters = None
 
         # Because of their very peculiar role, we will scan the architecture for any SSPC defined
-        # by the user and whether or not they are at the output of a bus, because a specific
+        # by the user and whether they are at the output of a bus, because a specific
         # option needs to be turned on in this was
         self._sspc_list = {}
 
@@ -225,7 +225,7 @@ class FASTGAHEPowerTrainConfigurator:
 
     def _get_components(self):
         # We will work under the assumption that is one list is empty, all are hence only one if
-        # statement. This allows us to know whether or not retriggering the identification of
+        # statement. This allows us to know whether retriggering the identification of
         # components is necessary
 
         if self._components_id is None:
@@ -290,7 +290,7 @@ class FASTGAHEPowerTrainConfigurator:
 
                 # We sort the pair to ensure that if the pair is already there because the
                 # symmetrical tag is defined twice (propeller1 is symmetrical to propeller2 and
-                # propeller2 is symmetrical to propeller1) it will have the same name and we
+                # propeller2 is symmetrical to propeller1) it will have the same name, and we
                 # don't have to register it twice.
                 sorted_pair = sorted([component_name, component_symmetrical])
 
@@ -2252,6 +2252,68 @@ class FASTGAHEPowerTrainConfigurator:
                 clean_dict[component_name] = clean_lines
 
         return clean_dict
+
+    def get_lca_use_phase_element_list(self) -> Tuple[Dict, List]:
+        # I still hate doing that here, but it prevents a circular import
+        import fastga_he.models.propulsion.components as he_comp
+
+        # We will start with the assumption that if a component of the powertrain has an impact
+        # in the use phase, it will have a computation of the emissions, even if they can be nil.
+
+        clean_dict = {}
+
+        species_list = []
+
+        for component_name, component_om_type, component_type in zip(
+            self._components_name, self._components_om_type, self._components_type
+        ):
+            sizing_group = he_comp.__dict__["Sizing" + component_om_type]
+            path_to_sizing_file = pathlib.Path(sys.modules[sizing_group.__module__].__file__)
+
+            # The sizing class is defined inside components/sizing...py and the lca template is in
+            # components/lca_resources/lca_conf.yml so:
+
+            path_to_lca_use_conf_template = (
+                path_to_sizing_file.parents[0] / "lca_resources/lca_conf_use.yml"
+            )
+
+            if pth.exists(path_to_lca_use_conf_template):
+                # If the component has an impact on the use phase, it must release species in the
+                # air, which means it must have a species list. We intersect those list to have the
+                # names of the species release by the power train  and update the NAME_TO_UNIT
+                # dict in the lca_core script.
+                pre_lca_group = he_comp.__dict__["PreLCA" + component_om_type]()
+                species_list = species_list + pre_lca_group.species_list
+
+                clean_lines = []
+                with open(path_to_lca_use_conf_template, "r") as template_file:
+                    for line in template_file.readlines():
+                        # Important to add in the definition of the custom attribute, the name of
+                        # the phase as the code writes it in the lca conf file.
+
+                        # If an anchor for an emission is added, we put the right variable name
+                        if "ANCHOR_EMISSION" in line:
+                            line_to_add = line.replace(
+                                "ANCHOR_EMISSION_",
+                                "data__LCA__operation__he_power_train__"
+                                + component_type
+                                + "__"
+                                + component_name
+                                + "__",
+                            )
+                            line_to_add = line_to_add.replace("\n", "")
+                            line_to_add = line_to_add + "_per_fu\n"
+                        else:
+                            line_to_add = line.replace(
+                                "value: ANCHOR_COMPONENT_NAME",
+                                "value: " + component_name + "_operation",
+                            ).replace("ANCHOR_COMPONENT_NAME", component_name)
+
+                        clean_lines.append(line_to_add)
+
+                clean_dict[component_name] = clean_lines
+
+        return clean_dict, list(set(species_list))
 
 
 class _YAMLSerializer(ABC):

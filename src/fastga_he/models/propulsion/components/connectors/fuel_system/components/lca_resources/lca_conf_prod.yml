@@ -3,7 +3,7 @@ ANCHOR_COMPONENT_NAME:
         - attribute: "component"
           value: ANCHOR_COMPONENT_NAME
 
-    propeller:
+    fuel_system:
       amount: ANCHOR_COMPONENT_MASS
       unit: kilogram
 

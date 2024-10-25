@@ -1066,6 +1066,7 @@ def test_weight_per_fu():
 
     problem.check_partials(compact_print=True)
 
+
 def test_emissions_per_fu():
     inputs_list = [
         "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:CO2",

@@ -5,10 +5,15 @@
 import openmdao.api as om
 
 from .pre_lca_prod_weight_per_fu import PreLCATurboshaftProdWeightPerFU
-from .pre_lca_use_emission_per_fu import PreLCATurboshaftUseEmissionPerFU
+from .pre_lca_use_emission_per_fu import PreLCATurboshaftUseEmissionPerFU, SPECIES_LIST
 
 
 class PreLCATurboshaft(om.Group):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.species_list = SPECIES_LIST
+
     def initialize(self):
         self.options.declare(
             name="turboshaft_id",

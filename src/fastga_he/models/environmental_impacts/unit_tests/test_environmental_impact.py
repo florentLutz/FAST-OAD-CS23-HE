@@ -485,7 +485,7 @@ def test_lca_tbm900():
             LCA(
                 power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
                 component_level_breakdown=True,
-                airframe_material="composite",
+                airframe_material="aluminium",
             )
         ),
         __file__,
@@ -508,5 +508,13 @@ def test_lca_tbm900():
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
     ) == pytest.approx(0.00241945, rel=1e-5)
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:production:turboshaft_1"
+    ) == pytest.approx(0.00034762, rel=1e-3)
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:operation:turboshaft_1"
+    ) == pytest.approx(0.21645, rel=1e-3)
 
     problem.check_partials(compact_print=True)

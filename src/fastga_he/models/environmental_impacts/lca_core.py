@@ -51,6 +51,8 @@ class LCACore(om.ExplicitComponent):
         # Seems required to do it here
         dotenv.load_dotenv()
 
+        self.name_to_unit = NAME_TO_UNIT
+
     def initialize(self):
         self.options.declare(
             name="power_train_file_path",
@@ -125,7 +127,7 @@ class LCACore(om.ExplicitComponent):
                 self.add_input(
                     parameter_name,
                     val=np.nan,
-                    units=NAME_TO_UNIT[parameter_name.split(":")[-1].replace("_per_fu", "")],
+                    units=self.name_to_unit[parameter_name.split(":")[-1].replace("_per_fu", "")],
                 )
 
         for m in self.methods:
@@ -395,6 +397,21 @@ class LCACore(om.ExplicitComponent):
                     my_file.write("        " + line_to_copy)
                 my_file.write("\n")
 
+    @staticmethod
+    def write_use(path_to_yaml: pathlib.Path, dict_with_use):
+        with open(path_to_yaml, "a") as my_file:
+            my_file.write("\n")
+            my_file.write("    use:\n")
+            my_file.write("        custom_attributes:\n")
+            my_file.write('            - attribute: "phase"\n')
+            my_file.write('              value: "operation"\n')
+            my_file.write("\n")
+
+            for component_name in dict_with_use.keys():
+                for line_to_copy in dict_with_use[component_name]:
+                    my_file.write("        " + line_to_copy)
+                my_file.write("\n")
+
     def write_lca_conf_file(self):
         ecoinvent_version = self.options["ecoinvent_version"]
         methods = self.options["impact_assessment_method"]
@@ -418,6 +435,12 @@ class LCACore(om.ExplicitComponent):
         # This function writes the "model: " in the yml so it must be run before anything else
         # that need to go in the model section in the model section
         self.write_production(lca_conf_file_path, dict_with_production)
+
+        dict_with_use, species_list = self.configurator.get_lca_use_phase_element_list()
+        for specie in species_list:
+            self.name_to_unit[specie] = "kg"
+
+        self.write_use(lca_conf_file_path, dict_with_use)
 
         methods_file = RESOURCE_FOLDER_PATH / METHODS_TO_FILE[methods]
 

@@ -5,10 +5,15 @@
 import openmdao.api as om
 
 from .pre_lca_prod_weight_per_fu import PreLCAICEProdWeightPerFU
-from .pre_lca_use_emission_per_fu import PreLCAICEUseEmissionPerFU
+from .pre_lca_use_emission_per_fu import PreLCAICEUseEmissionPerFU, SPECIES_LIST
 
 
 class PreLCAICE(om.Group):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.species_list = SPECIES_LIST
+
     def initialize(self):
         self.options.declare(
             name="ice_id",
