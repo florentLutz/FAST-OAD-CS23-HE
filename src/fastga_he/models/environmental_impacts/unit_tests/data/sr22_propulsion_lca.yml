@@ -1,4 +1,4 @@
-project: tbm900_propulsion
+project: sr22_propulsion
 
 ecoinvent:
     version: 3.9.1
@@ -15,7 +15,7 @@ model:
                 - attribute: "component"
                   value: wing_production
         
-            name: market for aluminium, cast alloy
+            name: market for carbon fibre reinforced plastic, injection moulded
             amount: data__weight__airframe__wing__mass_per_fu
         
         fuselage:
@@ -23,7 +23,7 @@ model:
                 - attribute: "component"
                   value: fuselage_production
         
-            name: market for aluminium, cast alloy
+            name: market for carbon fibre reinforced plastic, injection moulded
             amount: data__weight__airframe__fuselage__mass_per_fu
         
         horizontal_tail:
@@ -31,7 +31,7 @@ model:
                 - attribute: "component"
                   value: horizontal_tail_production
         
-            name: market for aluminium, cast alloy
+            name: market for carbon fibre reinforced plastic, injection moulded
             amount: data__weight__airframe__horizontal_tail__mass_per_fu
         
         vertical_tail:
@@ -39,7 +39,7 @@ model:
                 - attribute: "component"
                   value: vertical_tail_production
         
-            name: market for aluminium, cast alloy
+            name: market for carbon fibre reinforced plastic, injection moulded
             amount: data__weight__airframe__vertical_tail__mass_per_fu
         
         landing_gear:
@@ -212,104 +212,14 @@ model:
                   categories:
                     - 'air'
 
-        turboshaft_1:
+        ice_1:
             custom_attributes:
                 - attribute: "component"
-                  value: turboshaft_1_production
+                  value: ice_1_production
         
-            turboshaft:
-              amount: data__propulsion__he_power_train__turboshaft__turboshaft_1__mass_per_fu
-              unit: kilogram
-        
-              production:
-                # For all of those we use the weight ration from :cite:`thonemann:2024`
-                aluminium_alloy:
-                  name: 'market for aluminium, cast alloy'
-                  loc: 'GLO'
-                  amount: 0.127
-        
-                titanium_aluminide:
-                  name: 'titanium production'
-                  loc: 'GLO'
-                  amount: 0.086
-        
-                magnesium_alloy:
-                  name: 'market for magnesium-alloy, AZ91'
-                  loc: 'GLO'
-                  amount: 0.040
-        
-                nickel_alloy:
-                  name: 'market for iron-nickel-chromium alloy'
-                  amount: 0.263
-        
-                metal_matrix_composite: # Also account for ceramic matrix composite as I couldn't find the process
-                  name: 'market for aluminium alloy, metal matrix composite'
-                  amount: 0.483
-        
-                # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
-                # with the mass
-                electricity:
-                  name: 'electricity, high voltage, European attribute mix'
-                  amount: 9484 / 237 # We are giving here the amount for 1 kg of turboshaft since we are defining a custom process
-        
-                gas:
-                  name: 'natural gas, burned in gas turbine'  # Not sure about this one
-                  loc: 'RoE'
-                  amount: 9537 / 237 * 3.6 # kWh to MJ
-        
-                heat_and_steam:
-                  name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
-                  loc: 'RoW'
-                  amount: 1190 / 237 * 3.6 # kWh to MJ
-        
-                diesel:
-                  name: 'market for diesel'
-                  loc: 'Europe without Switzerland'
-                  amount: 2524 / 237 * 3.6 / 45.6 # kWh to MJ to kg
-        
-                kerosene: # SAF aggregated in here because the process does not exist
-                  name: 'market for kerosene'
-                  loc: 'RoW'
-                  amount: 5168 / 237 * 3.6 / 43.0 # kWh to MJ to kg
-        
-                water_in:
-                  name: 'market for water, decarbonised'
-                  loc: 'RoW'
-                  amount: 23 / 237 # In m**3 but since 1m**3 = 1kg
-        
-                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-                  amount: 22 / 237
-                  name: 'water'
-                  categories:
-                    - 'water'
-                    - 'ground-'
-        
-                CO2:
-                  amount: 9858 / 237 # In kg
-                  name: 'carbon dioxide, fossil'  # this is a biosphere process
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                SOx:
-                  amount: 0.105 / 237
-                  name: 'sulfur dioxide'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                NOx:
-                  amount: 3.030 / 237
-                  name: 'nitrogen oxides'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                VOC:
-                  amount: 14.347 / 237
-                  name: 'VOC, volatile organic compounds'
-                  categories:
-                    - 'air'
+            name: 'internal combustion engine production, passenger car'
+            loc: 'GLO'
+            amount: data__propulsion__he_power_train__ICE__ice_1__mass_per_fu
 
         fuel_system_1:
             custom_attributes:
@@ -401,49 +311,56 @@ model:
             - attribute: "phase"
               value: "operation"
 
-        turboshaft_1:
+        ice_1:
             custom_attributes:
                 - attribute: "component"
-                  value: turboshaft_1_operation
+                  value: ice_1_operation
         
             CO2:
-              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__CO2_per_fu
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__CO2_per_fu
               name: 'carbon dioxide, fossil'  # this is a biosphere process
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             CO:
-              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__CO_per_fu
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__CO_per_fu
               name: 'carbon monoxide, fossil'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             SOx:
-              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__SOx_per_fu
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__SOx_per_fu
               name: 'sulfur dioxide'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             NOx:
-              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__NOx_per_fu
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__NOx_per_fu
               name: 'nitrogen oxides'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__H2O_per_fu
               name: 'water'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             PM:
-              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__HC_per_fu
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__HC_per_fu
               name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            lead:
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__lead_per_fu
+              name: 'Lead II'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'

@@ -26,7 +26,7 @@ ANCHOR_COMPONENT_NAME:
 
     NOx:
       amount: ANCHOR_EMISSION_NOx
-      name: 'sulfur dioxide'
+      name: 'nitrogen oxides'
       categories:
         - 'air'
         - 'lower stratosphere + upper troposphere'

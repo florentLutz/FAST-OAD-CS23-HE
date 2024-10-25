@@ -43,6 +43,7 @@ from ..components.perf_inflight_nox_emissions import PerformancesICEInFlightNOxE
 from ..components.perf_inflight_sox_emissions import PerformancesICEInFlightSOxEmissions
 from ..components.perf_inflight_h2o_emissions import PerformancesICEInFlightH2OEmissions
 from ..components.perf_inflight_hc_emissions import PerformancesICEInFlightHCEmissions
+from ..components.perf_inflight_lead_emissions import PerformancesICEInFlightLeadEmissions
 from ..components.perf_inflight_emissions_sum import PerformancesICEInFlightEmissionsSum
 from ..components.perf_inflight_emissions import PerformancesICEInFlightEmissions
 
@@ -696,6 +697,29 @@ def test_in_flight_hc_emissions():
     problem.check_partials(compact_print=True)
 
 
+def test_in_flight_lead_emissions():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([5.12, 5.5, 5.9, 6.33, 6.81, 7.33, 7.89, 8.44, 9.1, 9.72]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesICEInFlightLeadEmissions(ice_id="ice_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val("lead_emissions", units="g") == pytest.approx(
+        np.array(
+            [4.06528, 4.367, 4.6846, 5.02602, 5.40714, 5.82002, 6.26466, 6.70136, 7.2254, 7.71768]
+        ),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_in_flight_emissions_sum():
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -771,6 +795,13 @@ def test_in_flight_emissions_sum():
             ]
         ),
     )
+    ivc.add_output(
+        "lead_emissions",
+        units="g",
+        val=np.array(
+            [4.06528, 4.367, 4.6846, 5.02602, 5.40714, 5.82002, 6.26466, 6.70136, 7.2254, 7.71768]
+        ),
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -795,6 +826,9 @@ def test_in_flight_emissions_sum():
     assert problem.get_val(
         "data:LCA:operation:he_power_train:ICE:ice_1:HC", units="g"
     ) == pytest.approx(1361.06, rel=1e-2)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:ICE:ice_1:lead", units="g"
+    ) == pytest.approx(57.27916, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

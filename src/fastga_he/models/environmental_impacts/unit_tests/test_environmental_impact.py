@@ -2,6 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import os
+
 import pathlib
 import pytest
 
@@ -23,6 +25,8 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 XML_FILE = "data.xml"
 DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "results"
+
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def test_impact_sizing_jet_fuel():
@@ -406,7 +410,7 @@ def test_empty_aircraft_weight_per_fu():
 
     problem.check_partials(compact_print=True)
 
-
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_pipistrel():
     ivc = get_indep_var_comp(
         list_inputs(
@@ -483,6 +487,7 @@ def test_lca_pipistrel():
     problem.check_partials(compact_print=True)
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_tbm900():
     ivc = get_indep_var_comp(
         list_inputs(
@@ -520,5 +525,42 @@ def test_lca_tbm900():
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:turboshaft_1"
     ) == pytest.approx(0.21645, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_cirrus_sr22():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCA(
+                power_train_file_path=DATA_FOLDER_PATH / "sr22_propulsion.yml",
+                component_level_breakdown=True,
+                airframe_material="composite",
+            )
+        ),
+        __file__,
+        DATA_FOLDER_PATH / "sr22.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCA(
+            power_train_file_path=DATA_FOLDER_PATH / "sr22_propulsion.yml",
+            component_level_breakdown=True,
+            airframe_material="composite",
+        ),
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "sr22_lca.xml"
+    problem.write_outputs()
+
+    assert problem.get_val(
+        "data:environmental_impact:human_toxicity_non-carcinogenic:operation:ice_1"
+    ) == pytest.approx(0.69629354, rel=1e-3)
+    assert problem.get_val(
+        "data:environmental_impact:human_toxicity_carcinogenic:operation:ice_1"
+    ) == pytest.approx(0.00058180, rel=1e-3)
 
     problem.check_partials(compact_print=True)

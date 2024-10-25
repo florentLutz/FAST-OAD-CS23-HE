@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-SPECIES_LIST = ["CO2", "CO", "NOx", "SOx", "HC", "H2O"]
+SPECIES_LIST = ["CO2", "CO", "NOx", "SOx", "HC", "H2O", "lead"]
 
 
 class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):

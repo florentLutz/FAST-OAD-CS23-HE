@@ -44,3 +44,10 @@ ANCHOR_COMPONENT_NAME:
       categories:
         - 'air'
         - 'lower stratosphere + upper troposphere'
+
+    lead:
+      amount: ANCHOR_EMISSION_lead
+      name: 'Lead II'
+      categories:
+        - 'air'
+        - 'lower stratosphere + upper troposphere'
