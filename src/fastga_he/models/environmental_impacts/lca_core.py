@@ -402,6 +402,8 @@ class LCACore(om.ExplicitComponent):
         with open(path_to_yaml, "a") as my_file:
             my_file.write("\n")
             my_file.write("    use:\n")
+            # The use of use seem to cause problem when written
+            # somewhere else in the code but not here, so it'll stay like that there
             my_file.write("        custom_attributes:\n")
             my_file.write('            - attribute: "phase"\n')
             my_file.write('              value: "operation"\n')

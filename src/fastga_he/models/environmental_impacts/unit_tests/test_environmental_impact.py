@@ -476,6 +476,10 @@ def test_lca_pipistrel():
         "data:environmental_impact:climate_change:production:sum"
     ) == pytest.approx(0.11821691, rel=1e-5)
 
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:operation:battery_pack_1"
+    ) == pytest.approx(0.0, abs=1e-5)
+
     problem.check_partials(compact_print=True)
 
 

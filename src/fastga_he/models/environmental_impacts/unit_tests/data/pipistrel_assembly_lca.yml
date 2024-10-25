@@ -132,6 +132,7 @@ model:
                   name: 'VOC, volatile organic compounds'
                   categories:
                     - 'air'
+
         propeller_1:
             custom_attributes:
                 - attribute: "component"
@@ -286,6 +287,106 @@ model:
             name: 'battery production, Li-ion, NMC111, rechargeable, prismatic'
             loc: 'RoW'
             amount: data__propulsion__he_power_train__battery_pack__battery_pack_2__mass_per_fu
+
+
+    use:
+        custom_attributes:
+            - attribute: "phase"
+              value: "operation"
+
+        battery_pack_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: battery_pack_1_operation
+        
+            CO2:
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_1__NOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_1__H2O_per_fu
+              name: 'water'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        battery_pack_2:
+            custom_attributes:
+                - attribute: "component"
+                  value: battery_pack_2_operation
+        
+            CO2:
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__NOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__H2O_per_fu
+              name: 'water'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
 
 
 methods:
