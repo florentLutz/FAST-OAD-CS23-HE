@@ -2,6 +2,7 @@
   <data>
     <environmental_impact>
       <aircraft_per_fu>1e-6</aircraft_per_fu>
+      <flight_per_fu is_input="False">0.00932426502852128<!--Number of flight required to perform a functionnal unit, defined here as carrying 85kg over one km--></flight_per_fu>
     </environmental_impact>
     <TLAR>
       <NPAX_design is_input="True">0.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>
@@ -479,7 +480,7 @@
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <energy units="W*h" is_input="False">12506.640872674561<!--Energy drawn from the battery for the mission--></energy>
+            <energy_consumed_mission units="W*h" is_input="False">12506.640872674561<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
             <mass units="kg" is_input="False">75.00000000000001<!--Mass of the battery pack--></mass>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_cells is_input="False">1152.0<!--Total number of cells in the battery pack--></number_cells>
@@ -523,7 +524,7 @@
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <energy units="W*h" is_input="False">12506.640872674567<!--Energy drawn from the battery for the mission--></energy>
+            <energy_consumed_mission units="W*h" is_input="False">12506.640872674567<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
             <mass units="kg" is_input="False">75.00000000000001<!--Mass of the battery pack--></mass>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_cells is_input="False">1152.0<!--Total number of cells in the battery pack--></number_cells>

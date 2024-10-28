@@ -2265,6 +2265,27 @@ class FASTGAHEPowerTrainConfigurator:
 
         return all_current_dict
 
+    def get_battery_list(self) -> Tuple[list, list]:
+        """
+        Returns the list of components inside the power train that are batteries. This function is
+        used to see where the electricity is stored in the powertrain for the LCA. For now, it tests
+        the id of the component, but it should be more generic in the future for components like
+        super-capacitors and others.
+        """
+
+        self._get_components()
+        components_names = []
+        components_types = []
+
+        for component_id, component_name, component_type in zip(
+            self._components_id, self._components_name, self._components_type
+        ):
+            if "battery_pack" in component_id:
+                components_names.append(component_name)
+                components_types.append(component_type)
+
+        return components_names, components_types
+
     def get_lca_production_element_list(self) -> Dict:
         # I hate doing that here, but it prevents a circular import
         import fastga_he.models.propulsion.components as he_comp

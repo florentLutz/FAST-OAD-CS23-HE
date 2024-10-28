@@ -34,7 +34,9 @@ class PerformancesEnergyConsumed(om.ExplicitComponent):
             units="W*h",
         )
         self.add_output(
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":energy_consumed_mission",
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":energy_consumed_mission",
             units="W*h",
             val=50e3,
             desc="Energy drawn from the battery for the mission",
@@ -52,6 +54,8 @@ class PerformancesEnergyConsumed(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         battery_pack_id = self.options["battery_pack_id"]
 
-        outputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":energy_consumed_mission"] = (
-            np.sum(inputs["non_consumable_energy_t"])
-        )
+        outputs[
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":energy_consumed_mission"
+        ] = np.sum(inputs["non_consumable_energy_t"])

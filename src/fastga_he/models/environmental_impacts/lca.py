@@ -18,6 +18,11 @@ from .lca_vtp_weight_per_fu import LCAVTPWeightPerFU
 from .lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
 from .lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from .lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
+
+from .lca_gasoline_per_fu import LCAGasolinePerFU
+from .lca_kerosene_per_fu import LCAKerosenePerFU
+from .lca_electricty_per_fu import LCAElectricityPerFU
+
 from .lca_core import LCACore, METHODS_TO_FILE
 
 
@@ -105,6 +110,50 @@ class LCA(om.Group):
             local_sub_sys.options[component_name_id] = component_name
 
             self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
+
+        # Add the component to compute kerosene/gasoline/electricity_per_fu if needed
+
+        gasoline_tank_names, gasoline_tank_types = [], []
+        kerosene_tank_names, kerosene_tank_types = [], []
+
+        tank_names, tank_types, contents = self.configurator.get_fuel_tank_list_and_fuel()
+
+        for tank_name, tank_type, content in zip(tank_names, tank_types, contents):
+            if content == "jet_fuel":
+                kerosene_tank_names.append(tank_name)
+                kerosene_tank_types.append(tank_type)
+            elif content == "avgas":
+                gasoline_tank_names.append(tank_name)
+                gasoline_tank_types.append(tank_type)
+
+        if gasoline_tank_names:
+            self.add_subsystem(
+                name="pre_lca_avgas",
+                subsys=LCAGasolinePerFU(
+                    tanks_name_list=gasoline_tank_names, tanks_type_list=gasoline_tank_types
+                ),
+                promotes=["*"],
+            )
+
+        if kerosene_tank_types:
+            self.add_subsystem(
+                name="pre_lca_kerosene",
+                subsys=LCAKerosenePerFU(
+                    tanks_name_list=kerosene_tank_names, tanks_type_list=kerosene_tank_types
+                ),
+                promotes=["*"],
+            )
+
+        battery_names, battery_types = self.configurator.get_battery_list()
+
+        if battery_names:
+            self.add_subsystem(
+                name="pre_lca_electricity",
+                subsys=LCAElectricityPerFU(
+                    batteries_name_list=battery_names, batteries_type_list=battery_types
+                ),
+                promotes=["*"],
+            )
 
         self.add_subsystem(
             name="lca_core",

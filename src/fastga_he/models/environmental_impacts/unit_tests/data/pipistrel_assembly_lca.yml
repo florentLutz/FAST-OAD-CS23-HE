@@ -322,7 +322,7 @@ model:
         
             NOx:
               amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_1__NOx_per_fu
-              name: 'sulfur dioxide'
+              name: 'nitrogen oxides'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
@@ -369,7 +369,7 @@ model:
         
             NOx:
               amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__NOx_per_fu
-              name: 'sulfur dioxide'
+              name: 'nitrogen oxides'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'

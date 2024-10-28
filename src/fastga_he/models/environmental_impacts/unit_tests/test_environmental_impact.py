@@ -18,6 +18,9 @@ from ..lca_vtp_weight_per_fu import LCAVTPWeightPerFU
 from ..lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
 from ..lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from ..lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
+from ..lca_kerosene_per_fu import LCAKerosenePerFU
+from ..lca_gasoline_per_fu import LCAGasolinePerFU
+from ..lca_electricty_per_fu import LCAElectricityPerFU
 from ..lca import LCA
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -411,6 +414,31 @@ def test_empty_aircraft_weight_per_fu():
     problem.check_partials(compact_print=True)
 
 
+def test_electricity_per_fu_velis():
+    inputs_list = [
+        "data:environmental_impact:flight_per_fu",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, DATA_FOLDER_PATH / "data.xml")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAElectricityPerFU(
+            batteries_name_list=["battery_pack_1", "battery_pack_2"],
+            batteries_type_list=["battery_pack", "battery_pack"],
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:electricity_per_fu", units="W*h"
+    ) == pytest.approx(233.23046823, rel=1e-5)
+
+    problem.check_partials(compact_print=True)
+
+
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_pipistrel():
     ivc = get_indep_var_comp(
@@ -488,6 +516,31 @@ def test_lca_pipistrel():
     problem.check_partials(compact_print=True)
 
 
+def test_kerosene_per_fu_tbm900():
+    inputs_list = [
+        "data:environmental_impact:flight_per_fu",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, DATA_FOLDER_PATH / "tbm900.xml")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAKerosenePerFU(
+            tanks_name_list=["fuel_tank_1", "fuel_tank_2"],
+            tanks_type_list=["fuel_tank", "fuel_tank"],
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:LCA:operation:he_power_train:kerosene_per_fu") == pytest.approx(
+        0.80076265, rel=1e-5
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_tbm900():
     ivc = get_indep_var_comp(
@@ -526,6 +579,31 @@ def test_lca_tbm900():
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:turboshaft_1"
     ) == pytest.approx(0.21645, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_gasoline_per_fu_sr22():
+    inputs_list = [
+        "data:environmental_impact:flight_per_fu",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, DATA_FOLDER_PATH / "sr22.xml")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAGasolinePerFU(
+            tanks_name_list=["fuel_tank_1", "fuel_tank_2"],
+            tanks_type_list=["fuel_tank", "fuel_tank"],
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:LCA:operation:he_power_train:gasoline_per_fu") == pytest.approx(
+        0.23346842, rel=1e-5
+    )
 
     problem.check_partials(compact_print=True)
 

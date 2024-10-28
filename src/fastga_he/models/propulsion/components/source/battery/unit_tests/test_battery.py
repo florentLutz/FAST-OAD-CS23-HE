@@ -1024,7 +1024,8 @@ def test_energy_consumed():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission", units="kW*h"
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
+        units="kW*h",
     ) == pytest.approx(421.867, rel=1e-2)
 
     problem.check_partials(compact_print=True)
