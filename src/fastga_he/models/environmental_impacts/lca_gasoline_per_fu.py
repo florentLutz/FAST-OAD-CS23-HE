@@ -30,7 +30,7 @@ class LCAGasolinePerFU(om.ExplicitComponent):
         self.add_input(name="data:environmental_impact:flight_per_fu", val=1e-3)
 
         self.add_output(
-            name="data:LCA:operation:he_power_train:gasoline_per_fu", units="kg", val=0.0
+            name="data:LCA:operation:he_power_train:gasoline:mass_per_fu", units="kg", val=0.0
         )
 
         for tank_name, tank_type in zip(tanks_names, tanks_types):
@@ -61,7 +61,7 @@ class LCAGasolinePerFU(om.ExplicitComponent):
                 + ":fuel_consumed_mission"
             ]
 
-        outputs["data:LCA:operation:he_power_train:gasoline_per_fu"] = (
+        outputs["data:LCA:operation:he_power_train:gasoline:mass_per_fu"] = (
             total_fuel * inputs["data:environmental_impact:flight_per_fu"]
         )
 
@@ -73,7 +73,7 @@ class LCAGasolinePerFU(om.ExplicitComponent):
 
         for tank_name, tank_type in zip(tanks_names, tanks_types):
             partials[
-                "data:LCA:operation:he_power_train:gasoline_per_fu",
+                "data:LCA:operation:he_power_train:gasoline:mass_per_fu",
                 "data:propulsion:he_power_train:"
                 + tank_type
                 + ":"
@@ -89,6 +89,6 @@ class LCAGasolinePerFU(om.ExplicitComponent):
             ]
 
         partials[
-            "data:LCA:operation:he_power_train:gasoline_per_fu",
+            "data:LCA:operation:he_power_train:gasoline:mass_per_fu",
             "data:environmental_impact:flight_per_fu",
         ] = partial_flight_per_fu

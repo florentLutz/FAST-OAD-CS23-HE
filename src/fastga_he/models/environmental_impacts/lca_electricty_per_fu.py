@@ -31,7 +31,7 @@ class LCAElectricityPerFU(om.ExplicitComponent):
         self.add_input(name="data:environmental_impact:flight_per_fu", val=1e-3)
 
         self.add_output(
-            name="data:LCA:operation:he_power_train:electricity_per_fu", units="W*h", val=0.0
+            name="data:LCA:operation:he_power_train:electricity:energy_per_fu", units="W*h", val=0.0
         )
 
         for batteries_name, batteries_type in zip(batteries_names, batteries_types):
@@ -62,7 +62,7 @@ class LCAElectricityPerFU(om.ExplicitComponent):
                 + ":energy_consumed_mission"
             ]
 
-        outputs["data:LCA:operation:he_power_train:electricity_per_fu"] = (
+        outputs["data:LCA:operation:he_power_train:electricity:energy_per_fu"] = (
             total_fuel * inputs["data:environmental_impact:flight_per_fu"]
         )
 
@@ -74,7 +74,7 @@ class LCAElectricityPerFU(om.ExplicitComponent):
 
         for batteries_name, batteries_type in zip(batteries_names, batteries_types):
             partials[
-                "data:LCA:operation:he_power_train:electricity_per_fu",
+                "data:LCA:operation:he_power_train:electricity:energy_per_fu",
                 "data:propulsion:he_power_train:"
                 + batteries_type
                 + ":"
@@ -90,6 +90,6 @@ class LCAElectricityPerFU(om.ExplicitComponent):
             ]
 
         partials[
-            "data:LCA:operation:he_power_train:electricity_per_fu",
+            "data:LCA:operation:he_power_train:electricity:energy_per_fu",
             "data:environmental_impact:flight_per_fu",
         ] = partial_flight_per_fu

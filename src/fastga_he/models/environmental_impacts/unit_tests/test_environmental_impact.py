@@ -433,7 +433,7 @@ def test_electricity_per_fu_velis():
     )
 
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:electricity_per_fu", units="W*h"
+        "data:LCA:operation:he_power_train:electricity:energy_per_fu", units="W*h"
     ) == pytest.approx(233.23046823, rel=1e-5)
 
     problem.check_partials(compact_print=True)
@@ -513,6 +513,10 @@ def test_lca_pipistrel():
         "data:environmental_impact:climate_change:operation:battery_pack_1"
     ) == pytest.approx(0.0, abs=1e-5)
 
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:operation:sum"
+    ) == pytest.approx(0.0, abs=1e-5)
+
     problem.check_partials(compact_print=True)
 
 
@@ -534,9 +538,9 @@ def test_kerosene_per_fu_tbm900():
         ivc,
     )
 
-    assert problem.get_val("data:LCA:operation:he_power_train:kerosene_per_fu") == pytest.approx(
-        0.80076265, rel=1e-5
-    )
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:kerosene:mass_per_fu"
+    ) == pytest.approx(0.80076265, rel=1e-5)
 
     problem.check_partials(compact_print=True)
 
@@ -601,9 +605,9 @@ def test_gasoline_per_fu_sr22():
         ivc,
     )
 
-    assert problem.get_val("data:LCA:operation:he_power_train:gasoline_per_fu") == pytest.approx(
-        0.23346842, rel=1e-5
-    )
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:gasoline:mass_per_fu"
+    ) == pytest.approx(0.23346842, rel=1e-5)
 
     problem.check_partials(compact_print=True)
 
