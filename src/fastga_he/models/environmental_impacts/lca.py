@@ -2,7 +2,6 @@
 # Electric Aircraft.
 # Copyright (C) 2024 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator

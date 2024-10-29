@@ -68,6 +68,7 @@ from fastga_he.models.performances.mission_vector.initialization.initialize_time
 from fastga_he.models.performances.mission_vector.mission.performance_per_phase import (
     PerformancePerPhase,
 )
+from fastga_he.models.performances.mission_vector.mission.sizing_time import SizingDuration
 
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
@@ -1549,6 +1550,26 @@ def test_performances_per_phase():
     assert problem.get_val(
         "data:mission:sizing:main_route:descent:distance", units="nmi"
     ) == pytest.approx(65.315, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_sizing_duration():
+    inputs_list = [
+        "data:mission:sizing:main_route:climb:duration",
+        "data:mission:sizing:main_route:cruise:duration",
+        "data:mission:sizing:main_route:descent:duration",
+        "data:mission:sizing:main_route:reserve:duration",
+        "data:mission:sizing:taxi_out:duration",
+        "data:mission:sizing:taxi_in:duration",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    problem = run_system(SizingDuration(), ivc)
+
+    sizing_duration = problem.get_val("data:mission:sizing:duration", units="h")
+    assert sizing_duration == pytest.approx(2.01279002, abs=1e-2)
 
     problem.check_partials(compact_print=True)
 

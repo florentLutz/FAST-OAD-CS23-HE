@@ -9,6 +9,7 @@ import fastoad.api as oad
 from ..constants import HE_SUBMODEL_EQUILIBRIUM
 from ..mission.performance_per_phase import PerformancePerPhase
 from ..mission.sizing_energy import SizingEnergy
+from ..mission.sizing_time import SizingDuration
 from ..mission.thrust_taxi import ThrustTaxi
 from ..mission.update_mass import UpdateMass
 
@@ -116,6 +117,7 @@ class MissionCore(om.Group):
             promotes_outputs=["data:*", "fuel_consumed_t", "fuel_mass_t", "fuel_lever_arm_t"],
         )
         self.add_subsystem("sizing_fuel", SizingEnergy(), promotes=["*"])
+        self.add_subsystem("sizing_duration", SizingDuration(), promotes=["*"])
         self.add_subsystem(
             "update_mass",
             UpdateMass(number_of_points=number_of_points),

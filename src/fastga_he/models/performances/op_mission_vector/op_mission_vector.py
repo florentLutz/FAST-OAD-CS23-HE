@@ -361,6 +361,10 @@ class OperationalMissionVector(om.Group):
                     "data:mission:sizing:taxi_out:speed",
                     "data:mission:operational:taxi_out:speed",
                 ),
+                (
+                    "data:mission:sizing:main_route:reserve:duration",
+                    "data:mission:operational:reserve:duration",
+                ),
                 "data:propulsion:*",
                 ("data:weight:aircraft:MTOW", "data:mission:operational:TOW"),
                 "settings:propulsion:*",
@@ -456,6 +460,10 @@ class OperationalMissionVector(om.Group):
                     "data:mission:sizing:taxi_out:thrust",
                     "data:mission:operational:taxi_out:thrust",
                 ),
+                (
+                    "data:mission:sizing:duration",
+                    "data:mission:operational:duration",
+                )
             ],
         )
         self.add_subsystem(

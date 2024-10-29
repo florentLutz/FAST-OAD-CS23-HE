@@ -29,7 +29,7 @@ class LCAAircraftPerFU(om.ExplicitComponent):
         self.add_output(
             "data:environmental_impact:aircraft_per_fu",
             val=1e-8,
-            desc="Number of aircraft required to perform a functionnal unit, defined here as "
+            desc="Number of aircraft required to perform a functional unit, defined here as "
             "carrying 85kg over one km",
         )
 
