@@ -515,7 +515,7 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:sum"
-    ) == pytest.approx(0.0, abs=1e-5)
+    ) == pytest.approx(0.124769, abs=1e-5)
 
     problem.check_partials(compact_print=True)
 
@@ -584,6 +584,18 @@ def test_lca_tbm900():
         "data:environmental_impact:climate_change:operation:turboshaft_1"
     ) == pytest.approx(0.21645, rel=1e-3)
 
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:operation:sum"
+    ) == pytest.approx(0.27663438, rel=1e-3)
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:operation:turboshaft_1"
+    ) + problem.get_val(
+        "data:environmental_impact:climate_change:operation:kerosene_for_mission"
+    ) == pytest.approx(
+        problem.get_val("data:environmental_impact:climate_change:operation:sum"), rel=1e-3
+    )
+
     problem.check_partials(compact_print=True)
 
 
@@ -645,5 +657,13 @@ def test_lca_cirrus_sr22():
     assert problem.get_val(
         "data:environmental_impact:human_toxicity_carcinogenic:operation:ice_1"
     ) == pytest.approx(0.00058180, rel=1e-3)
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:operation:ice_1"
+    ) == pytest.approx(0.09122571820320151, rel=1e-3)
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:operation:sum"
+    ) == pytest.approx(0.12129755, rel=1e-3)
 
     problem.check_partials(compact_print=True)

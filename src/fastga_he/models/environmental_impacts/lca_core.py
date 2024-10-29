@@ -30,7 +30,7 @@ METHODS_TO_FILE = {
     "IMPACT World+ v2.0.1": "impact_world_methods.yml",
     "ReCiPe 2016 v1.03": "recipe_methods.yml",
 }
-NAME_TO_UNIT = {"mass": "kg", "length": "m", "OWE": "kg"}
+NAME_TO_UNIT = {"mass": "kg", "length": "m", "OWE": "kg", "energy": "W*h"}
 LCA_PREFIX = "data:environmental_impact:"
 
 
@@ -397,8 +397,7 @@ class LCACore(om.ExplicitComponent):
                     my_file.write("        " + line_to_copy)
                 my_file.write("\n")
 
-    @staticmethod
-    def write_use(path_to_yaml: pathlib.Path, dict_with_use):
+    def write_use(self, path_to_yaml: pathlib.Path, dict_with_use):
         with open(path_to_yaml, "a") as my_file:
             my_file.write("\n")
             my_file.write("    use:\n")
@@ -413,6 +412,32 @@ class LCACore(om.ExplicitComponent):
                 for line_to_copy in dict_with_use[component_name]:
                     my_file.write("        " + line_to_copy)
                 my_file.write("\n")
+
+            battery_names, _ = self.configurator.get_battery_list()
+
+            if battery_names:
+                path_to_electricity_prod_file = RESOURCE_FOLDER_PATH / "electricity_production.yml"
+                with open(path_to_electricity_prod_file, "r") as electricity_prod_conf:
+                    for line_to_copy in electricity_prod_conf.readlines():
+                        my_file.write("        " + line_to_copy)
+                    my_file.write("\n")
+
+            tank_names, tank_types, contents = self.configurator.get_fuel_tank_list_and_fuel()
+
+            if tank_names:
+                if "jet_fuel" in contents:
+                    path_to_kerosene_prod_file = RESOURCE_FOLDER_PATH / "kerosene_production.yml"
+                    with open(path_to_kerosene_prod_file, "r") as kerosene_prod_conf:
+                        for line_to_copy in kerosene_prod_conf.readlines():
+                            my_file.write("        " + line_to_copy)
+                        my_file.write("\n")
+
+                if "avgas" in contents:
+                    path_to_gasoline_prod_file = RESOURCE_FOLDER_PATH / "gasoline_production.yml"
+                    with open(path_to_gasoline_prod_file, "r") as gasoline_prod_conf:
+                        for line_to_copy in gasoline_prod_conf.readlines():
+                            my_file.write("        " + line_to_copy)
+                        my_file.write("\n")
 
     def write_lca_conf_file(self):
         ecoinvent_version = self.options["ecoinvent_version"]

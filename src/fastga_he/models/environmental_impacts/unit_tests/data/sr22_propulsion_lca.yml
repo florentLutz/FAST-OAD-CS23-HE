@@ -365,6 +365,25 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
 
+        gasoline_for_mission_production:
+            custom_attributes:
+                - attribute: "component"
+                  value: gasoline_for_mission_operation
+        
+            gasoline:
+                amount: data__LCA__operation__he_power_train__gasoline__mass_per_fu
+                unit: kilogram
+        
+                # There is no process for Gasoline, much less for AvGas so we'll approximate it like that
+                unleaded_petrol:
+                    name: 'market for petrol, unleaded'
+                    loc: RoW
+                    amount: 1
+        
+                lead:
+                    name: 'market for lead'
+                    amount: 0.794 / 1000  # 0.794 g / kg of fuel and then the unit for lead is kg
+
 
 methods:
     - "('ReCiPe 2016 v1.03, midpoint (H)', 'acidification: terrestrial', 'terrestrial acidification potential (TAP)')"

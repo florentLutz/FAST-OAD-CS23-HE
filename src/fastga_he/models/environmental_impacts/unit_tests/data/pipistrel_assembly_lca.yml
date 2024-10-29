@@ -396,7 +396,7 @@ model:
             name: 'electricity, high voltage, European attribute mix'
             # This variable should always exist since we will only add this part to the conf file if
             # there are batteries and if there are batteries the component that computes this value will be added
-            amount: data__LCA__operation__he_power_train__electricity_per_fu
+            amount: data__LCA__operation__he_power_train__electricity__energy_per_fu / 1000
 
 
 methods:
