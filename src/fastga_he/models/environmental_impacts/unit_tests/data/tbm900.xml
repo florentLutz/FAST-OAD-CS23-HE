@@ -867,6 +867,10 @@
         </cs23>
       </landing>
     </mission>
+    <environmental_impact>
+      <aircraft_per_fu is_input="False">1.564848051624904e-08<!--Number of aircraft required to perform a functionnal unit, defined here as carrying 85kg over one km--></aircraft_per_fu>
+      <flight_per_fu is_input="False">8.56754308264635e-05<!--Number of flight required to perform a functionnal unit, defined here as carrying 85kg over one km--></flight_per_fu>
+    </environmental_impact>
     <weight>
       <aircraft>
         <MFW units="kg" is_input="False">864.912039076923<!--maximum fuel weight--></MFW>

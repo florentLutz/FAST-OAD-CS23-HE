@@ -2408,6 +2408,111 @@ class FASTGAHEPowerTrainConfigurator:
 
         return clean_dict, list(set(species_list))
 
+    def get_lca_manufacturing_phase_element_list(self) -> Tuple[Dict, List]:
+        """
+        Get a dict with all the lines to add to the LCA configuration file for the manufacturing
+        phase. Theoretically, the manufacturing contains the assembly of the airframe plus tests
+        plus the construction of the assembly plant. In our case, the assembly plant will be
+        discarded and because we lack data, the assembly of the airframe has been aggregated in the
+        production. So all that remains are the line tests, which will be very similar to the use
+        phase. Except we won't attribute emission to each component (which means not adding the
+        custom attributes), however we'll need to differentiate each CO2, NOx emissions ... so we'll
+        tag them with component name.
+        """
+        # I still hate doing that here, but it prevents a circular import
+        import fastga_he.models.propulsion.components as he_comp
+
+        # We will start with the assumption that if a component of the powertrain has an impact
+        # in the use phase, it will have a computation of the emissions, even if they can be nil.
+
+        clean_dict = {}
+
+        species_list = []
+
+        for component_name, component_om_type, component_type in zip(
+            self._components_name, self._components_om_type, self._components_type
+        ):
+            sizing_group = he_comp.__dict__["Sizing" + component_om_type]
+            path_to_sizing_file = pathlib.Path(sys.modules[sizing_group.__module__].__file__)
+
+            # The sizing class is defined inside components/sizing...py and the lca template is in
+            # components/lca_resources/lca_conf.yml so:
+
+            path_to_lca_use_conf_template = (
+                path_to_sizing_file.parents[0] / "lca_resources/lca_conf_use.yml"
+            )
+
+            if pth.exists(path_to_lca_use_conf_template):
+                # If the component has an impact on the use phase, it must release species in the
+                # air, which means it must have a species list. We intersect those list to have the
+                # names of the species release by the power train  and update the NAME_TO_UNIT
+                # dict in the lca_core script.
+                pre_lca_group = he_comp.__dict__["PreLCA" + component_om_type]()
+                species_list = species_list + pre_lca_group.species_list
+
+                clean_lines = []
+                with open(path_to_lca_use_conf_template, "r") as template_file:
+                    lines = template_file.readlines()
+                    for idx, line in enumerate(lines):
+                        # Important to add in the definition of the custom attribute, the name of
+                        # the phase as the code writes it in the lca conf file.
+
+                        # Since we are using the same template as the use phase we remove the lines
+                        # with the custom attributes. Or rather, we simply don't add them which
+                        # means continuing to the next loop of the for
+                        if self.belongs_to_custom_attribute_definition(line, idx, lines):
+                            continue
+
+                        # If an anchor for an emission is added, we put the right variable name
+                        if "ANCHOR_EMISSION" in line:
+                            line_to_add = line.replace(
+                                "ANCHOR_EMISSION_",
+                                "data__LCA__manufacturing__he_power_train__"
+                                + component_type
+                                + "__"
+                                + component_name
+                                + "__",
+                            )
+                            line_to_add = line_to_add.replace("\n", "")
+                            line_to_add = line_to_add + "_per_fu\n"
+                        else:
+                            line_to_add = line.replace("ANCHOR_COMPONENT_NAME", component_name)
+
+                        clean_lines.append(line_to_add)
+
+                clean_dict[component_name] = clean_lines
+
+        return clean_dict, list(set(species_list))
+
+    @staticmethod
+    def belongs_to_custom_attribute_definition(line, line_idx, lines_to_inspect) -> bool:
+        """
+        Utility function to detect if the line is part of the definition of a custom attribute.
+        """
+        if (
+            "custom_attributes" in line
+            and 'attribute: "component"' in lines_to_inspect[line_idx + 1]
+        ):
+            return True
+
+        # Trying to foolproof but if the format is respected it should not cause issues
+        if line_idx >= 1:
+            if (
+                'attribute: "component"' in line
+                and "custom_attributes" in lines_to_inspect[line_idx - 1]
+            ):
+                return True
+
+        # Trying to foolproof but if the format is respected it should not cause issues
+        if line_idx >= 2:
+            if (
+                'attribute: "component"' in lines_to_inspect[line_idx - 1]
+                and "custom_attributes" in lines_to_inspect[line_idx - 2]
+            ):
+                return True
+
+        return False
+
 
 class _YAMLSerializer(ABC):
     """YAML-format serializer."""

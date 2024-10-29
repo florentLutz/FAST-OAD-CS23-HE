@@ -29,23 +29,39 @@ class LCAElectricityPerFU(om.ExplicitComponent):
         batteries_types = self.options["batteries_type_list"]
 
         self.add_input(name="data:environmental_impact:flight_per_fu", val=1e-3)
+        self.add_input(name="data:environmental_impact:aircraft_per_fu", val=np.nan)
 
         self.add_output(
             name="data:LCA:operation:he_power_train:electricity:energy_per_fu", units="W*h", val=0.0
         )
+        self.declare_partials(
+            of="data:LCA:operation:he_power_train:electricity:energy_per_fu",
+            wrt="data:environmental_impact:flight_per_fu",
+            method="exact",
+        )
+
+        self.add_output(
+            name="data:LCA:manufacturing:he_power_train:electricity:energy_per_fu",
+            units="W*h",
+            val=0.0,
+        )
+        self.declare_partials(
+            of="data:LCA:manufacturing:he_power_train:electricity:energy_per_fu",
+            wrt="data:environmental_impact:aircraft_per_fu",
+            method="exact",
+        )
 
         for batteries_name, batteries_type in zip(batteries_names, batteries_types):
-            self.add_input(
+            input_name = (
                 "data:propulsion:he_power_train:"
                 + batteries_type
                 + ":"
                 + batteries_name
-                + ":energy_consumed_mission",
-                units="W*h",
-                val=np.nan,
+                + ":energy_consumed_mission"
             )
+            self.add_input(input_name, units="W*h", val=np.nan)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+            self.declare_partials(of="*", wrt=input_name, method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         batteries_names = self.options["batteries_name_list"]
@@ -65,6 +81,9 @@ class LCAElectricityPerFU(om.ExplicitComponent):
         outputs["data:LCA:operation:he_power_train:electricity:energy_per_fu"] = (
             total_fuel * inputs["data:environmental_impact:flight_per_fu"]
         )
+        outputs["data:LCA:manufacturing:he_power_train:electricity:energy_per_fu"] = (
+            5 * total_fuel * inputs["data:environmental_impact:aircraft_per_fu"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         batteries_names = self.options["batteries_name_list"]
@@ -81,6 +100,16 @@ class LCAElectricityPerFU(om.ExplicitComponent):
                 + batteries_name
                 + ":energy_consumed_mission",
             ] = inputs["data:environmental_impact:flight_per_fu"]
+
+            partials[
+                "data:LCA:manufacturing:he_power_train:electricity:energy_per_fu",
+                "data:propulsion:he_power_train:"
+                + batteries_type
+                + ":"
+                + batteries_name
+                + ":energy_consumed_mission",
+            ] = 5 * inputs["data:environmental_impact:aircraft_per_fu"]
+
             partial_flight_per_fu += inputs[
                 "data:propulsion:he_power_train:"
                 + batteries_type
@@ -93,3 +122,7 @@ class LCAElectricityPerFU(om.ExplicitComponent):
             "data:LCA:operation:he_power_train:electricity:energy_per_fu",
             "data:environmental_impact:flight_per_fu",
         ] = partial_flight_per_fu
+        partials[
+            "data:LCA:manufacturing:he_power_train:electricity:energy_per_fu",
+            "data:environmental_impact:aircraft_per_fu",
+        ] = 5 * partial_flight_per_fu

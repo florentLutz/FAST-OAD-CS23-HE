@@ -397,6 +397,78 @@ class LCACore(om.ExplicitComponent):
                     my_file.write("        " + line_to_copy)
                 my_file.write("\n")
 
+    def write_manufacturing(self, path_to_yaml: pathlib.Path, dict_with_use):
+        """
+        Copy of the docstring of the get_lca_manufacturing_phase_element_list() method
+
+        Theoretically, the manufacturing contains the assembly of the airframe plus tests
+        plus the construction of the assembly plant. In our case, the assembly plant will be
+        discarded and because we lack data, the assembly of the airframe has been aggregated in the
+        production. So all that remains are the line tests, which will be very similar to the use
+        phase. Except we won't attribute emission to each component (which means not adding the
+        custom attributes), however we'll need to differentiate each CO2, NOx emissions ... so we'll
+        tag them with component name.
+        """
+        with open(path_to_yaml, "a") as my_file:
+            my_file.write("\n")
+            my_file.write("    manufacturing:\n")
+            # The use of use seem to cause problem when written
+            # somewhere else in the code but not here, so it'll stay like that there
+            my_file.write("        custom_attributes:\n")
+            my_file.write('            - attribute: "phase"\n')
+            my_file.write('              value: "manufacturing"\n')
+            my_file.write("\n")
+
+            for component_name in dict_with_use.keys():
+                for line_to_copy in dict_with_use[component_name]:
+                    my_file.write("        " + line_to_copy)
+                my_file.write("\n")
+
+            battery_names, _ = self.configurator.get_battery_list()
+
+            if battery_names:
+                path_to_electricity_prod_file = RESOURCE_FOLDER_PATH / "electricity_production.yml"
+                with open(path_to_electricity_prod_file, "r") as electricity_prod_conf:
+                    lines_to_copy = electricity_prod_conf.readlines()
+                    for idx, line_to_copy in enumerate(lines_to_copy):
+                        if not self.configurator.belongs_to_custom_attribute_definition(
+                            line_to_copy, idx, lines_to_copy
+                        ):
+                            line_to_add = line_to_copy.replace("__operation__", "__manufacturing__")
+                            my_file.write("        " + line_to_add)
+                    my_file.write("\n")
+
+            tank_names, tank_types, contents = self.configurator.get_fuel_tank_list_and_fuel()
+
+            if tank_names:
+                if "jet_fuel" in contents:
+                    path_to_kerosene_prod_file = RESOURCE_FOLDER_PATH / "kerosene_production.yml"
+                    with open(path_to_kerosene_prod_file, "r") as kerosene_prod_conf:
+                        lines_to_copy = kerosene_prod_conf.readlines()
+                        for idx, line_to_copy in enumerate(lines_to_copy):
+                            if not self.configurator.belongs_to_custom_attribute_definition(
+                                line_to_copy, idx, lines_to_copy
+                            ):
+                                line_to_add = line_to_copy.replace(
+                                    "__operation__", "__manufacturing__"
+                                )
+                                my_file.write("        " + line_to_add)
+                        my_file.write("\n")
+
+                if "avgas" in contents:
+                    path_to_gasoline_prod_file = RESOURCE_FOLDER_PATH / "gasoline_production.yml"
+                    with open(path_to_gasoline_prod_file, "r") as gasoline_prod_conf:
+                        lines_to_copy = gasoline_prod_conf.readlines()
+                        for idx, line_to_copy in enumerate(lines_to_copy):
+                            if not self.configurator.belongs_to_custom_attribute_definition(
+                                line_to_copy, idx, lines_to_copy
+                            ):
+                                line_to_add = line_to_copy.replace(
+                                    "__operation__", "__manufacturing__"
+                                )
+                                my_file.write("        " + line_to_add)
+                        my_file.write("\n")
+
     def write_use(self, path_to_yaml: pathlib.Path, dict_with_use):
         with open(path_to_yaml, "a") as my_file:
             my_file.write("\n")
@@ -462,6 +534,14 @@ class LCACore(om.ExplicitComponent):
         # This function writes the "model: " in the yml so it must be run before anything else
         # that need to go in the model section in the model section
         self.write_production(lca_conf_file_path, dict_with_production)
+
+        dict_with_manufacturing, species_list = (
+            self.configurator.get_lca_manufacturing_phase_element_list()
+        )
+        for specie in species_list:
+            self.name_to_unit[specie] = "kg"
+
+        self.write_manufacturing(lca_conf_file_path, dict_with_manufacturing)
 
         dict_with_use, species_list = self.configurator.get_lca_use_phase_element_list()
         for specie in species_list:

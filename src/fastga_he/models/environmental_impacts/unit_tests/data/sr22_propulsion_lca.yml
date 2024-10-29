@@ -306,6 +306,79 @@ model:
                     - 'air'
 
 
+    manufacturing:
+        custom_attributes:
+            - attribute: "phase"
+              value: "manufacturing"
+
+        ice_1:
+        
+            CO2:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__H2O_per_fu
+              name: 'water'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            lead:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__lead_per_fu
+              name: 'Lead II'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        gasoline_for_mission_production:
+        
+            gasoline:
+                amount: data__LCA__manufacturing__he_power_train__gasoline__mass_per_fu
+                unit: kilogram
+        
+                # There is no process for Gasoline, much less for AvGas so we'll approximate it like that
+                unleaded_petrol:
+                    name: 'market for petrol, unleaded'
+                    loc: RoW
+                    amount: 1
+        
+                lead:
+                    name: 'market for lead'
+                    amount: 0.794 / 1000  # 0.794 g / kg of fuel and then the unit for lead is kg
+
+
     use:
         custom_attributes:
             - attribute: "phase"

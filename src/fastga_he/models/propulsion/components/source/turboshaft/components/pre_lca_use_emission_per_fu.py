@@ -54,7 +54,11 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
             )
 
             manufacturing_output_name = (
-                    "data:LCA:manufacturing:he_power_train:turboshaft:" + turboshaft_id + ":" + specie + "_per_fu"
+                "data:LCA:manufacturing:he_power_train:turboshaft:"
+                + turboshaft_id
+                + ":"
+                + specie
+                + "_per_fu"
             )
             self.add_output(name=manufacturing_output_name, val=0.0, units="kg")
             self.declare_partials(
@@ -81,11 +85,15 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
             )
 
             manufacturing_output_name = (
-                    "data:LCA:manufacturing:he_power_train:turboshaft:" + turboshaft_id + ":" + specie + "_per_fu"
+                "data:LCA:manufacturing:he_power_train:turboshaft:"
+                + turboshaft_id
+                + ":"
+                + specie
+                + "_per_fu"
             )
             # 5 line test flight per aircraft
             outputs[manufacturing_output_name] = (
-                    5 * inputs[input_name] * inputs["data:environmental_impact:aircraft_per_fu"]
+                5 * inputs[input_name] * inputs["data:environmental_impact:aircraft_per_fu"]
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -111,12 +119,16 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
             ]
 
             manufacturing_output_name = (
-                    "data:LCA:manufacturing:he_power_train:turboshaft:" + turboshaft_id + ":" + specie + "_per_fu"
+                "data:LCA:manufacturing:he_power_train:turboshaft:"
+                + turboshaft_id
+                + ":"
+                + specie
+                + "_per_fu"
             )
 
-            partials[manufacturing_output_name, input_name] = 5 * inputs[
-                "data:environmental_impact:aircraft_per_fu"
-            ]
+            partials[manufacturing_output_name, input_name] = (
+                5 * inputs["data:environmental_impact:aircraft_per_fu"]
+            )
             partials[manufacturing_output_name, "data:environmental_impact:aircraft_per_fu"] = (
-                    5 * inputs[input_name]
+                5 * inputs[input_name]
             )

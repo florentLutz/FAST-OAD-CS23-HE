@@ -27,24 +27,38 @@ class LCAKerosenePerFU(om.ExplicitComponent):
         tanks_names = self.options["tanks_name_list"]
         tanks_types = self.options["tanks_type_list"]
 
-        self.add_input(name="data:environmental_impact:flight_per_fu", val=1e-3)
+        self.add_input(name="data:environmental_impact:flight_per_fu", val=np.nan)
+        self.add_input(name="data:environmental_impact:aircraft_per_fu", val=np.nan)
 
         self.add_output(
             name="data:LCA:operation:he_power_train:kerosene:mass_per_fu", units="kg", val=0.0
         )
+        self.declare_partials(
+            of="data:LCA:operation:he_power_train:kerosene:mass_per_fu",
+            wrt="data:environmental_impact:flight_per_fu",
+            method="exact",
+        )
+
+        self.add_output(
+            name="data:LCA:manufacturing:he_power_train:kerosene:mass_per_fu", units="kg", val=0.0
+        )
+        self.declare_partials(
+            of="data:LCA:manufacturing:he_power_train:kerosene:mass_per_fu",
+            wrt="data:environmental_impact:aircraft_per_fu",
+            method="exact",
+        )
 
         for tank_name, tank_type in zip(tanks_names, tanks_types):
-            self.add_input(
+            input_name = (
                 "data:propulsion:he_power_train:"
                 + tank_type
                 + ":"
                 + tank_name
-                + ":fuel_consumed_mission",
-                units="kg",
-                val=np.nan,
+                + ":fuel_consumed_mission"
             )
+            self.add_input(input_name, units="kg", val=np.nan)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+            self.declare_partials(of="*", wrt=input_name, method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         tanks_names = self.options["tanks_name_list"]
@@ -65,6 +79,10 @@ class LCAKerosenePerFU(om.ExplicitComponent):
             total_fuel * inputs["data:environmental_impact:flight_per_fu"]
         )
 
+        outputs["data:LCA:manufacturing:he_power_train:kerosene:mass_per_fu"] = (
+            5 * total_fuel * inputs["data:environmental_impact:aircraft_per_fu"]
+        )
+
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         tanks_names = self.options["tanks_name_list"]
         tanks_types = self.options["tanks_type_list"]
@@ -80,6 +98,16 @@ class LCAKerosenePerFU(om.ExplicitComponent):
                 + tank_name
                 + ":fuel_consumed_mission",
             ] = inputs["data:environmental_impact:flight_per_fu"]
+
+            partials[
+                "data:LCA:manufacturing:he_power_train:kerosene:mass_per_fu",
+                "data:propulsion:he_power_train:"
+                + tank_type
+                + ":"
+                + tank_name
+                + ":fuel_consumed_mission",
+            ] = 5 * inputs["data:environmental_impact:aircraft_per_fu"]
+
             partial_flight_per_fu += inputs[
                 "data:propulsion:he_power_train:"
                 + tank_type
@@ -92,3 +120,7 @@ class LCAKerosenePerFU(om.ExplicitComponent):
             "data:LCA:operation:he_power_train:kerosene:mass_per_fu",
             "data:environmental_impact:flight_per_fu",
         ] = partial_flight_per_fu
+        partials[
+            "data:LCA:manufacturing:he_power_train:kerosene:mass_per_fu",
+            "data:environmental_impact:aircraft_per_fu",
+        ] = 5 * partial_flight_per_fu

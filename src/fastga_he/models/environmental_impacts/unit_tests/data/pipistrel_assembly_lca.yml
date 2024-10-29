@@ -289,6 +289,107 @@ model:
             amount: data__propulsion__he_power_train__battery_pack__battery_pack_2__mass_per_fu
 
 
+    manufacturing:
+        custom_attributes:
+            - attribute: "phase"
+              value: "manufacturing"
+
+        battery_pack_1:
+        
+            CO2:
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_1__H2O_per_fu
+              name: 'water'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        battery_pack_2:
+        
+            CO2:
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__H2O_per_fu
+              name: 'water'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        electricity_for_mission_production:
+        
+            name: 'electricity, high voltage, European attribute mix'
+            # This variable should always exist since we will only add this part to the conf file if
+            # there are batteries and if there are batteries the component that computes this value will be added
+            amount: data__LCA__manufacturing__he_power_train__electricity__energy_per_fu / 1000
+
+
     use:
         custom_attributes:
             - attribute: "phase"

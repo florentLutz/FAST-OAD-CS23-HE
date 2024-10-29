@@ -96,9 +96,9 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
                 "data:LCA:manufacturing:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
             )
 
-            partials[manufacturing_output_name, input_name] = 5 * inputs[
-                "data:environmental_impact:aircraft_per_fu"
-            ]
+            partials[manufacturing_output_name, input_name] = (
+                5 * inputs["data:environmental_impact:aircraft_per_fu"]
+            )
             partials[manufacturing_output_name, "data:environmental_impact:aircraft_per_fu"] = (
                 5 * inputs[input_name]
             )
