@@ -463,7 +463,7 @@ class OperationalMissionVector(om.Group):
                 (
                     "data:mission:sizing:duration",
                     "data:mission:operational:duration",
-                )
+                ),
             ],
         )
         self.add_subsystem(

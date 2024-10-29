@@ -3,6 +3,9 @@
     <environmental_impact>
       <aircraft_per_fu>1e-6</aircraft_per_fu>
       <flight_per_fu is_input="False">0.00932426502852128<!--Number of flight required to perform a functionnal unit, defined here as carrying 85kg over one km--></flight_per_fu>
+      <line_test>
+        <duration units="h">10.0</duration>
+      </line_test>
     </environmental_impact>
     <TLAR>
       <NPAX_design is_input="True">0.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>
@@ -1079,6 +1082,7 @@
     </constraints>
     <mission>
       <sizing>
+        <duration units="s" is_input="False">3494.343859355023</duration>
         <energy units="W*h" is_input="False">25013.28174534913</energy>
         <fuel units="kg" is_input="False">0.0</fuel>
         <cs23>

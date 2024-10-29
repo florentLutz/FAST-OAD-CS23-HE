@@ -21,6 +21,7 @@ from ..lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
 from ..lca_kerosene_per_fu import LCAKerosenePerFU
 from ..lca_gasoline_per_fu import LCAGasolinePerFU
 from ..lca_electricty_per_fu import LCAElectricityPerFU
+from ..lca_line_test_mission_ratio import LCARatioTestFlightMission
 from ..lca import LCA
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -409,6 +410,28 @@ def test_empty_aircraft_weight_per_fu():
 
     assert problem.get_val("data:weight:aircraft:OWE_per_fu", units="kg") == pytest.approx(
         0.00042658, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_line_tests_sizing_ratio():
+    inputs_list = ["data:mission:sizing:duration", "data:environmental_impact:line_test:duration"]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCARatioTestFlightMission(),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:line_test:mission_ratio") == pytest.approx(
+        10.30236332, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
