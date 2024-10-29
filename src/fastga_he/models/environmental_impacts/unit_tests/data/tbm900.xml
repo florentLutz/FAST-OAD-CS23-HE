@@ -776,6 +776,7 @@
       <sizing>
         <energy units="W*h" is_input="False">0.0</energy>
         <fuel units="kg" is_input="False">802.6626517726677</fuel>
+        <duration units="s" is_input="False">16588.350196741827</duration>
         <cs23>
           <safety_factor is_input="True">1.5</safety_factor>
           <characteristic_speed>
@@ -870,6 +871,10 @@
     <environmental_impact>
       <aircraft_per_fu is_input="False">1.564848051624904e-08<!--Number of aircraft required to perform a functionnal unit, defined here as carrying 85kg over one km--></aircraft_per_fu>
       <flight_per_fu is_input="False">8.56754308264635e-05<!--Number of flight required to perform a functionnal unit, defined here as carrying 85kg over one km--></flight_per_fu>
+      <line_test>
+        <duration units="h">10.0</duration>
+        <mission_ratio>7.5</mission_ratio>
+      </line_test>
     </environmental_impact>
     <weight>
       <aircraft>

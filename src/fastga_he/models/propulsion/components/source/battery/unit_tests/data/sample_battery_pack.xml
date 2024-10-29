@@ -23,6 +23,9 @@
         <environmental_impact>
             <aircraft_per_fu>1e-6</aircraft_per_fu>
             <flight_per_fu>1e-3</flight_per_fu>
+            <line_test>
+                <mission_ratio>7.5</mission_ratio>
+            </line_test>
         </environmental_impact>
         <aerodynamics>
           <cruise>

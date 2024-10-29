@@ -441,6 +441,7 @@ def test_electricity_per_fu_velis():
     inputs_list = [
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
+        "data:environmental_impact:line_test:mission_ratio",
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
         "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
     ]
@@ -461,7 +462,7 @@ def test_electricity_per_fu_velis():
     ) == pytest.approx(233.23046823, rel=1e-5)
     assert problem.get_val(
         "data:LCA:manufacturing:he_power_train:electricity:energy_per_fu", units="W*h"
-    ) == pytest.approx(0.12506641, rel=1e-5)
+    ) == pytest.approx(0.25769592, rel=1e-5)
 
     problem.check_partials(compact_print=True)
 
@@ -547,7 +548,7 @@ def test_lca_pipistrel():
     assert problem.get_val(
         "data:environmental_impact:climate_change:manufacturing:sum"
     ) == pytest.approx(
-        5.0
+        problem.get_val("data:environmental_impact:line_test:mission_ratio")
         * problem.get_val("data:environmental_impact:climate_change:operation:sum")
         * problem.get_val("data:environmental_impact:aircraft_per_fu")
         / problem.get_val("data:environmental_impact:flight_per_fu"),
@@ -561,6 +562,7 @@ def test_kerosene_per_fu_tbm900():
     inputs_list = [
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
+        "data:environmental_impact:line_test:mission_ratio",
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
     ]
@@ -581,7 +583,7 @@ def test_kerosene_per_fu_tbm900():
     ) == pytest.approx(0.06860569, rel=1e-5)
     assert problem.get_val(
         "data:LCA:manufacturing:he_power_train:kerosene:mass_per_fu"
-    ) == pytest.approx(6.26535938e-05, rel=1e-5)
+    ) == pytest.approx(9.39803907e-05, rel=1e-5)
 
     problem.check_partials(compact_print=True)
 
@@ -640,7 +642,8 @@ def test_lca_tbm900():
     assert problem.get_val(
         "data:environmental_impact:climate_change:manufacturing:sum"
     ) == pytest.approx(
-        5.0
+        problem.get_val("data:environmental_impact:line_test:duration", units="h")
+        / problem.get_val("data:mission:sizing:duration", units="h")
         * problem.get_val("data:environmental_impact:climate_change:operation:sum")
         * problem.get_val("data:environmental_impact:aircraft_per_fu")
         / problem.get_val("data:environmental_impact:flight_per_fu"),
@@ -649,7 +652,7 @@ def test_lca_tbm900():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:manufacturing:sum"
-    ) == pytest.approx(0.00025263, rel=1e-4)
+    ) == pytest.approx(0.0001096532063891862, rel=1e-4)
 
     problem.check_partials(compact_print=True)
 
@@ -660,6 +663,7 @@ def test_gasoline_per_fu_sr22():
         "data:environmental_impact:aircraft_per_fu",
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
+        "data:environmental_impact:line_test:mission_ratio",
     ]
 
     ivc = get_indep_var_comp(inputs_list, __file__, DATA_FOLDER_PATH / "sr22.xml")
@@ -678,7 +682,7 @@ def test_gasoline_per_fu_sr22():
     ) == pytest.approx(0.02942765, rel=1e-5)
     assert problem.get_val(
         "data:LCA:manufacturing:he_power_train:gasoline:mass_per_fu"
-    ) == pytest.approx(2.68745672e-05, rel=1e-5)
+    ) == pytest.approx(4.03118507e-05, rel=1e-5)
 
     problem.check_partials(compact_print=True)
 
@@ -728,7 +732,8 @@ def test_lca_cirrus_sr22():
     assert problem.get_val(
         "data:environmental_impact:climate_change:manufacturing:sum"
     ) == pytest.approx(
-        5.0
+        problem.get_val("data:environmental_impact:line_test:duration", units="h")
+        / problem.get_val("data:mission:sizing:duration", units="h")
         * problem.get_val("data:environmental_impact:climate_change:operation:sum")
         * problem.get_val("data:environmental_impact:aircraft_per_fu")
         / problem.get_val("data:environmental_impact:flight_per_fu"),
@@ -737,6 +742,6 @@ def test_lca_cirrus_sr22():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:manufacturing:sum"
-    ) == pytest.approx(0.00011077, rel=1e-4)
+    ) == pytest.approx(3.07602591e-05, rel=1e-4)
 
     problem.check_partials(compact_print=True)

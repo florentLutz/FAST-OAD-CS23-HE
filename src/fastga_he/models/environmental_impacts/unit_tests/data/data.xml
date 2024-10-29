@@ -5,6 +5,7 @@
       <flight_per_fu is_input="False">0.00932426502852128<!--Number of flight required to perform a functionnal unit, defined here as carrying 85kg over one km--></flight_per_fu>
       <line_test>
         <duration units="h">10.0</duration>
+        <mission_ratio>10.30236332</mission_ratio>
       </line_test>
     </environmental_impact>
     <TLAR>

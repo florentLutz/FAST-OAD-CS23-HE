@@ -10,6 +10,8 @@ import fastga_he.models.propulsion.components as he_comp
 from .lca_aircraft_per_fu import LCAAircraftPerFU
 from .lca_use_flight_per_fu import LCAUseFlightPerFU
 
+from .lca_line_test_mission_ratio import LCARatioTestFlightMission
+
 from .lca_wing_weight_per_fu import LCAWingWeightPerFU
 from .lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
 from .lca_htp_weight_per_fu import LCAHTPWeightPerFU
@@ -70,6 +72,10 @@ class LCA(om.Group):
 
         self.add_subsystem(name="aircraft_per_fu", subsys=LCAAircraftPerFU(), promotes=["*"])
         self.add_subsystem(name="flight_per_fu", subsys=LCAUseFlightPerFU(), promotes=["*"])
+
+        self.add_subsystem(
+            name="line_tests_mission_ratio", subsys=LCARatioTestFlightMission(), promotes=["*"]
+        )
 
         # Adds all the LCA groups for the airframe which will be here regardless of the powertrain
         self.add_subsystem(name="pre_lca_wing", subsys=LCAWingWeightPerFU(), promotes=["*"])

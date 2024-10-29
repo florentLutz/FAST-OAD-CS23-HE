@@ -1102,6 +1102,7 @@ def test_emissions_per_fu():
         "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:H2O",
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
+        "data:environmental_impact:line_test:mission_ratio",
     ]
 
     ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
