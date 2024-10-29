@@ -12,6 +12,10 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
     """
     Simply dividing the emission to get how much per functional unit we need. Would have
     preferred to separate them all but for the sake of refactoring it's all in one.
+
+    We'll also include the emissions during the line testing phase and possible during distribution
+    phase in that component because the computation is very similar. Again I'd have preferred to do
+    it separately but for the sake of refactoring it's easier to do it here.
     """
 
     def initialize(self):
@@ -25,19 +29,31 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
     def setup(self):
         ice_id = self.options["ice_id"]
 
-        self.add_input(name="data:environmental_impact:flight_per_fu", val=1e-3)
+        self.add_input(name="data:environmental_impact:flight_per_fu", val=np.nan)
+
+        # Already includes the per FU division
+        self.add_input(name="data:environmental_impact:aircraft_per_fu", val=np.nan)
 
         for specie in SPECIES_LIST:
             input_name = "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie
             self.add_input(name=input_name, val=np.nan, units="kg")
 
-            output_name = (
+            operation_output_name = (
                 "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
             )
-            self.add_output(name=output_name, val=0.0, units="kg")
-
+            self.add_output(name=operation_output_name, val=0.0, units="kg")
             self.declare_partials(
-                of=output_name, wrt=[input_name, "data:environmental_impact:flight_per_fu"]
+                of=operation_output_name,
+                wrt=[input_name, "data:environmental_impact:flight_per_fu"],
+            )
+
+            manufacturing_output_name = (
+                "data:LCA:manufacturing:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
+            )
+            self.add_output(name=manufacturing_output_name, val=0.0, units="kg")
+            self.declare_partials(
+                of=manufacturing_output_name,
+                wrt=[input_name, "data:environmental_impact:aircraft_per_fu"],
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -45,12 +61,19 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
 
         for specie in SPECIES_LIST:
             input_name = "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie
-            output_name = (
+            operation_output_name = (
                 "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
             )
-
-            outputs[output_name] = (
+            outputs[operation_output_name] = (
                 inputs[input_name] * inputs["data:environmental_impact:flight_per_fu"]
+            )
+
+            manufacturing_output_name = (
+                "data:LCA:manufacturing:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
+            )
+            # 5 line test flight per aircraft
+            outputs[manufacturing_output_name] = (
+                5 * inputs[input_name] * inputs["data:environmental_impact:aircraft_per_fu"]
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -58,9 +81,24 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
 
         for specie in SPECIES_LIST:
             input_name = "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie
-            output_name = (
+            operation_output_name = (
                 "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
             )
 
-            partials[output_name, input_name] = inputs["data:environmental_impact:flight_per_fu"]
-            partials[output_name, "data:environmental_impact:flight_per_fu"] = inputs[input_name]
+            partials[operation_output_name, input_name] = inputs[
+                "data:environmental_impact:flight_per_fu"
+            ]
+            partials[operation_output_name, "data:environmental_impact:flight_per_fu"] = inputs[
+                input_name
+            ]
+
+            manufacturing_output_name = (
+                "data:LCA:manufacturing:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
+            )
+
+            partials[manufacturing_output_name, input_name] = 5 * inputs[
+                "data:environmental_impact:aircraft_per_fu"
+            ]
+            partials[manufacturing_output_name, "data:environmental_impact:aircraft_per_fu"] = (
+                5 * inputs[input_name]
+            )

@@ -1281,6 +1281,7 @@ def test_emissions_per_fu():
         "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:HC",
         "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:H2O",
         "data:environmental_impact:flight_per_fu",
+        "data:environmental_impact:aircraft_per_fu",
     ]
 
     ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
@@ -1306,5 +1307,24 @@ def test_emissions_per_fu():
     assert problem.get_val(
         "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:HC_per_fu", units="kg"
     ) == pytest.approx(0.00040038, rel=1e-3)
+
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:turboshaft:turboshaft_1:CO2_per_fu", units="kg"
+    ) == pytest.approx(0.01263203085, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:turboshaft:turboshaft_1:CO_per_fu", units="kg"
+    ) == pytest.approx(2.001905e-05, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:turboshaft:turboshaft_1:NOx_per_fu", units="kg"
+    ) == pytest.approx(4.564345e-05, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:turboshaft:turboshaft_1:SOx_per_fu", units="kg"
+    ) == pytest.approx(3.2030499999999998e-06, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:turboshaft:turboshaft_1:H2O_per_fu", units="kg"
+    ) == pytest.approx(0.004952717, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:turboshaft:turboshaft_1:HC_per_fu", units="kg"
+    ) == pytest.approx(2.0019e-06, rel=1e-3)
 
     problem.check_partials(compact_print=True)

@@ -46,6 +46,7 @@
                             <HC units="g" is_input="False">4404.848754938354</HC>
                             <NOx units="g" is_input="False">733.0908512485522</NOx>
                             <SOx units="g" is_input="False">98.05673806509293</SOx>
+                            <lead units="g" is_input="False">57.27916</lead>
                         </ice_1>
                     </ICE>
                 </he_power_train>
