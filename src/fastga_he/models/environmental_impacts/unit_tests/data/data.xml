@@ -7,6 +7,10 @@
         <duration units="h">10.0</duration>
         <mission_ratio>10.30236332</mission_ratio>
       </line_test>
+      <delivery>
+        <distance units="km">8000.0</distance>
+         <mission_ratio>50.</mission_ratio>
+      </delivery>
     </environmental_impact>
     <TLAR>
       <NPAX_design is_input="True">0.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>

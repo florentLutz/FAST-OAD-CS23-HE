@@ -34,6 +34,7 @@ class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
         # Already includes the per FU division
         self.add_input(name="data:environmental_impact:aircraft_per_fu", val=np.nan)
         self.add_input(name="data:environmental_impact:line_test:mission_ratio", val=np.nan)
+        self.add_input(name="data:environmental_impact:delivery:mission_ratio", val=np.nan)
 
         for specie in SPECIES_LIST:
             input_name = (
@@ -71,6 +72,31 @@ class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
                 ],
             )
 
+            distribution_output_name = (
+                "data:LCA:distribution:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":"
+                + specie
+                + "_per_fu"
+            )
+            self.add_output(
+                name=distribution_output_name,
+                val=0.0,
+                units="kg",
+                desc="Amount of "
+                + specie
+                + "release during distribution of the aircraft via air, might not be used if "
+                "delivered via cargo or train",
+            )
+            self.declare_partials(
+                of=distribution_output_name,
+                wrt=[
+                    input_name,
+                    "data:environmental_impact:aircraft_per_fu",
+                    "data:environmental_impact:delivery:mission_ratio",
+                ],
+            )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         battery_pack_id = self.options["battery_pack_id"]
 
@@ -99,6 +125,20 @@ class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
 
             outputs[manufacturing_output_name] = (
                 inputs["data:environmental_impact:line_test:mission_ratio"]
+                * inputs[input_name]
+                * inputs["data:environmental_impact:aircraft_per_fu"]
+            )
+
+            distribution_output_name = (
+                "data:LCA:distribution:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":"
+                + specie
+                + "_per_fu"
+            )
+
+            outputs[distribution_output_name] = (
+                inputs["data:environmental_impact:delivery:mission_ratio"]
                 * inputs[input_name]
                 * inputs["data:environmental_impact:aircraft_per_fu"]
             )
@@ -142,4 +182,23 @@ class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
             )
             partials[
                 manufacturing_output_name, "data:environmental_impact:line_test:mission_ratio"
+            ] = inputs["data:environmental_impact:aircraft_per_fu"] * inputs[input_name]
+
+            distribution_output_name = (
+                "data:LCA:distribution:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":"
+                + specie
+                + "_per_fu"
+            )
+
+            partials[distribution_output_name, input_name] = (
+                inputs["data:environmental_impact:delivery:mission_ratio"]
+                * inputs["data:environmental_impact:aircraft_per_fu"]
+            )
+            partials[distribution_output_name, "data:environmental_impact:aircraft_per_fu"] = (
+                inputs["data:environmental_impact:delivery:mission_ratio"] * inputs[input_name]
+            )
+            partials[
+                distribution_output_name, "data:environmental_impact:delivery:mission_ratio"
             ] = inputs["data:environmental_impact:aircraft_per_fu"] * inputs[input_name]

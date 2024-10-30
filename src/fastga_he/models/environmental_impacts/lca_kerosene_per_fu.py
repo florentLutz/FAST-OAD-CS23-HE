@@ -30,6 +30,7 @@ class LCAKerosenePerFU(om.ExplicitComponent):
         self.add_input(name="data:environmental_impact:flight_per_fu", val=np.nan)
         self.add_input(name="data:environmental_impact:aircraft_per_fu", val=np.nan)
         self.add_input(name="data:environmental_impact:line_test:mission_ratio", val=np.nan)
+        self.add_input(name="data:environmental_impact:delivery:mission_ratio", val=np.nan)
 
         self.add_output(
             name="data:LCA:operation:he_power_train:kerosene:mass_per_fu", units="kg", val=0.0
@@ -48,6 +49,20 @@ class LCAKerosenePerFU(om.ExplicitComponent):
             wrt=[
                 "data:environmental_impact:aircraft_per_fu",
                 "data:environmental_impact:line_test:mission_ratio",
+            ],
+            method="exact",
+        )
+
+        self.add_output(
+            name="data:LCA:distribution:he_power_train:kerosene:mass_per_fu",
+            units="kg",
+            val=0.0,
+        )
+        self.declare_partials(
+            of="data:LCA:distribution:he_power_train:kerosene:mass_per_fu",
+            wrt=[
+                "data:environmental_impact:aircraft_per_fu",
+                "data:environmental_impact:delivery:mission_ratio",
             ],
             method="exact",
         )
@@ -88,6 +103,11 @@ class LCAKerosenePerFU(om.ExplicitComponent):
             * total_fuel
             * inputs["data:environmental_impact:aircraft_per_fu"]
         )
+        outputs["data:LCA:distribution:he_power_train:kerosene:mass_per_fu"] = (
+            inputs["data:environmental_impact:delivery:mission_ratio"]
+            * total_fuel
+            * inputs["data:environmental_impact:aircraft_per_fu"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         tanks_names = self.options["tanks_name_list"]
@@ -117,6 +137,18 @@ class LCAKerosenePerFU(om.ExplicitComponent):
                 * inputs["data:environmental_impact:aircraft_per_fu"]
             )
 
+            partials[
+                "data:LCA:distribution:he_power_train:kerosene:mass_per_fu",
+                "data:propulsion:he_power_train:"
+                + tank_type
+                + ":"
+                + tank_name
+                + ":fuel_consumed_mission",
+            ] = (
+                inputs["data:environmental_impact:delivery:mission_ratio"]
+                * inputs["data:environmental_impact:aircraft_per_fu"]
+            )
+
             partial_flight_per_fu += inputs[
                 "data:propulsion:he_power_train:"
                 + tank_type
@@ -129,6 +161,7 @@ class LCAKerosenePerFU(om.ExplicitComponent):
             "data:LCA:operation:he_power_train:kerosene:mass_per_fu",
             "data:environmental_impact:flight_per_fu",
         ] = partial_flight_per_fu
+
         partials[
             "data:LCA:manufacturing:he_power_train:kerosene:mass_per_fu",
             "data:environmental_impact:aircraft_per_fu",
@@ -136,4 +169,13 @@ class LCAKerosenePerFU(om.ExplicitComponent):
         partials[
             "data:LCA:manufacturing:he_power_train:kerosene:mass_per_fu",
             "data:environmental_impact:line_test:mission_ratio",
+        ] = inputs["data:environmental_impact:aircraft_per_fu"] * partial_flight_per_fu
+
+        partials[
+            "data:LCA:distribution:he_power_train:kerosene:mass_per_fu",
+            "data:environmental_impact:aircraft_per_fu",
+        ] = inputs["data:environmental_impact:delivery:mission_ratio"] * partial_flight_per_fu
+        partials[
+            "data:LCA:distribution:he_power_train:kerosene:mass_per_fu",
+            "data:environmental_impact:delivery:mission_ratio",
         ] = inputs["data:environmental_impact:aircraft_per_fu"] * partial_flight_per_fu

@@ -26,6 +26,9 @@
             <line_test>
                 <mission_ratio>7.5</mission_ratio>
             </line_test>
+            <delivery>
+                <mission_ratio>50.</mission_ratio>
+            </delivery>
         </environmental_impact>
         <aerodynamics>
           <cruise>

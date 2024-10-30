@@ -1103,6 +1103,7 @@ def test_emissions_per_fu():
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:line_test:mission_ratio",
+        "data:environmental_impact:delivery:mission_ratio",
     ]
 
     ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
@@ -1146,6 +1147,25 @@ def test_emissions_per_fu():
     ) == pytest.approx(0.0, rel=1e-3)
     assert problem.get_val(
         "data:LCA:manufacturing:he_power_train:battery_pack:battery_pack_1:HC_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:CO2_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:CO_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:NOx_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:SOx_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:H2O_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:HC_per_fu", units="kg"
     ) == pytest.approx(0.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)

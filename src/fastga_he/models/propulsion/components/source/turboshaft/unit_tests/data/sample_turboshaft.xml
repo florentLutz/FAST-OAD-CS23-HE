@@ -6,6 +6,9 @@
             <line_test>
                 <mission_ratio>7.5</mission_ratio>
             </line_test>
+            <delivery>
+                <mission_ratio>5.0</mission_ratio>
+            </delivery>
         </environmental_impact>
         <LCA>
             <operation>

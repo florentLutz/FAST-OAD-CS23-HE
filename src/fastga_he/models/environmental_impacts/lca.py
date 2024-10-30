@@ -11,6 +11,8 @@ from .lca_aircraft_per_fu import LCAAircraftPerFU
 from .lca_use_flight_per_fu import LCAUseFlightPerFU
 
 from .lca_line_test_mission_ratio import LCARatioTestFlightMission
+from .lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
+from .lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
 
 from .lca_wing_weight_per_fu import LCAWingWeightPerFU
 from .lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
@@ -66,6 +68,14 @@ class LCA(om.Group):
             " always be in aluminium and flight controls in steel",
             allow_none=False,
         )
+        self.options.declare(
+            name="delivery_method",
+            default="flight",
+            desc="Method with which the aircraft will be brought from the assembly plant to the "
+            "end user. Can be either flown or carried by train",
+            allow_none=False,
+            values=["flight", "train"],
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
@@ -76,6 +86,18 @@ class LCA(om.Group):
         self.add_subsystem(
             name="line_tests_mission_ratio", subsys=LCARatioTestFlightMission(), promotes=["*"]
         )
+        # Will always be added even when not used because I can't see a smarter way to compute
+        # fuel and emissions that doing as I did for line tests
+        self.add_subsystem(
+            name="delivery_mission_ratio", subsys=LCARatioDeliveryFlightMission(), promotes=["*"]
+        )
+        if self.options["delivery_method"] == "train":
+            # Will only be used if this method is added which contrast with the other method
+            self.add_subsystem(
+                name="delivery_ton_km",
+                subsys=LCADistributionCargoMassDistancePerFU(),
+                promotes=["*"],
+            )
 
         # Adds all the LCA groups for the airframe which will be here regardless of the powertrain
         self.add_subsystem(name="pre_lca_wing", subsys=LCAWingWeightPerFU(), promotes=["*"])

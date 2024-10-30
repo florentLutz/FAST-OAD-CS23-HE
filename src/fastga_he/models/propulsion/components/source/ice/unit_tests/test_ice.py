@@ -898,6 +898,7 @@ def test_emissions_per_fu():
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:line_test:mission_ratio",
+        "data:environmental_impact:delivery:mission_ratio",
     ]
 
     ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
@@ -948,5 +949,27 @@ def test_emissions_per_fu():
     assert problem.get_val(
         "data:LCA:manufacturing:he_power_train:ICE:ice_1:lead_per_fu", units="kg"
     ) == pytest.approx(4.295937e-07, rel=1e-3)
+
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:ICE:ice_1:CO2_per_fu", units="kg"
+    ) == pytest.approx(0.00289501, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:ICE:ice_1:CO_per_fu", units="kg"
+    ) == pytest.approx(0.00074523, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:ICE:ice_1:NOx_per_fu", units="kg"
+    ) == pytest.approx(2.9323634e-06, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:ICE:ice_1:SOx_per_fu", units="kg"
+    ) == pytest.approx(3.92226952e-07, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:ICE:ice_1:H2O_per_fu", units="kg"
+    ) == pytest.approx(0.0011552, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:ICE:ice_1:HC_per_fu", units="kg"
+    ) == pytest.approx(1.7619395e-05, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:ICE:ice_1:lead_per_fu", units="kg"
+    ) == pytest.approx(2.2911664e-07, rel=1e-3)
 
     problem.check_partials(compact_print=True)

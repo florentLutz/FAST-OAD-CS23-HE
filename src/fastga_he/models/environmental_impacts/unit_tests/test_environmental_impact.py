@@ -22,6 +22,8 @@ from ..lca_kerosene_per_fu import LCAKerosenePerFU
 from ..lca_gasoline_per_fu import LCAGasolinePerFU
 from ..lca_electricty_per_fu import LCAElectricityPerFU
 from ..lca_line_test_mission_ratio import LCARatioTestFlightMission
+from ..lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
+from ..lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
 from ..lca import LCA
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -437,11 +439,60 @@ def test_line_tests_sizing_ratio():
     problem.check_partials(compact_print=True)
 
 
+def test_delivery_sizing_ratio():
+    inputs_list = ["data:TLAR:range", "data:environmental_impact:delivery:distance"]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCARatioDeliveryFlightMission(),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:delivery:mission_ratio") == pytest.approx(
+        150.94, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_delivery_ton_km():
+    inputs_list = [
+        "data:weight:aircraft:OWE",
+        "data:environmental_impact:delivery:distance",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCADistributionCargoMassDistancePerFU(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:environmental_impact:delivery:cargo_transport_per_fu"
+    ) == pytest.approx(0.00341267, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_electricity_per_fu_velis():
     inputs_list = [
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:line_test:mission_ratio",
+        "data:environmental_impact:delivery:mission_ratio",
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
         "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
     ]
@@ -463,6 +514,9 @@ def test_electricity_per_fu_velis():
     assert problem.get_val(
         "data:LCA:manufacturing:he_power_train:electricity:energy_per_fu", units="W*h"
     ) == pytest.approx(0.25769592, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:electricity:energy_per_fu", units="W*h"
+    ) == pytest.approx(1.25066409, rel=1e-5)
 
     problem.check_partials(compact_print=True)
 
@@ -563,6 +617,7 @@ def test_kerosene_per_fu_tbm900():
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:line_test:mission_ratio",
+        "data:environmental_impact:delivery:mission_ratio",
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
     ]
@@ -584,7 +639,9 @@ def test_kerosene_per_fu_tbm900():
     assert problem.get_val(
         "data:LCA:manufacturing:he_power_train:kerosene:mass_per_fu"
     ) == pytest.approx(9.39803907e-05, rel=1e-5)
-
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:kerosene:mass_per_fu"
+    ) == pytest.approx(5.63882344e-05, rel=1e-5)
     problem.check_partials(compact_print=True)
 
 
@@ -661,6 +718,7 @@ def test_gasoline_per_fu_sr22():
     inputs_list = [
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
+        "data:environmental_impact:delivery:mission_ratio",
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
         "data:environmental_impact:line_test:mission_ratio",
@@ -683,6 +741,9 @@ def test_gasoline_per_fu_sr22():
     assert problem.get_val(
         "data:LCA:manufacturing:he_power_train:gasoline:mass_per_fu"
     ) == pytest.approx(4.03118507e-05, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:gasoline:mass_per_fu"
+    ) == pytest.approx(2.39111932e-05, rel=1e-5)
 
     problem.check_partials(compact_print=True)
 
