@@ -530,6 +530,7 @@ def test_lca_pipistrel():
                 component_level_breakdown=True,
                 airframe_material="composite",
                 delivery_method="train",
+                electric_mix="french",
 
             )
         ),
@@ -544,6 +545,7 @@ def test_lca_pipistrel():
             component_level_breakdown=True,
             airframe_material="composite",
             delivery_method="train",
+            electric_mix="french",
         ),
         ivc,
     )
@@ -553,10 +555,10 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:propeller_1"
-    ) == pytest.approx(0.00528819, rel=1e-4)
+    ) == pytest.approx(0.0046814, rel=1e-4)
     assert problem.get_val(
         "data:environmental_impact:total_natural_resources:production:propeller_1"
-    ) == pytest.approx(0.00030415567672208426, rel=1e-4)
+    ) == pytest.approx(0.0002649087829670403, rel=1e-4)
 
     assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
         1.70306211e-06, rel=1e-2
@@ -592,7 +594,7 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.11821691, rel=1e-5)
+    ) == pytest.approx(0.10397035506796956, rel=1e-5)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:battery_pack_1"
@@ -600,7 +602,7 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:sum"
-    ) == pytest.approx(0.124769, abs=1e-5)
+    ) == pytest.approx(0.01535945984419287, abs=1e-5)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:manufacturing:sum"

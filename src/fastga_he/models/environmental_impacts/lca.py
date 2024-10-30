@@ -76,6 +76,15 @@ class LCA(om.Group):
             allow_none=False,
             values=["flight", "train"],
         )
+        self.options.declare(
+            name="electric_mix",
+            default="default",
+            desc="By default to construct the aircraft, a European electric mix is used. This "
+                 "forces all higher level process to use a different mix. This will not affect "
+                 "subprocesses of proxies directly taken from EcoInvent",
+            allow_none=False,
+            values=["default", "french", "slovenia"],
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
@@ -191,6 +200,7 @@ class LCA(om.Group):
                 ecoinvent_version=self.options["ecoinvent_version"],
                 airframe_material=self.options["airframe_material"],
                 delivery_method=self.options["delivery_method"],
+                electric_mix=self.options["electric_mix"],
             ),
             promotes=["*"],
         )

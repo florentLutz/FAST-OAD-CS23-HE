@@ -4,6 +4,8 @@
 
 import pathlib
 import dotenv
+import shutil
+from tempfile import mkstemp
 
 from typing import Dict, List
 
@@ -94,6 +96,15 @@ class LCACore(om.ExplicitComponent):
             "end user. Can be either flown or carried by train",
             allow_none=False,
             values=["flight", "train"],
+        )
+        self.options.declare(
+            name="electric_mix",
+            default="default",
+            desc="By default to construct the aircraft, a European electric mix is used. This "
+                 "forces all higher level process to use a different mix. This will not affect "
+                 "subprocesses of proxies directly taken from EcoInvent",
+            allow_none=False,
+            values=["default", "french", "slovenia"],
         )
 
     def setup(self):
@@ -602,6 +613,33 @@ class LCACore(om.ExplicitComponent):
                             my_file.write("        " + line_to_copy)
                         my_file.write("\n")
 
+    def change_electric_mix(self, lca_conf_file_path):
+
+        path_to_folder = lca_conf_file_path.parents[0]
+        tmp_copy_path = path_to_folder / "tmp_copy.yml"
+
+        shutil.copy(lca_conf_file_path, tmp_copy_path)
+
+        with open(tmp_copy_path, "w") as new_file:
+            with open(lca_conf_file_path, "r") as old_file:
+                for line in old_file:
+                    if 'electricity, high voltage, European attribute mix' not in line:
+                        new_file.write(line)
+                    else:
+                        # line should be starting with "name:"
+                        indent_pattern = line.split("name")[0]
+                        new_file.write(indent_pattern + "name: 'electricity, high voltage, production mix'\n")
+
+                        # TODO: Add more eventually
+                        if self.options["electric_mix"] == "french":
+                            new_file.write(indent_pattern + "loc: 'FR'\n")
+                        if self.options["electric_mix"] == "slovenia":
+                            new_file.write(indent_pattern + "loc: 'SI'\n")
+
+        pathlib.Path.unlink(lca_conf_file_path)
+        shutil.move(tmp_copy_path, lca_conf_file_path)
+
+
     def write_lca_conf_file(self):
         ecoinvent_version = self.options["ecoinvent_version"]
         methods = self.options["impact_assessment_method"]
@@ -656,6 +694,9 @@ class LCACore(om.ExplicitComponent):
             methods_dict = yaml.safe_load(methods_file_stream)
 
         self.write_methods(lca_conf_file_path, methods_dict)
+
+        if self.options["electric_mix"] != "default":
+            self.change_electric_mix(lca_conf_file_path)
 
         return lca_conf_file_path
 
