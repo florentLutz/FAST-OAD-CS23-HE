@@ -529,6 +529,8 @@ def test_lca_pipistrel():
                 power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
                 component_level_breakdown=True,
                 airframe_material="composite",
+                delivery_method="train",
+
             )
         ),
         __file__,
@@ -541,6 +543,7 @@ def test_lca_pipistrel():
             power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
             component_level_breakdown=True,
             airframe_material="composite",
+            delivery_method="train",
         ),
         ivc,
     )
@@ -609,6 +612,10 @@ def test_lca_pipistrel():
         abs=1e-5,
     )
 
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:distribution:sum"
+    ) == pytest.approx(0.00027065, rel=1e-4)
+
     problem.check_partials(compact_print=True)
 
 
@@ -653,6 +660,7 @@ def test_lca_tbm900():
                 power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
                 component_level_breakdown=True,
                 airframe_material="aluminium",
+                delivery_method="flight",
             )
         ),
         __file__,
@@ -665,6 +673,7 @@ def test_lca_tbm900():
             power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
             component_level_breakdown=True,
             airframe_material="aluminium",
+            delivery_method="flight",
         ),
         ivc,
     )
@@ -711,6 +720,19 @@ def test_lca_tbm900():
         "data:environmental_impact:climate_change:manufacturing:sum"
     ) == pytest.approx(0.0001096532063891862, rel=1e-4)
 
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:distribution:sum"
+    ) == pytest.approx(
+        problem.get_val("data:environmental_impact:climate_change:manufacturing:sum")
+        / problem.get_val("data:environmental_impact:line_test:mission_ratio")
+        * problem.get_val("data:environmental_impact:delivery:mission_ratio"),
+        abs=1e-5,
+    )
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:distribution:sum"
+    ) == pytest.approx(0.00019842, rel=1e-4)
+
     problem.check_partials(compact_print=True)
 
 
@@ -756,6 +778,7 @@ def test_lca_cirrus_sr22():
                 power_train_file_path=DATA_FOLDER_PATH / "sr22_propulsion.yml",
                 component_level_breakdown=True,
                 airframe_material="composite",
+                delivery_method="flight",
             )
         ),
         __file__,
@@ -768,6 +791,7 @@ def test_lca_cirrus_sr22():
             power_train_file_path=DATA_FOLDER_PATH / "sr22_propulsion.yml",
             component_level_breakdown=True,
             airframe_material="composite",
+            delivery_method="flight",
         ),
         ivc,
     )
@@ -804,5 +828,18 @@ def test_lca_cirrus_sr22():
     assert problem.get_val(
         "data:environmental_impact:climate_change:manufacturing:sum"
     ) == pytest.approx(3.07602591e-05, rel=1e-4)
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:distribution:sum"
+    ) == pytest.approx(
+        problem.get_val("data:environmental_impact:climate_change:manufacturing:sum")
+        / problem.get_val("data:environmental_impact:line_test:mission_ratio")
+        * problem.get_val("data:environmental_impact:delivery:mission_ratio"),
+        abs=1e-5,
+    )
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:distribution:sum"
+    ) == pytest.approx(9.85593183e-05, rel=1e-4)
 
     problem.check_partials(compact_print=True)

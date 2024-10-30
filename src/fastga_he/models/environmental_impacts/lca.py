@@ -190,6 +190,7 @@ class LCA(om.Group):
                 impact_assessment_method=self.options["impact_assessment_method"],
                 ecoinvent_version=self.options["ecoinvent_version"],
                 airframe_material=self.options["airframe_material"],
+                delivery_method=self.options["delivery_method"],
             ),
             promotes=["*"],
         )

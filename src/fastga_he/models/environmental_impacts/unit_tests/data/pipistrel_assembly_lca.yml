@@ -390,6 +390,17 @@ model:
             amount: data__LCA__manufacturing__he_power_train__electricity__energy_per_fu / 1000
 
 
+    distribution:
+        custom_attributes:
+            - attribute: "phase"
+              value: "distribution"
+
+        transport_via_train:
+            name: 'market group for transport, freight train'
+            loc: 'RER'
+            amount: data__environmental_impact__delivery__cargo_transport_per_fu
+
+
     use:
         custom_attributes:
             - attribute: "phase"
