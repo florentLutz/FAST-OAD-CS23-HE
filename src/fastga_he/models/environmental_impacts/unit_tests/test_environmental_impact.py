@@ -531,7 +531,6 @@ def test_lca_pipistrel():
                 airframe_material="composite",
                 delivery_method="train",
                 electric_mix="french",
-
             )
         ),
         __file__,

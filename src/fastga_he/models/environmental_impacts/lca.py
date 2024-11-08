@@ -26,7 +26,11 @@ from .lca_gasoline_per_fu import LCAGasolinePerFU
 from .lca_kerosene_per_fu import LCAKerosenePerFU
 from .lca_electricty_per_fu import LCAElectricityPerFU
 
-from .lca_core import LCACore, METHODS_TO_FILE
+from .lca_core_normalization import LCACoreNormalisation
+
+from .lca_core import LCACore
+
+from .resources.constants import METHODS_TO_FILE, METHODS_TO_NORMALIZATION
 
 
 class LCA(om.Group):
@@ -80,10 +84,22 @@ class LCA(om.Group):
             name="electric_mix",
             default="default",
             desc="By default to construct the aircraft, a European electric mix is used. This "
-                 "forces all higher level process to use a different mix. This will not affect "
-                 "subprocesses of proxies directly taken from EcoInvent",
+            "forces all higher level process to use a different mix. This will not affect "
+            "subprocesses of proxies directly taken from EcoInvent",
             allow_none=False,
             values=["default", "french", "slovenia"],
+        )
+        self.options.declare(
+            name="normalization",
+            default=False,
+            types=bool,
+            desc="If available, the normalization step will be added to the LCA process",
+        )
+        self.options.declare(
+            name="weighting",
+            default=False,
+            types=bool,
+            desc="If available, the weighting and aggregation steps will be added to the LCA process",
         )
 
     def setup(self):
@@ -204,3 +220,23 @@ class LCA(om.Group):
             ),
             promotes=["*"],
         )
+
+        if (
+            self.options["normalization"]
+            and METHODS_TO_NORMALIZATION[self.options["impact_assessment_method"]]
+        ):
+            self.add_subsystem(
+                name="lca_normalization",
+                subsys=LCACoreNormalisation(),
+                promotes=["*"],
+            )
+
+        # Be careful here, the weighting step should only be done if the normalization step has
+        # been done beforehand
+
+    def configure(self):
+        if (
+            self.options["normalization"]
+            and METHODS_TO_NORMALIZATION[self.options["impact_assessment_method"]]
+        ):
+            pass

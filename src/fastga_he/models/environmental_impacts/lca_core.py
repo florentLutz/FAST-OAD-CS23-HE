@@ -24,15 +24,17 @@ import brightway2 as bw
 from lcav.io.configuration import LCAProblemConfigurator
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
+from .resources.constants import METHODS_TO_FILE
 
 RESOURCE_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "resources"
-METHODS_TO_FILE = {
-    "EF v3.1 no LT": "ef_no_lt_methods.yml",
-    "EF v3.1": "ef_methods.yml",
-    "IMPACT World+ v2.0.1": "impact_world_methods.yml",
-    "ReCiPe 2016 v1.03": "recipe_methods.yml",
+
+NAME_TO_UNIT = {
+    "mass": "kg",
+    "length": "m",
+    "OWE": "kg",
+    "energy": "W*h",
+    "cargo_transport": "t*km",
 }
-NAME_TO_UNIT = {"mass": "kg", "length": "m", "OWE": "kg", "energy": "W*h", "cargo_transport": "t*km"}
 LCA_PREFIX = "data:environmental_impact:"
 
 
@@ -54,6 +56,9 @@ class LCACore(om.ExplicitComponent):
         dotenv.load_dotenv()
 
         self.name_to_unit = NAME_TO_UNIT
+
+        self.outputs_list = []
+        self.clean_method_name = set()
 
     def initialize(self):
         self.options.declare(
@@ -101,8 +106,8 @@ class LCACore(om.ExplicitComponent):
             name="electric_mix",
             default="default",
             desc="By default to construct the aircraft, a European electric mix is used. This "
-                 "forces all higher level process to use a different mix. This will not affect "
-                 "subprocesses of proxies directly taken from EcoInvent",
+            "forces all higher level process to use a different mix. This will not affect "
+            "subprocesses of proxies directly taken from EcoInvent",
             allow_none=False,
             values=["default", "french", "slovenia"],
         )
@@ -152,6 +157,7 @@ class LCACore(om.ExplicitComponent):
         for m in self.methods:
             clean_method_name = re.sub(r": |/| ", "_", m[1])
             clean_method_name = clean_method_name.replace(",_", "")
+            self.clean_method_name.add(clean_method_name)
 
             # "Phase" is always inside the axis, so we can do that
             for phase in self.axis_keys_dict["phase"]:
@@ -164,6 +170,7 @@ class LCACore(om.ExplicitComponent):
                         units=None,
                         desc=bw.Method(m).metadata["unit"] + " for the whole " + phase + " phase",
                     )
+                    self.outputs_list.append(LCA_PREFIX + clean_method_name + ":" + phase + ":sum")
 
             if "component" in self.axis:
                 # Components are tagged with the phase just in case, so we can do this. However,
@@ -191,6 +198,14 @@ class LCACore(om.ExplicitComponent):
                             + " in "
                             + clean_phase_name
                             + " phase",
+                        )
+                        self.outputs_list.append(
+                            LCA_PREFIX
+                            + clean_method_name
+                            + ":"
+                            + clean_phase_name
+                            + ":"
+                            + clean_component_name
                         )
 
     def setup_partials(self):
@@ -614,7 +629,6 @@ class LCACore(om.ExplicitComponent):
                         my_file.write("\n")
 
     def change_electric_mix(self, lca_conf_file_path):
-
         path_to_folder = lca_conf_file_path.parents[0]
         tmp_copy_path = path_to_folder / "tmp_copy.yml"
 
@@ -623,12 +637,14 @@ class LCACore(om.ExplicitComponent):
         with open(tmp_copy_path, "w") as new_file:
             with open(lca_conf_file_path, "r") as old_file:
                 for line in old_file:
-                    if 'electricity, high voltage, European attribute mix' not in line:
+                    if "electricity, high voltage, European attribute mix" not in line:
                         new_file.write(line)
                     else:
                         # line should be starting with "name:"
                         indent_pattern = line.split("name")[0]
-                        new_file.write(indent_pattern + "name: 'electricity, high voltage, production mix'\n")
+                        new_file.write(
+                            indent_pattern + "name: 'electricity, high voltage, production mix'\n"
+                        )
 
                         # TODO: Add more eventually
                         if self.options["electric_mix"] == "french":
@@ -638,7 +654,6 @@ class LCACore(om.ExplicitComponent):
 
         pathlib.Path.unlink(lca_conf_file_path)
         shutil.move(tmp_copy_path, lca_conf_file_path)
-
 
     def write_lca_conf_file(self):
         ecoinvent_version = self.options["ecoinvent_version"]
