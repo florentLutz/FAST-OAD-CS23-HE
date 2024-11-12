@@ -2,13 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import os
-
-from dotenv import load_dotenv
-import lca_algebraic as agb
-
 import brightway2 as bw
-import bw2io
+from dotenv import load_dotenv
 
 if __name__ == "__main__":
     bw.projects.set_current("MethodListing")

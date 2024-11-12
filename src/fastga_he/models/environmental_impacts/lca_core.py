@@ -3,28 +3,22 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import pathlib
-import dotenv
+import re
 import shutil
-from tempfile import mkstemp
-
 from typing import Dict, List
 
-import yaml
-
-import pandas as pd
-import numpy as np
-import sympy as sym
-
-import re
-
-import openmdao.api as om
-
-import lca_algebraic as agb
 import brightway2 as bw
+import dotenv
+import lca_algebraic as agb
+import numpy as np
+import openmdao.api as om
+import pandas as pd
+import sympy as sym
+import yaml
 from lcav.io.configuration import LCAProblemConfigurator
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
-from .resources.constants import METHODS_TO_FILE
+from .resources.constants import METHODS_TO_FILE, LCA_PREFIX
 
 RESOURCE_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "resources"
 
@@ -35,7 +29,6 @@ NAME_TO_UNIT = {
     "energy": "W*h",
     "cargo_transport": "t*km",
 }
-LCA_PREFIX = "data:environmental_impact:"
 
 
 class LCACore(om.ExplicitComponent):

@@ -2,10 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
-
-from .lca_core import LCA_PREFIX
 
 
 class LCACoreNormalisation(om.ExplicitComponent):
@@ -23,10 +20,15 @@ class LCACoreNormalisation(om.ExplicitComponent):
         super().__init__(**kwargs)
 
         # Will be changed by the configure method of the parent group eventually.
-        self.clean_method_name = None
+        self.inputs_list = None
+        self.normalization_factor = None
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pass
+        for var_in in self.inputs_list:
+            method_name = var_in.split(":")[2]
+            if method_name in self.normalization_factor:
+                normalized_method_name = method_name + "_normalized"
+                normalization_factor = self.normalization_factor[method_name]
+                var_out = var_in.replace(method_name, normalized_method_name)
 
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pass
+                outputs[var_out] = inputs[var_in] / normalization_factor

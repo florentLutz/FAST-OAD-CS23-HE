@@ -2,8 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import yaml
 import pathlib
+
+import yaml
 
 RESOURCE_FOLDER_PATH = pathlib.Path(__file__).parents[0].parents[0] / "resources"
 HEADER_PATH = RESOURCE_FOLDER_PATH / "lca_conf_header.yml"

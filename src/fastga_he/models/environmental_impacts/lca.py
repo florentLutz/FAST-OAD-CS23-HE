@@ -2,35 +2,34 @@
 # Electric Aircraft.
 # Copyright (C) 2024 ISAE-SUPAERO
 
+import numpy as np
 import openmdao.api as om
 
-from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 import fastga_he.models.propulsion.components as he_comp
-
+from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from .lca_aircraft_per_fu import LCAAircraftPerFU
-from .lca_use_flight_per_fu import LCAUseFlightPerFU
-
-from .lca_line_test_mission_ratio import LCARatioTestFlightMission
+from .lca_core import LCACore
+from .lca_core_normalization import LCACoreNormalisation
 from .lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from .lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
-
-from .lca_wing_weight_per_fu import LCAWingWeightPerFU
-from .lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
-from .lca_htp_weight_per_fu import LCAHTPWeightPerFU
-from .lca_vtp_weight_per_fu import LCAVTPWeightPerFU
-from .lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
-from .lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
-from .lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
-
-from .lca_gasoline_per_fu import LCAGasolinePerFU
-from .lca_kerosene_per_fu import LCAKerosenePerFU
 from .lca_electricty_per_fu import LCAElectricityPerFU
-
-from .lca_core_normalization import LCACoreNormalisation
-
-from .lca_core import LCACore
-
-from .resources.constants import METHODS_TO_FILE, METHODS_TO_NORMALIZATION
+from .lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
+from .lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
+from .lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
+from .lca_gasoline_per_fu import LCAGasolinePerFU
+from .lca_htp_weight_per_fu import LCAHTPWeightPerFU
+from .lca_kerosene_per_fu import LCAKerosenePerFU
+from .lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
+from .lca_line_test_mission_ratio import LCARatioTestFlightMission
+from .lca_use_flight_per_fu import LCAUseFlightPerFU
+from .lca_vtp_weight_per_fu import LCAVTPWeightPerFU
+from .lca_wing_weight_per_fu import LCAWingWeightPerFU
+from .resources.constants import (
+    METHODS_TO_FILE,
+    METHODS_TO_NORMALIZATION,
+    LCA_PREFIX,
+    NORMALIZATION_FACTOR,
+)
 
 
 class LCA(om.Group):
@@ -231,6 +230,9 @@ class LCA(om.Group):
                 promotes=["*"],
             )
 
+            ivc = om.IndepVarComp()
+            self.add_subsystem(name="lca_normalization_factor", subsys=ivc, promotes=["*"])
+
         # Be careful here, the weighting step should only be done if the normalization step has
         # been done beforehand
 
@@ -239,4 +241,43 @@ class LCA(om.Group):
             self.options["normalization"]
             and METHODS_TO_NORMALIZATION[self.options["impact_assessment_method"]]
         ):
-            pass
+            normalization_inputs_list = self.lca_core.list_outputs(
+                return_format="dict", out_stream=None
+            ).keys()
+            self.lca_normalization.inputs_list = normalization_inputs_list
+
+            added_normalization_factor = []
+            self.lca_normalization.normalization_factor = NORMALIZATION_FACTOR[
+                self.options["impact_assessment_method"]
+            ]
+
+            for var_in in normalization_inputs_list:
+                # We transform the name of the input variable in the following manner: we replace
+                # the impact name with (impact_name)_normalized
+
+                method_name = var_in.split(":")[2]
+
+                # Normalize only if the normalization factor exists, which might not be the case
+                # for recipe and total_ impacts
+                if method_name in NORMALIZATION_FACTOR[self.options["impact_assessment_method"]]:
+                    normalized_method_name = method_name + "_normalized"
+                    normalization_factor_name = LCA_PREFIX + method_name + ":normalization_factor"
+                    normalization_factor = NORMALIZATION_FACTOR[
+                        self.options["impact_assessment_method"]
+                    ][method_name]
+                    var_out = var_in.replace(method_name, normalized_method_name)
+
+                    # Add outputs from core LCIA as inputs to normalization
+                    self.lca_normalization.add_input(var_in, val=np.nan, units=None)
+                    self.lca_normalization.add_output(var_out, units=None)
+                    self.lca_normalization.declare_partials(
+                        of=var_out, wrt=var_in, val=1.0 / normalization_factor
+                    )
+
+                    # Declaring normalization factor in a separate ivc so that it doesn't become an
+                    # input of lca_normalization and the partials are easier to declare
+                    if normalization_factor_name not in added_normalization_factor:
+                        self.lca_normalization_factor.add_output(
+                            normalization_factor_name, val=normalization_factor, units=None
+                        )
+                        added_normalization_factor.append(normalization_factor_name)

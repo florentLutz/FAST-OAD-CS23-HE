@@ -3,30 +3,29 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import os
-
 import pathlib
+
 import pytest
 
-from ..simple_energy_impact import SimpleEnergyImpacts
-from ..lca_core import LCACore
+from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
+from ..lca import LCA
 from ..lca_aircraft_per_fu import LCAAircraftPerFU
-from ..lca_use_flight_per_fu import LCAUseFlightPerFU
-from ..lca_wing_weight_per_fu import LCAWingWeightPerFU
-from ..lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
-from ..lca_htp_weight_per_fu import LCAHTPWeightPerFU
-from ..lca_vtp_weight_per_fu import LCAVTPWeightPerFU
-from ..lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
-from ..lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
-from ..lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
-from ..lca_kerosene_per_fu import LCAKerosenePerFU
-from ..lca_gasoline_per_fu import LCAGasolinePerFU
-from ..lca_electricty_per_fu import LCAElectricityPerFU
-from ..lca_line_test_mission_ratio import LCARatioTestFlightMission
+from ..lca_core import LCACore
 from ..lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from ..lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
-from ..lca import LCA
-
-from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
+from ..lca_electricty_per_fu import LCAElectricityPerFU
+from ..lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
+from ..lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
+from ..lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
+from ..lca_gasoline_per_fu import LCAGasolinePerFU
+from ..lca_htp_weight_per_fu import LCAHTPWeightPerFU
+from ..lca_kerosene_per_fu import LCAKerosenePerFU
+from ..lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
+from ..lca_line_test_mission_ratio import LCARatioTestFlightMission
+from ..lca_use_flight_per_fu import LCAUseFlightPerFU
+from ..lca_vtp_weight_per_fu import LCAVTPWeightPerFU
+from ..lca_wing_weight_per_fu import LCAWingWeightPerFU
+from ..simple_energy_impact import SimpleEnergyImpacts
 
 XML_FILE = "data.xml"
 DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
@@ -531,6 +530,7 @@ def test_lca_pipistrel():
                 airframe_material="composite",
                 delivery_method="train",
                 electric_mix="french",
+                normalization=True,
             )
         ),
         __file__,
@@ -545,6 +545,7 @@ def test_lca_pipistrel():
             airframe_material="composite",
             delivery_method="train",
             electric_mix="french",
+            normalization=True,
         ),
         ivc,
     )
@@ -735,6 +736,54 @@ def test_lca_tbm900():
     ) == pytest.approx(0.00019842, rel=1e-4)
 
     problem.check_partials(compact_print=True)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_tbm900_ef():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCA(
+                power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
+                component_level_breakdown=True,
+                airframe_material="aluminium",
+                delivery_method="flight",
+                impact_assessment_method="EF v3.1",
+                normalization=True,
+            )
+        ),
+        __file__,
+        DATA_FOLDER_PATH / "tbm900.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCA(
+            power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
+            component_level_breakdown=True,
+            airframe_material="aluminium",
+            delivery_method="flight",
+            impact_assessment_method="EF v3.1",
+            normalization=True,
+        ),
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "tbm900_lca_ef.xml"
+    problem.write_outputs()
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:production:sum"
+    ) == pytest.approx(0.00238141, rel=1e-5)
+    assert problem.get_val(
+        "data:environmental_impact:climate_change_normalized:production:sum"
+    ) == pytest.approx(
+        problem.get_val("data:environmental_impact:climate_change:production:sum")
+        / problem.get_val("data:environmental_impact:climate_change:normalization_factor"),
+        rel=1e-5,
+    )
+    assert problem.get_val(
+        "data:environmental_impact:climate_change_normalized:production:sum"
+    ) == pytest.approx(3.15419102e-07, rel=1e-5)
 
 
 def test_gasoline_per_fu_sr22():
