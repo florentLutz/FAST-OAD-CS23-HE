@@ -10,6 +10,7 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 from .lca_aircraft_per_fu import LCAAircraftPerFU
 from .lca_core import LCACore
 from .lca_core_normalization import LCACoreNormalisation
+from .lca_core_weighting import LCACoreWeighting
 from .lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from .lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
 from .lca_electricty_per_fu import LCAElectricityPerFU
@@ -27,8 +28,10 @@ from .lca_wing_weight_per_fu import LCAWingWeightPerFU
 from .resources.constants import (
     METHODS_TO_FILE,
     METHODS_TO_NORMALIZATION,
+    METHODS_TO_WEIGHTING,
     LCA_PREFIX,
     NORMALIZATION_FACTOR,
+    WEIGHTING_FACTOR,
 )
 
 
@@ -236,6 +239,17 @@ class LCA(om.Group):
         # Be careful here, the weighting step should only be done if the normalization step has
         # been done beforehand
 
+        if (
+            self.options["normalization"]
+            and self.options["weighting"]
+            and METHODS_TO_WEIGHTING[self.options["impact_assessment_method"]]
+        ):
+            self.add_subsystem(
+                name="lca_weighting",
+                subsys=LCACoreWeighting(),
+                promotes=["*"],
+            )
+
     def configure(self):
         if (
             self.options["normalization"]
@@ -281,3 +295,46 @@ class LCA(om.Group):
                             normalization_factor_name, val=normalization_factor, units=None
                         )
                         added_normalization_factor.append(normalization_factor_name)
+
+        if (
+            self.options["normalization"]
+            and self.options["weighting"]
+            and METHODS_TO_WEIGHTING[self.options["impact_assessment_method"]]
+        ):
+            potential_weighting_inputs_list = self.lca_normalization.list_outputs(
+                return_format="dict", out_stream=None
+            ).keys()
+            self.lca_weighting.inputs_list = potential_weighting_inputs_list
+            self.lca_weighting.weighting_factor = WEIGHTING_FACTOR[
+                self.options["impact_assessment_method"]
+            ]
+
+            added_weighting_factor = []
+
+            for var_in in potential_weighting_inputs_list:
+                # We transform the name of the input variable in the following manner: we replace
+                # the impact name with (impact_name)_weighted
+
+                normalized_method_name = var_in.split(":")[2]
+                method_name = normalized_method_name.replace("_normalized", "")
+
+                if method_name in WEIGHTING_FACTOR[self.options["impact_assessment_method"]]:
+                    weighted_method_name = method_name + "_weighted"
+                    weighting_factor_name = LCA_PREFIX + method_name + ":weighting_factor"
+                    weighting_factor = WEIGHTING_FACTOR[self.options["impact_assessment_method"]][
+                        method_name
+                    ]
+                    var_out = var_in.replace(normalized_method_name, weighted_method_name)
+
+                    self.lca_weighting.add_input(var_in, val=np.nan, units=None)
+
+                    if weighting_factor_name not in added_weighting_factor:
+                        self.lca_weighting.add_input(
+                            weighting_factor_name, val=weighting_factor, units=None
+                        )
+                        added_weighting_factor.append(weighting_factor_name)
+
+                    self.lca_weighting.add_output(var_out, units=None)
+                    self.lca_weighting.declare_partials(
+                        of=var_out, wrt=[var_in, weighting_factor_name], method="exact"
+                    )

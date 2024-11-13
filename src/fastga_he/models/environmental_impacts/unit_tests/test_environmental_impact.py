@@ -749,6 +749,7 @@ def test_lca_tbm900_ef():
                 delivery_method="flight",
                 impact_assessment_method="EF v3.1",
                 normalization=True,
+                weighting=True,
             )
         ),
         __file__,
@@ -764,6 +765,7 @@ def test_lca_tbm900_ef():
             delivery_method="flight",
             impact_assessment_method="EF v3.1",
             normalization=True,
+            weighting=True,
         ),
         ivc,
     )
@@ -784,6 +786,9 @@ def test_lca_tbm900_ef():
     assert problem.get_val(
         "data:environmental_impact:climate_change_normalized:production:sum"
     ) == pytest.approx(3.15419102e-07, rel=1e-5)
+    assert problem.get_val(
+        "data:environmental_impact:climate_change_weighted:sum"
+    ) == pytest.approx(7.674733918972728e-06, rel=1e-5)
 
 
 def test_gasoline_per_fu_sr22():

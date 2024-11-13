@@ -15,16 +15,17 @@ METHODS_TO_NORMALIZATION = {
     "IMPACT World+ v2.0.1": False,  # In EcoInvent, they implement a version that doesn't handle normalisation
     "ReCiPe 2016 v1.03": True,
 }
+METHODS_TO_WEIGHTING = {
+    "EF v3.1 no LT": True,
+    "EF v3.1": True,
+    "IMPACT World+ v2.0.1": False,  # In EcoInvent, they implement a version that doesn't handle normalisation
+    "ReCiPe 2016 v1.03": True,
+}
 NORMALIZATION_FACTOR = {
     "EF v3.1 no LT": {
         "acidification": 5.56e01,
         "climate_change": 7.55e03,
-        "climate_change_biogenic": 7.55e03,  # Same as climate_change
-        "climate_change_fossil": 7.55e03,  # Same as climate_change
-        "climate_change_land_use_and_land_use_change": 7.55e03,  # Same as climate_change
         "ecotoxicity_freshwater": 5.67e04,
-        "ecotoxicity_freshwaterinorganics": 5.67e04,  # Same as ecotoxicity_freshwater
-        "ecotoxicity_freshwaterorganics": 5.67e04,  # Same as ecotoxicity_freshwater
         "energy_resources_non-renewable": 6.50e04,
         "eutrophication_freshwater": 1.61e00,
         "eutrophication_marine": 1.95e01,
@@ -89,5 +90,52 @@ NORMALIZATION_FACTOR = {
         "photochemical_oxidant_formation_human_health": 2.06e01,
         "photochemical_oxidant_formation_terrestrial_ecosystems": 1.77e01,
         "water_use": 2.67e02,
+        "total_human_health": 2.40e-02,
+        "total_ecosystem_quality": 1.48e-03,
+        "total_natural_resources": 2.80e04,
+    },
+}
+
+WEIGHTING_FACTOR = {
+    "EF v3.1 no LT": {
+        "acidification": 0.062,
+        "climate_change": 0.2106,
+        "ecotoxicity_freshwater": 0.0192,
+        "energy_resources_non-renewable": 0.0832,
+        "eutrophication_freshwater": 0.0280,
+        "eutrophication_marine": 0.0296,
+        "eutrophication_terrestrial": 0.0371,
+        "human_toxicity_carcinogenic": 0.0213,
+        "human_toxicity_non-carcinogenic": 0.0184,
+        "ionising_radiation": 0.0501,
+        "land_use": 0.0794,
+        "material_resources_metals_minerals": 0.0755,
+        "ozone_depletion": 0.0631,
+        "particulate_matter_formation": 0.0896,
+        "photochemical_oxidant_formation_human_health": 0.0478,
+        "water_use": 0.0851,
+    },
+    "EF v3.1": {
+        "acidification": 0.062,
+        "climate_change": 0.2106,
+        "ecotoxicity_freshwater": 0.0192,
+        "energy_resources_non-renewable": 0.0832,
+        "eutrophication_freshwater": 0.0280,
+        "eutrophication_marine": 0.0296,
+        "eutrophication_terrestrial": 0.0371,
+        "human_toxicity_carcinogenic": 0.0213,
+        "human_toxicity_non-carcinogenic": 0.0184,
+        "ionising_radiation": 0.0501,
+        "land_use": 0.0794,
+        "material_resources_metals_minerals": 0.0755,
+        "ozone_depletion": 0.0631,
+        "particulate_matter_formation": 0.0896,
+        "photochemical_oxidant_formation_human_health": 0.0478,
+        "water_use": 0.0851,
+    },
+    "ReCiPe 2016 v1.03": {  # Taking hierarchic values
+        "total_ecosystem_quality": 4.0e-1,
+        "total_human_health": 4.0e-1,
+        "total_natural_resources": 2.0e-1,
     },
 }
