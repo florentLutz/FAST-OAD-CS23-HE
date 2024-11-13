@@ -165,6 +165,14 @@ class LCACore(om.ExplicitComponent):
                     )
                     self.outputs_list.append(LCA_PREFIX + clean_method_name + ":" + phase + ":sum")
 
+            self.add_output(
+                LCA_PREFIX + clean_method_name + ":sum",
+                val=0.0,
+                units=None,
+                desc=bw.Method(m).metadata["unit"] + " for the whole process",
+            )
+            self.outputs_list.append(LCA_PREFIX + clean_method_name + ":sum")
+
             if "component" in self.axis:
                 # Components are tagged with the phase just in case, so we can do this. However,
                 # production seems like the only phase in which we can attribute impacts on the
@@ -235,6 +243,14 @@ class LCACore(om.ExplicitComponent):
                                         val=partial_value,
                                     )
 
+                        partial_value = res_param[m]["*sum*"]
+                        if partial_value != 0:
+                            self.declare_partials(
+                                of=LCA_PREFIX + clean_method_name + ":sum",
+                                wrt=input_name,
+                                val=partial_value,
+                            )
+
             if axis_to_evaluate == "component":
                 for param_name, res_param in res.items():
                     for m in res_param:
@@ -279,6 +295,8 @@ class LCACore(om.ExplicitComponent):
                             outputs[LCA_PREFIX + clean_method_name + ":" + phase + ":sum"] = res[m][
                                 phase
                             ]
+
+                    outputs[LCA_PREFIX + clean_method_name + ":sum"] = res[m]["*sum*"]
 
             if axis_to_evaluate == "component":
                 for m in res:  # for each LCIA method
