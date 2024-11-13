@@ -6,6 +6,7 @@ import openmdao.api as om
 
 from .resources.constants import LCA_PREFIX
 
+
 class LCACoreWeighting(om.ExplicitComponent):
     """
     We'll use the same feature of OpenMDAO as for the LCACoreNormalization.
@@ -34,7 +35,6 @@ class LCACoreWeighting(om.ExplicitComponent):
                 outputs[var_out] = inputs[var_in] * weighting_factor
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         for var_in in self.inputs_list:
             normalized_method_name = var_in.split(":")[2]
             method_name = normalized_method_name.replace("_normalized", "")
@@ -46,4 +46,3 @@ class LCACoreWeighting(om.ExplicitComponent):
 
                 partials[var_out, var_in] = inputs[weighting_factor_name]
                 partials[var_out, weighting_factor_name] = inputs[var_in]
-

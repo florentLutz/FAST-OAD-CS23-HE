@@ -11,6 +11,7 @@ from .lca_aircraft_per_fu import LCAAircraftPerFU
 from .lca_core import LCACore
 from .lca_core_normalization import LCACoreNormalisation
 from .lca_core_weighting import LCACoreWeighting
+from .lca_core_aggregation import LCACoreAggregation
 from .lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from .lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
 from .lca_electricty_per_fu import LCAElectricityPerFU
@@ -249,6 +250,11 @@ class LCA(om.Group):
                 subsys=LCACoreWeighting(),
                 promotes=["*"],
             )
+            self.add_subsystem(
+                name="lca_aggregation",
+                subsys=LCACoreAggregation(),
+                promotes=["*"],
+            )
 
     def configure(self):
         if (
@@ -311,6 +317,10 @@ class LCA(om.Group):
 
             added_weighting_factor = []
 
+            self.lca_aggregation.add_output(
+                "data:environmental_impact:single_score", val=0.0, units=None
+            )
+
             for var_in in potential_weighting_inputs_list:
                 # We transform the name of the input variable in the following manner: we replace
                 # the impact name with (impact_name)_weighted
@@ -337,4 +347,9 @@ class LCA(om.Group):
                     self.lca_weighting.add_output(var_out, units=None)
                     self.lca_weighting.declare_partials(
                         of=var_out, wrt=[var_in, weighting_factor_name], method="exact"
+                    )
+
+                    self.lca_aggregation.add_input(var_out, units=None)
+                    self.lca_aggregation.declare_partials(
+                        of="data:environmental_impact:single_score", wrt=var_out, val=1.0
                     )
