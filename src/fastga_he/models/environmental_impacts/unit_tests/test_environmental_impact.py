@@ -7,6 +7,8 @@ import pathlib
 
 import pytest
 
+from lcav.gui.plots import process_tree
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lca import LCA
 from ..lca_aircraft_per_fu import LCAAircraftPerFU
@@ -619,6 +621,10 @@ def test_lca_pipistrel():
     ) == pytest.approx(0.00027065, rel=1e-4)
 
     problem.check_partials(compact_print=True)
+
+    lca_model = problem.model.component.lca_core.model
+
+    process_tree(lca_model, outfile=os.path.join(RESULTS_FOLDER_PATH, "lca_pipistrel.html"))
 
 
 def test_kerosene_per_fu_tbm900():
