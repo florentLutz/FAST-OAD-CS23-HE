@@ -795,9 +795,9 @@ def test_lca_tbm900_ef():
     assert problem.get_val(
         "data:environmental_impact:climate_change_weighted:sum"
     ) == pytest.approx(7.674733918972728e-06, rel=1e-5)
-    assert problem.get_val(
-        "data:environmental_impact:single_score"
-    ) == pytest.approx(0.0001337, rel=1e-5)
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        1.75793655e-05, rel=1e-5
+    )
 
 
 def test_gasoline_per_fu_sr22():

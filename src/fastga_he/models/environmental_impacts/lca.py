@@ -349,7 +349,10 @@ class LCA(om.Group):
                         of=var_out, wrt=[var_in, weighting_factor_name], method="exact"
                     )
 
-                    self.lca_aggregation.add_input(var_out, units=None)
-                    self.lca_aggregation.declare_partials(
-                        of="data:environmental_impact:single_score", wrt=var_out, val=1.0
-                    )
+                    # For the single score we only take the sum of each category meaning the
+                    # variable that match the following pattern :
+                    if var_out == LCA_PREFIX + weighted_method_name + ":sum":
+                        self.lca_aggregation.add_input(var_out, units=None)
+                        self.lca_aggregation.declare_partials(
+                            of="data:environmental_impact:single_score", wrt=var_out, val=1.0
+                        )

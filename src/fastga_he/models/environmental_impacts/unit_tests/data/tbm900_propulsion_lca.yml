@@ -431,12 +431,13 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
-            water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
-              name: 'water'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
         
             PM:
               amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__HC_per_fu
@@ -489,12 +490,13 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
-            water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
-              name: 'water'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
         
             PM:
               amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__HC_per_fu
@@ -550,12 +552,13 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
-            water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
-              name: 'water'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
         
             PM:
               amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__HC_per_fu

@@ -31,12 +31,13 @@ ANCHOR_COMPONENT_NAME:
         - 'air'
         - 'lower stratosphere + upper troposphere'
 
-    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-      amount: ANCHOR_EMISSION_H2O
-      name: 'water'
-      categories:
-        - 'air'
-        - 'lower stratosphere + upper troposphere'
+#    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+#    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+#      amount: ANCHOR_EMISSION_H2O
+#      name: 'water'
+#      categories:
+#        - 'air'
+#        - 'lower stratosphere + upper troposphere'
 
     PM:
       amount: ANCHOR_EMISSION_HC
