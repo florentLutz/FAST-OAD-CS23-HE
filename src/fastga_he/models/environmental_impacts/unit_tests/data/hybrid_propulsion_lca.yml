@@ -1,4 +1,4 @@
-project: pipistrel_assembly
+project: hybrid_propulsion
 
 ecoinvent:
     version: 3.9.1
@@ -212,6 +212,90 @@ model:
                   categories:
                     - 'air'
 
+        planetary_gear_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: planetary_gear_1_production
+        
+            propeller:
+              amount: data__propulsion__he_power_train__planetary_gear__planetary_gear_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                cast_steel:
+                  name: 'market for steel, unalloyed'
+                  amount: 0.750
+        
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.250
+        
+                # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
+                # with the mass
+                electricity:
+                  name: 'electricity, high voltage, European attribute mix'
+                  amount: 4516 / 112.8 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
+        
+                gas:
+                  name: 'natural gas, burned in gas turbine'  # Not sure about this one
+                  loc: 'RoE'
+                  amount: 4541 / 112.8 * 3.6 # kWh to MJ
+        
+                heat_and_steam:
+                  name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
+                  loc: 'RoW'
+                  amount: 567 / 112.8 * 3.6 # kWh to MJ
+        
+                diesel:
+                  name: 'market for diesel'
+                  loc: 'Europe without Switzerland'
+                  amount: 1202 / 112.8 * 3.6 / 45.6 # kWh to MJ to kg
+        
+                kerosene: # SAF aggregated in here because the process does not exist
+                  name: 'market for kerosene'
+                  loc: 'RoW'
+                  amount: 2461 / 112.8 * 3.6 / 43.0 # kWh to MJ to kg
+        
+                water_in:
+                  name: 'market for water, decarbonised'
+                  loc: 'RoW'
+                  amount: 11 / 112.8 # In m**3 but since 1m**3 = 1kg
+        
+                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+                  amount: 10 / 112.8
+                  name: 'water'
+                  categories:
+                    - 'water'
+                    - 'ground-'
+        
+                CO2:
+                  amount: 4695 / 112.8 # In kg
+                  name: 'carbon dioxide, fossil'  # this is a biosphere process
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                SOx:
+                  amount: 0.05 / 112.8
+                  name: 'sulfur dioxide'
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                NOx:
+                  amount: 0.796 / 112.8
+                  name: 'nitrogen oxides'
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                VOC:
+                  amount: 3.770 / 112.8
+                  name: 'VOC, volatile organic compounds'
+                  categories:
+                    - 'air'
+
         motor_1:
             custom_attributes:
                 - attribute: "component"
@@ -236,30 +320,13 @@ model:
             name: 'power distribution unit production, for electric passenger car'
             amount: data__propulsion__he_power_train__DC_bus__dc_bus_1__mass_per_fu
 
-        harness_1:
+        dc_dc_converter_1:
             custom_attributes:
                 - attribute: "component"
-                  value: harness_1_production
+                  value: dc_dc_converter_1_production
         
-            name: 'cable production, three-conductor cable'
-            amount: data__propulsion__he_power_train__DC_cable_harness__harness_1__length_per_fu
-
-        dc_splitter_1:
-            custom_attributes:
-                - attribute: "component"
-                  value: dc_splitter_1_production
-            
-            name: 'power distribution unit production, for electric passenger car'
-            amount: data__propulsion__he_power_train__DC_splitter__dc_splitter_1__mass_per_fu
-
-        dc_sspc_1:
-            custom_attributes:
-                - attribute: "component"
-                  value: dc_sspc_1_production
-        
-            name: 'silicon carbide production'
-            loc: 'RoW'
-            amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_1__mass_per_fu
+            name: 'inverter production, for electric passenger car' # For lack of a better proxy, i'll use that
+            amount: data__propulsion__he_power_train__DC_DC_converter__dc_dc_converter_1__mass_per_fu
 
         battery_pack_1:
             custom_attributes:
@@ -270,23 +337,272 @@ model:
             loc: 'RoW'
             amount: data__propulsion__he_power_train__battery_pack__battery_pack_1__mass_per_fu
 
-        dc_sspc_2:
+        gearbox_1:
             custom_attributes:
                 - attribute: "component"
-                  value: dc_sspc_2_production
+                  value: gearbox_1_production
         
-            name: 'silicon carbide production'
-            loc: 'RoW'
-            amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_2__mass_per_fu
+            propeller:
+              amount: data__propulsion__he_power_train__speed_reducer__gearbox_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                cast_steel:
+                  name: 'market for steel, unalloyed'
+                  amount: 0.750
+        
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.250
+        
+                # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
+                # with the mass
+                electricity:
+                  name: 'electricity, high voltage, European attribute mix'
+                  amount: 4516 / 112.8 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
+        
+                gas:
+                  name: 'natural gas, burned in gas turbine'  # Not sure about this one
+                  loc: 'RoE'
+                  amount: 4541 / 112.8 * 3.6 # kWh to MJ
+        
+                heat_and_steam:
+                  name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
+                  loc: 'RoW'
+                  amount: 567 / 112.8 * 3.6 # kWh to MJ
+        
+                diesel:
+                  name: 'market for diesel'
+                  loc: 'Europe without Switzerland'
+                  amount: 1202 / 112.8 * 3.6 / 45.6 # kWh to MJ to kg
+        
+                kerosene: # SAF aggregated in here because the process does not exist
+                  name: 'market for kerosene'
+                  loc: 'RoW'
+                  amount: 2461 / 112.8 * 3.6 / 43.0 # kWh to MJ to kg
+        
+                water_in:
+                  name: 'market for water, decarbonised'
+                  loc: 'RoW'
+                  amount: 11 / 112.8 # In m**3 but since 1m**3 = 1kg
+        
+                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+                  amount: 10 / 112.8
+                  name: 'water'
+                  categories:
+                    - 'water'
+                    - 'ground-'
+        
+                CO2:
+                  amount: 4695 / 112.8 # In kg
+                  name: 'carbon dioxide, fossil'  # this is a biosphere process
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                SOx:
+                  amount: 0.05 / 112.8
+                  name: 'sulfur dioxide'
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                NOx:
+                  amount: 0.796 / 112.8
+                  name: 'nitrogen oxides'
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                VOC:
+                  amount: 3.770 / 112.8
+                  name: 'VOC, volatile organic compounds'
+                  categories:
+                    - 'air'
 
-        battery_pack_2:
+        turboshaft_1:
             custom_attributes:
                 - attribute: "component"
-                  value: battery_pack_2_production
+                  value: turboshaft_1_production
         
-            name: 'battery production, Li-ion, NMC111, rechargeable, prismatic'
-            loc: 'RoW'
-            amount: data__propulsion__he_power_train__battery_pack__battery_pack_2__mass_per_fu
+            turboshaft:
+              amount: data__propulsion__he_power_train__turboshaft__turboshaft_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                # For all of those we use the weight ration from :cite:`thonemann:2024`
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.127
+        
+                titanium_aluminide:
+                  name: 'titanium production'
+                  loc: 'GLO'
+                  amount: 0.086
+        
+                magnesium_alloy:
+                  name: 'market for magnesium-alloy, AZ91'
+                  loc: 'GLO'
+                  amount: 0.040
+        
+                nickel_alloy:
+                  name: 'market for iron-nickel-chromium alloy'
+                  amount: 0.263
+        
+                metal_matrix_composite: # Also account for ceramic matrix composite as I couldn't find the process
+                  name: 'market for aluminium alloy, metal matrix composite'
+                  amount: 0.483
+        
+                # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
+                # with the mass
+                electricity:
+                  name: 'electricity, high voltage, European attribute mix'
+                  amount: 9484 / 237 # We are giving here the amount for 1 kg of turboshaft since we are defining a custom process
+        
+                gas:
+                  name: 'natural gas, burned in gas turbine'  # Not sure about this one
+                  loc: 'RoE'
+                  amount: 9537 / 237 * 3.6 # kWh to MJ
+        
+                heat_and_steam:
+                  name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
+                  loc: 'RoW'
+                  amount: 1190 / 237 * 3.6 # kWh to MJ
+        
+                diesel:
+                  name: 'market for diesel'
+                  loc: 'Europe without Switzerland'
+                  amount: 2524 / 237 * 3.6 / 45.6 # kWh to MJ to kg
+        
+                kerosene: # SAF aggregated in here because the process does not exist
+                  name: 'market for kerosene'
+                  loc: 'RoW'
+                  amount: 5168 / 237 * 3.6 / 43.0 # kWh to MJ to kg
+        
+                water_in:
+                  name: 'market for water, decarbonised'
+                  loc: 'RoW'
+                  amount: 23 / 237 # In m**3 but since 1m**3 = 1kg
+        
+                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+                  amount: 22 / 237
+                  name: 'water'
+                  categories:
+                    - 'water'
+                    - 'ground-'
+        
+                CO2:
+                  amount: 9858 / 237 # In kg
+                  name: 'carbon dioxide, fossil'  # this is a biosphere process
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                SOx:
+                  amount: 0.105 / 237
+                  name: 'sulfur dioxide'
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                NOx:
+                  amount: 3.030 / 237
+                  name: 'nitrogen oxides'
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                VOC:
+                  amount: 14.347 / 237
+                  name: 'VOC, volatile organic compounds'
+                  categories:
+                    - 'air'
+
+        fuel_system_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: fuel_system_1_production
+        
+            fuel_system:
+              amount: data__propulsion__he_power_train__fuel_system__fuel_system_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                cast_steel:
+                  name: 'market for steel, unalloyed'
+                  amount: 0.667
+        
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.333
+        
+                # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
+                # with the mass
+                electricity:
+                  name: 'electricity, high voltage, European attribute mix'
+                  amount: 918 / 22.9 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
+        
+                gas:
+                  name: 'natural gas, burned in gas turbine'  # Not sure about this one
+                  loc: 'RoE'
+                  amount: 923 / 22.9 * 3.6 # kWh to MJ
+        
+                heat_and_steam:
+                  name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
+                  loc: 'RoW'
+                  amount: 115 / 22.9 * 3.6 # kWh to MJ
+        
+                diesel:
+                  name: 'market for diesel'
+                  loc: 'Europe without Switzerland'
+                  amount: 244 / 22.9 * 3.6 / 45.6 # kWh to MJ to kg
+        
+                kerosene: # SAF aggregated in here because the process does not exist
+                  name: 'market for kerosene'
+                  loc: 'RoW'
+                  amount: 500 / 22.9 * 3.6 / 43.0 # kWh to MJ to kg
+        
+                water_in:
+                  name: 'market for water, decarbonised'
+                  loc: 'RoW'
+                  amount: 2 / 22.9 # In m**3 but since 1m**3 = 1kg
+        
+                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+                  amount: 2 / 22.9
+                  name: 'water'
+                  categories:
+                    - 'water'
+                    - 'ground-'
+        
+                CO2:
+                  amount: 954 / 22.9 # In kg
+                  name: 'carbon dioxide, fossil'  # this is a biosphere process
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                SOx:
+                  amount: 0.01 / 22.9
+                  name: 'sulfur dioxide'
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                NOx:
+                  amount: 0.162 / 22.9
+                  name: 'nitrogen oxides'
+                  categories:
+                    - 'air'
+                    - 'lower stratosphere + upper troposphere'
+        
+                VOC:
+                  amount: 0.766 / 22.9
+                  name: 'VOC, volatile organic compounds'
+                  categories:
+                    - 'air'
 
 
     manufacturing:
@@ -339,31 +655,31 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
 
-        battery_pack_2:
+        turboshaft_1:
         
             CO2:
-              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__CO2_per_fu
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__CO2_per_fu
               name: 'carbon dioxide, fossil'  # this is a biosphere process
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             CO:
-              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__CO_per_fu
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__CO_per_fu
               name: 'carbon monoxide, fossil'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             SOx:
-              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__SOx_per_fu
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__SOx_per_fu
               name: 'sulfur dioxide'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             NOx:
-              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__NOx_per_fu
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__NOx_per_fu
               name: 'nitrogen oxides'
               categories:
                 - 'air'
@@ -371,14 +687,14 @@ model:
         
         #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
         #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-        #      amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__H2O_per_fu
+        #      amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
         #      name: 'water'
         #      categories:
         #        - 'air'
         #        - 'lower stratosphere + upper troposphere'
         
             PM:
-              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__HC_per_fu
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__HC_per_fu
               name: 'Particulate Matter, < 2.5 um'
               categories:
                 - 'air'
@@ -390,6 +706,14 @@ model:
             # This variable should always exist since we will only add this part to the conf file if
             # there are batteries and if there are batteries the component that computes this value will be added
             amount: data__LCA__manufacturing__he_power_train__electricity__energy_per_fu / 1000
+
+        kerosene_for_mission_production:
+        
+            name: 'market for kerosene'
+            loc: 'RoW'
+            # This variable should always exist since we will only add this part to the conf file if
+            # there are batteries and if there are batteries the component that computes this value will be added
+            amount: data__LCA__manufacturing__he_power_train__kerosene__mass_per_fu
 
 
     distribution:
@@ -442,31 +766,31 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
 
-        battery_pack_2:
+        turboshaft_1:
         
             CO2:
-              amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_2__CO2_per_fu
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__CO2_per_fu
               name: 'carbon dioxide, fossil'  # this is a biosphere process
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             CO:
-              amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_2__CO_per_fu
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__CO_per_fu
               name: 'carbon monoxide, fossil'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             SOx:
-              amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_2__SOx_per_fu
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__SOx_per_fu
               name: 'sulfur dioxide'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             NOx:
-              amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_2__NOx_per_fu
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__NOx_per_fu
               name: 'nitrogen oxides'
               categories:
                 - 'air'
@@ -474,14 +798,14 @@ model:
         
         #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
         #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-        #      amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_2__H2O_per_fu
+        #      amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
         #      name: 'water'
         #      categories:
         #        - 'air'
         #        - 'lower stratosphere + upper troposphere'
         
             PM:
-              amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_2__HC_per_fu
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__HC_per_fu
               name: 'Particulate Matter, < 2.5 um'
               categories:
                 - 'air'
@@ -493,6 +817,14 @@ model:
             # This variable should always exist since we will only add this part to the conf file if
             # there are batteries and if there are batteries the component that computes this value will be added
             amount: data__LCA__distribution__he_power_train__electricity__energy_per_fu / 1000
+
+        kerosene_for_mission_production:
+        
+            name: 'market for kerosene'
+            loc: 'RoW'
+            # This variable should always exist since we will only add this part to the conf file if
+            # there are batteries and if there are batteries the component that computes this value will be added
+            amount: data__LCA__distribution__he_power_train__kerosene__mass_per_fu
 
 
     use:
@@ -548,34 +880,34 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
 
-        battery_pack_2:
+        turboshaft_1:
             custom_attributes:
                 - attribute: "component"
-                  value: battery_pack_2_operation
+                  value: turboshaft_1_operation
         
             CO2:
-              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__CO2_per_fu
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__CO2_per_fu
               name: 'carbon dioxide, fossil'  # this is a biosphere process
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             CO:
-              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__CO_per_fu
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__CO_per_fu
               name: 'carbon monoxide, fossil'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             SOx:
-              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__SOx_per_fu
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__SOx_per_fu
               name: 'sulfur dioxide'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             NOx:
-              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__NOx_per_fu
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__NOx_per_fu
               name: 'nitrogen oxides'
               categories:
                 - 'air'
@@ -583,14 +915,14 @@ model:
         
         #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
         #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-        #      amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__H2O_per_fu
+        #      amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
         #      name: 'water'
         #      categories:
         #        - 'air'
         #        - 'lower stratosphere + upper troposphere'
         
             PM:
-              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__HC_per_fu
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__HC_per_fu
               name: 'Particulate Matter, < 2.5 um'
               categories:
                 - 'air'
@@ -606,26 +938,41 @@ model:
             # there are batteries and if there are batteries the component that computes this value will be added
             amount: data__LCA__operation__he_power_train__electricity__energy_per_fu / 1000
 
+        kerosene_for_mission_production:
+            custom_attributes:
+                - attribute: "component"
+                  value: kerosene_for_mission_operation
+        
+            name: 'market for kerosene'
+            loc: 'RoW'
+            # This variable should always exist since we will only add this part to the conf file if
+            # there are batteries and if there are batteries the component that computes this value will be added
+            amount: data__LCA__operation__he_power_train__kerosene__mass_per_fu
+
 
 methods:
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'acidification: terrestrial', 'terrestrial acidification potential (TAP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'climate change',  'global warming potential (GWP100)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: freshwater', 'freshwater ecotoxicity potential (FETP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: marine', 'marine ecotoxicity potential (METP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: terrestrial', 'terrestrial ecotoxicity potential (TETP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'energy resources: non-renewable, fossil', 'fossil fuel potential (FFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: freshwater', 'freshwater eutrophication potential (FEP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: marine', 'marine eutrophication potential (MEP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: carcinogenic', 'human toxicity potential (HTPc)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: non-carcinogenic', 'human toxicity potential (HTPnc)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ionising radiation', 'ionising radiation potential (IRP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'land use', 'agricultural land occupation (LOP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'material resources: metals/minerals', 'surplus ore potential (SOP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ozone depletion', 'ozone depletion potential (ODPinfinite)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'particulate matter formation', 'particulate matter formation potential (PMFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: human health', 'photochemical oxidant formation potential: humans (HOFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: terrestrial ecosystems', 'photochemical oxidant formation potential: ecosystems (EOFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'water use', 'water consumption potential (WCP)')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: ecosystem quality', 'ecosystem quality')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: human health', 'human health')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: natural resources', 'natural resources')"
+    - "('EF v3.1', 'acidification', 'accumulated exceedance (AE)')"
+    - "('EF v3.1', 'climate change', 'global warming potential (GWP100)')"
+    - "('EF v3.1', 'climate change: biogenic', 'global warming potential (GWP100)')"
+    - "('EF v3.1', 'climate change: fossil', 'global warming potential (GWP100)')"
+    - "('EF v3.1', 'climate change: land use and land use change', 'global warming potential (GWP100)')"
+    - "('EF v3.1', 'ecotoxicity: freshwater', 'comparative toxic unit for ecosystems (CTUe)')"
+    - "('EF v3.1', 'ecotoxicity: freshwater, inorganics', 'comparative toxic unit for ecosystems (CTUe)')"
+    - "('EF v3.1', 'ecotoxicity: freshwater, organics', 'comparative toxic unit for ecosystems (CTUe)')"
+    - "('EF v3.1', 'energy resources: non-renewable', 'abiotic depletion potential (ADP): fossil fuels')"
+    - "('EF v3.1', 'eutrophication: freshwater', 'fraction of nutrients reaching freshwater end compartment (P)')"
+    - "('EF v3.1', 'eutrophication: marine', 'fraction of nutrients reaching marine end compartment (N)')"
+    - "('EF v3.1', 'eutrophication: terrestrial', 'accumulated exceedance (AE)')"
+    - "('EF v3.1', 'human toxicity: carcinogenic', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'human toxicity: carcinogenic, inorganics', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'human toxicity: carcinogenic, organics', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'human toxicity: non-carcinogenic', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'human toxicity: non-carcinogenic, inorganics', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'human toxicity: non-carcinogenic, organics', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'ionising radiation: human health', 'human exposure efficiency relative to u235')"
+    - "('EF v3.1', 'land use', 'soil quality index')"
+    - "('EF v3.1', 'material resources: metals/minerals', 'abiotic depletion potential (ADP): elements (ultimate reserves)')"
+    - "('EF v3.1', 'ozone depletion', 'ozone depletion potential (ODP)')"
+    - "('EF v3.1', 'particulate matter formation', 'impact on human health')"
+    - "('EF v3.1', 'photochemical oxidant formation: human health', 'tropospheric ozone concentration increase')"
+    - "('EF v3.1', 'water use', 'user deprivation potential (deprivation-weighted water consumption)')"

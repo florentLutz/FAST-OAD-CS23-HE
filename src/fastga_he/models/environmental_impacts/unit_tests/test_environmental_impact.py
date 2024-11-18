@@ -907,3 +907,58 @@ def test_lca_cirrus_sr22():
     ) == pytest.approx(9.85593183e-05, rel=1e-4)
 
     problem.check_partials(compact_print=True)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_kodiak_100_ef_and_hybrid():
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion.yml",
+        component_level_breakdown=True,
+        airframe_material="aluminium",
+        delivery_method="flight",
+        impact_assessment_method="EF v3.1",
+        normalization=True,
+        weighting=True,
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(component),
+        __file__,
+        DATA_FOLDER_PATH / "oad_process_outputs_ref.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "kodiak_100_ef.xml"
+    problem.write_outputs()
+
+    # Second LCA
+
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "hybrid_propulsion.yml",
+        component_level_breakdown=True,
+        airframe_material="aluminium",
+        delivery_method="flight",
+        impact_assessment_method="EF v3.1",
+        normalization=True,
+        weighting=True,
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(component),
+        __file__,
+        DATA_FOLDER_PATH / "oad_process_outputs_he.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "hybrid_kodiak_100_ef.xml"
+    problem.write_outputs()
