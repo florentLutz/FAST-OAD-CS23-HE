@@ -1906,7 +1906,7 @@ def test_mission_vector_direct_sspc_battery_connection():
     pt_mass = problem.get_val("data:propulsion:he_power_train:mass", units="kg")
     assert pt_mass == pytest.approx(924.43, abs=1e-2)
     co2_emissions = problem.get_val(
-        "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:CO2", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:battery_pack:battery_pack_1:CO2", units="kg"
     )
     assert co2_emissions == pytest.approx(0.0, abs=1e-2)
 
@@ -2058,7 +2058,7 @@ def test_mission_vector_from_yml_fuel_and_battery():
     )
     assert mission_end_soc == pytest.approx(0.1254, abs=1e-2)
     co2_emissions_ice = problem.get_val(
-        "data:LCA:operation:he_power_train:ICE:ice_1:CO2", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:CO2", units="kg"
     )
     assert co2_emissions_ice == pytest.approx(61.16, abs=1e-2)
 
@@ -2315,7 +2315,7 @@ def test_mission_vector_turboshaft():
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
     co2_emissions_ice = problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO2", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2", units="kg"
     )
     assert co2_emissions_ice == pytest.approx(276.91, abs=1e-2)
 

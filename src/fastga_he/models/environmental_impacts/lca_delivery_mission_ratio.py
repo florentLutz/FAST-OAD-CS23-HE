@@ -12,6 +12,7 @@ class LCARatioDeliveryFlightMission(om.ExplicitComponent):
     needed for the mission. This will serve to compute the impact of manufacturing we'll assume
     the emission profiles are similar.
     """
+
     def initialize(self):
         self.options.declare(
             name="use_operational_mission",

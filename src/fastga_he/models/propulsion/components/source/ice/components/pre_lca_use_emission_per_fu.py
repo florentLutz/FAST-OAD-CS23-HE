@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-SPECIES_LIST = ["CO2", "CO", "NOx", "SOx", "HC", "H2O", "lead"]
+from .perf_inflight_emissions_sum import SPECIES_LIST
 
 
 class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
@@ -37,11 +37,20 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
         self.add_input(name="data:environmental_impact:delivery:mission_ratio", val=np.nan)
 
         for specie in SPECIES_LIST:
-            input_name = "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie
+            input_name = (
+                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                + ice_id
+                + ":"
+                + specie
+            )
             self.add_input(name=input_name, val=np.nan, units="kg")
 
             operation_output_name = (
-                "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
+                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                + ice_id
+                + ":"
+                + specie
+                + "_per_fu"
             )
             self.add_output(name=operation_output_name, val=0.0, units="kg")
             self.declare_partials(
@@ -79,9 +88,18 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
         ice_id = self.options["ice_id"]
 
         for specie in SPECIES_LIST:
-            input_name = "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie
+            input_name = (
+                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                + ice_id
+                + ":"
+                + specie
+            )
             operation_output_name = (
-                "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
+                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                + ice_id
+                + ":"
+                + specie
+                + "_per_fu"
             )
             outputs[operation_output_name] = (
                 inputs[input_name] * inputs["data:environmental_impact:flight_per_fu"]
@@ -109,9 +127,18 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
         ice_id = self.options["ice_id"]
 
         for specie in SPECIES_LIST:
-            input_name = "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie
+            input_name = (
+                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                + ice_id
+                + ":"
+                + specie
+            )
             operation_output_name = (
-                "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
+                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                + ice_id
+                + ":"
+                + specie
+                + "_per_fu"
             )
 
             partials[operation_output_name, input_name] = inputs[

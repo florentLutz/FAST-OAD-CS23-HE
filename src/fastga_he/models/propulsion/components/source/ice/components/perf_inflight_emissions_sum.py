@@ -33,10 +33,18 @@ class PerformancesICEInFlightEmissionsSum(om.ExplicitComponent):
             # For the LCA module we will adopt the following nomenclature:
             # "LCA" + phase + component + pollutant
             self.add_output(
-                "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie, units="g", val=0.0
+                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                + ice_id
+                + ":"
+                + specie,
+                units="g",
+                val=0.0,
             )
             self.declare_partials(
-                of="data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie,
+                of="data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                + ice_id
+                + ":"
+                + specie,
                 wrt=specie + "_emissions",
                 rows=np.zeros(number_of_points),
                 cols=np.arange(number_of_points),
@@ -47,6 +55,9 @@ class PerformancesICEInFlightEmissionsSum(om.ExplicitComponent):
         ice_id = self.options["ice_id"]
 
         for specie in SPECIES_LIST:
-            outputs["data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie] = np.sum(
-                inputs[specie + "_emissions"]
-            )
+            outputs[
+                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                + ice_id
+                + ":"
+                + specie
+            ] = np.sum(inputs[specie + "_emissions"])

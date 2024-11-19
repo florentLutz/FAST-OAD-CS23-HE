@@ -928,22 +928,28 @@ def test_in_flight_emissions_sum():
     )
 
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO2", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2",
+        units="kg",
     ) == pytest.approx(897.4, rel=1e-2)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO",
+        units="kg",
     ) == pytest.approx(1.423, rel=1e-2)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:NOx", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:NOx",
+        units="kg",
     ) == pytest.approx(3.244, rel=1e-2)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:SOx", units="g"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:SOx",
+        units="g",
     ) == pytest.approx(227.68, rel=1e-2)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:H2O", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:H2O",
+        units="kg",
     ) == pytest.approx(351.6, rel=1e-2)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:HC", units="g"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:HC",
+        units="g",
     ) == pytest.approx(142.3, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -966,22 +972,28 @@ def test_in_flight_emissions():
     )
 
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO2", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2",
+        units="kg",
     ) == pytest.approx(897.4, rel=1e-2)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO",
+        units="kg",
     ) == pytest.approx(1.423, rel=1e-2)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:NOx", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:NOx",
+        units="kg",
     ) == pytest.approx(3.244, rel=1e-2)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:SOx", units="g"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:SOx",
+        units="g",
     ) == pytest.approx(227.68, rel=1e-2)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:H2O", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:H2O",
+        units="kg",
     ) == pytest.approx(351.6, rel=1e-2)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:HC", units="g"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:HC",
+        units="g",
     ) == pytest.approx(142.3, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -1274,12 +1286,12 @@ def test_weight_per_fu():
 
 def test_emissions_per_fu():
     inputs_list = [
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO2",
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO",
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:NOx",
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:SOx",
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:HC",
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:H2O",
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2",
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO",
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:NOx",
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:SOx",
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:HC",
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:H2O",
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:line_test:mission_ratio",
@@ -1292,22 +1304,28 @@ def test_emissions_per_fu():
     problem = run_system(PreLCATurboshaftUseEmissionPerFU(turboshaft_id="turboshaft_1"), ivc)
 
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO2_per_fu", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2_per_fu",
+        units="kg",
     ) == pytest.approx(2.52640617, rel=1e-3)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO_per_fu", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO_per_fu",
+        units="kg",
     ) == pytest.approx(0.00400381, rel=1e-3)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:NOx_per_fu", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:NOx_per_fu",
+        units="kg",
     ) == pytest.approx(0.00912869, rel=1e-3)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:SOx_per_fu", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:SOx_per_fu",
+        units="kg",
     ) == pytest.approx(0.00064061, rel=1e-3)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:H2O_per_fu", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:H2O_per_fu",
+        units="kg",
     ) == pytest.approx(0.9905434, rel=1e-3)
     assert problem.get_val(
-        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:HC_per_fu", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:HC_per_fu",
+        units="kg",
     ) == pytest.approx(0.00040038, rel=1e-3)
 
     assert problem.get_val(

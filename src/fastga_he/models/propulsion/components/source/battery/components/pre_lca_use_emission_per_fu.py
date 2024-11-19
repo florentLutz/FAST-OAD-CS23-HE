@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-SPECIES_LIST = ["CO2", "CO", "NOx", "SOx", "HC", "H2O"]
+from .perf_inflight_emissions_sum import SPECIES_LIST
 
 
 class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
@@ -38,12 +38,15 @@ class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:LCA:operation:he_power_train:battery_pack:" + battery_pack_id + ":" + specie
+                "data:environmental_impact:operation:sizing:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":"
+                + specie
             )
             self.add_input(name=input_name, val=np.nan, units="kg")
 
             operation_output_name = (
-                "data:LCA:operation:he_power_train:battery_pack:"
+                "data:environmental_impact:operation:sizing:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":"
                 + specie
@@ -102,10 +105,13 @@ class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:LCA:operation:he_power_train:battery_pack:" + battery_pack_id + ":" + specie
+                "data:environmental_impact:operation:sizing:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":"
+                + specie
             )
             operation_output_name = (
-                "data:LCA:operation:he_power_train:battery_pack:"
+                "data:environmental_impact:operation:sizing:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":"
                 + specie
@@ -148,10 +154,13 @@ class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:LCA:operation:he_power_train:battery_pack:" + battery_pack_id + ":" + specie
+                "data:environmental_impact:operation:sizing:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":"
+                + specie
             )
             operation_output_name = (
-                "data:LCA:operation:he_power_train:battery_pack:"
+                "data:environmental_impact:operation:sizing:he_power_train:battery_pack:"
                 + battery_pack_id
                 + ":"
                 + specie

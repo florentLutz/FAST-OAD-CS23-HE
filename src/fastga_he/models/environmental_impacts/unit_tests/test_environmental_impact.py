@@ -484,7 +484,11 @@ def test_line_tests_sizing_ratio():
 
 
 def test_delivery_sizing_ratio():
-    inputs_list = ["data:TLAR:range", "data:environmental_impact:delivery:distance", "data:mission:operational:range"]
+    inputs_list = [
+        "data:TLAR:range",
+        "data:environmental_impact:delivery:distance",
+        "data:mission:operational:range",
+    ]
 
     ivc = get_indep_var_comp(
         inputs_list,

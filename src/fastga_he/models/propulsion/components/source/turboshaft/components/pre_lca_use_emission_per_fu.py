@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-SPECIES_LIST = ["CO2", "CO", "NOx", "SOx", "HC", "H2O"]
+from .perf_inflight_emissions_sum import SPECIES_LIST
 
 
 class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
@@ -38,12 +38,15 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:LCA:operation:he_power_train:turboshaft:" + turboshaft_id + ":" + specie
+                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
+                + turboshaft_id
+                + ":"
+                + specie
             )
             self.add_input(name=input_name, val=np.nan, units="kg")
 
             operation_output_name = (
-                "data:LCA:operation:he_power_train:turboshaft:"
+                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
                 + turboshaft_id
                 + ":"
                 + specie
@@ -94,10 +97,13 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:LCA:operation:he_power_train:turboshaft:" + turboshaft_id + ":" + specie
+                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
+                + turboshaft_id
+                + ":"
+                + specie
             )
             operation_output_name = (
-                "data:LCA:operation:he_power_train:turboshaft:"
+                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
                 + turboshaft_id
                 + ":"
                 + specie
@@ -138,10 +144,13 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:LCA:operation:he_power_train:turboshaft:" + turboshaft_id + ":" + specie
+                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
+                + turboshaft_id
+                + ":"
+                + specie
             )
             operation_output_name = (
-                "data:LCA:operation:he_power_train:turboshaft:"
+                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
                 + turboshaft_id
                 + ":"
                 + specie
