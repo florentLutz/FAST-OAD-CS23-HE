@@ -1698,6 +1698,12 @@ def test_op_mission_vector_from_yml():
     mission_tow = problem.get_val("data:mission:operational:TOW", units="kg")
     assert mission_tow == pytest.approx(840.0, abs=1e-2)
 
+    co2_emissions_ice = problem.get_val(
+        "data:environmental_impact:operation:operational:he_power_train:battery_pack:battery_pack_1:CO2",
+        units="kg",
+    )
+    assert co2_emissions_ice == pytest.approx(0.0, abs=1e-2)
+
 
 def test_update_tow():
     ivc = get_indep_var_comp(list_inputs(UpdateTOW()), __file__, XML_FILE)
@@ -1906,7 +1912,8 @@ def test_mission_vector_direct_sspc_battery_connection():
     pt_mass = problem.get_val("data:propulsion:he_power_train:mass", units="kg")
     assert pt_mass == pytest.approx(924.43, abs=1e-2)
     co2_emissions = problem.get_val(
-        "data:environmental_impact:operation:sizing:he_power_train:battery_pack:battery_pack_1:CO2", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:battery_pack:battery_pack_1:CO2",
+        units="kg",
     )
     assert co2_emissions == pytest.approx(0.0, abs=1e-2)
 
@@ -2315,7 +2322,8 @@ def test_mission_vector_turboshaft():
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
     co2_emissions_ice = problem.get_val(
-        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2", units="kg"
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2",
+        units="kg",
     )
     assert co2_emissions_ice == pytest.approx(276.91, abs=1e-2)
 
