@@ -104,12 +104,30 @@ class LCA(om.Group):
             types=bool,
             desc="If available, the weighting and aggregation steps will be added to the LCA process",
         )
+        self.options.declare(
+            name="use_operational_mission",
+            default=False,
+            types=bool,
+            desc="The characteristics and consumption of the operational mission will be used",
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
 
-        self.add_subsystem(name="aircraft_per_fu", subsys=LCAAircraftPerFU(), promotes=["*"])
-        self.add_subsystem(name="flight_per_fu", subsys=LCAUseFlightPerFU(), promotes=["*"])
+        self.add_subsystem(
+            name="aircraft_per_fu",
+            subsys=LCAAircraftPerFU(
+                use_operational_mission=self.options["use_operational_mission"]
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="flight_per_fu",
+            subsys=LCAUseFlightPerFU(
+                use_operational_mission=self.options["use_operational_mission"]
+            ),
+            promotes=["*"],
+        )
 
         self.add_subsystem(
             name="line_tests_mission_ratio", subsys=LCARatioTestFlightMission(), promotes=["*"]

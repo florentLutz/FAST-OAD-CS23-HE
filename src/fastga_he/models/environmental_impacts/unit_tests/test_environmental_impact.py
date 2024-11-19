@@ -195,7 +195,9 @@ def test_aircraft_per_fu_pax_km():
         "data:TLAR:aircraft_lifespan",
         "data:TLAR:flight_per_year",
         "data:TLAR:range",
+        "data:mission:operational:range",
         "data:weight:aircraft:payload",
+        "data:mission:operational:payload:mass",
     ]
 
     ivc = get_indep_var_comp(
@@ -216,11 +218,24 @@ def test_aircraft_per_fu_pax_km():
 
     problem.check_partials(compact_print=True)
 
+    problem = run_system(
+        LCAAircraftPerFU(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
+        3.10502283e-07, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_use_flight_per_fu_pax_km():
     inputs_list = [
         "data:TLAR:range",
+        "data:mission:operational:range",
         "data:weight:aircraft:payload",
+        "data:mission:operational:payload:mass",
     ]
 
     ivc = get_indep_var_comp(
@@ -237,6 +252,18 @@ def test_use_flight_per_fu_pax_km():
 
     assert problem.get_val("data:environmental_impact:flight_per_fu") == pytest.approx(
         0.00932427, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAUseFlightPerFU(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:flight_per_fu") == pytest.approx(
+        0.0017, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -419,7 +446,11 @@ def test_empty_aircraft_weight_per_fu():
 
 
 def test_line_tests_sizing_ratio():
-    inputs_list = ["data:mission:sizing:duration", "data:environmental_impact:line_test:duration"]
+    inputs_list = [
+        "data:mission:sizing:duration",
+        "data:mission:operational:duration",
+        "data:environmental_impact:line_test:duration",
+    ]
 
     ivc = get_indep_var_comp(
         inputs_list,
@@ -439,9 +470,21 @@ def test_line_tests_sizing_ratio():
 
     problem.check_partials(compact_print=True)
 
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCARatioTestFlightMission(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:line_test:mission_ratio") == pytest.approx(
+        2.57566001, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_delivery_sizing_ratio():
-    inputs_list = ["data:TLAR:range", "data:environmental_impact:delivery:distance"]
+    inputs_list = ["data:TLAR:range", "data:environmental_impact:delivery:distance", "data:mission:operational:range"]
 
     ivc = get_indep_var_comp(
         inputs_list,
@@ -457,6 +500,18 @@ def test_delivery_sizing_ratio():
 
     assert problem.get_val("data:environmental_impact:delivery:mission_ratio") == pytest.approx(
         150.94, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCARatioDeliveryFlightMission(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:delivery:mission_ratio") == pytest.approx(
+        32.0, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)

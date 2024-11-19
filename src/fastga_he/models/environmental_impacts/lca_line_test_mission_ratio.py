@@ -13,8 +13,20 @@ class LCARatioTestFlightMission(om.ExplicitComponent):
     similar.
     """
 
+    def initialize(self):
+        self.options.declare(
+            name="use_operational_mission",
+            default=False,
+            types=bool,
+            desc="The characteristics and consumption of the operational mission will be used",
+        )
+
     def setup(self):
-        self.add_input("data:mission:sizing:duration", units="h", val=np.nan)
+        if not self.options["use_operational_mission"]:
+            self.add_input("data:mission:sizing:duration", units="h", val=np.nan)
+        else:
+            self.add_input("data:mission:operational:duration", units="h", val=np.nan)
+
         self.add_input(
             "data:environmental_impact:line_test:duration",
             units="h",
@@ -31,20 +43,29 @@ class LCARatioTestFlightMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        if not self.options["use_operational_mission"]:
+            mission_duration = inputs["data:mission:sizing:duration"]
+        else:
+            mission_duration = inputs["data:mission:operational:duration"]
+
         outputs["data:environmental_impact:line_test:mission_ratio"] = (
-            inputs["data:environmental_impact:line_test:duration"]
-            / inputs["data:mission:sizing:duration"]
+            inputs["data:environmental_impact:line_test:duration"] / mission_duration
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
+        if not self.options["use_operational_mission"]:
+            mission_duration_name = "data:mission:sizing:duration"
+        else:
+            mission_duration_name = "data:mission:operational:duration"
+
         partials[
             "data:environmental_impact:line_test:mission_ratio",
             "data:environmental_impact:line_test:duration",
-        ] = 1.0 / inputs["data:mission:sizing:duration"]
+        ] = 1.0 / inputs[mission_duration_name]
         partials[
             "data:environmental_impact:line_test:mission_ratio",
-            "data:mission:sizing:duration",
+            mission_duration_name,
         ] = (
             -inputs["data:environmental_impact:line_test:duration"]
-            / inputs["data:mission:sizing:duration"] ** 2.0
+            / inputs[mission_duration_name] ** 2.0
         )

@@ -1086,6 +1086,13 @@
       </wing>
     </constraints>
     <mission>
+      <operational>
+        <range units="km">250.0</range>
+        <duration units="s" is_input="False">13977.0</duration>
+        <payload>
+          <mass units="kg">200.0</mass>
+        </payload>
+      </operational>
       <sizing>
         <duration units="s" is_input="False">3494.343859355023</duration>
         <energy units="W*h" is_input="False">25013.28174534913</energy>

@@ -151,7 +151,7 @@ class ComputePayloadRange(om.ExplicitComponent):
             for tank_name, tank_type in zip(tank_names, tank_types):
                 mfw += inputs[PT_DATA_PREFIX + tank_type + ":" + tank_name + ":capacity"]
 
-        self.cached_problem = om.Problem()
+        self.cached_problem = om.Problem(reports=False)
         model = self.cached_problem.model
 
         model.add_subsystem("ivc", ivc, promotes_outputs=["*"])

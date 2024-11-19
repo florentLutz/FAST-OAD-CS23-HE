@@ -170,7 +170,7 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
                         shape=np.shape(inputs[var_names]),
                     )
 
-        self.cached_problem = om.Problem()
+        self.cached_problem = om.Problem(reports=False)
         model = self.cached_problem.model
 
         model.add_subsystem("ivc", ivc, promotes_outputs=["*"])

@@ -40,7 +40,9 @@ def test_lca_sun_breakdown_pipistrel():
 
 def test_lca_sun_breakdown_kodiak_and_hybrid():
     # Check that we can create a plot
-    fig = lca_impacts_sun_breakdown(pth.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml"), full_burst=True)
+    fig = lca_impacts_sun_breakdown(
+        pth.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml"), full_burst=True
+    )
 
     fig.show()
 

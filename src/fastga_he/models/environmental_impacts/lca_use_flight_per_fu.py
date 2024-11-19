@@ -7,13 +7,29 @@ import openmdao.api as om
 
 
 class LCAUseFlightPerFU(om.ExplicitComponent):
+    def initialize(self):
+        self.options.declare(
+            name="use_operational_mission",
+            default=False,
+            types=bool,
+            desc="The characteristics and consumption of the operational mission will be used",
+        )
+
     def setup(self):
+        if not self.options["use_operational_mission"]:
+            range_mission_name = "data:TLAR:range"
+            payload_name = "data:weight:aircraft:payload"
+
+        else:
+            range_mission_name = "data:mission:operational:range"
+            payload_name = "data:mission:operational:payload:mass"
+
         self.add_input(
-            name="data:TLAR:range",
+            name=range_mission_name,
             units="km",
             val=np.nan,
         )
-        self.add_input("data:weight:aircraft:payload", val=np.nan, units="kg")
+        self.add_input(payload_name, val=np.nan, units="kg")
 
         self.add_output(
             "data:environmental_impact:flight_per_fu",
@@ -25,15 +41,30 @@ class LCAUseFlightPerFU(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        if not self.options["use_operational_mission"]:
+            range_mission_name = "data:TLAR:range"
+            payload_name = "data:weight:aircraft:payload"
+
+        else:
+            range_mission_name = "data:mission:operational:range"
+            payload_name = "data:mission:operational:payload:mass"
+
         outputs["data:environmental_impact:flight_per_fu"] = 1.0 / (
-            inputs["data:TLAR:range"] * inputs["data:weight:aircraft:payload"] / 85.0
+            inputs[range_mission_name] * inputs[payload_name] / 85.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["data:environmental_impact:flight_per_fu", "data:TLAR:range"] = -1.0 / (
-            inputs["data:TLAR:range"] ** 2.0 * inputs["data:weight:aircraft:payload"] / 85.0
+        if not self.options["use_operational_mission"]:
+            range_mission_name = "data:TLAR:range"
+            payload_name = "data:weight:aircraft:payload"
+
+        else:
+            range_mission_name = "data:mission:operational:range"
+            payload_name = "data:mission:operational:payload:mass"
+
+        partials["data:environmental_impact:flight_per_fu", range_mission_name] = -1.0 / (
+            inputs[range_mission_name] ** 2.0 * inputs[payload_name] / 85.0
         )
-        partials["data:environmental_impact:flight_per_fu", "data:weight:aircraft:payload"] = (
-            -1.0
-            / (inputs["data:TLAR:range"] * inputs["data:weight:aircraft:payload"] ** 2.0 / 85.0)
+        partials["data:environmental_impact:flight_per_fu", payload_name] = -1.0 / (
+            inputs[range_mission_name] * inputs[payload_name] ** 2.0 / 85.0
         )

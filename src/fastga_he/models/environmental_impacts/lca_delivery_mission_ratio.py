@@ -12,9 +12,20 @@ class LCARatioDeliveryFlightMission(om.ExplicitComponent):
     needed for the mission. This will serve to compute the impact of manufacturing we'll assume
     the emission profiles are similar.
     """
+    def initialize(self):
+        self.options.declare(
+            name="use_operational_mission",
+            default=False,
+            types=bool,
+            desc="The characteristics and consumption of the operational mission will be used",
+        )
 
     def setup(self):
-        self.add_input("data:TLAR:range", units="km", val=np.nan)
+        if not self.options["use_operational_mission"]:
+            self.add_input("data:TLAR:range", units="km", val=np.nan)
+        else:
+            self.add_input("data:mission:operational:range", units="km", val=np.nan)
+
         self.add_input(
             "data:environmental_impact:delivery:distance",
             units="km",
@@ -34,19 +45,30 @@ class LCARatioDeliveryFlightMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        if not self.options["use_operational_mission"]:
+            range_mission = inputs["data:TLAR:range"]
+        else:
+            range_mission = inputs["data:mission:operational:range"]
+
         outputs["data:environmental_impact:delivery:mission_ratio"] = (
-            inputs["data:environmental_impact:delivery:distance"] / inputs["data:TLAR:range"]
+            inputs["data:environmental_impact:delivery:distance"] / range_mission
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
+        if not self.options["use_operational_mission"]:
+            range_mission_name = "data:TLAR:range"
+
+        else:
+            range_mission_name = "data:mission:operational:range"
+
         partials[
             "data:environmental_impact:delivery:mission_ratio",
             "data:environmental_impact:delivery:distance",
-        ] = 1.0 / inputs["data:TLAR:range"]
+        ] = 1.0 / inputs[range_mission_name]
         partials[
             "data:environmental_impact:delivery:mission_ratio",
-            "data:TLAR:range",
+            range_mission_name,
         ] = (
             -inputs["data:environmental_impact:delivery:distance"]
-            / inputs["data:TLAR:range"] ** 2.0
+            / inputs[range_mission_name] ** 2.0
         )
