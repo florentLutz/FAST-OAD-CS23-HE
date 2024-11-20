@@ -130,12 +130,20 @@ class LCA(om.Group):
         )
 
         self.add_subsystem(
-            name="line_tests_mission_ratio", subsys=LCARatioTestFlightMission(use_operational_mission=self.options["use_operational_mission"]), promotes=["*"]
+            name="line_tests_mission_ratio",
+            subsys=LCARatioTestFlightMission(
+                use_operational_mission=self.options["use_operational_mission"]
+            ),
+            promotes=["*"],
         )
         # Will always be added even when not used because I can't see a smarter way to compute
         # fuel and emissions that doing as I did for line tests
         self.add_subsystem(
-            name="delivery_mission_ratio", subsys=LCARatioDeliveryFlightMission(use_operational_mission=self.options["use_operational_mission"]), promotes=["*"]
+            name="delivery_mission_ratio",
+            subsys=LCARatioDeliveryFlightMission(
+                use_operational_mission=self.options["use_operational_mission"]
+            ),
+            promotes=["*"],
         )
         if self.options["delivery_method"] == "train":
             # Will only be used if this method is added which contrast with the other method
@@ -183,7 +191,9 @@ class LCA(om.Group):
             local_sub_sys.options[component_name_id] = component_name
             # Fastest way to implement it even though not very elegant
             try:
-                local_sub_sys.options["use_operational_mission"] = self.options["use_operational_mission"]
+                local_sub_sys.options["use_operational_mission"] = self.options[
+                    "use_operational_mission"
+                ]
             except KeyError:
                 pass
 

@@ -11,7 +11,9 @@ import fastoad.api as oad
 from ..models.environmental_impacts.resources.constants import LCA_PREFIX
 
 
-def lca_impacts_sun_breakdown(aircraft_file_path: str, full_burst: bool = False) -> go.FigureWidget:
+def lca_impacts_sun_breakdown(
+    aircraft_file_path: str, full_burst: bool = False, name_aircraft: str = None
+) -> go.FigureWidget:
     datafile = oad.DataFile(aircraft_file_path)
     names = datafile.names()
     names_variables_lca = []
@@ -33,10 +35,19 @@ def lca_impacts_sun_breakdown(aircraft_file_path: str, full_burst: bool = False)
         if curr_depth > max_depth:
             max_depth = curr_depth
 
-    # Cause it's the earliest parent ;)
-    label_ancestor = (
-        "single_score" + "<br> " + str(datafile[LCA_PREFIX + "single_score"].value[0]) + " pt"
-    )
+    # Because it's the earliest parent ;)
+    if name_aircraft:
+        label_ancestor = (
+            name_aircraft
+            + "<br>single_score<br> "
+            + str(datafile[LCA_PREFIX + "single_score"].value[0])
+            + " pt"
+        )
+    else:
+        label_ancestor = (
+            "single_score <br> " + str(datafile[LCA_PREFIX + "single_score"].value[0]) + " pt"
+        )
+
     figure_labels = [label_ancestor]
     figure_parents = [""]
     figure_values = [datafile[LCA_PREFIX + "single_score"].value[0]]
@@ -70,7 +81,10 @@ def lca_impacts_sun_breakdown(aircraft_file_path: str, full_burst: bool = False)
     else:
         fig.update_traces(maxdepth=2, selector=dict(type="sunburst"))
 
-    fig.update_layout(title_text="Single score breakdown", title_x=0.5)
+    if name_aircraft:
+        fig.update_layout(title_text=name_aircraft + " Single score breakdown", title_x=0.5)
+    else:
+        fig.update_layout(title_text="Single score breakdown", title_x=0.5)
 
     fig = go.FigureWidget(fig)
 
