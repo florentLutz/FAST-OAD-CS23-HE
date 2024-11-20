@@ -1569,7 +1569,8 @@ class OperationalMissionVector(om.Group):
     def configure(self):
         # TODO: find a better way to do what I'm about to because it's not pretty
         mission_core_outputs_list = self.solve_equilibrium.list_outputs(
-            return_format="dict", out_stream=None,
+            return_format="dict",
+            out_stream=None,
         ).keys()
         renaming = {}
         for input_renamer in mission_core_outputs_list:

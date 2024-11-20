@@ -25,9 +25,19 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
             desc="Identifier of the turboshaft",
             allow_none=False,
         )
+        self.options.declare(
+            name="use_operational_mission",
+            default=False,
+            types=bool,
+            desc="The characteristics and consumption of the operational mission will be used",
+        )
 
     def setup(self):
         turboshaft_id = self.options["turboshaft_id"]
+        if self.options["use_operational_mission"]:
+            mission_tag = "operational"
+        else:
+            mission_tag = "sizing"
 
         self.add_input(name="data:environmental_impact:flight_per_fu", val=1e-3)
 
@@ -38,7 +48,9 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
+                "data:environmental_impact:operation:"
+                + mission_tag
+                + ":he_power_train:turboshaft:"
                 + turboshaft_id
                 + ":"
                 + specie
@@ -46,7 +58,7 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
             self.add_input(name=input_name, val=np.nan, units="kg")
 
             operation_output_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
+                "data:LCA:operation:he_power_train:turboshaft:"
                 + turboshaft_id
                 + ":"
                 + specie
@@ -94,16 +106,22 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         turboshaft_id = self.options["turboshaft_id"]
+        if self.options["use_operational_mission"]:
+            mission_tag = "operational"
+        else:
+            mission_tag = "sizing"
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
+                "data:environmental_impact:operation:"
+                + mission_tag
+                + ":he_power_train:turboshaft:"
                 + turboshaft_id
                 + ":"
                 + specie
             )
             operation_output_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
+                "data:LCA:operation:he_power_train:turboshaft:"
                 + turboshaft_id
                 + ":"
                 + specie
@@ -141,16 +159,22 @@ class PreLCATurboshaftUseEmissionPerFU(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         turboshaft_id = self.options["turboshaft_id"]
+        if self.options["use_operational_mission"]:
+            mission_tag = "operational"
+        else:
+            mission_tag = "sizing"
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
+                "data:environmental_impact:operation:"
+                + mission_tag
+                + ":he_power_train:turboshaft:"
                 + turboshaft_id
                 + ":"
                 + specie
             )
             operation_output_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:turboshaft:"
+                "data:LCA:operation:he_power_train:turboshaft:"
                 + turboshaft_id
                 + ":"
                 + specie

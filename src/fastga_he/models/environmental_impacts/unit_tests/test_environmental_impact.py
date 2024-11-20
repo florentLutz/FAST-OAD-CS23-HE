@@ -978,12 +978,13 @@ def test_lca_kodiak_100_ef_and_hybrid():
         impact_assessment_method="EF v3.1",
         normalization=True,
         weighting=True,
+        use_operational_mission=True,
     )
 
     ivc = get_indep_var_comp(
         list_inputs(component),
         __file__,
-        DATA_FOLDER_PATH / "oad_process_outputs_ref.xml",
+        DATA_FOLDER_PATH / "oad_process_outputs_op.xml",
     )
 
     # Run problem and check obtained value(s) is/(are) correct

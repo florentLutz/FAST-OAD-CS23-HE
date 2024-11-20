@@ -1026,22 +1026,24 @@
         </rear_fret>
       </payload>
     </weight>
-    <LCA>
+    <environmental_impact>
       <operation>
-        <he_power_train>
-          <turboshaft>
-            <turboshaft_1>
-              <CO units="g" is_input="False">4584.39153859487</CO>
-              <CO2 units="g" is_input="False">2892751.060853363</CO2>
-              <H2O units="g" is_input="False">1134178.4666483707</H2O>
-              <HC units="g" is_input="False">458.4391538594871</HC>
-              <NOx units="g" is_input="False">10452.412707996305</NOx>
-              <SOx units="g" is_input="False">733.5026461751793</SOx>
-            </turboshaft_1>
-          </turboshaft>
-        </he_power_train>
+        <sizing>
+          <he_power_train>
+            <turboshaft>
+              <turboshaft_1>
+                <CO units="g" is_input="False">4584.39153859487</CO>
+                <CO2 units="g" is_input="False">2892751.060853363</CO2>
+                <H2O units="g" is_input="False">1134178.4666483707</H2O>
+                <HC units="g" is_input="False">458.4391538594871</HC>
+                <NOx units="g" is_input="False">10452.412707996305</NOx>
+                <SOx units="g" is_input="False">733.5026461751793</SOx>
+              </turboshaft_1>
+            </turboshaft>
+          </he_power_train>
+        </sizing>
       </operation>
-    </LCA>
+    </environmental_impact>
   </data>
   <xfoil>
     <horizontal_tail>

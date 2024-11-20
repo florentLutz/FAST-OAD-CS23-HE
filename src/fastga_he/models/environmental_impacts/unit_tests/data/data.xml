@@ -1451,30 +1451,32 @@
         </rear_fret>
       </payload>
     </weight>
-    <LCA>
+    <environmental_impact>
       <operation>
-        <he_power_train>
-          <battery_pack>
-            <battery_pack_1>
-              <CO units="g" is_input="False">0.0</CO>
-              <CO2 units="g" is_input="False">0.0</CO2>
-              <H2O units="g" is_input="False">0.0</H2O>
-              <HC units="g" is_input="False">0.0</HC>
-              <NOx units="g" is_input="False">0.0</NOx>
-              <SOx units="g" is_input="False">0.0</SOx>
-            </battery_pack_1>
-            <battery_pack_2>
-              <CO units="g" is_input="False">0.0</CO>
-              <CO2 units="g" is_input="False">0.0</CO2>
-              <H2O units="g" is_input="False">0.0</H2O>
-              <HC units="g" is_input="False">0.0</HC>
-              <NOx units="g" is_input="False">0.0</NOx>
-              <SOx units="g" is_input="False">0.0</SOx>
-            </battery_pack_2>
-          </battery_pack>
-        </he_power_train>
+        <sizing>
+          <he_power_train>
+            <battery_pack>
+              <battery_pack_1>
+                <CO units="g" is_input="False">0.0</CO>
+                <CO2 units="g" is_input="False">0.0</CO2>
+                <H2O units="g" is_input="False">0.0</H2O>
+                <HC units="g" is_input="False">0.0</HC>
+                <NOx units="g" is_input="False">0.0</NOx>
+                <SOx units="g" is_input="False">0.0</SOx>
+              </battery_pack_1>
+              <battery_pack_2>
+                <CO units="g" is_input="False">0.0</CO>
+                <CO2 units="g" is_input="False">0.0</CO2>
+                <H2O units="g" is_input="False">0.0</H2O>
+                <HC units="g" is_input="False">0.0</HC>
+                <NOx units="g" is_input="False">0.0</NOx>
+                <SOx units="g" is_input="False">0.0</SOx>
+              </battery_pack_2>
+            </battery_pack>
+          </he_power_train>
+        </sizing>
       </operation>
-    </LCA>
+    </environmental_impact>
   </data>
   <xfoil>
     <horizontal_tail>

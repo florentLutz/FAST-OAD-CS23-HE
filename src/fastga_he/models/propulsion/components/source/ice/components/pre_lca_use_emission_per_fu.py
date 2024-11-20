@@ -25,9 +25,19 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
             desc="Identifier of the Internal Combustion Engine",
             allow_none=False,
         )
+        self.options.declare(
+            name="use_operational_mission",
+            default=False,
+            types=bool,
+            desc="The characteristics and consumption of the operational mission will be used",
+        )
 
     def setup(self):
         ice_id = self.options["ice_id"]
+        if self.options["use_operational_mission"]:
+            mission_tag = "operational"
+        else:
+            mission_tag = "sizing"
 
         self.add_input(name="data:environmental_impact:flight_per_fu", val=np.nan)
 
@@ -38,7 +48,9 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                "data:environmental_impact:operation:"
+                + mission_tag
+                + ":he_power_train:ICE:"
                 + ice_id
                 + ":"
                 + specie
@@ -46,11 +58,7 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
             self.add_input(name=input_name, val=np.nan, units="kg")
 
             operation_output_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
-                + ice_id
-                + ":"
-                + specie
-                + "_per_fu"
+                "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
             )
             self.add_output(name=operation_output_name, val=0.0, units="kg")
             self.declare_partials(
@@ -86,20 +94,22 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         ice_id = self.options["ice_id"]
+        if self.options["use_operational_mission"]:
+            mission_tag = "operational"
+        else:
+            mission_tag = "sizing"
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                "data:environmental_impact:operation:"
+                + mission_tag
+                + ":he_power_train:ICE:"
                 + ice_id
                 + ":"
                 + specie
             )
             operation_output_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
-                + ice_id
-                + ":"
-                + specie
-                + "_per_fu"
+                "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
             )
             outputs[operation_output_name] = (
                 inputs[input_name] * inputs["data:environmental_impact:flight_per_fu"]
@@ -125,20 +135,22 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         ice_id = self.options["ice_id"]
+        if self.options["use_operational_mission"]:
+            mission_tag = "operational"
+        else:
+            mission_tag = "sizing"
 
         for specie in SPECIES_LIST:
             input_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
+                "data:environmental_impact:operation:"
+                + mission_tag
+                + ":he_power_train:ICE:"
                 + ice_id
                 + ":"
                 + specie
             )
             operation_output_name = (
-                "data:environmental_impact:operation:sizing:he_power_train:ICE:"
-                + ice_id
-                + ":"
-                + specie
-                + "_per_fu"
+                "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
             )
 
             partials[operation_output_name, input_name] = inputs[

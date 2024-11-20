@@ -1044,23 +1044,25 @@
         </rear_fret>
       </payload>
     </weight>
-    <LCA>
+    <environmental_impact>
       <operation>
-        <he_power_train>
-          <ICE>
-            <ice_1>
-              <CO units="g" is_input="False">186307.80232368954</CO>
-              <CO2 units="g" is_input="False">723752.114290022</CO2>
-              <H2O units="g" is_input="False">288800.44044411526</H2O>
-              <HC units="g" is_input="False">4404.848754938659</HC>
-              <NOx units="g" is_input="False">733.090851248603</NOx>
-              <SOx units="g" is_input="False">98.05673806509975</SOx>
-              <lead units="g" is_input="False">185.37392862783142</lead>
-            </ice_1>
-          </ICE>
-        </he_power_train>
+        <sizing>
+          <he_power_train>
+            <ICE>
+              <ice_1>
+                <CO units="g" is_input="False">186307.80232368954</CO>
+                <CO2 units="g" is_input="False">723752.114290022</CO2>
+                <H2O units="g" is_input="False">288800.44044411526</H2O>
+                <HC units="g" is_input="False">4404.848754938659</HC>
+                <NOx units="g" is_input="False">733.090851248603</NOx>
+                <SOx units="g" is_input="False">98.05673806509975</SOx>
+                <lead units="g" is_input="False">185.37392862783142</lead>
+              </ice_1>
+            </ICE>
+          </he_power_train>
+        </sizing>
       </operation>
-    </LCA>
+    </environmental_impact>
   </data>
   <xfoil>
     <horizontal_tail>
