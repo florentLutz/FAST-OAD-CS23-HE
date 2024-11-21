@@ -41,17 +41,9 @@ def test_lca_sun_breakdown_pipistrel():
 def test_lca_sun_breakdown_kodiak_and_hybrid():
     # Check that we can create a plot
     fig = lca_impacts_sun_breakdown(
-        pth.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml"),
+        [pth.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml"),pth.join(DATA_FOLDER_PATH, "hybrid_kodiak_100_ef.xml")],
         full_burst=True,
-        name_aircraft="Reference Kodiak 100",
-    )
-
-    fig.show()
-
-    fig = lca_impacts_sun_breakdown(
-        pth.join(DATA_FOLDER_PATH, "hybrid_kodiak_100_ef.xml"),
-        full_burst=True,
-        name_aircraft="Hybrid Kodiak 100",
+        name_aircraft=["Reference Kodiak 100", "Hybrid Kodiak 100"],
     )
 
     fig.show()
@@ -73,6 +65,17 @@ def test_lca_sun_breakdown_kodiak_rel_parent():
         pth.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml"),
         full_burst=True,
         name_aircraft="Reference Kodiak 100",
+        rel="parent",
+    )
+
+    fig.show()
+
+
+def test_lca_sun_breakdown_kodiak_rel_parent_using_list():
+    fig = lca_impacts_sun_breakdown(
+        [pth.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml")],
+        full_burst=True,
+        name_aircraft=["Reference Kodiak 100"],
         rel="parent",
     )
 

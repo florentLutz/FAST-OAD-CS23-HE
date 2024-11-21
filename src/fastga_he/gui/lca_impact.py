@@ -2,10 +2,13 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+from typing import List, Union
+
 import numpy as np
 
 import plotly
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 import fastoad.api as oad
 
@@ -15,9 +18,9 @@ COLS = plotly.colors.DEFAULT_PLOTLY_COLORS
 
 
 def lca_impacts_sun_breakdown(
-    aircraft_file_path: str,
+    aircraft_file_path: Union[str, List[str]],
     full_burst: bool = False,
-    name_aircraft: str = None,
+    name_aircraft: Union[str, List[str]] = None,
     rel: str = "absolute",
 ) -> go.FigureWidget:
     """
@@ -30,11 +33,61 @@ def lca_impacts_sun_breakdown(
     :param rel: string to display impacts in a relative form. By default, it is not done. Can be
     relative to the "single_score" or relative to the "parent".
     """
+
+    title_text = "Single score breakdown"
+    if rel == "single_score":
+        title_text += "<br>expressed as a percentage of the total score"
+    elif rel == "parent":
+        title_text += "<br>expressed as a percentage of parent category"
+
+    if isinstance(aircraft_file_path, str):
+        fig = go.Figure()
+        fig.add_trace(_get_impact_sunburst(aircraft_file_path, rel))
+
+        if name_aircraft:
+            fig.update_layout(title_text=name_aircraft + " " + title_text, title_x=0.5)
+        else:
+            fig.update_layout(title_text=title_text, title_x=0.5)
+
+    elif len(aircraft_file_path) == 1:
+        fig = go.Figure()
+        fig.add_trace(_get_impact_sunburst(aircraft_file_path[0], rel))
+
+        if name_aircraft[0]:
+            fig.update_layout(title_text=name_aircraft[0] + " " + title_text, title_x=0.5)
+        else:
+            fig.update_layout(title_text=title_text, title_x=0.5)
+
+    else:
+        fig = make_subplots(
+            1,
+            cols=len(aircraft_file_path),
+            specs=[[{"type": "domain"}, {"type": "domain"}]],
+            subplot_titles=name_aircraft,
+        )
+        fig_counter = 1
+
+        for idx, curr_aircraft_file_path in enumerate(aircraft_file_path):
+            fig.add_trace(_get_impact_sunburst(curr_aircraft_file_path, rel=rel), 1, fig_counter)
+            fig.update_traces(row=1, col=fig_counter, name=name_aircraft[idx])
+            fig_counter += 1
+
+        fig.update_layout(title_text=title_text, title_x=0.5)
+
+    if full_burst:
+        fig.update_traces(selector=dict(type="sunburst"))
+    else:
+        fig.update_traces(maxdepth=2, selector=dict(type="sunburst"))
+
+    fig = go.FigureWidget(fig)
+
+    return fig
+
+
+def _get_impact_sunburst(aircraft_file_path: str, rel: str = "absolute") -> go.Sunburst:
     datafile = oad.DataFile(aircraft_file_path)
     names = datafile.names()
     names_variables_lca = []
-
-    fig = go.Figure()
 
     for name in names:
         if LCA_PREFIX in name:
@@ -42,8 +95,8 @@ def lca_impacts_sun_breakdown(
                 names_variables_lca.append(name)
 
     if len(names_variables_lca) == 0:
-        fig = go.FigureWidget(fig)
-        return fig
+        sunburst = go.Sunburst()
+        return sunburst
 
     max_depth = 0
     for name in names_variables_lca:
@@ -76,35 +129,14 @@ def lca_impacts_sun_breakdown(
             figure_values.append(datafile[name].value[0])
         figure_color.append(get_color(name, color_dict))
 
-    fig.add_trace(
-        go.Sunburst(
-            labels=figure_labels,
-            parents=figure_parents,
-            values=figure_values,
-            branchvalues="total",
-            sort=False,
-            marker={"colors": figure_color}
-        ),
+    return go.Sunburst(
+        labels=figure_labels,
+        parents=figure_parents,
+        values=figure_values,
+        branchvalues="total",
+        sort=False,
+        marker={"colors": figure_color},
     )
-    if full_burst:
-        fig.update_traces(maxdepth=max_depth, selector=dict(type="sunburst"))
-    else:
-        fig.update_traces(maxdepth=2, selector=dict(type="sunburst"))
-
-    title_text = "Single score breakdown"
-    if rel == "single_score":
-        title_text += "<br>expressed as a percentage of the total score"
-    elif rel == "parent":
-        title_text += "<br>expressed as a percentage of parent category"
-
-    if name_aircraft:
-        fig.update_layout(title_text=name_aircraft + " " + title_text, title_x=0.5)
-    else:
-        fig.update_layout(title_text=title_text, title_x=0.5)
-
-    fig = go.FigureWidget(fig)
-
-    return fig
 
 
 def depth_lca_detail(name_variable: str) -> int:
@@ -196,7 +228,6 @@ def get_first_parent_name(name_variable: str) -> str:
 
 
 def get_color(name_variable: str, color_dict: dict) -> str:
-
     first_parent = get_first_parent_name(name_variable)
     if first_parent in list(color_dict.keys()):
         return color_dict[first_parent]
@@ -204,4 +235,3 @@ def get_color(name_variable: str, color_dict: dict) -> str:
         color = COLS[len(list(color_dict.keys())) % len(COLS)]
         color_dict[name_variable] = color
         return color
-
