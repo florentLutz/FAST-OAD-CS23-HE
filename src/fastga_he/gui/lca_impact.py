@@ -2,8 +2,6 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import numpy as np
-
 import plotly.graph_objects as go
 
 import fastoad.api as oad
@@ -105,6 +103,7 @@ def lca_impacts_sun_breakdown(
             parents=figure_parents,
             values=figure_values,
             branchvalues="total",
+            sort=False,
         ),
     )
     if full_burst:
