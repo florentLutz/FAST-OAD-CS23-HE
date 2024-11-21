@@ -2,6 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import numpy as np
 import plotly.graph_objects as go
 
 import fastoad.api as oad
@@ -47,17 +48,7 @@ def lca_impacts_sun_breakdown(
             max_depth = curr_depth
 
     # Because it's the earliest parent ;)
-    if name_aircraft:
-        label_ancestor = (
-            name_aircraft
-            + "<br>single_score<br> "
-            + str(datafile[LCA_PREFIX + "single_score"].value[0])
-            + " pt"
-        )
-    else:
-        label_ancestor = (
-            "single_score <br> " + str(datafile[LCA_PREFIX + "single_score"].value[0]) + " pt"
-        )
+    label_ancestor = get_ancestor_label(datafile)
 
     figure_labels = [label_ancestor]
     figure_parents = [""]
@@ -66,36 +57,17 @@ def lca_impacts_sun_breakdown(
     else:
         figure_values = [datafile[LCA_PREFIX + "single_score"].value[0]]
 
-    # Not very generic :/ Might only work for EF3.1 to check
+    names_variables_lca.remove(LCA_PREFIX + "single_score")
+
     for name in names_variables_lca:
-        if depth_lca_detail(name) == 2 and "sum" in name:
-            figure_labels.append(name_to_label(name, datafile, rel=rel))
-            figure_parents.append(label_ancestor)
-            if rel == "single_score" or rel == "parent":
-                figure_values.append(
-                    datafile[name].value[0] / datafile[LCA_PREFIX + "single_score"].value[0] * 100.0
-                )
-            else:
-                figure_values.append(datafile[name].value[0])
-        elif depth_lca_detail(name) == 3 and "sum" in name:
-            figure_labels.append(name_to_label(name, datafile, rel=rel))
-            figure_parents.append(get_parent_label(name, datafile, rel=rel))
-            if rel == "single_score" or rel == "parent":
-                figure_values.append(
-                    datafile[name].value[0] / datafile[LCA_PREFIX + "single_score"].value[0] * 100.0
-                )
-            else:
-                figure_values.append(datafile[name].value[0])
-        elif depth_lca_detail(name) == 4:
-            # Sum should not be in the name here.
-            figure_labels.append(name_to_label(name, datafile, -1, rel=rel))
-            figure_parents.append(get_parent_label(name, datafile, rel=rel))
-            if rel == "single_score" or rel == "parent":
-                figure_values.append(
-                    datafile[name].value[0] / datafile[LCA_PREFIX + "single_score"].value[0] * 100.0
-                )
-            else:
-                figure_values.append(datafile[name].value[0])
+        figure_labels.append(name_to_label(name, datafile, rel=rel))
+        figure_parents.append(get_parent_label(name, datafile, rel=rel))
+        if rel == "single_score" or rel == "parent":
+            figure_values.append(
+                datafile[name].value[0] / datafile[LCA_PREFIX + "single_score"].value[0] * 100.0
+            )
+        else:
+            figure_values.append(datafile[name].value[0])
 
     fig.add_trace(
         go.Sunburst(
@@ -128,6 +100,9 @@ def lca_impacts_sun_breakdown(
 
 
 def depth_lca_detail(name_variable: str) -> int:
+    if "single_score" in name_variable:
+        return 1
+
     tmp_name = name_variable.replace(LCA_PREFIX, "")
     depth_lca = len(tmp_name.split(":"))
     if "sum" not in tmp_name:
@@ -136,9 +111,15 @@ def depth_lca_detail(name_variable: str) -> int:
     return depth_lca
 
 
-def name_to_label(
-    name_variable: str, datafile: oad.DataFile, depth: int = -2, rel: str = "absolute"
-) -> str:
+def name_to_label(name_variable: str, datafile: oad.DataFile, rel: str = "absolute") -> str:
+    if name_variable == LCA_PREFIX + "single_score":
+        return get_ancestor_label(datafile)
+
+    if "sum" not in name_variable:
+        depth = -1
+    else:
+        depth = -2
+
     clean_name = name_variable.split(":")[depth]
 
     if rel == "single_score":
@@ -147,17 +128,14 @@ def name_to_label(
             / datafile[LCA_PREFIX + "single_score"].value[0]
             * 100.0
         )
-        label = clean_name + "<br> " + str(value) + " %"
+        label = clean_name + "<br> " + str(round_value(value)) + " %"
     elif rel == "parent":
-        if depth_lca_detail(name_variable) > 2:
-            parent_value = get_parent_score(name_variable, datafile)
-        else:
-            parent_value = datafile[LCA_PREFIX + "single_score"].value[0]
+        parent_value = get_parent_score(name_variable, datafile)
         value = datafile[name_variable].value[0] / parent_value * 100.0
-        label = clean_name + "<br> " + str(value) + " %"
+        label = clean_name + "<br> " + str(round_value(value)) + " %"
     else:
         value = datafile[name_variable].value[0]
-        label = clean_name + "<br> " + str(value) + " pt"
+        label = clean_name + "<br> " + str(round_value(value)) + " pt"
 
     return label
 
@@ -176,9 +154,27 @@ def get_parent_score(name_variable: str, datafile: oad.DataFile) -> float:
 
 
 def get_parent_name(name_variable: str) -> str:
+    if depth_lca_detail(name_variable) == 2:
+        return LCA_PREFIX + "single_score"
+
     if "sum" not in name_variable:
         parent_name = ":".join(name_variable.split(":")[:-1]) + ":sum"
     else:
         parent_name = ":".join(name_variable.split(":")[:-2]) + ":sum"
 
     return parent_name
+
+
+def get_ancestor_label(datafile: oad.DataFile) -> str:
+    return (
+        "single_score <br> "
+        + str(round_value(datafile[LCA_PREFIX + "single_score"].value[0]))
+        + " pt"
+    )
+
+
+def round_value(value: float) -> float:
+    if value == 0.0:
+        return value
+    else:
+        return round(value, int(np.ceil(abs(np.log10(value))) + 5))
