@@ -3,11 +3,15 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import numpy as np
+
+import plotly
 import plotly.graph_objects as go
 
 import fastoad.api as oad
 
 from ..models.environmental_impacts.resources.constants import LCA_PREFIX
+
+COLS = plotly.colors.DEFAULT_PLOTLY_COLORS
 
 
 def lca_impacts_sun_breakdown(
@@ -52,6 +56,8 @@ def lca_impacts_sun_breakdown(
 
     figure_labels = [label_ancestor]
     figure_parents = [""]
+    figure_color = [None]
+    color_dict = {}
     if rel == "single_score" or rel == "parent":
         figure_values = [100.0]  # In percent
     else:
@@ -68,6 +74,7 @@ def lca_impacts_sun_breakdown(
             )
         else:
             figure_values.append(datafile[name].value[0])
+        figure_color.append(get_color(name, color_dict))
 
     fig.add_trace(
         go.Sunburst(
@@ -76,6 +83,7 @@ def lca_impacts_sun_breakdown(
             values=figure_values,
             branchvalues="total",
             sort=False,
+            marker={"colors": figure_color}
         ),
     )
     if full_burst:
@@ -178,3 +186,22 @@ def round_value(value: float) -> float:
         return value
     else:
         return round(value, int(np.ceil(abs(np.log10(value))) + 5))
+
+
+def get_first_parent_name(name_variable: str) -> str:
+    if depth_lca_detail(name_variable) <= 2:
+        return name_variable
+    else:
+        return get_first_parent_name(get_parent_name(name_variable))
+
+
+def get_color(name_variable: str, color_dict: dict) -> str:
+
+    first_parent = get_first_parent_name(name_variable)
+    if first_parent in list(color_dict.keys()):
+        return color_dict[first_parent]
+    else:
+        color = COLS[len(list(color_dict.keys())) % len(COLS)]
+        color_dict[name_variable] = color
+        return color
+
