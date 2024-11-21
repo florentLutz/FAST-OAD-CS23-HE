@@ -12,8 +12,21 @@ from ..models.environmental_impacts.resources.constants import LCA_PREFIX
 
 
 def lca_impacts_sun_breakdown(
-    aircraft_file_path: str, full_burst: bool = False, name_aircraft: str = None
+    aircraft_file_path: str,
+    full_burst: bool = False,
+    name_aircraft: str = None,
+    rel: str = "absolute",
 ) -> go.FigureWidget:
+    """
+    Give a breakdown of the single score impact of the aircraft under the form of a sun breakdown.
+
+    :param aircraft_file_path: path to the output file that contains the weighted and aggregated
+    impacts
+    :param full_burst: boolean to display all levels of impacts
+    :param name_aircraft: name of the aircraft
+    :param rel: string to display impacts in a relative form. By default, it is not done. Can be
+    relative to the "single_score" or relative to the "parent".
+    """
     datafile = oad.DataFile(aircraft_file_path)
     names = datafile.names()
     names_variables_lca = []
@@ -50,23 +63,41 @@ def lca_impacts_sun_breakdown(
 
     figure_labels = [label_ancestor]
     figure_parents = [""]
-    figure_values = [datafile[LCA_PREFIX + "single_score"].value[0]]
+    if rel == "single_score" or rel == "parent":
+        figure_values = [100.0]  # In percent
+    else:
+        figure_values = [datafile[LCA_PREFIX + "single_score"].value[0]]
 
     # Not very generic :/ Might only work for EF3.1 to check
     for name in names_variables_lca:
         if depth_lca_detail(name) == 2 and "sum" in name:
-            figure_labels.append(name_to_label(name, datafile))
+            figure_labels.append(name_to_label(name, datafile, rel=rel))
             figure_parents.append(label_ancestor)
-            figure_values.append(datafile[name].value[0])
+            if rel == "single_score" or rel == "parent":
+                figure_values.append(
+                    datafile[name].value[0] / datafile[LCA_PREFIX + "single_score"].value[0] * 100.0
+                )
+            else:
+                figure_values.append(datafile[name].value[0])
         elif depth_lca_detail(name) == 3 and "sum" in name:
-            figure_labels.append(name_to_label(name, datafile))
-            figure_parents.append(get_parent_label(name, datafile))
-            figure_values.append(datafile[name].value[0])
+            figure_labels.append(name_to_label(name, datafile, rel=rel))
+            figure_parents.append(get_parent_label(name, datafile, rel=rel))
+            if rel == "single_score" or rel == "parent":
+                figure_values.append(
+                    datafile[name].value[0] / datafile[LCA_PREFIX + "single_score"].value[0] * 100.0
+                )
+            else:
+                figure_values.append(datafile[name].value[0])
         elif depth_lca_detail(name) == 4:
             # Sum should not be in the name here.
-            figure_labels.append(name_to_label(name, datafile, -1))
-            figure_parents.append(get_parent_label(name + ":sum", datafile))
-            figure_values.append(datafile[name].value[0])
+            figure_labels.append(name_to_label(name, datafile, -1, rel=rel))
+            figure_parents.append(get_parent_label(name, datafile, rel=rel))
+            if rel == "single_score" or rel == "parent":
+                figure_values.append(
+                    datafile[name].value[0] / datafile[LCA_PREFIX + "single_score"].value[0] * 100.0
+                )
+            else:
+                figure_values.append(datafile[name].value[0])
 
     fig.add_trace(
         go.Sunburst(
@@ -81,10 +112,16 @@ def lca_impacts_sun_breakdown(
     else:
         fig.update_traces(maxdepth=2, selector=dict(type="sunburst"))
 
+    title_text = "Single score breakdown"
+    if rel == "single_score":
+        title_text += "<br>expressed as a percentage of the total score"
+    elif rel == "parent":
+        title_text += "<br>expressed as a percentage of parent category"
+
     if name_aircraft:
-        fig.update_layout(title_text=name_aircraft + " Single score breakdown", title_x=0.5)
+        fig.update_layout(title_text=name_aircraft + " " + title_text, title_x=0.5)
     else:
-        fig.update_layout(title_text="Single score breakdown", title_x=0.5)
+        fig.update_layout(title_text=title_text, title_x=0.5)
 
     fig = go.FigureWidget(fig)
 
@@ -100,14 +137,49 @@ def depth_lca_detail(name_variable: str) -> int:
     return depth_lca
 
 
-def name_to_label(name_variable: str, datafile: oad.DataFile, depth: int = -2) -> str:
+def name_to_label(
+    name_variable: str, datafile: oad.DataFile, depth: int = -2, rel: str = "absolute"
+) -> str:
     clean_name = name_variable.split(":")[depth]
-    value = datafile[name_variable].value[0]
 
-    return clean_name + "<br> " + str(value) + " pt"
+    if rel == "single_score":
+        value = (
+            datafile[name_variable].value[0]
+            / datafile[LCA_PREFIX + "single_score"].value[0]
+            * 100.0
+        )
+        label = clean_name + "<br> " + str(value) + " %"
+    elif rel == "parent":
+        if depth_lca_detail(name_variable) > 2:
+            parent_value = get_parent_score(name_variable, datafile)
+        else:
+            parent_value = datafile[LCA_PREFIX + "single_score"].value[0]
+        value = datafile[name_variable].value[0] / parent_value * 100.0
+        label = clean_name + "<br> " + str(value) + " %"
+    else:
+        value = datafile[name_variable].value[0]
+        label = clean_name + "<br> " + str(value) + " pt"
+
+    return label
 
 
-def get_parent_label(name_variable: str, datafile: oad.DataFile) -> str:
-    parent_name = ":".join(name_variable.split(":")[:-2]) + ":sum"
+def get_parent_label(name_variable: str, datafile: oad.DataFile, rel: str = "absolute") -> str:
+    parent_name = get_parent_name(name_variable)
 
-    return name_to_label(parent_name, datafile)
+    return name_to_label(parent_name, datafile, rel=rel)
+
+
+def get_parent_score(name_variable: str, datafile: oad.DataFile) -> float:
+    parent_name = get_parent_name(name_variable)
+    parent_score = datafile[parent_name].value[0]
+
+    return parent_score
+
+
+def get_parent_name(name_variable: str) -> str:
+    if "sum" not in name_variable:
+        parent_name = ":".join(name_variable.split(":")[:-1]) + ":sum"
+    else:
+        parent_name = ":".join(name_variable.split(":")[:-2]) + ":sum"
+
+    return parent_name
