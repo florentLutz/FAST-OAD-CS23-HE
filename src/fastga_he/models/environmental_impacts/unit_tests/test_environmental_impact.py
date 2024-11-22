@@ -1022,3 +1022,31 @@ def test_lca_kodiak_100_ef_and_hybrid():
 
     problem.output_file_path = RESULTS_FOLDER_PATH / "hybrid_kodiak_100_ef.xml"
     problem.write_outputs()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_kodiak_100_recipe():
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion.yml",
+        component_level_breakdown=True,
+        airframe_material="aluminium",
+        delivery_method="flight",
+        normalization=True,
+        weighting=True,
+        use_operational_mission=True,
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(component),
+        __file__,
+        DATA_FOLDER_PATH / "oad_process_outputs_op.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "kodiak_100_recipe.xml"
+    problem.write_outputs()

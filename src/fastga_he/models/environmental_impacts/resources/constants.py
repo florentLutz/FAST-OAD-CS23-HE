@@ -133,7 +133,7 @@ WEIGHTING_FACTOR = {
         "photochemical_oxidant_formation_human_health": 0.0478,
         "water_use": 0.0851,
     },
-    "ReCiPe 2016 v1.03": {  # Taking hierarchic values
+    "ReCiPe 2016 v1.03": {
         "total_ecosystem_quality": 4.0e-1,
         "total_human_health": 4.0e-1,
         "total_natural_resources": 2.0e-1,
