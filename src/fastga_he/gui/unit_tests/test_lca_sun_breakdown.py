@@ -83,3 +83,55 @@ def test_lca_sun_breakdown_kodiak_rel_parent_using_list():
     )
 
     fig.show()
+
+
+def test_lca_sun_breakdown_kodiak_recipe():
+    fig = lca_impacts_sun_breakdown(
+        [pth.join(DATA_FOLDER_PATH, "kodiak_100_recipe.xml")],
+        full_burst=True,
+        name_aircraft=["Reference Kodiak 100 using ReCiPe"],
+        rel="single_score",
+    )
+
+    fig.show()
+
+
+def test_compare_kodiak_recipe_and_ef():
+    fig = lca_impacts_sun_breakdown(
+        [
+            pth.join(DATA_FOLDER_PATH, "kodiak_100_recipe_mid.xml"),
+            pth.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml"),
+        ],
+        full_burst=True,
+        name_aircraft=["Reference Kodiak 100 using ReCiPe", "Reference Kodiak 100 using EF"],
+        # rel="single_score",
+    )
+
+    fig.show()
+
+
+def test_kodiak_recipe_endpoint():
+    fig = lca_impacts_sun_breakdown(
+        [
+            pth.join(DATA_FOLDER_PATH, "kodiak_100_recipe_end.xml"),
+        ],
+        full_burst=True,
+        name_aircraft=["Reference Kodiak 100 using ReCiPe"],
+        rel="single_score",
+    )
+
+    fig.show()
+
+
+def test_kodiak_and_hybrid_recipe_endpoint():
+    fig = lca_impacts_sun_breakdown(
+        [
+            pth.join(DATA_FOLDER_PATH, "kodiak_100_recipe_end.xml"),
+            pth.join(DATA_FOLDER_PATH, "hybrid_kodiak_recipe_end.xml"),
+        ],
+        full_burst=True,
+        name_aircraft=["Reference Kodiak 100 using ReCiPe", "Hybrid Kodiak 100 using ReCiPe"],
+        rel="single_score",
+    )
+
+    fig.show()

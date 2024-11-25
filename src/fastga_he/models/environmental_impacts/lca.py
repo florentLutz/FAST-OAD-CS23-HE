@@ -110,6 +110,13 @@ class LCA(om.Group):
             types=bool,
             desc="The characteristics and consumption of the operational mission will be used",
         )
+        self.options.declare(
+            name="recipe_midpoint_weighting",
+            default=False,
+            types=bool,
+            desc="Use equivalent midpoint weighting factor for the weighting of ReCiPe 2016. Is "
+            "only used ReCiPe is used as LCIA method and if weighting is enabled",
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
@@ -344,9 +351,16 @@ class LCA(om.Group):
                 return_format="dict", out_stream=None
             ).keys()
             self.lca_weighting.inputs_list = potential_weighting_inputs_list
-            self.lca_weighting.weighting_factor = WEIGHTING_FACTOR[
-                self.options["impact_assessment_method"]
-            ]
+
+            if self.options["impact_assessment_method"] != "ReCiPe 2016 v1.03":
+                weighting_factor_dict = WEIGHTING_FACTOR[self.options["impact_assessment_method"]]
+            else:
+                if self.options["recipe_midpoint_weighting"]:
+                    weighting_factor_dict = WEIGHTING_FACTOR["ReCiPe 2016 v1.03"]["midpoint"]
+                else:
+                    weighting_factor_dict = WEIGHTING_FACTOR["ReCiPe 2016 v1.03"]["endpoint"]
+
+            self.lca_weighting.weighting_factor = weighting_factor_dict
 
             added_weighting_factor = []
 
@@ -361,12 +375,10 @@ class LCA(om.Group):
                 normalized_method_name = var_in.split(":")[2]
                 method_name = normalized_method_name.replace("_normalized", "")
 
-                if method_name in WEIGHTING_FACTOR[self.options["impact_assessment_method"]]:
+                if method_name in weighting_factor_dict:
                     weighted_method_name = method_name + "_weighted"
                     weighting_factor_name = LCA_PREFIX + method_name + ":weighting_factor"
-                    weighting_factor = WEIGHTING_FACTOR[self.options["impact_assessment_method"]][
-                        method_name
-                    ]
+                    weighting_factor = weighting_factor_dict[method_name]
                     var_out = var_in.replace(normalized_method_name, weighted_method_name)
 
                     self.lca_weighting.add_input(var_in, val=np.nan, units=None)

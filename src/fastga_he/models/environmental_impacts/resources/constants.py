@@ -133,9 +133,34 @@ WEIGHTING_FACTOR = {
         "photochemical_oxidant_formation_human_health": 0.0478,
         "water_use": 0.0851,
     },
-    "ReCiPe 2016 v1.03": {
-        "total_ecosystem_quality": 4.0e-1,
-        "total_human_health": 4.0e-1,
-        "total_natural_resources": 2.0e-1,
+    # The following weighting factors have been calculated to compute a single score based on
+    # midpoints impacts while still keeping the 40/40/20 approach commonly used on endpoints. See
+    # in the methodology folder for the computation of those equivalent weighting factors
+    "ReCiPe 2016 v1.03": {  # Taking hierarchic values
+        "midpoint": {
+            "acidification_terrestrial": 2.351e-03,
+            "climate_change": 1.296e-01,
+            "ecotoxicity_freshwater": 4.737e-06,
+            "ecotoxicity_marine": 1.232e-06,
+            "ecotoxicity_terrestrial": 4.686e-05,
+            "energy_resources_non-renewablefossil": 1.859e-03,  # Taking the value for crude oil
+            "eutrophication_freshwater": 1.18e-04,
+            "eutrophication_marine": 2.124e-06,
+            "human_toxicity_carcinogenic": 5.696e-04,
+            "human_toxicity_non-carcinogenic": 1.189e-01,
+            "ionising_radiation": 6.797e-05,
+            "land_use": 1.482e-02,
+            "material_resources_metals_minerals": 1.981e-01,
+            "ozone_depletion": 5.307e-04,
+            "particulate_matter_formation": 2.682e-01,
+            "photochemical_oxidant_formation_human_health": 3.123e-04,
+            "photochemical_oxidant_formation_terrestrial_ecosystems": 6.175e-04,
+            "water_use": 1.085e-02,
+        },
+        "endpoint": {
+            "total_ecosystem_quality": 4.0e-1,
+            "total_human_health": 4.0e-1,
+            "total_natural_resources": 2.0e-1,
+        },
     },
 }

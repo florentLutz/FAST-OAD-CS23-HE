@@ -1025,7 +1025,7 @@ def test_lca_kodiak_100_ef_and_hybrid():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
-def test_lca_kodiak_100_recipe():
+def test_lca_kodiak_100_recipe_end_and_mid():
     component = LCA(
         power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion.yml",
         component_level_breakdown=True,
@@ -1048,5 +1048,74 @@ def test_lca_kodiak_100_recipe():
         ivc,
     )
 
-    problem.output_file_path = RESULTS_FOLDER_PATH / "kodiak_100_recipe.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "kodiak_100_recipe_end.xml"
+    problem.write_outputs()
+
+    # Takes time to reinitialize but I can't avoid it unfortunately
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion.yml",
+        component_level_breakdown=True,
+        airframe_material="aluminium",
+        delivery_method="flight",
+        normalization=True,
+        weighting=True,
+        use_operational_mission=True,
+        recipe_midpoint_weighting=True,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "kodiak_100_recipe_mid.xml"
+    problem.write_outputs()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_hybrid_kodiak_100_recipe_mid_and_end():
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "hybrid_propulsion.yml",
+        component_level_breakdown=True,
+        airframe_material="aluminium",
+        delivery_method="flight",
+        normalization=True,
+        weighting=True,
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(component),
+        __file__,
+        DATA_FOLDER_PATH / "oad_process_outputs_he.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "hybrid_kodiak_recipe_end.xml"
+    problem.write_outputs()
+
+    # Takes time to reinitialize but I can't avoid it unfortunately
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "hybrid_propulsion.yml",
+        component_level_breakdown=True,
+        airframe_material="aluminium",
+        delivery_method="flight",
+        normalization=True,
+        weighting=True,
+        use_operational_mission=False,
+        recipe_midpoint_weighting=True,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "hybrid_kodiak_recipe_mid.xml"
     problem.write_outputs()
