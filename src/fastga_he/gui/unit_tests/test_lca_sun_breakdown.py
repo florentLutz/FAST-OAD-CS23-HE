@@ -87,7 +87,7 @@ def test_lca_sun_breakdown_kodiak_rel_parent_using_list():
 
 def test_lca_sun_breakdown_kodiak_recipe():
     fig = lca_impacts_sun_breakdown(
-        [pth.join(DATA_FOLDER_PATH, "kodiak_100_recipe.xml")],
+        [pth.join(DATA_FOLDER_PATH, "kodiak_100_recipe_end.xml")],
         full_burst=True,
         name_aircraft=["Reference Kodiak 100 using ReCiPe"],
         rel="single_score",
@@ -97,6 +97,8 @@ def test_lca_sun_breakdown_kodiak_recipe():
 
 
 def test_compare_kodiak_recipe_and_ef():
+    # For ReCiPe, it uses equivalent weighting factor to transfer single score to midpoint
+    # indicators. Results to be taken with care.
     fig = lca_impacts_sun_breakdown(
         [
             pth.join(DATA_FOLDER_PATH, "kodiak_100_recipe_mid.xml"),
@@ -121,6 +123,18 @@ def test_kodiak_recipe_endpoint():
     )
 
     fig.show()
+
+    # Uses equivalent weighting factor to transfer single score to midpoint indicators.
+    fig2 = lca_impacts_sun_breakdown(
+        [
+            pth.join(DATA_FOLDER_PATH, "kodiak_100_recipe_mid.xml"),
+        ],
+        full_burst=True,
+        name_aircraft=["Reference Kodiak 100 using ReCiPe"],
+        rel="single_score",
+    )
+
+    fig2.show()
 
 
 def test_kodiak_and_hybrid_recipe_endpoint():

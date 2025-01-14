@@ -355,10 +355,13 @@ class LCA(om.Group):
             if self.options["impact_assessment_method"] != "ReCiPe 2016 v1.03":
                 weighting_factor_dict = WEIGHTING_FACTOR[self.options["impact_assessment_method"]]
             else:
-                if self.options["recipe_midpoint_weighting"]:
-                    weighting_factor_dict = WEIGHTING_FACTOR["ReCiPe 2016 v1.03"]["midpoint"]
-                else:
-                    weighting_factor_dict = WEIGHTING_FACTOR["ReCiPe 2016 v1.03"]["endpoint"]
+                # TODO: For now I'm disabling the option to use the equivalent midpoint weighting
+                #  factors as I'm not sure about the method I implemented, given the strange results
+                #  it gives.
+                # if self.options["recipe_midpoint_weighting"]:
+                #     weighting_factor_dict = WEIGHTING_FACTOR["ReCiPe 2016 v1.03"]["midpoint"]
+                # else:
+                weighting_factor_dict = WEIGHTING_FACTOR["ReCiPe 2016 v1.03"]["endpoint"]
 
             self.lca_weighting.weighting_factor = weighting_factor_dict
 
