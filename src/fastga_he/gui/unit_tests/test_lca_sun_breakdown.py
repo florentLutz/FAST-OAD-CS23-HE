@@ -2,10 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import os
 import os.path as pth
-
-import pytest
 
 from ..lca_impact import lca_impacts_sun_breakdown
 
