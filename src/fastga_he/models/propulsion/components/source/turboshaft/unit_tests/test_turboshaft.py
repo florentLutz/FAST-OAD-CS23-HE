@@ -1304,27 +1304,27 @@ def test_emissions_per_fu():
     problem = run_system(PreLCATurboshaftUseEmissionPerFU(turboshaft_id="turboshaft_1"), ivc)
 
     assert problem.get_val(
-        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2_per_fu",
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO2_per_fu",
         units="kg",
     ) == pytest.approx(2.52640617, rel=1e-3)
     assert problem.get_val(
-        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO_per_fu",
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO_per_fu",
         units="kg",
     ) == pytest.approx(0.00400381, rel=1e-3)
     assert problem.get_val(
-        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:NOx_per_fu",
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:NOx_per_fu",
         units="kg",
     ) == pytest.approx(0.00912869, rel=1e-3)
     assert problem.get_val(
-        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:SOx_per_fu",
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:SOx_per_fu",
         units="kg",
     ) == pytest.approx(0.00064061, rel=1e-3)
     assert problem.get_val(
-        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:H2O_per_fu",
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:H2O_per_fu",
         units="kg",
     ) == pytest.approx(0.9905434, rel=1e-3)
     assert problem.get_val(
-        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:HC_per_fu",
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:HC_per_fu",
         units="kg",
     ) == pytest.approx(0.00040038, rel=1e-3)
 
