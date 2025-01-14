@@ -34,23 +34,30 @@ def test_all_performances_components_exist():
             assert False
 
 
-def test_all_performances_components_are_imported():
-    performances_assembler_file_path = performances_from_pt_file.__file__
+def test_all_defined_performances_components_are_imported():
 
-    r = open(performances_assembler_file_path, "r")
-    lines = r.readlines()
-
-    imported_class = []
-
-    # First we parse the file to check which class are imported and the we check every registered
-    # component is imported
-    for line in lines:
-        if "    Performances" in line:
-            imported_class.append(line.replace("    ", "").replace(",", "").replace("\n", ""))
+    imported_components = list(he_comp.__dict__.keys())
 
     for component_om_name in resources.DICTIONARY_CN:
         performances_group_name = "Performances" + resources.DICTIONARY_CN[component_om_name]
-        assert performances_group_name in imported_class
+        assert performances_group_name in imported_components
+
+
+def test_all_imported_performances_components_are_defined():
+
+    # In practice this covers the tests above
+    imported_components = list(he_comp.__dict__.keys())
+    imported_performances_components = []
+
+    for imported_component in imported_components:
+        if "Performances" in imported_component:
+            imported_performances_components.append(imported_component)
+
+    defined_components = []
+    for component_om_name in resources.DICTIONARY_CN:
+        defined_components.append("Performances" + resources.DICTIONARY_CN[component_om_name])
+
+    assert set(imported_performances_components) == set(defined_components)
 
 
 def test_all_components_output_required_value():

@@ -63,19 +63,25 @@ def test_all_components_output_required_value():
 
 
 def test_all_sizing_components_are_imported():
-    sizing_assembler_file_path = sizing_from_pt_file.__file__
-
-    r = open(sizing_assembler_file_path, "r")
-    lines = r.readlines()
-
-    imported_class = []
-
-    # First we parse the file to check which class are imported and the we check every registered
-    # component is imported
-    for line in lines:
-        if "    Sizing" in line:
-            imported_class.append(line.replace("    ", "").replace(",", "").replace("\n", ""))
+    imported_components = list(he_comp.__dict__.keys())
 
     for component_om_name in resources.DICTIONARY_CN:
         sizing_group_name = "Sizing" + resources.DICTIONARY_CN[component_om_name]
-        assert sizing_group_name in imported_class
+        assert sizing_group_name in imported_components
+
+
+def test_all_imported_sizing_components_are_defined():
+
+    # In practice this covers the tests above
+    imported_components = list(he_comp.__dict__.keys())
+    imported_sizing_components = []
+
+    for imported_component in imported_components:
+        if "Sizing" in imported_component:
+            imported_sizing_components.append(imported_component)
+
+    defined_components = []
+    for component_om_name in resources.DICTIONARY_CN:
+        defined_components.append("Sizing" + resources.DICTIONARY_CN[component_om_name])
+
+    assert set(imported_sizing_components) == set(defined_components)
