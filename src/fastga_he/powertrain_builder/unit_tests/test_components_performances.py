@@ -11,7 +11,6 @@ from fastoad.openmdao.problem import AutoUnitsDefaultGroup
 
 from fastga_he.powertrain_builder import resources
 
-from fastga_he.models.propulsion.assemblers import performances_from_pt_file
 import fastga_he.models.propulsion.components as he_comp
 
 from tests.testing_utilities import VariableListLocal
