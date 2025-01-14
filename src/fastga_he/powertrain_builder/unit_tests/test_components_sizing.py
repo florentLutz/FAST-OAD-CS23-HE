@@ -71,7 +71,6 @@ def test_all_sizing_components_are_imported():
 
 
 def test_all_imported_sizing_components_are_defined():
-
     # In practice this covers the tests above
     imported_components = list(he_comp.__dict__.keys())
     imported_sizing_components = []

@@ -35,7 +35,6 @@ def test_all_performances_components_exist():
 
 
 def test_all_defined_performances_components_are_imported():
-
     imported_components = list(he_comp.__dict__.keys())
 
     for component_om_name in resources.DICTIONARY_CN:
@@ -44,7 +43,6 @@ def test_all_defined_performances_components_are_imported():
 
 
 def test_all_imported_performances_components_are_defined():
-
     # In practice this covers the tests above
     imported_components = list(he_comp.__dict__.keys())
     imported_performances_components = []
