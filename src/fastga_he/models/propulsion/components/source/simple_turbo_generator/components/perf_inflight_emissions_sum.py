@@ -5,6 +5,8 @@
 import openmdao.api as om
 import numpy as np
 
+SPECIES_LIST = ["CO2", "CO", "NOx", "SOx", "HC", "H2O"]
+
 
 class PerformancesTurboGeneratorInFlightEmissionsSum(om.ExplicitComponent):
     """
@@ -28,110 +30,36 @@ class PerformancesTurboGeneratorInFlightEmissionsSum(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
         turbo_generator_id = self.options["turbo_generator_id"]
 
-        self.add_input("CO2_emissions", val=np.full(number_of_points, np.nan), units="g")
-        # For the LCA module we will adopt the following nomenclature:
-        # "LCA" + phase + component + pollutant
-        self.add_output(
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":CO2",
-            units="g",
-            val=3.1e5,
-        )
-        self.declare_partials(
-            of="data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":CO2",
-            wrt="CO2_emissions",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-            val=np.ones(number_of_points),
-        )
-
-        self.add_input("CO_emissions", val=np.full(number_of_points, np.nan), units="g")
-        self.add_output(
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":CO",
-            units="g",
-            val=0.8e4,
-        )
-        self.declare_partials(
-            of="data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":CO",
-            wrt="CO_emissions",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-            val=np.ones(number_of_points),
-        )
-
-        self.add_input("NOx_emissions", val=np.full(number_of_points, np.nan), units="g")
-        self.add_output(
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":NOx",
-            units="g",
-            val=3.1e2,
-        )
-        self.declare_partials(
-            of="data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":NOx",
-            wrt="NOx_emissions",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-            val=np.ones(number_of_points),
-        )
-
-        self.add_input("SOx_emissions", val=np.full(number_of_points, np.nan), units="g")
-        self.add_output(
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":SOx",
-            units="g",
-            val=0.4e2,
-        )
-        self.declare_partials(
-            of="data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":SOx",
-            wrt="SOx_emissions",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-            val=np.ones(number_of_points),
-        )
-
-        self.add_input("H2O_emissions", val=np.full(number_of_points, np.nan), units="g")
-        self.add_output(
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":H2O",
-            units="g",
-            val=1.2e5,
-        )
-        self.declare_partials(
-            of="data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":H2O",
-            wrt="H2O_emissions",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-            val=np.ones(number_of_points),
-        )
-
-        self.add_input("HC_emissions", val=np.full(number_of_points, np.nan), units="g")
-        self.add_output(
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":HC",
-            units="g",
-            val=1.8e3,
-        )
-        self.declare_partials(
-            of="data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":HC",
-            wrt="HC_emissions",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-            val=np.ones(number_of_points),
-        )
+        for specie in SPECIES_LIST:
+            self.add_input(specie + "_emissions", val=np.full(number_of_points, np.nan), units="g")
+            # For the LCA module we will adopt the following nomenclature:
+            # "LCA" + phase + component + pollutant
+            self.add_output(
+                "data:environmental_impact:operation:sizing:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":"
+                + specie,
+                units="g",
+                val=3.1e5,
+            )
+            self.declare_partials(
+                of="data:environmental_impact:operation:sizing:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":"
+                + specie,
+                wrt=specie + "_emissions",
+                rows=np.zeros(number_of_points),
+                cols=np.arange(number_of_points),
+                val=np.ones(number_of_points),
+            )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         turbo_generator_id = self.options["turbo_generator_id"]
 
-        outputs[
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":CO2"
-        ] = np.sum(inputs["CO2_emissions"])
-        outputs[
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":CO"
-        ] = np.sum(inputs["CO_emissions"])
-        outputs[
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":NOx"
-        ] = np.sum(inputs["NOx_emissions"])
-        outputs[
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":SOx"
-        ] = np.sum(inputs["SOx_emissions"])
-        outputs[
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":H2O"
-        ] = np.sum(inputs["H2O_emissions"])
-        outputs[
-            "data:LCA:operation:he_power_train:turbo_generator:" + turbo_generator_id + ":HC"
-        ] = np.sum(inputs["HC_emissions"])
+        for specie in SPECIES_LIST:
+            outputs[
+                "data:environmental_impact:operation:sizing:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":"
+                + specie
+            ] = np.sum(inputs[specie + "_emissions"])

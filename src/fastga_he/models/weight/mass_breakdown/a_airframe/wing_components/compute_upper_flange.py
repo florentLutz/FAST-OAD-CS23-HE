@@ -18,7 +18,7 @@ in her MAE research project report.
 import openmdao.api as om
 import numpy as np
 
-from scipy.integrate import trapz
+from scipy.integrate import trapezoid
 from scipy.interpolate import interp1d
 
 from fastga_he.models.load_analysis.wing.aerostructural_loads import AerostructuralLoadHE
@@ -390,7 +390,9 @@ class ComputeUpperFlange(om.ExplicitComponent):
                 )
 
         upper_flange_area = np.fmax(upper_flange_area_pos, upper_flange_area_neg)
-        upper_flange_mass = abs(2.0 * rho_m / np.cos(sweep_e)) * trapz(upper_flange_area, y_vector)
+        upper_flange_mass = abs(2.0 * rho_m / np.cos(sweep_e)) * trapezoid(
+            upper_flange_area, y_vector
+        )
 
         if len(inputs["data:weight:airframe:wing:punctual_mass:mass"]) > 4:
             upper_flange_mass *= 1.1

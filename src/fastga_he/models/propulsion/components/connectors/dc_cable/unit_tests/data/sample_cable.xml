@@ -66,5 +66,8 @@
                 </DC_cable_harness>
             </he_power_train>
         </propulsion>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
     </data>
 </FASTOAD_model>

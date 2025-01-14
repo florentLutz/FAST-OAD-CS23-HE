@@ -8,32 +8,7 @@ import numpy as np
 import fastoad.api as oad
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
-
-# noinspection PyUnresolvedReferences
-# pylint: disable=unused-import
-# flake8: noqa
-from fastga_he.models.propulsion.components import (
-    SlipstreamPropeller,
-    SlipstreamPMSM,
-    SlipstreamInverter,
-    SlipstreamDCBus,
-    SlipstreamHarness,
-    SlipstreamDCDCConverter,
-    SlipstreamBatteryPack,
-    SlipstreamDCSSPC,
-    SlipstreamDCSplitter,
-    SlipstreamRectifier,
-    SlipstreamGenerator,
-    SlipstreamICE,
-    SlipstreamFuelTank,
-    SlipstreamFuelSystem,
-    SlipstreamTurboshaft,
-    SlipstreamSpeedReducer,
-    SlipstreamPlanetaryGear,
-    SlipstreamTurboGenerator,
-    SlipstreamGearbox,
-    SlipstreamDCAuxLoad,
-)
+import fastga_he.models.propulsion.components as he_comp
 
 from .constants import (
     SUBMODEL_THRUST_DISTRIBUTOR,
@@ -133,8 +108,7 @@ class AerodynamicDeltasFromPTFile(om.Group):
             components_slipstream_promotes,
             components_slipstream_flap,
         ):
-            klass = globals()["Slipstream" + component_om_type]
-            local_sub_sys = klass()
+            local_sub_sys = he_comp.__dict__["Slipstream" + component_om_type]()
             local_sub_sys.options[component_name_id] = component_name
             local_sub_sys.options["number_of_points"] = number_of_points
             if component_slipstream_flap:

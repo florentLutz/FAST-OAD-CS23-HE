@@ -19,6 +19,8 @@ from ..components.sizing_tank_weight import SizingFuelTankWeight
 from ..components.sizing_tank_drag import SizingFuelTankDrag
 from ..components.sizing_tank_prep_for_loads import SizingFuelTankPreparationForLoads
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCAFuelTankProdWeightPerFU
+
 from ..components.cstr_enforce import ConstraintsFuelTankCapacityEnforce
 from ..components.cstr_ensure import ConstraintsFuelTankCapacityEnsure
 
@@ -435,5 +437,23 @@ def test_performances_fuel_tank():
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission", units="kg"
     ) == pytest.approx(279.62, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCAFuelTankProdWeightPerFU(fuel_tank_id="fuel_tank_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:mass_per_fu", units="kg"
+    ) == pytest.approx(1.4e-06, rel=1e-3)
 
     problem.check_partials(compact_print=True)

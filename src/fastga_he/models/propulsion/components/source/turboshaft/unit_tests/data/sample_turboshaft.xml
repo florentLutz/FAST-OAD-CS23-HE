@@ -1,5 +1,33 @@
 <FASTOAD_model>
     <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+            <flight_per_fu>1e-3</flight_per_fu>
+            <line_test>
+                <mission_ratio>7.5</mission_ratio>
+            </line_test>
+            <delivery>
+                <mission_ratio>5.0</mission_ratio>
+            </delivery>
+        </environmental_impact>
+        <environmental_impact>
+            <operation>
+                <sizing>
+                    <he_power_train>
+                        <turboshaft>
+                            <turboshaft_1>
+                                <CO units="g" is_input="False">4003.813258863339</CO>
+                                <CO2 units="g" is_input="False">2526406.166342767</CO2>
+                                <H2O units="g" is_input="False">990543.40024279</H2O>
+                                <HC units="g" is_input="False">400.38132588633385</HC>
+                                <NOx units="g" is_input="False">9128.694230208415</NOx>
+                                <SOx units="g" is_input="False">640.6101214181342</SOx>
+                            </turboshaft_1>
+                        </turboshaft>
+                    </he_power_train>
+                </sizing>
+            </operation>
+        </environmental_impact>
         <aerodynamics>
             <cruise>
                   <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
@@ -33,6 +61,7 @@
             <he_power_train>
                 <turboshaft>
                     <turboshaft_1>
+                        <mass units="kg">231.57096</mass>
                         <power_max units="kW">625.0</power_max>
                         <from_LE units="m">0.5</from_LE>
                         <power_rating units="kW">634.0</power_rating>

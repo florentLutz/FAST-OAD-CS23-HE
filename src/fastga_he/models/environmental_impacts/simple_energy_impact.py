@@ -2,10 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import openmdao.api as om
-import numpy as np
-
 import fastoad.api as oad
+import numpy as np
+import openmdao.api as om
 from fastoad.module_management.constants import ModelDomain
 
 CARBON_INTENSITY_JET_FUEL = 88.7  # in gCO2eq/MJ

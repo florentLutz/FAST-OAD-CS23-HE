@@ -54,13 +54,13 @@
       <he_power_train>
         <DC_DC_converter>
           <dc_dc_converter_1>
-            <current_in_caliber units="A" is_input="False">422.35686296431624<!--Current caliber of one arm of the DC/DC converter--></current_in_caliber>
-            <current_in_max units="A" is_input="False">402.2523812728167</current_in_max>
+            <current_in_caliber units="A" is_input="False">422.3568629643162<!--Current caliber of one arm of the DC/DC converter--></current_in_caliber>
+            <current_in_max units="A" is_input="False">402.2523812728165</current_in_max>
             <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
             <dissipable_heat units="W" is_input="False">3298.8009869581724<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
-            <losses_max units="W" is_input="False">3188.989394166168</losses_max>
+            <losses_max units="W" is_input="False">3188.9893941661658</losses_max>
             <mass units="kg" is_input="False">566.8716230051436<!--Mass of the converter--></mass>
-            <power_density units="kW/kg" is_input="False">0.4495267677941435<!--Power density of the DC/DC converter--></power_density>
+            <power_density units="kW/kg" is_input="False">0.4495267677941434<!--Power density of the DC/DC converter--></power_density>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT module in the converter--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
@@ -79,7 +79,7 @@
               <aspect_ratio units="A" is_input="True">2.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
               <capacity units="F" is_input="False">0.00037828546893660164<!--Capacity of the capacitor--></capacity>
               <current_caliber units="A" is_input="False">308.68094265226694<!--Current caliber of the DC/DC converter--></current_caliber>
-              <current_max units="A" is_input="False">301.32819727523287</current_max>
+              <current_max units="A" is_input="False">301.32819727523275</current_max>
               <diameter units="mm" is_input="False">91.12059597368145<!--Diameter of the capacitor--></diameter>
               <height units="mm" is_input="False">182.2411919473629<!--Diameter of the capacitor--></height>
               <mass units="kg" is_input="False">1.4643308474965226<!--Capacitor's mass--></mass>
@@ -95,7 +95,7 @@
               </scaling>
             </capacitor>
             <contactor>
-              <mass units="kg" is_input="False">1.5890759263941794<!--Mass of the contactor--></mass>
+              <mass units="kg" is_input="False">1.589075926394179<!--Mass of the contactor--></mass>
             </contactor>
             <control_card>
               <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
@@ -104,7 +104,7 @@
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <diode>
-              <current_max units="A" is_input="False">378.72267056267714</current_max>
+              <current_max units="A" is_input="False">378.722670562677</current_max>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="False">0.0016261554865747432</resistance>
             </diode>
@@ -150,7 +150,7 @@
               </tube>
             </heat_sink>
             <igbt>
-              <current_max units="A" is_input="False">497.4339267244033</current_max>
+              <current_max units="A" is_input="False">497.4339267244029</current_max>
               <resistance units="ohm" is_input="False">0.0013130988153624932</resistance>
             </igbt>
             <inductor>
@@ -158,7 +158,7 @@
               <copper_mass units="kg" is_input="False">9.253691206382047<!--Mass of the copper in the inductor--></copper_mass>
               <core_mass units="kg" is_input="False">276.50324278015455<!--Mass of the E-core in the inductor--></core_mass>
               <current_caliber units="A" is_input="False">644.7477910352578<!--Current caliber of the DC/DC converter--></current_caliber>
-              <current_max units="A" is_input="False">625.1970670553287</current_max>
+              <current_max units="A" is_input="False">625.1970670553283</current_max>
               <inductance units="H" is_input="False">0.0005493103994943337<!--Inductance of the inductor--></inductance>
               <iron_surface units="m**2" is_input="False">0.0501909290829655<!--Iron surface of the E-core inductor--></iron_surface>
               <magnetic_energy_rating units="J" is_input="False">114.1740879958269<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
@@ -186,7 +186,6 @@
               <height units="m" is_input="False">0.021<!--Height of one module--></height>
               <length units="m" is_input="False">0.1705237270985948<!--Length of one module--></length>
               <mass units="kg" is_input="False">0.3819912765285429<!--Weight of the diode and IGBT module--></mass>
-              <number is_input="True">1.0<!--Number of module to cool down, will depend on the component (3 for inverter/rectifiers, 1 for DC/DC)--></number>
               <width units="m" is_input="False">0.065<!--Width of one module--></width>
             </module>
             <scaling>
@@ -502,18 +501,18 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <SOC_min units="percent" is_input="False">19.48093720040768<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <c_rate_max units="1/h" is_input="False">0.7251185394639261<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
-            <c_rate_multiplier is_input="False">0.35021298753260055<!--Multiplier for the the number of module if the c-rate of the battery is the active constraint--></c_rate_multiplier>
-            <capacity_multiplier is_input="False">1.103960535722879<!--Multiplier for the the number of module if the capacity of the battery is the active constraint--></capacity_multiplier>
+            <SOC_min units="percent" is_input="False">19.480937200407652<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <c_rate_max units="1/h" is_input="False">0.7251185394639255<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
+            <c_rate_multiplier is_input="False">0.35021298753260044<!--Multiplier for the the number of module if the c-rate of the battery is the active constraint--></c_rate_multiplier>
+            <capacity_multiplier is_input="False">1.1039605357228794<!--Multiplier for the the number of module if the capacity of the battery is the active constraint--></capacity_multiplier>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <mass units="kg" is_input="False">2483.911205376478<!--Mass of the battery pack--></mass>
+            <mass units="kg" is_input="False">2483.911205376479<!--Mass of the battery pack--></mass>
             <min_safe_SOC is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_cells is_input="False">24839.112053764777<!--Total number of cells in the battery pack--></number_cells>
-            <number_modules is_input="False">165.59408035843185<!--Number of modules in parallel inside the battery pack--></number_modules>
-            <volume units="L" is_input="False">547.3919318848413<!--Volume of the battery pack--></volume>
+            <number_cells is_input="False">24839.112053764788<!--Total number of cells in the battery pack--></number_cells>
+            <number_modules is_input="False">165.5940803584319<!--Number of modules in parallel inside the battery pack--></number_modules>
+            <volume units="L" is_input="False">547.3919318848414<!--Volume of the battery pack--></volume>
             <CG>
               <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
               <y units="m" is_input="False">1.5703687750797755<!--Y position of the battery center of gravity--></y>
@@ -522,17 +521,17 @@
             <cell>
               <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">0.3543031669311834<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <losses_max units="W" is_input="False">0.35430316693118263<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
               <voltage_max units="V" is_input="False">4.031658153996202<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">3.2847284195245257<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <voltage_min units="V" is_input="False">3.284728419524526<!--Minimum voltage provided by the cells during the mission--></voltage_min>
               <volume units="L" is_input="False">0.01763<!--Volume of the cell used for the assembly of the battery pack--></volume>
             </cell>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <dimension>
-              <height units="m" is_input="False">0.2896347634352171<!--Height of the battery, as in the size of the battery along the Z-axis--></height>
+              <height units="m" is_input="False">0.28963476343521716<!--Height of the battery, as in the size of the battery along the Z-axis--></height>
               <length units="m" is_input="False">0.5114874519835109<!--Length of the battery, as in the size of the battery along the X-axis--></length>
               <width units="m" is_input="False">3.6949853531288834<!--Width of the battery, as in the size of the battery along the Y-axis--></width>
             </dimension>
@@ -692,7 +691,6 @@
             <module>
               <height units="m" is_input="False">0.021<!--Height of one module--></height>
               <length units="m" is_input="False">0.20920450859555523<!--Length of one module--></length>
-              <number is_input="True">3.0<!--Number of module to cool down, will depend on the component (3 for inverter/rectifiers, 1 for DC/DC)--></number>
               <width units="m" is_input="False">0.065<!--Width of one module--></width>
             </module>
             <scaling>
@@ -755,6 +753,22 @@
         </propeller>
       </he_power_train>
     </propulsion>
+    <LCA>
+      <operation>
+        <he_power_train>
+          <battery_pack>
+            <battery_pack_1>
+              <CO units="g" is_input="False">0.0</CO>
+              <CO2 units="g" is_input="False">0.0</CO2>
+              <H2O units="g" is_input="False">0.0</H2O>
+              <HC units="g" is_input="False">0.0</HC>
+              <NOx units="g" is_input="False">0.0</NOx>
+              <SOx units="g" is_input="False">0.0</SOx>
+            </battery_pack_1>
+          </battery_pack>
+        </he_power_train>
+      </operation>
+    </LCA>
   </data>
   <constraints>
     <propulsion>

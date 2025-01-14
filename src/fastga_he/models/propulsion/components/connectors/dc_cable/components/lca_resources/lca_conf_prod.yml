@@ -1,0 +1,7 @@
+ANCHOR_COMPONENT_NAME:
+    custom_attributes:
+        - attribute: "component"
+          value: ANCHOR_COMPONENT_NAME
+
+    name: 'cable production, three-conductor cable'
+    amount: ANCHOR_COMPONENT_LENGTH

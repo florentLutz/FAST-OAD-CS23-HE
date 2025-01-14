@@ -1,0 +1,8 @@
+ANCHOR_COMPONENT_NAME:
+    custom_attributes:
+        - attribute: "component"
+          value: ANCHOR_COMPONENT_NAME
+
+    name: 'silicon carbide production'
+    loc: 'RoW'
+    amount: ANCHOR_COMPONENT_MASS

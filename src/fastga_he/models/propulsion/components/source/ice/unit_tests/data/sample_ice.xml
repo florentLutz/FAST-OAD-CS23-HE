@@ -1,5 +1,15 @@
 <FASTOAD_model>
     <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+            <flight_per_fu>1e-3</flight_per_fu>
+            <line_test>
+                <mission_ratio>7.5</mission_ratio>
+            </line_test>
+            <delivery>
+                <mission_ratio>4.0</mission_ratio>
+            </delivery>
+        </environmental_impact>
         <aerodynamics>
             <cruise>
                   <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
@@ -31,10 +41,30 @@
                 </MAC>
             </wing>
         </geometry>
+        <environmental_impact>
+            <operation>
+                <sizing>
+                    <he_power_train>
+                        <ICE>
+                            <ice_1>
+                                <CO units="g" is_input="False">186307.80232367662</CO>
+                                <CO2 units="g" is_input="False">723752.1142899718</CO2>
+                                <H2O units="g" is_input="False">288800.4404440951</H2O>
+                                <HC units="g" is_input="False">4404.848754938354</HC>
+                                <NOx units="g" is_input="False">733.0908512485522</NOx>
+                                <SOx units="g" is_input="False">98.05673806509293</SOx>
+                                <lead units="g" is_input="False">57.27916</lead>
+                            </ice_1>
+                        </ICE>
+                    </he_power_train>
+                </sizing>
+            </operation>
+        </environmental_impact>
         <propulsion>
             <he_power_train>
                 <ICE>
                     <ice_1>
+                        <mass units="kg">361.218</mass>
                         <from_LE units="m">0.5</from_LE>
                         <power_rating_SL units="kW">250.0</power_rating_SL>
                         <power_max_SL units="kW">245.0</power_max_SL>

@@ -8,3 +8,4 @@
 from .components.sizing_speed_reducer import SizingSpeedReducer
 from .components.perf_speed_reducer import PerformancesSpeedReducer
 from .components.slipstream_speed_reducer import SlipstreamSpeedReducer
+from .components.pre_lca_speed_reducer import PreLCASpeedReducer

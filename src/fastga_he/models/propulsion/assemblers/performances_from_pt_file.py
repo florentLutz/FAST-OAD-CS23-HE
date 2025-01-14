@@ -12,31 +12,7 @@ from fastga_he.models.propulsion.assemblers.energy_consumption_from_pt_file impo
     EnergyConsumptionFromPTFile,
 )
 
-# noinspection PyUnresolvedReferences
-# pylint: disable=unused-import
-# flake8: noqa
-from fastga_he.models.propulsion.components import (
-    PerformancesPropeller,
-    PerformancesPMSM,
-    PerformancesInverter,
-    PerformancesDCBus,
-    PerformancesHarness,
-    PerformancesDCDCConverter,
-    PerformancesBatteryPack,
-    PerformancesDCSSPC,
-    PerformancesDCSplitter,
-    PerformancesRectifier,
-    PerformancesGenerator,
-    PerformancesICE,
-    PerformancesFuelTank,
-    PerformancesFuelSystem,
-    PerformancesTurboshaft,
-    PerformancesSpeedReducer,
-    PerformancesPlanetaryGear,
-    PerformancesTurboGenerator,
-    PerformancesGearbox,
-    PerformancesDCAuxLoad,
-)
+import fastga_he.models.propulsion.components as he_comp
 
 from .constants import SUBMODEL_POWER_TRAIN_PERF, SUBMODEL_THRUST_DISTRIBUTOR
 
@@ -164,8 +140,7 @@ class PowerTrainPerformancesFromFile(om.Group):
             components_options,
             components_promotes,
         ):
-            klass = globals()["Performances" + component_om_type]
-            local_sub_sys = klass()
+            local_sub_sys = he_comp.__dict__["Performances" + component_om_type]()
             local_sub_sys.options[component_name_id] = component_name
             local_sub_sys.options["number_of_points"] = number_of_points
 
@@ -231,7 +206,7 @@ class PowerTrainPerformancesFromFile(om.Group):
         # level
         # TODO: Think about that
 
-        # This one will be passe in before going into the first pt components
+        # This one will be passed in before going into the first pt components
         number_of_points = self.options["number_of_points"]
 
         # Let's first check the coherence of the voltage

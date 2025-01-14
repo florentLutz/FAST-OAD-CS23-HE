@@ -8,3 +8,4 @@
 from .components.sizing_planetary_gear import SizingPlanetaryGear
 from .components.perf_planetary_gear import PerformancesPlanetaryGear
 from .components.slipstream_planetary_gear import SlipstreamPlanetaryGear
+from .components.pre_lca_planetary_gear import PreLCAPlanetaryGear

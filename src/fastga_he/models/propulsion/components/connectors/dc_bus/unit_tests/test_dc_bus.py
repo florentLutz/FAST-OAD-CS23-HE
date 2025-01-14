@@ -18,6 +18,8 @@ from ..components.sizing_dc_bus_cg_x import SizingDCBusCGX
 from ..components.sizing_dc_bus_cg_y import SizingDCBusCGY
 from ..components.sizing_dc_bus import SizingDCBus
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCADCBusProdWeightPerFU
+
 from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
 from ..components.cstr_ensure import ConstraintsCurrentEnsure, ConstraintsVoltageEnsure
 
@@ -321,5 +323,23 @@ def test_constraints_voltage_ensure():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:DC_bus:dc_bus_1:voltage_caliber", units="V"
     ) == pytest.approx(-88.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:DC_bus:dc_bus_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCADCBusProdWeightPerFU(dc_bus_id="dc_bus_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_bus:dc_bus_1:mass_per_fu", units="kg"
+    ) == pytest.approx(1.12e-6, rel=1e-3)
 
     problem.check_partials(compact_print=True)

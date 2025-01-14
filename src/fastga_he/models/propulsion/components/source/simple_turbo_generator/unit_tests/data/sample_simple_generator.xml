@@ -1,5 +1,11 @@
 <FASTOAD_model>
     <data>
+        <TLAR>
+            <aircraft_lifespan units="year">25.0</aircraft_lifespan>
+        </TLAR>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
         <geometry>
             <cabin>
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
@@ -23,6 +29,7 @@
             <he_power_train>
                 <turbo_generator>
                     <turbo_generator_1>
+                        <mass units="kg">160.0</mass>
                         <shaft_power_max units="W">750e3</shaft_power_max>
                         <power_rating units="kW">800</power_rating>
                         <power_factor>0.95</power_factor>

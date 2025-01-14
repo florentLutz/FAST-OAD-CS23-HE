@@ -1,5 +1,8 @@
 <FASTOAD_model>
     <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
         <geometry>
             <cabin>
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
@@ -23,6 +26,7 @@
             <he_power_train>
                 <gearbox>
                     <gearbox_1>
+                        <mass units="kg">32.86</mass>
                         <tech_level_constant>34.23</tech_level_constant>
                         <torque_out_max units="N*m">1900.0</torque_out_max>
                         <torque_out_rating units="N*m">2000.0</torque_out_rating>

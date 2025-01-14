@@ -899,3 +899,31 @@ def test_propulsor_connection():
     # They should all be connected
     assert not all(are_propulsor_connected.values())
     assert not are_propulsor_connected["propeller_1"]
+
+
+def test_tank_fuel_detection():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "turboshaft_propulsion.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    tank_name, _, tank_content = power_train_configurator.get_fuel_tank_list_and_fuel()
+
+    assert tank_name == ["fuel_tank_1", "fuel_tank_2"]
+    assert tank_content == ["jet_fuel", "jet_fuel"]
+
+
+def test_battery_detection():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_battery_symmetrical.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    battery_name, battery_type = power_train_configurator.get_battery_list()
+
+    assert battery_name == ["battery_pack_1", "battery_pack_2"]
+    assert battery_type == ["battery_pack", "battery_pack"]

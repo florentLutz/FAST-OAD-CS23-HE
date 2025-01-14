@@ -22,6 +22,8 @@ from ..components.sizing_dimension import SizingGearboxDimensions
 from ..components.sizing_cg_x import SizingGearboxCGX
 from ..components.sizing_cg_y import SizingGearboxCGY
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCAGearboxProdWeightPerFU
+
 from ..components.perf_gearbox import PerformancesGearbox
 from ..components.sizing_gearbox import SizingGearbox
 
@@ -347,5 +349,23 @@ def test_gearbox_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:gearbox:gearbox_1:cruise:CD0",
     ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:gearbox:gearbox_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCAGearboxProdWeightPerFU(gearbox_id="gearbox_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gearbox:gearbox_1:mass_per_fu", units="kg"
+    ) == pytest.approx(3.286e-05, rel=1e-3)
 
     problem.check_partials(compact_print=True)

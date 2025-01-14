@@ -11,6 +11,8 @@ from ..components.sizing_weight import SizingTurboGeneratorWeight
 from ..components.sizing_turbo_generator_cg_x import SizingTurboGeneratorCGX
 from ..components.sizing_turbo_generator_cg_y import SizingTurboGeneratorCGY
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCATurboGeneratorProdWeightPerFU
+
 from ..components.sizing_turbo_generator import SizingTurboGenerator
 
 from ..components.cstr_enforce import ConstraintsPowerEnforce
@@ -388,5 +390,26 @@ def test_maximum():
         "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:shaft_power_max",
         units="W",
     ) == pytest.approx(633.33e3, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+        "data:TLAR:aircraft_lifespan",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PreLCATurboGeneratorProdWeightPerFU(turbo_generator_id="turbo_generator_1"), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.00032, rel=1e-3)
 
     problem.check_partials(compact_print=True)

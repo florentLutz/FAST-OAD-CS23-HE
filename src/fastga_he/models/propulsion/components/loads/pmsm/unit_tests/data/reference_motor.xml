@@ -1,5 +1,11 @@
 <FASTOAD_model>
     <data>
+        <TLAR>
+            <aircraft_lifespan units="year">25.0</aircraft_lifespan>
+        </TLAR>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
         <aerodynamics>
             <cruise>
                   <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
@@ -29,6 +35,7 @@
             <he_power_train>
                 <PMSM>
                     <motor_1>
+                        <mass units="kg">16.19</mass>
                         <from_LE units="m">0.15</from_LE>
                         <length units="m">0.088</length>
                         <diameter units="m">0.268</diameter>

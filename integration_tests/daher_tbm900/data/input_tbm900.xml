@@ -141,6 +141,10 @@
       </propulsion>
     </geometry>
     <propulsion>
+      <IC_engine>
+        <max_power units="W" is_input="True">634000.0</max_power>
+        <strokes_nb>4.0</strokes_nb>
+      </IC_engine>
       <fuel_type is_input="True">3.0<!--1=Avgas ICE engine / 2=Diesel ICE engine / 3=Jet A1--></fuel_type>
       <max_rpm units="min**-1" is_input="True">2000.0<!--maximum number of rotation per minute on the engine--></max_rpm>
       <he_power_train>

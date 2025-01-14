@@ -8,3 +8,4 @@
 from .components.sizing_fuel_system import SizingFuelSystem
 from .components.perf_fuel_system import PerformancesFuelSystem
 from .components.slipstream_fuel_system import SlipstreamFuelSystem
+from .components.pre_lca_fuel_system import PreLCAFuelSystem

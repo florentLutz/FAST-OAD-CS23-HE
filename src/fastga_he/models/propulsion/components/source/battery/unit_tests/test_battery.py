@@ -39,8 +39,11 @@ from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
 from ..components.perf_battery_power import PerformancesBatteryPower
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
+from ..components.perf_battery_energy_consumed import PerformancesEnergyConsumed
 from ..components.cstr_ensure import ConstraintsSOCEnsure
 from ..components.cstr_enforce import ConstraintsSOCEnforce
+from ..components.pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
+from ..components.pre_lca_use_emission_per_fu import PreLCABatteryUseEmissionPerFU
 
 from ..components.sizing_battery_pack import SizingBatteryPack
 from ..components.perf_battery_pack import PerformancesBatteryPack
@@ -1004,6 +1007,30 @@ def test_energy_consumption():
     problem.check_partials(compact_print=True)
 
 
+def test_energy_consumed():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "non_consumable_energy_t",
+        units="kW*h",
+        val=np.array(
+            [44.556, 43.788, 43.015, 42.574, 42.13, 41.682, 41.457, 41.118, 40.889, 40.658]
+        ),
+    )
+
+    problem = run_system(
+        PerformancesEnergyConsumed(
+            number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"
+        ),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
+        units="kW*h",
+    ) == pytest.approx(421.867, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_performances_battery_pack():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -1041,5 +1068,110 @@ def test_performances_battery_pack():
     )
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+        "data:TLAR:aircraft_lifespan",
+        "data:TLAR:flight_per_year",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryProdWeightPerFU(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.033, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_emissions_per_fu():
+    inputs_list = [
+        "data:environmental_impact:operation:sizing:he_power_train:battery_pack:battery_pack_1:CO2",
+        "data:environmental_impact:operation:sizing:he_power_train:battery_pack:battery_pack_1:CO",
+        "data:environmental_impact:operation:sizing:he_power_train:battery_pack:battery_pack_1:NOx",
+        "data:environmental_impact:operation:sizing:he_power_train:battery_pack:battery_pack_1:SOx",
+        "data:environmental_impact:operation:sizing:he_power_train:battery_pack:battery_pack_1:HC",
+        "data:environmental_impact:operation:sizing:he_power_train:battery_pack:battery_pack_1:H2O",
+        "data:environmental_impact:flight_per_fu",
+        "data:environmental_impact:aircraft_per_fu",
+        "data:environmental_impact:line_test:mission_ratio",
+        "data:environmental_impact:delivery:mission_ratio",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryUseEmissionPerFU(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:CO2_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:CO_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:NOx_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:SOx_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:H2O_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:HC_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:battery_pack:battery_pack_1:CO2_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:battery_pack:battery_pack_1:CO_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:battery_pack:battery_pack_1:NOx_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:battery_pack:battery_pack_1:SOx_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:battery_pack:battery_pack_1:H2O_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:battery_pack:battery_pack_1:HC_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:CO2_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:CO_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:NOx_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:SOx_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:H2O_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:HC_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)

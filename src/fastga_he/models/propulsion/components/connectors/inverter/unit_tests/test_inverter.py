@@ -48,6 +48,7 @@ from ..components.perf_efficiency_fixed import PerformancesEfficiencyMission
 from ..components.perf_dc_current import PerformancesDCCurrent
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_inverter import PerformancesInverter
+from ..components.pre_lca_prod_weight_per_fu import PreLCAInverterProdWeightPerFU
 
 from ..components.cstr_enforce import (
     ConstraintsCurrentEnforce,
@@ -1447,5 +1448,24 @@ def test_performances_inverter_tot():
     assert problem.get_val("dc_current_in", units="A") == pytest.approx(
         expected_dc_current_in, rel=1e-2
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:inverter:inverter_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+        "data:TLAR:aircraft_lifespan",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCAInverterProdWeightPerFU(inverter_id="inverter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:mass_per_fu", units="kg"
+    ) == pytest.approx(8.564e-05, rel=1e-3)
 
     problem.check_partials(compact_print=True)

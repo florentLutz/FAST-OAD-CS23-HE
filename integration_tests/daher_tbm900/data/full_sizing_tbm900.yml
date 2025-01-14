@@ -17,18 +17,18 @@ model:
         linear_solver: om.DirectSolver()
         geometry:
             id: fastga.geometry.legacy
-            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
+            propulsion_id: fastga.wrapper.propulsion.basicIC_engine
             cabin_sizing: 0.0
         aerodynamics_lowspeed:
             id: fastga.aerodynamics.lowspeed.legacy
-            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
+            propulsion_id: fastga.wrapper.propulsion.basicIC_engine
             wing_airfoil: naca63_415.af
             result_folder_path: D:/tmp
             use_openvsp: true
             compute_slipstream: true
         aerodynamics_highspeed:
             id: fastga.aerodynamics.highspeed.legacy
-            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
+            propulsion_id: fastga.wrapper.propulsion.basicIC_engine
             wing_airfoil: naca63_415.af
             result_folder_path: D:/tmp
             compute_mach_interpolation: false
@@ -39,7 +39,7 @@ model:
             power_train_file_path: ./turboshaft_propulsion.yml
         weight:
             id: fastga.weight.legacy
-            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
+            propulsion_id: fastga.wrapper.propulsion.basicIC_engine
         performances:
             id: fastga_he.performances.mission_vector
             number_of_points_climb: 30
@@ -56,7 +56,7 @@ model:
         hq:
             tail_sizing:
                 id: fastga.handling_qualities.tail_sizing
-                propulsion_id: fastga.wrapper.propulsion.basicTurboprop
+                propulsion_id: fastga.wrapper.propulsion.basicIC_engine
             static_margin:
                 id: fastga.handling_qualities.static_margin
         wing_position:

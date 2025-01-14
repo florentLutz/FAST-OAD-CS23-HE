@@ -17,7 +17,7 @@ Computes the aerostructural loads on the wing of the aircraft.
 
 import numpy as np
 import openmdao.api as om
-from scipy.integrate import trapz
+from scipy.integrate import trapezoid
 from scipy.interpolate import interp1d
 
 from stdatm import Atmosphere
@@ -416,7 +416,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         # Each station of the shear diagram is equal to the integral of the forces on all
         # subsequent station
         for i, _ in enumerate(y_vector):
-            shear_force_diagram[i] = trapz(force_array[i:], y_vector[i:])
+            shear_force_diagram[i] = trapezoid(force_array[i:], y_vector[i:])
 
         return shear_force_diagram
 
@@ -440,7 +440,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         # subsequent stations
         for i, _ in enumerate(y_vector):
             lever_arm = y_vector - y_vector[i]
-            bending_moment_diagram[i] = trapz(force_array[i:] * lever_arm[i:], y_vector[i:])
+            bending_moment_diagram[i] = trapezoid(force_array[i:] * lever_arm[i:], y_vector[i:])
 
         return bending_moment_diagram
 
@@ -586,7 +586,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         else:
             struct_weight_distribution = chord_vector / max(chord_vector)
 
-        readjust_struct = trapz(struct_weight_distribution, y_vector)
+        readjust_struct = trapezoid(struct_weight_distribution, y_vector)
 
         # Here starts the part where we add all the distributed mass from the powertrain (mainly
         # batteries)
@@ -789,7 +789,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         for idx in where_add_mass_index:
             fake_point_mass_array[idx] = 1.0
 
-        readjust = trapz(fake_point_mass_array, y_vector)
+        readjust = trapezoid(fake_point_mass_array, y_vector)
 
         for idx in where_add_mass_index:
             point_mass_array[idx] += point_mass / readjust
@@ -827,7 +827,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
 
         chord_array[y_in_index] = chord_in_array
 
-        prop_coeff = mass / trapz(chord_array, y_array_orig)
+        prop_coeff = mass / trapezoid(chord_array, y_array_orig)
 
         linear_mass_array = prop_coeff * chord_array
 
@@ -860,7 +860,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
 
         chord_array[y_in_index] = chord_in_array
 
-        prop_coeff = fuel_mass / trapz(chord_array, y_array_orig)
+        prop_coeff = fuel_mass / trapezoid(chord_array, y_array_orig)
 
         linear_mass_array = prop_coeff * chord_array
 

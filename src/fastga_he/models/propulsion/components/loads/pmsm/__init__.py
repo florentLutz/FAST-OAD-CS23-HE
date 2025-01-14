@@ -8,3 +8,4 @@
 from .components.sizing_pmsm import SizingPMSM
 from .components.perf_pmsm import PerformancesPMSM
 from .components.slipstream_pmsm import SlipstreamPMSM
+from .components.pre_lca_pmsm import PreLCAPMSM

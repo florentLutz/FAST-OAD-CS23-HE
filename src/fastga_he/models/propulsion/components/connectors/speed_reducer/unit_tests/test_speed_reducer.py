@@ -22,6 +22,8 @@ from ..components.sizing_dimension import SizingSpeedReducerDimensions
 from ..components.sizing_cg_x import SizingSpeedReducerCGX
 from ..components.sizing_cg_y import SizingSpeedReducerCGY
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCASpeedReducerProdWeightPerFU
+
 from ..components.perf_speed_reducer import PerformancesSpeedReducer
 from ..components.sizing_speed_reducer import SizingSpeedReducer
 
@@ -349,5 +351,23 @@ def test_speed_reducer_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:cruise:CD0",
     ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCASpeedReducerProdWeightPerFU(speed_reducer_id="speed_reducer_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:mass_per_fu", units="kg"
+    ) == pytest.approx(3.11e-06, rel=1e-3)
 
     problem.check_partials(compact_print=True)

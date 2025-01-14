@@ -33,6 +33,8 @@ from ..components.sizing_weight import SizingGeneratorWeight
 from ..components.sizing_generator_cg_x import SizingGeneratorCGX
 from ..components.sizing_generator_cg_y import SizingGeneratorCGY
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCAGeneratorProdWeightPerFU
+
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_current_rms_3_phases import PerformancesCurrentRMS3Phases
@@ -676,5 +678,24 @@ def test_constraint_power_for_power_rate():
     assert problem.get_val(
         "data:propulsion:he_power_train:generator:generator_1:shaft_power_rating", units="kW"
     ) == pytest.approx(91.1, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:generator:generator_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+        "data:TLAR:aircraft_lifespan",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCAGeneratorProdWeightPerFU(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:mass_per_fu", units="kg"
+    ) == pytest.approx(6.1752e-05, rel=1e-3)
 
     problem.check_partials(compact_print=True)

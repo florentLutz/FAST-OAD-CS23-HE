@@ -1,5 +1,37 @@
 <FASTOAD_model>
     <data>
+        <environmental_impact>
+          <operation>
+              <sizing>
+                <he_power_train>
+                  <battery_pack>
+                    <battery_pack_1>
+                      <CO units="g" is_input="False">0.0</CO>
+                      <CO2 units="g" is_input="False">0.0</CO2>
+                      <H2O units="g" is_input="False">0.0</H2O>
+                      <HC units="g" is_input="False">0.0</HC>
+                      <NOx units="g" is_input="False">0.0</NOx>
+                      <SOx units="g" is_input="False">0.0</SOx>
+                    </battery_pack_1>
+                  </battery_pack>
+                </he_power_train>
+              </sizing>
+          </operation>
+        </environmental_impact>
+        <TLAR>
+            <aircraft_lifespan is_input="year">15.0<!--maximum speed at sea level--></aircraft_lifespan>
+            <flight_per_year>365.0<!--maximum speed at sea level--></flight_per_year>
+        </TLAR>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+            <flight_per_fu>1e-3</flight_per_fu>
+            <line_test>
+                <mission_ratio>7.5</mission_ratio>
+            </line_test>
+            <delivery>
+                <mission_ratio>50.</mission_ratio>
+            </delivery>
+        </environmental_impact>
         <aerodynamics>
           <cruise>
               <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
@@ -61,6 +93,7 @@
                         <number_modules>200.0</number_modules>
                         <number_cells>8000.0</number_cells>
                         <volume units="L">1550.0</volume>
+                        <mass units="kg">3000.0</mass>
                         <module>
                             <number_cells>150.0</number_cells>
                             <mass units="kg">15.0</mass>

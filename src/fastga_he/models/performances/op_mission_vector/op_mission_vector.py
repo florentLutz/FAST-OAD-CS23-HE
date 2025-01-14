@@ -20,6 +20,7 @@ from fastga_he.models.performances.mission_vector.mission.mission_core import Mi
 from fastga_he.models.performances.mission_vector.to_csv import ToCSV
 from fastga_he.models.weight.cg.op_cg_variation import OperationalInFlightCGVariation
 from fastga_he.models.performances.op_mission_vector.update_tow import UpdateTOW
+from fastga_he.models.performances.op_mission_vector.emissions_renamer import EmissionsRenamer
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from fastga_he.models.propulsion.assemblers.performances_watcher import (
@@ -361,6 +362,10 @@ class OperationalMissionVector(om.Group):
                     "data:mission:sizing:taxi_out:speed",
                     "data:mission:operational:taxi_out:speed",
                 ),
+                (
+                    "data:mission:sizing:main_route:reserve:duration",
+                    "data:mission:operational:reserve:duration",
+                ),
                 "data:propulsion:*",
                 ("data:weight:aircraft:MTOW", "data:mission:operational:TOW"),
                 "settings:propulsion:*",
@@ -368,6 +373,7 @@ class OperationalMissionVector(om.Group):
             ],
             promotes_outputs=[
                 "data:propulsion:*",
+                "data:environmental_impact:*",
                 (
                     "data:mission:sizing:energy",
                     "data:mission:operational:energy",
@@ -456,6 +462,10 @@ class OperationalMissionVector(om.Group):
                     "data:mission:sizing:taxi_out:thrust",
                     "data:mission:operational:taxi_out:thrust",
                 ),
+                (
+                    "data:mission:sizing:duration",
+                    "data:mission:operational:duration",
+                ),
             ],
         )
         self.add_subsystem(
@@ -472,6 +482,7 @@ class OperationalMissionVector(om.Group):
             ],
         )
         self.add_subsystem("update_tow", UpdateTOW(), promotes=["*"])
+        self.add_subsystem("emission_renamer", EmissionsRenamer(), promotes=["*"])
 
         self.connect(
             "initialization.initialize_engine_setting.engine_setting",
@@ -1554,6 +1565,27 @@ class OperationalMissionVector(om.Group):
             return bool(oad.RegisterSubmodel.active_models[service_id])
         except KeyError:
             return True
+
+    def configure(self):
+        # TODO: find a better way to do what I'm about to because it's not pretty
+        mission_core_outputs_list = self.solve_equilibrium.list_outputs(
+            return_format="dict",
+            out_stream=None,
+        ).keys()
+        renaming = {}
+        for input_renamer in mission_core_outputs_list:
+            if "data:environmental_impact:operation:sizing:" in input_renamer:
+                input_to_rename = input_renamer.split(".")[-1]
+                output_renamer = input_to_rename.replace(":sizing:", ":operational:")
+                renaming[input_to_rename] = output_renamer
+
+                self.emission_renamer.add_input(input_to_rename, val=np.nan, units="kg")
+                self.emission_renamer.add_output(output_renamer, val=0.0, units="kg")
+                self.emission_renamer.declare_partials(
+                    of=output_renamer, wrt=input_to_rename, val=1.0
+                )
+
+        self.emission_renamer.renamer_dict = renaming
 
 
 def get_propulsive_power(

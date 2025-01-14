@@ -1,5 +1,8 @@
 <FASTOAD_model>
     <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
         <geometry>
             <cabin>
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
@@ -23,6 +26,7 @@
             <he_power_train>
                 <DC_SSPC>
                     <dc_sspc_1>
+                        <mass units="kg">8.0</mass>
                         <efficiency>0.98</efficiency>
                         <current_caliber units="A">400.0</current_caliber>
                         <current_max units="A">400.0</current_max>

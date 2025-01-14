@@ -1,0 +1,7 @@
+ANCHOR_COMPONENT_NAME:
+    custom_attributes:
+        - attribute: "component"
+          value: ANCHOR_COMPONENT_NAME
+
+    name: 'inverter production, for electric passenger car' # For lack of a better proxy, i'll use that
+    amount: ANCHOR_COMPONENT_MASS

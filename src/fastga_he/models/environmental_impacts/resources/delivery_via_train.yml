@@ -1,0 +1,4 @@
+transport_via_train:
+    name: 'market group for transport, freight train'
+    loc: 'RER'
+    amount: data__environmental_impact__delivery__cargo_transport_per_fu

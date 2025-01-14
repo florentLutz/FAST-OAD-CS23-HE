@@ -1,5 +1,11 @@
 <FASTOAD_model>
     <data>
+        <TLAR>
+            <aircraft_lifespan>25.0</aircraft_lifespan>
+        </TLAR>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
         <geometry>
             <cabin>
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>

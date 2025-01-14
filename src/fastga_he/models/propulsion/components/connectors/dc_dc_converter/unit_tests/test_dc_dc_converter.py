@@ -54,6 +54,8 @@ from ..components.cstr_ensure import (
     ConstraintsFrequencyEnsure,
 )
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCADCDCConverterProdWeightPerFU
+
 from ..components.sizing_dc_dc_converter import SizingDCDCConverter
 
 from .....sub_components import SizingInductor, SizingCapacitor, SizingHeatSink
@@ -1309,5 +1311,26 @@ def test_maximum():
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency_max",
         units="Hz",
     ) == pytest.approx(12000, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    inputs_list = [
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+        "data:TLAR:aircraft_lifespan",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PreLCADCDCConverterProdWeightPerFU(dc_dc_converter_id="dc_dc_converter_1"), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.000172, rel=1e-3)
 
     problem.check_partials(compact_print=True)

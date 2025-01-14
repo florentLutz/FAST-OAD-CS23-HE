@@ -70,15 +70,15 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <SOC_min units="percent" is_input="False">57.00128698808381<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <SOC_min units="percent" is_input="False">57.00128698808379<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">0.368994771333964<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <number_modules is_input="True">200.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">0.07338333836542757<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <losses_max units="W" is_input="False">0.07338333836542768<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <voltage_max units="V" is_input="False">4.069982756275987<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">3.687730696975752<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <voltage_min units="V" is_input="False">3.6877306969757515<!--Minimum voltage provided by the cells during the mission--></voltage_min>
             </cell>
             <module>
               <number_cells is_input="True">220.0<!--Number of cells in series inside one battery module--></number_cells>
@@ -91,7 +91,7 @@
             <current_dc_max units="A" is_input="False">247.2264967937559<!--Maximum value of the current at the input of the inverter--></current_dc_max>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <losses_max units="W" is_input="False">5045.777265651243</losses_max>
-            <modulation_idx_max is_input="False">0.5257745373896903<!--Maximum modulation index during the mission--></modulation_idx_max>
+            <modulation_idx_max is_input="False">0.5257745373896904<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -155,5 +155,21 @@
         </propeller>
       </he_power_train>
     </propulsion>
+    <LCA>
+      <operation>
+        <he_power_train>
+          <battery_pack>
+            <battery_pack_1>
+              <CO units="g" is_input="False">0.0</CO>
+              <CO2 units="g" is_input="False">0.0</CO2>
+              <H2O units="g" is_input="False">0.0</H2O>
+              <HC units="g" is_input="False">0.0</HC>
+              <NOx units="g" is_input="False">0.0</NOx>
+              <SOx units="g" is_input="False">0.0</SOx>
+            </battery_pack_1>
+          </battery_pack>
+        </he_power_train>
+      </operation>
+    </LCA>
   </data>
 </FASTOAD_model>

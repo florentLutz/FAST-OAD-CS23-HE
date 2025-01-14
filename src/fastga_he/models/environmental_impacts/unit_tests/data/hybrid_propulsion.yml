@@ -1,0 +1,87 @@
+title: Powertrain file for the sizing of the hybridized Kodiak 100
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: in_the_nose  # "on_the_wing", "in_the_nose"
+
+  planetary_gear_1:
+    id: fastga_he.pt_component.planetary_gear
+    position: in_the_front
+    options:
+      gear_mode: power_share
+
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+    position: in_the_nose  # "on_the_wing", "in_the_nose"
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
+  battery_pack_1:
+    id: fastga_he.pt_component.battery_pack
+    position: underbelly  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
+
+  gearbox_1:
+    id: fastga_he.pt_component.speed_reducer
+    position: in_the_front  # "inside_the_wing", "in_the_back"
+  turboshaft_1:
+    id: fastga_he.pt_component.turboshaft
+    position: in_the_front  # "on_the_wing", "in_the_front", "in_the_back"
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+    options:
+      number_of_engines: 1
+      number_of_tanks: 2
+    position: in_the_front  # "in_the_wing", "in_the_front", "in_the_back"
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_fuselage"
+  fuel_tank_2:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_fuselage"
+    symmetrical: fuel_tank_1
+
+component_connections:
+  - source: propeller_1
+    target: [planetary_gear_1, 1]
+
+  - source: [planetary_gear_1, 1]
+    target: gearbox_1
+
+  - source: gearbox_1
+    target: turboshaft_1
+
+  - source: turboshaft_1
+    target: [fuel_system_1, 1]
+
+  - source: [fuel_system_1, 1]
+    target: fuel_tank_1
+
+  - source: [fuel_system_1, 2]
+    target: fuel_tank_2
+
+  - source: [planetary_gear_1, 2]
+    target: motor_1
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: inverter_1
+    target: [dc_bus_1, 1]
+
+  - source: [dc_bus_1, 1]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: battery_pack_1
+
+watcher_file_path: ../results/hybridized_kodiak_100.csv

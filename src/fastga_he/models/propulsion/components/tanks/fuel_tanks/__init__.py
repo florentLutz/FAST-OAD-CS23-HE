@@ -8,3 +8,4 @@
 from .components.sizing_tank import SizingFuelTank
 from .components.perf_fuel_tank import PerformancesFuelTank
 from .components.slipstream_fuel_tank import SlipstreamFuelTank
+from .components.pre_lca_tank import PreLCAFuelTank

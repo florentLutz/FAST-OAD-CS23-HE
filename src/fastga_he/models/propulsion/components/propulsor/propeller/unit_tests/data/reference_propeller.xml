@@ -1,5 +1,8 @@
 <FASTOAD_model>
     <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
         <geometry>
             <flap>
                 <span_ratio>0.45</span_ratio>
@@ -60,6 +63,7 @@
             <he_power_train>
                 <propeller>
                     <propeller_1>
+                        <mass units="lbm">75.0</mass>
                         <input_mass units="lbm">75.0</input_mass>
                         <installation_angle units="deg">2.0</installation_angle>
                         <flapped_ratio>0.9</flapped_ratio>

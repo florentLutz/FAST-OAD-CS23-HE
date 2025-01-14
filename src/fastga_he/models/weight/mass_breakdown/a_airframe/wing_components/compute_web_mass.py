@@ -18,7 +18,7 @@ in her MAE research project report.
 import openmdao.api as om
 import numpy as np
 
-from scipy.integrate import trapz
+from scipy.integrate import trapezoid
 
 from fastga_he.models.load_analysis.wing.aerostructural_loads import AerostructuralLoadHE
 
@@ -354,7 +354,7 @@ class ComputeWebMass(om.ExplicitComponent):
 
         shear_vector = AerostructuralLoadHE.compute_shear_diagram(y_vector, tot_force_array)
         web_surface = shear_vector / max_shear_stress
-        web_mass = abs(2.0 * rho_m / np.cos(sweep_e) * trapz(web_surface, y_vector))
+        web_mass = abs(2.0 * rho_m / np.cos(sweep_e) * trapezoid(web_surface, y_vector))
 
         # If there are enough punctual mass on the wing, we add some weight
         if len(inputs["data:weight:airframe:wing:punctual_mass:mass"]) > 4:

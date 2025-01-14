@@ -1,0 +1,7 @@
+ANCHOR_COMPONENT_NAME:
+    custom_attributes:
+        - attribute: "component"
+          value: ANCHOR_COMPONENT_NAME
+    
+    name: 'power distribution unit production, for electric passenger car'
+    amount: ANCHOR_COMPONENT_MASS

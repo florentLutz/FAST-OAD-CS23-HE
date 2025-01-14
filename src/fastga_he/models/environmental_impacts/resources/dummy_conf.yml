@@ -1,0 +1,62 @@
+project: dummy_project
+
+ecoinvent:
+    version: 3.9.1
+    model: cutoff
+
+model:
+
+    airports:
+        custom_attributes:
+            - attribute: "phase"
+              value: "airport"
+
+        name: 'market for airport'
+        amount: 8.88e-14  # from ecoinvent 'transport, passenger aircraft, xxx haul'
+
+    aircraft:
+        custom_attributes:
+            - attribute: "phase"
+              value: "aircraft production"
+
+        name: 'aircraft production, passenger aircraft, long haul'
+        amount: aircraft_production_long_range
+        
+    fuel:
+
+        unit: MJ
+        kerosene:
+            custom_attributes:
+                - attribute: "phase"
+                  value: "kerosene production"
+
+            name: 'market for kerosene'
+            loc: 'RoW'
+
+            amount: energy_consumption_kerosene / lhv_kerosene  # conversion MJ to kg
+            unit: kilogram
+
+methods:  # tip: you can search for methods with lca_algebraic function agb.findMethods()
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'acidification: terrestrial', 'terrestrial acidification potential (TAP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'climate change',  'global warming potential (GWP100)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: freshwater', 'freshwater ecotoxicity potential (FETP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: marine', 'marine ecotoxicity potential (METP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: terrestrial', 'terrestrial ecotoxicity potential (TETP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'energy resources: non-renewable, fossil', 'fossil fuel potential (FFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: freshwater', 'freshwater eutrophication potential (FEP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: marine', 'marine eutrophication potential (MEP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: carcinogenic', 'human toxicity potential (HTPc)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: non-carcinogenic', 'human toxicity potential (HTPnc)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ionising radiation', 'ionising radiation potential (IRP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'land use', 'agricultural land occupation (LOP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'material resources: metals/minerals', 'surplus ore potential (SOP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ozone depletion', 'ozone depletion potential (ODPinfinite)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'particulate matter formation', 'particulate matter formation potential (PMFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: human health', 'photochemical oxidant formation potential: humans (HOFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: terrestrial ecosystems', 'photochemical oxidant formation potential: ecosystems (EOFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'water use', 'water consumption potential (WCP)')"
+    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: ecosystem quality', 'ecosystem quality')"
+    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: human health', 'human health')"
+    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: natural resources', 'natural resources')"
+
+    

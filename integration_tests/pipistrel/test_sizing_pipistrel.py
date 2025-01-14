@@ -39,6 +39,7 @@ def test_pipistrel_velis_electro():
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
 
     # Define used files depending on options
     xml_file_name = "pipistrel_source.xml"

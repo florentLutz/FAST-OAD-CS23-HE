@@ -10,19 +10,19 @@
       <he_power_train>
         <DC_DC_converter>
           <dc_dc_converter_1>
-            <current_in_max units="A" is_input="False">89.02411209697264</current_in_max>
-            <losses_max units="W" is_input="False">739.6275473897194</losses_max>
+            <current_in_max units="A" is_input="False">89.02411209697263</current_in_max>
+            <losses_max units="W" is_input="False">739.6275473897191</losses_max>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_in_max units="V" is_input="False">613.1087164685222</voltage_in_max>
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
             <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <capacitor>
-              <current_max units="A" is_input="False">72.2358932198741</current_max>
+              <current_max units="A" is_input="False">72.23589321987409</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </capacitor>
             <diode>
-              <current_max units="A" is_input="False">93.56734960702724</current_max>
+              <current_max units="A" is_input="False">93.56734960702721</current_max>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="True">0.002805</resistance>
             </diode>
@@ -42,11 +42,11 @@
               <c is_input="True">-3.005e-08</c>
             </energy_rr>
             <igbt>
-              <current_max units="A" is_input="False">113.65030647464513</current_max>
+              <current_max units="A" is_input="False">113.6503064746451</current_max>
               <resistance units="ohm" is_input="True">0.002265</resistance>
             </igbt>
             <inductor>
-              <current_max units="A" is_input="False">147.2115521087405</current_max>
+              <current_max units="A" is_input="False">147.21155210874048</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
           </dc_dc_converter_1>
@@ -104,6 +104,14 @@
             <power_max_SL units="W" is_input="False">162849.95108401182<!--Maximum power the motor has to provide at Sea Level--></power_max_SL>
             <shaft_power_max units="W" is_input="False">162849.95108401182<!--Maximum power seen during the mission, without accounting for altitude effect, only used for power rate--></shaft_power_max>
             <strokes_number is_input="True">4.0</strokes_number>
+            <emission_index>
+              <CO units="g/kg" is_input="True">798.0</CO>
+              <CO2 units="g/kg" is_input="True">3100.0</CO2>
+              <H2O units="g/kg" is_input="True">1237.0</H2O>
+              <HC units="g/kg" is_input="True">18.867</HC>
+              <NOx units="g/kg" is_input="True">3.14</NOx>
+              <SOx units="g/kg" is_input="True">0.42</SOx>
+            </emission_index>
           </ice_1>
         </ICE>
         <PMSM>
@@ -124,13 +132,13 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <SOC_min units="percent" is_input="False">70.68752205378499<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <c_rate_max units="1/h" is_input="False">0.2657436181999183<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
+            <SOC_min units="percent" is_input="False">70.68752205378497<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <c_rate_max units="1/h" is_input="False">0.26574361819991826<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <number_modules is_input="True">100.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <cell>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">0.03459061506866831<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <losses_max units="W" is_input="False">0.03459061506866833<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <voltage_max units="V" is_input="False">4.087391443123481<!--Maximum voltage needed by the cells during the mission--></voltage_max>
               <voltage_min units="V" is_input="False">3.8409185694131787<!--Minimum voltage provided by the cells during the mission--></voltage_min>
             </cell>
@@ -148,7 +156,7 @@
         </fuel_system>
         <fuel_tank>
           <fuel_tank_1>
-            <fuel_consumed_mission units="kg" is_input="False">55.31548038117526<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
+            <fuel_consumed_mission units="kg" is_input="False">55.31548038117526<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
           </fuel_tank_1>
         </fuel_tank>
         <generator>
@@ -290,5 +298,41 @@
         </rectifier>
       </he_power_train>
     </propulsion>
+    <LCA>
+      <operation>
+        <he_power_train>
+          <ICE>
+            <ice_1>
+              <CO units="g" is_input="False">44141.75334417786</CO>
+              <CO2 units="g" is_input="False">171477.98918164332</CO2>
+              <H2O units="g" is_input="False">68425.2492315138</H2O>
+              <HC units="g" is_input="False">1043.6371683516336</HC>
+              <NOx units="g" is_input="False">173.69060839689033</NOx>
+              <SOx units="g" is_input="False">23.23250176009361</SOx>
+            </ice_1>
+          </ICE>
+          <battery_pack>
+            <battery_pack_1>
+              <CO units="g" is_input="False">0.0</CO>
+              <CO2 units="g" is_input="False">0.0</CO2>
+              <H2O units="g" is_input="False">0.0</H2O>
+              <HC units="g" is_input="False">0.0</HC>
+              <NOx units="g" is_input="False">0.0</NOx>
+              <SOx units="g" is_input="False">0.0</SOx>
+            </battery_pack_1>
+          </battery_pack>
+          <generator>
+            <generator_1>
+              <CO units="g" is_input="False">0.0</CO>
+              <CO2 units="g" is_input="False">0.0</CO2>
+              <H2O units="g" is_input="False">0.0</H2O>
+              <HC units="g" is_input="False">0.0</HC>
+              <NOx units="g" is_input="False">0.0</NOx>
+              <SOx units="g" is_input="False">0.0</SOx>
+            </generator_1>
+          </generator>
+        </he_power_train>
+      </operation>
+    </LCA>
   </data>
 </FASTOAD_model>

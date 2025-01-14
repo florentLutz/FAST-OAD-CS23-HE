@@ -8,3 +8,4 @@
 from .components.perf_dc_bus import PerformancesDCBus
 from .components.sizing_dc_bus import SizingDCBus
 from .components.slipstream_dc_bus import SlipstreamDCBus
+from .components.pre_lca_dc_bus import PreLCADCBus
