@@ -149,4 +149,10 @@ if __name__ == "__main__":
             )
         )
 
+    fig.update_layout(
+        title_text="Average airframe hours per category",
+        xaxis_title="Year [-]",
+        yaxis_title="Average airframe hours [h]",
+        title_x=0.5,
+    )
     fig.show()
