@@ -9,6 +9,8 @@
       <v_cruise units="knot" is_input="True">320.0<!--cruise speed--></v_cruise>
       <aircraft_lifespan is_input="year">15.0<!--maximum speed at sea level--></aircraft_lifespan>
       <flight_per_year>365.0<!--maximum speed at sea level--></flight_per_year>
+      <max_airframe_hours units="h">25228.11592421153</max_airframe_hours>
+      <flight_hours_per_year units="h">1681.8743949474351</flight_hours_per_year>
     </TLAR>
     <geometry>
       <has_T_tail is_input="True">0.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>

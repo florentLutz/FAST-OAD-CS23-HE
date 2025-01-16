@@ -919,6 +919,45 @@ def test_lca_tbm900_ef():
     )
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_tbm900_ef_inputs_as_hours():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCA(
+                power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
+                component_level_breakdown=True,
+                airframe_material="aluminium",
+                delivery_method="flight",
+                impact_assessment_method="EF v3.1",
+                normalization=True,
+                weighting=True,
+                aircraft_lifespan_in_hours=True,
+            )
+        ),
+        __file__,
+        DATA_FOLDER_PATH / "tbm900.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCA(
+            power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
+            component_level_breakdown=True,
+            airframe_material="aluminium",
+            delivery_method="flight",
+            impact_assessment_method="EF v3.1",
+            normalization=True,
+            weighting=True,
+            aircraft_lifespan_in_hours=True,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:production:sum"
+    ) == pytest.approx(0.00238141, rel=1e-5)
+
+
 def test_gasoline_per_fu_sr22():
     inputs_list = [
         "data:environmental_impact:flight_per_fu",

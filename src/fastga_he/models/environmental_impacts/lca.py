@@ -7,6 +7,8 @@ import openmdao.api as om
 
 import fastga_he.models.propulsion.components as he_comp
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
+from .lca_equivalent_year_of_life import LCAEquivalentYearOfLife
+from .lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
 from .lca_aircraft_per_fu import LCAAircraftPerFU
 from .lca_core import LCACore
 from .lca_core_normalization import LCACoreNormalisation
@@ -117,9 +119,30 @@ class LCA(om.Group):
             desc="Use equivalent midpoint weighting factor for the weighting of ReCiPe 2016. Is "
             "only used ReCiPe is used as LCIA method and if weighting is enabled",
         )
+        self.options.declare(
+            name="aircraft_lifespan_in_hours",
+            default=False,
+            types=bool,
+            desc="The inputs for the computation of the functional units are requested in "
+            "hours instead of years and number of flights per year",
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
+
+        if self.options["aircraft_lifespan_in_hours"]:
+            self.add_subsystem(
+                name="equivalent_years_of_life",
+                subsys=LCAEquivalentYearOfLife(),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                name="equivalent_flights_per_year",
+                subsys=LCAEquivalentFlightsPerYear(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
 
         self.add_subsystem(
             name="aircraft_per_fu",
