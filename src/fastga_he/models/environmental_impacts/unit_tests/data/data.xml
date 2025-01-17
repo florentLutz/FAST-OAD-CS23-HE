@@ -13,6 +13,8 @@
       </delivery>
     </environmental_impact>
     <TLAR>
+      <max_airframe_hours units="h">3524.9</max_airframe_hours>
+      <flight_hours_per_year units="h">283.2</flight_hours_per_year>
       <NPAX_design is_input="True">0.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">10.0<!--luggage design mass--></luggage_mass_design>
       <range units="km" is_input="True">53.0<!--design range--></range>

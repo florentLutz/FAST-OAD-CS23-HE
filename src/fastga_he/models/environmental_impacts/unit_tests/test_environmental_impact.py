@@ -11,6 +11,8 @@ from lcav.gui.plots import process_tree
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lca import LCA
+from ..lca_equivalent_year_of_life import LCAEquivalentYearOfLife
+from ..lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
 from ..lca_aircraft_per_fu import LCAAircraftPerFU
 from ..lca_core import LCACore
 from ..lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
@@ -186,6 +188,64 @@ def test_lca_without_fuel_burn():
         + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_2"),
         abs=1e-4,
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_aircraft_equivalent_year_of_life():
+    inputs_list = [
+        "data:TLAR:max_airframe_hours",
+        "data:TLAR:flight_hours_per_year",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAEquivalentYearOfLife(),
+        ivc,
+    )
+
+    assert problem.get_val("data:TLAR:aircraft_lifespan", units="yr") == pytest.approx(
+        12.446, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_aircraft_equivalent_flight_per_year():
+    inputs_list = [
+        "data:TLAR:max_airframe_hours",
+        "data:mission:sizing:duration",
+        "data:mission:operational:duration",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAEquivalentFlightsPerYear(use_operational_mission=False),
+        ivc,
+    )
+
+    assert problem.get_val("data:TLAR:flight_per_year") == pytest.approx(291.762, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    problem = run_system(
+        LCAEquivalentFlightsPerYear(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:TLAR:flight_per_year") == pytest.approx(72.94, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -857,6 +917,45 @@ def test_lca_tbm900_ef():
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
         1.75793655e-05, rel=1e-5
     )
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_tbm900_ef_inputs_as_hours():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCA(
+                power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
+                component_level_breakdown=True,
+                airframe_material="aluminium",
+                delivery_method="flight",
+                impact_assessment_method="EF v3.1",
+                normalization=True,
+                weighting=True,
+                aircraft_lifespan_in_hours=True,
+            )
+        ),
+        __file__,
+        DATA_FOLDER_PATH / "tbm900.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCA(
+            power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
+            component_level_breakdown=True,
+            airframe_material="aluminium",
+            delivery_method="flight",
+            impact_assessment_method="EF v3.1",
+            normalization=True,
+            weighting=True,
+            aircraft_lifespan_in_hours=True,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:environmental_impact:climate_change:production:sum"
+    ) == pytest.approx(0.00238141, rel=1e-5)
 
 
 def test_gasoline_per_fu_sr22():
