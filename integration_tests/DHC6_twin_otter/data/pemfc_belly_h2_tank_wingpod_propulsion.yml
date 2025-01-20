@@ -1,0 +1,100 @@
+title: Powertrain file for the sizing of PEMFC and Hydrogen Pressure Tank
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+
+  speed_reducer_1:
+    id: fastga_he.pt_component.speed_reducer
+    position: inside_the_wing  # "inside_the_wing", "in_the_back"
+  speed_reducer_2:
+    id: fastga_he.pt_component.speed_reducer
+    position: inside_the_wing  # "inside_the_wing", "in_the_back"
+
+  simple_motor_1:
+    id: fastga_he.pt_component.simple_pmsm
+    position: on_the_wing # "on_the_wing", "in_the_nose"
+  simple_motor_2:
+    id: fastga_he.pt_component.simple_pmsm
+    position: on_the_wing # "on_the_wing", "in_the_nose"
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing #"inside_the_wing", "in_the_front", "in_the_back"
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing #"inside_the_wing", "in_the_front", "in_the_back"
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 2
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
+
+  pemfc_stack_1:
+    id: fastga_he.pt_component.pemfc_stack
+    position: underbelly  #"in_the_front", "wing_pod", "underbelly", "in_the_back"
+
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+    options:
+      number_of_engines: 1
+      number_of_tanks: 2
+    position: in_the_wing  # "in_the_wing", "in_the_front", "in_the_back"
+
+  hydrogen_gas_tank_1:
+    id: fastga_he.pt_component.hydrogen_gas_tank
+    position: wing_pod # "in_the_fuselage", "wing_pod", "in_the_back", "underbelly"
+
+  hydrogen_gas_tank_2:
+    id: fastga_he.pt_component.hydrogen_gas_tank
+    position: wing_pod # "in_the_fuselage", "wing_pod", "in_the_back", "underbelly"
+
+component_connections:
+  - source: propeller_1
+    target: speed_reducer_1
+
+  - source: propeller_2
+    target: speed_reducer_2
+
+  - source: speed_reducer_1
+    target: simple_motor_1
+
+  - source: speed_reducer_2
+    target: simple_motor_2
+
+  - source: simple_motor_1
+    target: inverter_1
+
+  - source: simple_motor_2
+    target: inverter_2
+
+  - source: inverter_1
+    target: [dc_bus_1, 1]
+
+  - source: inverter_2
+    target: [ dc_bus_1, 2]
+
+  - source: [dc_bus_1, 1]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: pemfc_stack_1
+
+  - source: pemfc_stack_1
+    target: [fuel_system_1, 1]
+
+  - source: [fuel_system_1, 1]
+    target: hydrogen_gas_tank_1
+
+  - source: [ fuel_system_1, 2 ]
+    target: hydrogen_gas_tank_2
+
+
+watcher_file_path: ../results/dhc6_twin_otter_single_pemfc_belly_h2_gas_tank_wingpod_variant.csv

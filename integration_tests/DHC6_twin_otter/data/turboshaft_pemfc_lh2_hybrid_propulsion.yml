@@ -1,0 +1,134 @@
+title: Powertrain file for the sizing of the DHC6 Twin Otter hybrid LH2
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  planetary_gear_1:
+    id: fastga_he.pt_component.planetary_gear
+    position: inside_the_wing # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      gear_mode: power_share
+  speed_reducer_1:
+    id: fastga_he.pt_component.speed_reducer
+    position: inside_the_wing  # "inside_the_wing", "in_the_back"
+  turboshaft_1:
+    id: fastga_he.pt_component.turboshaft
+    position: on_the_wing  # "on_the_wing", "in_the_front", "in_the_back"
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  planetary_gear_2:
+    id: fastga_he.pt_component.planetary_gear
+    position: inside_the_wing # "inside_the_wing", "in_the_front", "in_the_back"
+    options:
+      gear_mode: power_share
+  speed_reducer_2:
+    id: fastga_he.pt_component.speed_reducer
+    position: inside_the_wing  # "inside_the_wing", "in_the_back"
+  turboshaft_2:
+    id: fastga_he.pt_component.turboshaft
+    position: on_the_wing  # "on_the_wing", "in_the_front", "in_the_back"
+  motor_2:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing  # "on_the_wing", "in_the_nose"
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+    options:
+      number_of_engines: 2
+      number_of_tanks: 2
+    position: in_the_wing  # "in_the_wing", "in_the_front", "in_the_back"
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 2
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
+  pemfc_stack_1:
+    id: fastga_he.pt_component.pemfc_stack
+    position: underbelly  #"in_the_front", "wing_pod", "underbelly", "in_the_back"
+
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_fuselage"
+  fuel_tank_2:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_fuselage"
+    symmetrical: fuel_tank_1
+  cryogenic_hydrogen_tank_1:
+    id: fastga_he.pt_component.cryogenic_hydrogen_tank
+    position: in_the_back #"in_the_fuselage", "wing_pod", "in_the_back", "underbelly"
+
+
+component_connections:
+  - source: propeller_1
+    target: [ planetary_gear_1, 1 ]
+
+  - source: [ planetary_gear_1, 1 ]
+    target: speed_reducer_1
+
+  - source: speed_reducer_1
+    target: turboshaft_1
+
+  - source: [ planetary_gear_1, 2 ]
+    target: motor_1
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: inverter_1
+    target: [ dc_bus_1, 1 ]
+
+  - source: propeller_2
+    target: [ planetary_gear_2, 1 ]
+
+  - source: [ planetary_gear_2, 1 ]
+    target: speed_reducer_2
+
+  - source: speed_reducer_2
+    target: turboshaft_2
+
+  - source: [ planetary_gear_2, 2 ]
+    target: motor_2
+
+  - source: motor_2
+    target: inverter_2
+
+  - source: inverter_2
+    target: [ dc_bus_1, 2 ]
+
+  - source: turboshaft_1
+    target: [fuel_system_1, 1]
+
+  - source: turboshaft_2
+    target: [ fuel_system_1, 2]
+
+  - source: [fuel_system_1, 1]
+    target: fuel_tank_1
+
+  - source: [fuel_system_1, 2]
+    target: fuel_tank_2
+
+  - source: [ dc_bus_1, 1 ]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: pemfc_stack_1
+
+  - source: pemfc_stack_1
+    target: cryogenic_hydrogen_tank_1
+
+watcher_file_path: ../results/pemfc_turboshaft_hybrid_lh2_propulsion_pt_watcher.csv

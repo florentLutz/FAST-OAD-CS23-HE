@@ -1,0 +1,95 @@
+<FASTOAD_model>
+    <data>
+        <geometry>
+            <flap>
+                <chord_ratio>0.45</chord_ratio>
+            </flap>
+             <cabin>
+                <length units="m" is_input="False">2.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">40.032<!--fuselage wet area--></wet_area>
+                <maximum_height units="m" is_input="False">1.08669<!--maximum fuselage height--></maximum_height>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
+                <thickness_ratio>0.15</thickness_ratio>
+                <span units="m" is_input="False">9.237463382822208<!--wing span--></span>
+                <root>
+                    <chord units="m" is_input="False">0.7672311779752663<!--chord length at wing root--></chord>
+                </root>
+                <tip>
+                    <chord units="m" is_input="False">0.7672311779752663<!--chord length at wing tip--></chord>
+                </tip>
+                <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <aerodynamics>
+            <cruise>
+              <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
+              <unit_reynolds units="1/m" is_input="False">2948053.940803294<!--unitary reynolds number representative of high speed aerodynamics--></unit_reynolds>
+            </cruise>
+            <low_speed>
+                <mach is_input="False">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
+                <unit_reynolds units="1/m" is_input="False">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
+            </low_speed>
+            <fuselage>
+                <cruise>
+                  <CD0 is_input="False">0.01194819286123646<!--profile drag coefficient for fuselage in cruise conditions--></CD0>
+                </cruise>
+                <low_speed>
+                  <CD0 is_input="False">0.012114342193164637<!--profile drag coefficient for fuselage in low speed conditions--></CD0>
+                </low_speed>
+            </fuselage>
+            <wing>
+                <low_speed>
+                    <Y_vector units="m" is_input="False">[0.11547445976593405, 0.34642337929780215, 0.5773722988296702, 1.0361325274187763, 1.7227040650651202, 2.4092756027114643, 3.0958471403578085, 3.782418678004152, 4.468990215650496, 5.1555617532968405, 5.5594273636770435, 5.6805870467911035, 5.801746729905164, 5.922906413019226, 6.044066096133287, 6.165225779247348, 6.286385462361408, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing station along the wing span at which chord_vector and Cl_vector are sampled--></Y_vector>
+                    <chord_vector units="m" is_input="False">[1.      , 0.984375, 0.96875 , 0.953125, 0.9375  , 0.921875, 0.90625 , 0.890625, 0.875   , 0.859375, 0.84375 , 0.828125, 0.8125  , 0.796875, 0.78125 , 0.765625, 0.75    , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing chord length at the station along the wing span in Y_vector--></chord_vector>
+                    <CL_vector is_input="False">[1.1017227197335075, 1.1013013453498266, 1.10038811694889, 1.098403873777725, 1.0918579844211873, 1.080610615570361, 1.0628034699038733, 1.0347815173407644, 0.9892716074062258, 0.9114284949703251, 0.8359515927452368, 0.7818631930166186, 0.7254369570766273, 0.660566179673128, 0.5814473768423762, 0.4785864136757275, 0.32879610850232355, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing at the station along the wing span in Y_vector, the total corresponding wing lift coefficient is equal to CL0_clean--></CL_vector>
+                </low_speed>
+            </wing>
+        </aerodynamics>
+        <propulsion>
+            <he_power_train>
+                <hydrogen_gas_tank>
+                    <tank_temperature units="K">300.</tank_temperature>
+                    <hydrogen_gas_tank_1>
+                        <CG>
+                            <y_ratio>0.4</y_ratio>
+                            <y units="m">1.85</y>
+                        </CG>
+                        <fuel_consumed_mission units="kg">1.0</fuel_consumed_mission>
+                        <unusable_fuel_mission units="kg">0.03</unusable_fuel_mission>
+                        <fuel_total_mission units="kg">1.03</fuel_total_mission>
+                        <capacity units="kg">1.03</capacity>
+                        <inner_volume units="L">1240.288</inner_volume>
+                        <tank_pressure units="Pa">1013250</tank_pressure>
+                        <Safety_factor>1.0</Safety_factor>
+                        <material>
+                            <type>"carbon_composite"</type>
+                            <yield_strength units="Pa">1.9e09</yield_strength>
+                            <density units="kg/m**3">1530</density>
+                        </material>
+                        <dimension>
+                            <length units="m">1.</length>
+                            <diameter units="m">1.2<!--inital guess for the tank outer diameter --></diameter>
+                            <inner_diameter units="m">0.97776</inner_diameter>
+                            <outer_diameter units="m">0.97802</outer_diameter>
+                            <wall_thickness units="m">1.3034e-4</wall_thickness>
+                            <overall_length units="m">1.97802</overall_length>
+                            <rear_length_ratio>0.5</rear_length_ratio>
+                            <aspect_ratio>2.022</aspect_ratio>
+                        </dimension>
+                    </hydrogen_gas_tank_1>
+                </hydrogen_gas_tank>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
