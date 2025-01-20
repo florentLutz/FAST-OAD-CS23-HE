@@ -14,7 +14,6 @@ class SlipstreamCryogenicHydrogenTank(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,
@@ -27,7 +26,6 @@ class SlipstreamCryogenicHydrogenTank(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         ivc = om.IndepVarComp()

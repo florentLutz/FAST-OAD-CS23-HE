@@ -13,7 +13,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,
@@ -31,7 +30,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
         )
 
     def setup(self):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]
 
@@ -76,7 +74,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
         )
 
         if position != "wing_pod":
-
             self.declare_partials(
                 of="*",
                 wrt="data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
@@ -86,7 +83,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
             )
 
         else:
-
             self.declare_partials(
                 of="*",
                 wrt="data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
@@ -96,7 +92,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
             )
 
         if position == "in_the_fuselage" or position == "underbelly":
-
             self.declare_partials(
                 of="*",
                 wrt="data:geometry:cabin:length",
@@ -104,7 +99,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
             )
 
         elif position == "in_the_back":
-
             self.declare_partials(
                 of="*",
                 wrt=[
@@ -118,7 +112,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
             )
 
         elif position == "in_the_front":
-
             self.declare_partials(
                 of="*",
                 wrt=[
@@ -132,7 +125,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]
 
@@ -151,7 +143,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
             )
 
         elif position == "in_the_back":
-
             outputs[
                 "constraints:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id
@@ -171,7 +162,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
             )
 
         elif position == "in_the_front":
-
             outputs[
                 "constraints:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id
@@ -191,7 +181,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
             )
 
         else:
-
             outputs[
                 "constraints:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id
@@ -199,12 +188,10 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
             ] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]
 
         if position == "in_the_back":
-
             partials[
                 "constraints:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id
@@ -226,7 +213,6 @@ class SizingCryogenicHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent
             ]
 
         elif position == "in_the_front":
-
             partials[
                 "constraints:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id

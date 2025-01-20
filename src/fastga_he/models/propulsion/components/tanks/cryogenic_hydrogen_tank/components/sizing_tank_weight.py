@@ -18,7 +18,6 @@ class SizingCryogenicHydrogenTankWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,
@@ -33,7 +32,6 @@ class SizingCryogenicHydrogenTankWeight(om.ExplicitComponent):
         )
 
     def setup(self):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         self.add_input(
@@ -105,7 +103,6 @@ class SizingCryogenicHydrogenTankWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         structure_factor = self.options["structure_factor"]
 
@@ -129,13 +126,8 @@ class SizingCryogenicHydrogenTankWeight(om.ExplicitComponent):
 
         outputs[input_prefix + ":mass"] = structure_factor * (
             wall_density
-            * (
-                np.pi * dw ** 3 / 6
-                + np.pi * dw ** 2 * l / 4
-                - inputs[input_prefix + ":inner_volume"]
-            )
-            + insulation_density
-            * (np.pi * (d ** 3 - dw ** 3) / 6 + np.pi * (d ** 2 - dw ** 2) * l / 4)
+            * (np.pi * dw**3 / 6 + np.pi * dw**2 * l / 4 - inputs[input_prefix + ":inner_volume"])
+            + insulation_density * (np.pi * (d**3 - dw**3) / 6 + np.pi * (d**2 - dw**2) * l / 4)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -159,24 +151,33 @@ class SizingCryogenicHydrogenTankWeight(om.ExplicitComponent):
         partials[
             input_prefix + ":mass",
             input_prefix + ":insulation:material_density",
-        ] = structure_factor * (np.pi * (d ** 3 - dw ** 3) / 6 + np.pi * (d ** 2 - dw ** 2) * l / 4)
+        ] = structure_factor * (np.pi * (d**3 - dw**3) / 6 + np.pi * (d**2 - dw**2) * l / 4)
 
-        partials[input_prefix + ":mass", input_prefix + ":material:density",] = structure_factor * (
-            np.pi * dw ** 3 / 6 + np.pi * dw ** 2 / 4 * l - inputs[input_prefix + ":inner_volume"]
+        partials[
+            input_prefix + ":mass",
+            input_prefix + ":material:density",
+        ] = structure_factor * (
+            np.pi * dw**3 / 6 + np.pi * dw**2 / 4 * l - inputs[input_prefix + ":inner_volume"]
         )
 
-        partials[input_prefix + ":mass", input_prefix + ":dimension:length",] = structure_factor * (
-            wall_density * np.pi * dw ** 2 / 4 + insulation_density * np.pi * (d ** 2 - dw ** 2) / 4
+        partials[
+            input_prefix + ":mass",
+            input_prefix + ":dimension:length",
+        ] = structure_factor * (
+            wall_density * np.pi * dw**2 / 4 + insulation_density * np.pi * (d**2 - dw**2) / 4
         )
 
-        partials[input_prefix + ":mass", input_prefix + ":inner_volume",] = (
-            -wall_density * structure_factor
-        )
+        partials[
+            input_prefix + ":mass",
+            input_prefix + ":inner_volume",
+        ] = -wall_density * structure_factor
 
-        partials[input_prefix + ":mass", input_prefix + ":dimension:outer_diameter",] = (
-            insulation_density * np.pi / 2 * (d ** 2 + d * l) * structure_factor
-        )
+        partials[
+            input_prefix + ":mass",
+            input_prefix + ":dimension:outer_diameter",
+        ] = insulation_density * np.pi / 2 * (d**2 + d * l) * structure_factor
 
-        partials[input_prefix + ":mass", input_prefix + ":dimension:wall_diameter",] = (
-            np.pi / 2 * (wall_density - insulation_density) * (dw ** 2 + dw * l) * structure_factor
-        )
+        partials[
+            input_prefix + ":mass",
+            input_prefix + ":dimension:wall_diameter",
+        ] = np.pi / 2 * (wall_density - insulation_density) * (dw**2 + dw * l) * structure_factor

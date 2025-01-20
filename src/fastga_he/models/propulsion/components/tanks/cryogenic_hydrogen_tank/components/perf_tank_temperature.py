@@ -16,7 +16,6 @@ class PerformancesLiquidHydrogenTankTemperature(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,
@@ -25,7 +24,6 @@ class PerformancesLiquidHydrogenTankTemperature(om.ExplicitComponent):
         )
 
     def setup(self):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         self.add_input(
@@ -49,7 +47,6 @@ class PerformancesLiquidHydrogenTankTemperature(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         outputs[
@@ -71,7 +68,6 @@ class PerformancesLiquidHydrogenTankTemperature(om.ExplicitComponent):
         ) ** -1
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         latent_heat_constant = GAS_CONSTANT / LIQUID_HYDROGEN_LATENT_HEAT_OF_VAPORIZATION
 

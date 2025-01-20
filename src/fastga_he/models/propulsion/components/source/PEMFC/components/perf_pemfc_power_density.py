@@ -13,7 +13,6 @@ class PerformancesPEMFCPowerDensity(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -26,7 +25,6 @@ class PerformancesPEMFCPowerDensity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
@@ -57,7 +55,6 @@ class PerformancesPEMFCPowerDensity(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs["power_density"] = (

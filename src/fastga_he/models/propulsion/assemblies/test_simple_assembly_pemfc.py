@@ -40,9 +40,9 @@ NB_POINTS_TEST = 10
 
 
 def test_assembly_performances():
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.performances.pemfc.layer_voltage"
-    ] = "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.statistical"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
+        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.statistical"
+    )
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -160,7 +160,6 @@ def test_assembly_performances():
 
 
 def test_assembly_sizing():
-
     ivc = get_indep_var_comp(list_inputs(SizingAssembly()), __file__, XML_FILE)
 
     problem = oad.FASTOADProblem(reports=False)
@@ -221,19 +220,18 @@ def test_assembly_sizing():
 
 
 def test_performances_sizing_assembly_pemfc_enforce():
-
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    )
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.pemfc_stack.effective_area"
     ] = "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.enforce"
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.hydrogen_gas_tank.capacity"
     ] = "fastga_he.submodel.propulsion.constraints.hydrogen_gas_tank.capacity.enforce"
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.performances.pemfc.layer_voltage"
-    ] = "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.statistical"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
+        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.statistical"
+    )
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
@@ -283,10 +281,9 @@ def test_performances_sizing_assembly_pemfc_enforce():
 
 
 def test_assembly_sizing_from_pt_file():
-
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    )
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_pemfc_h2_tank.yml")
 
@@ -363,13 +360,12 @@ def test_assembly_sizing_from_pt_file():
 
 
 def test_performances_sizing_assembly_pemfc_ensure():
-
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pmsm.rpm"
-    ] = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.pemfc.effective_area"
-    ] = "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    )
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pemfc.effective_area"] = (
+        "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure"
+    )
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.hydrogen_gas_tank.capacity"
     ] = "fastga_he.submodel.propulsion.constraints.hydrogen_gas_tank.capacity.ensure"
@@ -422,9 +418,9 @@ def test_performances_sizing_assembly_pemfc_ensure():
 
 
 def test_performances_from_pt_file():
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.performances.pemfc.layer_voltage"
-    ] = "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.statistical"
+    oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
+        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.statistical"
+    )
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_pemfc_h2_tank.yml")
 
     ivc = get_indep_var_comp(
@@ -554,7 +550,6 @@ def test_drag_from_pt_file():
 
 
 def test_delta_cls_summer():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_pemfc_h2_tank.yml")
 
     ivc = om.IndepVarComp()
@@ -586,7 +581,6 @@ def test_delta_cls_summer():
 
 
 def test_delta_cds_summer():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_pemfc_h2_tank.yml")
 
     ivc = om.IndepVarComp()
@@ -620,7 +614,6 @@ def test_delta_cds_summer():
 
 
 def test_delta_cms_summer():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_pemfc_h2_tank.yml")
 
     ivc = om.IndepVarComp()
@@ -652,7 +645,6 @@ def test_delta_cms_summer():
 
 
 def test_slipstream_from_pt_file():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_pemfc_h2_tank.yml")
 
     ivc = get_indep_var_comp(

@@ -19,7 +19,6 @@ class PerformancesActivePower(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         motor_id = self.options["motor_id"]
 
@@ -50,7 +49,6 @@ class PerformancesActivePower(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         outputs["active_power"] = (
@@ -59,7 +57,6 @@ class PerformancesActivePower(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 

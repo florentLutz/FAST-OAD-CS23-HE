@@ -5,6 +5,7 @@
 import openmdao.api as om
 import numpy as np
 
+
 # To modify
 class SizingCryogenicHydrogenTankWallThickness(om.ExplicitComponent):
     """
@@ -12,7 +13,6 @@ class SizingCryogenicHydrogenTankWallThickness(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,
@@ -21,7 +21,6 @@ class SizingCryogenicHydrogenTankWallThickness(om.ExplicitComponent):
         )
 
     def setup(self):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         self.add_input(
@@ -68,7 +67,6 @@ class SizingCryogenicHydrogenTankWallThickness(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         outputs[

@@ -13,7 +13,6 @@ class SizingHydrogenGasTankTotalHydrogenMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingHydrogenGasTankTotalHydrogenMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         self.add_input(
@@ -55,7 +53,6 @@ class SizingHydrogenGasTankTotalHydrogenMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         outputs[

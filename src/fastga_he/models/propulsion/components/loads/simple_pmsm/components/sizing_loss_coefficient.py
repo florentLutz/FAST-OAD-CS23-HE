@@ -35,7 +35,6 @@ class SizingMotorLossCoefficient(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -90,7 +89,6 @@ class SizingMotorLossCoefficient(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         alpha_ref = self.options["alpha_ref"]
@@ -122,7 +120,6 @@ class SizingMotorLossCoefficient(om.ExplicitComponent):
         ] = gamma
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         alpha_ref = self.options["alpha_ref"]

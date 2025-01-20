@@ -12,7 +12,6 @@ class SizingPEMFCCGX(om.ExplicitComponent):
     """Class that computes the CG of the pemfc according to the position given in the options."""
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -30,7 +29,6 @@ class SizingPEMFCCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
 
@@ -42,7 +40,6 @@ class SizingPEMFCCGX(om.ExplicitComponent):
         )
 
         if position == "wing_pod":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
             self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
@@ -52,7 +49,6 @@ class SizingPEMFCCGX(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="data:geometry:wing:MAC:length", val=0.25)
 
         elif position == "in_the_front":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
             self.add_input(
@@ -75,7 +71,6 @@ class SizingPEMFCCGX(om.ExplicitComponent):
             )
 
         elif position == "in_the_back":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
@@ -104,7 +99,6 @@ class SizingPEMFCCGX(om.ExplicitComponent):
         # We can do an else for the last option since we gave OpenMDAO the possible, ensuring it
         # is one among them
         else:
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
@@ -114,19 +108,16 @@ class SizingPEMFCCGX(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="data:geometry:cabin:length", val=0.5)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
 
         if position == "wing_pod":
-
             outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:x"] = (
                 inputs["data:geometry:wing:MAC:at25percent:x"]
                 + 0.25 * inputs["data:geometry:wing:MAC:length"]
             )
 
         elif position == "in_the_front":
-
             outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 - 0.5
@@ -138,7 +129,6 @@ class SizingPEMFCCGX(om.ExplicitComponent):
             )
 
         elif position == "in_the_back":
-
             outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + inputs["data:geometry:cabin:length"]
@@ -151,7 +141,6 @@ class SizingPEMFCCGX(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + 0.5 * inputs["data:geometry:cabin:length"]

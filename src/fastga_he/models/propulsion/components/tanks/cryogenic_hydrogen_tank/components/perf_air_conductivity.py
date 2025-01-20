@@ -13,13 +13,11 @@ class PerformancesAirThermalConductivity(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -49,8 +47,8 @@ class PerformancesAirThermalConductivity(om.ExplicitComponent):
         T = inputs["exterior_temperature"]
 
         outputs["air_thermal_conductivity"] = (
-            1.5207e-11 * T ** 3
-            - 4.8574e-08 * T ** 2
+            1.5207e-11 * T**3
+            - 4.8574e-08 * T**2
             + 1.0184e-04 * T
             - 3.9333e-04 * np.ones(number_of_points)
         )
@@ -61,5 +59,5 @@ class PerformancesAirThermalConductivity(om.ExplicitComponent):
         T = inputs["exterior_temperature"]
 
         partials["air_thermal_conductivity", "exterior_temperature"] = (
-            3 * 1.5207e-11 * T ** 2 - 2 * 4.8574e-08 * T + 1.0184e-04 * np.ones(number_of_points)
+            3 * 1.5207e-11 * T**2 - 2 * 4.8574e-08 * T + 1.0184e-04 * np.ones(number_of_points)
         )

@@ -5,6 +5,7 @@
 import openmdao.api as om
 import numpy as np
 
+
 # To modify
 class SizingCryogenicHydrogenTankInnerDiameter(om.ExplicitComponent):
     """
@@ -13,7 +14,6 @@ class SizingCryogenicHydrogenTankInnerDiameter(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,
@@ -22,7 +22,6 @@ class SizingCryogenicHydrogenTankInnerDiameter(om.ExplicitComponent):
         )
 
     def setup(self):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         self.add_input(
@@ -80,7 +79,6 @@ class SizingCryogenicHydrogenTankInnerDiameter(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         input_prefix = (
             "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
@@ -117,24 +115,22 @@ class SizingCryogenicHydrogenTankInnerDiameter(om.ExplicitComponent):
             input_prefix + ":dimension:wall_diameter",
         ] = 1 / (1 + c * tank_pressure * sf / sigma)
 
-        partials[input_prefix + ":dimension:inner_diameter", input_prefix + ":tank_pressure",] = (
-            -d_wall * sf * c * sigma / (sf * tank_pressure * c + sigma) ** 2
-        )
+        partials[
+            input_prefix + ":dimension:inner_diameter",
+            input_prefix + ":tank_pressure",
+        ] = -d_wall * sf * c * sigma / (sf * tank_pressure * c + sigma) ** 2
 
-        partials[input_prefix + ":dimension:inner_diameter", input_prefix + ":Safety_factor",] = (
-            -d_wall * tank_pressure * c * sigma / (tank_pressure * sf * c + sigma) ** 2
-        )
+        partials[
+            input_prefix + ":dimension:inner_diameter",
+            input_prefix + ":Safety_factor",
+        ] = -d_wall * tank_pressure * c * sigma / (tank_pressure * sf * c + sigma) ** 2
 
         partials[
             input_prefix + ":dimension:inner_diameter",
             input_prefix + ":dimension:stress_coefficient",
-        ] = (
-            -d_wall * tank_pressure * sf * sigma / (tank_pressure * sf * c + sigma) ** 2
-        )
+        ] = -d_wall * tank_pressure * sf * sigma / (tank_pressure * sf * c + sigma) ** 2
 
         partials[
             input_prefix + ":dimension:inner_diameter",
             input_prefix + ":material:yield_strength",
-        ] = (
-            c * d_wall * sf * tank_pressure / (sigma + sf * tank_pressure * c) ** 2
-        )
+        ] = c * d_wall * sf * tank_pressure / (sigma + sf * tank_pressure * c) ** 2

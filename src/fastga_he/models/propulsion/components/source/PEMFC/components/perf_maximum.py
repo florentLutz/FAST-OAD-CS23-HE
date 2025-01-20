@@ -17,7 +17,6 @@ class PerformancesMaximum(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -29,7 +28,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -84,27 +82,25 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":current_max"
-        ] = np.nanmax(inputs["dc_current_out"])
+        outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":current_max"] = (
+            np.nanmax(inputs["dc_current_out"])
+        )
 
-        outputs[
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":current_min"
-        ] = np.nanmin(inputs["dc_current_out"])
+        outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":current_min"] = (
+            np.nanmin(inputs["dc_current_out"])
+        )
 
-        outputs[
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max"
-        ] = np.nanmax(inputs["power_out"])
+        outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max"] = (
+            np.nanmax(inputs["power_out"])
+        )
 
-        outputs[
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_min"
-        ] = np.nanmin(inputs["power_out"])
+        outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_min"] = (
+            np.nanmin(inputs["power_out"])
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         partials[

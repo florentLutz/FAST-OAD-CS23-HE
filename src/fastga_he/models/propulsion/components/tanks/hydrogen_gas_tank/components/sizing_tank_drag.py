@@ -16,7 +16,6 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,
@@ -37,7 +36,6 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
         self.options.declare("low_speed_aero", default=False, types=bool)
 
     def setup(self):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
         position = self.options["position"]
         # For refactoring purpose we just match the option to the tag in the variable name and
@@ -55,7 +53,6 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
         )
 
         if position == "underbelly":
-
             self.add_input(
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
@@ -69,7 +66,6 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             self.add_input("data:aerodynamics:fuselage:" + ls_tag + ":CD0", val=np.nan)
 
         elif position == "wing_pod":
-
             self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
         self.add_output(
@@ -86,13 +82,11 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=0.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
         position = self.options["position"]
 
         if position == "wing_pod":
-
             # According to :cite:`gudmundsson:2013`. the drag of a streamlined external tank,
             # which more or less resemble a podded pemfc can be computed using the following
             # formula. It highly depends on the tank/wing interface so we will take a middle.
@@ -114,7 +108,6 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             cd0 = 0.10 * frontal_area / wing_area
 
         elif position == "underbelly":
-
             # For now we will just consider the addition of wetted area and not the change in
             # form factor, ...
 
@@ -149,7 +142,6 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             cd0 = added_wet_area / wet_area * cd0_fus
 
         else:
-
             cd0 = 0.0
 
         outputs[
@@ -161,13 +153,11 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
         ] = cd0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
         position = self.options["position"]
 
         if position == "wing_pod":
-
             frontal_area = (
                 np.pi
                 * inputs[
@@ -207,12 +197,9 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
                 + ls_tag
                 + ":CD0",
                 "data:geometry:wing:area",
-            ] = (
-                -0.10 * frontal_area / inputs["data:geometry:wing:area"] ** 2
-            )
+            ] = -0.10 * frontal_area / inputs["data:geometry:wing:area"] ** 2
 
         elif position == "underbelly":
-
             d = inputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
@@ -238,9 +225,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
                 + ":dimension:outer_diameter",
-            ] = (
-                cd0_fus * (3 * l + 4 * d) / wet_area
-            )
+            ] = cd0_fus * (3 * l + 4 * d) / wet_area
 
             partials[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
@@ -251,9 +236,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
                 + ":dimension:length",
-            ] = (
-                cd0_fus * 3 * d / wet_area
-            )
+            ] = cd0_fus * 3 * d / wet_area
 
             partials[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
@@ -262,9 +245,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
                 + ls_tag
                 + ":CD0",
                 "data:geometry:fuselage:wet_area",
-            ] = (
-                -cd0_fus * (3 * d * l + 2 * d ** 2) / wet_area ** 2
-            )
+            ] = -cd0_fus * (3 * d * l + 2 * d**2) / wet_area**2
 
             partials[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
@@ -273,10 +254,9 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
                 + ls_tag
                 + ":CD0",
                 "data:aerodynamics:fuselage:" + ls_tag + ":CD0",
-            ] = (3 * d * l + 2 * d ** 2) / wet_area
+            ] = (3 * d * l + 2 * d**2) / wet_area
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id

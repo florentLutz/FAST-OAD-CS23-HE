@@ -12,7 +12,6 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
     """Class that computes the CG of the battery according to the position given in the options."""
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,
@@ -42,7 +41,6 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
         )
 
         if position == "wing_pod":
-
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
             self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
 
@@ -50,7 +48,6 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="data:geometry:wing:MAC:length", val=0.25)
 
         elif position == "in_the_back":
-
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
             self.add_input(
@@ -124,7 +121,6 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
         position = self.options["position"]
 
         if position == "wing_pod":
-
             outputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:x"
             ] = (
@@ -133,7 +129,6 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
             )
 
         elif position == "in_the_back":
-
             outputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:x"
             ] = (
@@ -154,7 +149,6 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
             )
 
         elif position == "in_the_front":
-
             outputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:x"
             ] = (
@@ -168,7 +162,6 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
             )
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:x"
             ] = (

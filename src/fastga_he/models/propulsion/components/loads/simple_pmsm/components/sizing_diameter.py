@@ -22,7 +22,6 @@ class SizingMotorDiameter(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -43,7 +42,6 @@ class SizingMotorDiameter(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
         d_ref = self.options["diameter_ref"]
 
@@ -56,7 +54,6 @@ class SizingMotorDiameter(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
         d_ref = self.options["diameter_ref"]
 

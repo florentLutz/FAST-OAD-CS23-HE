@@ -16,7 +16,6 @@ class PerformancesOperationPressure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -28,7 +27,6 @@ class PerformancesOperationPressure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("altitude", units="m", val=np.zeros(number_of_points))
@@ -48,13 +46,11 @@ class PerformancesOperationPressure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["operation_pressure"] = AtmosphereWithPartials(
             inputs["altitude"], altitude_in_feet=False
         ).pressure
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["operation_pressure", "altitude"] = AtmosphereWithPartials(
             inputs["altitude"], altitude_in_feet=False
         ).partial_pressure_altitude

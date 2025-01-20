@@ -17,7 +17,6 @@ class SizingHydrogenGasTankGravimetricIndex(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,
@@ -26,7 +25,6 @@ class SizingHydrogenGasTankGravimetricIndex(om.ExplicitComponent):
         )
 
     def setup(self):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         self.add_input(
@@ -67,7 +65,6 @@ class SizingHydrogenGasTankGravimetricIndex(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         outputs[

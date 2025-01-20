@@ -14,13 +14,11 @@ class PerformancesHydrogenBoilOffMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -48,13 +46,11 @@ class PerformancesHydrogenBoilOffMission(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["hydrogen_boil_off_t"] = (
             inputs["time_step"] * inputs["heat_conduction"] / HYDROGEN_VAPORIZATION_LATENT_HEAT
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["hydrogen_boil_off_t", "time_step"] = (
             inputs["heat_conduction"] / HYDROGEN_VAPORIZATION_LATENT_HEAT
         )

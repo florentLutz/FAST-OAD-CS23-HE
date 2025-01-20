@@ -24,7 +24,6 @@ class ConstraintsCryogenicHydrogenTank(om.Group):
         )
 
     def setup(self):
-
         option_cryogenic_hydrogen_tank_id = {
             "cryogenic_hydrogen_tank_id": self.options["cryogenic_hydrogen_tank_id"]
         }

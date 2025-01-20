@@ -12,7 +12,6 @@ class SizingHydrogenGasTankAspectRatio(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,
@@ -21,7 +20,6 @@ class SizingHydrogenGasTankAspectRatio(om.ExplicitComponent):
         )
 
     def setup(self):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         self.add_input(
@@ -57,7 +55,6 @@ class SizingHydrogenGasTankAspectRatio(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         unclipped_ar = (
@@ -84,7 +81,6 @@ class SizingHydrogenGasTankAspectRatio(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         unclipped_ar = (
@@ -101,7 +97,6 @@ class SizingHydrogenGasTankAspectRatio(om.ExplicitComponent):
         )
 
         if unclipped_ar >= 1.0:
-
             partials[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id

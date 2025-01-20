@@ -20,13 +20,11 @@ class ConstraintsSimplePMSM(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         option_motor_id = {"motor_id": motor_id}
@@ -73,7 +71,6 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -92,7 +89,6 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         outputs[

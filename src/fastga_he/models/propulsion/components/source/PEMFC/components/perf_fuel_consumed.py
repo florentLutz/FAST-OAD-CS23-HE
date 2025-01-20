@@ -13,13 +13,11 @@ class PerformancesPEMFCFuelConsumed(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(name="fuel_consumption", units="kg/h", val=np.full(number_of_points, np.nan))
@@ -36,7 +34,6 @@ class PerformancesPEMFCFuelConsumed(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         clipped_fuel_consumption = np.clip(inputs["fuel_consumption"], 1e-6, 1e6)
         outputs["fuel_consumed_t"] = inputs["time_step"] * clipped_fuel_consumption
 

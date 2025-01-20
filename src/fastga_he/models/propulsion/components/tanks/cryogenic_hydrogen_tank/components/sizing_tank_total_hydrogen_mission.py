@@ -13,7 +13,6 @@ class SizingCryogenicHydrogenTankTotalHydrogenMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,
@@ -22,7 +21,6 @@ class SizingCryogenicHydrogenTankTotalHydrogenMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         self.add_input(
@@ -55,7 +53,6 @@ class SizingCryogenicHydrogenTankTotalHydrogenMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         outputs[

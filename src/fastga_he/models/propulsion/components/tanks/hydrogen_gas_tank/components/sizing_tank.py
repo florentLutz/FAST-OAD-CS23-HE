@@ -52,7 +52,6 @@ class SizingHydrogenGasTank(om.Group):
         )
 
     def setup(self):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
         position = self.options["position"]
 

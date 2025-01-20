@@ -17,7 +17,6 @@ from ...components.tanks.hydrogen_gas_tank import SizingHydrogenGasTank
 
 class SizingAssembly(om.Group):
     def setup(self):
-
         self.add_subsystem(
             "propeller_1",
             SizingPropeller(propeller_id="propeller_1"),

@@ -13,9 +13,9 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_SIMPLE_PMSM_VOLTAGE
-] = "fastga_he.submodel.propulsion.constraints.simple_pmsm.voltage.ensure"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SIMPLE_PMSM_VOLTAGE] = (
+    "fastga_he.submodel.propulsion.constraints.simple_pmsm.voltage.ensure"
+)
 
 
 @oad.RegisterSubmodel(
@@ -29,13 +29,11 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -66,7 +64,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         outputs[
@@ -77,7 +74,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         partials[
@@ -101,13 +97,11 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -138,7 +132,6 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         outputs["constraints:propulsion:he_power_train:simple_PMSM:" + motor_id + ":rpm_rating"] = (
@@ -147,7 +140,6 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         partials[
@@ -171,13 +163,11 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -212,7 +202,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         outputs[
@@ -223,7 +212,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         partials[

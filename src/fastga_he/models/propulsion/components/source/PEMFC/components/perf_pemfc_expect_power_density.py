@@ -9,9 +9,9 @@ from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY
 
 MAX_PEMFC_POWER_DENSITY = 2.06  # kW/kg
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY
-] = "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.aerostak"
+oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY] = (
+    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.aerostak"
+)
 
 
 @oad.RegisterSubmodel(
@@ -24,7 +24,6 @@ class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -33,7 +32,6 @@ class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
@@ -58,7 +56,6 @@ class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         power_max = inputs[
@@ -84,9 +81,7 @@ class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
                 + pemfc_stack_id
                 + ":max_power_density",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max",
-            ] = (
-                0.0344 / power_max
-            )
+            ] = 0.0344 / power_max
         else:
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
@@ -106,7 +101,6 @@ class PerformancesPEMFCMaxPowerDensityIntelligentEnergy(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -115,7 +109,6 @@ class PerformancesPEMFCMaxPowerDensityIntelligentEnergy(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
@@ -140,7 +133,6 @@ class PerformancesPEMFCMaxPowerDensityIntelligentEnergy(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         power_max = inputs[

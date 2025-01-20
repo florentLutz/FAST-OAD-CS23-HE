@@ -17,7 +17,6 @@ class PerformancesCryogenicHydrogenTankRayleighNumber(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -30,7 +29,6 @@ class PerformancesCryogenicHydrogenTankRayleighNumber(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
@@ -84,7 +82,6 @@ class PerformancesCryogenicHydrogenTankRayleighNumber(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         input_prefix = (
             "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
@@ -100,7 +97,6 @@ class PerformancesCryogenicHydrogenTankRayleighNumber(om.ExplicitComponent):
         outputs["tank_rayleigh_number"] = rayleigh_number
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         input_prefix = (
             "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id

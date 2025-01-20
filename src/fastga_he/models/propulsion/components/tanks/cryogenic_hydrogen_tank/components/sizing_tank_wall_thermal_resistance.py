@@ -17,7 +17,6 @@ class SizingCryogenicHydrogenTankWallThermalResistance(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,
@@ -26,7 +25,6 @@ class SizingCryogenicHydrogenTankWallThermalResistance(om.ExplicitComponent):
         )
 
     def setup(self):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         self.add_input(
@@ -77,7 +75,6 @@ class SizingCryogenicHydrogenTankWallThermalResistance(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         input_prefix = (
@@ -117,7 +114,7 @@ class SizingCryogenicHydrogenTankWallThermalResistance(om.ExplicitComponent):
         partials[
             input_prefix + ":wall_thermal_resistance",
             input_prefix + ":material:thermal_conductivity",
-        ] = (-2 * np.pi * k ** 2 * (l / np.log(dw / din) + 1 / (1 / dw + 1 / din))) ** -1
+        ] = (-2 * np.pi * k**2 * (l / np.log(dw / din) + 1 / (1 / dw + 1 / din))) ** -1
 
         partials[input_prefix + ":wall_thermal_resistance", input_prefix + ":dimension:length"] = -(
             (2 * np.pi * k) ** -1

@@ -14,7 +14,6 @@ class SizingHydrogenGasTankCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingHydrogenGasTankCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
         position = self.options["position"]
 
@@ -47,7 +45,6 @@ class SizingHydrogenGasTankCGY(om.ExplicitComponent):
         )
 
         if position == "wing_pod":
-
             self.add_input(
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
@@ -59,12 +56,10 @@ class SizingHydrogenGasTankCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
         position = self.options["position"]
 
         if position == "wing_pod":
-
             outputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:y"
             ] = (
@@ -78,18 +73,15 @@ class SizingHydrogenGasTankCGY(om.ExplicitComponent):
             )
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:y"
             ] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
         position = self.options["position"]
 
         if position == "wing_pod":
-
             partials[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
@@ -110,6 +102,4 @@ class SizingHydrogenGasTankCGY(om.ExplicitComponent):
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
                 + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

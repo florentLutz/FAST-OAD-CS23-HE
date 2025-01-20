@@ -12,7 +12,6 @@ class SizingCryogenicHydrogenTankStressCoefficinet(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,
@@ -21,7 +20,6 @@ class SizingCryogenicHydrogenTankStressCoefficinet(om.ExplicitComponent):
         )
 
     def setup(self):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         self.add_input(
@@ -48,7 +46,6 @@ class SizingCryogenicHydrogenTankStressCoefficinet(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         ar = inputs[
             "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
@@ -60,10 +57,9 @@ class SizingCryogenicHydrogenTankStressCoefficinet(om.ExplicitComponent):
             "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
             + cryogenic_hydrogen_tank_id
             + ":dimension:stress_coefficient"
-        ] = (0.5 * (1 - 1 / ar) + 1 / ar)
+        ] = 0.5 * (1 - 1 / ar) + 1 / ar
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         ar = inputs[
             "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
@@ -78,6 +74,4 @@ class SizingCryogenicHydrogenTankStressCoefficinet(om.ExplicitComponent):
             "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
             + cryogenic_hydrogen_tank_id
             + ":dimension:aspect_ratio",
-        ] = (
-            0.5 / ar ** 2 - 1 / ar ** 2
-        )
+        ] = 0.5 / ar**2 - 1 / ar**2

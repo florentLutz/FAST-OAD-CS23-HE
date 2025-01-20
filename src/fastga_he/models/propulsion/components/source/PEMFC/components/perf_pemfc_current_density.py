@@ -18,7 +18,6 @@ class PerformancesCurrentDensity(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -30,7 +29,6 @@ class PerformancesCurrentDensity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
         self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
@@ -65,7 +63,6 @@ class PerformancesCurrentDensity(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs["fc_current_density"] = (

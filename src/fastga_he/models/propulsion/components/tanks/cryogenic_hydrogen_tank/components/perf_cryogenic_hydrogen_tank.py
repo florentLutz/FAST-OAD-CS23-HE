@@ -32,7 +32,6 @@ class PerformancesCryogenicHydrogenTank(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -52,7 +51,6 @@ class PerformancesCryogenicHydrogenTank(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]

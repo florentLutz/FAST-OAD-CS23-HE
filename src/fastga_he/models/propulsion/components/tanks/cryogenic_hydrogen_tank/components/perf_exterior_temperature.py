@@ -15,13 +15,11 @@ class PerformancesExteriorTemperature(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("altitude", units="m", val=np.zeros(number_of_points))
@@ -41,11 +39,9 @@ class PerformancesExteriorTemperature(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["exterior_temperature"] = AtmosphereWithPartials(inputs["altitude"]).temperature
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["exterior_temperature", "altitude"] = AtmosphereWithPartials(
             inputs["altitude"]
         ).partial_temperature_altitude

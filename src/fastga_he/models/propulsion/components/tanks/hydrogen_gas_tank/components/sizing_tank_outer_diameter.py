@@ -17,7 +17,6 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,
@@ -35,7 +34,6 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
         )
 
     def setup(self):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         self.add_input("data:geometry:fuselage:maximum_height", val=np.nan, units="m")
@@ -70,7 +68,6 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
         position = self.options["position"]
 
@@ -102,27 +99,25 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
         )
 
         if not_under_wing and not_fit_in_fuselage and positive_length and not_underbelly:
-
             outputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
                 + ":dimension:outer_diameter"
-            ] = (0.9 * inputs["data:geometry:fuselage:maximum_height"])
+            ] = 0.9 * inputs["data:geometry:fuselage:maximum_height"]
 
             _LOGGER.warning(
                 msg="Tank dimension greater than fuselage!! Tank diameter adjust to proper size"
             )
 
         elif not positive_length:
-
             outputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
                 + ":dimension:outer_diameter"
             ] = ADJUST_FACTOR * np.cbrt(
-                d ** 3
+                d**3
                 + 3
-                * d ** 2
+                * d**2
                 * inputs[
                     "data:propulsion:he_power_train:hydrogen_gas_tank:"
                     + hydrogen_gas_tank_id
@@ -140,15 +135,14 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
                 + ":dimension:outer_diameter"
-            ] = (0.75 * inputs["data:geometry:fuselage:maximum_height"])
+            ] = 0.75 * inputs["data:geometry:fuselage:maximum_height"]
 
         elif not not_underbelly or not not_under_wing:
-
             outputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
                 + ":dimension:outer_diameter"
-            ] = (0.5 * inputs["data:geometry:fuselage:maximum_height"])
+            ] = 0.5 * inputs["data:geometry:fuselage:maximum_height"]
 
             _LOGGER.warning(msg="Tank dimension fixed to reduce drag")
 
@@ -160,7 +154,6 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
             ] = d
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
         position = self.options["position"]
 
@@ -192,7 +185,6 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
         )
 
         if not_under_wing and not_fit_in_fuselage and positive_length and not_underbelly:
-
             partials[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
@@ -220,14 +212,14 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
                     ]
                 )
                 / (
-                    d ** 3
+                    d**3
                     + 3
                     * inputs[
                         "data:propulsion:he_power_train:hydrogen_gas_tank:"
                         + hydrogen_gas_tank_id
                         + ":dimension:length"
                     ]
-                    * d ** 2
+                    * d**2
                     / 2
                 )
                 ** (2 / 3)
@@ -242,17 +234,17 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
             ] = (
                 ADJUST_FACTOR
                 * 0.5
-                * d ** 2
+                * d**2
                 / (
                     3
-                    * d ** 2
+                    * d**2
                     * inputs[
                         "data:propulsion:he_power_train:hydrogen_gas_tank:"
                         + hydrogen_gas_tank_id
                         + ":dimension:length"
                     ]
                     / 2
-                    + d ** 3
+                    + d**3
                 )
                 ** (2 / 3)
             )

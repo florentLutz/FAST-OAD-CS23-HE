@@ -12,7 +12,6 @@ class PerformancesCryogenicHydrogenTankConvection(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -25,7 +24,6 @@ class PerformancesCryogenicHydrogenTankConvection(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         input_prefix = (
@@ -112,7 +110,7 @@ class PerformancesCryogenicHydrogenTankConvection(om.ExplicitComponent):
         )
 
         d = inputs[input_prefix + ":dimension:outer_diameter"]
-        area = np.pi * d ** 2 + np.pi * d * inputs[input_prefix + ":dimension:length"]
+        area = np.pi * d**2 + np.pi * d * inputs[input_prefix + ":dimension:length"]
 
         h = inputs["air_thermal_conductivity"] * inputs["tank_nusselt_number"] / d
 
@@ -128,7 +126,7 @@ class PerformancesCryogenicHydrogenTankConvection(om.ExplicitComponent):
         )
 
         d = inputs[input_prefix + ":dimension:outer_diameter"]
-        area = np.pi * d ** 2 + np.pi * d * inputs[input_prefix + ":dimension:length"]
+        area = np.pi * d**2 + np.pi * d * inputs[input_prefix + ":dimension:length"]
         h = inputs["air_thermal_conductivity"] * inputs["tank_nusselt_number"] / d
 
         partials["heat_convection", "air_thermal_conductivity"] = (

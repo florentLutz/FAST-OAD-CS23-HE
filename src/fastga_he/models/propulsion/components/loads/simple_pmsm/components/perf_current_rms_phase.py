@@ -12,13 +12,11 @@ class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -38,11 +36,9 @@ class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["ac_current_rms_in_one_phase"] = inputs["ac_current_rms_in"] / 3.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
 
         partials["ac_current_rms_in_one_phase", "ac_current_rms_in"] = (

@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 from ..constants import POSSIBLE_POSITION
 
-STEFAN_BOLTZMANN_CONSTANT = 5.67 * 10 ** -8  # W/m^2.K^4
+STEFAN_BOLTZMANN_CONSTANT = 5.67 * 10**-8  # W/m^2.K^4
 SOLAR_HEAT_FLUX = 1420.0  # W/m^2
 
 
@@ -16,7 +16,6 @@ class PerformancesCryogenicHydrogenTankRadiation(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -38,7 +37,6 @@ class PerformancesCryogenicHydrogenTankRadiation(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]
@@ -109,7 +107,6 @@ class PerformancesCryogenicHydrogenTankRadiation(om.ExplicitComponent):
             cols=np.arange(number_of_points),
         )
         if position == "underbelly" or position == "wing_pod":
-
             self.declare_partials(
                 of="heat_radiation",
                 wrt=[
@@ -137,7 +134,6 @@ class PerformancesCryogenicHydrogenTankRadiation(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         number_of_points = self.options["number_of_points"]
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]
@@ -152,11 +148,11 @@ class PerformancesCryogenicHydrogenTankRadiation(om.ExplicitComponent):
             + ":dimension:length"
         ]
         if l <= 0:
-            area = np.pi * d ** 2
-            area_solar = 0.25 * np.pi * d ** 2
+            area = np.pi * d**2
+            area_solar = 0.25 * np.pi * d**2
         else:
-            area = np.pi * d ** 2 + np.pi * d * l
-            area_solar = 0.25 * np.pi * d ** 2 + d * l
+            area = np.pi * d**2 + np.pi * d * l
+            area_solar = 0.25 * np.pi * d**2 + d * l
         if position == "underbelly" or position == "wing_pod":
             solar_irradiation_factor = 0.06
             solar_radiation_heat = (
@@ -198,11 +194,11 @@ class PerformancesCryogenicHydrogenTankRadiation(om.ExplicitComponent):
         d = inputs[input_prefix + ":dimension:outer_diameter"]
         l = inputs[input_prefix + ":dimension:length"]
         if l <= 0:
-            area = np.pi * d ** 2
-            area_solar = 0.25 * np.pi * d ** 2
+            area = np.pi * d**2
+            area_solar = 0.25 * np.pi * d**2
         else:
-            area = np.pi * d ** 2 + np.pi * d * l
-            area_solar = 0.25 * np.pi * d ** 2 + d * l
+            area = np.pi * d**2 + np.pi * d * l
+            area_solar = 0.25 * np.pi * d**2 + d * l
         r = inputs[input_prefix + ":insulation:reflectivity_coefficient"]
 
         partials["heat_radiation", input_prefix + ":insulation:thermal_emissivity"] = (
@@ -240,11 +236,7 @@ class PerformancesCryogenicHydrogenTankRadiation(om.ExplicitComponent):
                     input_prefix + ":insulation:thermal_emissivity"
                 ] * STEFAN_BOLTZMANN_CONSTANT * (
                     inputs["exterior_temperature"] ** 4 - inputs["skin_temperature"] ** 4
-                ) + (
-                    np.pi * d / 2
-                ) * SOLAR_HEAT_FLUX * np.ones(
-                    number_of_points
-                ) * (
+                ) + (np.pi * d / 2) * SOLAR_HEAT_FLUX * np.ones(number_of_points) * (
                     1 - r
                 ) * solar_irradiation_factor
             else:
@@ -252,9 +244,7 @@ class PerformancesCryogenicHydrogenTankRadiation(om.ExplicitComponent):
                     input_prefix + ":insulation:thermal_emissivity"
                 ] * STEFAN_BOLTZMANN_CONSTANT * (
                     inputs["exterior_temperature"] ** 4 - inputs["skin_temperature"] ** 4
-                ) + SOLAR_HEAT_FLUX * d * solar_irradiation_factor * np.ones(
-                    number_of_points
-                ) * (
+                ) + SOLAR_HEAT_FLUX * d * solar_irradiation_factor * np.ones(number_of_points) * (
                     1 - r
                 )
 
@@ -264,11 +254,7 @@ class PerformancesCryogenicHydrogenTankRadiation(om.ExplicitComponent):
                     input_prefix + ":insulation:thermal_emissivity"
                 ] * STEFAN_BOLTZMANN_CONSTANT * (
                     inputs["exterior_temperature"] ** 4 - inputs["skin_temperature"] ** 4
-                ) + (
-                    np.pi * d / 2 + l
-                ) * SOLAR_HEAT_FLUX * np.ones(
-                    number_of_points
-                ) * (
+                ) + (np.pi * d / 2 + l) * SOLAR_HEAT_FLUX * np.ones(number_of_points) * (
                     1 - r
                 ) * solar_irradiation_factor
 

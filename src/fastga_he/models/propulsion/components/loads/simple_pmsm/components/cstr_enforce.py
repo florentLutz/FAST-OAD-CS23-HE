@@ -13,12 +13,12 @@ import numpy as np
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_SIMPLE_PMSM_TORQUE
-] = "fastga_he.submodel.propulsion.constraints.simple_pmsm.torque.enforce"
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_SIMPLE_PMSM_RPM
-] = "fastga_he.submodel.propulsion.constraints.simple_pmsm.rpm.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SIMPLE_PMSM_TORQUE] = (
+    "fastga_he.submodel.propulsion.constraints.simple_pmsm.torque.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SIMPLE_PMSM_RPM] = (
+    "fastga_he.submodel.propulsion.constraints.simple_pmsm.rpm.enforce"
+)
 
 
 @oad.RegisterSubmodel(
@@ -32,13 +32,11 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -61,12 +59,11 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":torque_rating"
-        ] = inputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":torque_max"]
+        outputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":torque_rating"] = (
+            inputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":torque_max"]
+        )
 
 
 @oad.RegisterSubmodel(
@@ -80,13 +77,11 @@ class ConstraintsRPMEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -108,7 +103,6 @@ class ConstraintsRPMEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         outputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":rpm_rating"] = inputs[
@@ -127,13 +121,11 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -155,9 +147,8 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":voltage_caliber"
-        ] = inputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":voltage_ac_max"]
+        outputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":voltage_caliber"] = (
+            inputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":voltage_ac_max"]
+        )

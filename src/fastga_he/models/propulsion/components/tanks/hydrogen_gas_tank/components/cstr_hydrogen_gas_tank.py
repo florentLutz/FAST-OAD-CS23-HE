@@ -24,7 +24,6 @@ class ConstraintsHydrogenGasTank(om.Group):
         )
 
     def setup(self):
-
         option_hydrogen_gas_tank_id = {"hydrogen_gas_tank_id": self.options["hydrogen_gas_tank_id"]}
 
         self.add_subsystem(

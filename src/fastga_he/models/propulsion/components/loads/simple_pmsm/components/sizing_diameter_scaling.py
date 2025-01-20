@@ -26,7 +26,6 @@ class SizingMotorDiameterScaling(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -46,7 +45,6 @@ class SizingMotorDiameterScaling(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         rpm_max_ref = self.options["rpm_max_ref"]
@@ -58,12 +56,11 @@ class SizingMotorDiameterScaling(om.ExplicitComponent):
         # Mechanical limit
         d_scaling = 1.0 / rpm_peak_scaling
 
-        outputs[
-            "data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":scaling:diameter"
-        ] = d_scaling
+        outputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":scaling:diameter"] = (
+            d_scaling
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         rpm_max_ref = self.options["rpm_max_ref"]
@@ -73,6 +70,4 @@ class SizingMotorDiameterScaling(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":scaling:diameter",
             "data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":rpm_rating",
-        ] = (
-            -1.0 * rpm_max_ref / rpm_max ** 2.0
-        )
+        ] = -1.0 * rpm_max_ref / rpm_max**2.0

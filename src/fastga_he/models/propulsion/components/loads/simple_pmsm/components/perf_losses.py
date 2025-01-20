@@ -12,13 +12,11 @@ class PerformancesLosses(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
@@ -45,5 +43,4 @@ class PerformancesLosses(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["power_losses"] = inputs["active_power"] - inputs["shaft_power_out"]

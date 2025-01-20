@@ -13,7 +13,6 @@ class SizingCryogenicHydrogenTankUnusableHydrogen(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,

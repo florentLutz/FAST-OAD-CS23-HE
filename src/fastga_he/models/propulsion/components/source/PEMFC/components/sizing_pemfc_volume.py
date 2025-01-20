@@ -14,7 +14,6 @@ class SizingPEMFCVolume(om.ExplicitComponent):
     # TODO: Adding another way of mass estimation from D.Juschus (detailed volume estimation)
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -23,7 +22,6 @@ class SizingPEMFCVolume(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
@@ -57,7 +55,6 @@ class SizingPEMFCVolume(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":volume"] = (
@@ -73,7 +70,6 @@ class SizingPEMFCVolume(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         partials[

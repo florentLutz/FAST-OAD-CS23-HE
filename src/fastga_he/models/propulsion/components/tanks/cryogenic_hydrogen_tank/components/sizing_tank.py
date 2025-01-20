@@ -59,7 +59,6 @@ class SizingCryogenicHydrogenTank(om.Group):
         )
 
     def setup(self):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]
 

@@ -80,7 +80,6 @@ def cleanup():
 
 
 def test_sizing_dhc6_twin_otter():
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -169,7 +168,6 @@ def test_operational_mission_dhc6_twin_otter():
 
 
 def test_pemfc_h2_gas_tank_powertrain_network():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "pemfc_h2_propulsion.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "pemfc_h2_propulsion.html")
 
@@ -178,7 +176,6 @@ def test_pemfc_h2_gas_tank_powertrain_network():
 
 
 def test_pemfc_h2_gas_retrofit():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -215,7 +212,6 @@ def test_pemfc_h2_gas_retrofit():
 
 
 def test_pemfc_wing_pod_h2_gas_tank_powertrain_network():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "pemfc_wing_pod_h2_propulsion.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "pemfc_wing_pod_h2_propulsion.html")
 
@@ -224,7 +220,6 @@ def test_pemfc_wing_pod_h2_gas_tank_powertrain_network():
 
 
 def test_pemfc_wing_pod_h2_gas_retrofit():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -261,7 +256,6 @@ def test_pemfc_wing_pod_h2_gas_retrofit():
 
 
 def test_pemfc_belly_h2_gas_tank_wingpod_powertrain_network():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "pemfc_belly_h2_tank_wingpod_propulsion.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "pemfc_belly_h2_tank_wingpod_propulsion.html")
 
@@ -270,7 +264,6 @@ def test_pemfc_belly_h2_gas_tank_wingpod_powertrain_network():
 
 
 def test_pemfc_belly_h2_gas_tank_wingpod_retrofit():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -306,7 +299,6 @@ def test_pemfc_belly_h2_gas_tank_wingpod_retrofit():
 
 
 def test_turboshaft_pemfc_hybrid_powertrain_network():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "turboshaft_pemfc_hybrid_propulsion.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "turboshaft_pemfc_hybrid_propulsion.html")
 
@@ -315,7 +307,6 @@ def test_turboshaft_pemfc_hybrid_powertrain_network():
 
 
 def test_turboshaft_pemfc_hybrid_retrofit_residual_check():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -376,7 +367,6 @@ def test_turboshaft_pemfc_hybrid_retrofit_residual_check():
 
 
 def test_turboshaft_pemfc_hybrid_retrofit_output_check():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -437,7 +427,6 @@ def test_turboshaft_pemfc_hybrid_retrofit_output_check():
 
 
 def test_turboshaft_pemfc_hybrid_retrofit():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -475,7 +464,6 @@ def test_turboshaft_pemfc_hybrid_retrofit():
 
 
 def test_pemfc_lh2_tank_powertrain_network():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "pemfc_lh2_propulsion.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "pemfc_lh2_propulsion.html")
 
@@ -484,7 +472,6 @@ def test_pemfc_lh2_tank_powertrain_network():
 
 
 def test_pemfc_lh2_retrofit():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -522,7 +509,6 @@ def test_pemfc_lh2_retrofit():
 
 
 def test_pemfc_wing_pod_lh2_tank_powertrain_network():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "pemfc_wing_pod_lh2_propulsion.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "pemfc_wing_pod_lh2_propulsion.html")
 
@@ -531,7 +517,6 @@ def test_pemfc_wing_pod_lh2_tank_powertrain_network():
 
 
 def test_pemfc_wing_pod_lh2_retrofit():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -571,7 +556,6 @@ def test_pemfc_wing_pod_lh2_retrofit():
 
 
 def test_pemfc_belly_lh2_tank_wingpod_powertrain_network():
-
     pt_file_path = pth.join(DATA_FOLDER_PATH, "pemfc_belly_lh2_tank_wingpod_propulsion.yml")
     network_file_path = pth.join(
         RESULTS_FOLDER_PATH, "pemfc_belly_lh2_tank_wingpod_propulsion.html"
@@ -582,7 +566,6 @@ def test_pemfc_belly_lh2_tank_wingpod_powertrain_network():
 
 
 def test_pemfc_belly_lh2_tank_wingpod_retrofit():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -622,7 +605,6 @@ def test_pemfc_belly_lh2_tank_wingpod_retrofit():
 
 
 def test_pemfc_lh2_hybrid_retrofit():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -661,7 +643,6 @@ def test_pemfc_lh2_hybrid_retrofit():
 
 
 def test_ghc_6():
-
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True

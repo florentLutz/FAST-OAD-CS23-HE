@@ -12,13 +12,11 @@ class PerformancesCryogenicHydrogenTankConduction(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -51,7 +49,6 @@ class PerformancesCryogenicHydrogenTankConduction(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["heat_conduction"] = inputs["heat_convection"] + inputs["heat_radiation"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):

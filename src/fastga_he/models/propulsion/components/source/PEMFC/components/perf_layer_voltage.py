@@ -11,9 +11,9 @@ DEFAULT_LAYER_VOLTAGE = 0.7
 DEFAULT_PRESSURE_ATM = 1.0
 DEFAULT_TEMPERATURE = 288.15
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
-] = "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.statistical"
+oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE] = (
+    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.statistical"
+)
 
 
 @oad.RegisterSubmodel(
@@ -28,7 +28,6 @@ class PerformancesSinglePEMFCVoltageStatistical(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -60,7 +59,7 @@ class PerformancesSinglePEMFCVoltageStatistical(om.ExplicitComponent):
 
         self.options.declare(
             "coefficient_in_concentration_loss",
-            default=5.63 * 10 ** -6,
+            default=5.63 * 10**-6,
             desc="coefficient in concentration loss of one layer of pemfc [V]",
         )
 
@@ -75,7 +74,6 @@ class PerformancesSinglePEMFCVoltageStatistical(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -119,7 +117,6 @@ class PerformancesSinglePEMFCVoltageStatistical(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         voc = self.options["open_circuit_voltage"]
         active_loss_coeff = self.options["activation_loss_coefficient"]
         r = self.options["ohmic_resistance"]
@@ -138,7 +135,7 @@ class PerformancesSinglePEMFCVoltageStatistical(om.ExplicitComponent):
 
         pressure_ratio_log = np.log(operation_pressure / nominal_pressure)
 
-        pressure_coeff = -0.0032 * pressure_ratio_log ** 2 + 0.0019 * pressure_ratio_log + 0.0542
+        pressure_coeff = -0.0032 * pressure_ratio_log**2 + 0.0019 * pressure_ratio_log + 0.0542
 
         outputs["single_layer_pemfc_voltage"] = (
             voc
@@ -149,7 +146,6 @@ class PerformancesSinglePEMFCVoltageStatistical(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
         active_loss_coeff = self.options["activation_loss_coefficient"]
         r = self.options["ohmic_resistance"]
@@ -177,11 +173,11 @@ class PerformancesSinglePEMFCVoltageStatistical(om.ExplicitComponent):
         partials["single_layer_pemfc_voltage", "fc_current_density"] = partials_j
 
         partials["single_layer_pemfc_voltage", "operation_pressure"] = -(
-            48 * pressure_ratio_log ** 2 - 19 * pressure_ratio_log - 271
+            48 * pressure_ratio_log**2 - 19 * pressure_ratio_log - 271
         ) / (5000 * operation_pressure)
 
         partials["single_layer_pemfc_voltage", "nominal_pressure"] = (
-            48 * pressure_ratio_log ** 2 - 19 * pressure_ratio_log - 271
+            48 * pressure_ratio_log**2 - 19 * pressure_ratio_log - 271
         ) / (5000 * nominal_pressure)
 
 
@@ -197,7 +193,6 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -253,7 +248,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
 
         self.options.declare(
             "area_specific_resistance",
-            default=1.0 * 10 ** -6,
+            default=1.0 * 10**-6,
             desc="Combined ohmic resistance that leads to losses in pemfc [Ωm**2]",
         )
 
@@ -276,7 +271,6 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -372,7 +366,6 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
         e0 = self.options["reversible_electric_potential"]
         ds = self.options["entropy_difference"]

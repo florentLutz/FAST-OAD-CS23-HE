@@ -10,7 +10,6 @@ class PerformancesApparentPower(om.ExplicitComponent):
     """Computation of the electric apparent power required to run the motor."""
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -19,7 +18,6 @@ class PerformancesApparentPower(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
@@ -35,7 +33,6 @@ class PerformancesApparentPower(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         outputs["apparent_power"] = (
@@ -44,7 +41,6 @@ class PerformancesApparentPower(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 

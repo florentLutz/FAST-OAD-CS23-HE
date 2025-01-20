@@ -24,7 +24,6 @@ from ..components.perf_analytical_voltage_adjustment import PerformancesAnalytic
 
 class PerformancesPEMFCStack(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -43,7 +42,6 @@ class PerformancesPEMFCStack(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
         direct_bus_connection = self.options["direct_bus_connection"]

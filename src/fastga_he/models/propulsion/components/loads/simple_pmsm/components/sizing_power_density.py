@@ -15,7 +15,6 @@ class SizingPowerDensity(om.ExplicitComponent):
         )
 
     def setup(self):
-
         motor_id = self.options["motor_id"]
 
         self.add_input(
@@ -40,7 +39,6 @@ class SizingPowerDensity(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         outputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":power_density"] = (
@@ -49,15 +47,12 @@ class SizingPowerDensity(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         partials[
             "data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":power_density",
             "data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":shaft_power_rating",
-        ] = (
-            1 / inputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":mass"]
-        )
+        ] = 1 / inputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":mass"]
         partials[
             "data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":power_density",
             "data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":mass",

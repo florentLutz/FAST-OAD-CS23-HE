@@ -13,7 +13,6 @@ class SizingHydrogenGasTankUnusableHydrogen(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,

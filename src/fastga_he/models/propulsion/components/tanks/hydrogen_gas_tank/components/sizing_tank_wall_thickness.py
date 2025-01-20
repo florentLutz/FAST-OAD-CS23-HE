@@ -5,6 +5,7 @@
 import openmdao.api as om
 import numpy as np
 
+
 # To modify
 class SizingHydrogenGasTankWallThickness(om.ExplicitComponent):
     """
@@ -12,7 +13,6 @@ class SizingHydrogenGasTankWallThickness(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,
@@ -21,7 +21,6 @@ class SizingHydrogenGasTankWallThickness(om.ExplicitComponent):
         )
 
     def setup(self):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         self.add_input(
@@ -68,7 +67,6 @@ class SizingHydrogenGasTankWallThickness(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         outputs[

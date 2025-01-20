@@ -13,7 +13,6 @@ class PerformancesLiquidHydrogenConsumedMission(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -26,7 +25,6 @@ class PerformancesLiquidHydrogenConsumedMission(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
@@ -49,7 +47,6 @@ class PerformancesLiquidHydrogenConsumedMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=np.ones(number_of_points))
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         outputs[

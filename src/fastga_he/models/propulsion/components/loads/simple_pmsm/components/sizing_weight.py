@@ -16,7 +16,6 @@ class SizingMotorWeight(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -46,7 +45,6 @@ class SizingMotorWeight(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         motor_id = self.options["motor_id"]
 
         torque_cont = inputs[
@@ -58,7 +56,6 @@ class SizingMotorWeight(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:simple_PMSM:" + motor_id + ":mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         motor_id = self.options["motor_id"]
 
         torque_cont = inputs[

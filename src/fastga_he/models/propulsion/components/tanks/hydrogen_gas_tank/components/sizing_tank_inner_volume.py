@@ -23,7 +23,6 @@ class SizingHydrogenGasTankInnerVolume(om.ExplicitComponent):
         self.rho_fuel = None
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,
@@ -32,7 +31,6 @@ class SizingHydrogenGasTankInnerVolume(om.ExplicitComponent):
         )
 
     def setup(self):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         self.add_input(
@@ -76,7 +74,6 @@ class SizingHydrogenGasTankInnerVolume(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         fuel_mass = inputs[
@@ -97,10 +94,9 @@ class SizingHydrogenGasTankInnerVolume(om.ExplicitComponent):
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
             + ":inner_volume"
-        ] = (z * HYDROGEN_GAS_CONSTANT * fuel_mass * tank_temperature / tank_pressure)
+        ] = z * HYDROGEN_GAS_CONSTANT * fuel_mass * tank_temperature / tank_pressure
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         fuel_mass = inputs[
@@ -124,18 +120,14 @@ class SizingHydrogenGasTankInnerVolume(om.ExplicitComponent):
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
             + ":capacity",
-        ] = (
-            z * HYDROGEN_GAS_CONSTANT * tank_temperature / tank_pressure
-        )
+        ] = z * HYDROGEN_GAS_CONSTANT * tank_temperature / tank_pressure
 
         partials[
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
             + ":inner_volume",
             "tank_temperature",
-        ] = (
-            z * HYDROGEN_GAS_CONSTANT * fuel_mass / tank_pressure
-        )
+        ] = z * HYDROGEN_GAS_CONSTANT * fuel_mass / tank_pressure
 
         partials[
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
@@ -144,6 +136,4 @@ class SizingHydrogenGasTankInnerVolume(om.ExplicitComponent):
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
             + ":tank_pressure",
-        ] = (
-            -0.99704 * HYDROGEN_GAS_CONSTANT * fuel_mass * tank_temperature / tank_pressure ** 2
-        )
+        ] = -0.99704 * HYDROGEN_GAS_CONSTANT * fuel_mass * tank_temperature / tank_pressure**2

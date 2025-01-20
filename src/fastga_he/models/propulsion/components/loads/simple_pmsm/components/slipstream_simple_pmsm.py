@@ -14,7 +14,6 @@ class SlipstreamSimplePMSM(om.Group):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -23,7 +22,6 @@ class SlipstreamSimplePMSM(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         ivc = om.IndepVarComp()

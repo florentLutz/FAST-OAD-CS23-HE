@@ -48,7 +48,6 @@ NB_POINTS_TEST = 10
 
 
 def test_unusable_hydrogen_gas_mission():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -63,19 +62,15 @@ def test_unusable_hydrogen_gas_mission():
         SizingHydrogenGasTankUnusableHydrogen(hydrogen_gas_tank_id="hydrogen_gas_tank_1"),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:unusable_fuel_mission",
-            units="kg",
-        )
-        == pytest.approx(0.03, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:unusable_fuel_mission",
+        units="kg",
+    ) == pytest.approx(0.03, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_total_hydrogen_gas_mission():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -90,19 +85,15 @@ def test_total_hydrogen_gas_mission():
         SizingHydrogenGasTankTotalHydrogenMission(hydrogen_gas_tank_id="hydrogen_gas_tank_1"),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:fuel_total_mission",
-            units="kg",
-        )
-        == pytest.approx(1.01, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:fuel_total_mission",
+        units="kg",
+    ) == pytest.approx(1.01, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_inner_volume_hydrogen_gas_tank():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankInnerVolume(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
@@ -115,19 +106,15 @@ def test_inner_volume_hydrogen_gas_tank():
         SizingHydrogenGasTankInnerVolume(hydrogen_gas_tank_id="hydrogen_gas_tank_1"),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:inner_volume",
-            units="L",
-        )
-        == pytest.approx(1272.265, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:inner_volume",
+        units="L",
+    ) == pytest.approx(1272.265, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_tank_cg_x():
-
     expected_values = [0.0, 1.73871, 2.8847, 3.96643, 1.73871]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -155,7 +142,6 @@ def test_tank_cg_x():
 
 
 def test_tank_cg_y():
-
     expected_values = [0.0, 1.848, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -183,7 +169,6 @@ def test_tank_cg_y():
 
 
 def test_tank_length():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankLength(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
         __file__,
@@ -196,19 +181,15 @@ def test_tank_length():
         ivc,
     )
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:length",
-            units="m",
-        )
-        == pytest.approx(1.0, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:length",
+        units="m",
+    ) == pytest.approx(1.0, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_tank_outer_diameter():
-
     expected_values = [0.97802, 0.97802, 0.543, 0.97802, 0.543]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -230,19 +211,15 @@ def test_tank_outer_diameter():
             ),
             ivc,
         )
-        assert (
-            problem.get_val(
-                "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:outer_diameter",
-                units="m",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:outer_diameter",
+            units="m",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_tank_adjust_outer_diameter():
-
     ivc = om.IndepVarComp()
     # Research independent input value in .xml file
 
@@ -267,13 +244,10 @@ def test_tank_adjust_outer_diameter():
         ivc,
     )
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:outer_diameter",
-            units="m",
-        )
-        == pytest.approx(2.3811, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:outer_diameter",
+        units="m",
+    ) == pytest.approx(2.3811, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
 
@@ -301,19 +275,15 @@ def test_tank_adjust_outer_diameter():
         ivc,
     )
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:outer_diameter",
-            units="m",
-        )
-        == pytest.approx(7.5, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:outer_diameter",
+        units="m",
+    ) == pytest.approx(7.5, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_tank_diameter_update():
-
     ivc = om.IndepVarComp()
     # Research independent input value in .xml file
 
@@ -329,13 +299,10 @@ def test_tank_diameter_update():
         ivc,
     )
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:diameter",
-            units="m",
-        )
-        == pytest.approx(1.0, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:diameter",
+        units="m",
+    ) == pytest.approx(1.0, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
 
@@ -355,13 +322,10 @@ def test_tank_overall_length():
         ),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:overall_length",
-            units="m",
-        )
-        == pytest.approx(1.97802, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:overall_length",
+        units="m",
+    ) == pytest.approx(1.97802, rel=1e-2)
     problem.check_partials(compact_print=True, step=1e-7)
 
 
@@ -370,7 +334,6 @@ def test_tank_overall_length_fuselage_check():
     expected_values = [1.628, -0.4994, 0.0, -0.84646, -0.4994]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
-
         ivc = get_indep_var_comp(
             list_inputs(
                 SizingHydrogenGasTankOverallLengthFuselageCheck(
@@ -388,19 +351,15 @@ def test_tank_overall_length_fuselage_check():
             ),
             ivc,
         )
-        assert (
-            problem.get_val(
-                "constraints:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:overall_length",
-                units="m",
-            )
-            == pytest.approx(expected_value, rel=1e-2)
-        )
+        assert problem.get_val(
+            "constraints:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:overall_length",
+            units="m",
+        ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_tank_inner_diameter():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankInnerDiameter(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
         __file__,
@@ -412,19 +371,15 @@ def test_tank_inner_diameter():
         SizingHydrogenGasTankInnerDiameter(hydrogen_gas_tank_id="hydrogen_gas_tank_1"),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:inner_diameter",
-            units="m",
-        )
-        == pytest.approx(0.97776, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:inner_diameter",
+        units="m",
+    ) == pytest.approx(0.97776, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_tank_aspect_ratio():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankAspectRatio(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
         __file__,
@@ -436,18 +391,14 @@ def test_tank_aspect_ratio():
         SizingHydrogenGasTankAspectRatio(hydrogen_gas_tank_id="hydrogen_gas_tank_1"),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:aspect_ratio",
-        )
-        == pytest.approx(2.022, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:aspect_ratio",
+    ) == pytest.approx(2.022, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_tank_stress_coefficient():
-
     ivc = get_indep_var_comp(
         list_inputs(
             SizingHydrogenGasTankStressCoefficinet(hydrogen_gas_tank_id="hydrogen_gas_tank_1")
@@ -461,18 +412,14 @@ def test_tank_stress_coefficient():
         SizingHydrogenGasTankStressCoefficinet(hydrogen_gas_tank_id="hydrogen_gas_tank_1"),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:stress_coefficient",
-        )
-        == pytest.approx(0.747, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:stress_coefficient",
+    ) == pytest.approx(0.747, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_tank_wall_thickness():
-
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankWallThickness(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
         __file__,
@@ -484,19 +431,15 @@ def test_tank_wall_thickness():
         SizingHydrogenGasTankWallThickness(hydrogen_gas_tank_id="hydrogen_gas_tank_1"),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:wall_thickness",
-            units="m",
-        )
-        == pytest.approx(1.303e-4, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:wall_thickness",
+        units="m",
+    ) == pytest.approx(1.303e-4, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_hydrogen_gas_tank_weight():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankWeight(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
@@ -517,7 +460,6 @@ def test_hydrogen_gas_tank_weight():
 
 
 def test_hydrogen_gas_tank_gravimetric_index():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -545,7 +487,6 @@ def test_hydrogen_gas_tank_gravimetric_index():
 
 
 def test_hydrogen_gas_tank_drag():
-
     expected_ls_drag = [0.0, 0.01057, 0.0, 1.4668e-3]
     expected_cruise_drag = [0.0, 0.01057, 0.0, 1.44669e-3]
 
@@ -577,25 +518,18 @@ def test_hydrogen_gas_tank_drag():
             )
 
             if ls_option:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:low_speed:CD0",
-                    )
-                    == pytest.approx(ls_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:low_speed:CD0",
+                ) == pytest.approx(ls_drag, rel=1e-2)
             else:
-                assert (
-                    problem.get_val(
-                        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:cruise:CD0",
-                    )
-                    == pytest.approx(cruise_drag, rel=1e-2)
-                )
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:cruise:CD0",
+                ) == pytest.approx(cruise_drag, rel=1e-2)
 
             problem.check_partials(compact_print=True)
 
 
 def test_sizing_tank():
-
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTank(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
@@ -614,27 +548,20 @@ def test_sizing_tank():
     assert problem.get_val(
         "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:cruise:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:inner_diameter",
-            units="m",
-        )
-        == pytest.approx(0.97776, rel=1e-2)
-    )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:overall_length",
-            units="m",
-        )
-        == pytest.approx(2.02166, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:inner_diameter",
+        units="m",
+    ) == pytest.approx(0.97776, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:dimension:overall_length",
+        units="m",
+    ) == pytest.approx(2.02166, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_constraints_enforce_tank_capacity():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -656,7 +583,6 @@ def test_constraints_enforce_tank_capacity():
 
 
 def test_constraints_ensure_tank_capacity():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -675,19 +601,15 @@ def test_constraints_ensure_tank_capacity():
         ConstraintsHydrogenGasTankCapacityEnsure(hydrogen_gas_tank_id="hydrogen_gas_tank_1"),
         ivc,
     )
-    assert (
-        problem.get_val(
-            "constraints:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:capacity",
-            units="kg",
-        )
-        == pytest.approx(-5.0, rel=1e-2)
-    )
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:capacity",
+        units="kg",
+    ) == pytest.approx(-5.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_hydrogen_gas_consumed_mission():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST), units="kg")
@@ -700,19 +622,15 @@ def test_hydrogen_gas_consumed_mission():
         ivc,
     )
 
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:fuel_consumed_mission",
-            units="kg",
-        )
-        == pytest.approx(276.85, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:fuel_consumed_mission",
+        units="kg",
+    ) == pytest.approx(276.85, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_hydrogen_gas_remaining_mission():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -737,7 +655,6 @@ def test_hydrogen_gas_remaining_mission():
 
 
 def test_performances_hydrogen_gas_tank():
-
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST))
@@ -752,11 +669,8 @@ def test_performances_hydrogen_gas_tank():
         np.array([276.85, 263.48, 246.93, 227.2, 204.28, 178.19, 148.91, 116.46, 80.82, 42.0]),
         rel=1e-2,
     )
-    assert (
-        problem.get_val(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:fuel_consumed_mission",
-            units="kg",
-        )
-        == pytest.approx(279.62, rel=1e-2)
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:fuel_consumed_mission",
+        units="kg",
+    ) == pytest.approx(279.62, rel=1e-2)
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))

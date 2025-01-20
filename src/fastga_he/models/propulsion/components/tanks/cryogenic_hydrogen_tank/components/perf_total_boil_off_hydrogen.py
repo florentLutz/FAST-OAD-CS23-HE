@@ -24,7 +24,6 @@ class PerformancesHydrogenBoilOffTotal(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 

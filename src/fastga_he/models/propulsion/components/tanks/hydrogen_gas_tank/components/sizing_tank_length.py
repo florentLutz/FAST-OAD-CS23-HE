@@ -12,7 +12,6 @@ class SizingHydrogenGasTankLength(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="hydrogen_gas_tank_id",
             default=None,
@@ -21,7 +20,6 @@ class SizingHydrogenGasTankLength(om.ExplicitComponent):
         )
 
     def setup(self):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         self.add_input(
@@ -55,7 +53,6 @@ class SizingHydrogenGasTankLength(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         d_inner = inputs[
@@ -70,8 +67,8 @@ class SizingHydrogenGasTankLength(om.ExplicitComponent):
                 + hydrogen_gas_tank_id
                 + ":inner_volume"
             ]
-            - np.pi * d_inner ** 3 / 6
-        ) / (np.pi * d_inner ** 2 / 4)
+            - np.pi * d_inner**3 / 6
+        ) / (np.pi * d_inner**2 / 4)
 
         outputs[
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
@@ -80,7 +77,6 @@ class SizingHydrogenGasTankLength(om.ExplicitComponent):
         ] = length
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
 
         d_inner = inputs[
@@ -102,7 +98,7 @@ class SizingHydrogenGasTankLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
             + ":inner_volume",
-        ] = 1 / (d_inner ** 2 * np.pi / 4)
+        ] = 1 / (d_inner**2 * np.pi / 4)
 
         partials[
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
@@ -111,6 +107,4 @@ class SizingHydrogenGasTankLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
             + ":dimension:inner_diameter",
-        ] = (
-            -8 * inner_volume / (np.pi * d_inner ** 3) - 2 / 3
-        )
+        ] = -8 * inner_volume / (np.pi * d_inner**3) - 2 / 3

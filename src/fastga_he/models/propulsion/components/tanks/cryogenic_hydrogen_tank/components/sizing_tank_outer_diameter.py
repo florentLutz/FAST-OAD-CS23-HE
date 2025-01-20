@@ -17,7 +17,6 @@ class SizingCryogenicHydrogenTankOuterDiameter(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="cryogenic_hydrogen_tank_id",
             default=None,
@@ -35,7 +34,6 @@ class SizingCryogenicHydrogenTankOuterDiameter(om.ExplicitComponent):
         )
 
     def setup(self):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
         self.add_input("data:geometry:fuselage:maximum_height", val=np.nan, units="m")
@@ -70,7 +68,6 @@ class SizingCryogenicHydrogenTankOuterDiameter(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]
 
@@ -101,27 +98,25 @@ class SizingCryogenicHydrogenTankOuterDiameter(om.ExplicitComponent):
         )
 
         if not_under_wing and not_fit_in_fuselage and positive_length:
-
             outputs[
                 "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id
                 + ":dimension:outer_diameter"
-            ] = (0.9 * inputs["data:geometry:fuselage:maximum_height"])
+            ] = 0.9 * inputs["data:geometry:fuselage:maximum_height"]
 
             _LOGGER.warning(
                 msg="Tank dimension greater than fuselage!! Tank diameter adjust to proper size"
             )
 
         elif not positive_length:
-
             outputs[
                 "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id
                 + ":dimension:outer_diameter"
             ] = ADJUST_FACTOR * np.cbrt(
-                d ** 3
+                d**3
                 + 3
-                * d ** 2
+                * d**2
                 * inputs[
                     "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                     + cryogenic_hydrogen_tank_id
@@ -139,10 +134,9 @@ class SizingCryogenicHydrogenTankOuterDiameter(om.ExplicitComponent):
                 "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id
                 + ":dimension:outer_diameter"
-            ] = (0.75 * inputs["data:geometry:fuselage:maximum_height"])
+            ] = 0.75 * inputs["data:geometry:fuselage:maximum_height"]
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id
@@ -150,7 +144,6 @@ class SizingCryogenicHydrogenTankOuterDiameter(om.ExplicitComponent):
             ] = d
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]
 
@@ -181,7 +174,6 @@ class SizingCryogenicHydrogenTankOuterDiameter(om.ExplicitComponent):
         )
 
         if not_under_wing and not_fit_in_fuselage and positive_length:
-
             partials[
                 "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id
@@ -209,14 +201,14 @@ class SizingCryogenicHydrogenTankOuterDiameter(om.ExplicitComponent):
                     ]
                 )
                 / (
-                    d ** 3
+                    d**3
                     + 3
                     * inputs[
                         "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                         + cryogenic_hydrogen_tank_id
                         + ":dimension:length"
                     ]
-                    * d ** 2
+                    * d**2
                     / 2
                 )
                 ** (2 / 3)
@@ -231,17 +223,17 @@ class SizingCryogenicHydrogenTankOuterDiameter(om.ExplicitComponent):
             ] = (
                 ADJUST_FACTOR
                 * 0.5
-                * d ** 2
+                * d**2
                 / (
                     3
-                    * d ** 2
+                    * d**2
                     * inputs[
                         "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                         + cryogenic_hydrogen_tank_id
                         + ":dimension:length"
                     ]
                     / 2
-                    + d ** 3
+                    + d**3
                 )
                 ** (2 / 3)
             )
@@ -257,7 +249,6 @@ class SizingCryogenicHydrogenTankOuterDiameter(om.ExplicitComponent):
             ] = 0.75
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
                 + cryogenic_hydrogen_tank_id
