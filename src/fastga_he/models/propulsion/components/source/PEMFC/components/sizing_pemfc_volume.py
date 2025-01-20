@@ -11,7 +11,7 @@ class SizingPEMFCVolume(om.ExplicitComponent):
     Computation of the volume the PEMFC based on number of layers.
     """
 
-    # TODO: Adding another way of mass estimation from D.Juschus
+    # TODO: Adding another way of mass estimation from D.Juschus (detailed volume estimation)
 
     def initialize(self):
 

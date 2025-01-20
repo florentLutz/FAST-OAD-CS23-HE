@@ -24,7 +24,7 @@ class SizingPEMFCWeightAerostak200W(om.ExplicitComponent):
     Computation of the weight the PEMFC based on the layer weight density of the Aerostak 200W stack.
     """
 
-    # TODO: Adding another way of mass estimation from D.Juschus
+    # TODO: Adding another way of mass estimation from D.Juschus (detailed volume estimation)
     def initialize(self):
 
         self.options.declare(
