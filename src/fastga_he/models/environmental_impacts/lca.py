@@ -5,6 +5,9 @@
 import numpy as np
 import openmdao.api as om
 
+import fastoad.api as oad
+from fastoad.module_management.constants import ModelDomain
+
 import fastga_he.models.propulsion.components as he_comp
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from .lca_equivalent_year_of_life import LCAEquivalentYearOfLife
@@ -37,7 +40,9 @@ from .resources.constants import (
     WEIGHTING_FACTOR,
 )
 
-
+@oad.RegisterOpenMDAOSystem(
+    "fastga_he.lca.legacy", domain=ModelDomain.OTHER
+)
 class LCA(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
