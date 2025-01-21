@@ -1,3 +1,8 @@
+"""
+Unitary Tests using DHC-6 Twin Otter as the baseline aircraft.
+The main purpose of this test file is to collect data for research.
+"""
+
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
@@ -22,6 +27,7 @@ RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
 
 def residuals_analyzer(recorder_path):
+    """Collect the residual sum of the output variables."""
     cr = om.CaseReader(recorder_path)
 
     solver_cases = cr.get_cases("root.nonlinear_solver")
@@ -41,6 +47,10 @@ def residuals_analyzer(recorder_path):
 
 
 def outputs_analyzer(recorder_path):
+    """
+    Record value evolution of output variables
+    in the last 10 iteration before the end of the run.
+    """
     cr = om.CaseReader(recorder_path)
 
     solver_cases = cr.get_cases("root.nonlinear_solver")
@@ -76,7 +86,7 @@ def outputs_analyzer(recorder_path):
 def cleanup():
     """Empties results folder to avoid any conflicts."""
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
-    rmtree("D:/tmp", ignore_errors=True)
+    rmtree("./workdir", ignore_errors=True)
 
 
 def test_sizing_dhc6_twin_otter():
