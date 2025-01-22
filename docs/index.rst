@@ -2,7 +2,7 @@
 Welcome to FAST-OAD-CS23-HE
 ===========================
 
-For a description of the features of the FAST-OAD framework, you may look at the `official documentation <https://fast-oad.readthedocs.io/en/stable/>`_
+For a description of the features of the FAST-OAD framework, you may explore the `official documentation <https://fast-oad.readthedocs.io/en/stable/>`_
 
 For a description of models used in FAST-OAD-CS23-HE, you may look at
 :ref:`models-index`.
