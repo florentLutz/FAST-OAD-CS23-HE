@@ -40,9 +40,8 @@ from .resources.constants import (
     WEIGHTING_FACTOR,
 )
 
-@oad.RegisterOpenMDAOSystem(
-    "fastga_he.lca.legacy", domain=ModelDomain.OTHER
-)
+
+@oad.RegisterOpenMDAOSystem("fastga_he.lca.legacy", domain=ModelDomain.OTHER)
 class LCA(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

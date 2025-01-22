@@ -5,9 +5,13 @@
 import os
 import pathlib
 
-import time
-
 import pytest
+
+import numpy as np
+
+import plotly.graph_objects as go
+
+import fastoad.api as oad
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lca import LCA
@@ -19,8 +23,8 @@ IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
-def test_environmental_impact_function_span():
-    t1 = time.time()
+def test_environmental_impact_function_span_hybrid():
+    input_file_name = "hybrid_kodiak.xml"
 
     component = LCA(
         power_train_file_path=DATA_FOLDER_PATH / "hybrid_propulsion.yml",
@@ -36,7 +40,7 @@ def test_environmental_impact_function_span():
     ivc = get_indep_var_comp(
         list_inputs(component),
         __file__,
-        DATA_FOLDER_PATH / "hybrid_kodiak.xml",
+        DATA_FOLDER_PATH / input_file_name,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -45,24 +49,116 @@ def test_environmental_impact_function_span():
         ivc,
     )
 
-    problem.output_file_path = RESULTS_FOLDER_PATH / "default.xml"
-    problem.write_outputs()
+    mean_airframe_hours = 3524.9
+    std_airframe_hours = 266.5
 
-    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        1.113997499958996e-05, rel=1e-3
+    # To have a widespread, we cover values of airframe hours that goes from the average airframe
+    # hours of the fleet (with confidence interval) to an estimate of the average max airframe
+    # hours of the fleet (which we'll estimate as twice the average airframe hours of the fleet,
+    # with the confidence interval)
+
+    print("First run done")
+
+    for airframe_hours in np.linspace(
+        mean_airframe_hours - 3.0 * std_airframe_hours,
+        2.0 * mean_airframe_hours + 6.0 * std_airframe_hours,
+    ):
+        problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
+
+        problem.run_model()
+
+        file_name = input_file_name.split(".")[0] + "_" + str(int(airframe_hours)) + ".xml"
+        problem.output_file_path = RESULTS_FOLDER_PATH / file_name
+        problem.write_outputs()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_draw_sensitivity_to_lifespan():
+    fig = go.Figure()
+
+    x, y = [], []
+
+    for dirpath, _, filenames in os.walk(RESULTS_FOLDER_PATH):
+        for filename in filenames:
+            x.append(int(filename.split(".")[0]))
+            datafile = oad.DataFile(os.path.join(dirpath, filename))
+            single_score = datafile["data:environmental_impact:single_score"].value[0]
+            y.append(single_score)
+
+    scatter = go.Scatter(x=x, y=y)
+
+    fig.add_trace(scatter)
+    fig.update_layout(
+        plot_bgcolor="white",
+        title_x=0.5,
+        title_text="Evolution of the single score with life expectancy of the aircraft",
+    )
+    fig.update_xaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        title="Airframe hours [h]",
+    )
+    fig.update_yaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        range=[0, None],
+        title="Single score [-]",
+    )
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_environmental_impact_function_span_conventional():
+    input_file_name = "ref_kodiak_op.xml"
+
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion.yml",
+        component_level_breakdown=True,
+        airframe_material="aluminium",
+        delivery_method="flight",
+        impact_assessment_method="EF v3.1",
+        normalization=True,
+        weighting=True,
+        aircraft_lifespan_in_hours=True,
+        use_operational_mission=True,
     )
 
-    t2 = time.time()
+    ivc = get_indep_var_comp(
+        list_inputs(component),
+        __file__,
+        DATA_FOLDER_PATH / input_file_name,
+    )
 
-    print("First run", t2 - t1)
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
 
-    problem.set_val("data:TLAR:max_airframe_hours", val=3524.9, units="h")
+    mean_airframe_hours = 3524.9
+    std_airframe_hours = 266.5
 
-    problem.run_model()
+    # To have a widespread, we cover values of airframe hours that goes from the average airframe
+    # hours of the fleet (with confidence interval) to an estimate of the average max airframe
+    # hours of the fleet (which we'll estimate as twice the average airframe hours of the fleet,
+    # with the confidence interval)
 
-    problem.output_file_path = RESULTS_FOLDER_PATH / "reduced_use.xml"
-    problem.write_outputs()
+    print("First run done")
 
-    t3 = time.time()
+    for airframe_hours in np.linspace(
+        mean_airframe_hours - 3.0 * std_airframe_hours,
+        2.0 * mean_airframe_hours + 6.0 * std_airframe_hours,
+    ):
+        problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
 
-    print("Second run", t3-t2)
+        problem.run_model()
+
+        file_name = input_file_name.split(".")[0] + "_" + str(int(airframe_hours)) + ".xml"
+        problem.output_file_path = RESULTS_FOLDER_PATH / file_name
+        problem.write_outputs()
