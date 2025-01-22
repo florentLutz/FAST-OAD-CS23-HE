@@ -1,7 +1,7 @@
-"""Unitary test to check the function of hydrogen gas tank calculation."""
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
+
 
 import openmdao.api as om
 import pytest
@@ -48,7 +48,6 @@ NB_POINTS_TEST = 10
 
 
 def test_unusable_hydrogen_gas_mission():
-    """Check calculation of unusable hydrogen gas remains in the tank."""
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -72,7 +71,6 @@ def test_unusable_hydrogen_gas_mission():
 
 
 def test_total_hydrogen_gas_mission():
-    """Check calculation of total hydrogen gas consumed in mission."""
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -96,7 +94,6 @@ def test_total_hydrogen_gas_mission():
 
 
 def test_inner_volume_hydrogen_gas_tank():
-    """Check calculation of inner volume of the hydrogen gas tank."""
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankInnerVolume(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
@@ -118,7 +115,6 @@ def test_inner_volume_hydrogen_gas_tank():
 
 
 def test_tank_cg_x():
-    """Check calculation of tank CG in x-direction with possible placements."""
     expected_values = [0.0, 1.73871, 2.8847, 3.96643, 1.73871]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -146,7 +142,6 @@ def test_tank_cg_x():
 
 
 def test_tank_cg_y():
-    """Check calculation of tank CG in y-direction with possible placements."""
     expected_values = [0.0, 1.848, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -174,7 +169,6 @@ def test_tank_cg_y():
 
 
 def test_tank_length():
-    """Check calculation of tank length excluding the two hemispherical ends."""
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankLength(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
         __file__,
@@ -196,7 +190,6 @@ def test_tank_length():
 
 
 def test_tank_outer_diameter():
-    """Check calculation of tank outer diameter."""
     expected_values = [0.97802, 0.97802, 0.543, 0.97802, 0.543]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
@@ -227,7 +220,6 @@ def test_tank_outer_diameter():
 
 
 def test_tank_adjust_outer_diameter():
-    """Check calculation of tank outer diameter to fit in the aircraft."""
     ivc = om.IndepVarComp()
     # Research independent input value in .xml file
 
@@ -292,7 +284,6 @@ def test_tank_adjust_outer_diameter():
 
 
 def test_tank_diameter_update():
-    """Check calculation of tank diameter update after each iteration."""
     ivc = om.IndepVarComp()
     # Research independent input value in .xml file
 
@@ -317,7 +308,6 @@ def test_tank_diameter_update():
 
 
 def test_tank_overall_length():
-    """Check calculation of tank overall length."""
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankOverallLength(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
@@ -340,10 +330,6 @@ def test_tank_overall_length():
 
 
 def test_tank_overall_length_fuselage_check():
-    """
-    Test calculation of tank overall length check
-    compared to the designated length in fuselage.
-    """
     # Research independent input value in .xml file
     expected_values = [1.628, -0.4994, 0.0, -0.84646, -0.4994]
 
@@ -374,9 +360,6 @@ def test_tank_overall_length_fuselage_check():
 
 
 def test_tank_inner_diameter():
-    """
-    Test calculation of the tank inner diameter.
-    """
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankInnerDiameter(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
         __file__,
@@ -397,7 +380,6 @@ def test_tank_inner_diameter():
 
 
 def test_tank_aspect_ratio():
-    """Test calculation of the tank aspect ratio."""
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankAspectRatio(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
         __file__,
@@ -417,7 +399,6 @@ def test_tank_aspect_ratio():
 
 
 def test_tank_stress_coefficient():
-    """Test calculation of the tank stress coefficient for hoop stress."""
     ivc = get_indep_var_comp(
         list_inputs(
             SizingHydrogenGasTankStressCoefficinet(hydrogen_gas_tank_id="hydrogen_gas_tank_1")
@@ -439,7 +420,6 @@ def test_tank_stress_coefficient():
 
 
 def test_tank_wall_thickness():
-    """Test calculation of tank wall thickness."""
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankWallThickness(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
         __file__,
@@ -460,7 +440,6 @@ def test_tank_wall_thickness():
 
 
 def test_hydrogen_gas_tank_weight():
-    """Test calculation of tank weight."""
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankWeight(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
@@ -481,7 +460,6 @@ def test_hydrogen_gas_tank_weight():
 
 
 def test_hydrogen_gas_tank_gravimetric_index():
-    """Test calculation of tank gravimetric index."""
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
@@ -509,7 +487,6 @@ def test_hydrogen_gas_tank_gravimetric_index():
 
 
 def test_hydrogen_gas_tank_drag():
-    """Test calculation of drag increment from hydrogen gas tank."""
     expected_ls_drag = [0.0, 0.01057, 0.0, 1.4668e-3]
     expected_cruise_drag = [0.0, 0.01057, 0.0, 1.44669e-3]
 
@@ -553,7 +530,6 @@ def test_hydrogen_gas_tank_drag():
 
 
 def test_sizing_tank():
-    """Test hydrogen gas tank sizing calculation process."""
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTank(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),
@@ -586,7 +562,6 @@ def test_sizing_tank():
 
 
 def test_constraints_enforce_tank_capacity():
-    """Test enforcing tank contraints in calculation."""
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -608,7 +583,6 @@ def test_constraints_enforce_tank_capacity():
 
 
 def test_constraints_ensure_tank_capacity():
-    """Test tank contraints ensured in calculation."""
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -636,7 +610,6 @@ def test_constraints_ensure_tank_capacity():
 
 
 def test_hydrogen_gas_consumed_mission():
-    """Test caculation of the amount of H2 gas consumed based on the mission."""
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST), units="kg")
@@ -658,7 +631,6 @@ def test_hydrogen_gas_consumed_mission():
 
 
 def test_hydrogen_gas_remaining_mission():
-    """Test caculation of the amount of H2 gas remained during mission."""
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -683,7 +655,6 @@ def test_hydrogen_gas_remaining_mission():
 
 
 def test_performances_hydrogen_gas_tank():
-    """Test hydrogen gas tank performance calculation process."""
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST))
