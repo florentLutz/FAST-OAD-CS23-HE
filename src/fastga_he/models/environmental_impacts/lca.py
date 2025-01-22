@@ -80,6 +80,7 @@ class LCA(om.Group):
             desc="Material used for the airframe which include wing, fuselage, HTP and VTP. LG will"
             " always be in aluminium and flight controls in steel",
             allow_none=False,
+            values=["aluminium", "composite"],
         )
         self.options.declare(
             name="delivery_method",
