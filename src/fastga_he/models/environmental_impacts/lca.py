@@ -5,6 +5,9 @@
 import numpy as np
 import openmdao.api as om
 
+import fastoad.api as oad
+from fastoad.module_management.constants import ModelDomain
+
 import fastga_he.models.propulsion.components as he_comp
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from .lca_equivalent_year_of_life import LCAEquivalentYearOfLife
@@ -38,6 +41,7 @@ from .resources.constants import (
 )
 
 
+@oad.RegisterOpenMDAOSystem("fastga_he.lca.legacy", domain=ModelDomain.OTHER)
 class LCA(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -76,6 +80,7 @@ class LCA(om.Group):
             desc="Material used for the airframe which include wing, fuselage, HTP and VTP. LG will"
             " always be in aluminium and flight controls in steel",
             allow_none=False,
+            values=["aluminium", "composite"],
         )
         self.options.declare(
             name="delivery_method",
