@@ -14,4 +14,6 @@ A description of this LCA module is available here. It includes a description of
 .. toctree::
    :maxdepth: 2
 
+    LCA module functioning <models>
     Options description <options>
+    LCA module assumptions <assumptions>
