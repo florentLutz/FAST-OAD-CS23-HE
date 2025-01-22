@@ -120,21 +120,27 @@ class PerformancesCryogenicHydrogenTankNusseltNumber(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
+
         air_speed = inputs["true_airspeed"]
 
         if position == "wing_pod" or position == "underbelly":
             reynolds_number = (
                 air_speed
-                * inputs[input_prefix + ":dimension:outer_diameter"]
+                * inputs[
+                    "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                    + cryogenic_hydrogen_tank_id
+                    + ":dimension:outer_diameter"
+                ]
                 / inputs["air_kinematic_viscosity"]
             )
             outputs["tank_nusselt_number"] = 0.03625 * PRANDTL_NUMBER**0.43 * reynolds_number**0.8
         else:
             rayleigh_number = inputs["tank_rayleigh_number"]
-            ar = inputs[input_prefix + ":dimension:aspect_ratio"]
+            ar = inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:aspect_ratio"
+            ]
             outputs["tank_nusselt_number"] = (0.06 + 0.3213 * rayleigh_number ** (1 / 6)) ** 2 * (
                 1 - 1 / ar
             ) + (2 + 0.4545 * rayleigh_number**0.25) / ar
@@ -142,9 +148,6 @@ class PerformancesCryogenicHydrogenTankNusseltNumber(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         position = self.options["position"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
 
         if position == "wing_pod" or position == "underbelly":
             partials["tank_nusselt_number", "true_airspeed"] = (
@@ -152,33 +155,58 @@ class PerformancesCryogenicHydrogenTankNusseltNumber(om.ExplicitComponent):
                 * PRANDTL_NUMBER**0.43
                 * 0.8
                 * (
-                    inputs[input_prefix + ":dimension:outer_diameter"]
+                    inputs[
+                        "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                        + cryogenic_hydrogen_tank_id
+                        + ":dimension:outer_diameter"
+                    ]
                     / inputs["air_kinematic_viscosity"]
                 )
                 ** 0.8
                 / inputs["true_airspeed"] ** 0.2
             )
 
-            partials["tank_nusselt_number", input_prefix + ":dimension:outer_diameter"] = (
+            partials[
+                "tank_nusselt_number",
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:outer_diameter",
+            ] = (
                 0.03625
                 * PRANDTL_NUMBER**0.43
                 * 0.8
                 * (inputs["true_airspeed"] / inputs["air_kinematic_viscosity"]) ** 0.8
-                / inputs[input_prefix + ":dimension:outer_diameter"] ** 0.2
+                / inputs[
+                    "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                    + cryogenic_hydrogen_tank_id
+                    + ":dimension:outer_diameter"
+                ]
+                ** 0.2
             )
 
             partials["tank_nusselt_number", "air_kinematic_viscosity"] = (
                 -0.03625
                 * PRANDTL_NUMBER**0.43
                 * 0.8
-                * (inputs["true_airspeed"] * inputs[input_prefix + ":dimension:outer_diameter"])
+                * (
+                    inputs["true_airspeed"]
+                    * inputs[
+                        "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                        + cryogenic_hydrogen_tank_id
+                        + ":dimension:outer_diameter"
+                    ]
+                )
                 ** 0.8
                 / inputs["air_kinematic_viscosity"] ** 1.8
             )
 
         else:
             rayleigh_number = inputs["tank_rayleigh_number"]
-            ar = inputs[input_prefix + ":dimension:aspect_ratio"]
+            ar = inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:aspect_ratio"
+            ]
             partials["tank_nusselt_number", "tank_rayleigh_number"] = (
                 0.3213
                 * (0.3213 * rayleigh_number ** (1 / 6) + 0.06)
@@ -188,8 +216,13 @@ class PerformancesCryogenicHydrogenTankNusseltNumber(om.ExplicitComponent):
                 + 0.4545 / 4 / rayleigh_number**0.75 / ar
             )
 
-            partials["tank_nusselt_number", input_prefix + ":dimension:aspect_ratio"] = (
-                0.06 + 0.3213 * rayleigh_number ** (1 / 6)
-            ) ** 2 / ar**2 - (2 + 0.4545 * rayleigh_number**0.25) / ar**2
+            partials[
+                "tank_nusselt_number",
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:aspect_ratio",
+            ] = (0.06 + 0.3213 * rayleigh_number ** (1 / 6)) ** 2 / ar**2 - (
+                2 + 0.4545 * rayleigh_number**0.25
+            ) / ar**2
 
             partials["tank_nusselt_number", "true_airspeed"] = np.zeros_like(rayleigh_number)

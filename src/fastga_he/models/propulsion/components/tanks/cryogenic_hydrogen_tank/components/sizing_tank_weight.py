@@ -106,9 +106,76 @@ class SizingCryogenicHydrogenTankWeight(om.ExplicitComponent):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         structure_factor = self.options["structure_factor"]
 
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
+        wall_density = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":material:density"
+        ]
+
+        insulation_density = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:material_density"
+        ]
+
+        d = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:outer_diameter"
+        ]
+
+        dw = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:wall_diameter"
+        ]
+
+        l = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:length"
+        ]
+
+        outputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":mass"
+        ] = structure_factor * (
+            wall_density
+            * (
+                np.pi * dw**3 / 6
+                + np.pi * dw**2 * l / 4
+                - inputs[
+                    "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                    + cryogenic_hydrogen_tank_id
+                    + ":inner_volume"
+                ]
+            )
+            + insulation_density * (np.pi * (d**3 - dw**3) / 6 + np.pi * (d**2 - dw**2) * l / 4)
         )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
+
+        structure_factor = self.options["structure_factor"]
+
+        d = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:outer_diameter"
+        ]
+
+        dw = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:wall_diameter"
+        ]
+
+        l = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:length"
+        ]
 
         wall_density = inputs[
             "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
@@ -116,68 +183,72 @@ class SizingCryogenicHydrogenTankWeight(om.ExplicitComponent):
             + ":material:density"
         ]
 
-        insulation_density = inputs[input_prefix + ":insulation:material_density"]
-
-        d = inputs[input_prefix + ":dimension:outer_diameter"]
-
-        dw = inputs[input_prefix + ":dimension:wall_diameter"]
-
-        l = inputs[input_prefix + ":dimension:length"]
-
-        outputs[input_prefix + ":mass"] = structure_factor * (
-            wall_density
-            * (np.pi * dw**3 / 6 + np.pi * dw**2 * l / 4 - inputs[input_prefix + ":inner_volume"])
-            + insulation_density * (np.pi * (d**3 - dw**3) / 6 + np.pi * (d**2 - dw**2) * l / 4)
-        )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
-
-        structure_factor = self.options["structure_factor"]
-
-        d = inputs[input_prefix + ":dimension:outer_diameter"]
-
-        dw = inputs[input_prefix + ":dimension:wall_diameter"]
-
-        l = inputs[input_prefix + ":dimension:length"]
-
-        wall_density = inputs[input_prefix + ":material:density"]
-
-        insulation_density = inputs[input_prefix + ":insulation:material_density"]
+        insulation_density = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:material_density"
+        ]
 
         partials[
-            input_prefix + ":mass",
-            input_prefix + ":insulation:material_density",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":mass",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:material_density",
         ] = structure_factor * (np.pi * (d**3 - dw**3) / 6 + np.pi * (d**2 - dw**2) * l / 4)
 
         partials[
-            input_prefix + ":mass",
-            input_prefix + ":material:density",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":mass",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":material:density",
         ] = structure_factor * (
-            np.pi * dw**3 / 6 + np.pi * dw**2 / 4 * l - inputs[input_prefix + ":inner_volume"]
+            np.pi * dw**3 / 6
+            + np.pi * dw**2 / 4 * l
+            - inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":inner_volume"
+            ]
         )
 
         partials[
-            input_prefix + ":mass",
-            input_prefix + ":dimension:length",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":mass",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:length",
         ] = structure_factor * (
             wall_density * np.pi * dw**2 / 4 + insulation_density * np.pi * (d**2 - dw**2) / 4
         )
 
         partials[
-            input_prefix + ":mass",
-            input_prefix + ":inner_volume",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":mass",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":inner_volume",
         ] = -wall_density * structure_factor
 
         partials[
-            input_prefix + ":mass",
-            input_prefix + ":dimension:outer_diameter",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":mass",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:outer_diameter",
         ] = insulation_density * np.pi / 2 * (d**2 + d * l) * structure_factor
 
         partials[
-            input_prefix + ":mass",
-            input_prefix + ":dimension:wall_diameter",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":mass",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:wall_diameter",
         ] = np.pi / 2 * (wall_density - insulation_density) * (dw**2 + dw * l) * structure_factor

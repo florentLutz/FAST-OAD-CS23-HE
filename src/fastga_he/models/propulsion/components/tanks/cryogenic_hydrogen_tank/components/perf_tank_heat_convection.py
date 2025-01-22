@@ -26,9 +26,6 @@ class PerformancesCryogenicHydrogenTankConvection(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
 
         self.add_input(
             "tank_nusselt_number",
@@ -95,8 +92,12 @@ class PerformancesCryogenicHydrogenTankConvection(om.ExplicitComponent):
         self.declare_partials(
             of="heat_convection",
             wrt=[
-                input_prefix + ":dimension:outer_diameter",
-                input_prefix + ":dimension:length",
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:outer_diameter",
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:length",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -105,12 +106,22 @@ class PerformancesCryogenicHydrogenTankConvection(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
 
-        d = inputs[input_prefix + ":dimension:outer_diameter"]
-        area = np.pi * d**2 + np.pi * d * inputs[input_prefix + ":dimension:length"]
+        d = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:outer_diameter"
+        ]
+        area = (
+            np.pi * d**2
+            + np.pi
+            * d
+            * inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:length"
+            ]
+        )
 
         h = inputs["air_thermal_conductivity"] * inputs["tank_nusselt_number"] / d
 
@@ -121,12 +132,22 @@ class PerformancesCryogenicHydrogenTankConvection(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
         number_of_points = self.options["number_of_points"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
 
-        d = inputs[input_prefix + ":dimension:outer_diameter"]
-        area = np.pi * d**2 + np.pi * d * inputs[input_prefix + ":dimension:length"]
+        d = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:outer_diameter"
+        ]
+        area = (
+            np.pi * d**2
+            + np.pi
+            * d
+            * inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:length"
+            ]
+        )
         h = inputs["air_thermal_conductivity"] * inputs["tank_nusselt_number"] / d
 
         partials["heat_convection", "air_thermal_conductivity"] = (
@@ -143,10 +164,18 @@ class PerformancesCryogenicHydrogenTankConvection(om.ExplicitComponent):
         )
         partials["heat_convection", "exterior_temperature"] = h * area * np.ones(number_of_points)
         partials["heat_convection", "skin_temperature"] = -h * area * np.ones(number_of_points)
-        partials["heat_convection", input_prefix + ":dimension:length"] = (
-            h * np.pi * d * (inputs["exterior_temperature"] - inputs["skin_temperature"])
-        )
-        partials["heat_convection", input_prefix + ":dimension:outer_diameter"] = (
+        partials[
+            "heat_convection",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:length",
+        ] = h * np.pi * d * (inputs["exterior_temperature"] - inputs["skin_temperature"])
+        partials[
+            "heat_convection",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:outer_diameter",
+        ] = (
             inputs["air_thermal_conductivity"]
             * inputs["tank_nusselt_number"]
             * np.pi

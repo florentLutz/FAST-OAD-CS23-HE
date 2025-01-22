@@ -80,57 +80,113 @@ class SizingCryogenicHydrogenTankInnerDiameter(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
 
-        outputs[input_prefix + ":dimension:inner_diameter"] = inputs[
-            input_prefix + ":dimension:wall_diameter"
+        outputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:inner_diameter"
+        ] = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:wall_diameter"
         ] / (
             1
-            + inputs[input_prefix + ":dimension:stress_coefficient"]
-            * inputs[input_prefix + ":tank_pressure"]
-            * inputs[input_prefix + ":Safety_factor"]
-            / inputs[input_prefix + ":material:yield_strength"]
+            + inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:stress_coefficient"
+            ]
+            * inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":tank_pressure"
+            ]
+            * inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":Safety_factor"
+            ]
+            / inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":material:yield_strength"
+            ]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
 
-        tank_pressure = inputs[input_prefix + ":tank_pressure"]
+        tank_pressure = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":tank_pressure"
+        ]
 
-        sf = inputs[input_prefix + ":Safety_factor"]
+        sf = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":Safety_factor"
+        ]
 
-        sigma = inputs[input_prefix + ":material:yield_strength"]
+        sigma = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":material:yield_strength"
+        ]
 
-        d_wall = inputs[input_prefix + ":dimension:wall_diameter"]
+        d_wall = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:wall_diameter"
+        ]
 
-        c = inputs[input_prefix + ":dimension:stress_coefficient"]
+        c = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:stress_coefficient"
+        ]
 
         partials[
-            input_prefix + ":dimension:inner_diameter",
-            input_prefix + ":dimension:wall_diameter",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:inner_diameter",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:wall_diameter",
         ] = 1 / (1 + c * tank_pressure * sf / sigma)
 
         partials[
-            input_prefix + ":dimension:inner_diameter",
-            input_prefix + ":tank_pressure",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:inner_diameter",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":tank_pressure",
         ] = -d_wall * sf * c * sigma / (sf * tank_pressure * c + sigma) ** 2
 
         partials[
-            input_prefix + ":dimension:inner_diameter",
-            input_prefix + ":Safety_factor",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:inner_diameter",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":Safety_factor",
         ] = -d_wall * tank_pressure * c * sigma / (tank_pressure * sf * c + sigma) ** 2
 
         partials[
-            input_prefix + ":dimension:inner_diameter",
-            input_prefix + ":dimension:stress_coefficient",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:inner_diameter",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:stress_coefficient",
         ] = -d_wall * tank_pressure * sf * sigma / (tank_pressure * sf * c + sigma) ** 2
 
         partials[
-            input_prefix + ":dimension:inner_diameter",
-            input_prefix + ":material:yield_strength",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:inner_diameter",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":material:yield_strength",
         ] = c * d_wall * sf * tank_pressure / (sigma + sf * tank_pressure * c) ** 2

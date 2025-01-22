@@ -83,14 +83,16 @@ class PerformancesCryogenicHydrogenTankRayleighNumber(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
 
         rayleigh_number = (
             GRAVITY_ACCELERATION
             * (1 - inputs["skin_temperature"] / inputs["exterior_temperature"])
-            * inputs[input_prefix + ":dimension:outer_diameter"] ** 3
+            * inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:outer_diameter"
+            ]
+            ** 3
             * PRANDTL_NUMBER
             / inputs["air_kinematic_viscosity"]
         )
@@ -98,14 +100,16 @@ class PerformancesCryogenicHydrogenTankRayleighNumber(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
 
         partials["tank_rayleigh_number", "skin_temperature"] = (
             -GRAVITY_ACCELERATION
             / inputs["exterior_temperature"]
-            * inputs[input_prefix + ":dimension:outer_diameter"] ** 3
+            * inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:outer_diameter"
+            ]
+            ** 3
             * PRANDTL_NUMBER
             / inputs["air_kinematic_viscosity"]
         )
@@ -114,7 +118,12 @@ class PerformancesCryogenicHydrogenTankRayleighNumber(om.ExplicitComponent):
             GRAVITY_ACCELERATION
             * inputs["skin_temperature"]
             / inputs["exterior_temperature"] ** 2
-            * inputs[input_prefix + ":dimension:outer_diameter"] ** 3
+            * inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:outer_diameter"
+            ]
+            ** 3
             * PRANDTL_NUMBER
             / inputs["air_kinematic_viscosity"]
         )
@@ -122,16 +131,31 @@ class PerformancesCryogenicHydrogenTankRayleighNumber(om.ExplicitComponent):
         partials["tank_rayleigh_number", "air_kinematic_viscosity"] = -(
             GRAVITY_ACCELERATION
             * (1 - inputs["skin_temperature"] / inputs["exterior_temperature"])
-            * inputs[input_prefix + ":dimension:outer_diameter"] ** 3
+            * inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:outer_diameter"
+            ]
+            ** 3
             * PRANDTL_NUMBER
             / inputs["air_kinematic_viscosity"] ** 2
         )
 
-        partials["tank_rayleigh_number", input_prefix + ":dimension:outer_diameter"] = (
+        partials[
+            "tank_rayleigh_number",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:outer_diameter",
+        ] = (
             3
             * GRAVITY_ACCELERATION
             * (1 - inputs["skin_temperature"] / inputs["exterior_temperature"])
-            * inputs[input_prefix + ":dimension:outer_diameter"] ** 2
+            * inputs[
+                "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+                + cryogenic_hydrogen_tank_id
+                + ":dimension:outer_diameter"
+            ]
+            ** 2
             * PRANDTL_NUMBER
             / inputs["air_kinematic_viscosity"]
         )

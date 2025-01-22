@@ -15,7 +15,7 @@ import fastoad.api as oad
 from utils.filter_residuals import filter_residuals
 
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
-from fastga_he.gui.power_train_weight_breakdown import power_train_mass_breakdown
+# from fastga_he.gui.power_train_weight_breakdown import power_train_mass_breakdown
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")

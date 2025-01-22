@@ -77,62 +77,106 @@ class SizingCryogenicHydrogenTankInsulationThermalResistance(om.ExplicitComponen
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
 
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
+        k = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:thermal_conductivity"
+        ]
 
-        k = inputs[input_prefix + ":insulation:thermal_conductivity"]
+        d = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:outer_diameter"
+        ]
 
-        d = inputs[input_prefix + ":dimension:outer_diameter"]
+        dw = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:wall_diameter"
+        ]
 
-        dw = inputs[input_prefix + ":dimension:wall_diameter"]
-
-        l = inputs[input_prefix + ":dimension:length"]
+        l = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:length"
+        ]
 
         resistance_cylindrical = np.log(d / dw) / (2 * np.pi * l * k)
 
         resistance_spherical = (1 / d + 1 / dw) / (2 * np.pi * k)
 
-        outputs[input_prefix + ":insulation:thermal_resistance"] = (
-            1 / resistance_cylindrical + 1 / resistance_spherical
-        ) ** -1
+        outputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:thermal_resistance"
+        ] = (1 / resistance_cylindrical + 1 / resistance_spherical) ** -1
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         cryogenic_hydrogen_tank_id = self.options["cryogenic_hydrogen_tank_id"]
-        input_prefix = (
-            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:" + cryogenic_hydrogen_tank_id
-        )
 
-        k = inputs[input_prefix + ":insulation:thermal_conductivity"]
+        k = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:thermal_conductivity"
+        ]
 
-        d = inputs[input_prefix + ":dimension:outer_diameter"]
+        d = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:outer_diameter"
+        ]
 
-        dw = inputs[input_prefix + ":dimension:wall_diameter"]
+        dw = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:wall_diameter"
+        ]
 
-        l = inputs[input_prefix + ":dimension:length"]
+        l = inputs[
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:length"
+        ]
 
         partials[
-            input_prefix + ":insulation:thermal_resistance",
-            input_prefix + ":insulation:thermal_conductivity",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:thermal_resistance",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:thermal_conductivity",
         ] = (-2 * np.pi * k**2 * (l / np.log(d / dw) + 1 / (1 / dw + 1 / d))) ** -1
 
         partials[
-            input_prefix + ":insulation:thermal_resistance", input_prefix + ":dimension:length"
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:thermal_resistance",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:length",
         ] = -(
             (2 * np.pi * k * np.log(d / dw) * (l / np.log(d / dw) + 1 / (1 / dw + 1 / d)) ** 2)
             ** -1
         )
 
         partials[
-            input_prefix + ":insulation:thermal_resistance",
-            input_prefix + ":dimension:outer_diameter",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:thermal_resistance",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:outer_diameter",
         ] = (l / (d * np.log(d / dw) ** 2) - dw / (d + dw) + d * dw / (d + dw) ** 2) / (
             2 * np.pi * k * (l / np.log(d / dw) + d * dw / (d + dw)) ** 2
         )
 
         partials[
-            input_prefix + ":insulation:thermal_resistance",
-            input_prefix + ":dimension:wall_diameter",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":insulation:thermal_resistance",
+            "data:propulsion:he_power_train:cryogenic_hydrogen_tank:"
+            + cryogenic_hydrogen_tank_id
+            + ":dimension:wall_diameter",
         ] = -(d / (d + dw) - d * dw / (d + dw) ** 2 + l / (dw * np.log(d / dw) ** 2)) / (
             2 * np.pi * k * (l / np.log(d / dw) + d * dw / (d + dw)) ** 2
         )

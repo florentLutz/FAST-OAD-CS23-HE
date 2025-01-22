@@ -88,7 +88,7 @@ def test_total_hydrogen_gas_mission():
     assert problem.get_val(
         "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:fuel_total_mission",
         units="kg",
-    ) == pytest.approx(1.01, rel=1e-2)
+    ) == pytest.approx(1.03, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -142,7 +142,7 @@ def test_tank_cg_x():
 
 
 def test_tank_cg_y():
-    expected_values = [0.0, 1.848, 0.0, 0.0]
+    expected_values = [0.0, 0.0, 1.848, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
         # Research independent input value in .xml file
@@ -481,14 +481,14 @@ def test_hydrogen_gas_tank_gravimetric_index():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:gravimetric_index"
-    ) == pytest.approx(0.0476, rel=1e-2)
+    ) == pytest.approx(0.0471, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_hydrogen_gas_tank_drag():
-    expected_ls_drag = [0.0, 0.01057, 0.0, 1.4668e-3]
-    expected_cruise_drag = [0.0, 0.01057, 0.0, 1.44669e-3]
+    expected_ls_drag = [0.0, 0.0, 0.01057, 0.0, 1.4668e-3]
+    expected_cruise_drag = [0.0, 0.0, 0.01057, 0.0, 1.44669e-3]
 
     for option, ls_drag, cruise_drag in zip(
         POSSIBLE_POSITION, expected_ls_drag, expected_cruise_drag
