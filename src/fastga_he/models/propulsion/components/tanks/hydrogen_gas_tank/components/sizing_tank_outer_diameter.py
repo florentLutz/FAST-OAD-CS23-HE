@@ -25,6 +25,13 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
         )
 
         self.options.declare(
+            name="diameter_height_ratio",
+            default=0.9,
+            desc="Fraction between the tank outer diameter and fuselage height",
+            allow_none=False,
+        )
+
+        self.options.declare(
             name="position",
             default="in_the_fuselage",
             values=POSSIBLE_POSITION,
@@ -38,22 +45,13 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
 
         self.add_input("data:geometry:fuselage:maximum_height", val=np.nan, units="m")
 
-        self.add_input(
+        self.add_output(
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
-            + ":dimension:diameter",
-            units="m",
+            + ":inner_volume",
+            units="m**3",
             val=np.nan,
-            desc="Initial Outer diameter of the hydrogen gas tank input",
-        )
-
-        self.add_input(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
-            + ":dimension:length",
-            val=0.0,
-            units="m",
-            desc="To avoid negative inner length",
+            desc="Capacity of the tank in terms of volume",
         )
 
         self.add_output(
@@ -70,12 +68,9 @@ class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
         position = self.options["position"]
+        diameter_height_ratio = self.options["diameter_height_ratio"]
 
-        d = inputs[
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
-            + ":dimension:diameter"
-        ]
+        d = diameter_height_ratio * inputs["data:geometry:fuselage:maximum_height"]
 
         not_under_wing = position != "wing_pod"
         not_underbelly = position != "underbelly"
