@@ -2,6 +2,10 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import os
+import os.path as pth
+import pathlib
+
 from typing import List, Union
 
 import numpy as np
@@ -100,12 +104,12 @@ def _get_impact_sunburst(aircraft_file_path: str, rel: str = "absolute") -> go.S
 
     max_depth = 0
     for name in names_variables_lca:
-        curr_depth = depth_lca_detail(name)
+        curr_depth = _depth_lca_detail(name)
         if curr_depth > max_depth:
             max_depth = curr_depth
 
     # Because it's the earliest parent ;)
-    label_ancestor = get_ancestor_label(datafile)
+    label_ancestor = _get_ancestor_label(datafile)
 
     figure_labels = [label_ancestor]
     figure_parents = [""]
@@ -119,15 +123,15 @@ def _get_impact_sunburst(aircraft_file_path: str, rel: str = "absolute") -> go.S
     names_variables_lca.remove(LCA_PREFIX + "single_score")
 
     for name in names_variables_lca:
-        figure_labels.append(name_to_label(name, datafile, rel=rel))
-        figure_parents.append(get_parent_label(name, datafile, rel=rel))
+        figure_labels.append(_name_to_label(name, datafile, rel=rel))
+        figure_parents.append(_get_parent_label(name, datafile, rel=rel))
         if rel == "single_score" or rel == "parent":
             figure_values.append(
                 datafile[name].value[0] / datafile[LCA_PREFIX + "single_score"].value[0] * 100.0
             )
         else:
             figure_values.append(datafile[name].value[0])
-        figure_color.append(get_color(name, color_dict))
+        figure_color.append(_get_color(name, color_dict))
 
     return go.Sunburst(
         labels=figure_labels,
@@ -139,7 +143,7 @@ def _get_impact_sunburst(aircraft_file_path: str, rel: str = "absolute") -> go.S
     )
 
 
-def depth_lca_detail(name_variable: str) -> int:
+def _depth_lca_detail(name_variable: str) -> int:
     if "single_score" in name_variable:
         return 1
 
@@ -151,9 +155,9 @@ def depth_lca_detail(name_variable: str) -> int:
     return depth_lca
 
 
-def name_to_label(name_variable: str, datafile: oad.DataFile, rel: str = "absolute") -> str:
+def _name_to_label(name_variable: str, datafile: oad.DataFile, rel: str = "absolute") -> str:
     if name_variable == LCA_PREFIX + "single_score":
-        return get_ancestor_label(datafile)
+        return _get_ancestor_label(datafile)
 
     if "sum" not in name_variable:
         depth = -1
@@ -168,33 +172,33 @@ def name_to_label(name_variable: str, datafile: oad.DataFile, rel: str = "absolu
             / datafile[LCA_PREFIX + "single_score"].value[0]
             * 100.0
         )
-        label = clean_name + "<br> " + str(round_value(value)) + " %"
+        label = clean_name + "<br> " + str(_round_value(value)) + " %"
     elif rel == "parent":
-        parent_value = get_parent_score(name_variable, datafile)
+        parent_value = _get_parent_score(name_variable, datafile)
         value = datafile[name_variable].value[0] / parent_value * 100.0
-        label = clean_name + "<br> " + str(round_value(value)) + " %"
+        label = clean_name + "<br> " + str(_round_value(value)) + " %"
     else:
         value = datafile[name_variable].value[0]
-        label = clean_name + "<br> " + str(round_value(value)) + " pt"
+        label = clean_name + "<br> " + str(_round_value(value)) + " pt"
 
     return label
 
 
-def get_parent_label(name_variable: str, datafile: oad.DataFile, rel: str = "absolute") -> str:
-    parent_name = get_parent_name(name_variable)
+def _get_parent_label(name_variable: str, datafile: oad.DataFile, rel: str = "absolute") -> str:
+    parent_name = _get_parent_name(name_variable)
 
-    return name_to_label(parent_name, datafile, rel=rel)
+    return _name_to_label(parent_name, datafile, rel=rel)
 
 
-def get_parent_score(name_variable: str, datafile: oad.DataFile) -> float:
-    parent_name = get_parent_name(name_variable)
+def _get_parent_score(name_variable: str, datafile: oad.DataFile) -> float:
+    parent_name = _get_parent_name(name_variable)
     parent_score = datafile[parent_name].value[0]
 
     return parent_score
 
 
-def get_parent_name(name_variable: str) -> str:
-    if depth_lca_detail(name_variable) == 2:
+def _get_parent_name(name_variable: str) -> str:
+    if _depth_lca_detail(name_variable) == 2:
         return LCA_PREFIX + "single_score"
 
     if "sum" not in name_variable:
@@ -205,33 +209,116 @@ def get_parent_name(name_variable: str) -> str:
     return parent_name
 
 
-def get_ancestor_label(datafile: oad.DataFile) -> str:
+def _get_ancestor_label(datafile: oad.DataFile) -> str:
     return (
         "single_score <br> "
-        + str(round_value(datafile[LCA_PREFIX + "single_score"].value[0]))
+        + str(_round_value(datafile[LCA_PREFIX + "single_score"].value[0]))
         + " pt"
     )
 
 
-def round_value(value: float) -> float:
+def _round_value(value: float) -> float:
     if value == 0.0:
         return value
     else:
         return round(value, int(np.ceil(abs(np.log10(value))) + 5))
 
 
-def get_first_parent_name(name_variable: str) -> str:
-    if depth_lca_detail(name_variable) <= 2:
+def _get_first_parent_name(name_variable: str) -> str:
+    if _depth_lca_detail(name_variable) <= 2:
         return name_variable
     else:
-        return get_first_parent_name(get_parent_name(name_variable))
+        return _get_first_parent_name(_get_parent_name(name_variable))
 
 
-def get_color(name_variable: str, color_dict: dict) -> str:
-    first_parent = get_first_parent_name(name_variable)
+def _get_color(name_variable: str, color_dict: dict) -> str:
+    first_parent = _get_first_parent_name(name_variable)
     if first_parent in list(color_dict.keys()):
         return color_dict[first_parent]
     else:
         color = COLS[len(list(color_dict.keys())) % len(COLS)]
         color_dict[name_variable] = color
         return color
+
+
+def lca_score_sensitivity_simple(
+    results_folder_path: Union[str, pathlib.Path],
+    prefix: str,
+    name: str = None,
+    fig: go.Figure = None,
+) -> go.Figure:
+    """
+    Displays the evolution of the impacts of an aircraft with respect to its lifespan. This
+    method is a bit sensitive to use as it requires the results to be stored under the form of
+    FAST-OAD output files, all in the same folder and all with the same prefix. It also requires
+    the user to know and input said prefix. Results can be superimposed to an existing figure but
+    it is recommended to only put results computed on the same lifespan.
+
+    :param results_folder_path: path to the folder that contains the output files that contains
+    the results.
+    :param prefix: prefix of the output file for the aircraft.
+    :param name: name of the aircraft, to be displayed on the figure.
+    :param fig: figure with existing results.
+
+    :return: plotly figure with the evolution of the impact as a function of the lifespan.
+    """
+
+    aircraft_lifespan_list = []
+    impact_list = []
+
+    for dirpath, _, filenames in os.walk(results_folder_path):
+        for filename in filenames:
+            if filename.startswith(prefix):
+                datafile = oad.DataFile(os.path.join(dirpath, filename))
+                aircraft_lifespan = datafile["data:TLAR:max_airframe_hours"].value[0]
+                aircraft_lifespan_list.append(aircraft_lifespan)
+                impact_score = datafile["data:environmental_impact:single_score"].value[0]
+                impact_list.append(impact_score)
+
+    aircraft_lifespan_list, impact_list = zip(*sorted(zip(aircraft_lifespan_list, impact_list)))
+
+    if fig is None:
+        orig_fig = True
+        fig = go.Figure()
+    else:
+        orig_fig = False
+
+    scatter = go.Scatter(x=aircraft_lifespan_list, y=impact_list, name=name, showlegend=True)
+
+    fig.add_trace(scatter)
+    if orig_fig:
+        fig.update_layout(
+            plot_bgcolor="white",
+            title_x=0.5,
+            title_text="Evolution of the single score with life expectancy of the aircraft",
+            title_font=dict(size=20),
+            legend_font=dict(size=20),
+        )
+        fig.update_xaxes(
+            mirror=True,
+            ticks="outside",
+            showline=True,
+            linecolor="black",
+            gridcolor="lightgrey",
+            title="Airframe hours [h]",
+            title_font=dict(size=20),
+            tickfont=dict(size=20),
+        )
+        fig.update_yaxes(
+            mirror=True,
+            ticks="outside",
+            showline=True,
+            linecolor="black",
+            gridcolor="lightgrey",
+            range=[0, None],
+            title="Single score [-]",
+            title_font=dict(size=20),
+            tickfont=dict(size=20),
+            side="right",
+        )
+        # You may wonder why I set the y-axis to the right, well that's because if it's on the left
+        # changing the tick font changes the range !
+        # You could try to solve that problem, but if you don't manage to update the counter below:
+        # hours_wasted: 1.5
+
+    return fig
