@@ -16,10 +16,7 @@ from .sizing_tank_weight import SizingHydrogenGasTankWeight
 from .sizing_gravimetric_index import SizingHydrogenGasTankGravimetricIndex
 from .sizing_tank_drag import SizingHydrogenGasTankDrag
 from .sizing_tank_outer_diameter import SizingHydrogenGasTankOuterDiameter
-from .sizing_tank_diameter_update import SizingHydrogenGasTankDiameterUpdate
 from .sizing_tank_overall_length import SizingHydrogenGasTankOverallLength
-from .sizing_tank_aspect_ratio import SizingHydrogenGasTankAspectRatio
-from .sizing_tank_stress_coefficient import SizingHydrogenGasTankStressCoefficinet
 from .sizing_tank_overall_length_fuselage_check import (
     SizingHydrogenGasTankOverallLengthFuselageCheck,
 )
@@ -85,26 +82,6 @@ class SizingHydrogenGasTank(om.Group):
             name="tank_outer_diameter",
             subsys=SizingHydrogenGasTankOuterDiameter(
                 hydrogen_gas_tank_id=hydrogen_gas_tank_id, position=position
-            ),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            name="tank_diameter_update",
-            subsys=SizingHydrogenGasTankDiameterUpdate(hydrogen_gas_tank_id=hydrogen_gas_tank_id),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            name="tank_aspect_ratio",
-            subsys=SizingHydrogenGasTankAspectRatio(hydrogen_gas_tank_id=hydrogen_gas_tank_id),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            name="tank_stree_coefficient",
-            subsys=SizingHydrogenGasTankStressCoefficinet(
-                hydrogen_gas_tank_id=hydrogen_gas_tank_id
             ),
             promotes=["*"],
         )

@@ -197,9 +197,11 @@ def test_assembly_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:mass", units="kg"
     ) == pytest.approx(327.988, rel=1e-2)
+
     assert problem.get_val(
         "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:mass", units="kg"
-    ) == pytest.approx(40.6, rel=1e-2)
+    ) == pytest.approx(29.74, rel=1e-2)
+
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
     ) == pytest.approx(6.47, rel=1e-2)
@@ -277,7 +279,7 @@ def test_performances_sizing_assembly_pemfc_enforce():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:mass", units="kg"
-    ) == pytest.approx(38.26, rel=1e-2)
+    ) == pytest.approx(32.44, rel=1e-2)
 
 
 def test_assembly_sizing_from_pt_file():
@@ -326,7 +328,7 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(327.988, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:mass", units="kg"
-    ) == pytest.approx(20.31, rel=1e-2)
+    ) == pytest.approx(32.98, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
     ) == pytest.approx(6.47, rel=1e-2)
@@ -341,7 +343,7 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(6.47, rel=1e-2)
 
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        733.3, rel=1e-2
+        750., rel=1e-2
     )
     assert problem.get_val("data:propulsion:he_power_train:CG:x", units="m") == pytest.approx(
         1.936, rel=1e-2
@@ -414,7 +416,7 @@ def test_performances_sizing_assembly_pemfc_ensure():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:hydrogen_gas_tank:hydrogen_gas_tank_1:mass", units="kg"
-    ) == pytest.approx(38.26, rel=1e-2)
+    ) == pytest.approx(31.09, rel=1e-2)
 
 
 def test_performances_from_pt_file():
