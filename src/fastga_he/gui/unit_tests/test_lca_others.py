@@ -9,6 +9,7 @@ import pytest
 
 import plotly.graph_objects as go
 
+from fastga_he.exceptions import ImpactUnavailableForPlotError
 from ..lca_impact import lca_score_sensitivity_simple
 
 PATH_TO_CURRENT_FILE = pathlib.Path(__file__)
@@ -44,7 +45,7 @@ def test_lca_score_sensitivity_analysis():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
-def test_lca_score_sensitivity_analysis_two_plots():
+def test_lca_single_score_sensitivity_analysis_two_plots():
     # Check that we can create a plot
     fig = lca_score_sensitivity_simple(
         results_folder_path=SENSITIVITY_STUDIES_FOLDER_PATH,
@@ -56,7 +57,7 @@ def test_lca_score_sensitivity_analysis_two_plots():
         results_folder_path=SENSITIVITY_STUDIES_FOLDER_PATH,
         prefix="ref_kodiak_op",
         name="Reference Kodiak",
-        fig=fig
+        fig=fig,
     )
 
     # We do that so that the legend doesn't overlap the y-axis, which as a reminder, we have to
@@ -67,8 +68,30 @@ def test_lca_score_sensitivity_analysis_two_plots():
 
     fig.show()
 
-    fig.update_layout(
-        height=800.0,
-        width=1600.0
-    )
+    fig.update_layout(height=800.0, width=1600.0)
     fig.write_image(PATH_TO_CURRENT_FILE.parent / "results" / "evolution_sing_score_kodiak.svg")
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_other_impact_sensitivity_analysis():
+    # Check that we can create a plot
+    fig = lca_score_sensitivity_simple(
+        results_folder_path=SENSITIVITY_STUDIES_FOLDER_PATH,
+        impact_to_plot="material_resources_metals_minerals",
+        prefix="hybrid_kodiak",
+        name="Hybrid Kodiak",
+    )
+
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_unavailable_impact_error():
+    try:
+        _ = lca_score_sensitivity_simple(
+            results_folder_path=SENSITIVITY_STUDIES_FOLDER_PATH,
+            impact_to_plot="orange_eutrophication",
+            prefix="hybrid_kodiak",
+        )
+    except ImpactUnavailableForPlotError as e:
+        assert " unavailable in the output file. Available impacts include: " in e.args[0]

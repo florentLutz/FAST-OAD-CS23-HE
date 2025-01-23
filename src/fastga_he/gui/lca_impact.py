@@ -3,7 +3,6 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import os
-import os.path as pth
 import pathlib
 
 from typing import List, Union
@@ -16,6 +15,7 @@ from plotly.subplots import make_subplots
 
 import fastoad.api as oad
 
+from fastga_he.exceptions import ImpactUnavailableForPlotError
 from ..models.environmental_impacts.resources.constants import LCA_PREFIX
 
 COLS = plotly.colors.DEFAULT_PLOTLY_COLORS
@@ -88,7 +88,15 @@ def lca_impacts_sun_breakdown(
     return fig
 
 
-def _get_impact_sunburst(aircraft_file_path: str, rel: str = "absolute") -> go.Sunburst:
+def _get_impact_variable_list(aircraft_file_path: Union[str, pathlib.Path]) -> list:
+    """
+    Returns a list of the name of the variable associated with the weighted impacts and available
+    in the output file.
+    :param aircraft_file_path: path to the output file path.
+
+    :return: a list of all weighted impact available in the output file path.
+    """
+
     datafile = oad.DataFile(aircraft_file_path)
     names = datafile.names()
     names_variables_lca = []
@@ -97,6 +105,32 @@ def _get_impact_sunburst(aircraft_file_path: str, rel: str = "absolute") -> go.S
         if LCA_PREFIX in name:
             if "weighted" in name or "single_score" in name:
                 names_variables_lca.append(name)
+
+    return names_variables_lca
+
+
+def _get_impact_list(aircraft_file_path: Union[str, pathlib.Path]) -> list:
+    """
+    Returns a list weighted impacts categories available in the output file.
+    :param aircraft_file_path: path to the output file path.
+
+    :return: a list of all weighted impact available in the output file path.
+    """
+
+    names_variable_lca = _get_impact_variable_list(aircraft_file_path)
+    names_impact_categories = []
+    for name_variable_lca in names_variable_lca:
+        if _depth_lca_detail(name_variable_lca) <= 2:
+            names_impact_categories.append(
+                name_variable_lca.replace(LCA_PREFIX, "").replace("_weighted:sum", "")
+            )
+
+    return names_impact_categories
+
+
+def _get_impact_sunburst(aircraft_file_path: str, rel: str = "absolute") -> go.Sunburst:
+    names_variables_lca = _get_impact_variable_list(aircraft_file_path)
+    datafile = oad.DataFile(aircraft_file_path)
 
     if len(names_variables_lca) == 0:
         sunburst = go.Sunburst()
@@ -245,18 +279,20 @@ def lca_score_sensitivity_simple(
     results_folder_path: Union[str, pathlib.Path],
     prefix: str,
     name: str = None,
+    impact_to_plot: str = "single_score",
     fig: go.Figure = None,
 ) -> go.Figure:
     """
     Displays the evolution of the impacts of an aircraft with respect to its lifespan. This
     method is a bit sensitive to use as it requires the results to be stored under the form of
     FAST-OAD output files, all in the same folder and all with the same prefix. It also requires
-    the user to know and input said prefix. Results can be superimposed to an existing figure but
+    the user to know and input said prefix. Results can be superimposed to an existing figure, but
     it is recommended to only put results computed on the same lifespan.
 
     :param results_folder_path: path to the folder that contains the output files that contains
     the results.
     :param prefix: prefix of the output file for the aircraft.
+    :param impact_to_plot: Name of the impact to plot.
     :param name: name of the aircraft, to be displayed on the figure.
     :param fig: figure with existing results.
 
@@ -265,14 +301,33 @@ def lca_score_sensitivity_simple(
 
     aircraft_lifespan_list = []
     impact_list = []
+    names_variables_lca = []
 
     for dirpath, _, filenames in os.walk(results_folder_path):
         for filename in filenames:
             if filename.startswith(prefix):
+                if not names_variables_lca:
+                    # Fetch the name of available impacts for plotting
+                    names_variables_lca = _get_impact_list(os.path.join(dirpath, filename))
+
+                    # Check that the impact we request exists to make it fail as soon as possible
+                    # if it needs to fail
+                    if impact_to_plot not in names_variables_lca:
+                        raise ImpactUnavailableForPlotError(
+                            "Impact "
+                            + impact_to_plot
+                            + " unavailable in the output file. Available impacts include: "
+                            + ", ".join(names_variables_lca)
+                        )
+
                 datafile = oad.DataFile(os.path.join(dirpath, filename))
                 aircraft_lifespan = datafile["data:TLAR:max_airframe_hours"].value[0]
                 aircraft_lifespan_list.append(aircraft_lifespan)
-                impact_score = datafile["data:environmental_impact:single_score"].value[0]
+                if impact_to_plot == "single_score":
+                    variable_name = LCA_PREFIX + "single_score"
+                else:
+                    variable_name = LCA_PREFIX + impact_to_plot + "_weighted:sum"
+                impact_score = datafile[variable_name].value[0]
                 impact_list.append(impact_score)
 
     aircraft_lifespan_list, impact_list = zip(*sorted(zip(aircraft_lifespan_list, impact_list)))
@@ -284,13 +339,16 @@ def lca_score_sensitivity_simple(
         orig_fig = False
 
     scatter = go.Scatter(x=aircraft_lifespan_list, y=impact_list, name=name, showlegend=True)
+    beautified_impact_score = impact_to_plot.replace("_", " ")
 
     fig.add_trace(scatter)
     if orig_fig:
         fig.update_layout(
             plot_bgcolor="white",
             title_x=0.5,
-            title_text="Evolution of the single score with life expectancy of the aircraft",
+            title_text="Evolution of the "
+            + beautified_impact_score
+            + " impact with life expectancy of the aircraft",
             title_font=dict(size=20),
             legend_font=dict(size=20),
         )
