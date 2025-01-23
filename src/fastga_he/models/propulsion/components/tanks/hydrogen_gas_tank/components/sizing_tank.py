@@ -56,6 +56,32 @@ class SizingHydrogenGasTank(om.Group):
         position = self.options["position"]
 
         self.add_subsystem(
+            name="unusable_hydrogen_gas",
+            subsys=SizingHydrogenGasTankUnusableHydrogen(hydrogen_gas_tank_id=hydrogen_gas_tank_id),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="total_hydrogen_gas",
+            subsys=SizingHydrogenGasTankTotalHydrogenMission(
+                hydrogen_gas_tank_id=hydrogen_gas_tank_id
+            ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="tank_constraints",
+            subsys=ConstraintsHydrogenGasTank(hydrogen_gas_tank_id=hydrogen_gas_tank_id),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="tank_inner_volume",
+            subsys=SizingHydrogenGasTankInnerVolume(hydrogen_gas_tank_id=hydrogen_gas_tank_id),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
             name="tank_outer_diameter",
             subsys=SizingHydrogenGasTankOuterDiameter(
                 hydrogen_gas_tank_id=hydrogen_gas_tank_id, position=position
@@ -84,26 +110,6 @@ class SizingHydrogenGasTank(om.Group):
         )
 
         self.add_subsystem(
-            name="unusable_hydrogen_gas",
-            subsys=SizingHydrogenGasTankUnusableHydrogen(hydrogen_gas_tank_id=hydrogen_gas_tank_id),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            name="total_hydrogen_gas",
-            subsys=SizingHydrogenGasTankTotalHydrogenMission(
-                hydrogen_gas_tank_id=hydrogen_gas_tank_id
-            ),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            name="tank_constraints",
-            subsys=ConstraintsHydrogenGasTank(hydrogen_gas_tank_id=hydrogen_gas_tank_id),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
             name="tank_inner_diameter",
             subsys=SizingHydrogenGasTankInnerDiameter(hydrogen_gas_tank_id=hydrogen_gas_tank_id),
             promotes=["*"],
@@ -112,12 +118,6 @@ class SizingHydrogenGasTank(om.Group):
         self.add_subsystem(
             name="tank_wall_thickness",
             subsys=SizingHydrogenGasTankWallThickness(hydrogen_gas_tank_id=hydrogen_gas_tank_id),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            name="tank_inner_volume",
-            subsys=SizingHydrogenGasTankInnerVolume(hydrogen_gas_tank_id=hydrogen_gas_tank_id),
             promotes=["*"],
         )
 
