@@ -11,7 +11,7 @@ from ..components.perf_fuel_remaining import PerformancesHydrogenGasRemainingMis
 class PerformancesHydrogenGasTank(om.Group):
     """
     Regrouping all the components for the performances of the tank. Note that to limit the work
-    to be done for the implementation of fuel tanks, fuel tanks don't output the fuel consumed
+    to be done for the implementation of hydrogen tanks, fuel tanks don't output the fuel consumed
     used to iterate on the mass during the mission, but it uses it. Just like for the CG where we
     will output the "varying" part of the CG straight from the mission; we could do the same for
     mass (which may or may not improve the computation time).

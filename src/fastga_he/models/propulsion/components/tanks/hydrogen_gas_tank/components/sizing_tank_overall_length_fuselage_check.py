@@ -9,7 +9,7 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingHydrogenGasTankOverallLengthFuselageCheck(om.ExplicitComponent):
     """
-    Computation of the cylindrical part length of the tank, which does not include the cap from both end.
+    Computation to check the overall length of the tank will fit in the fuselage or not.
     """
 
     def initialize(self):

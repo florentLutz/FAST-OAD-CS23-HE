@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingHydrogenGasTankOverallLength(om.ExplicitComponent):
     """
-    Computation of the cylindrical part length of the tank, which does not include the cap from both end.
+    Computation of the overall length of the tank, which includes the cap from both end.
     """
 
     def initialize(self):

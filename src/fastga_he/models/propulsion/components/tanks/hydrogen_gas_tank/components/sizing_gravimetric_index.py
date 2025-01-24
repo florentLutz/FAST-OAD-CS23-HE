@@ -4,7 +4,6 @@
 
 import openmdao.api as om
 import numpy as np
-from ..constants import POSSIBLE_POSITION
 import logging
 
 _LOGGER = logging.getLogger(__name__)
@@ -13,7 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 class SizingHydrogenGasTankGravimetricIndex(om.ExplicitComponent):
     """
     Computation of the gravimetric index of cryogenic hydrogen tank,
-    ratio between the mission used weight and overall weight
+    ratio between total mission fuel weight and overall weight.
     """
 
     def initialize(self):

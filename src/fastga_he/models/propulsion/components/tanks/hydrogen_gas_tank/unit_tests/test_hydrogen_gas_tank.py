@@ -287,6 +287,7 @@ def test_tank_inner_diameter():
 
     problem.check_partials(compact_print=True, step=1e-7)
 
+
 def test_tank_wall_thickness():
     ivc = get_indep_var_comp(
         list_inputs(SizingHydrogenGasTankWallThickness(hydrogen_gas_tank_id="hydrogen_gas_tank_1")),

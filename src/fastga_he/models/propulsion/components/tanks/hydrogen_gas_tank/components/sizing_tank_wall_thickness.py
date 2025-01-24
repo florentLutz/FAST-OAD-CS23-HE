@@ -9,7 +9,7 @@ import numpy as np
 # To modify
 class SizingHydrogenGasTankWallThickness(om.ExplicitComponent):
     """
-    Computation of the wall thickness of the tank. Using tank pressure and yield stress of material
+    Computation of the wall thickness of the tank from the difference between the inner and outer diameter.
     """
 
     def initialize(self):

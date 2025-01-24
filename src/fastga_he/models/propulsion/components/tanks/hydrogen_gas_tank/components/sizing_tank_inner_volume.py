@@ -13,8 +13,8 @@ HYDROGEN_GAS_CONSTANT = 4157.2  # (N.m/K.kg)
 
 class SizingHydrogenGasTankInnerVolume(om.ExplicitComponent):
     """
-    Computation of the volume of fuel to be stored in the tank in standard temperature condition (300K).
-    Calculate under ideal gas assumption.
+    Computation of the volume of hydrogen to be stored in the tank in specific temperature and pressure condition.
+    Calculation performed under ideal gas assumption.
     """
 
     def __init__(self, **kwargs):

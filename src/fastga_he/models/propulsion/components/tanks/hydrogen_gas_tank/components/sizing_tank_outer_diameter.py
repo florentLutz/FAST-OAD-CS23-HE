@@ -12,7 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class SizingHydrogenGasTankOuterDiameter(om.ExplicitComponent):
     """
-    Diameter check fot the hydrogen gas tank.
+    Outer diameter calculation fot the hydrogen gas tank.
     """
 
     def initialize(self):

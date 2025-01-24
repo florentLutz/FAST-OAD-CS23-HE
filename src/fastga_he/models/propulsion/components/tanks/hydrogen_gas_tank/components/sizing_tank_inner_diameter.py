@@ -83,7 +83,7 @@ class SizingHydrogenGasTankInnerDiameter(om.ExplicitComponent):
             + ":dimension:outer_diameter"
         ] / (
             1
-            +  inputs[
+            + inputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
                 + ":tank_pressure"
@@ -134,7 +134,7 @@ class SizingHydrogenGasTankInnerDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
             + ":dimension:outer_diameter",
-        ] = 1 / (1 +  tank_pressure * sf / sigma)
+        ] = 1 / (1 + tank_pressure * sf / sigma)
 
         partials[
             "data:propulsion:he_power_train:hydrogen_gas_tank:"

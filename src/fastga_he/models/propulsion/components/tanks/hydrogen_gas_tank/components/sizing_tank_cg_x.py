@@ -9,7 +9,7 @@ from ..constants import POSSIBLE_POSITION
 
 
 class SizingHydrogenGasTankCGX(om.ExplicitComponent):
-    """Class that computes the CG of the battery according to the position given in the options."""
+    """Class that computes the CG in X-direction of the tank according to the position given in the options."""
 
     def initialize(self):
         self.options.declare(

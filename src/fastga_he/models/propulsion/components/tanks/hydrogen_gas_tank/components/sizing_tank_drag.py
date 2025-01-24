@@ -10,9 +10,9 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingHydrogenGasTankDrag(om.ExplicitComponent):
     """
-    Class that computes the contribution to profile drag of the fuel tanks according to the
+    Class that computes the contribution to profile drag of the hydrogen tanks according to the
     position given in the options. For now this will be 0.0 regardless of the option except when
-    in a pod.
+    under the wing or under the aircraft belly.
     """
 
     def initialize(self):
@@ -206,7 +206,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
                 + ":dimension:outer_diameter"
             ]
 
-            l = inputs[
+            length = inputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
                 + ":dimension:length"
@@ -225,7 +225,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
                 + ":dimension:outer_diameter",
-            ] = cd0_fus * (3 * l + 4 * d) / wet_area
+            ] = cd0_fus * (3 * length + 4 * d) / wet_area
 
             partials[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
@@ -245,7 +245,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
                 + ls_tag
                 + ":CD0",
                 "data:geometry:fuselage:wet_area",
-            ] = -cd0_fus * (3 * d * l + 2 * d**2) / wet_area**2
+            ] = -cd0_fus * (3 * d * length + 2 * d**2) / wet_area**2
 
             partials[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
@@ -254,7 +254,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
                 + ls_tag
                 + ":CD0",
                 "data:aerodynamics:fuselage:" + ls_tag + ":CD0",
-            ] = (3 * d * l + 2 * d**2) / wet_area
+            ] = (3 * d * length + 2 * d**2) / wet_area
 
         else:
             partials[

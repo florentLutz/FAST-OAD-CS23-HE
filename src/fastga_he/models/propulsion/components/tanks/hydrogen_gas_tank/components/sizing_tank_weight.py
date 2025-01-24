@@ -4,7 +4,6 @@
 
 import openmdao.api as om
 import numpy as np
-from ..constants import POSSIBLE_POSITION
 import logging
 
 _LOGGER = logging.getLogger(__name__)
@@ -93,7 +92,7 @@ class SizingHydrogenGasTankWeight(om.ExplicitComponent):
             / 2
         )
 
-        l = inputs[
+        length = inputs[
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
             + ":dimension:length"
@@ -103,7 +102,7 @@ class SizingHydrogenGasTankWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":mass"
         ] = wall_density * (
             4 * np.pi * r**3 / 3
-            + np.pi * r**2 * l
+            + np.pi * r**2 * length
             - inputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
@@ -125,7 +124,7 @@ class SizingHydrogenGasTankWeight(om.ExplicitComponent):
 
         d = 2 * r
 
-        l = inputs[
+        length = inputs[
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
             + ":dimension:length"
@@ -144,7 +143,7 @@ class SizingHydrogenGasTankWeight(om.ExplicitComponent):
             + ":material:density",
         ] = (
             4 / 3 * np.pi * r**3
-            + np.pi * r**2 * l
+            + np.pi * r**2 * length
             - inputs[
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
                 + hydrogen_gas_tank_id
@@ -171,4 +170,4 @@ class SizingHydrogenGasTankWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:hydrogen_gas_tank:"
             + hydrogen_gas_tank_id
             + ":dimension:outer_diameter",
-        ] = wall_density * (np.pi * d**2 / 2 + np.pi * d * l / 2)
+        ] = wall_density * (np.pi * d**2 / 2 + np.pi * d * length / 2)
