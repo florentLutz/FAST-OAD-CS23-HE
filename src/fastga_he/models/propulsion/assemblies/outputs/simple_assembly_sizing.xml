@@ -177,7 +177,6 @@
               <height units="m" is_input="False">0.021<!--Height of one module--></height>
               <length units="m" is_input="False">0.14847<!--Length of one module--></length>
               <mass units="kg" is_input="False">0.33099999999999996<!--Weight of the diode and IGBT module--></mass>
-              <number is_input="True">1.0<!--Number of module to cool down, will depend on the component (3 for inverter/rectifiers, 1 for DC/DC)--></number>
               <width units="m" is_input="False">0.065<!--Width of one module--></width>
             </module>
             <scaling>
@@ -662,7 +661,6 @@
             <module>
               <height units="m" is_input="False">0.021<!--Height of one module--></height>
               <length units="m" is_input="False">0.1502<!--Length of one module--></length>
-              <number is_input="True">3.0<!--Number of module to cool down, will depend on the component (3 for inverter/rectifiers, 1 for DC/DC)--></number>
               <width units="m" is_input="False">0.065<!--Width of one module--></width>
             </module>
             <scaling>
