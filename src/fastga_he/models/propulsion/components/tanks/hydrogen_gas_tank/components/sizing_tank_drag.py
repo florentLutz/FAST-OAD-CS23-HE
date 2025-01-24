@@ -59,7 +59,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
                 + ":dimension:length",
                 units="m",
                 val=np.nan,
-                desc="Length of the pemfc, as in the size of the pemfc along the X-axis",
+                desc="Length of the tank, as in the size of the tank along the X-axis",
             )
 
             self.add_input("data:geometry:fuselage:wet_area", val=np.nan, units="m**2")
@@ -88,7 +88,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
 
         if position == "wing_pod":
             # According to :cite:`gudmundsson:2013`. the drag of a streamlined external tank,
-            # which more or less resemble a podded pemfc can be computed using the following
+            # which more or less resemble a podded cylinder can be computed using the following
             # formula. It highly depends on the tank/wing interface so we will take a middle.
             # Also, there is no dependency on the tank length
 

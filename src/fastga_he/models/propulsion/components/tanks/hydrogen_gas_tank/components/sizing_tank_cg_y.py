@@ -41,7 +41,7 @@ class SizingHydrogenGasTankCGY(om.ExplicitComponent):
             "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:y",
             units="m",
             val=0.0,
-            desc="Y position of the pemfc center of gravity",
+            desc="Y position of the tank center of gravity",
         )
 
         if position == "wing_pod":
@@ -50,7 +50,7 @@ class SizingHydrogenGasTankCGY(om.ExplicitComponent):
                 + hydrogen_gas_tank_id
                 + ":CG:y_ratio",
                 val=np.nan,
-                desc="X position of the pemfc center of gravity as a ratio of the wing half-span",
+                desc="X position of the tank center of gravity as a ratio of the wing half-span",
             )
 
             self.declare_partials(of="*", wrt="*", method="exact")

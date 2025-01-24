@@ -58,7 +58,7 @@ from .connectors.planetary_gear import (
 from .connectors.gearbox import SizingGearbox, PerformancesGearbox, SlipstreamGearbox, PreLCAGearbox
 
 from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM, PreLCAPMSM
-from .loads.simple_pmsm import SizingSimplePMSM, PerformancesSimplePMSM, SlipstreamSimplePMSM
+
 from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
 
 from .propulsor.propeller import (
@@ -80,7 +80,7 @@ from .source.generator import (
     SlipstreamGenerator,
     PreLCAGenerator,
 )
-from .source.pemfc import SizingPEMFCStack, PerformancesPEMFCStack, SlipstreamPEMFCStack
+
 from .source.ice import SizingICE, PerformancesICE, SlipstreamICE, PreLCAICE
 from .source.turboshaft import (
     SizingTurboshaft,
@@ -105,10 +105,4 @@ from .tanks.hydrogen_gas_tank import (
     SizingHydrogenGasTank,
     PerformancesHydrogenGasTank,
     SlipstreamHydrogenGasTank,
-)
-
-from .tanks.cryogenic_hydrogen_tank import (
-    SizingCryogenicHydrogenTank,
-    PerformancesCryogenicHydrogenTank,
-    SlipstreamCryogenicHydrogenTank,
 )

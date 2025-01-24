@@ -56,7 +56,7 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
                 + ":dimension:length",
                 units="m",
                 val=np.nan,
-                desc="Length of the pemfc, as in the size of the pemfc along the X-axis",
+                desc="Length of the tank, as in the size of the tank along the X-axis",
             )
             self.add_input(
                 "data:propulsion:he_power_train:hydrogen_gas_tank:"
@@ -93,7 +93,7 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
                 + ":dimension:length",
                 units="m",
                 val=np.nan,
-                desc="Length of the pemfc, as in the size of the pemfc along the X-axis",
+                desc="Length of the tank, as in the size of the tank along the X-axis",
             )
 
             self.declare_partials(of="*", wrt="data:geometry:fuselage:front_length", val=1.0)
