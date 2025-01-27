@@ -380,3 +380,150 @@ def lca_score_sensitivity_simple(
         # hours_wasted: 1.5
 
     return fig
+
+
+def lca_score_sensitivity_advanced_impact_category(
+    results_folder_path: Union[str, pathlib.Path],
+    prefix: str,
+    cutoff_criteria: float,
+    name: str = None,
+) -> go.Figure:
+    """
+    Displays the evolution of the impacts of an aircraft in terms of single score with respect to
+    its lifespan by stacking the contributing impact category. This method is a bit sensitive
+    to use as it requires the results to be stored under the form of FAST-OAD output files,
+    all in the same folder and all with the same prefix. It also requires the user to know and
+    input said prefix. Results can be superimposed to an existing figure, but it is recommended
+    to only put results computed on the same lifespan. In order not to overload the diagram,
+    we'll allow the user to set a cutoff criteria below which not to plot the contribution of the
+    impact. The rest will be aggregated into others.
+
+    :param results_folder_path: path to the folder that contains the output files that contains
+    the results.
+    :param prefix: prefix of the output file for the aircraft.
+    :param name: name of the aircraft, to be displayed on the figure.
+    :param cutoff_criteria: cutoff criteria, in % of the single score on the last year (e.g. enter
+    5 for 5% percent not 0.05)
+
+    :return: plotly figure with the evolution of all the impact contributing ot the single score
+    as a function of the lifespan.
+    """
+
+    aircraft_lifespan_list = []
+    names_variables_lca = []
+    impact_variations = {}
+
+    for dirpath, _, filenames in os.walk(results_folder_path):
+        for filename in filenames:
+            if filename.startswith(prefix):
+                if not names_variables_lca:
+                    # Fetch the name of available impacts for plotting
+                    names_variables_lca = _get_impact_list(os.path.join(dirpath, filename))
+                    names_variables_lca.remove("single_score")
+
+                datafile = oad.DataFile(os.path.join(dirpath, filename))
+                aircraft_lifespan = datafile["data:TLAR:max_airframe_hours"].value[0]
+                aircraft_lifespan_list.append(aircraft_lifespan)
+
+                for impact in names_variables_lca:
+                    variable_name = LCA_PREFIX + impact + "_weighted:sum"
+                    impact_score = datafile[variable_name].value[0]
+                    # I don't like that way of doing things, since it check everytime in the keys
+                    # of a dict
+                    if impact not in list(impact_variations.keys()):
+                        impact_variations[impact] = [impact_score]
+                    else:
+                        impact_variations[impact].append(impact_score)
+
+    for impact in list(impact_variations.keys()):
+        aircraft_lifespan, sorted_impact = zip(
+            *sorted(zip(aircraft_lifespan_list, impact_variations[impact]))
+        )
+        impact_variations[impact] = sorted_impact
+
+    # In order to not overload the diagram, we'll only display a limited number of impacts.
+    last_output_score = []
+    last_output_name = []
+    last_year_single_score = 0.0
+    for impact, impact_score in impact_variations.items():
+        last_output_score.append(impact_score[-1])
+        last_output_name.append(impact)
+        last_year_single_score += impact_score[-1]
+
+    last_output_score, last_output_name = zip(*sorted(zip(last_output_score, last_output_name)))
+
+    new_impact_variation = {}
+    other = np.zeros_like(aircraft_lifespan)
+    for impact, impact_score in impact_variations.items():
+        # We only take the biggest one
+        if impact_score[-1] / last_year_single_score > cutoff_criteria / 100.0:
+            new_impact_variation[impact] = impact_score
+        else:
+            other += np.array(list(impact_score))
+
+    new_impact_variation["Others"] = other
+
+    cumulated_impact = np.zeros_like(aircraft_lifespan)
+
+    fig = go.Figure()
+
+    # This way they should be plotted starting from the biggest down to the smallest up plus the
+    # other
+    biggest_to_smallest = list(reversed(list(last_output_name)))
+    biggest_to_smallest.append("Others")
+    for impact in biggest_to_smallest:
+        if impact in list(new_impact_variation.keys()):
+            impact_score = new_impact_variation[impact]
+            cumulated_impact += np.array(list(impact_score))
+            beautified_impact_score = impact.replace("_", " ")
+
+            scatter = go.Scatter(
+                x=aircraft_lifespan_list,
+                y=cumulated_impact,
+                name=beautified_impact_score,
+                showlegend=True,
+                fill="tonexty",
+            )
+            fig.add_trace(scatter)
+
+    scatter = go.Scatter(
+        x=aircraft_lifespan_list,
+        y=cumulated_impact,
+        name="Single score",
+        line=dict(color="black", width=5),
+        showlegend=True,
+    )
+    fig.add_trace(scatter)
+
+    fig.update_layout(
+        plot_bgcolor="white",
+        title_x=0.5,
+        title_text="Evolution of the contribution of each impact to the single score of the "
+        + name,
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+    )
+    fig.update_xaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        title="Airframe hours [h]",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+    )
+    fig.update_yaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        range=[0, None],
+        title="Single score [-]",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        side="right",
+    )
+
+    return fig

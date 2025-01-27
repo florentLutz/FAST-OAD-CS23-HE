@@ -10,7 +10,10 @@ import pytest
 import plotly.graph_objects as go
 
 from fastga_he.exceptions import ImpactUnavailableForPlotError
-from ..lca_impact import lca_score_sensitivity_simple
+from ..lca_impact import (
+    lca_score_sensitivity_simple,
+    lca_score_sensitivity_advanced_impact_category,
+)
 
 PATH_TO_CURRENT_FILE = pathlib.Path(__file__)
 
@@ -95,3 +98,16 @@ def test_lca_unavailable_impact_error():
         )
     except ImpactUnavailableForPlotError as e:
         assert " unavailable in the output file. Available impacts include: " in e.args[0]
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_sensitivity_analysis_advanced_impact_categories():
+    fig = lca_score_sensitivity_advanced_impact_category(
+        results_folder_path=SENSITIVITY_STUDIES_FOLDER_PATH,
+        prefix="hybrid_kodiak",
+        name="Hybrid Kodiak",
+        cutoff_criteria=5,
+    )
+
+    fig.update_xaxes(domain=[0, 0.95])
+    fig.show()
