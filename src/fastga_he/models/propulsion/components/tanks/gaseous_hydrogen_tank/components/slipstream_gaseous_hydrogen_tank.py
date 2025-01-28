@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class SlipstreamHydrogenGasTank(om.Group):
+class SlipstreamGaseousHydrogenTank(om.Group):
     """
     Component that computes the variation of aerodynamic coefficient during the mission. This
     component is required as all components are required to provide one component that computes
@@ -15,9 +15,9 @@ class SlipstreamHydrogenGasTank(om.Group):
 
     def initialize(self):
         self.options.declare(
-            name="hydrogen_gas_tank_id",
+            name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the hydrogen gas tank",
+            desc="Identifier of the gaseous hydrogen tank",
             allow_none=False,
         )
 

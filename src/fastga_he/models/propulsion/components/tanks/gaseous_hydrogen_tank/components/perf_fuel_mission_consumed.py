@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesHydrogenGasConsumedMission(om.ExplicitComponent):
+class PerformancesGaseousHydrogenConsumedMission(om.ExplicitComponent):
     """
     Computation of the amount of hydrogen in that particular tank which will be consumed. Simple
     summation.
@@ -18,15 +18,15 @@ class PerformancesHydrogenGasConsumedMission(om.ExplicitComponent):
         )
 
         self.options.declare(
-            name="hydrogen_gas_tank_id",
+            name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the hydrogen gas tank",
+            desc="Identifier of the gaseous hydrogen tank",
             allow_none=False,
         )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         self.add_input(
             "fuel_consumed_t",
@@ -36,8 +36,8 @@ class PerformancesHydrogenGasConsumedMission(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":fuel_consumed_mission",
             units="kg",
             val=15.0,
@@ -47,10 +47,10 @@ class PerformancesHydrogenGasConsumedMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=np.ones(number_of_points))
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         outputs[
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":fuel_consumed_mission"
         ] = sum(inputs["fuel_consumed_t"])

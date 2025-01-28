@@ -5,26 +5,26 @@
 import openmdao.api as om
 
 
-class SizingHydrogenGasTankUnusableHydrogen(om.ExplicitComponent):
+class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
     """
     Computation of the amount of trapped hydrogen in the tank.
     """
 
     def initialize(self):
         self.options.declare(
-            name="hydrogen_gas_tank_id",
+            name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the hydrogen gas tank",
+            desc="Identifier of the gas hydrogen tank",
             allow_none=False,
         )
 
     def setup(self):
         # To modify based on the minimum pressure for the output hydrogen mass flow
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":fuel_consumed_mission",
             units="kg",
             val=15.0,
@@ -32,8 +32,8 @@ class SizingHydrogenGasTankUnusableHydrogen(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":unusable_fuel_mission",
             units="kg",
             val=0.15,
@@ -44,17 +44,17 @@ class SizingHydrogenGasTankUnusableHydrogen(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         # To modify based on the minimum pressure for the output hydrogen mass flow
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         outputs[
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":unusable_fuel_mission"
         ] = (
             0.03
             * inputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":fuel_consumed_mission"
             ]
         )

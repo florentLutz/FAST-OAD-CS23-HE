@@ -7,19 +7,19 @@ import numpy as np
 
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_CONSTRAINTS_HYDROGEN_GAS_TANK_CAPACITY
+from ..constants import SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY
 
 # This choice was made. "Why ? Because I can" (Katarina from LoL)
-oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_HYDROGEN_GAS_TANK_CAPACITY] = (
-    "fastga_he.submodel.propulsion.constraints.hydrogen_gas_tank.capacity.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY] = (
+    "fastga_he.submodel.propulsion.constraints.gaseous_hydrogen_tank.capacity.enforce"
 )
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_HYDROGEN_GAS_TANK_CAPACITY,
-    "fastga_he.submodel.propulsion.constraints.hydrogen_gas_tank.capacity.enforce",
+    SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY,
+    "fastga_he.submodel.propulsion.constraints.gaseous_hydrogen_tank.capacity.enforce",
 )
-class ConstraintsHydrogenGasTankCapacityEnforce(om.ExplicitComponent):
+class ConstraintsGaseousHydrogenTankCapacityEnforce(om.ExplicitComponent):
     """
     Class that enforces that the capacity of the tank is equal to the amount of fuel needed for
     the mission (which includes the unusable fuel).
@@ -27,18 +27,18 @@ class ConstraintsHydrogenGasTankCapacityEnforce(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="hydrogen_gas_tank_id",
+            name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the hydrogen gas tank",
+            desc="Identifier of the gaseous hydrogen tank",
             allow_none=False,
         )
 
     def setup(self):
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":fuel_total_mission",
             units="kg",
             val=np.nan,
@@ -46,8 +46,8 @@ class ConstraintsHydrogenGasTankCapacityEnforce(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":capacity",
             units="kg",
             val=15.15,
@@ -57,12 +57,12 @@ class ConstraintsHydrogenGasTankCapacityEnforce(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         outputs[
-            "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":capacity"
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":capacity"
         ] = inputs[
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":fuel_total_mission"
         ]

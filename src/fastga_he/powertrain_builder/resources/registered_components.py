@@ -960,11 +960,11 @@ DC_AUX_LOAD = {
     ETA: 0.95,
     CTRL_PARAM: ["power_in_mission"],
 }
-HYDROGEN_GAS_TANK = {
-    ID: "fastga_he.pt_component.hydrogen_gas_tank",
-    CN: "HydrogenGasTank",
-    CN_ID: "hydrogen_gas_tank_id",
-    CT: "hydrogen_gas_tank",
+GASEOUS_HYDROGEN_TANK = {
+    ID: "fastga_he.pt_component.gaseous_hydrogen_tank",
+    CN: "GaseousHydrogenTank",
+    CN_ID: "gaseous_hydrogen_tank_id",
+    CT: "gaseous_hydrogen_tank",
     ATT: None,
     PT: [],
     SPT: [],
@@ -1020,7 +1020,7 @@ KNOWN_COMPONENTS = [
     TURBO_GENERATOR,
     GEARBOX,
     DC_AUX_LOAD,
-    HYDROGEN_GAS_TANK,
+    GASEOUS_HYDROGEN_TANK,
 ]
 
 KNOWN_ID = []

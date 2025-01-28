@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class SizingHydrogenGasTankTotalHydrogenMission(om.ExplicitComponent):
+class SizingGaseousHydrogenTankTotalHydrogenMission(om.ExplicitComponent):
     """
     Computation of the amount of the total amount of hydrogen loaded for the mission. Is the sum of
     the consumed hydrogen and unusable hydrogen.
@@ -14,18 +14,18 @@ class SizingHydrogenGasTankTotalHydrogenMission(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="hydrogen_gas_tank_id",
+            name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the hydrogen gas tank",
+            desc="Identifier of the gaseous hydrogen tank",
             allow_none=False,
         )
 
     def setup(self):
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":fuel_consumed_mission",
             units="kg",
             val=15.0,
@@ -33,8 +33,8 @@ class SizingHydrogenGasTankTotalHydrogenMission(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":unusable_fuel_mission",
             units="kg",
             val=np.nan,
@@ -42,8 +42,8 @@ class SizingHydrogenGasTankTotalHydrogenMission(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":fuel_total_mission",
             units="kg",
             val=15.15,
@@ -53,21 +53,21 @@ class SizingHydrogenGasTankTotalHydrogenMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         outputs[
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":fuel_total_mission"
         ] = (
             inputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":fuel_consumed_mission"
             ]
             + inputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":unusable_fuel_mission"
             ]
         )

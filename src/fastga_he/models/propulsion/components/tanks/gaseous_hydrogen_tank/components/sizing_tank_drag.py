@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingHydrogenGasTankDrag(om.ExplicitComponent):
+class SizingGaseousHydrogenTankDrag(om.ExplicitComponent):
     """
     Class that computes the contribution to profile drag of the hydrogen tanks according to the
     position given in the options. For now this will be 0.0 regardless of the option except when
@@ -17,9 +17,9 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="hydrogen_gas_tank_id",
+            name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the hydrogen gas tank",
+            desc="Identifier of the gaseous hydrogen tank",
             allow_none=False,
         )
 
@@ -36,7 +36,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
         self.options.declare("low_speed_aero", default=False, types=bool)
 
     def setup(self):
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
         # For refactoring purpose we just match the option to the tag in the variable name and
         # use it
@@ -44,8 +44,8 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
 
         # At least one input is needed regardless of the case
         self.add_input(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":dimension:outer_diameter",
             units="m",
             val=np.nan,
@@ -54,8 +54,8 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
 
         if position == "underbelly":
             self.add_input(
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:length",
                 units="m",
                 val=np.nan,
@@ -69,8 +69,8 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
         self.add_output(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":"
             + ls_tag
             + ":CD0",
@@ -82,7 +82,7 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=0.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
         position = self.options["position"]
 
@@ -97,8 +97,8 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             frontal_area = (
                 np.pi
                 * inputs[
-                    "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                    + hydrogen_gas_tank_id
+                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                    + gaseous_hydrogen_tank_id
                     + ":dimension:outer_diameter"
                 ]
                 ** 2
@@ -116,20 +116,20 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             wet_area = inputs["data:geometry:fuselage:wet_area"]
 
             belly_width = inputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
             ]
 
             belly_length = inputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:length"
             ]
 
             belly_height = inputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
             ]
 
@@ -145,15 +145,15 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             cd0 = 0.0
 
         outputs[
-            "data:propulsion:he_power_train:hydrogen_gas_tank:"
-            + hydrogen_gas_tank_id
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
             + ":"
             + ls_tag
             + ":CD0"
         ] = cd0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
         position = self.options["position"]
 
@@ -161,8 +161,8 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             frontal_area = (
                 np.pi
                 * inputs[
-                    "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                    + hydrogen_gas_tank_id
+                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                    + gaseous_hydrogen_tank_id
                     + ":dimension:outer_diameter"
                 ]
                 ** 2
@@ -170,20 +170,20 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             )
 
             partials[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":"
                 + ls_tag
                 + ":CD0",
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter",
             ] = (
                 0.1
                 * np.pi
                 * inputs[
-                    "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                    + hydrogen_gas_tank_id
+                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                    + gaseous_hydrogen_tank_id
                     + ":dimension:outer_diameter"
                 ]
                 / 2.0
@@ -191,8 +191,8 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             )
 
             partials[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":"
                 + ls_tag
                 + ":CD0",
@@ -201,14 +201,14 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
 
         elif position == "underbelly":
             d = inputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
             ]
 
             length = inputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:length"
             ]
 
@@ -217,30 +217,30 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             wet_area = inputs["data:geometry:fuselage:wet_area"]
 
             partials[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":"
                 + ls_tag
                 + ":CD0",
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter",
             ] = cd0_fus * (3 * length + 4 * d) / wet_area
 
             partials[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":"
                 + ls_tag
                 + ":CD0",
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:length",
             ] = cd0_fus * 3 * d / wet_area
 
             partials[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":"
                 + ls_tag
                 + ":CD0",
@@ -248,8 +248,8 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
             ] = -cd0_fus * (3 * d * length + 2 * d**2) / wet_area**2
 
             partials[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":"
                 + ls_tag
                 + ":CD0",
@@ -258,12 +258,12 @@ class SizingHydrogenGasTankDrag(om.ExplicitComponent):
 
         else:
             partials[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":"
                 + ls_tag
                 + ":CD0",
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter",
             ] = 0.0

@@ -58,9 +58,9 @@
         </aerodynamics>
         <propulsion>
             <he_power_train>
-                <hydrogen_gas_tank>
+                <gaseous_hydrogen_tank>
                     <tank_temperature units="K">300.</tank_temperature>
-                    <hydrogen_gas_tank_1>
+                    <gaseous_hydrogen_tank_1>
                         <CG>
                             <y_ratio>0.4</y_ratio>
                             <y units="m">1.85</y>
@@ -87,8 +87,8 @@
                             <rear_length_ratio>0.5</rear_length_ratio>
                             <aspect_ratio>2.022</aspect_ratio>
                         </dimension>
-                    </hydrogen_gas_tank_1>
-                </hydrogen_gas_tank>
+                    </gaseous_hydrogen_tank_1>
+                </gaseous_hydrogen_tank>
             </he_power_train>
         </propulsion>
     </data>

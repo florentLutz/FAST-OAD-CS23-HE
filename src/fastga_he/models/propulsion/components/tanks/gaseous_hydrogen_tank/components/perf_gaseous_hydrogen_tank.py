@@ -4,11 +4,11 @@
 
 import openmdao.api as om
 
-from ..components.perf_fuel_mission_consumed import PerformancesHydrogenGasConsumedMission
-from ..components.perf_fuel_remaining import PerformancesHydrogenGasRemainingMission
+from ..components.perf_fuel_mission_consumed import PerformancesGaseousHydrogenConsumedMission
+from ..components.perf_fuel_remaining import PerformancesGaseousHydrogenRemainingMission
 
 
-class PerformancesHydrogenGasTank(om.Group):
+class PerformancesGaseousHydrogenTank(om.Group):
     """
     Regrouping all the components for the performances of the tank. Note that to limit the work
     to be done for the implementation of hydrogen tanks, fuel tanks don't output the fuel consumed
@@ -22,28 +22,28 @@ class PerformancesHydrogenGasTank(om.Group):
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            name="hydrogen_gas_tank_id",
+            name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the fuel tank",
+            desc="Identifier of the gaseous hydrogen tank",
             allow_none=False,
         )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         self.add_subsystem(
             "hydrogen_gas_consumed_mission",
-            PerformancesHydrogenGasConsumedMission(
-                number_of_points=number_of_points, hydrogen_gas_tank_id=hydrogen_gas_tank_id
+            PerformancesGaseousHydrogenConsumedMission(
+                number_of_points=number_of_points, gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id
             ),
             promotes=["*"],
         )
 
         self.add_subsystem(
             "hydrogen_gas_remaining_mission",
-            PerformancesHydrogenGasRemainingMission(
-                number_of_points=number_of_points, hydrogen_gas_tank_id=hydrogen_gas_tank_id
+            PerformancesGaseousHydrogenRemainingMission(
+                number_of_points=number_of_points, gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id
             ),
             promotes=["*"],
         )

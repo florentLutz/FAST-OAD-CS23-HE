@@ -6,29 +6,29 @@ import openmdao.api as om
 
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_CONSTRAINTS_HYDROGEN_GAS_TANK_CAPACITY
+from ..constants import SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY
 
 
-class ConstraintsHydrogenGasTank(om.Group):
+class ConstraintsGaseousHydrogenTank(om.Group):
     """
     Class that gather the different constraints for the fuel tank, be they ensure or enforce.
     """
 
     def initialize(self):
         self.options.declare(
-            name="hydrogen_gas_tank_id",
+            name="gaseous_hydrogen_tank_id",
             default=None,
             desc="Identifier of the hydrogen gas tank",
             allow_none=False,
         )
 
     def setup(self):
-        option_hydrogen_gas_tank_id = {"hydrogen_gas_tank_id": self.options["hydrogen_gas_tank_id"]}
+        option_gaseous_hydrogen_tank_id = {"gaseous_hydrogen_tank_id": self.options["gaseous_hydrogen_tank_id"]}
 
         self.add_subsystem(
-            name="constraints_hydrogen_gas_tank",
+            name="constraints_gaseous_hydrogen_tank",
             subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_HYDROGEN_GAS_TANK_CAPACITY, options=option_hydrogen_gas_tank_id
+                SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY, options=option_gaseous_hydrogen_tank_id
             ),
             promotes=["*"],
         )

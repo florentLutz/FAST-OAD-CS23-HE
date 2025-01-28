@@ -8,14 +8,14 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingHydrogenGasTankCGX(om.ExplicitComponent):
+class SizingGaseousHydrogenTankCGX(om.ExplicitComponent):
     """Class that computes the CG in X-direction of the tank according to the position given in the options."""
 
     def initialize(self):
         self.options.declare(
-            name="hydrogen_gas_tank_id",
+            name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the hydrogen gas tank",
+            desc="Identifier of the gaseous hydrogen tank",
             allow_none=False,
         )
 
@@ -30,11 +30,11 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
 
     def setup(self):
         # To modify
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
 
         self.add_output(
-            "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:x",
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":CG:x",
             units="m",
             val=2.8,
             desc="X position of the tank center of gravity",
@@ -51,16 +51,16 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
             self.add_input(
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:length",
                 units="m",
                 val=np.nan,
                 desc="Length of the tank, as in the size of the tank along the X-axis",
             )
             self.add_input(
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter",
                 units="m",
                 val=np.nan,
@@ -71,15 +71,15 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="data:geometry:cabin:length", val=1.0)
             self.declare_partials(
                 of="*",
-                wrt="data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                wrt="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:length",
                 val=0.5,
             )
             self.declare_partials(
                 of="*",
-                wrt="data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                wrt="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter",
                 val=0.5,
             )
@@ -88,8 +88,8 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
             self.add_input(
-                "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:length",
                 units="m",
                 val=np.nan,
@@ -100,8 +100,8 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
 
             self.declare_partials(
                 of="*",
-                wrt="data:propulsion:he_power_train:hydrogen_gas_tank:"
-                + hydrogen_gas_tank_id
+                wrt="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
                 + ":dimension:length",
                 val=-0.5,
             )
@@ -117,12 +117,12 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         # To modify
-        hydrogen_gas_tank_id = self.options["hydrogen_gas_tank_id"]
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
 
         if position == "wing_pod":
             outputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:x"
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":CG:x"
             ] = (
                 inputs["data:geometry:wing:MAC:at25percent:x"]
                 + 0.25 * inputs["data:geometry:wing:MAC:length"]
@@ -130,40 +130,40 @@ class SizingHydrogenGasTankCGX(om.ExplicitComponent):
 
         elif position == "in_the_back":
             outputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:x"
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":CG:x"
             ] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + inputs["data:geometry:cabin:length"]
                 + 0.5
                 * inputs[
-                    "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                    + hydrogen_gas_tank_id
+                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                    + gaseous_hydrogen_tank_id
                     + ":dimension:length"
                 ]
                 + 0.5
                 * inputs[
-                    "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                    + hydrogen_gas_tank_id
+                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                    + gaseous_hydrogen_tank_id
                     + ":dimension:outer_diameter"
                 ]
             )
 
         elif position == "in_the_front":
             outputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:x"
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":CG:x"
             ] = (
                 inputs["data:geometry:fuselage:front_length"]
                 - 0.5
                 * inputs[
-                    "data:propulsion:he_power_train:hydrogen_gas_tank:"
-                    + hydrogen_gas_tank_id
+                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                    + gaseous_hydrogen_tank_id
                     + ":dimension:length"
                 ]
             )
 
         else:
             outputs[
-                "data:propulsion:he_power_train:hydrogen_gas_tank:" + hydrogen_gas_tank_id + ":CG:x"
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":CG:x"
             ] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + 0.5 * inputs["data:geometry:cabin:length"]
