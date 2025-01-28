@@ -99,7 +99,9 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
         ]
 
         outputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":mass"
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":mass"
         ] = wall_density * (
             4 * np.pi * r**3 / 3
             + np.pi * r**2 * length
@@ -137,7 +139,9 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":mass",
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":mass",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":material:density",
@@ -152,21 +156,27 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":mass",
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":mass",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:length",
         ] = wall_density * np.pi * r**2
 
         partials[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":mass",
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":mass",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":inner_volume",
         ] = -wall_density
 
         partials[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":mass",
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":mass",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:outer_diameter",

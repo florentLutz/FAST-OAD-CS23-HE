@@ -81,7 +81,9 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
                 + ":fuel_total_mission"
             ]
             + inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":mass"
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":mass"
             ]
         )
 
@@ -102,7 +104,9 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
                 + ":fuel_total_mission"
             ]
             + inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":mass"
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":mass"
             ]
         )
 
@@ -110,7 +114,9 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":gravimetric_index",
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":mass",
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":mass",
         ] = (
             -inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"

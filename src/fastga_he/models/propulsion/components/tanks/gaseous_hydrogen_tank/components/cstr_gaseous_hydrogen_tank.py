@@ -23,12 +23,15 @@ class ConstraintsGaseousHydrogenTank(om.Group):
         )
 
     def setup(self):
-        option_gaseous_hydrogen_tank_id = {"gaseous_hydrogen_tank_id": self.options["gaseous_hydrogen_tank_id"]}
+        option_gaseous_hydrogen_tank_id = {
+            "gaseous_hydrogen_tank_id": self.options["gaseous_hydrogen_tank_id"]
+        }
 
         self.add_subsystem(
             name="constraints_gaseous_hydrogen_tank",
             subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY, options=option_gaseous_hydrogen_tank_id
+                SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY,
+                options=option_gaseous_hydrogen_tank_id,
             ),
             promotes=["*"],
         )

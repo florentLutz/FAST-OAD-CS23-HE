@@ -48,7 +48,9 @@ def test_unusable_hydrogen_gas_mission():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
-            SizingGaseousHydrogenTankUnusableHydrogen(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")
+            SizingGaseousHydrogenTankUnusableHydrogen(
+                gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+            )
         ),
         __file__,
         XML_FILE,
@@ -56,7 +58,9 @@ def test_unusable_hydrogen_gas_mission():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        SizingGaseousHydrogenTankUnusableHydrogen(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+        SizingGaseousHydrogenTankUnusableHydrogen(
+            gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+        ),
         ivc,
     )
     assert problem.get_val(
@@ -71,7 +75,9 @@ def test_total_hydrogen_gas_mission():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
-            SizingGaseousHydrogenTankTotalHydrogenMission(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")
+            SizingGaseousHydrogenTankTotalHydrogenMission(
+                gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+            )
         ),
         __file__,
         XML_FILE,
@@ -79,7 +85,9 @@ def test_total_hydrogen_gas_mission():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        SizingGaseousHydrogenTankTotalHydrogenMission(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+        SizingGaseousHydrogenTankTotalHydrogenMission(
+            gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+        ),
         ivc,
     )
     assert problem.get_val(
@@ -93,7 +101,9 @@ def test_total_hydrogen_gas_mission():
 def test_inner_volume_gaseous_hydrogen_tank():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingGaseousHydrogenTankInnerVolume(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")),
+        list_inputs(
+            SizingGaseousHydrogenTankInnerVolume(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")
+        ),
         __file__,
         XML_FILE,
     )
@@ -128,11 +138,14 @@ def test_tank_cg_x():
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
-            SizingGaseousHydrogenTankCGX(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1", position=option),
+            SizingGaseousHydrogenTankCGX(
+                gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1", position=option
+            ),
             ivc,
         )
         assert problem.get_val(
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:CG:x", units="m"
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:CG:x",
+            units="m",
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -155,11 +168,14 @@ def test_tank_cg_y():
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
-            SizingGaseousHydrogenTankCGY(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1", position=option),
+            SizingGaseousHydrogenTankCGY(
+                gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1", position=option
+            ),
             ivc,
         )
         assert problem.get_val(
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:CG:y", units="m"
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:CG:y",
+            units="m",
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -167,7 +183,9 @@ def test_tank_cg_y():
 
 def test_tank_length():
     ivc = get_indep_var_comp(
-        list_inputs(SizingGaseousHydrogenTankLength(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")),
+        list_inputs(
+            SizingGaseousHydrogenTankLength(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")
+        ),
         __file__,
         XML_FILE,
     )
@@ -219,7 +237,11 @@ def test_tank_outer_diameter():
 def test_tank_overall_length():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingGaseousHydrogenTankOverallLength(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")),
+        list_inputs(
+            SizingGaseousHydrogenTankOverallLength(
+                gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+            )
+        ),
         __file__,
         XML_FILE,
     )
@@ -270,7 +292,11 @@ def test_tank_overall_length_fuselage_check():
 
 def test_tank_inner_diameter():
     ivc = get_indep_var_comp(
-        list_inputs(SizingGaseousHydrogenTankInnerDiameter(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")),
+        list_inputs(
+            SizingGaseousHydrogenTankInnerDiameter(
+                gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+            )
+        ),
         __file__,
         XML_FILE,
     )
@@ -290,7 +316,11 @@ def test_tank_inner_diameter():
 
 def test_tank_wall_thickness():
     ivc = get_indep_var_comp(
-        list_inputs(SizingGaseousHydrogenTankWallThickness(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")),
+        list_inputs(
+            SizingGaseousHydrogenTankWallThickness(
+                gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+            )
+        ),
         __file__,
         XML_FILE,
     )
@@ -311,7 +341,9 @@ def test_tank_wall_thickness():
 def test_gaseous_hydrogen_tank_weight():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingGaseousHydrogenTankWeight(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")),
+        list_inputs(
+            SizingGaseousHydrogenTankWeight(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")
+        ),
         __file__,
         XML_FILE,
     )
@@ -322,7 +354,8 @@ def test_gaseous_hydrogen_tank_weight():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass", units="kg"
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
+        units="kg",
     ) == pytest.approx(1.2179, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -332,7 +365,9 @@ def test_gaseous_hydrogen_tank_gravimetric_index():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
-            SizingGaseousHydrogenTankGravimetricIndex(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")
+            SizingGaseousHydrogenTankGravimetricIndex(
+                gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+            )
         ),
         __file__,
         XML_FILE,
@@ -345,7 +380,9 @@ def test_gaseous_hydrogen_tank_gravimetric_index():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        SizingGaseousHydrogenTankGravimetricIndex(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+        SizingGaseousHydrogenTankGravimetricIndex(
+            gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+        ),
         ivc,
     )
     assert problem.get_val(
@@ -413,7 +450,8 @@ def test_sizing_tank():
     )
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass", units="kg"
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
+        units="kg",
     ) == pytest.approx(2.476, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:cruise:CD0"
@@ -441,11 +479,14 @@ def test_constraints_enforce_tank_capacity():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        ConstraintsGaseousHydrogenTankCapacityEnforce(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+        ConstraintsGaseousHydrogenTankCapacityEnforce(
+            gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+        ),
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:capacity", units="kg"
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:capacity",
+        units="kg",
     ) == pytest.approx(10.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -467,7 +508,9 @@ def test_constraints_ensure_tank_capacity():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        ConstraintsGaseousHydrogenTankCapacityEnsure(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+        ConstraintsGaseousHydrogenTankCapacityEnsure(
+            gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+        ),
         ivc,
     )
     assert problem.get_val(

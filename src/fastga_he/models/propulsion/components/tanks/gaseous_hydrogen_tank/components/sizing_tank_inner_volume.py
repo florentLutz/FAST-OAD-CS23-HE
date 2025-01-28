@@ -77,7 +77,9 @@ class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         fuel_mass = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":capacity"
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":capacity"
         ]
 
         tank_pressure = inputs[
@@ -100,7 +102,9 @@ class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         fuel_mass = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":capacity"
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":capacity"
         ]
 
         tank_pressure = inputs[

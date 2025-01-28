@@ -60,7 +60,9 @@ class ConstraintsGaseousHydrogenTankCapacityEnforce(om.ExplicitComponent):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         outputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:" + gaseous_hydrogen_tank_id + ":capacity"
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":capacity"
         ] = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
