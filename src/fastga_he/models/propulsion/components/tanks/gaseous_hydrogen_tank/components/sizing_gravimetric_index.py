@@ -11,7 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
     """
-    Computation of the gravimetric index of cryogenic hydrogen tank,
+    Computation of the gravimetric index of gaseous hydrogen tank,
     ratio between total mission fuel weight and overall weight.
     """
 
@@ -32,7 +32,7 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
             + ":mass",
             units="kg",
             val=np.nan,
-            desc="Weight of the hydrogen gas tanks",
+            desc="Weight of the gaseous hydrogen tanks",
         )
 
         self.add_input(

@@ -48,14 +48,14 @@ class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
             + ":tank_pressure",
             val=np.nan,
             units="Pa",
-            desc="Hydrogen gas tank static pressure",
+            desc="gaseous hydrogen tank static pressure",
         )
 
         self.add_input(
             "tank_temperature",
             val=300.0,
             units="K",
-            desc="Hydrogen gas tank temperature",
+            desc="gaseous hydrogen tank temperature",
         )
 
         self.add_output(

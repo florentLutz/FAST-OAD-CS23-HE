@@ -18,7 +18,7 @@ class ConstraintsGaseousHydrogenTank(om.Group):
         self.options.declare(
             name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the hydrogen gas tank",
+            desc="Identifier of the gaseous hydrogen tank",
             allow_none=False,
         )
 

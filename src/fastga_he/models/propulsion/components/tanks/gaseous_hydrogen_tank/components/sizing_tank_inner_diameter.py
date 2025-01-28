@@ -17,7 +17,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
         self.options.declare(
             name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the hydrogen gas tank",
+            desc="Identifier of the gaseous hydrogen tank",
             allow_none=False,
         )
 
@@ -30,7 +30,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             + ":dimension:outer_diameter",
             units="m",
             val=np.nan,
-            desc="Outer diameter of the hydrogen gas tank",
+            desc="Outer diameter of the gaseous hydrogen tank",
         )
 
         self.add_input(
@@ -39,7 +39,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             + ":tank_pressure",
             val=np.nan,
             units="Pa",
-            desc="Hydrogen gas tank static pressure",
+            desc="gaseous hydrogen tank static pressure",
         )
 
         self.add_input(
@@ -47,7 +47,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             + gaseous_hydrogen_tank_id
             + ":Safety_factor",
             val=1.0,
-            desc="Hydrogen gas tank design safety factor",
+            desc="gaseous hydrogen tank design safety factor",
         )
 
         self.add_input(
@@ -56,7 +56,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             + ":material:yield_strength",
             val=np.nan,
             units="Pa",
-            desc="Hydrogen gas tank material yield stress",
+            desc="gaseous hydrogen tank material yield stress",
         )
 
         self.add_output(
@@ -65,7 +65,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             + ":dimension:inner_diameter",
             units="m",
             val=1.0,
-            desc="Inner diameter of the hydrogen gas tanks",
+            desc="Inner diameter of the gaseous hydrogen tanks",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

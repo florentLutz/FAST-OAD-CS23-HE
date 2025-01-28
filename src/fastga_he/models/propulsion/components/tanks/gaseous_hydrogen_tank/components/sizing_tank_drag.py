@@ -27,7 +27,7 @@ class SizingGaseousHydrogenTankDrag(om.ExplicitComponent):
             name="position",
             default="in_the_fuselage",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the hydrogen gas tank, possible position include "
+            desc="Option to give the position of the gaseous hydrogen tank, possible position include "
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
@@ -49,7 +49,7 @@ class SizingGaseousHydrogenTankDrag(om.ExplicitComponent):
             + ":dimension:outer_diameter",
             units="m",
             val=np.nan,
-            desc="Outer diameter of the hydrogen gas tank",
+            desc="Outer diameter of the gaseous hydrogen tank",
         )
 
         if position == "underbelly":

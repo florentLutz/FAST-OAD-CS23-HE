@@ -29,7 +29,7 @@ class SizingGaseousHydrogenTankWallThickness(om.ExplicitComponent):
             + ":dimension:inner_diameter",
             units="m",
             val=np.nan,
-            desc="Inner diameter of the hydrogen gas tanks",
+            desc="Inner diameter of the gaseous hydrogen tanks",
         )
 
         self.add_input(
@@ -38,7 +38,7 @@ class SizingGaseousHydrogenTankWallThickness(om.ExplicitComponent):
             + ":dimension:outer_diameter",
             units="m",
             val=np.nan,
-            desc="Outer diameter of the hydrogen gas tanks",
+            desc="Outer diameter of the gaseous hydrogen tanks",
         )
 
         self.add_output(
@@ -47,7 +47,7 @@ class SizingGaseousHydrogenTankWallThickness(om.ExplicitComponent):
             + ":dimension:wall_thickness",
             units="m",
             val=0.001,
-            desc="Inner diameter of the hydrogen gas tanks",
+            desc="Inner diameter of the gaseous hydrogen tanks",
         )
 
         self.declare_partials(

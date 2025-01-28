@@ -37,7 +37,7 @@ class SizingGaseousHydrogenTankOverallLength(om.ExplicitComponent):
             + ":dimension:length",
             units="m",
             val=np.nan,
-            desc="cylindrical section length of the hydrogen gas tanks",
+            desc="cylindrical section length of the gaseous hydrogen tanks",
         )
 
         self.add_output(

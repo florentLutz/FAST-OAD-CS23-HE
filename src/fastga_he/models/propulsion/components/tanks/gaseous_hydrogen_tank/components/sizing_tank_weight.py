@@ -50,7 +50,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             + ":dimension:outer_diameter",
             units="m",
             val=np.nan,
-            desc="Outer diameter of the hydrogen gas tank",
+            desc="Outer diameter of the gaseous hydrogen tank",
         )
 
         self.add_input(
@@ -69,7 +69,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             + ":mass",
             units="kg",
             val=20.0,
-            desc="Weight of the hydrogen gas tanks",
+            desc="Weight of the gaseous hydrogen tanks",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
