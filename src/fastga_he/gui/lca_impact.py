@@ -903,8 +903,7 @@ def lca_impacts_bar_chart_simple(
     is done relative to the first design given in the inputs. Can be used with only one design but
     is pointless since it will compare an aircraft to itself.
 
-    :param aircraft_file_paths: paths to the output file that contains the weighted and aggregated
-    impacts
+    :param aircraft_file_paths: paths to the output file that contains the impacts
     :param names_aircraft: names of the aircraft
     """
 
@@ -921,7 +920,7 @@ def lca_impacts_bar_chart_simple(
 
         for impact_name in impact_names:
             beautified_impact_name = impact_name.replace("_", " ")
-            variable_name = LCA_PREFIX + impact_name + "_weighted:sum"
+            variable_name = LCA_PREFIX + impact_name + ":sum"
 
             raw_score = datafile[variable_name].value[0]
             if variable_name not in reference_value:
@@ -938,8 +937,9 @@ def lca_impacts_bar_chart_simple(
         plot_bgcolor="white",
         title_font=dict(size=20),
         legend_font=dict(size=20),
+        title_x=0.5,
+        title_text="Relative score of " + ", ".join(names_aircraft[1:]) + " with respect to " + names_aircraft[0]
     )
-
     fig.update_xaxes(
         ticks="outside",
         title_font=dict(size=20),
@@ -956,6 +956,69 @@ def lca_impacts_bar_chart_simple(
         linewidth=3,
         tickfont=dict(size=20),
         title="Relative score [%]",
+    )
+    fig.update_yaxes(
+        title_font=dict(size=20),
+    )
+
+    return go.FigureWidget(fig)
+
+def lca_impacts_bar_chart_normalised_weighted(
+    aircraft_file_path: str,
+    name_aircraft: str = None,
+) -> go.FigureWidget:
+    """
+    Give a bar chart that compares multiples aircraft designs across all categories. This comparison
+    is done relative to the first design given in the inputs. Can be used with only one design but
+    is pointless since it will compare an aircraft to itself.
+
+    :param aircraft_file_path: path to the output file that contains the normalised and weighted
+    impacts
+    :param name_aircraft: name of the aircraft
+    """
+
+    impact_names = _get_impact_list(aircraft_file_path)
+    impact_names.remove("single_score")
+    fig = go.Figure()
+
+    datafile = oad.DataFile(aircraft_file_path)
+    impact_scores = []
+    beautified_impact_names = []
+
+    for impact_name in impact_names:
+        beautified_impact_name = impact_name.replace("_", " ")
+        variable_name = LCA_PREFIX + impact_name + "_weighted:sum"
+
+        impact_scores.append(datafile[variable_name].value[0])
+        beautified_impact_names.append(beautified_impact_name)
+
+    bar_chart = go.Bar(name=name_aircraft, x=beautified_impact_names, y=impact_scores)
+    fig.add_trace(bar_chart)
+
+    fig.update_layout(
+        barmode="group",
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+        title_x=0.5,
+        title_text="Normalized and weighted scores for " + name_aircraft
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=20),
+        title="Points [-]",
     )
     fig.update_yaxes(
         title_font=dict(size=20),
