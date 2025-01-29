@@ -4,7 +4,7 @@
 
 import openmdao.api as om
 import numpy as np
-from ..constants import POSSIBLE_POSITION
+from ..constants import POSSIBLE_POSITION, MULTI_TANK_FACTOR
 import logging
 
 _LOGGER = logging.getLogger(__name__)
@@ -46,6 +46,13 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
         )
 
         self.add_input(
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:number_of_tank",
+            val=1.0,
+            desc="Number of gaseous hydrogen tank. "
+            "Default set 1.0 for single tank in fuselage and outside fuselage uses.",
+        )
+
+        self.add_input(
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":inner_volume",
@@ -74,18 +81,28 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             + ":diameter_height_ratio"
         ]
 
-        d = diameter_height_ratio * inputs["data:geometry:fuselage:maximum_height"]
-
         not_in_fuselage = (position == "wing_pod") or (position == "underbelly")
 
-        # This condition is to keep the tank as a cylindrical or spherical shape.
+        nb_tank = inputs["data:propulsion:he_power_train:gaseous_hydrogen_tank:number_of_tank"]
+        # multi_tank_factor divides the outer diameter with respect to the number of tanks.
+        if not_in_fuselage:
+            multi_tank_factor = 1.0
+        else:
+            multi_tank_factor = 1 / MULTI_TANK_FACTOR.get(int(nb_tank))
+
+        d = (
+            diameter_height_ratio
+            * inputs["data:geometry:fuselage:maximum_height"]
+            * multi_tank_factor
+        )
+        # This condition is to keep the tank as cylindrical as possible.
         positive_length = (
             inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":inner_volume"
             ]
-            >= np.pi * d**3 / 6
+            >= nb_tank * np.pi * d**3 / 6
         )
 
         if positive_length and not not_in_fuselage:
@@ -95,19 +112,22 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + ":dimension:outer_diameter"
             ] = d
 
-        elif not positive_length:
+        elif not positive_length and not not_in_fuselage:
             outputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
-            ] = np.cbrt(
-                6
-                * inputs[
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + gaseous_hydrogen_tank_id
-                    + ":inner_volume"
-                ]
-                / np.pi
+            ] = (
+                np.cbrt(
+                    6
+                    * inputs[
+                        "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                        + gaseous_hydrogen_tank_id
+                        + ":inner_volume"
+                    ]
+                    / np.pi
+                )
+                * multi_tank_factor
             )
 
             _LOGGER.warning(msg="Possible Negative length!! Tank diameter adjust to proper size")
@@ -130,18 +150,28 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             + ":diameter_height_ratio"
         ]
 
-        d = diameter_height_ratio * inputs["data:geometry:fuselage:maximum_height"]
-
         not_in_fuselage = (position == "wing_pod") or (position == "underbelly")
 
-        # This condition is to keep the tank as a cylindrical or spherical shape.
+        nb_tank = inputs["data:propulsion:he_power_train:gaseous_hydrogen_tank:number_of_tank"]
+        # multi_tank_factor divides the outer diameter with respect to the number of tanks.
+        if not_in_fuselage:
+            multi_tank_factor = 1.0
+        else:
+            multi_tank_factor = 1 / MULTI_TANK_FACTOR.get(int(nb_tank))
+
+        d = (
+            diameter_height_ratio
+            * inputs["data:geometry:fuselage:maximum_height"]
+            * multi_tank_factor
+        )
+        # This condition is to keep the tank as cylindrical as possible.
         positive_length = (
             inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":inner_volume"
             ]
-            >= np.pi * d**3 / 6
+            >= nb_tank * np.pi * d**3 / 6
         )
 
         if positive_length and not not_in_fuselage:
@@ -150,11 +180,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter",
                 "data:geometry:fuselage:maximum_height",
-            ] = inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":diameter_height_ratio"
-            ]
+            ] = diameter_height_ratio * multi_tank_factor
 
             partials[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -163,9 +189,9 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":diameter_height_ratio",
-            ] = inputs["data:geometry:fuselage:maximum_height"]
+            ] = inputs["data:geometry:fuselage:maximum_height"] * multi_tank_factor
 
-        elif not positive_length:
+        elif not positive_length and not not_in_fuselage:
             partials[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -175,6 +201,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + ":inner_volume",
             ] = (
                 2
+                * multi_tank_factor
                 / np.pi
                 * np.cbrt(
                     6

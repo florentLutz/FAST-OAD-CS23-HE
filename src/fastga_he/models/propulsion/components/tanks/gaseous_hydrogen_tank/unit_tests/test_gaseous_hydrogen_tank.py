@@ -36,7 +36,7 @@ from ..components.perf_fuel_remaining import PerformancesGaseousHydrogenRemainin
 from ..components.sizing_tank import SizingGaseousHydrogenTank
 from ..components.perf_gaseous_hydrogen_tank import PerformancesGaseousHydrogenTank
 
-from ..constants import POSSIBLE_POSITION
+from ..constants import POSSIBLE_POSITION, MULTI_TANK_FACTOR
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -230,6 +230,49 @@ def test_tank_outer_diameter():
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:outer_diameter",
             units="m",
         ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True, step=1e-7)
+
+
+def test_mutli_tank_outer_diameter():
+    expected_values = [
+        0.97802,
+        0.48901,
+        0.45390,
+        0.40511,
+        0.36206,
+        0.32601,
+        0.32601,
+        0.29594,
+        0.27069,
+    ]
+
+    for n_int, _ in MULTI_TANK_FACTOR.items():
+        # Research independent input value in .xml file
+        n = float(n_int)
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingGaseousHydrogenTankOuterDiameter(
+                    gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+                )
+            ),
+            __file__,
+            XML_FILE,
+        )
+        ivc.add_output("data:propulsion:he_power_train:gaseous_hydrogen_tank:number_of_tank", val=n)
+
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SizingGaseousHydrogenTankOuterDiameter(
+                gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+            ),
+            ivc,
+        )
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:outer_diameter",
+            units="m",
+        ) == pytest.approx(expected_values[n_int - 1], rel=1e-2)
 
         problem.check_partials(compact_print=True, step=1e-7)
 
