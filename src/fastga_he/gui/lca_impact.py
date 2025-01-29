@@ -706,6 +706,19 @@ def _get_list_contributing_components_and_variables(
                     contributing_components_and_variables[component_name].append(name)
                 else:
                     contributing_components_and_variables[component_name] = [name]
+            # This isn't very generic, but I can't find another way to do it, maybe check that there
+            # aren't any other subprocesses ?
+            # TODO: Update if we add any life phase to the LCA analysis that aren't detailed
+            elif "manufacturing:sum" in name:
+                if "manufacturing" in list(contributing_components_and_variables.keys()):
+                    contributing_components_and_variables["manufacturing"].append(name)
+                else:
+                    contributing_components_and_variables["manufacturing"] = [name]
+            elif "distribution:sum" in name:
+                if "distribution" in list(contributing_components_and_variables.keys()):
+                    contributing_components_and_variables["distribution"].append(name)
+                else:
+                    contributing_components_and_variables["distribution"] = [name]
 
     return contributing_components_and_variables
 
