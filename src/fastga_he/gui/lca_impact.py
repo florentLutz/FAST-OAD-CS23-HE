@@ -344,40 +344,13 @@ def lca_score_sensitivity_simple(
     fig.add_trace(scatter)
     if orig_fig:
         fig.update_layout(
-            plot_bgcolor="white",
-            title_x=0.5,
             title_text="Evolution of the "
             + beautified_impact_score
             + " impact with life expectancy of the aircraft",
-            title_font=dict(size=20),
-            legend_font=dict(size=20),
+            xaxis_title="Airframe hours [h]",
+            yaxis_title="Single score [-]",
         )
-        fig.update_xaxes(
-            mirror=True,
-            ticks="outside",
-            showline=True,
-            linecolor="black",
-            gridcolor="lightgrey",
-            title="Airframe hours [h]",
-            title_font=dict(size=20),
-            tickfont=dict(size=20),
-        )
-        fig.update_yaxes(
-            mirror=True,
-            ticks="outside",
-            showline=True,
-            linecolor="black",
-            gridcolor="lightgrey",
-            range=[0, None],
-            title="Single score [-]",
-            title_font=dict(size=20),
-            tickfont=dict(size=20),
-            side="right",
-        )
-        # You may wonder why I set the y-axis to the right, well that's because if it's on the left
-        # changing the tick font changes the range !
-        # You could try to solve that problem, but if you don't manage to update the counter below:
-        # hours_wasted: 1.5
+        _update_fig_axis(fig)
 
     return fig
 
@@ -433,9 +406,7 @@ def lca_score_sensitivity_advanced_impact_category(
                     _safe_add_to_dict_of_list(impact_variations, impact, impact_score)
 
     for impact_name, impact_value in impact_variations.items():
-        aircraft_lifespan, sorted_impact = zip(
-            *sorted(zip(aircraft_lifespan_list, impact_value))
-        )
+        aircraft_lifespan, sorted_impact = zip(*sorted(zip(aircraft_lifespan_list, impact_value)))
         impact_variations[impact_name] = sorted_impact
 
     # In order to not overload the diagram, we'll only display a limited number of impacts.
@@ -495,35 +466,12 @@ def lca_score_sensitivity_advanced_impact_category(
     fig.add_trace(scatter)
 
     fig.update_layout(
-        plot_bgcolor="white",
-        title_x=0.5,
         title_text="Evolution of the contribution of each impact to the single score of the "
         + name,
-        title_font=dict(size=20),
-        legend_font=dict(size=20),
+        xaxis_title="Airframe hours [h]",
+        yaxis_title="Single score [-]",
     )
-    fig.update_xaxes(
-        mirror=True,
-        ticks="outside",
-        showline=True,
-        linecolor="black",
-        gridcolor="lightgrey",
-        title="Airframe hours [h]",
-        title_font=dict(size=20),
-        tickfont=dict(size=20),
-    )
-    fig.update_yaxes(
-        mirror=True,
-        ticks="outside",
-        showline=True,
-        linecolor="black",
-        gridcolor="lightgrey",
-        range=[0, None],
-        title="Single score [-]",
-        title_font=dict(size=20),
-        tickfont=dict(size=20),
-        side="right",
-    )
+    _update_fig_axis(fig)
 
     return fig
 
@@ -648,10 +596,25 @@ def lca_score_sensitivity_advanced_components(
     fig.add_trace(scatter)
 
     fig.update_layout(
-        plot_bgcolor="white",
-        title_x=0.5,
         title_text="Evolution of the contribution of each component to the single score of the "
         + name,
+        xaxis_title="Airframe hours [h]",
+        yaxis_title="Single score [-]",
+    )
+    _update_fig_axis(fig)
+
+    return fig
+
+
+def _update_fig_axis(fig: go.Figure):
+    """
+    Utility function that updates the aspect of the axis so that all figures have the same aspect.
+
+    :param fig: figure whose layout is to be updated.
+    """
+    fig.update_layout(
+        plot_bgcolor="white",
+        title_x=0.5,
         title_font=dict(size=20),
         legend_font=dict(size=20),
     )
@@ -661,7 +624,6 @@ def lca_score_sensitivity_advanced_components(
         showline=True,
         linecolor="black",
         gridcolor="lightgrey",
-        title="Airframe hours [h]",
         title_font=dict(size=20),
         tickfont=dict(size=20),
     )
@@ -672,13 +634,14 @@ def lca_score_sensitivity_advanced_components(
         linecolor="black",
         gridcolor="lightgrey",
         range=[0, None],
-        title="Single score [-]",
         title_font=dict(size=20),
         tickfont=dict(size=20),
         side="right",
     )
-
-    return fig
+    # You may wonder why I set the y-axis to the right, well that's because if it's on the left
+    # changing the tick font changes the range !
+    # You could try to solve that problem, but if you don't manage to update the counter below:
+    # hours_wasted: 1.5
 
 
 def _get_list_contributing_components_and_variables(
