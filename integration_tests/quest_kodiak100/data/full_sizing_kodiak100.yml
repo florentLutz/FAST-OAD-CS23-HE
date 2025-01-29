@@ -22,12 +22,12 @@ model:
         aerodynamics_lowspeed:
             id: fastga.aerodynamics.lowspeed.legacy
             propulsion_id: fastga.wrapper.propulsion.basicTurboprop
-            result_folder_path: ../workdir
+            result_folder_path: D:/tmp
             use_openvsp: false
         aerodynamics_highspeed:
             id: fastga.aerodynamics.highspeed.legacy
             propulsion_id: fastga.wrapper.propulsion.basicTurboprop
-            result_folder_path: ../workdir
+            result_folder_path: D:/tmp
             compute_mach_interpolation: false
             use_openvsp: false
         power_train_sizing:

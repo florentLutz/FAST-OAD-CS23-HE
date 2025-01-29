@@ -12,7 +12,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
     """
-    Outer diameter calculation fot the gaseous hydrogen tank.
+    The Outer diameter of the gaseous hydrogen tank is based on the maximum fuselage height and the number of tanks.
+    For Multi-tank scenarios, all the tanks are assumed with the same diameter and using the table provided by:
+    Kravitz, S. "Packing Cylinders into Cylindrical Containers." Math. Mag. 40, 65-70, 1967.
     """
 
     def initialize(self):
@@ -130,15 +132,27 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 * multi_tank_factor
             )
 
-            _LOGGER.warning(msg="Possible Negative length!! Tank diameter adjust to proper size")
+            _LOGGER.warning(
+                msg="Inconsistent tank length for tank "
+                + gaseous_hydrogen_tank_id
+                + ",this is due to the diameter being too big for the required tank capacity"
+            )
 
-        elif not_in_fuselage:
+        elif position == "underbelly":
             outputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
             ] = 0.5 * inputs["data:geometry:fuselage:maximum_height"]
+            _LOGGER.warning(msg="Tank dimension fixed to reduce drag")
 
+        elif position == "wing_pod":
+            outputs[
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":dimension:outer_diameter"
+            ] = 0.2 * inputs["data:geometry:fuselage:maximum_height"]
+            # Ratio inspired by the size of fighter jet external fuel tank
             _LOGGER.warning(msg="Tank dimension fixed to reduce drag")
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -215,10 +229,18 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 ** (-2)
             )
 
-        elif not_in_fuselage:
+        elif position == "underbelly":
             partials[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter",
                 "data:geometry:fuselage:maximum_height",
             ] = 0.5
+
+        elif position == "wing_pod":
+            partials[
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":dimension:outer_diameter",
+                "data:geometry:fuselage:maximum_height",
+            ] = 0.2

@@ -59,8 +59,8 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             + ":material:density",
             units="kg/m**3",
             val=7860.0,
-            desc="Choice of the tank material,Some reference: Steel(ASTM-A514):7860, "
-            "Aluminum(2014-T6):2800, Titanium(6%Al,4%V):4460, Carbon Composite:1530",
+            desc="Choice of the tank material,Some reference (in kg/m**3): "
+            "Steel(ASTM-A514):7860, Aluminum(2014-T6):2800, Titanium(6%Al,4%V):4460, Carbon Composite:1530",
         )
 
         self.add_output(

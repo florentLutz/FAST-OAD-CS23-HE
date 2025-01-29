@@ -7,7 +7,7 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingGaseousHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent):
+class SizingGaseousHydrogenTankOverallLengthFuselageConstraints(om.ExplicitComponent):
     """
     Computation to check the overall length of the tank will fit in the fuselage or not.
     """
@@ -53,15 +53,7 @@ class SizingGaseousHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent):
                 + gaseous_hydrogen_tank_id
                 + ":dimension:rear_length_ratio",
                 val=0.5,
-            )
-
-        if position == "in_the_front":
-            self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
-            self.add_input(
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:front_length_ratio",
-                val=0.7,
+                desc="The ratio between the usable length of the rear fuselage and the the whole rear fuselage length.",
             )
 
         self.add_output(
@@ -111,19 +103,6 @@ class SizingGaseousHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent):
                 method="exact",
             )
 
-        elif position == "in_the_front":
-            self.declare_partials(
-                of="*",
-                wrt=[
-                    "data:geometry:fuselage:front_length",
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + gaseous_hydrogen_tank_id
-                    + ":dimension:front_length_ratio",
-                    "data:geometry:fuselage:front_length",
-                ],
-                method="exact",
-            )
-
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
@@ -161,25 +140,6 @@ class SizingGaseousHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent):
                 * inputs["data:geometry:fuselage:rear_length"]
             )
 
-        elif position == "in_the_front":
-            outputs[
-                "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:overall_length"
-            ] = (
-                inputs[
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + gaseous_hydrogen_tank_id
-                    + ":dimension:overall_length"
-                ]
-                - inputs[
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + gaseous_hydrogen_tank_id
-                    + ":dimension:front_length_ratio"
-                ]
-                * inputs["data:geometry:fuselage:front_length"]
-            )
-
         else:
             outputs[
                 "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -210,24 +170,4 @@ class SizingGaseousHydrogenTankOverallLengthFuselageCheck(om.ExplicitComponent):
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:rear_length_ratio"
-            ]
-        elif position == "in_the_front":
-            partials[
-                "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:overall_length",
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:front_length_ratio",
-            ] = -inputs["data:geometry:fuselage:front_length"]
-
-            partials[
-                "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:overall_length",
-                "data:geometry:fuselage:front_length",
-            ] = -inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:front_length_ratio"
             ]

@@ -18,6 +18,17 @@ class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
             allow_none=False,
         )
 
+        self.options.declare(
+            name="trapped_ratio",
+            default=0.03,
+            desc="Ratio between typical empty pressure and filling pressure of hydrogen tank.",
+            allow_none=False,
+        )
+        # "The default value is set slightly higher to prevent underestimation."
+        # Reference: Ahluwalia, R. K., et al.
+        # "Technical assessment of cryo-compressed hydrogen storage tank systems for automotive applications."
+        # International journal of hydrogen energy 35.9 (2010): 4171-4184.",
+
     def setup(self):
         # To modify based on the minimum pressure for the output hydrogen mass flow
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
@@ -45,13 +56,13 @@ class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         # To modify based on the minimum pressure for the output hydrogen mass flow
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
-
+        trapped_ratio = self.options["trapped_ratio"]
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":unusable_fuel_mission"
         ] = (
-            0.03
+            trapped_ratio
             * inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id

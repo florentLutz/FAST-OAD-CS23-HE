@@ -29,7 +29,6 @@ class SizingGaseousHydrogenTankCGX(om.ExplicitComponent):
         )
 
     def setup(self):
-        # To modify
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
 
@@ -107,7 +106,6 @@ class SizingGaseousHydrogenTankCGX(om.ExplicitComponent):
                 + ":dimension:length",
                 val=-0.5,
             )
-
         # We can do an else for the last option since we gave OpenMDAO the possible, ensuring it
         # is one among them
         else:
@@ -118,7 +116,6 @@ class SizingGaseousHydrogenTankCGX(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="data:geometry:cabin:length", val=0.5)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        # To modify
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
 

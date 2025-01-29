@@ -4,15 +4,16 @@
 
 import openmdao.api as om
 import numpy as np
-import logging
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
     """
     Computation of the gravimetric index of gaseous hydrogen tank,
-    ratio between total mission fuel weight and overall weight.
+    ratio between hydrogen capacity and overall system weight.
+    Reference:
+    Mukhopadhaya, Jayant, and Dan Rutherford.
+    "Performance analysis of evolutionary hydrogen-powered aircraft."
+    International Council on Clean Transportation (2022).
     """
 
     def initialize(self):
@@ -38,26 +39,17 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":fuel_total_mission",
+            + ":capacity",
             units="kg",
             val=np.nan,
-            desc="Total amount of hydrogen loaded in the tank for the mission",
-        )
-
-        self.add_input(
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":fuel_consumed_mission",
-            units="kg",
-            val=15.0,
-            desc="Amount of hydrogen from that tank which will be consumed during mission",
+            desc="Capacity of the tank in terms of weight",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":gravimetric_index",
-            val=10.0,
+            val=0.5,
             desc="Ratio between the mission used weight and overall weight",
         )
 
@@ -73,12 +65,12 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
         ] = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":fuel_consumed_mission"
+            + ":capacity"
         ] / (
             inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
-                + ":fuel_total_mission"
+                + ":capacity"
             ]
             + inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -96,38 +88,18 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
             + ":gravimetric_index",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":fuel_consumed_mission",
-        ] = 1 / (
+            + ":capacity",
+        ] = (
             inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
-                + ":fuel_total_mission"
-            ]
-            + inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
                 + ":mass"
-            ]
-        )
-
-        partials[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":gravimetric_index",
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":mass",
-        ] = (
-            -inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":fuel_consumed_mission"
             ]
             / (
                 inputs[
                     "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                     + gaseous_hydrogen_tank_id
-                    + ":fuel_total_mission"
+                    + ":capacity"
                 ]
                 + inputs[
                     "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -144,18 +116,18 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
             + ":gravimetric_index",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":fuel_total_mission",
+            + ":mass",
         ] = (
             -inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
-                + ":fuel_consumed_mission"
+                + ":capacity"
             ]
             / (
                 inputs[
                     "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                     + gaseous_hydrogen_tank_id
-                    + ":fuel_total_mission"
+                    + ":capacity"
                 ]
                 + inputs[
                     "data:propulsion:he_power_train:gaseous_hydrogen_tank:"

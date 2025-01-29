@@ -23,8 +23,8 @@ from ..components.sizing_gravimetric_index import SizingGaseousHydrogenTankGravi
 from ..components.sizing_tank_drag import SizingGaseousHydrogenTankDrag
 from ..components.sizing_tank_wall_thickness import SizingGaseousHydrogenTankWallThickness
 from ..components.sizing_tank_overall_length import SizingGaseousHydrogenTankOverallLength
-from ..components.sizing_tank_overall_length_fuselage_check import (
-    SizingGaseousHydrogenTankOverallLengthFuselageCheck,
+from ..components.sizing_tank_overall_length_fuselage_contraints import (
+    SizingGaseousHydrogenTankOverallLengthFuselageConstraints,
 )
 
 from ..components.cstr_enforce import ConstraintsGaseousHydrogenTankCapacityEnforce
@@ -122,7 +122,7 @@ def test_inner_volume_gaseous_hydrogen_tank():
 
 
 def test_tank_cg_x():
-    expected_values = [0.0, 1.73871, 2.8847, 3.96643, 1.73871]
+    expected_values = [1.73871, 2.8847, 3.96643, 1.73871]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
         # Research independent input value in .xml file
@@ -152,7 +152,7 @@ def test_tank_cg_x():
 
 
 def test_tank_cg_y():
-    expected_values = [0.0, 0.0, 1.848, 0.0, 0.0]
+    expected_values = [0.0, 1.848, 0.0, 0.0]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
         # Research independent input value in .xml file
@@ -205,7 +205,7 @@ def test_tank_length():
 
 
 def test_tank_outer_diameter():
-    expected_values = [0.97802, 0.97802, 0.543, 0.97802, 0.543]
+    expected_values = [0.97802, 0.217, 0.97802, 0.543]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
         # Research independent input value in .xml file
@@ -305,12 +305,12 @@ def test_tank_overall_length():
 
 def test_tank_overall_length_fuselage_check():
     # Research independent input value in .xml file
-    expected_values = [1.628, -0.4994, 0.0, -0.84646, -0.4994]
+    expected_values = [-0.4994, 0.0, -0.84646, -0.4994]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
         ivc = get_indep_var_comp(
             list_inputs(
-                SizingGaseousHydrogenTankOverallLengthFuselageCheck(
+                SizingGaseousHydrogenTankOverallLengthFuselageConstraints(
                     gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1", position=option
                 )
             ),
@@ -320,7 +320,7 @@ def test_tank_overall_length_fuselage_check():
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
-            SizingGaseousHydrogenTankOverallLengthFuselageCheck(
+            SizingGaseousHydrogenTankOverallLengthFuselageConstraints(
                 gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1", position=option
             ),
             ivc,
@@ -430,14 +430,14 @@ def test_gaseous_hydrogen_tank_gravimetric_index():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:gravimetric_index"
-    ) == pytest.approx(0.0471, rel=1e-2)
+    ) == pytest.approx(0.0485, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_gaseous_hydrogen_tank_drag():
-    expected_ls_drag = [0.0, 0.0, 0.01057, 0.0, 1.4668e-3]
-    expected_cruise_drag = [0.0, 0.0, 0.01057, 0.0, 1.44669e-3]
+    expected_ls_drag = [0.0, 0.01057, 0.0, 1.4668e-3]
+    expected_cruise_drag = [0.0, 0.01057, 0.0, 1.44669e-3]
 
     for option, ls_drag, cruise_drag in zip(
         POSSIBLE_POSITION, expected_ls_drag, expected_cruise_drag
