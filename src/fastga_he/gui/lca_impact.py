@@ -5,6 +5,8 @@
 import os
 import pathlib
 
+from collections import OrderedDict
+
 from typing import List, Union, Dict
 
 import numpy as np
@@ -405,56 +407,27 @@ def lca_score_sensitivity_advanced_impact_category(
                     # of a dict
                     _safe_add_to_dict_of_list(impact_variations, impact, impact_score)
 
-    for impact_name, impact_value in impact_variations.items():
-        aircraft_lifespan, sorted_impact = zip(*sorted(zip(aircraft_lifespan_list, impact_value)))
-        impact_variations[impact_name] = sorted_impact
+    new_impact_variation = _sort_and_cut_off(
+        impact_variations, aircraft_lifespan_list, cutoff_criteria
+    )
 
-    # In order to not overload the diagram, we'll only display a limited number of impacts.
-    last_output_score = []
-    last_output_name = []
-    last_year_single_score = 0.0
-    for impact, impact_score in impact_variations.items():
-        last_output_score.append(impact_score[-1])
-        last_output_name.append(impact)
-        last_year_single_score += impact_score[-1]
-
-    # Even though we check for a threshold value (which means this would theoretically be useless),
-    # it's used to ensure the biggest impacts are put at the bottom of the graph
-    last_output_score, last_output_name = zip(*sorted(zip(last_output_score, last_output_name)))
-
-    new_impact_variation = {}
-    other = np.zeros_like(aircraft_lifespan)
-    for impact, impact_score in impact_variations.items():
-        # We only take the biggest one
-        if impact_score[-1] / last_year_single_score > cutoff_criteria / 100.0:
-            new_impact_variation[impact] = impact_score
-        else:
-            other += np.array(list(impact_score))
-
-    new_impact_variation["Others"] = other
-
-    cumulated_impact = np.zeros_like(aircraft_lifespan)
+    cumulated_impact = np.zeros_like(aircraft_lifespan_list)
 
     fig = go.Figure()
 
-    # This way they should be plotted starting from the biggest down to the smallest up plus the
-    # other
-    biggest_to_smallest = list(reversed(list(last_output_name)))
-    biggest_to_smallest.append("Others")
-    for impact in biggest_to_smallest:
-        if impact in new_impact_variation:
-            impact_score = new_impact_variation[impact]
-            cumulated_impact += np.array(list(impact_score))
-            beautified_impact_score = impact.replace("_", " ")
+    for impact in new_impact_variation:
+        impact_score = new_impact_variation[impact]
+        cumulated_impact += np.array(list(impact_score))
+        beautified_impact_score = impact.replace("_", " ")
 
-            scatter = go.Scatter(
-                x=aircraft_lifespan_list,
-                y=cumulated_impact,
-                name=beautified_impact_score,
-                showlegend=True,
-                fill="tonexty",
-            )
-            fig.add_trace(scatter)
+        scatter = go.Scatter(
+            x=aircraft_lifespan_list,
+            y=cumulated_impact,
+            name=beautified_impact_score,
+            showlegend=True,
+            fill="tonexty",
+        )
+        fig.add_trace(scatter)
 
     scatter = go.Scatter(
         x=aircraft_lifespan_list,
@@ -533,58 +506,27 @@ def lca_score_sensitivity_advanced_components(
                         components_contribution, component, impact_this_component_this_year
                     )
 
-    for component, component_impact in components_contribution.items():
-        aircraft_lifespan, sorted_component = zip(
-            *sorted(zip(aircraft_lifespan_list, component_impact))
-        )
-        components_contribution[component] = sorted_component
+    new_component_variation = _sort_and_cut_off(
+        components_contribution, aircraft_lifespan_list, cutoff_criteria
+    )
 
-    # In order to not overload the diagram, we'll only display a limited number of components.
-    last_output_score = []
-    last_output_name = []
-    last_year_single_score = 0.0
-    for component, component_score in components_contribution.items():
-        last_output_score.append(component_score[-1])
-        last_output_name.append(component)
-        last_year_single_score += component_score[-1]
-
-    # Even though we check for a threshold value (which means this would theoretically be useless),
-    # it's used to ensure the biggest components are put at the bottom of the graph
-    last_output_score, last_output_name = zip(*sorted(zip(last_output_score, last_output_name)))
-
-    new_component_variation = {}
-    other = np.zeros_like(aircraft_lifespan)
-    for component, component_score in components_contribution.items():
-        # We only take the biggest one
-        if component_score[-1] / last_year_single_score > cutoff_criteria / 100.0:
-            new_component_variation[component] = np.array(list(component_score))
-        else:
-            other += np.array(list(component_score))
-
-    new_component_variation["Others"] = other
-
-    cumulated_impact = np.zeros_like(aircraft_lifespan)
+    cumulated_impact = np.zeros_like(aircraft_lifespan_list)
 
     fig = go.Figure()
 
-    # This way they should be plotted starting from the biggest down to the smallest up plus the
-    # other
-    biggest_to_smallest = list(reversed(list(last_output_name)))
-    biggest_to_smallest.append("Others")
-    for component in biggest_to_smallest:
-        if component in new_component_variation.keys():
-            component_score = new_component_variation[component]
-            cumulated_impact += np.array(list(component_score))
-            beautified_component_score = component.replace("_", " ")
+    for component in new_component_variation:
+        component_score = new_component_variation[component]
+        cumulated_impact += np.array(list(component_score))
+        beautified_component_score = component.replace("_", " ")
 
-            scatter = go.Scatter(
-                x=aircraft_lifespan_list,
-                y=cumulated_impact,
-                name=beautified_component_score,
-                showlegend=True,
-                fill="tonexty",
-            )
-            fig.add_trace(scatter)
+        scatter = go.Scatter(
+            x=aircraft_lifespan_list,
+            y=cumulated_impact,
+            name=beautified_component_score,
+            showlegend=True,
+            fill="tonexty",
+        )
+        fig.add_trace(scatter)
 
     scatter = go.Scatter(
         x=aircraft_lifespan_list,
@@ -604,6 +546,59 @@ def lca_score_sensitivity_advanced_components(
     _update_fig_axis(fig)
 
     return fig
+
+
+def _sort_and_cut_off(
+    untreated_dict: Dict[str, list], lifespan_list: List[float], cutoff_criteria: float
+) -> Dict[str, list]:
+    """
+    For a lot of figures, we will only plot the most significant contributors. This function sorts
+    the contributor from biggest to smallest, cuts off the smallest ones based on the criteria and
+    aggregates the others. It also ensures that the data are sorted starting from the one that were
+    computed with the smallest lifespan.
+
+    :param untreated_dict: dictionary containing the untreated value, stored as a dict where key
+    are the contributor and the items are the evolution of the contributor.
+    :param lifespan_list: list containing the untreated list containing the value of the aircraft
+    lifespan at which the analysis was conducted.
+    :param cutoff_criteria: value of the cutoff criteria, in percent
+    """
+
+    for contributor_name, contributor_value in untreated_dict.items():
+        aircraft_lifespan, sorted_impact = zip(*sorted(zip(lifespan_list, contributor_value)))
+        untreated_dict[contributor_name] = sorted_impact
+
+    # In order to not overload the diagram, we'll only display a limited number of impacts.
+    contributor_score_last_year = []
+    contributor_name = []
+    aggregated_score_last_year = 0.0
+    for contributor, contributor_score in untreated_dict.items():
+        contributor_score_last_year.append(contributor_score[-1])
+        contributor_name.append(contributor)
+        aggregated_score_last_year += contributor_score[-1]
+
+    # Ensure the biggest impacts are inserted first so that they are at the bottom of the graph
+    last_output_score, last_output_name = zip(
+        *sorted(zip(contributor_score_last_year, contributor_name))
+    )
+
+    # This way they should be inserted starting from the biggest down to the smallest up plus the
+    # other
+    biggest_to_smallest = list(reversed(list(last_output_name)))
+
+    treated_dict = OrderedDict()
+    other = np.zeros_like(lifespan_list)
+    for contributor in biggest_to_smallest:
+        # We only take the biggest one
+        contributor_score = untreated_dict[contributor]
+        if contributor_score[-1] / aggregated_score_last_year > cutoff_criteria / 100.0:
+            treated_dict[contributor] = contributor_score
+        else:
+            other += np.array(list(contributor_score))
+
+    treated_dict["Others"] = other
+
+    return treated_dict
 
 
 def _update_fig_axis(fig: go.Figure):
