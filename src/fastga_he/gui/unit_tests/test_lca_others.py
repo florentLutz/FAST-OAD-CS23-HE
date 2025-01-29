@@ -14,6 +14,7 @@ from ..lca_impact import (
     lca_score_sensitivity_simple,
     lca_score_sensitivity_advanced_impact_category,
     lca_score_sensitivity_advanced_components,
+    lca_score_sensitivity_advanced_components_and_phase,
 )
 
 PATH_TO_CURRENT_FILE = pathlib.Path(__file__)
@@ -117,6 +118,19 @@ def test_lca_sensitivity_analysis_advanced_impact_categories():
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_sensitivity_analysis_advanced_components():
     fig = lca_score_sensitivity_advanced_components(
+        results_folder_path=SENSITIVITY_STUDIES_FOLDER_PATH,
+        prefix="hybrid_kodiak",
+        name="Hybrid Kodiak",
+        cutoff_criteria=2,
+    )
+
+    fig.update_xaxes(domain=[0, 0.95])
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_sensitivity_analysis_advanced_components_and_phase():
+    fig = lca_score_sensitivity_advanced_components_and_phase(
         results_folder_path=SENSITIVITY_STUDIES_FOLDER_PATH,
         prefix="hybrid_kodiak",
         name="Hybrid Kodiak",

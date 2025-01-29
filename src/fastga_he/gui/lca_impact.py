@@ -365,13 +365,12 @@ def lca_score_sensitivity_advanced_impact_category(
 ) -> go.Figure:
     """
     Displays the evolution of the impacts of an aircraft in terms of single score with respect to
-    its lifespan by stacking the contributing impact category. This method is a bit sensitive
-    to use as it requires the results to be stored under the form of FAST-OAD output files,
+    its lifespan by stacking the contributing impact category. This method is a bit sensitive to
+    use as it requires the results to be stored under the form of FAST-OAD output files,
     all in the same folder and all with the same prefix. It also requires the user to know and
-    input said prefix. Results can be superimposed to an existing figure, but it is recommended
-    to only put results computed on the same lifespan. In order not to overload the diagram,
-    we'll allow the user to set a cutoff criteria below which not to plot the contribution of the
-    impact. The rest will be aggregated into others.
+    input said prefix. In order not to overload the diagram, we'll allow the user to set a cutoff
+    criteria below which not to plot the contribution of the impact. The rest will be aggregated
+    into others.
 
     :param results_folder_path: path to the folder that contains the output files that contains
     the results.
@@ -403,8 +402,6 @@ def lca_score_sensitivity_advanced_impact_category(
                 for impact in names_variables_lca:
                     variable_name = LCA_PREFIX + impact + "_weighted:sum"
                     impact_score = datafile[variable_name].value[0]
-                    # I don't like that way of doing things, since it check everytime in the keys
-                    # of a dict
                     _safe_add_to_dict_of_list(impact_variations, impact, impact_score)
 
     new_impact_variation = _sort_and_cut_off(
@@ -435,9 +432,8 @@ def lca_score_sensitivity_advanced_components(
     aircraft as a function of the estimated lifespan of the aircraft. This method is a bit
     sensitive to use as it requires the results to be stored under the form of FAST-OAD output
     files, all in the same folder and all with the same prefix. It also requires the user to know
-    and input said prefix. Results can be superimposed to an existing figure, but it is
-    recommended to only put results computed on the same lifespan. In order not to overload the
-    diagram, we'll allow the user to set a cutoff criteria. The rest will be aggregated into others.
+    and input said prefix. In order not to overload the diagram, we'll allow the user to set a
+    cutoff criteria. The rest will be aggregated into others.
 
     :param results_folder_path: path to the folder that contains the output files that contains
     the results.
@@ -474,8 +470,6 @@ def lca_score_sensitivity_advanced_components(
                     impact_this_component_this_year = 0.0
                     for variable in variables:
                         impact_this_component_this_year += datafile[variable].value[0]
-                        # I don't like that way of doing things, since it check everytime in the
-                        # keys of a dict
 
                     _safe_add_to_dict_of_list(
                         components_contribution, component, impact_this_component_this_year
@@ -486,6 +480,197 @@ def lca_score_sensitivity_advanced_components(
     )
 
     fig = _prep_lasagna_plot(new_component_variation, aircraft_lifespan_list)
+
+    fig.update_layout(
+        title_text="Evolution of the contribution of each component to the single score of the "
+        + name,
+        xaxis_title="Airframe hours [h]",
+        yaxis_title="Single score [-]",
+    )
+    _update_fig_axis(fig)
+
+    return fig
+
+
+def lca_score_sensitivity_advanced_components_and_phase(
+    results_folder_path: Union[str, pathlib.Path],
+    prefix: str,
+    cutoff_criteria: float,
+    name: str = None,
+) -> go.Figure:
+    """
+    Displays the evolution of the contribution to the single score of each component of the
+    aircraft as a function of the estimated lifespan of the aircraft and separates them by phase.
+    This method is a bit sensitive to use as it requires the results to be stored under the form
+    of FAST-OAD output files, all in the same folder and all with the same prefix. It also
+    requires the user to know and input said prefix. In order not to overload the diagram,
+    we'll allow the user to set a cutoff criteria. The rest will be aggregated into others. For
+    components whose total contribution is greater than the cutoff we'll highlight if their
+    biggest impact comes from the production phase or the use phase
+
+    :param results_folder_path: path to the folder that contains the output files that contains
+    the results.
+    :param prefix: prefix of the output file for the aircraft.
+    :param name: name of the aircraft, to be displayed on the figure.
+    :param cutoff_criteria: cutoff criteria, in % of the single score on the last year (e.g. enter
+    5 for 5% percent not 0.05)
+
+    :return: plotly figure with the evolution of all the components contributing ot the single score
+    as a function of the lifespan.
+    """
+
+    aircraft_lifespan_list = []
+    contributing_components_and_variables = {}
+    components_contribution_total = {}
+    components_contribution_production = {}
+    components_contribution_use = {}
+    components_contribution_other = {}
+
+    for dirpath, _, filenames in os.walk(results_folder_path):
+        for filename in filenames:
+            if filename.startswith(prefix):
+                datafile = oad.DataFile(os.path.join(dirpath, filename))
+                aircraft_lifespan = datafile["data:TLAR:max_airframe_hours"].value[0]
+                aircraft_lifespan_list.append(aircraft_lifespan)
+
+                if not contributing_components_and_variables:
+                    # In that context, by components, we mean all that contributes to the different
+                    # impacts.
+                    contributing_components_and_variables = (
+                        _get_list_contributing_components_and_variables(
+                            os.path.join(dirpath, filename)
+                        )
+                    )
+
+                for component, variables in contributing_components_and_variables.items():
+                    impact_this_component_this_year = 0.0
+
+                    # Based on what the LCA conf file looks like at the time this was written, the
+                    # only life cycle phases where we can do a breakdown of components is the
+                    # production and the use phase. This is not generic
+                    impact_this_component_production_this_year = 0.0
+                    impact_this_component_use_this_year = 0.0
+                    impact_this_component_other_this_year = 0.0
+
+                    for variable in variables:
+                        impact_this_component_this_year += datafile[variable].value[0]
+                        if ":production:" in variable:
+                            impact_this_component_production_this_year += datafile[variable].value[
+                                0
+                            ]
+                        elif ":operation:" in variable:
+                            impact_this_component_use_this_year += datafile[variable].value[0]
+                        else:
+                            impact_this_component_other_this_year += datafile[variable].value[0]
+
+                    _safe_add_to_dict_of_list(
+                        components_contribution_total, component, impact_this_component_this_year
+                    )
+                    if impact_this_component_other_this_year != 0.0:
+                        _safe_add_to_dict_of_list(
+                            components_contribution_other,
+                            component,
+                            impact_this_component_other_this_year,
+                        )
+                    if impact_this_component_production_this_year != 0.0:
+                        _safe_add_to_dict_of_list(
+                            components_contribution_production,
+                            component,
+                            impact_this_component_production_this_year,
+                        )
+                    if impact_this_component_use_this_year != 0.0:
+                        _safe_add_to_dict_of_list(
+                            components_contribution_use,
+                            component,
+                            impact_this_component_use_this_year,
+                        )
+
+    # To get them sorted and cut off
+    new_component_variation = _sort_and_cut_off(
+        components_contribution_total, aircraft_lifespan_list, cutoff_criteria
+    )
+
+    fig = go.Figure()
+
+    cumulated_impact = np.zeros_like(aircraft_lifespan_list)
+
+    for idx, contributor in enumerate(new_component_variation):
+        component_color = COLS[idx % len(COLS)]
+        beautified_impact_score = contributor.replace("_", " ")
+
+        if contributor in components_contribution_production:
+            cumulated_impact += np.array(list(components_contribution_production[contributor]))
+            scatter = go.Scatter(
+                x=aircraft_lifespan_list,
+                y=cumulated_impact,
+                name=beautified_impact_score + ": production",
+                showlegend=True,
+                line=dict(color="rgb(50,50,50)", width=3),
+                fill="tonexty",
+                fillpattern=dict(shape="/"),
+                fillcolor=component_color,
+                legendgroup=beautified_impact_score,
+            )
+            fig.add_trace(scatter)
+
+        if contributor in components_contribution_use:
+            cumulated_impact += np.array(list(components_contribution_use[contributor]))
+            scatter = go.Scatter(
+                x=aircraft_lifespan_list,
+                y=cumulated_impact,
+                name=beautified_impact_score + ": operation",
+                showlegend=True,
+                line=dict(color="rgb(50,50,50)", width=3),
+                fill="tonexty",
+                fillpattern=dict(shape="x"),
+                fillcolor=component_color,
+                legendgroup=beautified_impact_score,
+            )
+            fig.add_trace(scatter)
+        if contributor in components_contribution_other:
+            cumulated_impact += np.array(list(components_contribution_other[contributor]))
+            scatter = go.Scatter(
+                x=aircraft_lifespan_list,
+                y=cumulated_impact,
+                name=beautified_impact_score + ": other phases",
+                line=dict(color="rgb(50,50,50)", width=3),
+                showlegend=True,
+                fill="tonexty",
+                fillpattern=dict(shape="o"),
+                fillcolor=component_color,
+                legendgroup=beautified_impact_score,
+            )
+            fig.add_trace(scatter)
+
+        separator_scatter = go.Scatter(
+            x=aircraft_lifespan_list,
+            y=cumulated_impact,
+            line=dict(color="rgb(0,0,0)", width=2),
+            showlegend=False,
+        )
+        fig.add_trace(separator_scatter)
+
+    cumulated_impact += new_component_variation["Others"]
+    others_scatter = go.Scatter(
+        x=aircraft_lifespan_list,
+        y=cumulated_impact,
+        name="Others",
+        line=dict(color="rgb(50,50,50)", width=3),
+        showlegend=True,
+        fill="tonexty",
+        fillcolor=COLS[len(new_component_variation) % len(COLS)],
+        legendgroup="others",
+    )
+    fig.add_trace(others_scatter)
+
+    scatter = go.Scatter(
+        x=aircraft_lifespan_list,
+        y=cumulated_impact,
+        name="Single score",
+        line=dict(color="black", width=5),
+        showlegend=True,
+    )
+    fig.add_trace(scatter)
 
     fig.update_layout(
         title_text="Evolution of the contribution of each component to the single score of the "
