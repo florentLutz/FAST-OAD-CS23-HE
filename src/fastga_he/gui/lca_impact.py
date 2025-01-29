@@ -5,7 +5,7 @@
 import os
 import pathlib
 
-from typing import List, Union
+from typing import List, Union, Dict
 
 import numpy as np
 
@@ -267,10 +267,10 @@ def _get_first_parent_name(name_variable: str) -> str:
 
 def _get_color(name_variable: str, color_dict: dict) -> str:
     first_parent = _get_first_parent_name(name_variable)
-    if first_parent in list(color_dict.keys()):
+    if first_parent in color_dict:
         return color_dict[first_parent]
     else:
-        color = COLS[len(list(color_dict.keys())) % len(COLS)]
+        color = COLS[len(color_dict) % len(COLS)]
         color_dict[name_variable] = color
         return color
 
@@ -430,16 +430,13 @@ def lca_score_sensitivity_advanced_impact_category(
                     impact_score = datafile[variable_name].value[0]
                     # I don't like that way of doing things, since it check everytime in the keys
                     # of a dict
-                    if impact not in list(impact_variations.keys()):
-                        impact_variations[impact] = [impact_score]
-                    else:
-                        impact_variations[impact].append(impact_score)
+                    _safe_add_to_dict_of_list(impact_variations, impact, impact_score)
 
-    for impact in list(impact_variations.keys()):
+    for impact_name, impact_value in impact_variations.items():
         aircraft_lifespan, sorted_impact = zip(
-            *sorted(zip(aircraft_lifespan_list, impact_variations[impact]))
+            *sorted(zip(aircraft_lifespan_list, impact_value))
         )
-        impact_variations[impact] = sorted_impact
+        impact_variations[impact_name] = sorted_impact
 
     # In order to not overload the diagram, we'll only display a limited number of impacts.
     last_output_score = []
@@ -474,7 +471,7 @@ def lca_score_sensitivity_advanced_impact_category(
     biggest_to_smallest = list(reversed(list(last_output_name)))
     biggest_to_smallest.append("Others")
     for impact in biggest_to_smallest:
-        if impact in list(new_impact_variation.keys()):
+        if impact in new_impact_variation:
             impact_score = new_impact_variation[impact]
             cumulated_impact += np.array(list(impact_score))
             beautified_impact_score = impact.replace("_", " ")
@@ -584,14 +581,13 @@ def lca_score_sensitivity_advanced_components(
                         # I don't like that way of doing things, since it check everytime in the
                         # keys of a dict
 
-                    if component not in list(components_contribution.keys()):
-                        components_contribution[component] = [impact_this_component_this_year]
-                    else:
-                        components_contribution[component].append(impact_this_component_this_year)
+                    _safe_add_to_dict_of_list(
+                        components_contribution, component, impact_this_component_this_year
+                    )
 
-    for component in list(components_contribution.keys()):
+    for component, component_impact in components_contribution.items():
         aircraft_lifespan, sorted_component = zip(
-            *sorted(zip(aircraft_lifespan_list, components_contribution[component]))
+            *sorted(zip(aircraft_lifespan_list, component_impact))
         )
         components_contribution[component] = sorted_component
 
@@ -628,7 +624,7 @@ def lca_score_sensitivity_advanced_components(
     biggest_to_smallest = list(reversed(list(last_output_name)))
     biggest_to_smallest.append("Others")
     for component in biggest_to_smallest:
-        if component in list(new_component_variation.keys()):
+        if component in new_component_variation.keys():
             component_score = new_component_variation[component]
             cumulated_impact += np.array(list(component_score))
             beautified_component_score = component.replace("_", " ")
@@ -702,25 +698,40 @@ def _get_list_contributing_components_and_variables(
         if LCA_PREFIX in name and "_weighted:" in name:
             if _depth_lca_detail(name) >= 4:
                 component_name = _get_component_from_variable_name(name)
-                if component_name in list(contributing_components_and_variables.keys()):
-                    contributing_components_and_variables[component_name].append(name)
-                else:
-                    contributing_components_and_variables[component_name] = [name]
+                _safe_add_to_dict_of_list(
+                    contributing_components_and_variables, component_name, name
+                )
             # This isn't very generic, but I can't find another way to do it, maybe check that there
             # aren't any other subprocesses ?
             # TODO: Update if we add any life phase to the LCA analysis that aren't detailed
             elif "manufacturing:sum" in name:
-                if "manufacturing" in list(contributing_components_and_variables.keys()):
-                    contributing_components_and_variables["manufacturing"].append(name)
-                else:
-                    contributing_components_and_variables["manufacturing"] = [name]
+                _safe_add_to_dict_of_list(
+                    contributing_components_and_variables, "manufacturing", name
+                )
             elif "distribution:sum" in name:
-                if "distribution" in list(contributing_components_and_variables.keys()):
-                    contributing_components_and_variables["distribution"].append(name)
-                else:
-                    contributing_components_and_variables["distribution"] = [name]
+                _safe_add_to_dict_of_list(
+                    contributing_components_and_variables, "distribution", name
+                )
 
     return contributing_components_and_variables
+
+
+def _safe_add_to_dict_of_list(
+    dict_to_update: Dict[str, list], dict_key: str, element_to_add: Union[str, float]
+):
+    """
+    For dictionaries where items are meant to be lists, this function checks if the key exists.
+    If it does, it appends to the list, otherwise it creates the lists.
+
+    :param dict_to_update: dictionary in which to add element
+    :param dict_key: dictionary key at which the element is meant to be added
+    :param dict_key: dictionary key at which the element is meant to be added
+    :param element_to_add: element to add to the dictionary
+    """
+    if dict_to_update.get(dict_key):
+        dict_to_update[dict_key].append(element_to_add)
+    else:
+        dict_to_update[dict_key] = [element_to_add]
 
 
 def _get_component_from_variable_name(variable_name: str) -> str:
