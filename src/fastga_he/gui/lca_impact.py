@@ -892,3 +892,73 @@ def _get_component_from_variable_name(variable_name: str) -> str:
 
     else:
         return component
+
+
+def lca_impacts_bar_chart_simple(
+    aircraft_file_paths: Union[str, List[str]],
+    names_aircraft: Union[str, List[str]] = None,
+) -> go.FigureWidget:
+    """
+    Give a bar chart that compares multiples aircraft designs across all categories. This comparison
+    is done relative to the first design given in the inputs. Can be used with only one design but
+    is pointless since it will compare an aircraft to itself.
+
+    :param aircraft_file_paths: paths to the output file that contains the weighted and aggregated
+    impacts
+    :param names_aircraft: names of the aircraft
+    """
+
+    impact_names = _get_impact_list(aircraft_file_paths[0])
+    impact_names.remove("single_score")
+    fig = go.Figure()
+
+    reference_value = {}
+
+    for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
+        datafile = oad.DataFile(aircraft_file_path)
+        impact_scores = []
+        beautified_impact_names = []
+
+        for impact_name in impact_names:
+            beautified_impact_name = impact_name.replace("_", " ")
+            variable_name = LCA_PREFIX + impact_name + "_weighted:sum"
+
+            raw_score = datafile[variable_name].value[0]
+            if variable_name not in reference_value:
+                reference_value[variable_name] = raw_score
+
+            impact_scores.append(raw_score / reference_value[variable_name] * 100.0)
+            beautified_impact_names.append(beautified_impact_name)
+
+        bar_chart = go.Bar(name=name_aircraft, x=beautified_impact_names, y=impact_scores)
+        fig.add_trace(bar_chart)
+
+    fig.update_layout(
+        barmode="group",
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+    )
+
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=20),
+        title="Relative score [%]",
+    )
+    fig.update_yaxes(
+        title_font=dict(size=20),
+    )
+
+    return go.FigureWidget(fig)
