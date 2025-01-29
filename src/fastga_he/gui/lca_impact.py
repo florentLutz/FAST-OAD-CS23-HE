@@ -411,32 +411,7 @@ def lca_score_sensitivity_advanced_impact_category(
         impact_variations, aircraft_lifespan_list, cutoff_criteria
     )
 
-    cumulated_impact = np.zeros_like(aircraft_lifespan_list)
-
-    fig = go.Figure()
-
-    for impact in new_impact_variation:
-        impact_score = new_impact_variation[impact]
-        cumulated_impact += np.array(list(impact_score))
-        beautified_impact_score = impact.replace("_", " ")
-
-        scatter = go.Scatter(
-            x=aircraft_lifespan_list,
-            y=cumulated_impact,
-            name=beautified_impact_score,
-            showlegend=True,
-            fill="tonexty",
-        )
-        fig.add_trace(scatter)
-
-    scatter = go.Scatter(
-        x=aircraft_lifespan_list,
-        y=cumulated_impact,
-        name="Single score",
-        line=dict(color="black", width=5),
-        showlegend=True,
-    )
-    fig.add_trace(scatter)
+    fig = _prep_lasagna_plot(new_impact_variation, aircraft_lifespan_list)
 
     fig.update_layout(
         title_text="Evolution of the contribution of each impact to the single score of the "
@@ -510,19 +485,43 @@ def lca_score_sensitivity_advanced_components(
         components_contribution, aircraft_lifespan_list, cutoff_criteria
     )
 
-    cumulated_impact = np.zeros_like(aircraft_lifespan_list)
+    fig = _prep_lasagna_plot(new_component_variation, aircraft_lifespan_list)
+
+    fig.update_layout(
+        title_text="Evolution of the contribution of each component to the single score of the "
+        + name,
+        xaxis_title="Airframe hours [h]",
+        yaxis_title="Single score [-]",
+    )
+    _update_fig_axis(fig)
+
+    return fig
+
+
+def _prep_lasagna_plot(
+    treated_data_dict: Dict[str, list], aircraft_lifespan_list: list
+) -> go.Figure:
+    """
+    Prepares the lasagna plot by stacking impacts on top of one another and filling below. Having
+    contributors sorted from biggest to smallest is recommended. Thanks @ScottDelbecq for the name
+    suggestions
+
+    :param treated_data_dict: dictionary containing the data to plot
+    :param aircraft_lifespan_list: list containing the lifespan at which data were computed.
+    """
 
     fig = go.Figure()
 
-    for component in new_component_variation:
-        component_score = new_component_variation[component]
-        cumulated_impact += np.array(list(component_score))
-        beautified_component_score = component.replace("_", " ")
+    cumulated_impact = np.zeros_like(aircraft_lifespan_list)
+
+    for contributor, contributor_score in treated_data_dict.items():
+        cumulated_impact += np.array(list(contributor_score))
+        beautified_impact_score = contributor.replace("_", " ")
 
         scatter = go.Scatter(
             x=aircraft_lifespan_list,
             y=cumulated_impact,
-            name=beautified_component_score,
+            name=beautified_impact_score,
             showlegend=True,
             fill="tonexty",
         )
@@ -536,14 +535,6 @@ def lca_score_sensitivity_advanced_components(
         showlegend=True,
     )
     fig.add_trace(scatter)
-
-    fig.update_layout(
-        title_text="Evolution of the contribution of each component to the single score of the "
-        + name,
-        xaxis_title="Airframe hours [h]",
-        yaxis_title="Single score [-]",
-    )
-    _update_fig_axis(fig)
 
     return fig
 
