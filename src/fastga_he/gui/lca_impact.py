@@ -450,6 +450,8 @@ def lca_score_sensitivity_advanced_impact_category(
         last_output_name.append(impact)
         last_year_single_score += impact_score[-1]
 
+    # Even though we check for a threshold value (which means this would theoretically be useless),
+    # it's used to ensure the biggest impacts are put at the bottom of the graph
     last_output_score, last_output_name = zip(*sorted(zip(last_output_score, last_output_name)))
 
     new_impact_variation = {}
@@ -527,3 +529,208 @@ def lca_score_sensitivity_advanced_impact_category(
     )
 
     return fig
+
+
+def lca_score_sensitivity_advanced_components(
+    results_folder_path: Union[str, pathlib.Path],
+    prefix: str,
+    cutoff_criteria: float,
+    name: str = None,
+) -> go.Figure:
+    """
+    Displays the evolution of the contribution to the single score of each component of the
+    aircraft as a function of the estimated lifespan of the aircraft. This method is a bit
+    sensitive to use as it requires the results to be stored under the form of FAST-OAD output
+    files, all in the same folder and all with the same prefix. It also requires the user to know
+    and input said prefix. Results can be superimposed to an existing figure, but it is
+    recommended to only put results computed on the same lifespan. In order not to overload the
+    diagram, we'll allow the user to set a cutoff criteria. The rest will be aggregated into others.
+
+    :param results_folder_path: path to the folder that contains the output files that contains
+    the results.
+    :param prefix: prefix of the output file for the aircraft.
+    :param name: name of the aircraft, to be displayed on the figure.
+    :param cutoff_criteria: cutoff criteria, in % of the single score on the last year (e.g. enter
+    5 for 5% percent not 0.05)
+
+    :return: plotly figure with the evolution of all the components contributing ot the single score
+    as a function of the lifespan.
+    """
+
+    aircraft_lifespan_list = []
+    contributing_components_and_variables = {}
+    components_contribution = {}
+
+    for dirpath, _, filenames in os.walk(results_folder_path):
+        for filename in filenames:
+            if filename.startswith(prefix):
+                datafile = oad.DataFile(os.path.join(dirpath, filename))
+                aircraft_lifespan = datafile["data:TLAR:max_airframe_hours"].value[0]
+                aircraft_lifespan_list.append(aircraft_lifespan)
+
+                if not contributing_components_and_variables:
+                    # In that context, by components, we mean all that contributes to the different
+                    # impacts.
+                    contributing_components_and_variables = (
+                        _get_list_contributing_components_and_variables(
+                            os.path.join(dirpath, filename)
+                        )
+                    )
+
+                for component, variables in contributing_components_and_variables.items():
+                    impact_this_component_this_year = 0.0
+                    for variable in variables:
+                        impact_this_component_this_year += datafile[variable].value[0]
+                        # I don't like that way of doing things, since it check everytime in the
+                        # keys of a dict
+
+                    if component not in list(components_contribution.keys()):
+                        components_contribution[component] = [impact_this_component_this_year]
+                    else:
+                        components_contribution[component].append(impact_this_component_this_year)
+
+    for component in list(components_contribution.keys()):
+        aircraft_lifespan, sorted_component = zip(
+            *sorted(zip(aircraft_lifespan_list, components_contribution[component]))
+        )
+        components_contribution[component] = sorted_component
+
+    # In order to not overload the diagram, we'll only display a limited number of components.
+    last_output_score = []
+    last_output_name = []
+    last_year_single_score = 0.0
+    for component, component_score in components_contribution.items():
+        last_output_score.append(component_score[-1])
+        last_output_name.append(component)
+        last_year_single_score += component_score[-1]
+
+    # Even though we check for a threshold value (which means this would theoretically be useless),
+    # it's used to ensure the biggest components are put at the bottom of the graph
+    last_output_score, last_output_name = zip(*sorted(zip(last_output_score, last_output_name)))
+
+    new_component_variation = {}
+    other = np.zeros_like(aircraft_lifespan)
+    for component, component_score in components_contribution.items():
+        # We only take the biggest one
+        if component_score[-1] / last_year_single_score > cutoff_criteria / 100.0:
+            new_component_variation[component] = np.array(list(component_score))
+        else:
+            other += np.array(list(component_score))
+
+    new_component_variation["Others"] = other
+
+    cumulated_impact = np.zeros_like(aircraft_lifespan)
+
+    fig = go.Figure()
+
+    # This way they should be plotted starting from the biggest down to the smallest up plus the
+    # other
+    biggest_to_smallest = list(reversed(list(last_output_name)))
+    biggest_to_smallest.append("Others")
+    for component in biggest_to_smallest:
+        if component in list(new_component_variation.keys()):
+            component_score = new_component_variation[component]
+            cumulated_impact += np.array(list(component_score))
+            beautified_component_score = component.replace("_", " ")
+
+            scatter = go.Scatter(
+                x=aircraft_lifespan_list,
+                y=cumulated_impact,
+                name=beautified_component_score,
+                showlegend=True,
+                fill="tonexty",
+            )
+            fig.add_trace(scatter)
+
+    scatter = go.Scatter(
+        x=aircraft_lifespan_list,
+        y=cumulated_impact,
+        name="Single score",
+        line=dict(color="black", width=5),
+        showlegend=True,
+    )
+    fig.add_trace(scatter)
+
+    fig.update_layout(
+        plot_bgcolor="white",
+        title_x=0.5,
+        title_text="Evolution of the contribution of each component to the single score of the "
+        + name,
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+    )
+    fig.update_xaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        title="Airframe hours [h]",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+    )
+    fig.update_yaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        range=[0, None],
+        title="Single score [-]",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        side="right",
+    )
+
+    return fig
+
+
+def _get_list_contributing_components_and_variables(
+    datafile_path: Union[str, pathlib.Path],
+) -> dict:
+    """
+    Gets a list of variables names that contribute to the single score as well as the component
+    they are linked to.
+    """
+
+    datafile = oad.DataFile(datafile_path)
+
+    names = datafile.names()
+    contributing_components_and_variables = {}
+
+    for name in names:
+        if LCA_PREFIX in name and "_weighted:" in name:
+            if _depth_lca_detail(name) >= 4:
+                component_name = _get_component_from_variable_name(name)
+                if component_name in list(contributing_components_and_variables.keys()):
+                    contributing_components_and_variables[component_name].append(name)
+                else:
+                    contributing_components_and_variables[component_name] = [name]
+
+    return contributing_components_and_variables
+
+
+def _get_component_from_variable_name(variable_name: str) -> str:
+    """
+    Gets the name of the component or process based on the name of the variable it is associated to.
+    We will aggregate all process related to the airframe in "airframe". It is possible because
+    they are included in the analysis regardless of the propulsion chain.
+    """
+
+    component = variable_name.split(":")[4 - _depth_lca_detail(variable_name) - 1]
+
+    # These names are assured to be in the LCA conf file regardless of the propulsion chain.
+    airframe_associated_components = [
+        "wing",
+        "fuselage",
+        "horizontal_tail",
+        "vertical_tail",
+        "landing_gear",
+        "flight_controls",
+        "assembly",
+    ]
+    if component in airframe_associated_components:
+        return "airframe"
+
+    else:
+        return component

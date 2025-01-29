@@ -113,9 +113,7 @@ class LCACore(om.ExplicitComponent):
         if self.options["component_level_breakdown"]:
             self.axis.append("component")
 
-        _, self.model, self.methods = LCAProblemConfigurator(lca_conf_file_path).generate(
-            reset=False
-        )
+        _, self.model, self.methods = LCAProblemConfigurator(lca_conf_file_path).generate()
 
         # noinspection PyProtectedMember
         self.lambdas_dict = {
