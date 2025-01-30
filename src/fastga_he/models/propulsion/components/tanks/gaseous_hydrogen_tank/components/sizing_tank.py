@@ -16,9 +16,8 @@ from .sizing_tank_weight import SizingGaseousHydrogenTankWeight
 from .sizing_gravimetric_index import SizingGaseousHydrogenTankGravimetricIndex
 from .sizing_tank_drag import SizingGaseousHydrogenTankDrag
 from .sizing_tank_outer_diameter import SizingGaseousHydrogenTankOuterDiameter
-from .sizing_tank_overall_length import SizingGaseousHydrogenTankOverallLength
-from .sizing_tank_overall_length_fuselage_contraints import (
-    SizingGaseousHydrogenTankOverallLengthFuselageConstraints,
+from .sizing_tank_length_fuselage_contraints import (
+    SizingGaseousHydrogenTankLengthFuselageConstraints,
 )
 
 from .cstr_gaseous_hydrogen_tank import ConstraintsGaseousHydrogenTank
@@ -117,14 +116,6 @@ class SizingGaseousHydrogenTank(om.Group):
         )
 
         self.add_subsystem(
-            name="tank_overall_length",
-            subsys=SizingGaseousHydrogenTankOverallLength(
-                gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id
-            ),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
             name="tank_cg_x",
             subsys=SizingGaseousHydrogenTankCGX(
                 gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id, position=position
@@ -141,8 +132,8 @@ class SizingGaseousHydrogenTank(om.Group):
         )
 
         self.add_subsystem(
-            name="tank_overall_length_length_fuselage_check",
-            subsys=SizingGaseousHydrogenTankOverallLengthFuselageConstraints(
+            name="tank_length_fuselage_constraints",
+            subsys=SizingGaseousHydrogenTankLengthFuselageConstraints(
                 gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id,
                 position=position,
             ),

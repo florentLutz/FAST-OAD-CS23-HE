@@ -59,14 +59,6 @@ class SizingGaseousHydrogenTankCGX(om.ExplicitComponent):
                 val=np.nan,
                 desc="Length of the tank, as in the size of the tank along the X-axis",
             )
-            self.add_input(
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:outer_diameter",
-                units="m",
-                val=np.nan,
-                desc="Outer diameter of the gaseous hydrogen tank",
-            )
 
             self.declare_partials(of="*", wrt="data:geometry:fuselage:front_length", val=1.0)
             self.declare_partials(of="*", wrt="data:geometry:cabin:length", val=1.0)
@@ -76,35 +68,6 @@ class SizingGaseousHydrogenTankCGX(om.ExplicitComponent):
                 + gaseous_hydrogen_tank_id
                 + ":dimension:length",
                 val=0.5,
-            )
-            self.declare_partials(
-                of="*",
-                wrt="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:outer_diameter",
-                val=0.5,
-            )
-
-        elif position == "in_the_front":
-            self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
-
-            self.add_input(
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:length",
-                units="m",
-                val=np.nan,
-                desc="Length of the tank, as in the size of the tank along the X-axis",
-            )
-
-            self.declare_partials(of="*", wrt="data:geometry:fuselage:front_length", val=1.0)
-
-            self.declare_partials(
-                of="*",
-                wrt="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:length",
-                val=-0.5,
             )
         # We can do an else for the last option since we gave OpenMDAO the possible, ensuring it
         # is one among them
@@ -138,27 +101,6 @@ class SizingGaseousHydrogenTankCGX(om.ExplicitComponent):
                 inputs["data:geometry:fuselage:front_length"]
                 + inputs["data:geometry:cabin:length"]
                 + 0.5
-                * inputs[
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + gaseous_hydrogen_tank_id
-                    + ":dimension:length"
-                ]
-                + 0.5
-                * inputs[
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + gaseous_hydrogen_tank_id
-                    + ":dimension:outer_diameter"
-                ]
-            )
-
-        elif position == "in_the_front":
-            outputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":CG:x"
-            ] = (
-                inputs["data:geometry:fuselage:front_length"]
-                - 0.5
                 * inputs[
                     "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                     + gaseous_hydrogen_tank_id

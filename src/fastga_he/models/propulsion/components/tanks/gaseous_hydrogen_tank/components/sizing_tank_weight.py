@@ -83,28 +83,32 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             + ":material:density"
         ]
 
-        r = (
+        d = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":dimension:outer_diameter"
+        ]
+
+        length = (
             inputs[
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":dimension:length"
+            ]
+            - inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
             ]
-            / 2
         )
-
-        length = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":dimension:length"
-        ]
 
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":mass"
         ] = wall_density * (
-            4 * np.pi * r**3 / 3
-            + np.pi * r**2 * length
+            np.pi * d**3 / 6
+            + np.pi * d**2 * length / 4
             - inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -115,22 +119,24 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
-        r = (
+        d = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":dimension:outer_diameter"
+        ]
+
+        length = (
             inputs[
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":dimension:length"
+            ]
+            - inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
             ]
-            / 2
         )
-
-        d = 2 * r
-
-        length = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":dimension:length"
-        ]
 
         wall_density = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -146,8 +152,8 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             + gaseous_hydrogen_tank_id
             + ":material:density",
         ] = (
-            4 / 3 * np.pi * r**3
-            + np.pi * r**2 * length
+            np.pi * d**3 / 6
+            + np.pi * d**2 * length / 4
             - inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -162,7 +168,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:length",
-        ] = wall_density * np.pi * r**2
+        ] = wall_density * np.pi * d**2 / 4
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -180,4 +186,4 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:outer_diameter",
-        ] = wall_density * (np.pi * d**2 / 2 + np.pi * d * length / 2)
+        ] = wall_density * (-np.pi * d**2 / 4 + np.pi * d * (length + d) / 2)

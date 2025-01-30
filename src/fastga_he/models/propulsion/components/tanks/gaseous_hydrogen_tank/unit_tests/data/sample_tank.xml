@@ -78,12 +78,11 @@
                             <density units="kg/m**3">1530</density>
                         </material>
                         <dimension>
-                            <length units="m">1.</length>
+                            <length units="m">1.97802</length>
                             <diameter units="m">1.2<!--inital guess for the tank outer diameter --></diameter>
                             <inner_diameter units="m">0.97776</inner_diameter>
                             <outer_diameter units="m">0.97802</outer_diameter>
                             <wall_thickness units="m">1.3034e-4</wall_thickness>
-                            <overall_length units="m">1.97802</overall_length>
                             <rear_length_ratio>0.5</rear_length_ratio>
                             <aspect_ratio>2.022</aspect_ratio>
                         </dimension>

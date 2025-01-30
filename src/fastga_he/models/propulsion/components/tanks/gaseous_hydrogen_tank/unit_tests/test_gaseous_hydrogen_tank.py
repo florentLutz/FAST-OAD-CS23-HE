@@ -22,9 +22,8 @@ from ..components.sizing_tank_weight import SizingGaseousHydrogenTankWeight
 from ..components.sizing_gravimetric_index import SizingGaseousHydrogenTankGravimetricIndex
 from ..components.sizing_tank_drag import SizingGaseousHydrogenTankDrag
 from ..components.sizing_tank_wall_thickness import SizingGaseousHydrogenTankWallThickness
-from ..components.sizing_tank_overall_length import SizingGaseousHydrogenTankOverallLength
-from ..components.sizing_tank_overall_length_fuselage_contraints import (
-    SizingGaseousHydrogenTankOverallLengthFuselageConstraints,
+from ..components.sizing_tank_length_fuselage_contraints import (
+    SizingGaseousHydrogenTankLengthFuselageConstraints,
 )
 
 from ..components.cstr_enforce import ConstraintsGaseousHydrogenTankCapacityEnforce
@@ -199,7 +198,7 @@ def test_tank_length():
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:length",
         units="m",
-    ) == pytest.approx(1.0, rel=1e-2)
+    ) == pytest.approx(1.97802, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
 
@@ -277,40 +276,14 @@ def test_mutli_tank_outer_diameter():
         problem.check_partials(compact_print=True, step=1e-7)
 
 
-def test_tank_overall_length():
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(
-            SizingGaseousHydrogenTankOverallLength(
-                gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
-            )
-        ),
-        __file__,
-        XML_FILE,
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        SizingGaseousHydrogenTankOverallLength(
-            gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1",
-        ),
-        ivc,
-    )
-    assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:overall_length",
-        units="m",
-    ) == pytest.approx(1.97802, rel=1e-2)
-    problem.check_partials(compact_print=True, step=1e-7)
-
-
-def test_tank_overall_length_fuselage_check():
+def test_tank_length_fuselage_constraints():
     # Research independent input value in .xml file
     expected_values = [-0.4994, 0.0, -0.84646, -0.4994]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
         ivc = get_indep_var_comp(
             list_inputs(
-                SizingGaseousHydrogenTankOverallLengthFuselageConstraints(
+                SizingGaseousHydrogenTankLengthFuselageConstraints(
                     gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1", position=option
                 )
             ),
@@ -320,13 +293,13 @@ def test_tank_overall_length_fuselage_check():
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
-            SizingGaseousHydrogenTankOverallLengthFuselageConstraints(
+            SizingGaseousHydrogenTankLengthFuselageConstraints(
                 gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1", position=option
             ),
             ivc,
         )
         assert problem.get_val(
-            "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:overall_length",
+            "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:length",
             units="m",
         ) == pytest.approx(expected_value, rel=1e-2)
 
@@ -436,8 +409,8 @@ def test_gaseous_hydrogen_tank_gravimetric_index():
 
 
 def test_gaseous_hydrogen_tank_drag():
-    expected_ls_drag = [0.0, 0.01057, 0.0, 1.4668e-3]
-    expected_cruise_drag = [0.0, 0.01057, 0.0, 1.44669e-3]
+    expected_ls_drag = [0.0, 0.01057, 0.0, 0.00233519]
+    expected_cruise_drag = [0.0, 0.01057, 0.0, 0.00230317]
 
     for option, ls_drag, cruise_drag in zip(
         POSSIBLE_POSITION, expected_ls_drag, expected_cruise_drag
@@ -504,7 +477,7 @@ def test_sizing_tank():
         units="m",
     ) == pytest.approx(0.97776, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:overall_length",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:length",
         units="m",
     ) == pytest.approx(2.02166, rel=1e-2)
 

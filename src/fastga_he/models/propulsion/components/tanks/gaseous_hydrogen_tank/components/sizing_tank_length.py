@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
     """
-    Computation of the cylindrical part length of the tank, which does not include the cap from both end.
+    Computation of the length of the tank, which includes the cap from both end.
     """
 
     def initialize(self):
@@ -40,6 +40,15 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
             desc="Inner diameter of the gaseous hydrogen tanks",
         )
 
+        self.add_input(
+            name="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":dimension:outer_diameter",
+            units="m",
+            val=np.nan,
+            desc="Outer diameter of the gaseous hydrogen tanks",
+        )
+
         self.add_output(
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
@@ -52,6 +61,14 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":dimension:outer_diameter",
+            val=1.0,
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
@@ -59,6 +76,12 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:inner_diameter"
+        ]
+
+        d_outer = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":dimension:outer_diameter"
         ]
 
         length = (
@@ -74,7 +97,7 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:length"
-        ] = length
+        ] = length + d_outer
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
