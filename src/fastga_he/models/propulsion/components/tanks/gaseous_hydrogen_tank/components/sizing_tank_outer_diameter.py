@@ -98,7 +98,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             * multi_tank_factor
         )
         # This condition is to keep the tank as cylindrical as possible.
-        positive_length = (
+        has_sufficient_volume = (
             inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -107,14 +107,14 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             >= nb_tank * np.pi * d**3 / 6
         )
 
-        if positive_length and not not_in_fuselage:
+        if has_sufficient_volume and not not_in_fuselage:
             outputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
             ] = d
 
-        elif not positive_length and not not_in_fuselage:
+        elif not has_sufficient_volume and not not_in_fuselage:
             outputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -179,7 +179,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             * multi_tank_factor
         )
         # This condition is to keep the tank as cylindrical as possible.
-        positive_length = (
+        has_sufficient_volume = (
             inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -188,7 +188,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             >= nb_tank * np.pi * d**3 / 6
         )
 
-        if positive_length and not not_in_fuselage:
+        if has_sufficient_volume and not not_in_fuselage:
             partials[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -205,7 +205,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + ":diameter_height_ratio",
             ] = inputs["data:geometry:fuselage:maximum_height"] * multi_tank_factor
 
-        elif not positive_length and not not_in_fuselage:
+        elif not has_sufficient_volume and not not_in_fuselage:
             partials[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
