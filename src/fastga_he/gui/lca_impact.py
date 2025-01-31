@@ -111,21 +111,22 @@ def _get_impact_variable_list(aircraft_file_path: Union[str, pathlib.Path]) -> l
     return names_variables_lca
 
 
-def _get_impact_list(aircraft_file_path: Union[str, pathlib.Path]) -> list:
+def _get_weighted_impact_dict(aircraft_file_path: Union[str, pathlib.Path]) -> dict:
     """
-    Returns a list weighted impacts categories available in the output file.
+    Returns a dict of weighted impacts categories available in the output file and their value.
     :param aircraft_file_path: path to the output file path.
 
-    :return: a list of all weighted impact available in the output file path.
+    :return: a dict of all weighted impact available in the output file path and their value.
     """
 
     names_variable_lca = _get_impact_variable_list(aircraft_file_path)
-    names_impact_categories = []
+    names_impact_categories = {}
+    datafile = oad.DataFile(aircraft_file_path)
     for name_variable_lca in names_variable_lca:
         if _depth_lca_detail(name_variable_lca) <= 2:
-            names_impact_categories.append(
-                name_variable_lca.replace(LCA_PREFIX, "").replace("_weighted:sum", "")
-            )
+            impact_score = datafile[name_variable_lca].value[0]
+            impact_name = name_variable_lca.replace(LCA_PREFIX, "").replace("_weighted:sum", "")
+            names_impact_categories[impact_name] = impact_score
 
     return names_impact_categories
 
@@ -310,7 +311,9 @@ def lca_score_sensitivity_simple(
             if filename.startswith(prefix):
                 if not names_variables_lca:
                     # Fetch the name of available impacts for plotting
-                    names_variables_lca = _get_impact_list(os.path.join(dirpath, filename))
+                    names_variables_lca = list(
+                        _get_weighted_impact_dict(os.path.join(dirpath, filename)).keys()
+                    )
 
                     # Check that the impact we request exists to make it fail as soon as possible
                     # if it needs to fail
@@ -384,24 +387,19 @@ def lca_score_sensitivity_advanced_impact_category(
     """
 
     aircraft_lifespan_list = []
-    names_variables_lca = []
     impact_variations = {}
 
     for dirpath, _, filenames in os.walk(results_folder_path):
         for filename in filenames:
             if filename.startswith(prefix):
-                if not names_variables_lca:
-                    # Fetch the name of available impacts for plotting
-                    names_variables_lca = _get_impact_list(os.path.join(dirpath, filename))
-                    names_variables_lca.remove("single_score")
+                impact_score_dict = _get_weighted_impact_dict(os.path.join(dirpath, filename))
+                impact_score_dict.pop("single_score")
 
                 datafile = oad.DataFile(os.path.join(dirpath, filename))
                 aircraft_lifespan = datafile["data:TLAR:max_airframe_hours"].value[0]
                 aircraft_lifespan_list.append(aircraft_lifespan)
 
-                for impact in names_variables_lca:
-                    variable_name = LCA_PREFIX + impact + "_weighted:sum"
-                    impact_score = datafile[variable_name].value[0]
+                for impact, impact_score in impact_score_dict.items():
                     _safe_add_to_dict_of_list(impact_variations, impact, impact_score)
 
     new_impact_variation = _sort_and_cut_off(
@@ -907,26 +905,21 @@ def lca_impacts_bar_chart_simple(
     :param names_aircraft: names of the aircraft
     """
 
-    impact_names = _get_impact_list(aircraft_file_paths[0])
-    impact_names.remove("single_score")
     fig = go.Figure()
 
-    reference_value = {}
+    reference_value = _get_weighted_impact_dict(aircraft_file_paths[0])
+    reference_value.pop("single_score")
 
     for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
-        datafile = oad.DataFile(aircraft_file_path)
+        impact_score_dict = _get_weighted_impact_dict(aircraft_file_path)
+        impact_score_dict.pop("single_score")
         impact_scores = []
         beautified_impact_names = []
 
-        for impact_name in impact_names:
+        for impact_name, impact_score in impact_score_dict.items():
             beautified_impact_name = impact_name.replace("_", " ")
-            variable_name = LCA_PREFIX + impact_name + ":sum"
 
-            raw_score = datafile[variable_name].value[0]
-            if variable_name not in reference_value:
-                reference_value[variable_name] = raw_score
-
-            impact_scores.append(raw_score / reference_value[variable_name] * 100.0)
+            impact_scores.append(impact_score / reference_value[impact_name] * 100.0)
             beautified_impact_names.append(beautified_impact_name)
 
         bar_chart = go.Bar(name=name_aircraft, x=beautified_impact_names, y=impact_scores)
@@ -980,20 +973,16 @@ def lca_impacts_bar_chart_normalised_weighted(
     :param names_aircraft: names of the aircraft
     """
 
-    impact_names = _get_impact_list(aircraft_file_paths[0])
-    impact_names.remove("single_score")
     fig = go.Figure()
 
     for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
-        datafile = oad.DataFile(aircraft_file_path)
+        impact_score_dict = _get_weighted_impact_dict(aircraft_file_path)
         impact_scores = []
         beautified_impact_names = []
 
-        for impact_name in impact_names:
+        for impact_name, impact_score in impact_score_dict.items():
             beautified_impact_name = impact_name.replace("_", " ")
-            variable_name = LCA_PREFIX + impact_name + "_weighted:sum"
-
-            impact_scores.append(datafile[variable_name].value[0])
+            impact_scores.append(impact_score)
             beautified_impact_names.append(beautified_impact_name)
 
         bar_chart = go.Bar(name=name_aircraft, x=beautified_impact_names, y=impact_scores)
@@ -1041,7 +1030,7 @@ def lca_impacts_bar_chart_normalised_weighted(
     return go.FigureWidget(fig)
 
 
-def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]) -> (dict, dict):
+def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]) -> dict:
     """
     Returns a dict of the components and their impact in each category. Also return a dict with the
     total value for each impact.
@@ -1054,7 +1043,6 @@ def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]
 
     names = datafile.names()
     component_and_impacts = {}
-    total_score_impacts = {}
 
     for name in names:
         # We can focus on the weighted value since it'll be relative anyway
@@ -1072,10 +1060,6 @@ def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]
                     else:
                         component_and_impacts[component_name] = {impact_name: contribution}
 
-                    if impact_name in total_score_impacts:
-                        total_score_impacts[impact_name] += contribution
-                    else:
-                        total_score_impacts[impact_name] = contribution
             elif "manufacturing:sum" in name:
                 component_name = "manufacturing"
                 impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
@@ -1086,10 +1070,6 @@ def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]
                         component_and_impacts[component_name][impact_name] = contribution
                     else:
                         component_and_impacts[component_name] = {impact_name: contribution}
-                if impact_name in total_score_impacts:
-                    total_score_impacts[impact_name] += contribution
-                else:
-                    total_score_impacts[impact_name] = contribution
             elif "distribution:sum" in name:
                 component_name = "distribution"
                 impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
@@ -1100,12 +1080,8 @@ def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]
                         component_and_impacts[component_name][impact_name] = contribution
                     else:
                         component_and_impacts[component_name] = {impact_name: contribution}
-                if impact_name in total_score_impacts:
-                    total_score_impacts[impact_name] += contribution
-                else:
-                    total_score_impacts[impact_name] = contribution
 
-    return component_and_impacts, total_score_impacts
+    return component_and_impacts
 
 
 def lca_impacts_bar_chart_with_contributors(
@@ -1120,11 +1096,12 @@ def lca_impacts_bar_chart_with_contributors(
     :param name_aircraft: name of the aircraft
     """
 
-    component_and_contribution, total_score_impact = _get_component_and_contribution(
-        aircraft_file_path
-    )
+    component_and_contribution = _get_component_and_contribution(aircraft_file_path)
 
     fig = go.Figure()
+
+    impact_score_dict = _get_weighted_impact_dict(aircraft_file_path)
+    impact_score_dict.pop("single_score")
 
     for component, impacts in component_and_contribution.items():
         impact_contributions = []
@@ -1134,11 +1111,9 @@ def lca_impacts_bar_chart_with_contributors(
             beautified_impact_name = impact_name.replace("_", " ")
             beautified_impact_names.append(beautified_impact_name)
 
-            impact_contributions.append(contribution / total_score_impact[impact_name] * 100.0)
+            impact_contributions.append(contribution / impact_score_dict[impact_name] * 100.0)
 
-        bar_chart = go.Bar(
-            name=component, x=beautified_impact_names, y=impact_contributions
-        )
+        bar_chart = go.Bar(name=component, x=beautified_impact_names, y=impact_contributions)
         fig.add_trace(bar_chart)
 
     title_text = (
@@ -1151,7 +1126,7 @@ def lca_impacts_bar_chart_with_contributors(
         legend_font=dict(size=20),
         title_x=0.5,
         title_text=title_text,
-        barmode="stack"
+        barmode="stack",
     )
     fig.update_xaxes(
         ticks="outside",
