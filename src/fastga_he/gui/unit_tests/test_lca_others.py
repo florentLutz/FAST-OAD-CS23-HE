@@ -17,6 +17,7 @@ from ..lca_impact import (
     lca_score_sensitivity_advanced_components_and_phase,
     lca_impacts_bar_chart_simple,
     lca_impacts_bar_chart_normalised_weighted,
+    lca_impacts_bar_chart_with_contributors,
 )
 
 DATA_FOLDER_PATH = os.path.join(os.path.dirname(__file__), "data")
@@ -173,6 +174,15 @@ def test_lca_bar_chart_normalised_and_weighted_multiples():
             os.path.join(DATA_FOLDER_PATH, "hybrid_kodiak_100_ef.xml"),
         ],
         names_aircraft=["Reference Kodiak 100", "Hybrid Kodiak 100"],
+    )
+
+    fig.show()
+
+
+def test_lca_bar_chart_relative_contribution():
+    fig = lca_impacts_bar_chart_with_contributors(
+        os.path.join(DATA_FOLDER_PATH, "hybrid_kodiak_100_ef.xml"),
+        name_aircraft="Hybrid Kodiak 100",
     )
 
     fig.show()

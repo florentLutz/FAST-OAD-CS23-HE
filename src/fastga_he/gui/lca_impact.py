@@ -1039,3 +1039,139 @@ def lca_impacts_bar_chart_normalised_weighted(
     )
 
     return go.FigureWidget(fig)
+
+
+def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]) -> (dict, dict):
+    """
+    Returns a dict of the components and their impact in each category. Also return a dict with the
+    total value for each impact.
+
+    :param aircraft_file_path: path to the output file path.
+    :return: a dict of the components with their contribution to each impact category
+    """
+
+    datafile = oad.DataFile(aircraft_file_path)
+
+    names = datafile.names()
+    component_and_impacts = {}
+    total_score_impacts = {}
+
+    for name in names:
+        # We can focus on the weighted value since it'll be relative anyway
+        if LCA_PREFIX in name and "_weighted:" in name:
+            if _depth_lca_detail(name) >= 4:
+                component_name = _get_component_from_variable_name(name)
+                impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
+                contribution = datafile[name].value[0]
+                if contribution != 0.0:
+                    if component_name in component_and_impacts:
+                        if impact_name in component_and_impacts[component_name]:
+                            component_and_impacts[component_name][impact_name] += contribution
+                        else:
+                            component_and_impacts[component_name][impact_name] = contribution
+                    else:
+                        component_and_impacts[component_name] = {impact_name: contribution}
+
+                    if impact_name in total_score_impacts:
+                        total_score_impacts[impact_name] += contribution
+                    else:
+                        total_score_impacts[impact_name] = contribution
+            elif "manufacturing:sum" in name:
+                component_name = "manufacturing"
+                impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
+                contribution = datafile[name].value[0]
+                if contribution != 0.0:
+                    if component_name in component_and_impacts:
+                        # Manufacturing and distribution only contribute once each time
+                        component_and_impacts[component_name][impact_name] = contribution
+                    else:
+                        component_and_impacts[component_name] = {impact_name: contribution}
+                if impact_name in total_score_impacts:
+                    total_score_impacts[impact_name] += contribution
+                else:
+                    total_score_impacts[impact_name] = contribution
+            elif "distribution:sum" in name:
+                component_name = "distribution"
+                impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
+                contribution = datafile[name].value[0]
+                if contribution != 0.0:
+                    if component_name in component_and_impacts:
+                        # Manufacturing and distribution only contribute once each time
+                        component_and_impacts[component_name][impact_name] = contribution
+                    else:
+                        component_and_impacts[component_name] = {impact_name: contribution}
+                if impact_name in total_score_impacts:
+                    total_score_impacts[impact_name] += contribution
+                else:
+                    total_score_impacts[impact_name] = contribution
+
+    return component_and_impacts, total_score_impacts
+
+
+def lca_impacts_bar_chart_with_contributors(
+    aircraft_file_path: str,
+    name_aircraft: str = None,
+) -> go.FigureWidget:
+    """
+    Give a bar chart that plot the impact of an aircraft in each category and how each components
+    contributes to it in relative terms
+
+    :param aircraft_file_path: path to the output file that contains the results of the LCA
+    :param name_aircraft: name of the aircraft
+    """
+
+    component_and_contribution, total_score_impact = _get_component_and_contribution(
+        aircraft_file_path
+    )
+
+    fig = go.Figure()
+
+    for component, impacts in component_and_contribution.items():
+        impact_contributions = []
+        beautified_impact_names = []
+
+        for impact_name, contribution in impacts.items():
+            beautified_impact_name = impact_name.replace("_", " ")
+            beautified_impact_names.append(beautified_impact_name)
+
+            impact_contributions.append(contribution / total_score_impact[impact_name] * 100.0)
+
+        bar_chart = go.Bar(
+            name=component, x=beautified_impact_names, y=impact_contributions
+        )
+        fig.add_trace(bar_chart)
+
+    title_text = (
+        "Relative contribution of each component to each impact category for " + name_aircraft
+    )
+
+    fig.update_layout(
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+        title_x=0.5,
+        title_text=title_text,
+        barmode="stack"
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=20),
+        title="Relative contribution [%]",
+    )
+    fig.update_yaxes(
+        title_font=dict(size=20),
+    )
+
+    return go.FigureWidget(fig)
