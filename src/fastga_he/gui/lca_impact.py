@@ -21,7 +21,7 @@ from fastga_he.exceptions import ImpactUnavailableForPlotError
 from ..models.environmental_impacts.resources.constants import LCA_PREFIX
 
 COLS = plotly.colors.DEFAULT_PLOTLY_COLORS
-HASH = ['/', 'x', '-', '|', '+', '.', '', '\\']
+HASH = ["/", "x", "-", "|", "+", ".", "", "\\"]
 
 
 def lca_impacts_sun_breakdown(
