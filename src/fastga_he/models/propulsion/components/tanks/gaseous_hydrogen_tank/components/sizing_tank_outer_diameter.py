@@ -32,7 +32,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             default="in_the_fuselage",
             values=POSSIBLE_POSITION,
             desc="Option to give the position of the gaseous hydrogen tank, "
-                 "possible position include "+ ", ".join(POSSIBLE_POSITION),
+            "possible position include " + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
 
@@ -50,7 +50,9 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:number_of_tank",
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + "number_of_tank",
             val=1.0,
             desc="Number of gaseous hydrogen tank in a stack. "
             "Default set 1.0 for single tank in fuselage and outside fuselage uses.",
@@ -87,7 +89,11 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
 
         not_in_fuselage = (position == "wing_pod") or (position == "underbelly")
 
-        nb_tank = inputs["data:propulsion:he_power_train:gaseous_hydrogen_tank:number_of_tank"]
+        nb_tank = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + "number_of_tank"
+        ]
         # multi_tank_factor divides the outer diameter with respect to the number of tanks.
 
         inner_volume = inputs[
@@ -154,7 +160,11 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
 
         not_in_fuselage = (position == "wing_pod") or (position == "underbelly")
 
-        nb_tank = inputs["data:propulsion:he_power_train:gaseous_hydrogen_tank:number_of_tank"]
+        nb_tank = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + "number_of_tank"
+        ]
         # multi_tank_factor divides the outer diameter with respect to the number of tanks.
         if not_in_fuselage:
             multi_tank_factor = 1.0

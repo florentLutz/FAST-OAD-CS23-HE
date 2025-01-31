@@ -27,7 +27,7 @@ class SizingGaseousHydrogenTankCGY(om.ExplicitComponent):
             default="in_the_fuselage",
             values=POSSIBLE_POSITION,
             desc="Option to give the position of the gaseous hydrogen tank, "
-                 "possible position include " + ", ".join(POSSIBLE_POSITION),
+            "possible position include " + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
 
