@@ -21,6 +21,7 @@ from fastga_he.exceptions import ImpactUnavailableForPlotError
 from ..models.environmental_impacts.resources.constants import LCA_PREFIX
 
 COLS = plotly.colors.DEFAULT_PLOTLY_COLORS
+HASH = ['/', 'x', '-', '|', '+', '.', '', '\\']
 
 
 def lca_impacts_sun_breakdown(
@@ -1103,6 +1104,8 @@ def lca_impacts_bar_chart_with_contributors(
     impact_score_dict = _get_weighted_impact_dict(aircraft_file_path)
     impact_score_dict.pop("single_score")
 
+    component_counter = 0
+
     for component, impacts in component_and_contribution.items():
         impact_contributions = []
         beautified_impact_names = []
@@ -1113,8 +1116,18 @@ def lca_impacts_bar_chart_with_contributors(
 
             impact_contributions.append(contribution / impact_score_dict[impact_name] * 100.0)
 
-        bar_chart = go.Bar(name=component, x=beautified_impact_names, y=impact_contributions)
+        bar_chart = go.Bar(
+            name=component,
+            x=beautified_impact_names,
+            y=impact_contributions,
+            marker=dict(
+                pattern_shape=HASH[component_counter // len(HASH)],
+                color=COLS[component_counter % len(COLS)],
+            ),
+        )
         fig.add_trace(bar_chart)
+
+        component_counter += 1
 
     title_text = (
         "Relative contribution of each component to each impact category for " + name_aircraft
