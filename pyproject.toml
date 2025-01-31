@@ -49,9 +49,7 @@ Pillow = "9.3"
 kaleido = "0.2.1"
 click = "8.0.4"
 debugpy = "1.5.0"
-lcav = {git = "https://github.com/felixpollet/LCAv.git"}
-# TODO: Need to properly define dependencies to lca-algebraic for now it's blocked by lcav
-eight = "^1.0.0"
+lca-modeller = "^0.1.1b0"
 
 [tool.poetry.group.dev.dependencies]
 pyvplm = { git = "https://github.com/florentLutz/pyvplm.git", branch = "master" }
