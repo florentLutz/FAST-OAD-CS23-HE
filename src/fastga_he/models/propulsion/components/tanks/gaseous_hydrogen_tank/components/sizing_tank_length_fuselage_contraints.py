@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -144,7 +144,7 @@ class SizingGaseousHydrogenTankLengthFuselageConstraints(om.ExplicitComponent):
                 "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:length"
-            ] = 0.0
+            ] = -1.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]

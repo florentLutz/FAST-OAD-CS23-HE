@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import logging
 
@@ -13,14 +13,9 @@ HYDROGEN_GAS_CONSTANT = 4157.2  # (N.m/K.kg)
 
 class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
     """
-    Computation of the volume of hydrogen to be stored in the tank in specific temperature and pressure condition.
-    Calculation performed under ideal gas assumption.
+    Computation of the volume of hydrogen to be stored in the tank
+    in specific temperature and pressure condition, performed under ideal gas assumption.
     """
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        self.rho_fuel = None
 
     def initialize(self):
         self.options.declare(

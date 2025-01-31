@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -27,8 +27,8 @@ class SizingGaseousHydrogenTankDrag(om.ExplicitComponent):
             name="position",
             default="in_the_fuselage",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the gaseous hydrogen tank, possible position include "
-            + ", ".join(POSSIBLE_POSITION),
+            desc="Option to give the position of the gaseous hydrogen tank, "
+            "possible position include " + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
         # Not as useful as the ones in aerodynamics, here it will just be run twice in the sizing

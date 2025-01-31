@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 
@@ -27,14 +27,14 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingGaseousHydrogenTank(om.Group):
     """
-    Class that regroups all the subcomponents for the sizing of the hydrogen gas tank.
+    Class that regroups all the subcomponents for the sizing of the gaseous hydrogen tank.
     """
 
     def initialize(self):
         self.options.declare(
             name="gaseous_hydrogen_tank_id",
             default=None,
-            desc="Identifier of the hydrogen gas tank",
+            desc="Identifier of the gaseous hydrogen tank",
             allow_none=False,
         )
 
@@ -42,8 +42,8 @@ class SizingGaseousHydrogenTank(om.Group):
             name="position",
             default="in_the_fuselage",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the hydrogen gas tank, possible position include "
-            + ", ".join(POSSIBLE_POSITION),
+            desc="Option to give the position of the gaseous hydrogen tank, "
+                 "possible position include " + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
 

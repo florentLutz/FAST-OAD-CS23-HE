@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -55,8 +55,8 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
             + ":dimension:length",
             val=1.0,
             units="m",
-            desc="Value of the cylindrical length of the tank in the x-direction, computed differently based "
-            "on the location of the tank",
+            desc="Value of the cylindrical length of the tank in the x-direction, "
+            "computed differently based on the location of the tank.",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -84,14 +84,13 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
             + ":dimension:outer_diameter"
         ]
 
-        length = (
-            inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":inner_volume"
-            ]
-            - np.pi * d_inner**3 / 6
-        ) / (np.pi * d_inner**2 / 4)
+        inner_volume = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":inner_volume"
+        ]
+
+        length = (inner_volume - np.pi * d_inner**3 / 6) / (np.pi * d_inner**2 / 4)
 
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"

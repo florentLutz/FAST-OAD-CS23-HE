@@ -12,9 +12,11 @@ _LOGGER = logging.getLogger(__name__)
 
 class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
     """
-    The Outer diameter of the gaseous hydrogen tank is based on the maximum fuselage height and the number of tanks.
-    For Multi-tank scenarios, all the tanks are assumed with the same diameter and using the table provided by:
-    Kravitz, S. "Packing Cylinders into Cylindrical Containers." Math. Mag. 40, 65-70, 1967.
+    The Outer diameter of the gaseous hydrogen tank is based on
+    the maximum fuselage height and the number of tanks.
+    For Multi-tank stack scenarios,
+    all the tanks are assumed with the same diameter and using the table provided by:
+    :cite:`kravitz1967packing`
     """
 
     def initialize(self):
@@ -29,8 +31,8 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             name="position",
             default="in_the_fuselage",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the gaseous hydrogen tank, possible position include "
-            + ", ".join(POSSIBLE_POSITION),
+            desc="Option to give the position of the gaseous hydrogen tank, "
+                 "possible position include "+ ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
 
@@ -50,7 +52,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:number_of_tank",
             val=1.0,
-            desc="Number of gaseous hydrogen tank. "
+            desc="Number of gaseous hydrogen tank in a stack. "
             "Default set 1.0 for single tank in fuselage and outside fuselage uses.",
         )
 
@@ -87,6 +89,13 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
 
         nb_tank = inputs["data:propulsion:he_power_train:gaseous_hydrogen_tank:number_of_tank"]
         # multi_tank_factor divides the outer diameter with respect to the number of tanks.
+
+        inner_volume = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":inner_volume"
+        ]
+
         if not_in_fuselage:
             multi_tank_factor = 1.0
         else:
@@ -98,14 +107,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             * multi_tank_factor
         )
         # This condition is to keep the tank as cylindrical as possible.
-        has_sufficient_volume = (
-            inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":inner_volume"
-            ]
-            >= nb_tank * np.pi * d**3 / 6
-        )
+        has_sufficient_volume = inner_volume >= nb_tank * np.pi * d**3 / 6
 
         if has_sufficient_volume and not not_in_fuselage:
             outputs[
@@ -119,34 +121,15 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
-            ] = (
-                np.cbrt(
-                    6
-                    * inputs[
-                        "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                        + gaseous_hydrogen_tank_id
-                        + ":inner_volume"
-                    ]
-                    / np.pi
-                )
-                * multi_tank_factor
-            )
+            ] = np.cbrt(6 * inner_volume / np.pi) * multi_tank_factor
 
             _LOGGER.warning(
-                msg="Inconsistent tank length for tank "
+                msg="Inconsistent tank length for tank(s) "
                 + gaseous_hydrogen_tank_id
-                + ",this is due to the diameter being too big for the required tank capacity"
+                + "due to the diameter being too large for the required tank capacity, suggest to reduce the diameter o"
             )
 
-        elif position == "underbelly":
-            outputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:outer_diameter"
-            ] = 0.5 * inputs["data:geometry:fuselage:maximum_height"]
-            _LOGGER.warning(msg="Tank dimension fixed to reduce drag")
-
-        elif position == "wing_pod":
+        elif position == "wing_pod" or position == "underbelly":
             outputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -162,6 +145,11 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":diameter_height_ratio"
+        ]
+        inner_volume = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":inner_volume"
         ]
 
         not_in_fuselage = (position == "wing_pod") or (position == "underbelly")
@@ -179,14 +167,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             * multi_tank_factor
         )
         # This condition is to keep the tank as cylindrical as possible.
-        has_sufficient_volume = (
-            inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":inner_volume"
-            ]
-            >= nb_tank * np.pi * d**3 / 6
-        )
+        has_sufficient_volume = inner_volume >= nb_tank * np.pi * d**3 / 6
 
         if has_sufficient_volume and not not_in_fuselage:
             partials[
@@ -213,31 +194,9 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":inner_volume",
-            ] = (
-                2
-                * multi_tank_factor
-                / np.pi
-                * np.cbrt(
-                    6
-                    * inputs[
-                        "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                        + gaseous_hydrogen_tank_id
-                        + ":inner_volume"
-                    ]
-                    / np.pi
-                )
-                ** (-2)
-            )
+            ] = 2 * multi_tank_factor / np.pi * np.cbrt(6 * inner_volume / np.pi) ** (-2)
 
-        elif position == "underbelly":
-            partials[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":dimension:outer_diameter",
-                "data:geometry:fuselage:maximum_height",
-            ] = 0.5
-
-        elif position == "wing_pod":
+        elif position == "wing_pod" or position == "underbelly":
             partials[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id

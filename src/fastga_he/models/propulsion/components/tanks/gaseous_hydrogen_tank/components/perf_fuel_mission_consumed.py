@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -53,4 +53,4 @@ class PerformancesGaseousHydrogenConsumedMission(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":fuel_consumed_mission"
-        ] = sum(inputs["fuel_consumed_t"])
+        ] = np.sum(inputs["fuel_consumed_t"])

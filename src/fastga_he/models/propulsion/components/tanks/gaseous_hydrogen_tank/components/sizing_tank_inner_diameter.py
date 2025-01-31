@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -9,9 +9,9 @@ import numpy as np
 # To modify
 class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
     """
-    Computation of the inner diameter of the tank. Using the relation of the tank pressure and the yield strength of
-    the wall material.
-    Reference: Colozza, A. J. and Kohout, L., “Hydrogen storage for aircraft applications overview,” Tech. rep., 2002.
+    Computation of the inner diameter of the tank.
+    Using the relation of the tank pressure and the yield strength of the wall material.
+    :cite:`colozza2002hydrogen`
     """
 
     def initialize(self):
@@ -57,8 +57,9 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             + ":material:yield_strength",
             val=np.nan,
             units="Pa",
-            desc="gaseous hydrogen tank material yield stress. Some reference (in MPa): "
-            "Steel(ASTM-A514):690, Aluminum(2014-T6):410, Titanium(6%Al,4%V):825, Carbon Composite:1900",
+            desc="gaseous hydrogen tank material yield stress. Some reference (in MPa):"
+            "Steel(ASTM-A514):690, Aluminum(2014-T6):410, "
+            "Titanium(6%Al,4%V):825, Carbon Composite:1900",
         )
 
         self.add_output(
@@ -74,7 +75,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
-        sf = inputs[
+        safety_factor = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":safety_factor"
@@ -102,7 +103,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:inner_diameter"
-        ] = d_outer * sigma / (tank_pressure * sf + sigma)
+        ] = d_outer * sigma / (tank_pressure * safety_factor + sigma)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
@@ -113,7 +114,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             + ":tank_pressure"
         ]
 
-        sf = inputs[
+        safety_factor = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":safety_factor"
@@ -138,7 +139,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:outer_diameter",
-        ] = sigma / (sigma + tank_pressure * sf)
+        ] = sigma / (sigma + tank_pressure * safety_factor)
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -147,7 +148,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":tank_pressure",
-        ] = -d_outer * sf * sigma / (sf * tank_pressure + sigma) ** 2
+        ] = -d_outer * safety_factor * sigma / (safety_factor * tank_pressure + sigma) ** 2
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -156,7 +157,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":safety_factor",
-        ] = -d_outer * tank_pressure * sigma / (tank_pressure * sf + sigma) ** 2
+        ] = -d_outer * tank_pressure * sigma / (tank_pressure * safety_factor + sigma) ** 2
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -165,4 +166,4 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":material:yield_strength",
-        ] = d_outer * sf * tank_pressure / (sigma + sf * tank_pressure) ** 2
+        ] = d_outer * safety_factor * tank_pressure / (sigma + safety_factor * tank_pressure) ** 2

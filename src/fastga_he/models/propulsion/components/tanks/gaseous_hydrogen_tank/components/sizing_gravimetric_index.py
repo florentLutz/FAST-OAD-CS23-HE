@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -10,10 +10,7 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
     """
     Computation of the gravimetric index of gaseous hydrogen tank,
     ratio between hydrogen capacity and overall system weight.
-    Reference:
-    Mukhopadhaya, Jayant, and Dan Rutherford.
-    "Performance analysis of evolutionary hydrogen-powered aircraft."
-    International Council on Clean Transportation (2022).
+    :cite:`mukhopadhaya2022performance`
     """
 
     def initialize(self):
@@ -50,7 +47,7 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
             + gaseous_hydrogen_tank_id
             + ":gravimetric_index",
             val=0.5,
-            desc="Ratio between the mission used weight and overall weight",
+            desc="Ratio between the maximum capacity and overall system weight",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
