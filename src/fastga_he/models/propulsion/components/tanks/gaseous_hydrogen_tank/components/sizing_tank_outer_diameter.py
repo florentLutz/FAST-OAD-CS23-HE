@@ -133,7 +133,8 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             _LOGGER.warning(
                 msg="Inconsistent tank length for tank(s) "
                 + gaseous_hydrogen_tank_id
-                + "due to the diameter being too large for the required tank capacity, suggest to reduce the diameter o"
+                + " due to the diameter being too large for the required tank capacity, "
+                "suggest to reduce the diameter."
             )
 
         elif position == "wing_pod" or position == "underbelly":

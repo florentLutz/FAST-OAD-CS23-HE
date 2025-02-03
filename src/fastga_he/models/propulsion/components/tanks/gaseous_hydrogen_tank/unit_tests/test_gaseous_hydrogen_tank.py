@@ -458,7 +458,7 @@ def test_gaseous_hydrogen_tank_weight():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:total_mass",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
         units="kg",
     ) == pytest.approx(1.2179, rel=1e-2)
 
@@ -477,7 +477,7 @@ def test_gaseous_hydrogen_tank_gravimetric_index():
         XML_FILE,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:total_mass",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
         val=20.2,
         units="kg",
     )
@@ -554,7 +554,7 @@ def test_sizing_tank():
     )
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:total_mass",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
         units="kg",
     ) == pytest.approx(2.476, rel=1e-2)
     assert problem.get_val(

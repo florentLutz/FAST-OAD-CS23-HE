@@ -66,7 +66,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":total_mass",
+            + ":mass",
             units="kg",
             val=20.0,
             desc="Weight of the gaseous hydrogen tanks",
@@ -111,7 +111,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":total_mass"
+            + ":mass"
         ] = wall_density * (np.pi * d**3 / 6 + np.pi * d**2 * length / 4 - inner_volume)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -151,7 +151,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":total_mass",
+            + ":mass",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":material:density",
@@ -160,7 +160,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":total_mass",
+            + ":mass",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:length",
@@ -169,7 +169,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":total_mass",
+            + ":mass",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":inner_volume",
@@ -178,7 +178,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":total_mass",
+            + ":mass",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:outer_diameter",
