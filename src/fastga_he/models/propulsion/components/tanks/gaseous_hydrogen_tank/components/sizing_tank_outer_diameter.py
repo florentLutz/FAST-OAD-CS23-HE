@@ -16,7 +16,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
     the maximum fuselage height and the number of tanks.
     For Multi-tank stack scenarios,
     all the tanks are assumed with the same diameter and using the table provided by:
-    :cite:`kravitz1967packing`
+    :cite:`kravitz:1967`
     """
 
     def initialize(self):

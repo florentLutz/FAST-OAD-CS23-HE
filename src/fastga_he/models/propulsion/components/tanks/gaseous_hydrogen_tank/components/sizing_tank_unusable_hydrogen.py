@@ -25,7 +25,7 @@ class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
             allow_none=False,
         )
         # "The default value is set slightly higher to prevent underestimation."
-        # :cite: `ahluwalia2010technical`
+        # :cite:`ahluwalia:2010`
 
     def setup(self):
         # To modify based on the minimum pressure for the output hydrogen mass flow

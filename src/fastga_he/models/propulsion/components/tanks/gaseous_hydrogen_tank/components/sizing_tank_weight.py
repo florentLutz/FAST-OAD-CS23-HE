@@ -13,7 +13,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
     """
     Computation of the weight of the tank. The very simplistic approach we will use is to say
     that weight of tank is the weight of unused fuel and the weight of the tank itself.
-    Reference material density are cite from: Hydrogen Storage for Aircraft Application Overview, NASA 2002
+    :cite:`colozza:2002`
     """
 
     def initialize(self):

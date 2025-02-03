@@ -11,7 +11,7 @@ class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
     """
     Computation of the inner diameter of the tank.
     Using the relation of the tank pressure and the yield strength of the wall material.
-    :cite:`colozza2002hydrogen`
+    :cite:`colozza:2002`
     """
 
     def initialize(self):

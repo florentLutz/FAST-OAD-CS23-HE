@@ -8,7 +8,12 @@ SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY = (
 )
 
 POSSIBLE_POSITION = ["in_the_cabin", "wing_pod", "in_the_back", "underbelly"]
-
+# This factor is derived from the circle packing problem.
+# The keys of the dictionary represent the number of tanks inside the fuselage.
+# The value corresponds to the key is the ratio between
+# the maximum height of fuselage and the tank outer diameter.
+# :cite:`kravitz:1967`
+# Explanation could be also found in https://mathworld.wolfram.com/CirclePacking.html
 MULTI_TANK_FACTOR = {
     1: 1,
     2: 2,

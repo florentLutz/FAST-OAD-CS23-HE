@@ -24,8 +24,8 @@ class SizingGaseousHydrogenTankLengthFuselageConstraints(om.ExplicitComponent):
             name="position",
             default="in_the_cabin",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the gaseous hydrogen tank, possible position include "
-            + ", ".join(POSSIBLE_POSITION),
+            desc="Option to give the position of the gaseous hydrogen tank, "
+            "possible position include " + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
 
@@ -52,7 +52,8 @@ class SizingGaseousHydrogenTankLengthFuselageConstraints(om.ExplicitComponent):
                 + gaseous_hydrogen_tank_id
                 + ":dimension:rear_length_ratio",
                 val=0.5,
-                desc="The ratio between the usable length of the rear fuselage and the the whole rear fuselage length.",
+                desc="The ratio between the usable length of the rear fuselage "
+                "and the the whole rear fuselage length.",
             )
 
         self.add_output(
@@ -61,7 +62,8 @@ class SizingGaseousHydrogenTankLengthFuselageConstraints(om.ExplicitComponent):
             + ":dimension:length",
             val=0.0,
             units="m",
-            desc="Constraints on the tank length w.r.t the cabin/rear_fuselage/front_fuselage length,  respected if <0",
+            desc="Constraints on the tank length w.r.t "
+            "the cabin/rear_fuselage/front_fuselage length,  respected if <0",
         )
 
         if position != "wing_pod":
