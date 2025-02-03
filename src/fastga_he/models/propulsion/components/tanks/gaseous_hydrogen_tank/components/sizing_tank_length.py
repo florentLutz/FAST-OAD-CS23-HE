@@ -52,8 +52,8 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + "number_of_tank",
-            val=1.0,
+            + ":number_of_tank",
+            val=np.nan,
             desc="Number of gaseous hydrogen tank in a stack. "
             "Default set 1.0 for single tank in fuselage and outside fuselage uses.",
         )
@@ -102,7 +102,7 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
         nb_tank = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + "number_of_tank"
+            + ":number_of_tank"
         ]
 
         length = (inner_volume - np.pi * d_inner**3 / 6 * nb_tank) / (
@@ -133,7 +133,7 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
         nb_tank = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + "number_of_tank"
+            + ":number_of_tank"
         ]
 
         partials[
@@ -162,5 +162,5 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
             + ":dimension:length",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + "number_of_tank",
+            + ":number_of_tank",
         ] = -4 * inner_volume / (np.pi * d_inner**2 * nb_tank**2)

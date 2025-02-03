@@ -27,7 +27,7 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":mass",
+            + ":total_mass",
             units="kg",
             val=np.nan,
             desc="Weight of the gaseous hydrogen tanks",
@@ -72,7 +72,7 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
             + inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
-                + ":mass"
+                + ":total_mass"
             ]
         )
 
@@ -90,7 +90,7 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
-                + ":mass"
+                + ":total_mass"
             ]
             / (
                 inputs[
@@ -101,7 +101,7 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
                 + inputs[
                     "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                     + gaseous_hydrogen_tank_id
-                    + ":mass"
+                    + ":total_mass"
                 ]
             )
             ** 2
@@ -113,7 +113,7 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
             + ":gravimetric_index",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":mass",
+            + ":total_mass",
         ] = (
             -inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -129,7 +129,7 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
                 + inputs[
                     "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                     + gaseous_hydrogen_tank_id
-                    + ":mass"
+                    + ":total_mass"
                 ]
             )
             ** 2

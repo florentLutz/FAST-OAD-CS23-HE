@@ -188,6 +188,10 @@ def test_tank_length():
         __file__,
         XML_FILE,
     )
+    ivc.add_output(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:number_of_tank",
+        val=1.0,
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -201,6 +205,58 @@ def test_tank_length():
     ) == pytest.approx(1.97802, rel=1e-2)
 
     problem.check_partials(compact_print=True, step=1e-7)
+
+
+def test_multi_tank_length():
+    d_outers = [
+        0.97802,
+        0.48901,
+        0.45390,
+        0.40511,
+        0.36206,
+        0.32601,
+        0.32601,
+        0.29594,
+        0.27069,
+    ]
+    wall_thickness = 1.3034e-4
+    for n_int, _ in MULTI_TANK_FACTOR.items():
+        # Research independent input value in .xml file
+        n = float(n_int)
+        ivc = om.IndepVarComp()
+        d_outer = d_outers[n_int - 1]
+        ivc.add_output(
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:outer_diameter",
+            val=d_outer,
+            units="m",
+        )
+        d_inner = d_outers[n_int - 1] - 2 * wall_thickness
+        ivc.add_output(
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:inner_diameter",
+            val=d_inner,
+            units="m",
+        )
+        ivc.add_output(
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:inner_volume",
+            val=1240.288,
+            units="L",
+        )
+        ivc.add_output(
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:number_of_tank",
+            val=n,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(
+            SizingGaseousHydrogenTankLength(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+            ivc,
+        )
+        length = (1.240288 - np.pi * d_inner**3 / 6 * n) / (np.pi * n * d_inner**2 / 4) + d_outer
+        assert problem.get_val(
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:length",
+            units="m",
+        ) == pytest.approx(length, rel=1e-2)
+
+        problem.check_partials(compact_print=True, step=1e-7)
 
 
 def test_tank_outer_diameter():
@@ -258,7 +314,10 @@ def test_mutli_tank_outer_diameter():
             __file__,
             XML_FILE,
         )
-        ivc.add_output("data:propulsion:he_power_train:gaseous_hydrogen_tank:number_of_tank", val=n)
+        ivc.add_output(
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:number_of_tank",
+            val=n,
+        )
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
@@ -278,7 +337,7 @@ def test_mutli_tank_outer_diameter():
 
 def test_tank_length_fuselage_constraints():
     # Research independent input value in .xml file
-    expected_values = [-0.4994, 0.0, -0.84646, -0.4994]
+    expected_values = [-0.4994, -1.0, -0.84646, -0.4994]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
         ivc = get_indep_var_comp(
@@ -370,7 +429,7 @@ def test_gaseous_hydrogen_tank_weight():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:total_mass",
         units="kg",
     ) == pytest.approx(1.2179, rel=1e-2)
 
@@ -389,7 +448,7 @@ def test_gaseous_hydrogen_tank_gravimetric_index():
         XML_FILE,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:total_mass",
         val=20.2,
         units="kg",
     )
@@ -466,7 +525,7 @@ def test_sizing_tank():
     )
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:total_mass",
         units="kg",
     ) == pytest.approx(2.476, rel=1e-2)
     assert problem.get_val(
