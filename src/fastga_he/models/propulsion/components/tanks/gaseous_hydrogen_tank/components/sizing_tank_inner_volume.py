@@ -83,7 +83,8 @@ class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
             + ":tank_pressure"
         ]
 
-        z = 0.99704 + 6.4149e-9 * tank_pressure  # compressibility correction
+        z = 0.99704 + 6.4149e-9 * tank_pressure
+        # Hydrogen gas compressibility factor :cite:`bolz:1973`
 
         tank_temperature = inputs["tank_temperature"]
 
@@ -108,7 +109,8 @@ class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
             + ":tank_pressure"
         ]
 
-        z = 0.99704 + 6.4149e-9 * tank_pressure  # compressibility correction
+        z = 0.99704 + 6.4149e-9 * tank_pressure
+        # Hydrogen gas compressibility factor :cite:`bolz:1973`
 
         tank_temperature = inputs["tank_temperature"]
 
