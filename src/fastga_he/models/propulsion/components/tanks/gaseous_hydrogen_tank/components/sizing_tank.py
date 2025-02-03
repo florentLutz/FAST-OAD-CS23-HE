@@ -40,7 +40,7 @@ class SizingGaseousHydrogenTank(om.Group):
 
         self.options.declare(
             name="position",
-            default="in_the_fuselage",
+            default="in_the_cabin",
             values=POSSIBLE_POSITION,
             desc="Option to give the position of the gaseous hydrogen tank, "
             "possible position include " + ", ".join(POSSIBLE_POSITION),
@@ -110,7 +110,7 @@ class SizingGaseousHydrogenTank(om.Group):
         self.add_subsystem(
             name="tank_length",
             subsys=SizingGaseousHydrogenTankLength(
-                gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id
+                gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id, position=position
             ),
             promotes=["*"],
         )

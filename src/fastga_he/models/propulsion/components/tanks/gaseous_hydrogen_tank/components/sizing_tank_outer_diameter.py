@@ -29,7 +29,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
 
         self.options.declare(
             name="position",
-            default="in_the_fuselage",
+            default="in_the_cabin",
             values=POSSIBLE_POSITION,
             desc="Option to give the position of the gaseous hydrogen tank, "
             "possible position include " + ", ".join(POSSIBLE_POSITION),
@@ -38,6 +38,8 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
 
     def setup(self):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
+        position = self.options["position"]
+        in_fuselage = not (position == "wing_pod" or position == "underbelly")
 
         self.add_input("data:geometry:fuselage:maximum_height", val=np.nan, units="m")
 
@@ -48,15 +50,15 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             val=0.9,
             desc="Fraction between the tank outer diameter and fuselage height",
         )
-
-        self.add_input(
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":number_of_tank",
-            val=1.0,
-            desc="Number of gaseous hydrogen tank in a stack. "
-            "Default set 1.0 for single tank in fuselage and outside fuselage uses.",
-        )
+        if in_fuselage:
+            self.add_input(
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":number_of_tank",
+                val=1.0,
+                desc="Number of gaseous hydrogen tank in a stack in fuselage. "
+                "Default set 1.0 for single tank in fuselage and outside fuselage uses.",
+            )
 
         self.add_input(
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -89,12 +91,6 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
 
         not_in_fuselage = (position == "wing_pod") or (position == "underbelly")
 
-        nb_tank = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":number_of_tank"
-        ]
-
         inner_volume = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
@@ -103,7 +99,13 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
 
         if not_in_fuselage:
             multi_tank_factor = 1.0
+            nb_tank = 1.0
         else:
+            nb_tank = inputs[
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":number_of_tank"
+            ]
             multi_tank_factor = 1 / MULTI_TANK_FACTOR.get(int(nb_tank))
         # multi_tank_factor divides the outer diameter with respect to the number of tanks.
         d = (
@@ -159,15 +161,16 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
 
         not_in_fuselage = (position == "wing_pod") or (position == "underbelly")
 
-        nb_tank = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":number_of_tank"
-        ]
         # multi_tank_factor divides the outer diameter with respect to the number of tanks.
         if not_in_fuselage:
             multi_tank_factor = 1.0
+            nb_tank = 1.0
         else:
+            nb_tank = inputs[
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":number_of_tank"
+            ]
             multi_tank_factor = 1 / MULTI_TANK_FACTOR.get(int(nb_tank))
 
         d = (

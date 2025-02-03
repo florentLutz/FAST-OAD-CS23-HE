@@ -207,6 +207,35 @@ def test_tank_length():
     problem.check_partials(compact_print=True, step=1e-7)
 
 
+def test_tank_length_outside_fuselage():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SizingGaseousHydrogenTankLength(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1")
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:number_of_tank",
+        val=2.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingGaseousHydrogenTankLength(
+            gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1", position="wing_pod"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:length",
+        units="m",
+    ) == pytest.approx(1.97802, rel=1e-2)
+
+    problem.check_partials(compact_print=True, step=1e-7)
+
+
 def test_multi_tank_length():
     d_outers = [
         0.97802,

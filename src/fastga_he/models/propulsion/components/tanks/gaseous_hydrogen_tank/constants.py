@@ -7,7 +7,7 @@ SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY = (
     "submodel.propulsion.constraints.gaseous_hydrogen_tank.capacity"
 )
 
-POSSIBLE_POSITION = ["in_the_fuselage", "wing_pod", "in_the_back", "underbelly"]
+POSSIBLE_POSITION = ["in_the_cabin", "wing_pod", "in_the_back", "underbelly"]
 
 MULTI_TANK_FACTOR = {
     1: 1,

@@ -25,9 +25,7 @@ class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
             allow_none=False,
         )
         # "The default value is set slightly higher to prevent underestimation."
-        # Reference: Ahluwalia, R. K., et al.
-        # "Technical assessment of cryo-compressed hydrogen storage tank systems for automotive applications."
-        # International journal of hydrogen energy 35.9 (2010): 4171-4184.",
+        # :cite: `ahluwalia2010technical`
 
     def setup(self):
         # To modify based on the minimum pressure for the output hydrogen mass flow

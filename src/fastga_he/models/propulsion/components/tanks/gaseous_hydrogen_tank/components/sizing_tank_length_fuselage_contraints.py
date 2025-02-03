@@ -22,7 +22,7 @@ class SizingGaseousHydrogenTankLengthFuselageConstraints(om.ExplicitComponent):
 
         self.options.declare(
             name="position",
-            default="in_the_fuselage",
+            default="in_the_cabin",
             values=POSSIBLE_POSITION,
             desc="Option to give the position of the gaseous hydrogen tank, possible position include "
             + ", ".join(POSSIBLE_POSITION),
@@ -42,7 +42,7 @@ class SizingGaseousHydrogenTankLengthFuselageConstraints(om.ExplicitComponent):
             desc="Value of the length of the tank in the x-direction",
         )
 
-        if position == "in_the_fuselage" or position == "underbelly":
+        if position == "in_the_cabin" or position == "underbelly":
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
 
         if position == "in_the_back":
@@ -82,7 +82,7 @@ class SizingGaseousHydrogenTankLengthFuselageConstraints(om.ExplicitComponent):
                 val=0.0,
             )
 
-        if position == "in_the_fuselage" or position == "underbelly":
+        if position == "in_the_cabin" or position == "underbelly":
             self.declare_partials(
                 of="*",
                 wrt="data:geometry:cabin:length",
@@ -106,7 +106,7 @@ class SizingGaseousHydrogenTankLengthFuselageConstraints(om.ExplicitComponent):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
 
-        if position == "in_the_fuselage" or position == "underbelly":
+        if position == "in_the_cabin" or position == "underbelly":
             outputs[
                 "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
