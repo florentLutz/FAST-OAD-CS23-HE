@@ -102,19 +102,17 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             ]
         )
 
+        inner_volume = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":inner_volume"
+        ]
+
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":total_mass"
-        ] = wall_density * (
-            np.pi * d**3 / 6
-            + np.pi * d**2 * length / 4
-            - inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":inner_volume"
-            ]
-        )
+        ] = wall_density * (np.pi * d**3 / 6 + np.pi * d**2 * length / 4 - inner_volume)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
@@ -144,6 +142,12 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             + ":material:density"
         ]
 
+        inner_volume = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":inner_volume"
+        ]
+
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
@@ -151,15 +155,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":material:density",
-        ] = (
-            np.pi * d**3 / 6
-            + np.pi * d**2 * length / 4
-            - inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":inner_volume"
-            ]
-        )
+        ] = np.pi * d**3 / 6 + np.pi * d**2 * length / 4 - inner_volume
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
