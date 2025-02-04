@@ -1,8 +1,9 @@
-.. _assumptions-lca:
+.. _assumptions-gaseous_hydrogen_tank:
 
 =======================================
-Life Cycle Assessment model assumptions
+Gaseous Hydrogen Tank assumptions
 =======================================
+
 
 This is a Work-In-Progress, future version of the documentation will include a description of:
 

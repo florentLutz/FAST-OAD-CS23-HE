@@ -1,12 +1,12 @@
 =============================
-Life Cycle Assessment options
+Gaseous Hydrogen Tank model
 =============================
 
 The Life Cycle Assessment (LCA) module can be parametrized according to several criterion which are implemented under the form of group options. A description of those options is available here. There is one mandatory option, the rest are configured with default values which will be detailed here.
 
 .. contents::
 
-.. _mandatory-options-lca:
+.. _mandatory-options-gaseous_hydrogen_tank:
 
 *****************
 Mandatory options
