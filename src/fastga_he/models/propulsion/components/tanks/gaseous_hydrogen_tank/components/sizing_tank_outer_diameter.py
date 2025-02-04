@@ -100,6 +100,9 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
         if not_in_fuselage:
             multi_tank_factor = 1.0
             nb_tank = 1.0
+            _LOGGER.warning(
+                msg="Number of tank per stack fixed to 1 for all outside fuselage position !!"
+            )
         else:
             nb_tank = inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -137,7 +140,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 "suggest to reduce the diameter."
             )
 
-        elif position == "wing_pod" or position == "underbelly":
+        elif not_in_fuselage:
             outputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -209,7 +212,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + ":inner_volume",
             ] = 2 * multi_tank_factor / np.pi * np.cbrt(6 * inner_volume / np.pi) ** (-2)
 
-        elif position == "wing_pod" or position == "underbelly":
+        elif not_in_fuselage:
             partials[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
