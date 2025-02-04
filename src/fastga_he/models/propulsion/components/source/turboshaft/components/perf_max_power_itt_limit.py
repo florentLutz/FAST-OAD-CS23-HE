@@ -48,6 +48,7 @@ class PerformancesMaxPowerITTLimit(om.ExplicitComponent):
         )
         self.add_input(
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":limit:ITT",
+            units="degK",
             val=np.nan,
             desc="Limit ITT of the turboshaft",
         )

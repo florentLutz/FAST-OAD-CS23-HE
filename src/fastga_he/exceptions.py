@@ -17,3 +17,10 @@ class ControlParameterInconsistentShapeError(FastOadGaHeError):
     It should be equal to 1 (same value for the whole mission), 3 (one value for each phase) or
     number_of_points (one value for each point).
     """
+
+
+class ImpactUnavailableForPlotError(FastOadGaHeError):
+    """
+    This exception is used when the user try to ask for an impact inside of a post-processing
+    function but its results were not computed
+    """

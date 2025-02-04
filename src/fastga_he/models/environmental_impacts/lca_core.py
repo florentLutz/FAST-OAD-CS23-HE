@@ -15,7 +15,7 @@ import openmdao.api as om
 import pandas as pd
 import sympy as sym
 import yaml
-from lcav.io.configuration import LCAProblemConfigurator
+from lca_modeller.io.configuration import LCAProblemConfigurator
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from .resources.constants import METHODS_TO_FILE, LCA_PREFIX
@@ -113,9 +113,7 @@ class LCACore(om.ExplicitComponent):
         if self.options["component_level_breakdown"]:
             self.axis.append("component")
 
-        _, self.model, self.methods = LCAProblemConfigurator(lca_conf_file_path).generate(
-            reset=False
-        )
+        _, self.model, self.methods = LCAProblemConfigurator(lca_conf_file_path).generate()
 
         # noinspection PyProtectedMember
         self.lambdas_dict = {

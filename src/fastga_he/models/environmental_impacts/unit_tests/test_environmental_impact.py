@@ -7,7 +7,7 @@ import pathlib
 
 import pytest
 
-from lcav.gui.plots import process_tree
+from lca_modeller.gui.plots import process_tree
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lca import LCA
