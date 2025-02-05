@@ -66,3 +66,13 @@ while :math:`A_{cross}` refers to the tank's inner cross-sectional area.
     V_{cap} = \frac{\pi D_{inner}^3}{6} \\
     A_{cross} = \frac{\pi D_{inner}^2}{4}
 
+*******************************
+Component Computation Structure
+*******************************
+| This `performance N2 diagram <../../../../../../../n2/n2_performance_gh2_tank.html>`_ demonstrates the connections of each performance computations and the calculation order in this component.
+
+| This `sizing N2 diagram <../../../../../../../n2/n2_sizing_gh2_tank.html>`_ demonstrates the connections of each sizing computations and the calculation order in this component.
+
+
+
+
