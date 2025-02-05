@@ -1,4 +1,4 @@
-.. _assumptions-gaseous_hydrogen_tank:
+.. _assumptions-gaseous-hydrogen-tank:
 
 =================================
 Gaseous Hydrogen Tank assumptions
