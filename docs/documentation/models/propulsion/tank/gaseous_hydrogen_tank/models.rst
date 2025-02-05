@@ -69,9 +69,14 @@ while :math:`A_{cross}` refers to the tank's inner cross-sectional area.
 *******************************
 Component Computation Structure
 *******************************
-| This `performance N2 diagram <../../../../../../../n2/n2_performance_gh2_tank.html>`_ demonstrates the connections of each performance computations and the calculation order in this component.
+The following two links are the N2 diagrams representing the performance and sizing computation
+in gaseous hydrogen tank component.
 
-| This `sizing N2 diagram <../../../../../../../n2/n2_sizing_gh2_tank.html>`_ demonstrates the connections of each sizing computations and the calculation order in this component.
+.. raw:: html
+
+   <a href="../../../../../../../n2/n2_performance_gh2_tank.html" target="_blank">Gaseous hydrogen tank performance N2 diagram</a><br>
+   <a href="../../../../../../../n2/n2_sizing_gh2_tank.html" target="_blank">Gaseous hydrogen tank sizing N2 diagram</a>
+
 
 
 
