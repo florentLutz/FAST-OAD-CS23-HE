@@ -28,6 +28,7 @@ NAME_TO_UNIT = {
     "OWE": "kg",
     "energy": "W*h",
     "cargo_transport": "t*km",
+    "material": None,
 }
 
 

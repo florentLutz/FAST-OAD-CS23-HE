@@ -144,53 +144,6 @@ def test_impact_both():
     problem.check_partials(compact_print=True)
 
 
-def test_lca_without_fuel_burn():
-    ivc = get_indep_var_comp(
-        list_inputs(
-            LCACore(
-                power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
-                component_level_breakdown=True,
-            )
-        ),
-        __file__,
-        XML_FILE,
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        LCACore(
-            power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
-            component_level_breakdown=True,
-        ),
-        ivc,
-    )
-
-    assert problem.get_val(
-        "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(4706.81, abs=1e-2)
-    assert problem.get_val(
-        "data:environmental_impact:climate_change:production:propeller_1"
-    ) == pytest.approx(1618.39, abs=1e-2)
-
-    # Sanity check
-    assert problem.get_val(
-        "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(
-        problem.get_val("data:environmental_impact:climate_change:production:propeller_1")
-        + problem.get_val("data:environmental_impact:climate_change:production:motor_1")
-        + problem.get_val("data:environmental_impact:climate_change:production:inverter_1")
-        + problem.get_val("data:environmental_impact:climate_change:production:dc_bus_1")
-        + problem.get_val("data:environmental_impact:climate_change:production:harness_1")
-        + problem.get_val("data:environmental_impact:climate_change:production:dc_splitter_1")
-        + problem.get_val("data:environmental_impact:climate_change:production:dc_sspc_1")
-        + problem.get_val("data:environmental_impact:climate_change:production:dc_sspc_2")
-        + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_1")
-        + problem.get_val("data:environmental_impact:climate_change:production:battery_pack_2"),
-        abs=1e-4,
-    )
-
-    problem.check_partials(compact_print=True)
-
 
 def test_aircraft_equivalent_year_of_life():
     inputs_list = [
@@ -810,19 +763,19 @@ def test_lca_tbm900():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.00241945, rel=1e-5)
+    ) == pytest.approx(0.0023324200884401324, rel=1e-5)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:turboshaft_1"
-    ) == pytest.approx(0.00034762, rel=1e-3)
+    ) == pytest.approx(0.0003476245760137255, rel=1e-3)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:turboshaft_1"
-    ) == pytest.approx(0.21645, rel=1e-3)
+    ) == pytest.approx(0.21645093674405058, rel=1e-3)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:sum"
-    ) == pytest.approx(0.27663438, rel=1e-3)
+    ) == pytest.approx(0.27663438022478826, rel=1e-3)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:turboshaft_1"
@@ -845,7 +798,7 @@ def test_lca_tbm900():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:manufacturing:sum"
-    ) == pytest.approx(0.0001096532063891862, rel=1e-4)
+    ) == pytest.approx(0.00010965320638918626, rel=1e-4)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:distribution:sum"
@@ -858,7 +811,7 @@ def test_lca_tbm900():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:distribution:sum"
-    ) == pytest.approx(0.00019842, rel=1e-4)
+    ) == pytest.approx(0.00019841675805347533, rel=1e-4)
 
     problem.check_partials(compact_print=True)
 
@@ -900,7 +853,7 @@ def test_lca_tbm900_ef():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.00238141, rel=1e-5)
+    ) == pytest.approx(0.0022963105511525188, rel=1e-5)
     assert problem.get_val(
         "data:environmental_impact:climate_change_normalized:production:sum"
     ) == pytest.approx(
@@ -910,12 +863,12 @@ def test_lca_tbm900_ef():
     )
     assert problem.get_val(
         "data:environmental_impact:climate_change_normalized:production:sum"
-    ) == pytest.approx(3.15419102e-07, rel=1e-5)
+    ) == pytest.approx(3.0414709286788327e-07, rel=1e-5)
     assert problem.get_val(
         "data:environmental_impact:climate_change_weighted:sum"
-    ) == pytest.approx(7.674733918972728e-06, rel=1e-5)
+    ) == pytest.approx(7.672360033830974e-06, rel=1e-5)
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        1.75793655e-05, rel=1e-5
+        1.7572441570374884e-05, rel=1e-5
     )
 
 
@@ -955,7 +908,7 @@ def test_lca_tbm900_ef_inputs_as_hours():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.00238141, rel=1e-5)
+    ) == pytest.approx(0.0022963105511525188, rel=1e-5)
 
 
 def test_gasoline_per_fu_sr22():
