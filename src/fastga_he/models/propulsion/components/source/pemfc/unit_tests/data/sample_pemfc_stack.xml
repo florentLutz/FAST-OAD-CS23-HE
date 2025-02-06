@@ -1,0 +1,70 @@
+<FASTOAD_model>
+    <data>
+        <aerodynamics>
+          <cruise>
+              <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
+              <unit_reynolds units="1/m" is_input="False">2948053.940803294<!--unitary reynolds number representative of high speed aerodynamics--></unit_reynolds>
+          </cruise>
+          <low_speed>
+            <mach is_input="False">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
+            <unit_reynolds units="1/m" is_input="False">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
+          </low_speed>
+            <fuselage>
+                <cruise>
+                  <CD0 is_input="False">0.01194819286123646<!--profile drag coefficient for fuselage in cruise conditions--></CD0>
+                </cruise>
+                <low_speed>
+                  <CD0 is_input="False">0.012114342193164637<!--profile drag coefficient for fuselage in low speed conditions--></CD0>
+                </low_speed>
+            </fuselage>
+        </aerodynamics>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
+                <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+                <root>
+                    <chord units="m" is_input="False">0.7672311779752663<!--chord length at wing root--></chord>
+                </root>
+                <tip>
+                    <chord units="m" is_input="False">0.7672311779752663<!--chord length at wing tip--></chord>
+                </tip>
+                <span units="m" is_input="False">9.237463382822208<!--wing span--></span>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <pemfc_stack>
+                    <pemfc_stack_1>
+                        <max_power_density units="kW/kg">0.345</max_power_density>
+                        <number_of_layers>35.0</number_of_layers>
+                        <effective_area units="cm**2">16.8</effective_area>
+                        <operation_pressure units="atm">1.2</operation_pressure>
+                        <dimension>
+                            <length units="m">0.11998</length>
+                            <width units="m">0.1162</width>
+                            <height units="m">0.1162</height>
+                        </dimension>
+                        <volume units="L">1.62</volume>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                    </pemfc_stack_1>
+                </pemfc_stack>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
