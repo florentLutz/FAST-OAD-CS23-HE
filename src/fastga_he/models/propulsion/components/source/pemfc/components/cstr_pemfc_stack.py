@@ -23,7 +23,6 @@ class ConstraintsPEMFCStack(om.Group):
         )
 
     def setup(self):
-
         option_pemfc_stack_id = {"pemfc_stack_id": self.options["pemfc_stack_id"]}
 
         self.add_subsystem(

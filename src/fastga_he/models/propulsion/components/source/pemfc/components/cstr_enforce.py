@@ -9,9 +9,9 @@ from ..constants import SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA
 
 import fastoad.api as oad
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA
-] = "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.enforce"
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = (
+    "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.enforce"
+)
 
 MAX_CURRENT_DENSITY = 0.7  # A/cm^2
 
@@ -27,7 +27,6 @@ class ConstraintsEffectiveAreaEnforce(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -36,7 +35,6 @@ class ConstraintsEffectiveAreaEnforce(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
@@ -60,7 +58,6 @@ class ConstraintsEffectiveAreaEnforce(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs[

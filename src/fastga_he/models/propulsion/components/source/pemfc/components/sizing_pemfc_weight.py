@@ -10,9 +10,9 @@ import fastoad.api as oad
 FC_WEIGHT_DENSITY = 8.5034  # kg/m^2
 DEFAULT_FC_POWER_DENSITY = 0.345  # kW/kg
 
-oad.RegisterSubmodel.active_models[
-    SUBMODEL_SIZING_PEMFC_WEIGHT
-] = "fastga_he.submodel.propulsion.sizing.pemfc.weight.base"
+oad.RegisterSubmodel.active_models[SUBMODEL_SIZING_PEMFC_WEIGHT] = (
+    "fastga_he.submodel.propulsion.sizing.pemfc.weight.base"
+)
 
 
 @oad.RegisterSubmodel(
@@ -26,7 +26,6 @@ class SizingPEMFCWeightAerostak200W(om.ExplicitComponent):
 
     # TODO: Adding another way of mass estimation from D.Juschus
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -35,7 +34,6 @@ class SizingPEMFCWeightAerostak200W(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
@@ -61,7 +59,6 @@ class SizingPEMFCWeightAerostak200W(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":mass"] = (
@@ -75,7 +72,6 @@ class SizingPEMFCWeightAerostak200W(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         partials[
@@ -109,7 +105,6 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -118,7 +113,6 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
@@ -152,7 +146,6 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         adjust_factor = (
@@ -176,7 +169,6 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         adjust_factor = (
             DEFAULT_FC_POWER_DENSITY

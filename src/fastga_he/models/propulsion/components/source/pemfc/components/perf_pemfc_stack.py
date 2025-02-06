@@ -9,7 +9,8 @@ import fastoad.api as oad
 from ..components.perf_direct_bus_connection import PerformancesPEMFCDirectBusConnection
 from ..components.perf_pemfc_power import PerformancesPEMFCPower
 from ..components.perf_pemfc_power_density import PerformancesPEMFCPowerDensity
-from ..components.perf_maximum import PerformancesMaximum
+from ..components.perf_maximum_current import PerformancesMaximumCurrent
+from ..components.perf_maximum_power import PerformancesMaximumPower
 from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
 from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
 from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY
@@ -24,7 +25,6 @@ from ..components.perf_analytical_voltage_adjustment import PerformancesAnalytic
 
 class PerformancesPEMFCStack(om.Group):
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -43,7 +43,6 @@ class PerformancesPEMFCStack(om.Group):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
         direct_bus_connection = self.options["direct_bus_connection"]
@@ -55,12 +54,6 @@ class PerformancesPEMFCStack(om.Group):
         option_max_power_density = {
             "pemfc_stack_id": pemfc_stack_id,
         }
-
-        self.add_subsystem(
-            "maximum",
-            PerformancesMaximum(number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id),
-            promotes=["*"],
-        )
 
         self.add_subsystem(
             "pemfc_current_density",
@@ -106,14 +99,6 @@ class PerformancesPEMFCStack(om.Group):
             promotes=["*"],
         )
 
-        self.add_subsystem(
-            name="maximum_power_density",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY, options=option_max_power_density
-            ),
-            promotes=["*"],
-        )
-
         if self.options["direct_bus_connection"]:
             self.add_subsystem(
                 "direct_bus_connection",
@@ -148,8 +133,32 @@ class PerformancesPEMFCStack(om.Group):
         )
 
         self.add_subsystem(
+            "maximum_power",
+            PerformancesMaximumPower(
+                number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
+            ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
             "pemfc_power_density",
             PerformancesPEMFCPowerDensity(
+                number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
+            ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="maximum_power_density",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY, options=option_max_power_density
+            ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "maximum_current",
+            PerformancesMaximumCurrent(
                 number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
             ),
             promotes=["*"],

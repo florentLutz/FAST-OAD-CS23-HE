@@ -23,7 +23,6 @@ class PerformancesPEMFCVoltage(om.ExplicitComponent):
         self.output_name = "voltage_out"
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -42,7 +41,6 @@ class PerformancesPEMFCVoltage(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
 

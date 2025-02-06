@@ -21,7 +21,6 @@ class SizingPEMFCStack(om.Group):
     """Class that regroups all the subcomponents for the sizing of the PEMFC stack."""
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -38,7 +37,6 @@ class SizingPEMFCStack(om.Group):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
         option_weight = {

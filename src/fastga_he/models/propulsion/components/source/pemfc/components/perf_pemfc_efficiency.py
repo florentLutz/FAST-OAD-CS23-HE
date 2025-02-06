@@ -16,7 +16,6 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -32,7 +31,6 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -75,7 +73,6 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         e0 = self.options["pemfc_theoretical_electric_potential"]
         pressure_coeff = self.options["pressure coefficient"]
         operation_pressure = inputs["operation_pressure"]
@@ -96,14 +93,17 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
         nominal_pressure = inputs["nominal_pressure"]
         e = e0 + pressure_coeff * np.log(operation_pressure / nominal_pressure)
 
-        partials["efficiency", "single_layer_pemfc_voltage",] = (
-            np.ones(number_of_points) / e
-        )
+        partials[
+            "efficiency",
+            "single_layer_pemfc_voltage",
+        ] = np.ones(number_of_points) / e
 
-        partials["efficiency", "operation_pressure",] = (
-            -pressure_coeff * inputs["single_layer_pemfc_voltage"] / (operation_pressure * e ** 2)
-        )
+        partials[
+            "efficiency",
+            "operation_pressure",
+        ] = -pressure_coeff * inputs["single_layer_pemfc_voltage"] / (operation_pressure * e**2)
 
-        partials["efficiency", "nominal_pressure",] = (
-            pressure_coeff * inputs["single_layer_pemfc_voltage"] / (nominal_pressure * e ** 2)
-        )
+        partials[
+            "efficiency",
+            "nominal_pressure",
+        ] = pressure_coeff * inputs["single_layer_pemfc_voltage"] / (nominal_pressure * e**2)

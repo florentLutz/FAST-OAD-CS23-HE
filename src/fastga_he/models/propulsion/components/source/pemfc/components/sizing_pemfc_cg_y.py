@@ -14,7 +14,6 @@ class SizingPEMFCCGY(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -31,7 +30,6 @@ class SizingPEMFCCGY(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
 
@@ -46,7 +44,6 @@ class SizingPEMFCCGY(om.ExplicitComponent):
         )
 
         if position == "wing_pod":
-
             self.add_input(
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y_ratio",
                 val=np.nan,
@@ -56,12 +53,10 @@ class SizingPEMFCCGY(om.ExplicitComponent):
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
 
         if position == "wing_pod":
-
             outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
                 * inputs[
@@ -71,16 +66,13 @@ class SizingPEMFCCGY(om.ExplicitComponent):
             )
 
         else:
-
             outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
 
         if position == "wing_pod":
-
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y",
                 "data:geometry:wing:span",
@@ -94,6 +86,4 @@ class SizingPEMFCCGY(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y_ratio",
-            ] = (
-                inputs["data:geometry:wing:span"] / 2.0
-            )
+            ] = inputs["data:geometry:wing:span"] / 2.0

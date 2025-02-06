@@ -18,7 +18,6 @@ class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -30,7 +29,6 @@ class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
@@ -84,7 +82,6 @@ class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs["fuel_consumption"] = (
@@ -100,7 +97,6 @@ class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
 

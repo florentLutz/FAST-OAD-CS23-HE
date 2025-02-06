@@ -16,7 +16,6 @@ class PerformancesOperationTemperature(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -28,7 +27,6 @@ class PerformancesOperationTemperature(om.ExplicitComponent):
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input("altitude", units="m", val=np.zeros(number_of_points))
@@ -48,11 +46,9 @@ class PerformancesOperationTemperature(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         outputs["operation_temperature"] = AtmosphereWithPartials(inputs["altitude"]).temperature
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials["operation_temperature", "altitude"] = AtmosphereWithPartials(
             inputs["altitude"]
         ).partial_temperature_altitude

@@ -22,7 +22,6 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -40,7 +39,6 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
 
@@ -79,13 +77,11 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
         )
 
         if position == "underbelly":
-
             self.add_input("data:geometry:fuselage:maximum_width", val=np.nan, units="m")
 
         self.declare_partials(of="*", wrt="*")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
 
@@ -93,7 +89,7 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
             ]
-            / DIMENSION_RATIO ** 2
+            / DIMENSION_RATIO**2
         )
 
         outputs[
@@ -106,21 +102,19 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
         )
 
         if position in "underbelly":
-
             _LOGGER.warning(
                 msg="Position Underbelly, Fuel cell height and width adjusted for better fitting !!"
             )
 
             outputs[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width"
-            ] = (UNDERBELLY_RATIO * inputs["data:geometry:fuselage:maximum_width"])
+            ] = UNDERBELLY_RATIO * inputs["data:geometry:fuselage:maximum_width"]
 
             outputs[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:height"
             ] = pemfc_area / (UNDERBELLY_RATIO * inputs["data:geometry:fuselage:maximum_width"])
 
         else:
-
             outputs[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:height"
             ] = np.sqrt(pemfc_area)
@@ -130,7 +124,6 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
             ] = np.sqrt(pemfc_area)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
 
@@ -138,7 +131,7 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
             ]
-            / DIMENSION_RATIO ** 2
+            / DIMENSION_RATIO**2
         )
 
         partials[
@@ -147,7 +140,6 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
         ] = LENGTH_LAYER_RATIO
 
         if position in "underbelly":
-
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
                 "data:geometry:fuselage:maximum_width",
@@ -159,7 +151,7 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
                 + ":dimension:height",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
             ] = 1 / (
-                DIMENSION_RATIO ** 2
+                DIMENSION_RATIO**2
                 * UNDERBELLY_RATIO
                 * inputs["data:geometry:fuselage:maximum_width"]
             )
@@ -174,7 +166,6 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
             )
 
         else:
-
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
@@ -184,7 +175,7 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
                     + pemfc_stack_id
                     + ":effective_area"
                 ]
-                * DIMENSION_RATIO ** 2
+                * DIMENSION_RATIO**2
             )
 
             partials[
@@ -198,5 +189,5 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
                     + pemfc_stack_id
                     + ":effective_area"
                 ]
-                * DIMENSION_RATIO ** 2
+                * DIMENSION_RATIO**2
             )

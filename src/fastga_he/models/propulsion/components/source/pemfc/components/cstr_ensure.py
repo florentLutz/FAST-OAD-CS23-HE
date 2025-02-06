@@ -24,7 +24,6 @@ class ConstraintsEffectiveAreaEnsure(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
@@ -33,7 +32,6 @@ class ConstraintsEffectiveAreaEnsure(om.ExplicitComponent):
         )
 
     def setup(self):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
@@ -75,7 +73,6 @@ class ConstraintsEffectiveAreaEnsure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs[

@@ -13,13 +13,11 @@ class PerformancesAnalyticalVoltageAdjustment(om.ExplicitComponent):
     """
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -42,14 +40,13 @@ class PerformancesAnalyticalVoltageAdjustment(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         p = inputs["operation_pressure"]
         outputs["analytical_voltage_adjust_factor"] = (
-            -0.022830 * p ** 4 + 0.230982 * p ** 3 - 0.829603 * p ** 2 + 1.291515 * p + 0.329935
+            -0.022830 * p**4 + 0.230982 * p**3 - 0.829603 * p**2 + 1.291515 * p + 0.329935
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         p = inputs["operation_pressure"]
         partials["analytical_voltage_adjust_factor", "operation_pressure"] = (
-            -0.022830 * 4 * p ** 3 + 0.230982 * 3 * p ** 2 - 0.829603 * 2 * p + 1.291515
+            -0.022830 * 4 * p**3 + 0.230982 * 3 * p**2 - 0.829603 * 2 * p + 1.291515
         )
