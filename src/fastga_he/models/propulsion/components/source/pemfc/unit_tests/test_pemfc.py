@@ -373,7 +373,7 @@ def test_analytical_voltage_adjustment():
     problem.check_partials(compact_print=True)
 
 
-def test_single_layer_voltage_statistical():
+def test_single_layer_voltage_simple():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fc_current_density",

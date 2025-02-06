@@ -49,5 +49,5 @@ class PerformancesAnalyticalVoltageAdjustment(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         p = inputs["operation_pressure"]
         partials["analytical_voltage_adjust_factor", "operation_pressure"] = (
-            -0.022830 * 4 * p**3 + 0.230982 * 3 * p**2 - 0.829603 * 2 * p + 1.291515
+            -0.09132 * p**3 + 0.692946 * p**2 - 1.659206 * p + 1.291515
         )

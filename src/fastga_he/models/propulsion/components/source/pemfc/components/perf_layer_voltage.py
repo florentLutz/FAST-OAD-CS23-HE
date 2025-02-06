@@ -101,8 +101,14 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
             val=np.full(number_of_points, DEFAULT_LAYER_VOLTAGE),
         )
 
+        self.add_output(
+            "hydrogen_reactant_pressure",
+            units="atm",
+            val=DEFAULT_PRESSURE_ATM,
+        )
+
         self.declare_partials(
-            of="*",
+            of="single_layer_pemfc_voltage",
             wrt=["fc_current_density", "operation_pressure"],
             method="exact",
             rows=np.arange(number_of_points),
@@ -110,12 +116,14 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="*",
+            of="single_layer_pemfc_voltage",
             wrt="nominal_pressure",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
         )
+
+        self.declare_partials(of="hydrogen_reactant_pressure", wrt="nominal_pressure", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         voc = self.options["open_circuit_voltage"]
@@ -145,6 +153,8 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
             - m * np.exp(n * i)
             + pressure_coeff * pressure_ratio_log
         )
+        # This output is to for tank connection
+        outputs["hydrogen_reactant_pressure"] = nominal_pressure
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         active_loss_coeff = self.options["activation_loss_coefficient"]
