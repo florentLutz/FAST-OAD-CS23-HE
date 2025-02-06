@@ -92,7 +92,7 @@ def test_total_hydrogen_gas_mission():
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:fuel_total_mission",
         units="kg",
-    ) == pytest.approx(1.03, rel=1e-2)
+    ) == pytest.approx(1.0309, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
