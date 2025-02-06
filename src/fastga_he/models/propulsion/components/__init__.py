@@ -56,17 +56,14 @@ from .connectors.planetary_gear import (
     PreLCAPlanetaryGear,
 )
 from .connectors.gearbox import SizingGearbox, PerformancesGearbox, SlipstreamGearbox, PreLCAGearbox
-
 from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM, PreLCAPMSM
 from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
-
 from .propulsor.propeller import (
     SizingPropeller,
     PerformancesPropeller,
     SlipstreamPropeller,
     PreLCAPropeller,
 )
-
 from .source.battery import (
     SizingBatteryPack,
     PerformancesBatteryPack,
@@ -98,4 +95,9 @@ from .tanks.fuel_tanks import (
     PerformancesFuelTank,
     SlipstreamFuelTank,
     PreLCAFuelTank,
+)
+from .tanks.gaseous_hydrogen_tank import (
+    SizingGaseousHydrogenTank,
+    PerformancesGaseousHydrogenTank,
+    SlipstreamGaseousHydrogenTank,
 )
