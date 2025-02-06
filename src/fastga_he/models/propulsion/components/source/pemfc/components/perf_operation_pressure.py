@@ -10,6 +10,7 @@ DEFAULT_PRESSURE = 101325.0
 
 
 class PerformancesOperationPressure(om.ExplicitComponent):
+    # TODO: Edit citation after rebase
     """
     Computation of the ambient pressure that PEMFC is working based on altitude only applied to the model
     from: `Fuel Cell and Battery Hybrid System Optimization by J. Hoogendoorn:2018`

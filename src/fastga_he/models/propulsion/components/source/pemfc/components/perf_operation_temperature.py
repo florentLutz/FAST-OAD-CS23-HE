@@ -10,6 +10,7 @@ DEFAULT_TEMPERATURE = 300.0
 
 
 class PerformancesOperationTemperature(om.ExplicitComponent):
+    # TODO: Edit citation after rebase
     """
     Computation of the ambient temperature that PEMFC is working based on altitude only applied to the model
     from: `Preliminary Propulsion System Sizing Methods for PEM Fuel Cell Aircraft by D.Juschus:2021`

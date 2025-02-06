@@ -12,6 +12,7 @@ NUMBER_OF_ELETRONS_FROM_H2 = 2.0
 
 
 class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
+    # TODO: Edit citation after rebase
     """
     Computation of the hydrogen consumption for the required power. Simply based on the
     results of the currrent density and effective area

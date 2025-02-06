@@ -12,19 +12,20 @@ DEFAULT_PRESSURE_ATM = 1.0
 DEFAULT_TEMPERATURE = 288.15
 
 oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE] = (
-    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.statistical"
+    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple"
 )
 
 
 @oad.RegisterSubmodel(
     SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE,
-    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.statistical",
+    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple",
 )
-class PerformancesSinglePEMFCVoltageStatistical(om.ExplicitComponent):
+class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
+    # TODO: Edit citation after rebase
     """
     Computation of the voltage of single layer proton exchange membrane fuel cell inside one stack. Assumes it can be
-    estimated with the i-v curve relation. Model based on existing pemfc, Aerostack Ultralight 200, details can be found in:
-    cite:`Fuel Cell and Battery Hybrid System Optimization by J. Hoogendoorn:2018`.
+    estimated with the i-v curve relation. Model based on existing pemfc, Aerostack Ultralight 200, details can be found
+    in :cite:`Fuel Cell and Battery Hybrid System Optimization by J. Hoogendoorn:2018`.
     """
 
     def initialize(self):

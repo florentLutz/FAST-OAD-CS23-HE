@@ -6,6 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
+# TODO: Edit citation after rebase
 class SizingPEMFCVolume(om.ExplicitComponent):
     """
     Computation of the volume the PEMFC based on number of layers.

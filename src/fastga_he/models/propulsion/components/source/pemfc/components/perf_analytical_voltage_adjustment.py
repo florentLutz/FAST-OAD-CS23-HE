@@ -7,6 +7,7 @@ import numpy as np
 
 
 class PerformancesAnalyticalVoltageAdjustment(om.ExplicitComponent):
+    # TODO: Edit citation after rebase
     """
     Computation of PEMFC voltage based on cathode pressure in different altitude
     from:`Preliminary Propulsion System Sizing Methods for PEM Fuel Cell Aircraft by D.Juschus:2021`
