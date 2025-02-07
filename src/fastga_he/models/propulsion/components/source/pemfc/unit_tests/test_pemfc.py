@@ -26,12 +26,13 @@ from ..components.perf_maximum_current import PerformancesMaximumCurrent
 from ..components.perf_maximum_power import PerformancesMaximumPower
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
 from ..components.perf_pemfc_power import PerformancesPEMFCPower
-from ..components.perf_pemfc_power_density import PerformancesPEMFCPowerDensity
+from ..components.perf_pemfc_specific_power import PerformancesPEMFCSpecificPower
 from ..components.perf_pemfc_voltage import PerformancesPEMFCVoltage
 from ..components.perf_operation_pressure import PerformancesOperationPressure
-from ..components.perf_pemfc_expect_power_density import PerformancesPEMFCMaxPowerDensityAerostak
-from ..components.perf_pemfc_expect_power_density import (
-    PerformancesPEMFCMaxPowerDensityIntelligentEnergy,
+from ..components.perf_operation_temperature import PerformancesOperationTemperature
+from ..components.perf_pemfc_expect_specific_power import PerformancesPEMFCMaxSpecificPowerAerostak
+from ..components.perf_pemfc_expect_specific_power import (
+    PerformancesPEMFCMaxSpecificPowerIntelligentEnergy,
 )
 from ..components.perf_analytical_voltage_adjustment import PerformancesAnalyticalVoltageAdjustment
 
@@ -355,6 +356,26 @@ def test_operation_pressure():
     problem.check_partials(compact_print=True)
 
 
+def test_operation_temperature():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "altitude",
+        units="m",
+        val=np.zeros(NB_POINTS_TEST),
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesOperationTemperature(
+            pemfc_stack_id="pemfc_stack_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+    assert problem.get_val("operation_temperature", units="K") == pytest.approx(
+        [288.15] * int(NB_POINTS_TEST), rel=1e-2
+    )
+    problem.check_partials(compact_print=True)
+
+
 def test_analytical_voltage_adjustment():
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -536,7 +557,7 @@ def test_maximum_power():
     problem.check_partials(compact_print=True)
 
 
-def test_max_power_density_aerostak():
+def test_max_specific_power_aerostak():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -547,20 +568,20 @@ def test_max_power_density_aerostak():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCMaxPowerDensityAerostak(pemfc_stack_id="pemfc_stack_1"),
+        PerformancesPEMFCMaxSpecificPowerAerostak(pemfc_stack_id="pemfc_stack_1"),
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:max_power_density", units="kW/kg"
+        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:max_specific_power", units="kW/kg"
     ) == pytest.approx(
-        0.401,
+        0.4677,
         rel=1e-2,
     )
 
     problem.check_partials(compact_print=True)
 
 
-def test_max_power_density_intelligent_energy():
+def test_max_specific_power_intelligent_energy():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -571,11 +592,11 @@ def test_max_power_density_intelligent_energy():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCMaxPowerDensityIntelligentEnergy(pemfc_stack_id="pemfc_stack_1"),
+        PerformancesPEMFCMaxSpecificPowerIntelligentEnergy(pemfc_stack_id="pemfc_stack_1"),
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:max_power_density", units="kW/kg"
+        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:max_specific_power", units="kW/kg"
     ) == pytest.approx(
         2.06,
         rel=1e-2,
@@ -607,7 +628,7 @@ def test_pemfc_power():
     problem.check_partials(compact_print=True)
 
 
-def test_pemfc_power_density():
+def test_pemfc_specifc_power():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "power_out",
@@ -620,12 +641,12 @@ def test_pemfc_power_density():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCPowerDensity(
+        PerformancesPEMFCSpecificPower(
             number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
         ),
         ivc,
     )
-    assert problem.get_val("power_density", units="kW/kg") == pytest.approx(
+    assert problem.get_val("specific_power", units="kW/kg") == pytest.approx(
         [0.802, 0.786, 0.77, 0.76, 0.75, 0.74, 0.734, 0.726, 0.72, 0.714],
         rel=1e-2,
     )

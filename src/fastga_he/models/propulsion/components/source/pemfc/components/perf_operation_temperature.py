@@ -47,9 +47,11 @@ class PerformancesOperationTemperature(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["operation_temperature"] = AtmosphereWithPartials(inputs["altitude"]).temperature
+        outputs["operation_temperature"] = AtmosphereWithPartials(
+            inputs["altitude"], altitude_in_feet=False
+        ).temperature
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         partials["operation_temperature", "altitude"] = AtmosphereWithPartials(
-            inputs["altitude"]
+            inputs["altitude"], altitude_in_feet=False
         ).partial_temperature_altitude

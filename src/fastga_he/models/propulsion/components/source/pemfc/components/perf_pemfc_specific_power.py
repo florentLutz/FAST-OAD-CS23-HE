@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesPEMFCPowerDensity(om.ExplicitComponent):
+class PerformancesPEMFCSpecificPower(om.ExplicitComponent):
     """
     Computation of the power provide per kilogram of pemfc. As of when I wrote this, it will only
     be used as a post-processing value
@@ -36,7 +36,7 @@ class PerformancesPEMFCPowerDensity(om.ExplicitComponent):
 
         self.add_input("power_out", units="kW", val=np.full(number_of_points, np.nan))
 
-        self.add_output("power_density", units="kW/kg", val=np.full(number_of_points, 5.0))
+        self.add_output("specific_power", units="kW/kg", val=np.full(number_of_points, 5.0))
 
         self.declare_partials(
             of="*",
@@ -57,7 +57,7 @@ class PerformancesPEMFCPowerDensity(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
-        outputs["power_density"] = (
+        outputs["specific_power"] = (
             inputs["power_out"]
             / inputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":mass"]
         )
@@ -66,12 +66,12 @@ class PerformancesPEMFCPowerDensity(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
-        partials["power_density", "power_out"] = (
+        partials["specific_power", "power_out"] = (
             np.ones(number_of_points)
             / inputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":mass"]
         )
         partials[
-            "power_density",
+            "specific_power",
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":mass",
         ] = (
             -inputs["power_out"]

@@ -5,22 +5,24 @@
 import openmdao.api as om
 import numpy as np
 import fastoad.api as oad
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY
+from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER
 
-MAX_PEMFC_POWER_DENSITY = 2.06  # kW/kg
+MAX_PEMFC_SPECIFIC_POWER = 2.06  # kW/kg
 
-oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY] = (
-    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.aerostak"
+oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER] = (
+    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.aerostak"
 )
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY,
-    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.aerostak",
+    SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER,
+    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.aerostak",
 )
-class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
+class PerformancesPEMFCMaxSpecificPowerAerostak(om.ExplicitComponent):
+    # TODO:Proper citation after rebase
     """
     Computation of the max power provide per kilogram of pemfc. Applied in weight calculation
+    Source: H3D_H2_UnmannedAviation_Brochure 2024.pptx
     """
 
     def initialize(self):
@@ -44,7 +46,7 @@ class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:pemfc_stack:"
             + pemfc_stack_id
-            + ":max_power_density",
+            + ":max_specific_power",
             units="kW/kg",
             val=0.3,
         )
@@ -62,11 +64,11 @@ class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max"
         ]
 
-        unclipped_power_density = 0.0344 * np.log(power_max) + 0.4564
+        unclipped_specific_power = 0.0845 * np.log(power_max) + 0.6037
 
         outputs[
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_power_density"
-        ] = np.clip(unclipped_power_density, 0.05, MAX_PEMFC_POWER_DENSITY)
+            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_specific_power"
+        ] = np.clip(unclipped_specific_power, 0.05, MAX_PEMFC_SPECIFIC_POWER)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
@@ -74,28 +76,31 @@ class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max"
         ]
 
-        unclipped_power_density = 0.0344 * np.log(power_max) + 0.4564
-        if unclipped_power_density <= MAX_PEMFC_POWER_DENSITY and unclipped_power_density >= 0.05:
+        unclipped_specific_power = 0.0845 * np.log(power_max) + 0.6037
+        if (
+            unclipped_specific_power <= MAX_PEMFC_SPECIFIC_POWER
+            and unclipped_specific_power >= 0.05
+        ):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
-                + ":max_power_density",
+                + ":max_specific_power",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max",
-            ] = 0.0344 / power_max
+            ] = 0.0845 / power_max
         else:
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
-                + ":max_power_density",
+                + ":max_specific_power",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max",
             ] = 0.0
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY,
-    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.intelligent_energy",
+    SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER,
+    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.intelligent_energy",
 )
-class PerformancesPEMFCMaxPowerDensityIntelligentEnergy(om.ExplicitComponent):
+class PerformancesPEMFCMaxSpecificPowerIntelligentEnergy(om.ExplicitComponent):
     """
     Computation of the max power provide per kilogram of pemfc. Applied in weight calculation
     """
@@ -121,7 +126,7 @@ class PerformancesPEMFCMaxPowerDensityIntelligentEnergy(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:pemfc_stack:"
             + pemfc_stack_id
-            + ":max_power_density",
+            + ":max_specific_power",
             units="kW/kg",
             val=1.0,
         )
@@ -139,16 +144,16 @@ class PerformancesPEMFCMaxPowerDensityIntelligentEnergy(om.ExplicitComponent):
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max"
         ]
 
-        unclipped_power_density = 0.27775 * np.log(power_max) + 1.598
+        unclipped_specific_power = 0.27775 * np.log(power_max) + 1.598
 
         outputs[
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_power_density"
-        ] = np.clip(unclipped_power_density, 0.05, MAX_PEMFC_POWER_DENSITY)
+            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_specific_power"
+        ] = np.clip(unclipped_specific_power, 0.05, MAX_PEMFC_SPECIFIC_POWER)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
-        unclipped_power_density = (
+        unclipped_specific_power = (
             0.27775
             * np.log(
                 inputs[
@@ -158,11 +163,14 @@ class PerformancesPEMFCMaxPowerDensityIntelligentEnergy(om.ExplicitComponent):
             + 1.598
         )
 
-        if unclipped_power_density <= MAX_PEMFC_POWER_DENSITY and unclipped_power_density >= 0.05:
+        if (
+            unclipped_specific_power <= MAX_PEMFC_SPECIFIC_POWER
+            and unclipped_specific_power >= 0.05
+        ):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
-                + ":max_power_density",
+                + ":max_specific_power",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max",
             ] = (
                 0.27775
@@ -174,6 +182,6 @@ class PerformancesPEMFCMaxPowerDensityIntelligentEnergy(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
-                + ":max_power_density",
+                + ":max_specific_power",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max",
             ] = 0.0
