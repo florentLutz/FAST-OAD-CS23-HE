@@ -54,22 +54,44 @@ class SizingPEMFCStack(om.Group):
             subsys=ConstraintsPEMFCStack(pemfc_stack_id=pemfc_stack_id),
             promotes=["*"],
         )
-        self.add_subsystem(
-            name="pemfc_dimensions",
-            subsys=SizingPEMFCDimensions(pemfc_stack_id=pemfc_stack_id, position=position),
-            promotes=["*"],
-        )
+
+        if (
+            oad.RegisterSubmodel.active_models.get(SUBMODEL_SIZING_PEMFC_VOLUME)
+            == "fastga_he.submodel.propulsion.sizing.pemfc.volume.base"
+        ):
+            self.add_subsystem(
+                name="pemfc_dimensions",
+                subsys=SizingPEMFCDimensions(pemfc_stack_id=pemfc_stack_id, position=position),
+                promotes=["*"],
+            )
+
+            self.add_subsystem(
+                name="pemfc_volume",
+                subsys=oad.RegisterSubmodel.get_submodel(
+                    SUBMODEL_SIZING_PEMFC_VOLUME, options=option_volume
+                ),
+                promotes=["*"],
+            )
+
+        else:
+            self.add_subsystem(
+                name="pemfc_volume",
+                subsys=oad.RegisterSubmodel.get_submodel(
+                    SUBMODEL_SIZING_PEMFC_VOLUME, options=option_volume
+                ),
+                promotes=["*"],
+            )
+
+            self.add_subsystem(
+                name="pemfc_dimensions",
+                subsys=SizingPEMFCDimensions(pemfc_stack_id=pemfc_stack_id, position=position),
+                promotes=["*"],
+            )
+
         self.add_subsystem(
             name="pemfc_weight",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_SIZING_PEMFC_WEIGHT, options=option_weight
-            ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="pemfc_volume",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_SIZING_PEMFC_VOLUME, options=option_volume
             ),
             promotes=["*"],
         )
