@@ -8,7 +8,7 @@ from ..constants import SUBMODEL_SIZING_PEMFC_WEIGHT
 import fastoad.api as oad
 
 FC_WEIGHT_DENSITY = 8.5034  # kg/m^2
-DEFAULT_FC_POWER_DENSITY = 0.345  # kW/kg
+DEFAULT_FC_SPECIFIC_POWER = 0.345  # kW/kg
 
 oad.RegisterSubmodel.active_models[SUBMODEL_SIZING_PEMFC_WEIGHT] = (
     "fastga_he.submodel.propulsion.sizing.pemfc.weight.base"
@@ -150,7 +150,7 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         adjust_factor = (
-            DEFAULT_FC_POWER_DENSITY
+            DEFAULT_FC_SPECIFIC_POWER
             / inputs[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
@@ -172,7 +172,7 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         adjust_factor = (
-            DEFAULT_FC_POWER_DENSITY
+            DEFAULT_FC_SPECIFIC_POWER
             / inputs[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
@@ -207,7 +207,7 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_power_density",
         ] = (
             -FC_WEIGHT_DENSITY
-            * DEFAULT_FC_POWER_DENSITY
+            * DEFAULT_FC_SPECIFIC_POWER
             * inputs[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers"
             ]

@@ -7,7 +7,7 @@ import fastoad.api as oad
 
 
 from ..constants import SUBMODEL_SIZING_PEMFC_WEIGHT
-from .sizing_pemfc_volume import SizingPEMFCVolume
+from ..constants import SUBMODEL_SIZING_PEMFC_VOLUME
 from .sizing_pemfc_dimensions import SizingPEMFCDimensions
 from .sizing_pemfc_cg_x import SizingPEMFCCGX
 from .sizing_pemfc_cg_y import SizingPEMFCCGY
@@ -42,6 +42,9 @@ class SizingPEMFCStack(om.Group):
         option_weight = {
             "pemfc_stack_id": pemfc_stack_id,
         }
+        option_volume = {
+            "pemfc_stack_id": pemfc_stack_id,
+        }
 
         # It was decided to add the constraints computation at the beginning of the sizing to
         # ensure that both are ran along and to avoid having an additional id to add in the
@@ -65,7 +68,9 @@ class SizingPEMFCStack(om.Group):
         )
         self.add_subsystem(
             name="pemfc_volume",
-            subsys=SizingPEMFCVolume(pemfc_stack_id=pemfc_stack_id),
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_SIZING_PEMFC_VOLUME, options=option_volume
+            ),
             promotes=["*"],
         )
 
