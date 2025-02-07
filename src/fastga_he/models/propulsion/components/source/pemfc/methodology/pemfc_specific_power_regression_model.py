@@ -8,7 +8,7 @@ The specific power is utilized in weight calculation for PEMFC.
 
 import numpy as np
 from scipy import optimize
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 # Data points from the graph
 x = np.array([0.3, 0.8, 1.2, 2.0])
@@ -20,29 +20,44 @@ def log_func(x, a, b):
     return a * np.log(x) + b
 
 
-log_params, _ = optimize.curve_fit(log_func, x, y)
+if __name__ == "__main__":
+    log_params, _ = optimize.curve_fit(log_func, x, y)
 
-y_log = log_func(x, *log_params)
-r2_log = 1 - np.sum((y - y_log) ** 2) / np.sum((y - np.mean(y)) ** 2)
+    y_log = log_func(x, *log_params)
+    r2_log = 1 - np.sum((y - y_log) ** 2) / np.sum((y - np.mean(y)) ** 2)
 
-# Generate points for smooth curves
-x_smooth = np.linspace(min(x), max(x), 100)
+    # Generate points for smooth curves
+    x_smooth = np.linspace(min(x), max(x), 100)
+    y_smooth = log_func(x_smooth, *log_params)
 
-# Plot
-plt.figure(figsize=(10, 6))
-plt.scatter(x, y, color="blue", label="Data points")
-plt.plot(x_smooth, log_func(x_smooth, *log_params), "r-", label=f"Logarithmic (R² = {r2_log:.3f})")
-plt.grid(True)
-plt.xlabel("X")
-plt.ylabel("Y")
-plt.title("Logarithmic Regression")
-plt.legend()
+    # Create interactive plot
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(x=x, y=y, mode="markers", name="Data points", marker=dict(color="blue"))
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=x_smooth,
+            y=y_smooth,
+            mode="lines",
+            name=f"Logarithmic (R² = {r2_log:.3f})",
+            line=dict(color="red"),
+        )
+    )
 
-# Add function text to the plot
-function_text = f"y = {log_params[0]:.4f}ln(x) + {log_params[1]:.4f}"
-plt.text(0.7, 0.5, function_text, fontsize=12, color="blue", ha="left", va="bottom")
+    # Add function text to the plot
+    function_text = f"y = {log_params[0]:.4f}ln(x) + {log_params[1]:.4f}"
+    fig.add_annotation(
+        x=max(x),
+        y=min(y),
+        text=function_text,
+        showarrow=False,
+        font=dict(size=12, color="blue"),
+        xanchor="right",
+        yanchor="bottom",
+    )
 
-plt.show()
+    fig.update_layout(title="Logarithmic Regression", xaxis_title="X", yaxis_title="Y")
+    fig.show()
 
-# Print equation
-print(f"Logarithmic: y = {log_params[0]:.4f}ln(x) + {log_params[1]:.4f}")
+    print(f"Logarithmic: y = {log_params[0]:.4f}ln(x) + {log_params[1]:.4f}")
