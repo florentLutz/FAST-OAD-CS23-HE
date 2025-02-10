@@ -11,6 +11,5 @@ SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY = (
     "submodel.propulsion.performances.pemfc.max_power_density"
 )
 SUBMODEL_SIZING_PEMFC_WEIGHT = "submodel.propulsion.sizing.pemfc.weight"
-SUBMODEL_SIZING_PEMFC_VOLUME = "submodel.propulsion.sizing.pemfc.volume"
-
+SUBMODEL_SIZING_PEMFC_DIMENSION = "submodel.propulsion.sizing.pemfc.dimension"
 POSSIBLE_POSITION = ["in_the_front", "wing_pod", "underbelly", "in_the_back"]

@@ -7,22 +7,23 @@ import numpy as np
 import fastoad.api as oad
 from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY
 
-MAX_PEMFC_POWER_DENSITY = 2500  # kW/m^3
+MAX_PEMFC_SYSYEM_POWER_DENSITY = 500  # kW/m^3
+MAX_PEMFC_STACK_POWER_DENSITY = 6000  # kW/m^3
 
 oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY] = (
-    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.aerostak"
+    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.fuel_cell_system"
 )
 
 
 @oad.RegisterSubmodel(
     SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY,
-    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.aerostak",
+    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.fuel_cell_system",
 )
-class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
+class PerformancesPEMFCMaxPowerDensityFuelCellSystem(om.ExplicitComponent):
     # TODO:Proper citation after rebase
     """
-    Computation of the max power provide per kilogram of pemfc. Applied in volume calculation
-    Source: H3D_H2_UnmannedAviation_Brochure 2024.pptx
+    Computation of the max power density of pemfc system excluding the inlet compressor.
+    Applied in volume calculation. Source: H3D_H2_UnmannedAviation_Brochure 2024.pptx
     """
 
     def initialize(self):
@@ -68,7 +69,7 @@ class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_power_density"
-        ] = np.clip(unclipped_power_density, 230.0, MAX_PEMFC_POWER_DENSITY)
+        ] = np.clip(unclipped_power_density, 230.0, MAX_PEMFC_SYSYEM_POWER_DENSITY)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
@@ -77,7 +78,10 @@ class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
         ]
 
         unclipped_power_density = 19.816 * np.log(power_max) + 236.48
-        if unclipped_power_density <= MAX_PEMFC_POWER_DENSITY and unclipped_power_density >= 230.0:
+        if (
+            unclipped_power_density <= MAX_PEMFC_SYSYEM_POWER_DENSITY
+            and unclipped_power_density >= 230.0
+        ):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
@@ -95,11 +99,11 @@ class PerformancesPEMFCMaxPowerDensityAerostak(om.ExplicitComponent):
 
 @oad.RegisterSubmodel(
     SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY,
-    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.intelligent_energy",
+    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.fuel_cell_stack",
 )
-class PerformancesPEMFCMaxSpecificPowerIntelligentEnergy(om.ExplicitComponent):
+class PerformancesPEMFCMaxSpecificPowerFuelCellStack(om.ExplicitComponent):
     """
-    Computation of the max power provide per kilogram of pemfc. Applied in volume calculation
+    Computation of the max power density of PEMFC system excluding all BOPs. Applied in volume calculation
     """
 
     def initialize(self):
@@ -145,7 +149,7 @@ class PerformancesPEMFCMaxSpecificPowerIntelligentEnergy(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_power_density"
-        ] = np.clip(unclipped_power_density, 400.0, MAX_PEMFC_POWER_DENSITY)
+        ] = np.clip(unclipped_power_density, 400.0, MAX_PEMFC_STACK_POWER_DENSITY)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
@@ -156,7 +160,10 @@ class PerformancesPEMFCMaxSpecificPowerIntelligentEnergy(om.ExplicitComponent):
             + 425.31
         )
 
-        if unclipped_power_density <= MAX_PEMFC_POWER_DENSITY and unclipped_power_density >= 400.0:
+        if (
+            unclipped_power_density <= MAX_PEMFC_STACK_POWER_DENSITY
+            and unclipped_power_density >= 400.0
+        ):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id

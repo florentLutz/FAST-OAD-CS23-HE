@@ -4,21 +4,8 @@
 
 import openmdao.api as om
 import numpy as np
-from ..constants import SUBMODEL_SIZING_PEMFC_VOLUME
-import fastoad.api as oad
-
-DEFAULT_FC_POWER_DENSITY = 124  # kW/m^3
-
-oad.RegisterSubmodel.active_models[SUBMODEL_SIZING_PEMFC_VOLUME] = (
-    "fastga_he.submodel.propulsion.sizing.pemfc.volume.base"
-)
 
 
-# TODO: Edit citation after rebase
-@oad.RegisterSubmodel(
-    SUBMODEL_SIZING_PEMFC_VOLUME,
-    "fastga_he.submodel.propulsion.sizing.pemfc.volume.base",
-)
 class SizingPEMFCVolume(om.ExplicitComponent):
     """
     Computation of the volume the PEMFC based on number of layers.

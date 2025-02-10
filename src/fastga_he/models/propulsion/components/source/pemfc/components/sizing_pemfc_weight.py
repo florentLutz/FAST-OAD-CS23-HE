@@ -132,7 +132,7 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:pemfc_stack:"
             + pemfc_stack_id
-            + ":max_power_density",
+            + ":max_specific_power",
             units="kW/kg",
             val=np.nan,
         )
@@ -154,7 +154,7 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
             / inputs[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
-                + ":max_power_density"
+                + ":max_specific_power"
             ]
         )
 
@@ -176,7 +176,7 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
             / inputs[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
-                + ":max_power_density"
+                + ":max_specific_power"
             ]
         )
 
@@ -204,7 +204,7 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":mass",
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_power_density",
+            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_specific_power",
         ] = (
             -FC_WEIGHT_DENSITY
             * DEFAULT_FC_SPECIFIC_POWER
@@ -217,7 +217,7 @@ class SizingPEMFCWeightAdjusted(om.ExplicitComponent):
             / inputs[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
-                + ":max_power_density"
+                + ":max_specific_power"
             ]
             ** 2
         )

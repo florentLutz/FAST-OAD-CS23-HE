@@ -7,22 +7,23 @@ import numpy as np
 import fastoad.api as oad
 from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER
 
-MAX_PEMFC_SPECIFIC_POWER = 2.06  # kW/kg
+MAX_PEMFC_SYSTEM_SPECIFIC_POWER = 2.06  # kW/kg
+MAX_PEMFC_STACK_SPECIFIC_POWER = 4.5  # kW/kg
 
 oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER] = (
-    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.aerostak"
+    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.fuel_cell_system"
 )
 
 
 @oad.RegisterSubmodel(
     SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER,
-    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.aerostak",
+    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.fuel_cell_system",
 )
-class PerformancesPEMFCMaxSpecificPowerAerostak(om.ExplicitComponent):
+class PerformancesPEMFCMaxSpecificPowerFuelCellSystem(om.ExplicitComponent):
     # TODO:Proper citation after rebase
     """
-    Computation of the max power provide per kilogram of pemfc. Applied in weight calculation
-    Source: H3D_H2_UnmannedAviation_Brochure 2024.pptx
+    Computation of the sizing specific power provide of PEMFC system exclude the inlet compressor.
+    Applied in weight calculation. Source: H3D_H2_UnmannedAviation_Brochure 2024.pptx
     """
 
     def initialize(self):
@@ -68,7 +69,7 @@ class PerformancesPEMFCMaxSpecificPowerAerostak(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_specific_power"
-        ] = np.clip(unclipped_specific_power, 0.05, MAX_PEMFC_SPECIFIC_POWER)
+        ] = np.clip(unclipped_specific_power, 0.05, MAX_PEMFC_SYSTEM_SPECIFIC_POWER)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
@@ -78,7 +79,7 @@ class PerformancesPEMFCMaxSpecificPowerAerostak(om.ExplicitComponent):
 
         unclipped_specific_power = 0.0845 * np.log(power_max) + 0.6037
         if (
-            unclipped_specific_power <= MAX_PEMFC_SPECIFIC_POWER
+            unclipped_specific_power <= MAX_PEMFC_SYSTEM_SPECIFIC_POWER
             and unclipped_specific_power >= 0.05
         ):
             partials[
@@ -98,11 +99,11 @@ class PerformancesPEMFCMaxSpecificPowerAerostak(om.ExplicitComponent):
 
 @oad.RegisterSubmodel(
     SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER,
-    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.intelligent_energy",
+    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.fuel_cell_stack",
 )
-class PerformancesPEMFCMaxSpecificPowerIntelligentEnergy(om.ExplicitComponent):
+class PerformancesPEMFCMaxSpecificPowerFuelCellStack(om.ExplicitComponent):
     """
-    Computation of the max power provide per kilogram of pemfc. Applied in weight calculation
+    Computation of the max specific power of PEMFC stack. Applied in weight calculation
     """
 
     def initialize(self):
@@ -148,7 +149,7 @@ class PerformancesPEMFCMaxSpecificPowerIntelligentEnergy(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_specific_power"
-        ] = np.clip(unclipped_specific_power, 0.05, MAX_PEMFC_SPECIFIC_POWER)
+        ] = np.clip(unclipped_specific_power, 0.05, MAX_PEMFC_STACK_SPECIFIC_POWER)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
@@ -164,7 +165,7 @@ class PerformancesPEMFCMaxSpecificPowerIntelligentEnergy(om.ExplicitComponent):
         )
 
         if (
-            unclipped_specific_power <= MAX_PEMFC_SPECIFIC_POWER
+            unclipped_specific_power <= MAX_PEMFC_STACK_SPECIFIC_POWER
             and unclipped_specific_power >= 0.05
         ):
             partials[
