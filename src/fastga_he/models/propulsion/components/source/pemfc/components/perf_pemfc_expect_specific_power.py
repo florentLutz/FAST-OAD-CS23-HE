@@ -4,21 +4,12 @@
 
 import openmdao.api as om
 import numpy as np
-import fastoad.api as oad
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER
+
 
 MAX_PEMFC_SYSTEM_SPECIFIC_POWER = 2.06  # kW/kg
 MAX_PEMFC_STACK_SPECIFIC_POWER = 4.5  # kW/kg
 
-oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER] = (
-    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.fuel_cell_system"
-)
 
-
-@oad.RegisterSubmodel(
-    SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER,
-    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.fuel_cell_system",
-)
 class PerformancesPEMFCMaxSpecificPowerFuelCellSystem(om.ExplicitComponent):
     # TODO:Proper citation after rebase
     """
@@ -97,10 +88,6 @@ class PerformancesPEMFCMaxSpecificPowerFuelCellSystem(om.ExplicitComponent):
             ] = 0.0
 
 
-@oad.RegisterSubmodel(
-    SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER,
-    "fastga_he.submodel.propulsion.performances.pemfc.max_specific_power.fuel_cell_stack",
-)
 class PerformancesPEMFCMaxSpecificPowerFuelCellStack(om.ExplicitComponent):
     """
     Computation of the max specific power of PEMFC stack. Applied in weight calculation

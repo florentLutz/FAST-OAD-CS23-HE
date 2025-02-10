@@ -4,21 +4,11 @@
 
 import openmdao.api as om
 import numpy as np
-from ..constants import SUBMODEL_SIZING_PEMFC_WEIGHT
-import fastoad.api as oad
 
 FC_WEIGHT_DENSITY = 8.5034  # kg/m^2
 DEFAULT_FC_SPECIFIC_POWER = 0.345  # kW/kg
 
-oad.RegisterSubmodel.active_models[SUBMODEL_SIZING_PEMFC_WEIGHT] = (
-    "fastga_he.submodel.propulsion.sizing.pemfc.weight.aerostak200"
-)
 
-
-@oad.RegisterSubmodel(
-    SUBMODEL_SIZING_PEMFC_WEIGHT,
-    "fastga_he.submodel.propulsion.sizing.pemfc.weight.aerostak200",
-)
 class SizingPEMFCWeightAerostak200W(om.ExplicitComponent):
     """
     Computation of the weight the PEMFC based on the layer weight density of the Aerostak 200W stack.
@@ -96,10 +86,6 @@ class SizingPEMFCWeightAerostak200W(om.ExplicitComponent):
         )
 
 
-@oad.RegisterSubmodel(
-    SUBMODEL_SIZING_PEMFC_WEIGHT,
-    "fastga_he.submodel.propulsion.sizing.pemfc.weight.sp",
-)
 class SizingPEMFCWeightSpecificPower(om.ExplicitComponent):
     """
     Computation of the weight the PEMFC based on the layer weight density but adjusted with power density

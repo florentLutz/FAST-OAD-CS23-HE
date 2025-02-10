@@ -4,21 +4,11 @@
 
 import openmdao.api as om
 import numpy as np
-import fastoad.api as oad
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY
 
 MAX_PEMFC_SYSYEM_POWER_DENSITY = 500  # kW/m^3
 MAX_PEMFC_STACK_POWER_DENSITY = 6000  # kW/m^3
 
-oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY] = (
-    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.fuel_cell_system"
-)
 
-
-@oad.RegisterSubmodel(
-    SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY,
-    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.fuel_cell_system",
-)
 class PerformancesPEMFCMaxPowerDensityFuelCellSystem(om.ExplicitComponent):
     # TODO:Proper citation after rebase
     """
@@ -97,10 +87,6 @@ class PerformancesPEMFCMaxPowerDensityFuelCellSystem(om.ExplicitComponent):
             ] = 0.0
 
 
-@oad.RegisterSubmodel(
-    SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY,
-    "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.fuel_cell_stack",
-)
 class PerformancesPEMFCMaxPowerDensityFuelCellStack(om.ExplicitComponent):
     """
     Computation of the max power density of PEMFC system excluding all BOPs. Applied in volume calculation

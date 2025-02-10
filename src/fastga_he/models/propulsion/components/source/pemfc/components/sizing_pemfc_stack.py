@@ -6,9 +6,8 @@ import openmdao.api as om
 import fastoad.api as oad
 
 
-from ..constants import SUBMODEL_SIZING_PEMFC_WEIGHT
+from ..constants import SUBMODEL_SIZING_PEMFC_WEIGHT_DIMENSION
 from .sizing_pemfc_volume import SizingPEMFCVolume
-from ..constants import SUBMODEL_SIZING_PEMFC_DIMENSION
 from .sizing_pemfc_cg_x import SizingPEMFCCGX
 from .sizing_pemfc_cg_y import SizingPEMFCCGY
 from .sizing_pemfc_drag import SizingPEMFCDrag
@@ -39,10 +38,7 @@ class SizingPEMFCStack(om.Group):
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
-        option_weight = {
-            "pemfc_stack_id": pemfc_stack_id,
-        }
-        option_dimension = {
+        option_weight_dimension = {
             "pemfc_stack_id": pemfc_stack_id,
         }
 
@@ -56,17 +52,9 @@ class SizingPEMFCStack(om.Group):
         )
 
         self.add_subsystem(
-            name="pemfc_dimension",
+            name="pemfc_weight_dimension",
             subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_SIZING_PEMFC_DIMENSION, options=option_dimension
-            ),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            name="pemfc_weight",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_SIZING_PEMFC_WEIGHT, options=option_weight
+                SUBMODEL_SIZING_PEMFC_WEIGHT_DIMENSION, options=option_weight_dimension
             ),
             promotes=["*"],
         )

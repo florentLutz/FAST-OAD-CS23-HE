@@ -5,22 +5,12 @@
 import openmdao.api as om
 import numpy as np
 from ..constants import POSSIBLE_POSITION
-from ..constants import SUBMODEL_SIZING_PEMFC_DIMENSION
-import fastoad.api as oad
 
 DIMENSION_RATIO = 0.3528  # Ratio between the effective area length size and the actual FC size
 LENGTH_LAYER_RATIO = 3.428e-3  # in meters
 DEFAULT_FC_POWER_DENSITY = 124  # kW/m^3
 
-oad.RegisterSubmodel.active_models[SUBMODEL_SIZING_PEMFC_DIMENSION] = (
-    "fastga_he.submodel.propulsion.sizing.pemfc.dimension.aerostak200"
-)
 
-
-@oad.RegisterSubmodel(
-    SUBMODEL_SIZING_PEMFC_DIMENSION,
-    "fastga_he.submodel.propulsion.sizing.pemfc.dimension.aerostak200",
-)
 class SizingPEMFCDimensionsAerostak200W(om.ExplicitComponent):
     """
     Computation of the different dimensions of the PEMFC, it will heavily depend on the
@@ -159,10 +149,6 @@ class SizingPEMFCDimensionsAerostak200W(om.ExplicitComponent):
             ] = 0.5 / np.sqrt(effective_area * DIMENSION_RATIO**2)
 
 
-@oad.RegisterSubmodel(
-    SUBMODEL_SIZING_PEMFC_DIMENSION,
-    "fastga_he.submodel.propulsion.sizing.pemfc.dimension.pd",
-)
 class SizingPEMFCDimensionsPowerDensity(om.ExplicitComponent):
     """
     Computation of the different dimensions of the PEMFC, it will heavily depend on the
