@@ -4,16 +4,13 @@
 
 import openmdao.api as om
 import numpy as np
-import logging
 from ..constants import POSSIBLE_POSITION
 from ..constants import SUBMODEL_SIZING_PEMFC_DIMENSION
 import fastoad.api as oad
 
-
 DIMENSION_RATIO = 0.3528  # Ratio between the effective area length size and the actual FC size
 LENGTH_LAYER_RATIO = 3.428e-3  # in meters
 DEFAULT_FC_POWER_DENSITY = 124  # kW/m^3
-_LOGGER = logging.getLogger(__name__)
 
 oad.RegisterSubmodel.active_models[SUBMODEL_SIZING_PEMFC_DIMENSION] = (
     "fastga_he.submodel.propulsion.sizing.pemfc.dimension.base"
@@ -126,7 +123,7 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
 
-        effeective_area = inputs[
+        effective_area = inputs[
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
         ]
 
@@ -139,27 +136,27 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = 0.5 * np.sqrt(2) / np.sqrt(effeective_area * DIMENSION_RATIO**2)
+            ] = 0.5 * np.sqrt(2) / np.sqrt(effective_area * DIMENSION_RATIO**2)
 
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
                 + ":dimension:height",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = 0.5 / np.sqrt(2 * effeective_area * DIMENSION_RATIO**2)
+            ] = 0.5 / np.sqrt(2 * effective_area * DIMENSION_RATIO**2)
 
         else:
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = 0.5 / np.sqrt(effeective_area * DIMENSION_RATIO**2)
+            ] = 0.5 / np.sqrt(effective_area * DIMENSION_RATIO**2)
 
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
                 + ":dimension:height",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = 0.5 / np.sqrt(effeective_area * DIMENSION_RATIO**2)
+            ] = 0.5 / np.sqrt(effective_area * DIMENSION_RATIO**2)
 
 
 @oad.RegisterSubmodel(
@@ -200,7 +197,6 @@ class SizingPEMFCDimensionsAdjusted(om.ExplicitComponent):
 
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
-        position = self.options["position"]
 
         self.add_output(
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:length",
@@ -244,53 +240,36 @@ class SizingPEMFCDimensionsAdjusted(om.ExplicitComponent):
             val=np.nan,
         )
 
-        if position == "underbelly":
-            self.add_input("data:geometry:fuselage:maximum_width", val=np.nan, units="m")
-
         self.declare_partials(of="*", wrt="*")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
-        underbelly_ratio = self.options["underbelly_ratio"]
+        effective_area = inputs[
+            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
+        ]
+        number_of_layers = inputs[
+            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers"
+        ]
+        max_power_density = inputs[
+            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_power_density"
+        ]
 
-        pemfc_area = (
-            inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
-            ]
-            / DIMENSION_RATIO**2
-        )
-        max_fuselage_width = inputs["data:geometry:fuselage:maximum_width"]
+        pemfc_area = effective_area / DIMENSION_RATIO**2
+        adjust_factor = DEFAULT_FC_POWER_DENSITY / max_power_density
 
         outputs[
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:length"
-        ] = (
-            LENGTH_LAYER_RATIO
-            * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers"
-            ]
-        )
-        adjust_factor = (
-            DEFAULT_FC_POWER_DENSITY
-            / inputs[
-                "data:propulsion:he_power_train:pemfc_stack:"
-                + pemfc_stack_id
-                + ":max_power_density"
-            ]
-        )
+        ] = LENGTH_LAYER_RATIO * number_of_layers
 
         if position in "underbelly":
-            _LOGGER.warning(
-                msg="Position Underbelly, Fuel cell height and width adjusted for better fitting !!"
-            )
-
             outputs[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width"
-            ] = underbelly_ratio * max_fuselage_width
+            ] = np.sqrt(2 * pemfc_area * adjust_factor)
 
             outputs[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:height"
-            ] = pemfc_area / (underbelly_ratio * max_fuselage_width) * adjust_factor
+            ] = np.sqrt(pemfc_area * adjust_factor / 2)
 
         else:
             outputs[
@@ -304,7 +283,13 @@ class SizingPEMFCDimensionsAdjusted(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
-        underbelly_ratio = self.options["underbelly_ratio"]
+        effective_area = inputs[
+            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
+        ]
+
+        max_power_density = inputs[
+            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_power_density"
+        ]
 
         pemfc_area = (
             inputs[
@@ -318,64 +303,62 @@ class SizingPEMFCDimensionsAdjusted(om.ExplicitComponent):
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers",
         ] = LENGTH_LAYER_RATIO
 
-        adjust_factor = (
-            DEFAULT_FC_POWER_DENSITY
-            / inputs[
-                "data:propulsion:he_power_train:pemfc_stack:"
-                + pemfc_stack_id
-                + ":max_power_density"
-            ]
-        )
+        adjust_factor = DEFAULT_FC_POWER_DENSITY / max_power_density
 
         if position in "underbelly":
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
-                "data:geometry:fuselage:maximum_width",
-            ] = underbelly_ratio
+                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
+            ] = 0.5 * np.sqrt(2 * adjust_factor) / np.sqrt(effective_area * DIMENSION_RATIO**2)
 
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
                 + ":dimension:height",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = adjust_factor / (
-                DIMENSION_RATIO**2
-                * underbelly_ratio
-                * inputs["data:geometry:fuselage:maximum_width"]
-            )
+            ] = 0.5 * np.sqrt(adjust_factor) / np.sqrt(2 * effective_area * DIMENSION_RATIO**2)
+
+            partials[
+                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
+                "data:propulsion:he_power_train:pemfc_stack:"
+                + pemfc_stack_id
+                + ":max_power_density",
+            ] = -0.5 * np.sqrt(2 * pemfc_area * DEFAULT_FC_POWER_DENSITY) / max_power_density**1.5
 
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
                 + ":dimension:height",
-                "data:geometry:fuselage:maximum_width",
-            ] = -pemfc_area / (
-                underbelly_ratio * inputs["data:geometry:fuselage:maximum_width"] ** 2
-            )
+                "data:propulsion:he_power_train:pemfc_stack:"
+                + pemfc_stack_id
+                + ":max_power_density",
+            ] = -0.5 * np.sqrt(0.5 * pemfc_area * DEFAULT_FC_POWER_DENSITY) / max_power_density**1.5
 
         else:
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = 0.5 / np.sqrt(
-                inputs[
-                    "data:propulsion:he_power_train:pemfc_stack:"
-                    + pemfc_stack_id
-                    + ":effective_area"
-                ]
-                * DIMENSION_RATIO**2
-            )
+            ] = 0.5 * np.sqrt(adjust_factor) / np.sqrt(effective_area * DIMENSION_RATIO**2)
 
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
                 + ":dimension:height",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = 0.5 / np.sqrt(
-                inputs[
-                    "data:propulsion:he_power_train:pemfc_stack:"
-                    + pemfc_stack_id
-                    + ":effective_area"
-                ]
-                * DIMENSION_RATIO**2
-            )
+            ] = 0.5 * np.sqrt(adjust_factor) / np.sqrt(effective_area * DIMENSION_RATIO**2)
+
+            partials[
+                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
+                "data:propulsion:he_power_train:pemfc_stack:"
+                + pemfc_stack_id
+                + ":max_power_density",
+            ] = -0.5 * np.sqrt(pemfc_area * DEFAULT_FC_POWER_DENSITY) / max_power_density**1.5
+
+            partials[
+                "data:propulsion:he_power_train:pemfc_stack:"
+                + pemfc_stack_id
+                + ":dimension:height",
+                "data:propulsion:he_power_train:pemfc_stack:"
+                + pemfc_stack_id
+                + ":max_power_density",
+            ] = -0.5 * np.sqrt(pemfc_area * DEFAULT_FC_POWER_DENSITY) / max_power_density**1.5
