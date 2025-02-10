@@ -62,16 +62,18 @@ class SizingPEMFCStack(om.Group):
             ),
             promotes=["*"],
         )
-        self.add_subsystem(
-            name="pemfc_volume",
-            subsys=SizingPEMFCVolume(pemfc_stack_id=pemfc_stack_id),
-            promotes=["*"],
-        )
+
         self.add_subsystem(
             name="pemfc_weight",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_SIZING_PEMFC_WEIGHT, options=option_weight
             ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="pemfc_volume",
+            subsys=SizingPEMFCVolume(pemfc_stack_id=pemfc_stack_id),
             promotes=["*"],
         )
 

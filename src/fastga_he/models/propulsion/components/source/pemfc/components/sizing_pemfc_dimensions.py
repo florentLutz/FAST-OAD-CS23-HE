@@ -13,15 +13,15 @@ LENGTH_LAYER_RATIO = 3.428e-3  # in meters
 DEFAULT_FC_POWER_DENSITY = 124  # kW/m^3
 
 oad.RegisterSubmodel.active_models[SUBMODEL_SIZING_PEMFC_DIMENSION] = (
-    "fastga_he.submodel.propulsion.sizing.pemfc.dimension.base"
+    "fastga_he.submodel.propulsion.sizing.pemfc.dimension.aerostak200"
 )
 
 
 @oad.RegisterSubmodel(
     SUBMODEL_SIZING_PEMFC_DIMENSION,
-    "fastga_he.submodel.propulsion.sizing.pemfc.dimension.base",
+    "fastga_he.submodel.propulsion.sizing.pemfc.dimension.aerostak200",
 )
-class SizingPEMFCDimensions(om.ExplicitComponent):
+class SizingPEMFCDimensionsAerostak200W(om.ExplicitComponent):
     """
     Computation of the different dimensions of the PEMFC, it will heavily depend on the
     position of the PEMFC. If the batteries are in the rear, front or in pods,
@@ -161,9 +161,9 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
 
 @oad.RegisterSubmodel(
     SUBMODEL_SIZING_PEMFC_DIMENSION,
-    "fastga_he.submodel.propulsion.sizing.pemfc.dimension.adjusted",
+    "fastga_he.submodel.propulsion.sizing.pemfc.dimension.pd",
 )
-class SizingPEMFCDimensionsAdjusted(om.ExplicitComponent):
+class SizingPEMFCDimensionsPowerDensity(om.ExplicitComponent):
     """
     Computation of the different dimensions of the PEMFC, it will heavily depend on the
     position of the PEMFC. If the batteries are in the rear, front or in pods,
@@ -236,7 +236,7 @@ class SizingPEMFCDimensionsAdjusted(om.ExplicitComponent):
             name="data:propulsion:he_power_train:pemfc_stack:"
             + pemfc_stack_id
             + ":max_power_density",
-            units="kW/m^3",
+            units="kW/m**3",
             val=np.nan,
         )
 

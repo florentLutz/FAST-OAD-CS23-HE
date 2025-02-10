@@ -14,6 +14,7 @@ from ..components.perf_maximum_power import PerformancesMaximumPower
 from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
 from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
 from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER
+from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY
 from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
@@ -52,6 +53,10 @@ class PerformancesPEMFCStack(om.Group):
         }
 
         option_max_specific_power = {
+            "pemfc_stack_id": pemfc_stack_id,
+        }
+
+        option_max_power_density = {
             "pemfc_stack_id": pemfc_stack_id,
         }
 
@@ -149,9 +154,17 @@ class PerformancesPEMFCStack(om.Group):
         )
 
         self.add_subsystem(
-            name="maximum_power_density",
+            name="maximum_specific_power",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_PERFORMANCES_PEMFC_MAX_SPECIFIC_POWER, options=option_max_specific_power
+            ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="maximum_power_density",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY, options=option_max_power_density
             ),
             promotes=["*"],
         )

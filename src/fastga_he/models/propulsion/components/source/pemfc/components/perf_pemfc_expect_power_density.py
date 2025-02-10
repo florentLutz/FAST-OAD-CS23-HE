@@ -48,7 +48,7 @@ class PerformancesPEMFCMaxPowerDensityFuelCellSystem(om.ExplicitComponent):
             name="data:propulsion:he_power_train:pemfc_stack:"
             + pemfc_stack_id
             + ":max_power_density",
-            units="kW/m^3",
+            units="kW/m**3",
             val=250.0,
         )
 
@@ -101,7 +101,7 @@ class PerformancesPEMFCMaxPowerDensityFuelCellSystem(om.ExplicitComponent):
     SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_DENSITY,
     "fastga_he.submodel.propulsion.performances.pemfc.max_power_density.fuel_cell_stack",
 )
-class PerformancesPEMFCMaxSpecificPowerFuelCellStack(om.ExplicitComponent):
+class PerformancesPEMFCMaxPowerDensityFuelCellStack(om.ExplicitComponent):
     """
     Computation of the max power density of PEMFC system excluding all BOPs. Applied in volume calculation
     """
@@ -128,7 +128,7 @@ class PerformancesPEMFCMaxSpecificPowerFuelCellStack(om.ExplicitComponent):
             name="data:propulsion:he_power_train:pemfc_stack:"
             + pemfc_stack_id
             + ":max_power_density",
-            units="kW/m^3",
+            units="kW/m**3",
             val=1000.0,
         )
 
@@ -167,7 +167,7 @@ class PerformancesPEMFCMaxSpecificPowerFuelCellStack(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
-                + ":max_specific_power",
+                + ":max_power_density",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max",
             ] = (
                 85.474
@@ -179,6 +179,6 @@ class PerformancesPEMFCMaxSpecificPowerFuelCellStack(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
-                + ":max_specific_power",
+                + ":max_power_density",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":power_max",
             ] = 0.0
