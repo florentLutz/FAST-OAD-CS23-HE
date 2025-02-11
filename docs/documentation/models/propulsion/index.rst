@@ -4,14 +4,15 @@
 Propulsion components
 ========================
 
-Here contains the documentation of the propulsion components available in FAST-OAD-CS23-HE powertrain building.
+Here you will find the documentation on the model used for the components of the hybrid-electric powertain
+
 
 .. toctree::
    :maxdepth: 1
 
-    Powertrain connector components <connectors/index>
-    Power source components <source/index>
-    Power load components <loads/index>
-    Powertrain propulsor components <propulsor/index>
-    Fuel storage components <tank/index>
+    Connectors <connectors/index>
+    Power sources <source/index>
+    Power loads <loads/index>
+    Propulsors <propulsor/index>
+    Storage tanks <tank/index>
 

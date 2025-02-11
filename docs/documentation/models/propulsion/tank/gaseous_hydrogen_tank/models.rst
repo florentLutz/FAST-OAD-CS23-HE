@@ -6,16 +6,16 @@ Gaseous Hydrogen Tank computation
 
 .. contents::
 
-*************************
-Tank capacity calculation
-*************************
-The tank capacity is calculated based on the hydrogen capacity in mass specified by user (:math:`M_H`)
+***********************
+Tank volume calculation
+***********************
+The tank inner volume is calculated based on the hydrogen  mass specified by user (:math:`m_{h2}`)
 and the ideal gas assumption. Thus, the ideal gas constant (:math:`R`), the storage temperature (:math:`T`),
-and the storage pressure (:math:`P`)  are applied in this calculation.
+and the storage pressure (:math:`P`) are applied in this calculation.
 
 .. math::
 
-    V_{inner} = \frac{Z*M_H*R*T}{P}
+    V_{inner} = \frac{Z*m_{h2}*R*T}{P}
 
 
 The Hydrogen gas compressibility factor (:math:`Z`) is expressed as:
@@ -30,15 +30,26 @@ Tank geometry calculation
 
 Tank diameter calculation
 =========================
+The gaseous hydrogen tank's outer diameter (:math:`D_{outer}`)  is defined based on its installation location. For an internal installation,
+it is set as a fraction of the maximum fuselage height to ensure proper fit. For an external installation,
+the outer diameter is fixed at 20% of the maximum fuselage height to minimize drag.
+
+.. math::
+
+    D_{outer} =
+    \begin{cases}
+        0.9 \cdot \max(H_{fuselage}) & \text{if inside fuselage} \\
+        0.2 \cdot \max(H_{fuselage}) & \text{if outside fuselage}
+    \end{cases}
 
 
-The diameter calculation is based on the hoop stress of a cylindrical tank calculation provided by :cite:`colozza:2002`
+Then the inner diameter calculation is based on the hoop stress of a cylindrical tank calculation provided by :cite:`colozza:2002`
 
 .. math::
 
    t_{wall} = \frac {R_{in} * SF*P}{\sigma_{wall}}
 
-As the tank outer diameter (:math:`D_{outer}`) is defined by user, the tank inner diameter (:math:`D_{inner}`) is derived
+With the tank outer diameter calculated in advance, the tank inner diameter (:math:`D_{inner}`) is derived
 with the following equation:
 
 .. math::
@@ -50,7 +61,7 @@ Where :math:`SF` represent the safety factor of the tank,  :math:`P` is the tank
 
 Tank length calculation
 =======================
-With the assumption given that the shape of the tank is cylindrical with hemispherical cap at both coth end,
+With the assumption that the shape of the tank is cylindrical with hemispherical cap at both end,
 the length of the tank can be expressed as:
 
 .. math::
@@ -76,8 +87,3 @@ in gaseous hydrogen tank component.
 
    <a href="../../../../../../../n2/n2_performance_gh2_tank.html" target="_blank">Gaseous hydrogen tank performance N2 diagram</a><br>
    <a href="../../../../../../../n2/n2_sizing_gh2_tank.html" target="_blank">Gaseous hydrogen tank sizing N2 diagram</a>
-
-
-
-
-

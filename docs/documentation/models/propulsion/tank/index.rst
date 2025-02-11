@@ -1,10 +1,10 @@
 .. _tank-index:
 
-========================
+==========================
 Propulsion Tank components
-========================
+==========================
 
-Here contains the documentation of the propulsion tank components available in FAST-OAD-CS23-HE powertrain building.
+Here you will find the documentation of the propulsion tank components available in FAST-OAD-CS23-HE powertrain building.
 
 .. toctree::
    :maxdepth: 1

@@ -2,12 +2,19 @@
 Gaseous Hydrogen Tank model
 ============================
 
-The gaseous hydrogen tank is a storage option in FAST-OAD-CS23-HE, designed to store hydrogen in its gas-phase.
-This component can be activated through the powertrain configuration file (PT file) and
-customized by editing in the source code.
+The gaseous hydrogen tank is a storage option in FAST-OAD-CS23-HE, designed to store hydrogen in gaseous state.
+This component can be activated through the powertrain configuration file (PT file). The registered installation
+positions can be found at tank position options in :ref:`options <options-gaseous-hydrogen-tank>`.
 
-A brief description of the gaseous hydrogen tank component is shown below.
-Including the component computation logic, options for customization, and model assumptions.
+.. code-block:: yaml
+
+    power_train_components:
+
+      gaseous_hydrogen_tank_1:
+        id: fastga_he.pt_component.hydrogen_gas_tank
+        position: ...
+
+A brief description of the gaseous hydrogen tank component is presented:
 
 .. _table:
 .. toctree::
