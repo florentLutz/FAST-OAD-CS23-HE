@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -9,7 +9,8 @@ import numpy as np
 # To modify
 class SizingGaseousHydrogenTankWallThickness(om.ExplicitComponent):
     """
-    Computation of the wall thickness of the tank from the difference between the inner and outer diameter.
+    Computation of the wall thickness of the tank from the difference between the inner and
+    outer diameter.
     """
 
     def initialize(self):

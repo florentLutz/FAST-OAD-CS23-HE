@@ -10,8 +10,8 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingGaseousHydrogenTankCGY(om.ExplicitComponent):
     """
-    Class that computes the CG in Y-direction of the tank
-    according to the position given in the options.
+    Class that computes the CG in Y-direction of the tank according to the position given in the
+    options.
     """
 
     def initialize(self):
@@ -53,7 +53,7 @@ class SizingGaseousHydrogenTankCGY(om.ExplicitComponent):
                 + gaseous_hydrogen_tank_id
                 + ":CG:y_ratio",
                 val=np.nan,
-                desc="X position of the tank center of gravity as a ratio of the wing half-span",
+                desc="Y position of the tank center of gravity as a ratio of the wing half-span",
             )
 
             self.declare_partials(of="*", wrt="*", method="exact")

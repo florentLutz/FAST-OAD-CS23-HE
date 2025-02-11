@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -57,7 +57,8 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             units="kg/m**3",
             val=7860.0,
             desc="Choice of the tank material,Some reference (in kg/m**3): "
-            "Steel(ASTM-A514):7860, Aluminum(2014-T6):2800, Titanium(6%Al,4%V):4460, Carbon Composite:1530",
+            "Steel(ASTM-A514):7860, Aluminum(2014-T6):2800, Titanium(6%Al,4%V):4460, "
+            "Carbon Composite:1530",
         )
 
         self.add_output(

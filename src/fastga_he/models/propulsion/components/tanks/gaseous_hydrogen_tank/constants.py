@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 import numpy as np
 
 SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY = (
@@ -13,7 +13,7 @@ POSSIBLE_POSITION = ["in_the_cabin", "wing_pod", "in_the_back", "underbelly"]
 # The value corresponds to the key is the ratio between
 # the maximum height of fuselage and the tank outer diameter.
 # :cite:`kravitz:1967`
-# Explanation could be also found in https://mathworld.wolfram.com/CirclePacking.html
+# Explanation can be also found in https://mathworld.wolfram.com/CirclePacking.html
 MULTI_TANK_FACTOR = {
     1: 1,
     2: 2,

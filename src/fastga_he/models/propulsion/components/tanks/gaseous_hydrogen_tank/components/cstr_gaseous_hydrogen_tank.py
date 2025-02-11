@@ -11,8 +11,8 @@ from ..constants import SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY
 
 class ConstraintsGaseousHydrogenTank(om.Group):
     """
-    Class that gather the different constraints for the gaseous hydrogen tank,
-    be they ensure or enforce.
+    Class that gather the different constraints for the gaseous hydrogen tank, be they ensure or
+    enforce.
     """
 
     def initialize(self):

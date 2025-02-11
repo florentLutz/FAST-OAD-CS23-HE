@@ -9,7 +9,6 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY
 
-# This choice was made. "Why ? Because I can" (Katarina from LoL)
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY] = (
     "fastga_he.submodel.propulsion.constraints.gaseous_hydrogen_tank.capacity.enforce"
 )

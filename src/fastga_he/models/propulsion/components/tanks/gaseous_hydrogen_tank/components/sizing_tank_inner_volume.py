@@ -13,8 +13,8 @@ STORAGE_TEMPERATURE = 300.0  # (K)
 
 class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
     """
-    Computation of the volume of hydrogen to be stored in the tank in specific temperature and pressure condition,
-    performed under ideal gas assumption.
+    Computation of the volume of hydrogen to be stored in the tank in specific temperature and
+    pressure condition, performed under ideal gas assumption.
     """
 
     def initialize(self):

@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -136,8 +136,8 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             _LOGGER.warning(
                 msg="Inconsistent tank length for tank(s) "
                 + gaseous_hydrogen_tank_id
-                + " due to the diameter being too large for the required tank capacity, "
-                "suggest to reduce the diameter."
+                + " due to the diameter being too large for the required tank capacity. Reduce "
+                "tank diameter to fuselage height ratio."
             )
 
         elif not_in_fuselage:
