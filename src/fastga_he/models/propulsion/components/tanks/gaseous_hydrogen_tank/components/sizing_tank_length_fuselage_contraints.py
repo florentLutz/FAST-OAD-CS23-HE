@@ -63,7 +63,7 @@ class SizingGaseousHydrogenTankLengthFuselageConstraints(om.ExplicitComponent):
             val=0.0,
             units="m",
             desc="Constraints on the tank length w.r.t "
-            "the cabin/rear_fuselage/front_fuselage length,  respected if <0",
+            "the cabin/rear_fuselage length,  respected if <0",
         )
 
         if position != "wing_pod":
