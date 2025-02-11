@@ -18,14 +18,16 @@ from ..lca_impact import (
     lca_impacts_bar_chart_simple,
     lca_impacts_bar_chart_normalised_weighted,
     lca_impacts_bar_chart_with_contributors,
+    lca_impacts_bar_chart_with_phases_absolute,
 )
 
-DATA_FOLDER_PATH = os.path.join(os.path.dirname(__file__), "data")
+DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
+RESULT_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 
 PATH_TO_CURRENT_FILE = pathlib.Path(__file__)
 
 SENSITIVITY_STUDIES_FOLDER_PATH = (
-    pathlib.Path(__file__).parent.parent.parent
+    pathlib.Path(__file__).parents[2]
     / "models"
     / "environmental_impacts"
     / "unit_tests"
@@ -79,7 +81,7 @@ def test_lca_single_score_sensitivity_analysis_two_plots():
     fig.show()
 
     fig.update_layout(height=800.0, width=1600.0)
-    fig.write_image(PATH_TO_CURRENT_FILE.parent / "results" / "evolution_sing_score_kodiak.svg")
+    fig.write_image(PATH_TO_CURRENT_FILE.parent / "results" / "ga_single_score_evolution.pdf")
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -149,8 +151,8 @@ def test_lca_sensitivity_analysis_advanced_components_and_phase():
 def test_lca_bar_chart():
     fig = lca_impacts_bar_chart_simple(
         [
-            os.path.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml"),
-            os.path.join(DATA_FOLDER_PATH, "hybrid_kodiak_100_ef.xml"),
+            DATA_FOLDER_PATH / "kodiak_100_ef.xml",
+            DATA_FOLDER_PATH / "hybrid_kodiak_100_ef.xml",
         ],
         names_aircraft=["Reference Kodiak 100", "Hybrid Kodiak 100"],
     )
@@ -158,9 +160,23 @@ def test_lca_bar_chart():
     fig.show()
 
 
+def test_lca_bar_chart_relative_paper():
+    fig = lca_impacts_bar_chart_simple(
+        [
+            SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+            SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml",
+        ],
+        names_aircraft=["Reference Kodiak 100", "Hybrid Kodiak 100"],
+    )
+
+    fig.show()
+    fig.update_layout(height=800, width=1600)
+    fig.write_image(RESULT_FOLDER_PATH / "ga_impacts_evolution.pdf")
+
+
 def test_lca_bar_chart_normalised_and_weighted():
     fig = lca_impacts_bar_chart_normalised_weighted(
-        [os.path.join(DATA_FOLDER_PATH, "hybrid_kodiak_100_ef.xml")],
+        [DATA_FOLDER_PATH / "hybrid_kodiak_100_ef.xml"],
         names_aircraft=["Hybrid Kodiak 100"],
     )
 
@@ -170,8 +186,8 @@ def test_lca_bar_chart_normalised_and_weighted():
 def test_lca_bar_chart_normalised_and_weighted_multiples():
     fig = lca_impacts_bar_chart_normalised_weighted(
         [
-            os.path.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml"),
-            os.path.join(DATA_FOLDER_PATH, "hybrid_kodiak_100_ef.xml"),
+            DATA_FOLDER_PATH / "kodiak_100_ef.xml",
+            DATA_FOLDER_PATH / "hybrid_kodiak_100_ef.xml",
         ],
         names_aircraft=["Reference Kodiak 100", "Hybrid Kodiak 100"],
     )
@@ -181,8 +197,20 @@ def test_lca_bar_chart_normalised_and_weighted_multiples():
 
 def test_lca_bar_chart_relative_contribution():
     fig = lca_impacts_bar_chart_with_contributors(
-        os.path.join(DATA_FOLDER_PATH, "hybrid_kodiak_100_ef.xml"),
+        DATA_FOLDER_PATH / "hybrid_kodiak_100_ef.xml",
         name_aircraft="Hybrid Kodiak 100",
     )
 
     fig.show()
+
+
+def test_lca_bar_chart_absolute_phase():
+    fig = lca_impacts_bar_chart_with_phases_absolute(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+        name_aircraft="Hybrid Kodiak 100",
+    )
+    fig.update_layout(title_text=None)
+
+    fig.show()
+    fig.update_layout(height=800, width=1600)
+    fig.write_image(RESULT_FOLDER_PATH / "ref_kodiak_component_contribution.pdf")
