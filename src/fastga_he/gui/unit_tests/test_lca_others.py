@@ -19,6 +19,7 @@ from ..lca_impact import (
     lca_impacts_bar_chart_normalised_weighted,
     lca_impacts_bar_chart_with_contributors,
     lca_impacts_bar_chart_with_phases_absolute,
+    lca_impacts_search_table,
 )
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
@@ -217,3 +218,38 @@ def test_lca_bar_chart_absolute_phase():
     fig.update_layout(height=800, width=1600)
     if not IN_GITHUB_ACTIONS:
         fig.write_image(RESULT_FOLDER_PATH / "ref_kodiak_component_contribution.pdf")
+
+
+def test_search_engine():
+    impact_list = ["*", "acidification", "acidification", "*", "*"]
+    phase_list = ["*", "*", "production", "*", "operation"]
+    component_list = ["*", "*", "*", "turboshaft_1", "*"]
+
+    impacts_value = lca_impacts_search_table(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+        impact_list,
+        phase_list,
+        component_list,
+        rel=False,
+    )
+
+    # Should be equal to the single score.
+    assert impacts_value[0] == pytest.approx(1.247e-05, rel=1e-3)
+    assert impacts_value[1] == pytest.approx(7.632e-07, rel=1e-3)
+    assert impacts_value[2] == pytest.approx(2.489e-08, rel=1e-3)
+    assert impacts_value[3] == pytest.approx(6.125e-06, rel=1e-3)
+    assert impacts_value[4] == pytest.approx(1.179e-05, rel=1e-3)
+
+    impact_list = ["*", "*", "*", "*"]
+    phase_list = ["manufacturing", "distribution", "production", "operation"]
+    component_list = ["*", "*", "*", "*"]
+
+    impacts_value = lca_impacts_search_table(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+        impact_list,
+        phase_list,
+        component_list,
+        rel=False,
+    )
+
+    assert sum(impacts_value) == pytest.approx(1.247e-05, rel=1e-3)

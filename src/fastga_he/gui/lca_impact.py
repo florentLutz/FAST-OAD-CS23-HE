@@ -22,6 +22,15 @@ from ..models.environmental_impacts.resources.constants import LCA_PREFIX
 
 COLS = plotly.colors.DEFAULT_PLOTLY_COLORS
 HASH = ["/", "x", "-", "|", "+", ".", "", "\\"]
+AIRFRAME_ASSOCIATED_COMPONENTS = [
+    "wing",
+    "fuselage",
+    "horizontal_tail",
+    "vertical_tail",
+    "landing_gear",
+    "flight_controls",
+    "assembly",
+]
 
 
 def lca_impacts_sun_breakdown(
@@ -879,16 +888,7 @@ def _get_component_from_variable_name(variable_name: str) -> str:
     component = variable_name.split(":")[4 - _depth_lca_detail(variable_name) - 1]
 
     # These names are assured to be in the LCA conf file regardless of the propulsion chain.
-    airframe_associated_components = [
-        "wing",
-        "fuselage",
-        "horizontal_tail",
-        "vertical_tail",
-        "landing_gear",
-        "flight_controls",
-        "assembly",
-    ]
-    if component in airframe_associated_components:
+    if component in AIRFRAME_ASSOCIATED_COMPONENTS:
         return "airframe"
 
     else:
@@ -1263,3 +1263,106 @@ def lca_impacts_bar_chart_with_phases_absolute(
     )
 
     return go.FigureWidget(fig)
+
+
+def lca_impacts_search_table(
+    aircraft_file_path: Union[str, pathlib.Path],
+    impact_criteria: List[str],
+    phase_criteria: List[str],
+    component_criteria: List[str],
+    rel: bool = False,
+) -> list:
+    """
+    Can be used as a very simple search engine of impacts and their contribution to the single
+    score. Can give criteria on what impacts/phases/components to consider. If an asterisk is used
+    the sum of all variable name that matches will be used. Can also be returned as a percent of the
+    total score rather than an absolute value.
+
+    :param aircraft_file_path: path to the output file that contains the results of the LCA
+    :param impact_criteria: criterion on impacts to consider
+    :param phase_criteria: criterion on phases to consider
+    :param component_criteria: criterion on components to consider
+    :param rel: boolean to return the variable as a percentage
+    """
+
+    datafile = oad.DataFile(aircraft_file_path)
+
+    available_impacts = list(_get_weighted_impact_dict(aircraft_file_path).keys())
+    available_impacts.remove("single_score")
+    # For now won't be likely to change a lot, so we will do it like this
+    available_phases = ["distribution", "manufacturing", "operation", "production"]
+    available_components = list(_get_component_and_contribution(aircraft_file_path).keys())
+    available_components.remove("airframe")
+    available_components += AIRFRAME_ASSOCIATED_COMPONENTS
+
+    # At this point there might some phase till left in the components, so we remove them first
+    # and put them in a separate list
+    un_detailed_phases = []
+    for phase in available_phases:
+        if phase in available_components:
+            available_components.remove(phase)
+            un_detailed_phases.append(phase)
+
+    single_score = datafile[LCA_PREFIX + "single_score"].value[0]
+
+    impacts = []
+
+    for impact, phase, component in zip(impact_criteria, phase_criteria, component_criteria):
+        if impact != "*":
+            if impact not in available_impacts:
+                impacts.append(np.nan)
+                continue
+            else:
+                impacts_to_browse = [impact]
+        else:
+            impacts_to_browse = available_impacts
+
+        if phase != "*":
+            if phase not in available_phases:
+                impacts.append(np.nan)
+                continue
+            else:
+                phases_to_browse = [phase]
+        else:
+            phases_to_browse = available_phases
+
+        if component != "*":
+            if component not in available_components:
+                impacts.append(np.nan)
+                continue
+            else:
+                components_to_browse = [component]
+        else:
+            components_to_browse = available_components
+
+        impact_value = 0.0
+
+        for impact_to_browse in impacts_to_browse:
+            for phase_to_browse in phases_to_browse:
+                if phase_to_browse in un_detailed_phases and component == "*":
+                    variable_name = (
+                        LCA_PREFIX + impact_to_browse + "_weighted:" + phase_to_browse + ":sum"
+                    )
+                    impact_value += datafile[variable_name].value[0]
+                    continue
+
+                else:
+                    for component_to_browse in components_to_browse:
+                        variable_name = (
+                            LCA_PREFIX
+                            + impact_to_browse
+                            + "_weighted:"
+                            + phase_to_browse
+                            + ":"
+                            + component_to_browse
+                        )
+                        # Only adds variable that exist
+                        if variable_name in datafile.names():
+                            impact_value += datafile[variable_name].value[0]
+
+        if rel:
+            impacts.append(impact_value / single_score * 100.0)
+        else:
+            impacts.append(impact_value)
+
+    return impacts
