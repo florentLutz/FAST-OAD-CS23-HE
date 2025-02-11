@@ -21,7 +21,7 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
         )
         self.options.declare(
             name="position",
-            default="in_the_cabin",
+            default="in_the_back",
             values=POSSIBLE_POSITION,
             desc="Option to give the position of the gaseous hydrogen tank, "
             "possible position include " + ", ".join(POSSIBLE_POSITION),
@@ -92,7 +92,7 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
-        in_fuselage = not (position == "wing_pod" or position == "underbelly")
+        in_fuselage = position == "in_the_cabin" or position == "in_the_back"
 
         d_inner = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -133,7 +133,7 @@ class SizingGaseousHydrogenTankLength(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
-        in_fuselage = not (position == "wing_pod" or position == "underbelly")
+        in_fuselage = position == "in_the_cabin" or position == "in_the_back"
 
         d_inner = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"

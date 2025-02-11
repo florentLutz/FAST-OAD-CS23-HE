@@ -24,7 +24,7 @@ class SizingGaseousHydrogenTankCGY(om.ExplicitComponent):
 
         self.options.declare(
             name="position",
-            default="in_the_cabin",
+            default="in_the_back",
             values=POSSIBLE_POSITION,
             desc="Option to give the position of the gaseous hydrogen tank, "
             "possible position include " + ", ".join(POSSIBLE_POSITION),
