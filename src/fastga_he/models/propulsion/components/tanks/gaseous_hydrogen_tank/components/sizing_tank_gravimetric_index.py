@@ -9,8 +9,7 @@ import numpy as np
 class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
     """
     Computation of the gravimetric index of gaseous hydrogen tank,
-    ratio between hydrogen capacity and overall system weight.
-    :cite:`mukhopadhaya:2022`
+    ratio between hydrogen capacity and overall system weight.:cite:`mukhopadhaya:2022`
     """
 
     def initialize(self):
@@ -54,31 +53,35 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
+        mass = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":mass"
+        ]
+        capacity = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":capacity"
+        ]
 
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":gravimetric_index"
-        ] = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":capacity"
-        ] / (
-            inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":capacity"
-            ]
-            + inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":mass"
-            ]
-        )
+        ] = capacity / (capacity + mass)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
-
+        mass = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":mass"
+        ]
+        capacity = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":capacity"
+        ]
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
@@ -86,26 +89,7 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":capacity",
-        ] = (
-            inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":mass"
-            ]
-            / (
-                inputs[
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + gaseous_hydrogen_tank_id
-                    + ":capacity"
-                ]
-                + inputs[
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + gaseous_hydrogen_tank_id
-                    + ":mass"
-                ]
-            )
-            ** 2
-        )
+        ] = mass / (capacity + mass) ** 2
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -114,23 +98,4 @@ class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":mass",
-        ] = (
-            -inputs[
-                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                + gaseous_hydrogen_tank_id
-                + ":capacity"
-            ]
-            / (
-                inputs[
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + gaseous_hydrogen_tank_id
-                    + ":capacity"
-                ]
-                + inputs[
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + gaseous_hydrogen_tank_id
-                    + ":mass"
-                ]
-            )
-            ** 2
-        )
+        ] = -capacity / (capacity + mass) ** 2

@@ -19,7 +19,7 @@ from ..components.sizing_tank_length import SizingGaseousHydrogenTankLength
 from ..components.sizing_tank_inner_diameter import SizingGaseousHydrogenTankInnerDiameter
 from ..components.sizing_tank_outer_diameter import SizingGaseousHydrogenTankOuterDiameter
 from ..components.sizing_tank_weight import SizingGaseousHydrogenTankWeight
-from ..components.sizing_gravimetric_index import SizingGaseousHydrogenTankGravimetricIndex
+from ..components.sizing_tank_gravimetric_index import SizingGaseousHydrogenTankGravimetricIndex
 from ..components.sizing_tank_drag import SizingGaseousHydrogenTankDrag
 from ..components.sizing_tank_wall_thickness import SizingGaseousHydrogenTankWallThickness
 from ..components.sizing_tank_length_fuselage_contraints import (

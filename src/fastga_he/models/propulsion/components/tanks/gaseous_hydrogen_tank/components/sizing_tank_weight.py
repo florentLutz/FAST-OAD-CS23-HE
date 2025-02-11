@@ -4,9 +4,6 @@
 
 import openmdao.api as om
 import numpy as np
-import logging
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
@@ -83,7 +80,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             + ":material:density"
         ]
 
-        d = inputs[
+        d_tank = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:outer_diameter"
@@ -112,12 +109,12 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":mass"
-        ] = wall_density * (np.pi * d**3 / 6 + np.pi * d**2 * length / 4 - inner_volume)
+        ] = wall_density * (np.pi * d_tank**3 / 6 + np.pi * d_tank**2 * length / 4 - inner_volume)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
-        d = inputs[
+        d_tank = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:outer_diameter"
@@ -155,7 +152,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":material:density",
-        ] = np.pi * d**3 / 6 + np.pi * d**2 * length / 4 - inner_volume
+        ] = np.pi * d_tank**3 / 6 + np.pi * d_tank**2 * length / 4 - inner_volume
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -164,7 +161,7 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:length",
-        ] = wall_density * np.pi * d**2 / 4
+        ] = wall_density * np.pi * d_tank**2 / 4
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -182,4 +179,4 @@ class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":dimension:outer_diameter",
-        ] = wall_density * (-np.pi * d**2 / 4 + np.pi * d * (length + d) / 2)
+        ] = wall_density * (-np.pi * d_tank**2 / 4 + np.pi * d_tank * (length + d_tank) / 2)
