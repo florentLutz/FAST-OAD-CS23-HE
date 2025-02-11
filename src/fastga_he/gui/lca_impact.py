@@ -25,7 +25,7 @@ HASH = ["/", "x", "-", "|", "+", ".", "", "\\"]
 
 
 def lca_impacts_sun_breakdown(
-    aircraft_file_path: Union[str, List[str]],
+    aircraft_file_path: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
     full_burst: bool = False,
     name_aircraft: Union[str, List[str]] = None,
     rel: str = "absolute",
@@ -47,7 +47,7 @@ def lca_impacts_sun_breakdown(
     elif rel == "parent":
         title_text += "<br>expressed as a percentage of parent category"
 
-    if isinstance(aircraft_file_path, str):
+    if isinstance(aircraft_file_path, str) or isinstance(aircraft_file_path, pathlib.Path):
         fig = go.Figure()
         fig.add_trace(_get_impact_sunburst(aircraft_file_path, rel))
 
@@ -132,7 +132,9 @@ def _get_weighted_impact_dict(aircraft_file_path: Union[str, pathlib.Path]) -> d
     return names_impact_categories
 
 
-def _get_impact_sunburst(aircraft_file_path: str, rel: str = "absolute") -> go.Sunburst:
+def _get_impact_sunburst(
+    aircraft_file_path: Union[str, pathlib.Path], rel: str = "absolute"
+) -> go.Sunburst:
     names_variables_lca = _get_impact_variable_list(aircraft_file_path)
     datafile = oad.DataFile(aircraft_file_path)
 
@@ -202,7 +204,7 @@ def _name_to_label(name_variable: str, datafile: oad.DataFile, rel: str = "absol
     else:
         depth = -2
 
-    clean_name = name_variable.split(":")[depth]
+    clean_name = name_variable.split(":")[depth].replace("_weighted", "").replace("_", "<br>")
 
     if rel == "single_score":
         value = (
@@ -259,7 +261,7 @@ def _round_value(value: float) -> float:
     if value == 0.0:
         return value
     else:
-        return round(value, int(np.ceil(abs(np.log10(value))) + 5))
+        return round(value, int(np.ceil(abs(np.log10(value))) + 2))
 
 
 def _get_first_parent_name(name_variable: str) -> str:
@@ -894,7 +896,7 @@ def _get_component_from_variable_name(variable_name: str) -> str:
 
 
 def lca_impacts_bar_chart_simple(
-    aircraft_file_paths: Union[str, List[str]],
+    aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
     names_aircraft: Union[str, List[str]] = None,
 ) -> go.FigureWidget:
     """
@@ -962,7 +964,7 @@ def lca_impacts_bar_chart_simple(
 
 
 def lca_impacts_bar_chart_normalised_weighted(
-    aircraft_file_paths: Union[str, List[str]],
+    aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
     names_aircraft: Union[str, List[str]] = None,
 ) -> go.FigureWidget:
     """
@@ -1086,7 +1088,7 @@ def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]
 
 
 def lca_impacts_bar_chart_with_contributors(
-    aircraft_file_path: str,
+    aircraft_file_path: Union[str, pathlib.Path],
     name_aircraft: str = None,
 ) -> go.FigureWidget:
     """
@@ -1157,6 +1159,104 @@ def lca_impacts_bar_chart_with_contributors(
         linewidth=3,
         tickfont=dict(size=20),
         title="Relative contribution [%]",
+    )
+    fig.update_yaxes(
+        title_font=dict(size=20),
+    )
+
+    return go.FigureWidget(fig)
+
+
+def lca_impacts_bar_chart_with_phases_absolute(
+    aircraft_file_path: Union[str, pathlib.Path],
+    name_aircraft: str = None,
+) -> go.FigureWidget:
+    """
+    Give a bar chart that plot the weighted impact of an aircraft in each category and how each
+    phase contributes to it in absolute terms
+
+    :param aircraft_file_path: path to the output file that contains the results of the LCA
+    :param name_aircraft: name of the aircraft
+    """
+
+    component_and_contribution = _get_component_and_contribution(aircraft_file_path)
+
+    fig = go.Figure()
+
+    impact_score_dict = _get_weighted_impact_dict(aircraft_file_path)
+    impact_score_dict.pop("single_score")
+
+    component_counter = 0
+
+    beautified_component_names = []
+
+    for component_name in component_and_contribution:
+        beautified_component_name = component_name.replace("_", " ")
+        if beautified_component_name[-1].isdigit():
+            beautified_component_names.append(beautified_component_name[:-2])
+        else:
+            beautified_component_names.append(beautified_component_name)
+
+    for component, impacts in component_and_contribution.items():
+        impact_contributions = []
+        beautified_impact_names = []
+
+        for impact_name, contribution in impacts.items():
+            beautified_impact_name = impact_name.replace("_", " ")
+            beautified_impact_names.append(beautified_impact_name)
+
+            impact_contributions.append(contribution)
+
+        # If there are only one component of each type, we don't put the number
+        beautified_component_name = component.replace("_", " ")
+        if beautified_component_name[-1].isdigit():
+            component_type = " ".join(beautified_component_name.split(" ")[:-1])
+            if beautified_component_names.count(component_type) == 1:
+                final_name = component_type
+            else:
+                final_name = beautified_component_name
+        else:
+            final_name = beautified_component_name
+
+        bar_chart = go.Bar(
+            name=final_name,
+            x=beautified_impact_names,
+            y=impact_contributions,
+            marker=dict(
+                pattern_shape=HASH[component_counter // len(HASH)],
+                color=COLS[component_counter % len(COLS)],
+            ),
+        )
+        fig.add_trace(bar_chart)
+
+        component_counter += 1
+
+    title_text = "Contribution of each phase to each impact category for " + name_aircraft
+
+    fig.update_layout(
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+        title_x=0.5,
+        title_text=title_text,
+        barmode="stack",
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=20),
+        title="Normalised and weighted contribution [-]",
     )
     fig.update_yaxes(
         title_font=dict(size=20),
