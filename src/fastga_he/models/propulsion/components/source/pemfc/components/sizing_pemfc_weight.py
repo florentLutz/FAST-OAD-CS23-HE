@@ -88,7 +88,7 @@ class SizingPEMFCWeightAerostak200W(om.ExplicitComponent):
 
 class SizingPEMFCWeightSpecificPower(om.ExplicitComponent):
     """
-    Computation of the weight the PEMFC based on the layer weight density but adjusted with power density
+    Computation of the weight the PEMFC based on the layer weight density but adjusted with power density.
     """
 
     def initialize(self):

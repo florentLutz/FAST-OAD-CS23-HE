@@ -13,10 +13,7 @@ DEFAULT_FC_POWER_DENSITY = 124  # kW/m^3
 
 class SizingPEMFCDimensionsAerostak200W(om.ExplicitComponent):
     """
-    Computation of the different dimensions of the PEMFC, it will heavily depend on the
-    position of the PEMFC. If the batteries are in the rear, front or in pods,
-    we will use ratios. If the batteries are in the underbelly/wing, we will use fuselage/wing
-    dimensions.
+    Computation of the different dimensions of the PEMFC based on Aerostak 200W.
     """
 
     def initialize(self):
@@ -151,10 +148,8 @@ class SizingPEMFCDimensionsAerostak200W(om.ExplicitComponent):
 
 class SizingPEMFCDimensionsPowerDensity(om.ExplicitComponent):
     """
-    Computation of the different dimensions of the PEMFC, it will heavily depend on the
-    position of the PEMFC. If the batteries are in the rear, front or in pods,
-    we will use ratios. If the batteries are in the underbelly/wing, we will use fuselage/wing
-    dimensions.
+    Computing the PEMFC dimensions based on the ratio of its maximum power density to that
+    of the Aerostak 200W reference enables more realistic sizing.
     """
 
     def initialize(self):

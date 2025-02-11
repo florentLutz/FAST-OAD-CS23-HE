@@ -13,7 +13,7 @@ from ..components.perf_maximum_current import PerformancesMaximumCurrent
 from ..components.perf_maximum_power import PerformancesMaximumPower
 from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
 from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_GROUP
+from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION
 from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
@@ -151,7 +151,7 @@ class PerformancesPEMFCStack(om.Group):
         self.add_subsystem(
             name="maximum_power_related_parameters_group",
             subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_GROUP, options=option_max_power_group
+                SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION, options=option_max_power_group
             ),
             promotes=["*"],
         )

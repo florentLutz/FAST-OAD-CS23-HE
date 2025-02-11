@@ -3,7 +3,7 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_GROUP
+from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION
 import fastoad.api as oad
 from .perf_pemfc_expect_power_density import (
     PerformancesPEMFCMaxPowerDensityFuelCellSystem,
@@ -15,18 +15,19 @@ from .perf_pemfc_expect_specific_power import (
 )
 
 
-oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_GROUP] = (
-    "submodel.propulsion.performances.pemfc.max_power_group.system"
+oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION] = (
+    "submodel.propulsion.performances.pemfc.modeling_option.system"
 )
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_GROUP,
-    "submodel.propulsion.performances.pemfc.max_power_group.system",
+    SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION,
+    "submodel.propulsion.performances.pemfc.modeling_option.system",
 )
-class PerformancesPEMFCMaxPowerGroupFuelCellSystem(om.Group):
+class PerformancesPEMFCModelingOptionSystem(om.Group):
     """
-    Collect both weight and dimension of PEMFC based on Aerostak 200W.
+    This group provide the maximum power density and maximum specific power of the PEMFC.
+    These two sizing indicators are derived from PEMFC systems includes all the BOPs except inlet compressors.
     """
 
     def initialize(self):
@@ -54,12 +55,13 @@ class PerformancesPEMFCMaxPowerGroupFuelCellSystem(om.Group):
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_PERFORMANCES_PEMFC_MAX_POWER_GROUP,
-    "submodel.propulsion.performances.pemfc.max_power_group.stack",
+    SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION,
+    "submodel.propulsion.performances.pemfc.modeling_option.stack",
 )
-class PerformancesPEMFCMaxPowerGroupFuelCellStack(om.Group):
+class PerformancesPEMFCModelingOptionStack(om.Group):
     """
-    Collect both weight and dimension of PEMFC based on Aerostak 200W.
+    This group defines the PEMFC stack's maximum power density and maximum specific power.
+    These sizing indicators are derived solely from the PEMFC itself, ensuring flexibility in configuring BOPs.
     """
 
     def initialize(self):
