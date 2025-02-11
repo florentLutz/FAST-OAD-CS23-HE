@@ -6,7 +6,6 @@ import openmdao.api as om
 import numpy as np
 
 
-# To modify
 class SizingGaseousHydrogenTankInnerDiameter(om.ExplicitComponent):
     """
     Computation of the inner diameter of the tank.

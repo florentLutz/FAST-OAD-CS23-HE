@@ -52,16 +52,16 @@ class SizingGaseousHydrogenTank(om.Group):
         position = self.options["position"]
 
         self.add_subsystem(
-            name="total_gaseous_hydrogen",
-            subsys=SizingGaseousHydrogenTankTotalHydrogenMission(
+            name="unusable_gaseous_hydrogen",
+            subsys=SizingGaseousHydrogenTankUnusableHydrogen(
                 gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id
             ),
             promotes=["*"],
         )
 
         self.add_subsystem(
-            name="unusable_gaseous_hydrogen",
-            subsys=SizingGaseousHydrogenTankUnusableHydrogen(
+            name="total_gaseous_hydrogen",
+            subsys=SizingGaseousHydrogenTankTotalHydrogenMission(
                 gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id
             ),
             promotes=["*"],

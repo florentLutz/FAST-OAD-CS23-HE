@@ -3,12 +3,12 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
-import numpy as np
 
 
 class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
     """
-    Computation of the amount of trapped hydrogen in the tank.
+    Computation of the amount of trapped hydrogen in the tank. The default value of trapped_ratio is
+    set slightly higher to prevent underestimation (3%). :cite:`ahluwalia:2010`
     """
 
     def initialize(self):
@@ -18,15 +18,6 @@ class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
             desc="Identifier of the gas hydrogen tank",
             allow_none=False,
         )
-
-        self.options.declare(
-            name="trapped_ratio",
-            default=0.03,
-            desc="Ratio between typical empty pressure and filling pressure of hydrogen tank.",
-            allow_none=False,
-        )
-        # "The default value is set slightly higher to prevent underestimation."
-        # :cite:`ahluwalia:2010`
 
     def setup(self):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
@@ -43,10 +34,9 @@ class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":fuel_total_mission",
-            units="kg",
-            val=np.nan,
-            desc="Total amount of hydrogen loaded in the tank for the mission",
+            + ":trapped_ratio",
+            val=0.03,
+            desc="Ratio between typical empty pressure and filling pressure of hydrogen tank",
         )
 
         self.add_output(
@@ -58,21 +48,7 @@ class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
             desc="Amount of trapped hydrogen in the tank",
         )
 
-        self.declare_partials(
-            of="*",
-            wrt="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":fuel_total_mission",
-            val=1.0,
-        )
-
-        self.declare_partials(
-            of="*",
-            wrt="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":fuel_consumed_mission",
-            val=-1.0,
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         # To modify based on the minimum pressure for the output hydrogen mass flow
@@ -85,11 +61,39 @@ class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
-                + ":fuel_total_mission"
+                + ":trapped_ratio"
             ]
-            - inputs[
+            * inputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":fuel_consumed_mission"
             ]
         )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
+        partials[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":unusable_fuel_mission",
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":trapped_ratio",
+        ] = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":fuel_consumed_mission"
+        ]
+
+        partials[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":unusable_fuel_mission",
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":fuel_consumed_mission",
+        ] = inputs[
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+            + gaseous_hydrogen_tank_id
+            + ":trapped_ratio"
+        ]

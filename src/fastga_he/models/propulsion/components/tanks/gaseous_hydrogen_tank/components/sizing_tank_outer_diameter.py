@@ -12,9 +12,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
     """
-    The Outer diameter of the gaseous hydrogen tank is based on
+    The outer diameter of the gaseous hydrogen tank is based on
     the maximum fuselage height and the number of tanks.
-    For Multi-tank stack scenarios,
+    For multi-tank stack scenarios,
     all the tanks are assumed with the same diameter and using the table provided by:
     :cite:`kravitz:1967`
     """
@@ -39,7 +39,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
     def setup(self):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
-        in_fuselage = not (position == "wing_pod" or position == "underbelly")
+        in_fuselage = position == "in_the_cabin" or position == "in_the_back"
 
         self.add_input("data:geometry:fuselage:maximum_height", val=np.nan, units="m")
 
@@ -88,7 +88,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             + gaseous_hydrogen_tank_id
             + ":diameter_height_ratio"
         ]
-
+        # Ratio between the tank outer diameter and fuselage height
         not_in_fuselage = (position == "wing_pod") or (position == "underbelly")
 
         inner_volume = inputs[
@@ -100,8 +100,8 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
         if not_in_fuselage:
             multi_tank_factor = 1.0
             nb_tank = 1.0
-            _LOGGER.warning(
-                msg="Number of tank per stack fixed to 1 for all outside fuselage position !!"
+            _LOGGER.info(
+                msg="Number of tank per stack fixed to 1 for all outside fuselage position"
             )
         else:
             nb_tank = inputs[
@@ -111,20 +111,20 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             ]
             multi_tank_factor = 1 / MULTI_TANK_FACTOR.get(int(nb_tank))
         # multi_tank_factor divides the outer diameter with respect to the number of tanks.
-        d = (
+        d_tank = (
             diameter_height_ratio
             * inputs["data:geometry:fuselage:maximum_height"]
             * multi_tank_factor
         )
         # This condition is to keep the tank as cylindrical as possible.
-        has_sufficient_volume = inner_volume >= nb_tank * np.pi * d**3 / 6
+        has_sufficient_volume = inner_volume >= nb_tank * np.pi * d_tank**3 / 6
 
         if has_sufficient_volume and not not_in_fuselage:
             outputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
-            ] = d
+            ] = d_tank
 
         elif not has_sufficient_volume and not not_in_fuselage:
             outputs[
@@ -147,7 +147,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + ":dimension:outer_diameter"
             ] = 0.2 * inputs["data:geometry:fuselage:maximum_height"]
             # Ratio inspired by the size of fighter jet external fuel tank
-            _LOGGER.warning(msg="Tank diameter fixed as 20% of fuselage maximum height !!")
+            _LOGGER.info(msg="Tank diameter fixed as 20% of fuselage maximum height")
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
@@ -157,6 +157,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             + gaseous_hydrogen_tank_id
             + ":diameter_height_ratio"
         ]
+        # Ratio between the tank outer diameter and fuselage height
         inner_volume = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
@@ -177,13 +178,13 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             ]
             multi_tank_factor = 1 / MULTI_TANK_FACTOR.get(int(nb_tank))
 
-        d = (
+        d_tank = (
             diameter_height_ratio
             * inputs["data:geometry:fuselage:maximum_height"]
             * multi_tank_factor
         )
         # This condition is to keep the tank as cylindrical as possible.
-        has_sufficient_volume = inner_volume >= nb_tank * np.pi * d**3 / 6
+        has_sufficient_volume = inner_volume >= nb_tank * np.pi * d_tank**3 / 6
 
         if has_sufficient_volume and not not_in_fuselage:
             partials[

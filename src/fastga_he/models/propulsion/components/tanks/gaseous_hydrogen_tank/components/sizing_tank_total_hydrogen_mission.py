@@ -35,17 +35,10 @@ class SizingGaseousHydrogenTankTotalHydrogenMission(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":tank_pressure",
+            + ":unusable_fuel_mission",
+            units="kg",
             val=np.nan,
-            units="atm",
-            desc="gaseous hydrogen tank storage pressure",
-        )
-
-        self.add_input(
-            name="hydrogen_reactant_pressure",
-            units="atm",
-            val=0.3,
-            desc="hydrogen gas pressure applied at source components",
+            desc="Amount of trapped hydrogen in the tank",
         )
 
         self.add_output(
@@ -57,67 +50,24 @@ class SizingGaseousHydrogenTankTotalHydrogenMission(om.ExplicitComponent):
             desc="Total amount of hydrogen loaded in the tank for the mission",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
-        storage_pressure = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":tank_pressure"
-        ]
 
-        reactant_pressure = inputs["hydrogen_reactant_pressure"]
-        mission_consumed_fuel = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":fuel_consumed_mission"
-        ]
-        pressure_ratio = (storage_pressure - reactant_pressure) / storage_pressure
-        # pressure ratio between the available pressure and storage pressure
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":fuel_total_mission"
-        ] = mission_consumed_fuel / pressure_ratio
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
-        storage_pressure = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":tank_pressure"
-        ]
-
-        reactant_pressure = inputs["hydrogen_reactant_pressure"]
-        mission_consumed_fuel = inputs[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":fuel_consumed_mission"
-        ]
-        pressure_ratio = (storage_pressure - reactant_pressure) / storage_pressure
-
-        partials[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":fuel_total_mission",
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":fuel_consumed_mission",
-        ] = 1 / pressure_ratio
-
-        partials[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":fuel_total_mission",
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":tank_pressure",
-        ] = -mission_consumed_fuel * reactant_pressure / (storage_pressure - reactant_pressure) ** 2
-
-        partials[
-            "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-            + gaseous_hydrogen_tank_id
-            + ":fuel_total_mission",
-            "hydrogen_reactant_pressure",
-        ] = mission_consumed_fuel * storage_pressure / (storage_pressure - reactant_pressure) ** 2
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":fuel_consumed_mission"
+            ]
+            + inputs[
+                "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
+                + gaseous_hydrogen_tank_id
+                + ":unusable_fuel_mission"
+            ]
+        )
