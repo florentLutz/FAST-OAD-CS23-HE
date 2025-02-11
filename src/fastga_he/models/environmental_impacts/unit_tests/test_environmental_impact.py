@@ -144,7 +144,6 @@ def test_impact_both():
     problem.check_partials(compact_print=True)
 
 
-
 def test_aircraft_equivalent_year_of_life():
     inputs_list = [
         "data:TLAR:max_airframe_hours",

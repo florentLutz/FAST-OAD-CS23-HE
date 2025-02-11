@@ -2342,9 +2342,7 @@ class FASTGAHEPowerTrainConfigurator:
                             )
                             .replace(
                                 "ANCHOR_COMPONENT_MATERIAL",
-                                variable_name_mass.replace("mass", "material").replace(
-                                    ":", "__"
-                                ),
+                                variable_name_mass.replace("mass", "material").replace(":", "__"),
                             )
                         )
 
