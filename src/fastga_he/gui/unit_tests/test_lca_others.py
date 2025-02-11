@@ -81,7 +81,8 @@ def test_lca_single_score_sensitivity_analysis_two_plots():
     fig.show()
 
     fig.update_layout(height=800.0, width=1600.0)
-    fig.write_image(PATH_TO_CURRENT_FILE.parent / "results" / "ga_single_score_evolution.pdf")
+    if not IN_GITHUB_ACTIONS:
+        fig.write_image(PATH_TO_CURRENT_FILE.parent / "results" / "ga_single_score_evolution.pdf")
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -171,7 +172,8 @@ def test_lca_bar_chart_relative_paper():
 
     fig.show()
     fig.update_layout(height=800, width=1600)
-    fig.write_image(RESULT_FOLDER_PATH / "ga_impacts_evolution.pdf")
+    if not IN_GITHUB_ACTIONS:
+        fig.write_image(RESULT_FOLDER_PATH / "ga_impacts_evolution.pdf")
 
 
 def test_lca_bar_chart_normalised_and_weighted():
@@ -213,4 +215,5 @@ def test_lca_bar_chart_absolute_phase():
 
     fig.show()
     fig.update_layout(height=800, width=1600)
-    fig.write_image(RESULT_FOLDER_PATH / "ref_kodiak_component_contribution.pdf")
+    if not IN_GITHUB_ACTIONS:
+        fig.write_image(RESULT_FOLDER_PATH / "ref_kodiak_component_contribution.pdf")

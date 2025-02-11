@@ -2,6 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import os
 import os.path as pth
 import pathlib
 
@@ -17,6 +18,8 @@ SENSITIVITY_STUDIES_FOLDER_PATH = (
     / "results"
     / "parametric_study"
 )
+
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def test_lca_sun_breakdown_tbm900():
@@ -103,7 +106,8 @@ def test_lca_sun_breakdown_kodiak_rel_absolute_paper():
     fig.update_layout(title_text=None)
 
     fig.show()
-    fig.write_image(RESULT_FOLDER_PATH / "reference_kodiak_sun_breakdown.pdf")
+    if not IN_GITHUB_ACTIONS:
+        fig.write_image(RESULT_FOLDER_PATH / "reference_kodiak_sun_breakdown.pdf")
 
 
 def test_lca_sun_breakdown_kodiak_rel_parent():
