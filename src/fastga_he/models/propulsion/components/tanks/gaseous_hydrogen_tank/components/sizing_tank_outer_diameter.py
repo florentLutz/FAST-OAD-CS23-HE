@@ -12,11 +12,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
     """
-    The outer diameter of the gaseous hydrogen tank is based on
-    the maximum fuselage height and the number of tanks.
-    For multi-tank stack scenarios,
-    all the tanks are assumed with the same diameter and using the table provided by:
-    :cite:`kravitz:1967`
+    The outer diameter of the gaseous hydrogen tank is based on the maximum fuselage height and
+    the number of tanks. For multi-tank stack scenarios, all the tanks are assumed with the same
+    diameter and using the table provided by :cite:`kravitz:1967`.
     """
 
     def initialize(self):
