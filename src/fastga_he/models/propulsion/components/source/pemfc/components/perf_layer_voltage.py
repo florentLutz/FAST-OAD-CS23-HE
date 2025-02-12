@@ -76,7 +76,7 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-
+        pemfc_stack_id = self.options["pemfc_stack_id"]
         self.add_input(
             "fc_current_density",
             units="A/cm**2",
@@ -102,7 +102,9 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
         )
 
         self.add_output(
-            "hydrogen_reactant_pressure",
+            "data:propulsion:he_power_train:pemfc_stack:"
+            + pemfc_stack_id
+            + ":hydrogen_reactant_pressure",
             units="atm",
             val=DEFAULT_PRESSURE_ATM,
         )
@@ -123,9 +125,16 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
             cols=np.zeros(number_of_points),
         )
 
-        self.declare_partials(of="hydrogen_reactant_pressure", wrt="nominal_pressure", val=1.0)
+        self.declare_partials(
+            of="data:propulsion:he_power_train:pemfc_stack:"
+            + pemfc_stack_id
+            + ":hydrogen_reactant_pressure",
+            wrt="nominal_pressure",
+            val=1.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_id = self.options["pemfc_stack_id"]
         voc = self.options["open_circuit_voltage"]
         active_loss_coeff = self.options["activation_loss_coefficient"]
         r = self.options["ohmic_resistance"]
@@ -154,7 +163,11 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
             + pressure_coeff * pressure_ratio_log
         )
         # This output is to for tank connection
-        outputs["hydrogen_reactant_pressure"] = nominal_pressure
+        outputs[
+            "data:propulsion:he_power_train:pemfc_stack:"
+            + pemfc_stack_id
+            + ":hydrogen_reactant_pressure"
+        ] = nominal_pressure
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         active_loss_coeff = self.options["activation_loss_coefficient"]
@@ -282,6 +295,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
+        pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
             "fc_current_density",
@@ -290,7 +304,9 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="hydrogen_reactant_pressure",
+            name="data:propulsion:he_power_train:pemfc_stack:"
+            + pemfc_stack_id
+            + ":hydrogen_reactant_pressure",
             units="atm",
             val=DEFAULT_PRESSURE_ATM,
         )
@@ -341,6 +357,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         number_of_points = self.options["number_of_points"]
+        pemfc_stack_id = self.options["pemfc_stack_id"]
         e0 = self.options["reversible_electric_potential"]
         ds = self.options["entropy_difference"]
         gas_const = self.options["gas_constant"]
@@ -362,7 +379,11 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
 
         p_o2 = inputs["operation_pressure"]
 
-        p_h2 = inputs["hydrogen_reactant_pressure"]
+        p_h2 = inputs[
+            "data:propulsion:he_power_train:pemfc_stack:"
+            + pemfc_stack_id
+            + ":hydrogen_reactant_pressure"
+        ]
 
         t = inputs["operation_temperature"]
 
@@ -377,6 +398,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         number_of_points = self.options["number_of_points"]
+        pemfc_stack_id = self.options["pemfc_stack_id"]
         e0 = self.options["reversible_electric_potential"]
         ds = self.options["entropy_difference"]
         gas_const = self.options["gas_constant"]
@@ -391,7 +413,11 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         p_o2 = inputs["operation_pressure"]
         vf = inputs["analytical_voltage_adjust_factor"]
 
-        p_h2 = inputs["hydrogen_reactant_pressure"]
+        p_h2 = inputs[
+            "data:propulsion:he_power_train:pemfc_stack:"
+            + pemfc_stack_id
+            + ":hydrogen_reactant_pressure"
+        ]
 
         j = np.clip(
             inputs["fc_current_density"],
@@ -422,9 +448,12 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
             gas_const * t / (4 * faraday_const * p_o2)
         )
 
-        partials["single_layer_pemfc_voltage", "hydrogen_reactant_pressure"] = vf * (
-            gas_const * t / (2 * faraday_const * p_h2)
-        )
+        partials[
+            "single_layer_pemfc_voltage",
+            "data:propulsion:he_power_train:pemfc_stack:"
+            + pemfc_stack_id
+            + ":hydrogen_reactant_pressure",
+        ] = vf * (gas_const * t / (2 * faraday_const * p_h2))
 
         partials["single_layer_pemfc_voltage", "analytical_voltage_adjust_factor"] = (
             e0
