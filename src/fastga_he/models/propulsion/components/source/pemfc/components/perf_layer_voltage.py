@@ -72,8 +72,15 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
         )
 
         self.options.declare(
-            "max_current_density", default=0.7, desc="maximum current density  of pemfc"
+            "exponential_coefficient_in_concentration_loss",
+            default=11.42,
+            desc="exponential coefficient in concentration loss of one layer of pemfc [cm**2/A]",
         )
+
+        self.options.declare(
+            "max_current_density", default=0.7, desc="maximum current density  of pemfc[A/cm^2]"
+        )
+
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
@@ -88,6 +95,8 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
             name="nominal_pressure",
             units="atm",
             val=DEFAULT_PRESSURE_ATM,
+            desc="The nominal pressure at which the PEMFC operates does not affect the layer "
+                 "voltage "
         )
 
         self.add_input(

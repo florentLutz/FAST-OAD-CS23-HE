@@ -24,10 +24,19 @@ produces electricity with H₂O as the only byproduct.
   :width: 600
   :name: 1
 
-This component can be activated through the powertrain configuration file (PT file) and customized by editing in the source code.
+This component can be activated through the powertrain configuration file (PT file). The registered installation
+positions can be found at tank position options in :ref:`options <options-pemfc>`.
 
-A brief description of the gaseous hydrogen tank component is shown below.
-Including the component computation logic, options for customization, and model assumptions.
+.. code-block:: yaml
+
+    power_train_components:
+      ⋮
+      pemfc_stack_1:
+        id: fastga_he.pt_component.pemfc_stack
+        position: ...
+        options: ...
+
+A brief description of the PEMFC component is presented here:
 
 .. _table:
 .. toctree::

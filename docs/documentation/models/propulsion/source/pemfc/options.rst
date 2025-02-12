@@ -1,3 +1,5 @@
+.. _options-pemfc:
+
 ========================================
 Proton-exchange membrane fuel cell model
 ========================================
