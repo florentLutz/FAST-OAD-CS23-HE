@@ -1,7 +1,7 @@
 .. _models-gaseous_hydrogen_tank:
 
 =================================
-Gaseous Hydrogen Tank computation
+Gaseous hydrogen tank computation
 =================================
 
 .. contents::

@@ -1,7 +1,7 @@
 .. _tank-index:
 
 ==========================
-Propulsion Tank components
+Storage tank components
 ==========================
 
 Here you will find the documentation of the propulsion tank components available in FAST-OAD-CS23-HE powertrain building.

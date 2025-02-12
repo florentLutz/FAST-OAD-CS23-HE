@@ -1,5 +1,5 @@
 ============================
-Gaseous Hydrogen Tank model
+Gaseous hydrogen tank model
 ============================
 
 The gaseous hydrogen tank is a storage option in FAST-OAD-CS23-HE, designed to store hydrogen in gaseous state.

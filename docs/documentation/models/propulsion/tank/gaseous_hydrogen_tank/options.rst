@@ -1,11 +1,11 @@
 .. _options-gaseous-hydrogen-tank:
 
 ===========================
-Gaseous Hydrogen Tank model
+Gaseous hydrogen tank model
 ===========================
 
 ********************
-Tank Position option
+Tank position option
 ********************
 The gaseous hydrogen tank model has four possible installation position:
 
