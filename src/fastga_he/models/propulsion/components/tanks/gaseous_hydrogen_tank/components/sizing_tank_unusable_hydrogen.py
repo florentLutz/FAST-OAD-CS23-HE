@@ -36,7 +36,8 @@ class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
             + gaseous_hydrogen_tank_id
             + ":trapped_ratio",
             val=0.03,
-            desc="Ratio between typical empty pressure and filling pressure of hydrogen tank",
+            desc="Ratio between the hydrogen reactant pressure for fuel cell or the injection "
+            "pressure for hydrogen engines and filling pressure of hydrogen tank",
         )
 
         self.add_output(
