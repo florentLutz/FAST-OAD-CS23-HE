@@ -52,6 +52,7 @@
                         <max_specific_power units="kW/kg">0.345</max_specific_power>
                         <max_power_density units="kW/m**3">124</max_power_density>
                         <number_of_layers>35.0</number_of_layers>
+                        <hydrogen_reactant_pressure units="atm">1.0</hydrogen_reactant_pressure>
                         <effective_area units="cm**2">16.8</effective_area>
                         <operation_pressure units="atm">1.2</operation_pressure>
                         <dimension>

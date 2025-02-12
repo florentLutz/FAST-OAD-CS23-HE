@@ -1,15 +1,9 @@
-.. _assumptions-gaseous-hydrogen-tank:
+.. _assumptions-pemfc:
 
-=================================
-Gaseous Hydrogen Tank assumptions
-=================================
+==============================================
+Proton-exchange membrane fuel cell assumptions
+==============================================
 
-The followings are the assumptions that applied in the gaseous hydrogen tank computation.
+The followings are the assumptions that applied in the Proton-Exchange Membrane Fuel Cell (PEMFC) computation.
 
-* The hydrogen gas in the tank is considered ideal gas.
-* The hydrogen properties remain static during the whole mission.
-* The tank body maintains a uniform wall thickness.
-* The hydrogen tank capacity while applying enforce constraint is the sum of the design mission consumption and the
-  unused hydrogen in the tank. The trapped (unused) hydrogen is estimated as 3% of the design mission consumption
-  based on :cite:`ahluwalia:2010`.
-* The number of tank per stack remains as single tank for components installed outside the fuselage.
+*

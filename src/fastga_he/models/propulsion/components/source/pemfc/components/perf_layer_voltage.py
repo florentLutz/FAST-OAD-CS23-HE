@@ -23,9 +23,10 @@ oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE] = 
 class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
     # TODO: Edit citation after rebase
     """
-    Computation of the voltage of single layer proton exchange membrane fuel cell inside one stack. Assumes it can be
-    estimated with the i-v curve relation. Model based on existing pemfc, Aerostack Ultralight 200, details can be found
-    in :cite:`Fuel Cell and Battery Hybrid System Optimization by J. Hoogendoorn:2018`.
+    Computation of the voltage of single layer proton exchange membrane fuel cell inside one
+    stack. Assumes it can be estimated with the i-v curve relation. Model based on existing
+    pemfc, Aerostack Ultralight 200, details can be found in :cite:`Fuel Cell and Battery Hybrid
+    System Optimization by J. Hoogendoorn:2018`.
     """
 
     def initialize(self):
@@ -210,9 +211,10 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
 )
 class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
     """
-    Computation of the voltage of single layer proton exchange membrane fuel cell inside one stack. Assumes it can be
-    estimated with the i-v curve relation. Model based on analytical i-v curve equation, details can be found in:
-    cite:`Preliminary Propulsion System Sizing Methods for PEM Fuel Cell Aircraft by D.Juschus:2021`.
+    Computation of the voltage of single layer proton exchange membrane fuel cell inside one
+    stack. Assumes it can be estimated with the i-v curve relation. Model based on analytical i-v
+    curve equation, details can be found in: cite:`Preliminary Propulsion System Sizing Methods
+    for PEM Fuel Cell Aircraft by D.Juschus:2021`.
     """
 
     def initialize(self):
@@ -349,7 +351,9 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="hydrogen_reactant_pressure",
+            wrt="data:propulsion:he_power_train:pemfc_stack:"
+            + pemfc_stack_id
+            + ":hydrogen_reactant_pressure",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),

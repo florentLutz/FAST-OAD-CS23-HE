@@ -1,10 +1,30 @@
 ========================================
-Proton-Exchange Membrane Fuel Cell Model
+Proton-exchange membrane fuel cell model
 ========================================
 
-The gaseous hydrogen tank is a storage option in FAST-OAD-CS23-HE, designed to store hydrogen in its gas-phase.
-This component can be activated through the powertrain configuration file (PT file) and
-customized by editing in the source code.
+The Proton-Exchange Membrane Fuel Cell (PEMFC) in FAST-OAD-CS23-HE generates electric energy through the Hydrogen
+Oxidation Reaction (HOR) at the anode, where hydrogen gas (H₂) splits into protons (H⁺) and electrons (e⁻). The H⁺
+ions pass through the membrane, while the e⁻ travel through an external circuit, creating an electric current. At
+the cathode, the Oxygen Reduction Reaction (ORR) combines oxygen (O₂) with H⁺ and e⁻ to form water (H₂O). This process
+produces electricity with H₂O as the only byproduct.
+
+.. math::
+
+   \text{Anode (HOR):} \quad \text{H}_2 \rightarrow 2\text{H}^+ + 2e^-
+
+.. math::
+
+   \text{Cathode (ORR):} \quad \frac{1}{2} \text{O}_2 + 2\text{H}^+ + 2e^- \rightarrow \text{H}_2\text{O}
+
+.. math::
+
+   \text{Overall Reaction:} \quad \text{H}_2 + \frac{1}{2} \text{O}_2 \rightarrow \text{H}_2\text{O}
+
+.. image::../../../../img/pemfc_reaction_schematic.svg
+  :width: 600
+  :name: 1
+
+This component can be activated through the powertrain configuration file (PT file) and customized by editing in the source code.
 
 A brief description of the gaseous hydrogen tank component is shown below.
 Including the component computation logic, options for customization, and model assumptions.
@@ -13,6 +33,6 @@ Including the component computation logic, options for customization, and model 
 .. toctree::
    :maxdepth: 2
 
-    Gaseous hydrogen tank computation logic <models>
-    Gaseous hydrogen tank customization options <options>
-    Gaseous hydrogen tank model assumption <assumptions>
+    PEMFC computation logic <models>
+    PEMFC options <options>
+    PEMFC model assumption <assumptions>

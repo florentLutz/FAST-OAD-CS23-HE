@@ -477,11 +477,6 @@ def test_single_layer_voltage_analytical():
         val=np.array([1.2] * 7),
     )
     ivc.add_output(
-        name="hydrogen_reactant_pressure",
-        units="atm",
-        val=1.0,
-    )
-    ivc.add_output(
         name="operation_temperature",
         units="degC",
         val=np.array([50.0] * 7),
