@@ -229,6 +229,21 @@ def test_lca_bar_chart_absolute_phase():
         fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
 
 
+def test_lca_bar_chart_absolute_phase_hybrid():
+    fig = lca_impacts_bar_chart_with_phases_absolute(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml",
+        name_aircraft="Hybrid Kodiak 100",
+    )
+    fig.update_layout(title_text=None)
+
+    fig.show()
+    fig.update_layout(height=800, width=1600)
+    if not IN_GITHUB_ACTIONS:
+        # Somehow this prevents the ugly footer from appearing !
+        fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
+        time.sleep(3)
+        fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
+
 def test_search_engine():
     impact_list = ["*", "acidification", "acidification", "*", "*"]
     phase_list = ["*", "*", "production", "*", "operation"]
@@ -263,9 +278,9 @@ def test_search_engine():
 
     assert sum(impacts_value) == pytest.approx(1.247e-05, rel=1e-3)
 
+
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_search_engine_production_ref_kodiak_paper():
-
     impact_list_ref_design = ["*"]
     phase_list_ref_design = ["production"]
     component_list_ref_design = ["*"]
@@ -292,6 +307,8 @@ def test_search_engine_paper():
     flights_per_fu_ref_design = ref_design_datafile[
         "data:environmental_impact:flight_per_fu"
     ].value[0]
+    print("Flights per FU design", flights_per_fu_ref_design)
+    print("FU per flights design", 1.0 / flights_per_fu_ref_design)
 
     # Not available here directly, have to rely on the amount of kerosene in the tanks
     fuel_burned_ref_design = (
@@ -301,6 +318,7 @@ def test_search_engine_paper():
         * 2.0
     )
     energy_mission_ref_design = fuel_burned_ref_design * 11.9  # in kWh
+    print("Energy required per FU", energy_mission_ref_design * flights_per_fu_ref_design)
 
     impact_list_ref_design = ["*", "*", "*"]
     phase_list_ref_design = ["operation", "*", "*"]
@@ -314,11 +332,12 @@ def test_search_engine_paper():
         rel=False,
     )
 
-    assert sum(impacts_value_ref_design[:2]) > 0.94 * impacts_value_ref_design[2]
+    assert sum(impacts_value_ref_design[:-1]) > 0.94 * impacts_value_ref_design[-1]
 
     impact_one_flight = sum(impacts_value_ref_design[:2]) / flights_per_fu_ref_design
     impact_per_kwh_of_energy_used = impact_one_flight / energy_mission_ref_design
     print(impact_per_kwh_of_energy_used)
+    print("\n")
 
     # For the hybrid design, we consider the impacts of the fuel consumption and the production
     # of the fuel, the impact of the production of electricity for the mission and the production
@@ -329,6 +348,54 @@ def test_search_engine_paper():
     hybrid_design_datafile = oad.DataFile(
         SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml"
     )
-    flights_per_fu_ref_design = ref_design_datafile[
+    flights_per_fu_hybrid_design = hybrid_design_datafile[
         "data:environmental_impact:flight_per_fu"
     ].value[0]
+    fu_per_flights_hybrid_design = 1.0 / flights_per_fu_hybrid_design
+    print("Flights per FU hybrid design", flights_per_fu_hybrid_design)
+    print("FU per flights hybrid design", fu_per_flights_hybrid_design)
+
+    # Not available here directly, have to rely on the amount of kerosene in the tanks
+    fuel_burned_hybrid_design = (
+        hybrid_design_datafile[
+            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission"
+        ].value[0]
+        * 2.0
+    )
+    electricity_used_hybrid_design = hybrid_design_datafile[
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission"
+    ].value[0]
+    electricity_unit = hybrid_design_datafile[
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission"
+    ].units
+    if electricity_unit == "W*h":
+        electricity_used_hybrid_design /= 1000.0
+    energy_mission_hybrid_design = (
+        fuel_burned_hybrid_design * 11.9 + electricity_used_hybrid_design
+    )  # in kWh
+    print("Energy required per FU", energy_mission_hybrid_design * flights_per_fu_hybrid_design)
+
+    impact_list_hybrid_design = ["*", "*", "*", "*", "*"]
+    phase_list_hybrid_design = ["operation", "*", "*", "production", "*"]
+    component_list_hybrid_design = [
+        "turboshaft_1",
+        "kerosene_for_mission",
+        "electricity_for_mission",
+        "battery_pack_1",
+        "*",
+    ]
+
+    impacts_value_hybrid_design = lca_impacts_search_table(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml",
+        impact_list_hybrid_design,
+        phase_list_hybrid_design,
+        component_list_hybrid_design,
+        rel=False,
+    )
+
+    assert sum(impacts_value_hybrid_design[:-1]) > 0.93 * impacts_value_hybrid_design[-1]
+
+    impact_one_flight_hybrid = sum(impacts_value_hybrid_design[:-1]) * fu_per_flights_hybrid_design
+    impact_per_kwh_of_energy_used_hybrid = impact_one_flight_hybrid / energy_mission_hybrid_design
+    print(impact_per_kwh_of_energy_used_hybrid)
+    print("\n")
