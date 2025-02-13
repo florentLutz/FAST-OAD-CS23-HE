@@ -244,6 +244,7 @@ def test_lca_bar_chart_absolute_phase_hybrid():
         time.sleep(3)
         fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
 
+
 def test_search_engine():
     impact_list = ["*", "acidification", "acidification", "*", "*"]
     phase_list = ["*", "*", "production", "*", "operation"]
