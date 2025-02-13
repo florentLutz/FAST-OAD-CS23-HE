@@ -2,10 +2,11 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
-from ..constants import POSSIBLE_POSITION, MULTI_TANK_FACTOR
+import openmdao.api as om
 import logging
+from ..constants import POSSIBLE_POSITION, MULTI_TANK_FACTOR
+
 
 _LOGGER = logging.getLogger(__name__)
 

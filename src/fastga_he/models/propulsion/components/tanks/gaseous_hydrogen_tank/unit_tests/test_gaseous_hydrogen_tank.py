@@ -3,10 +3,10 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 
-import openmdao.api as om
 import pytest
 import numpy as np
 import os.path as pth
+import openmdao.api as om
 
 from ..components.sizing_tank_inner_volume import SizingGaseousHydrogenTankInnerVolume
 from ..components.sizing_tank_total_hydrogen_mission import (

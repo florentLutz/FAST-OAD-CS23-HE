@@ -2,9 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
-import numpy as np
 
+import numpy as np
+import openmdao.api as om
 import fastoad.api as oad
 
 from ..constants import SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY
