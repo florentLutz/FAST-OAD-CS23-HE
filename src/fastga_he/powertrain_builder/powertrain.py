@@ -482,6 +482,27 @@ class FASTGAHEPowerTrainConfigurator:
                 for current_output in current_outputs:
                     target_outputs.append(tuple(reversed(current_output)))
 
+            # Same idea also applies to PEMFC
+            if target_id == "fastga_he.pt_component.pemfc_stack" and (
+                source_id == "fastga_he.pt_component.dc_bus"
+                or source_id == "fastga_he.pt_component.dc_splitter"
+                or source_id == "fastga_he.pt_component.dc_sspc"
+            ):
+                # First we'll check if the option has already been set or no, just to avoid
+                # losing time
+
+                target_index = self._components_name.index(target_name)
+                target_option = self._components_options[target_index]
+
+                if not target_option:
+                    self._components_options[target_index] = {"direct_bus_connection": True}
+
+                current_outputs = resources.DICTIONARY_OUT[target_id]
+
+                target_outputs = []
+                for current_output in current_outputs:
+                    target_outputs.append(tuple(reversed(current_output)))
+
             for system_input, system_output in zip(source_inputs, target_outputs):
                 if system_input[0]:
                     if system_input[0][-1] == "_":

@@ -12,15 +12,15 @@ DEFAULT_PRESSURE_ATM = 1.0
 DEFAULT_TEMPERATURE = 288.15
 
 oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE] = (
-    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple"
+    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.system"
 )
 
 
 @oad.RegisterSubmodel(
     SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE,
-    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple",
+    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.system",
 )
-class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
+class PerformancesSinglePEMFCVoltageSystem(om.ExplicitComponent):
     # TODO: Edit citation after rebase
     """
     Computation of the voltage of single layer proton exchange membrane fuel cell inside one
@@ -81,7 +81,6 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
             "max_current_density", default=0.7, desc="maximum current density  of pemfc[A/cm^2]"
         )
 
-
     def setup(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
@@ -96,7 +95,7 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
             units="atm",
             val=DEFAULT_PRESSURE_ATM,
             desc="The nominal pressure at which the PEMFC operates does not affect the layer "
-                 "voltage "
+            "voltage ",
         )
 
         self.add_input(
@@ -216,9 +215,9 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
 
 @oad.RegisterSubmodel(
     SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE,
-    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.analytical",
+    "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.stack",
 )
-class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
+class PerformancesSinglePEMFCVoltageStack(om.ExplicitComponent):
     """
     Computation of the voltage of single layer proton exchange membrane fuel cell inside one
     stack. Assumes it can be estimated with the i-v curve relation. Model based on analytical i-v

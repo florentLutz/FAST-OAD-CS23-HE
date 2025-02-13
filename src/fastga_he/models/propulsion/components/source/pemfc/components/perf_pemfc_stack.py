@@ -19,6 +19,7 @@ from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
 from ..components.perf_pemfc_voltage import PerformancesPEMFCVoltage
 from ..components.perf_operation_pressure import PerformancesOperationPressure
+from ..components.perf_ambient_pressure import PerformancesAmbientPressure
 from ..components.perf_operation_temperature import PerformancesOperationTemperature
 from ..components.perf_analytical_voltage_adjustment import PerformancesAnalyticalVoltageAdjustment
 
@@ -41,10 +42,18 @@ class PerformancesPEMFCStack(om.Group):
             desc="If the battery is directly connected to a bus, a special mode is required to "
             "interface the two",
         )
+        self.options.declare(
+            name="compressor_connection",
+            default=False,
+            types=bool,
+            desc="The PEMFC operation pressure have to adjust based on compressor connection for "
+            "oxygen inlet",
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
+        compressor_connection = self.options["compressor_connection"]
         direct_bus_connection = self.options["direct_bus_connection"]
         option_layer_voltage = {
             "number_of_points": number_of_points,
@@ -65,7 +74,15 @@ class PerformancesPEMFCStack(om.Group):
 
         self.add_subsystem(
             "pemfc_ambient_pressure",
-            PerformancesOperationPressure(number_of_points=number_of_points),
+            PerformancesAmbientPressure(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "pemfc_operation_pressure",
+            PerformancesOperationPressure(
+                number_of_points=number_of_points, compressor_connection=compressor_connection
+            ),
             promotes=["*"],
         )
 

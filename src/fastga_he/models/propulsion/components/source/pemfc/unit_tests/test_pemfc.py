@@ -9,19 +9,18 @@ import pytest
 import numpy as np
 import fastoad.api as oad
 
-from ..components.sizing_pemfc_weight import SizingPEMFCWeightAerostak200W
-from ..components.sizing_pemfc_weight import SizingPEMFCWeightSpecificPower
+from ..components.perf_ambient_pressure import PerformancesAmbientPressure
+from ..components.sizing_pemfc_weight import SizingPEMFCWeight
 from ..components.sizing_pemfc_cg_x import SizingPEMFCCGX
 from ..components.sizing_pemfc_cg_y import SizingPEMFCCGY
 from ..components.sizing_pemfc_volume import SizingPEMFCVolume
-from ..components.sizing_pemfc_dimensions import SizingPEMFCDimensionsAerostak200W
-from ..components.sizing_pemfc_dimensions import SizingPEMFCDimensionsPowerDensity
+from ..components.sizing_pemfc_dimensions import SizingPEMFCDimensions
 from ..components.sizing_pemfc_drag import SizingPEMFCDrag
 
 from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
-from ..components.perf_layer_voltage import PerformancesSinglePEMFCVoltageSimple
-from ..components.perf_layer_voltage import PerformancesSinglePEMFCVoltageAnalytical
+from ..components.perf_layer_voltage import PerformancesSinglePEMFCVoltageSystem
+from ..components.perf_layer_voltage import PerformancesSinglePEMFCVoltageStack
 from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
 from ..components.perf_maximum_current import PerformancesMaximumCurrent
 from ..components.perf_maximum_power import PerformancesMaximumPower
@@ -59,37 +58,17 @@ XML_FILE = "sample_pemfc_stack.xml"
 NB_POINTS_TEST = 10
 
 
-def test_pemfc_weight_aerostak_200w():
+def test_pemfc_weight():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingPEMFCWeightAerostak200W(pemfc_stack_id="pemfc_stack_1")),
+        list_inputs(SizingPEMFCWeight(pemfc_stack_id="pemfc_stack_1")),
         __file__,
         XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        SizingPEMFCWeightAerostak200W(pemfc_stack_id="pemfc_stack_1"),
-        ivc,
-    )
-    assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:mass", units="kg"
-    ) == pytest.approx(0.5, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_pemfc_weight_specific_power():
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingPEMFCWeightSpecificPower(pemfc_stack_id="pemfc_stack_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        SizingPEMFCWeightSpecificPower(pemfc_stack_id="pemfc_stack_1"),
+        SizingPEMFCWeight(pemfc_stack_id="pemfc_stack_1"),
         ivc,
     )
     assert problem.get_val(
@@ -119,7 +98,7 @@ def test_pemfc_volume():
     problem.check_partials(compact_print=True)
 
 
-def test_pemfc_dimensions_aerostak_200w():
+def test_pemfc_dimensions():
     expected_length = [0.11998, 0.11998, 0.11998, 0.11998]
     expected_width = [0.1162, 0.1162, 0.1643, 0.1162]
     expected_height = [0.1162, 0.1162, 0.0822, 0.1162]
@@ -129,51 +108,14 @@ def test_pemfc_dimensions_aerostak_200w():
     ):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(
-                SizingPEMFCDimensionsAerostak200W(pemfc_stack_id="pemfc_stack_1", position=option)
-            ),
+            list_inputs(SizingPEMFCDimensions(pemfc_stack_id="pemfc_stack_1", position=option)),
             __file__,
             XML_FILE,
         )
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
-            SizingPEMFCDimensionsAerostak200W(pemfc_stack_id="pemfc_stack_1", position=option),
-            ivc,
-        )
-        assert problem.get_val(
-            "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:dimension:length", units="m"
-        ) == pytest.approx(length, rel=1e-2)
-        assert problem.get_val(
-            "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:dimension:width", units="m"
-        ) == pytest.approx(width, rel=1e-2)
-        assert problem.get_val(
-            "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:dimension:height", units="m"
-        ) == pytest.approx(height, rel=1e-2)
-
-        problem.check_partials(compact_print=True)
-
-
-def test_pemfc_dimensions_power_density():
-    expected_length = [0.11998, 0.11998, 0.11998, 0.11998]
-    expected_width = [0.1162, 0.1162, 0.1643, 0.1162]
-    expected_height = [0.1162, 0.1162, 0.0822, 0.1162]
-
-    for option, length, width, height in zip(
-        POSSIBLE_POSITION, expected_length, expected_width, expected_height
-    ):
-        # Research independent input value in .xml file
-        ivc = get_indep_var_comp(
-            list_inputs(
-                SizingPEMFCDimensionsPowerDensity(pemfc_stack_id="pemfc_stack_1", position=option)
-            ),
-            __file__,
-            XML_FILE,
-        )
-
-        # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(
-            SizingPEMFCDimensionsPowerDensity(pemfc_stack_id="pemfc_stack_1", position=option),
+            SizingPEMFCDimensions(pemfc_stack_id="pemfc_stack_1", position=option),
             ivc,
         )
         assert problem.get_val(
@@ -382,7 +324,7 @@ def test_pemfc_current_density():
     problem.check_partials(compact_print=True)
 
 
-def test_operation_pressure():
+def test_ambient_pressure():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "altitude",
@@ -391,13 +333,29 @@ def test_operation_pressure():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesOperationPressure(
-            pemfc_stack_id="pemfc_stack_1", number_of_points=NB_POINTS_TEST
-        ),
+        PerformancesAmbientPressure(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    assert problem.get_val("ambient_pressure", units="atm") == pytest.approx(
+        np.ones(NB_POINTS_TEST), rel=1e-2
+    )
+    problem.check_partials(compact_print=True)
+
+
+def test_operation_pressure():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "ambient_pressure",
+        units="atm",
+        val=np.ones(NB_POINTS_TEST),
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesOperationPressure(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     assert problem.get_val("operation_pressure", units="atm") == pytest.approx(
-        [1.0] * int(NB_POINTS_TEST), rel=1e-2
+        np.ones(NB_POINTS_TEST), rel=1e-2
     )
     problem.check_partials(compact_print=True)
 
@@ -417,7 +375,7 @@ def test_operation_temperature():
         ivc,
     )
     assert problem.get_val("operation_temperature", units="K") == pytest.approx(
-        [288.15] * int(NB_POINTS_TEST), rel=1e-2
+        np.full(NB_POINTS_TEST, 288.15), rel=1e-2
     )
     problem.check_partials(compact_print=True)
 
@@ -435,12 +393,12 @@ def test_analytical_voltage_adjustment():
         ivc,
     )
     assert problem.get_val("analytical_voltage_adjust_factor") == pytest.approx(
-        [1.0] * int(NB_POINTS_TEST), rel=1e-2
+        np.full(NB_POINTS_TEST, 1.0), rel=1e-2
     )
     problem.check_partials(compact_print=True)
 
 
-def test_single_layer_voltage_simple():
+def test_single_layer_voltage_system():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fc_current_density",
@@ -450,11 +408,11 @@ def test_single_layer_voltage_simple():
     ivc.add_output(
         name="operation_pressure",
         units="atm",
-        val=np.array([1.2] * 7),
+        val=np.full(7, 1.2),
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesSinglePEMFCVoltageSimple(pemfc_stack_id="pemfc_stack_1", number_of_points=7),
+        PerformancesSinglePEMFCVoltageSystem(pemfc_stack_id="pemfc_stack_1", number_of_points=7),
         ivc,
     )
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
@@ -464,7 +422,7 @@ def test_single_layer_voltage_simple():
     problem.check_partials(compact_print=True)
 
 
-def test_single_layer_voltage_analytical():
+def test_single_layer_voltage_stack():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fc_current_density",
@@ -474,19 +432,17 @@ def test_single_layer_voltage_analytical():
     ivc.add_output(
         name="operation_pressure",
         units="atm",
-        val=np.array([1.2] * 7),
+        val=np.full(7, 1.2),
     )
     ivc.add_output(
         name="operation_temperature",
         units="degC",
-        val=np.array([50.0] * 7),
+        val=np.full(7, 50.0),
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesSinglePEMFCVoltageAnalytical(
-            pemfc_stack_id="pemfc_stack_1", number_of_points=7
-        ),
+        PerformancesSinglePEMFCVoltageStack(pemfc_stack_id="pemfc_stack_1", number_of_points=7),
         ivc,
     )
 
@@ -756,7 +712,7 @@ def test_pemfc_efficiency():
     )
     ivc.add_output(
         "operation_pressure",
-        np.array([1.2] * int(NB_POINTS_TEST)),
+        np.full(NB_POINTS_TEST, 1.2),
         units="atm",
     )
     ivc.add_output("nominal_pressure", 1, units="atm")
@@ -843,9 +799,9 @@ def test_fuel_consumed():
     problem.check_partials(compact_print=True)
 
 
-def test_performances_pemfc_stack():
+def test_performances_pemfc_stack_system():
     oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
-        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple"
+        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.system"
     )
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -898,9 +854,9 @@ def test_performances_pemfc_stack():
     problem.check_partials(compact_print=True)
 
 
-def test_performances_pemfc_stack_analytical():
+def test_performances_pemfc_stack_only_stack():
     oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
-        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.analytical"
+        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.stack"
     )
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(

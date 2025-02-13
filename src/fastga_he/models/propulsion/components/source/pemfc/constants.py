@@ -7,5 +7,4 @@ SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE = "submodel.propulsion.performances.pe
 SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION = (
     "submodel.propulsion.performances.pemfc.modeling_option"
 )
-SUBMODEL_SIZING_PEMFC_WEIGHT_DIMENSION = "submodel.propulsion.sizing.pemfc.weight_dimension"
 POSSIBLE_POSITION = ["in_the_front", "wing_pod", "underbelly", "in_the_back"]

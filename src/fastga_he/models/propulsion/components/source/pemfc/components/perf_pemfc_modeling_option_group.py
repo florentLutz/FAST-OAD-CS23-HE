@@ -27,7 +27,8 @@ oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION] 
 class PerformancesPEMFCModelingOptionSystem(om.Group):
     """
     This group provide the maximum power density and maximum specific power of the PEMFC.
-    These two sizing indicators are derived from PEMFC systems includes all the BOPs except inlet compressors.
+    These two sizing indicators are derived from PEMFC systems includes all the BOPs except
+    inlet compressors.
     """
 
     def initialize(self):
@@ -61,7 +62,8 @@ class PerformancesPEMFCModelingOptionSystem(om.Group):
 class PerformancesPEMFCModelingOptionStack(om.Group):
     """
     This group defines the PEMFC stack's maximum power density and maximum specific power.
-    These sizing indicators are derived solely from the PEMFC itself, ensuring flexibility in configuring BOPs.
+    These sizing indicators are derived solely from the PEMFC itself, ensuring flexibility in
+    configuring BOPs.
     """
 
     def initialize(self):

@@ -4,33 +4,42 @@
 
 import openmdao.api as om
 import numpy as np
-from stdatm import AtmosphereWithPartials
 
 DEFAULT_PRESSURE = 101325.0
 
 
 class PerformancesOperationPressure(om.ExplicitComponent):
-    # TODO: Edit citation after rebase
     """
-    Computation of the ambient pressure that PEMFC is working based on altitude only applied to the model
-    from: `Fuel Cell and Battery Hybrid System Optimization by J. Hoogendoorn:2018`
+    Computation of the operational pressure that PEMFC is working.
     """
 
     def initialize(self):
         self.options.declare(
-            name="pemfc_stack_id",
-            default=None,
-            desc="Identifier of the PEMFC stack",
-            allow_none=False,
+            name="compressor_connection",
+            default=False,
+            types=bool,
+            desc="The PEMFC operation pressure have to adjust based on compressor connection for "
+            "oxygen inlet",
         )
+        # powertrain.py under powertrain_builder needed to be modified once the compressor is
+        # integrated, example can be found with direct_bus_connection in battery
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
+        compressor_connection = self.options["compressor_connection"]
 
-        self.add_input("altitude", units="m", val=np.zeros(number_of_points))
+        if compressor_connection:
+            self.add_input(
+                "output_pressure",
+                units="Pa",
+                val=np.full(number_of_points, np.nan),
+                desc="Output absolute pressure from the compressor if applicable",
+            )
+        else:
+            self.add_input("ambient_pressure", units="Pa", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             name="operation_pressure",
@@ -47,11 +56,19 @@ class PerformancesOperationPressure(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["operation_pressure"] = AtmosphereWithPartials(
-            inputs["altitude"], altitude_in_feet=False
-        ).pressure
+        compressor_connection = self.options["compressor_connection"]
+        if compressor_connection:
+            outputs["operation_pressure"] = inputs["output_pressure"]
+        else:
+            outputs["operation_pressure"] = inputs["ambient_pressure"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["operation_pressure", "altitude"] = AtmosphereWithPartials(
-            inputs["altitude"], altitude_in_feet=False
-        ).partial_pressure_altitude
+        compressor_connection = self.options["compressor_connection"]
+        if compressor_connection:
+            partials["operation_pressure", "output_pressure"] = np.ones_like(
+                inputs["output_pressure"]
+            )
+        else:
+            partials["operation_pressure", "ambient_pressure"] = np.ones_like(
+                inputs["ambient_pressure"]
+            )
