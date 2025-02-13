@@ -11,7 +11,7 @@ positions can be found at tank position options in :ref:`options <options-gaseou
     power_train_components:
 
       gaseous_hydrogen_tank_1:
-        id: fastga_he.pt_component.hydrogen_gas_tank
+        id: fastga_he.pt_component.gaseous_hydrogen_tank
         position: ...
 
 A brief description of the gaseous hydrogen tank component is presented here:
