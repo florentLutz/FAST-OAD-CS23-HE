@@ -87,7 +87,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             + ":diameter_height_ratio"
         ]
         # Ratio between the tank outer diameter and fuselage height
-        not_in_fuselage = (position == "wing_pod") or (position == "underbelly")
+        in_fuselage = position == "in_the_cabin" or position == "in_the_back"
 
         inner_volume = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -95,7 +95,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             + ":inner_volume"
         ]
 
-        if not_in_fuselage:
+        if not in_fuselage:
             multi_tank_factor = 1.0
             nb_tank = 1.0
             _LOGGER.info(
@@ -117,14 +117,14 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
         # This condition is to keep the tank as cylindrical as possible.
         has_sufficient_volume = inner_volume >= nb_tank * np.pi * d_tank**3 / 6
 
-        if has_sufficient_volume and not not_in_fuselage:
+        if has_sufficient_volume and in_fuselage:
             outputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
                 + ":dimension:outer_diameter"
             ] = d_tank
 
-        elif not has_sufficient_volume and not not_in_fuselage:
+        elif not has_sufficient_volume and in_fuselage:
             outputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -138,7 +138,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 "tank diameter to fuselage height ratio."
             )
 
-        elif not_in_fuselage:
+        elif not in_fuselage:
             outputs[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -162,10 +162,10 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             + ":inner_volume"
         ]
 
-        not_in_fuselage = (position == "wing_pod") or (position == "underbelly")
+        in_fuselage = position == "in_the_cabin" or position == "in_the_back"
 
         # multi_tank_factor divides the outer diameter with respect to the number of tanks.
-        if not_in_fuselage:
+        if not in_fuselage:
             multi_tank_factor = 1.0
             nb_tank = 1.0
         else:
@@ -184,7 +184,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
         # This condition is to keep the tank as cylindrical as possible.
         has_sufficient_volume = inner_volume >= nb_tank * np.pi * d_tank**3 / 6
 
-        if has_sufficient_volume and not not_in_fuselage:
+        if has_sufficient_volume and in_fuselage:
             partials[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -201,7 +201,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + ":diameter_height_ratio",
             ] = inputs["data:geometry:fuselage:maximum_height"] * multi_tank_factor
 
-        elif not has_sufficient_volume and not not_in_fuselage:
+        elif not has_sufficient_volume and in_fuselage:
             partials[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id
@@ -211,7 +211,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + ":inner_volume",
             ] = 2 * multi_tank_factor / np.pi * np.cbrt(6 * inner_volume / np.pi) ** (-2)
 
-        elif not_in_fuselage:
+        elif not in_fuselage:
             partials[
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
                 + gaseous_hydrogen_tank_id

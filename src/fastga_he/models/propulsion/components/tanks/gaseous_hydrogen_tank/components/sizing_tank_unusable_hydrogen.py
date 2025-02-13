@@ -7,8 +7,8 @@ import openmdao.api as om
 
 class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
     """
-    Computation of the amount of trapped hydrogen in the tank. The default value of trapped_ratio is
-    set slightly higher to prevent underestimation (3%). :cite:`ahluwalia:2010`
+    Computation of the amount of trapped hydrogen in the tank. Computed based on a ratio of the
+    mission fuel whose default value is computed based on :cite:`ahluwalia:2010`.
     """
 
     def initialize(self):
