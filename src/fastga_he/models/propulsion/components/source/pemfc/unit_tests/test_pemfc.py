@@ -19,8 +19,8 @@ from ..components.sizing_pemfc_drag import SizingPEMFCDrag
 
 from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
-from ..components.perf_layer_voltage import PerformancesSinglePEMFCVoltageSystem
-from ..components.perf_layer_voltage import PerformancesSinglePEMFCVoltageStack
+from ..components.perf_layer_voltage import PerformancesSinglePEMFCVoltageSimple
+from ..components.perf_layer_voltage import PerformancesSinglePEMFCVoltageAnalytical
 from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
 from ..components.perf_maximum_current import PerformancesMaximumCurrent
 from ..components.perf_maximum_power import PerformancesMaximumPower
@@ -412,7 +412,7 @@ def test_single_layer_voltage_system():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesSinglePEMFCVoltageSystem(pemfc_stack_id="pemfc_stack_1", number_of_points=7),
+        PerformancesSinglePEMFCVoltageSimple(pemfc_stack_id="pemfc_stack_1", number_of_points=7),
         ivc,
     )
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
@@ -442,7 +442,9 @@ def test_single_layer_voltage_stack():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesSinglePEMFCVoltageStack(pemfc_stack_id="pemfc_stack_1", number_of_points=7),
+        PerformancesSinglePEMFCVoltageAnalytical(
+            pemfc_stack_id="pemfc_stack_1", number_of_points=7
+        ),
         ivc,
     )
 
