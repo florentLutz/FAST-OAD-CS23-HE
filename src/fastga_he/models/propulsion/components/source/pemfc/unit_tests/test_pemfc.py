@@ -803,7 +803,7 @@ def test_fuel_consumed():
 
 def test_performances_pemfc_stack_system():
     oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
-        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.system"
+        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple"
     )
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -858,7 +858,7 @@ def test_performances_pemfc_stack_system():
 
 def test_performances_pemfc_stack_only_stack():
     oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
-        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.stack"
+        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.analytical"
     )
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
