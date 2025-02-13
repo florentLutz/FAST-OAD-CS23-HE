@@ -3,10 +3,9 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-
-import openmdao.api as om
 import pytest
 import numpy as np
+import openmdao.api as om
 import fastoad.api as oad
 
 from ..components.perf_ambient_pressure import PerformancesAmbientPressure

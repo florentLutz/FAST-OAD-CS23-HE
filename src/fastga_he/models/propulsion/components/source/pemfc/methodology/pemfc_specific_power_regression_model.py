@@ -7,8 +7,10 @@ The specific power is utilized in weight calculation for PEMFC.
 """
 
 import numpy as np
-from scipy import optimize
 import plotly.graph_objects as go
+
+from scipy import optimize
+
 
 # Data points from the graph
 x = np.array([0.3, 0.8, 1.2, 2.0])

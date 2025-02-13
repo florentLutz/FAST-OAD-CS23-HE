@@ -2,8 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
+import openmdao.api as om
 
 FC_WEIGHT_DENSITY = 8.5034  # kg/m^2
 DEFAULT_FC_SPECIFIC_POWER = 0.345  # kW/kg

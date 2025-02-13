@@ -2,8 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
+import openmdao.api as om
 
 MAX_PEMFC_SYSYEM_POWER_DENSITY = 500  # kW/m^3
 MAX_PEMFC_STACK_POWER_DENSITY = 6000  # kW/m^3

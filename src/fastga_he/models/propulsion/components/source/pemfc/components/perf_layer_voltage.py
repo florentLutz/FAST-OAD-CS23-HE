@@ -2,10 +2,11 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
+import openmdao.api as om
 import fastoad.api as oad
+
+from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
 
 DEFAULT_LAYER_VOLTAGE = 0.7
 DEFAULT_PRESSURE_ATM = 1.0

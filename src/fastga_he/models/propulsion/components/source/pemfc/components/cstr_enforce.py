@@ -2,12 +2,12 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
+import openmdao.api as om
+import fastoad.api as oad
 
 from ..constants import SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA
 
-import fastoad.api as oad
 
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = (
     "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.enforce"

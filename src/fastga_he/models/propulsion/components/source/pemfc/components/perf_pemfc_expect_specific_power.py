@@ -2,8 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
+import openmdao.api as om
 
 
 MAX_PEMFC_SYSTEM_SPECIFIC_POWER = 2.06  # kW/kg

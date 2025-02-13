@@ -4,7 +4,6 @@
 
 import openmdao.api as om
 
-
 from .sizing_pemfc_weight import SizingPEMFCWeight
 from .sizing_pemfc_dimensions import SizingPEMFCDimensions
 from .sizing_pemfc_volume import SizingPEMFCVolume

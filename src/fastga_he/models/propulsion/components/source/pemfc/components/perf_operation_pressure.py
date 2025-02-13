@@ -2,8 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
+import openmdao.api as om
 
 DEFAULT_PRESSURE = 101325.0
 

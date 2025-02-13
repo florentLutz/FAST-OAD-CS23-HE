@@ -3,7 +3,6 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
-
 import fastoad.api as oad
 
 from ..constants import SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA

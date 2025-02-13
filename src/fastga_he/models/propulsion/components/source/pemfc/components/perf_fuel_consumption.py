@@ -2,8 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
+import openmdao.api as om
 
 DEFAULT_HYDROGEN_CONSUMPTION = 10.0
 FARADAYS_CONSTANT = 96485.3321  # [C/mol]

@@ -2,8 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
+import openmdao.api as om
+
 from ..constants import POSSIBLE_POSITION
 
 DIMENSION_RATIO = 0.3528  # Ratio between the effective area length size and the actual FC size

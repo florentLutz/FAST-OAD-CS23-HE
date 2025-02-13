@@ -3,8 +3,9 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION
 import fastoad.api as oad
+
+from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION
 from .perf_pemfc_expect_power_density import (
     PerformancesPEMFCMaxPowerDensityFuelCellSystem,
     PerformancesPEMFCMaxPowerDensityFuelCellStack,
