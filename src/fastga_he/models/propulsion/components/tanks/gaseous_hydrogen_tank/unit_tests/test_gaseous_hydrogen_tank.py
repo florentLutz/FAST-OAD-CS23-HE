@@ -366,9 +366,9 @@ def test_mutli_tank_outer_diameter():
 
 def test_tank_length_fuselage_constraints():
     # Research independent input value in .xml file
-    expected_values = [-0.4994, -1.0, -0.84646, -0.4994]
-
-    for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
+    expected_values = [-0.4994, -0.84646]
+    position_in_fuselage = ["in_the_cabin", "in_the_back"]
+    for option, expected_value in zip(position_in_fuselage, expected_values):
         ivc = get_indep_var_comp(
             list_inputs(
                 SizingGaseousHydrogenTankLengthFuselageConstraints(
@@ -387,7 +387,8 @@ def test_tank_length_fuselage_constraints():
             ivc,
         )
         assert problem.get_val(
-            "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:length",
+            "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+            "dimension:length",
             units="m",
         ) == pytest.approx(expected_value, rel=1e-2)
 
@@ -411,7 +412,8 @@ def test_tank_inner_diameter():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:inner_diameter",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+        "dimension:inner_diameter",
         units="m",
     ) == pytest.approx(0.97776, rel=1e-2)
 
@@ -435,7 +437,8 @@ def test_tank_wall_thickness():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:wall_thickness",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+        "dimension:wall_thickness",
         units="m",
     ) == pytest.approx(1.303e-4, rel=1e-2)
 
@@ -490,7 +493,8 @@ def test_gaseous_hydrogen_tank_gravimetric_index():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:gravimetric_index"
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+        "gravimetric_index"
     ) == pytest.approx(0.0485, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -529,11 +533,13 @@ def test_gaseous_hydrogen_tank_drag():
 
             if ls_option:
                 assert problem.get_val(
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:low_speed:CD0",
+                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+                    "low_speed:CD0",
                 ) == pytest.approx(ls_drag, rel=1e-2)
             else:
                 assert problem.get_val(
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:cruise:CD0",
+                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+                    "cruise:CD0",
                 ) == pytest.approx(cruise_drag, rel=1e-2)
 
             problem.check_partials(compact_print=True)
@@ -561,11 +567,13 @@ def test_sizing_tank():
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:cruise:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:inner_diameter",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:"
+        "inner_diameter",
         units="m",
     ) == pytest.approx(0.97776, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:length",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:dimension:"
+        "length",
         units="m",
     ) == pytest.approx(2.02166, rel=1e-2)
 
@@ -576,7 +584,8 @@ def test_constraints_enforce_tank_capacity():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:fuel_total_mission",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+        "fuel_total_mission",
         val=10.0,
         units="kg",
     )
@@ -600,12 +609,13 @@ def test_constraints_ensure_tank_capacity():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:fuel_total_mission",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+        "fuel_total_mission",
         val=10.0,
         units="kg",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:capacity",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:" "capacity",
         val=15.0,
         units="kg",
     )
@@ -618,7 +628,8 @@ def test_constraints_ensure_tank_capacity():
         ivc,
     )
     assert problem.get_val(
-        "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:capacity",
+        "constraints:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+        "capacity",
         units="kg",
     ) == pytest.approx(-5.0, rel=1e-2)
 
@@ -639,7 +650,8 @@ def test_hydrogen_gas_consumed_mission():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:fuel_consumed_mission",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+        "fuel_consumed_mission",
         units="kg",
     ) == pytest.approx(276.85, rel=1e-2)
 
@@ -650,7 +662,8 @@ def test_hydrogen_gas_remaining_mission():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:fuel_consumed_mission",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+        "fuel_consumed_mission",
         units="kg",
         val=140.0,
     )
@@ -686,7 +699,8 @@ def test_performances_gaseous_hydrogen_tank():
         rel=1e-2,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:fuel_consumed_mission",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:"
+        "fuel_consumed_mission",
         units="kg",
     ) == pytest.approx(279.62, rel=1e-2)
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))

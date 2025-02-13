@@ -50,7 +50,7 @@ class SizingGaseousHydrogenTank(om.Group):
     def setup(self):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         position = self.options["position"]
-
+        in_fuselage = position == "in_the_cabin" or position == "in_the_back"
         self.add_subsystem(
             name="unusable_gaseous_hydrogen",
             subsys=SizingGaseousHydrogenTankUnusableHydrogen(
@@ -130,7 +130,7 @@ class SizingGaseousHydrogenTank(om.Group):
             ),
             promotes=["*"],
         )
-        if not position == "wing_pod":
+        if in_fuselage:
             self.add_subsystem(
                 name="tank_length_fuselage_constraints",
                 subsys=SizingGaseousHydrogenTankLengthFuselageConstraints(
