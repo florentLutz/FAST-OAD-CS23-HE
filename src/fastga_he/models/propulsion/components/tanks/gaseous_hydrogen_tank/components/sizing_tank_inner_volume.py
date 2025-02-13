@@ -78,7 +78,7 @@ class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
         ]
 
         z = 0.99704 + 6.4149e-9 * tank_pressure
-        # Hydrogen gas compressibility factor :cite:`bolz:1973`
+        # Hydrogen gas compressibility factor :cite:`bolz:1973`.
 
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -102,7 +102,7 @@ class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
         ]
 
         z = 0.99704 + 6.4149e-9 * tank_pressure
-        # Hydrogen gas compressibility factor :cite:`bolz:1973`
+        # Hydrogen gas compressibility factor :cite:`bolz:1973`.
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"

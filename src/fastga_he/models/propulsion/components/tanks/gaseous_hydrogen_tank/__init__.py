@@ -2,10 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-from .components.sizing_tank import SizingGaseousHydrogenTank as SizingGaseousHydrogenTank
-from .components.perf_gaseous_hydrogen_tank import (
-    PerformancesGaseousHydrogenTank as PerformancesGaseousHydrogenTank,
-)
-from .components.slipstream_gaseous_hydrogen_tank import (
-    SlipstreamGaseousHydrogenTank as SlipstreamGaseousHydrogenTank,
-)
+# pylint: disable=unused-import
+# flake8: noqa
+
+from .components.sizing_tank import SizingGaseousHydrogenTank
+from .components.perf_gaseous_hydrogen_tank import PerformancesGaseousHydrogenTank
+from .components.slipstream_gaseous_hydrogen_tank import SlipstreamGaseousHydrogenTank

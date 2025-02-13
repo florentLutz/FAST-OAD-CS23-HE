@@ -99,7 +99,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
             multi_tank_factor = 1.0
             nb_tank = 1.0
             _LOGGER.info(
-                msg="Number of tank per stack fixed to 1 for all outside fuselage position"
+                msg="Number of tank per stack fixed to 1 for all outside fuselage position."
             )
         else:
             nb_tank = inputs[
@@ -145,7 +145,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + ":dimension:outer_diameter"
             ] = 0.2 * inputs["data:geometry:fuselage:maximum_height"]
             # Ratio inspired by the size of fighter jet external fuel tank
-            _LOGGER.info(msg="Tank diameter fixed as 20% of fuselage maximum height")
+            _LOGGER.info(msg="Tank diameter fixed as 20% of fuselage maximum height.")
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]

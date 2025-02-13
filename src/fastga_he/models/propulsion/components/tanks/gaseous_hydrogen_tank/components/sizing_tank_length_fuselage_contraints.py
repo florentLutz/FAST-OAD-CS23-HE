@@ -9,7 +9,7 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingGaseousHydrogenTankLengthFuselageConstraints(om.ExplicitComponent):
     """
-    Computation to check the overall length of the tank will fit in the fuselage or not.
+    Computation to check the tank will fit in the fuselage or not.
     """
 
     def initialize(self):

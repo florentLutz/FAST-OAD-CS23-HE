@@ -1,10 +1,10 @@
 .. _propulsion-index:
 
-========================
+=====================
 Propulsion components
-========================
+=====================
 
-Here you will find the documentation on the model used for the components of the hybrid-electric powertain
+Here you will find the documentation on the models used for the components of the hybrid-electric powertain
 
 
 .. toctree::

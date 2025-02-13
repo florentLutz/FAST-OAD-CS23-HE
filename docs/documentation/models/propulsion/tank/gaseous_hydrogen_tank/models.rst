@@ -9,13 +9,13 @@ Gaseous hydrogen tank computation
 ***********************
 Tank volume calculation
 ***********************
-The tank inner volume is calculated based on the hydrogen  mass specified by user (:math:`m_{h2}`)
+The tank inner volume is calculated based on the hydrogen  mass specified by user (:math:`m_{H2}`)
 and the ideal gas assumption. Thus, the ideal gas constant (:math:`R`), the storage temperature (:math:`T`),
 and the storage pressure (:math:`P`) are applied in this calculation.
 
 .. math::
 
-    V_{inner} = \frac{Z*m_{h2}*R*T}{P}
+    V_{inner} = \frac{Z*m_{H2}*R*T}{P}
 
 
 The Hydrogen gas compressibility factor (:math:`Z`) is expressed as:
@@ -68,7 +68,7 @@ the length of the tank can be expressed as:
 
     L = \frac {V_{inner} - V_{cap}} {A_{cross}} + D_{outer}
 
-Where :math:`V_{inner}` denotes the inner volume, as calculated in the tank capacity section.
+Where :math:`V_{inner}` denotes the inner volume, as calculated in the tank capacity section,
 :math:`V_{cap}` represents the inner volume of the two hemispherical caps,
 while :math:`A_{cross}` refers to the tank's inner cross-sectional area.
 

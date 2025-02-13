@@ -17,7 +17,7 @@ The gaseous hydrogen tank model has four possible installation position:
 ********************
 Multiple tank option
 ********************
-This option is activated with changing the "number_of_tank" variable in the input file. Please note it will only be used for in-fuselage installation, as indicated in
+This option is activated by changing the "number_of_tank" variable in the input file. Please note it will only be used for in-fuselage installation, as indicated in
 the :ref:`assumptions <assumptions-gaseous-hydrogen-tank>`.
 
 ===  ================================================
@@ -35,5 +35,3 @@ n    Tank outer diameter compared to single tank case
 ===  ================================================
 
 This table indicates the maximum diameter of tanks located inside the fuselage as given by :cite:`kravitz:1967`.
-
-

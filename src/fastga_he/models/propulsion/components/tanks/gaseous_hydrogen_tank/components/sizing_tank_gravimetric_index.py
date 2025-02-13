@@ -9,7 +9,7 @@ import numpy as np
 class SizingGaseousHydrogenTankGravimetricIndex(om.ExplicitComponent):
     """
     Computation of the gravimetric index of gaseous hydrogen tank, ratio between hydrogen
-    capacity and overall system weight.:cite:`mukhopadhaya:2022`
+    capacity and overall system weight :cite:`mukhopadhaya:2022`.
     """
 
     def initialize(self):

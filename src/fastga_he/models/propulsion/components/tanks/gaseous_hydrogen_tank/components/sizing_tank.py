@@ -130,15 +130,15 @@ class SizingGaseousHydrogenTank(om.Group):
             ),
             promotes=["*"],
         )
-
-        self.add_subsystem(
-            name="tank_length_fuselage_constraints",
-            subsys=SizingGaseousHydrogenTankLengthFuselageConstraints(
-                gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id,
-                position=position,
-            ),
-            promotes=["*"],
-        )
+        if not position == "wing_pod":
+            self.add_subsystem(
+                name="tank_length_fuselage_constraints",
+                subsys=SizingGaseousHydrogenTankLengthFuselageConstraints(
+                    gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id,
+                    position=position,
+                ),
+                promotes=["*"],
+            )
 
         self.add_subsystem(
             name="tank_weight",

@@ -13,7 +13,7 @@ POSSIBLE_POSITION = ["in_the_cabin", "wing_pod", "in_the_back", "underbelly"]
 # The value corresponds to the key is the ratio between
 # the maximum height of fuselage and the tank outer diameter.
 # :cite:`kravitz:1967`
-# Explanation can be also found in https://mathworld.wolfram.com/CirclePacking.html
+# Explanation can also be found in https://mathworld.wolfram.com/CirclePacking.html
 MULTI_TANK_FACTOR = {
     1: 1,
     2: 2,

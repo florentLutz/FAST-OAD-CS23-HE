@@ -4,7 +4,7 @@
 Storage tank components
 ==========================
 
-Here you will find the documentation of the propulsion tank components available in FAST-OAD-CS23-HE powertrain building.
+Here you will find the documentation of the fuel storage tank components available in FAST-OAD-CS23-HE.
 
 .. toctree::
    :maxdepth: 1

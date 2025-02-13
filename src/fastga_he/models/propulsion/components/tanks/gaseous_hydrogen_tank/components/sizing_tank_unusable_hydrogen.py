@@ -52,7 +52,6 @@ class SizingGaseousHydrogenTankUnusableHydrogen(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        # To modify based on the minimum pressure for the output hydrogen mass flow
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"

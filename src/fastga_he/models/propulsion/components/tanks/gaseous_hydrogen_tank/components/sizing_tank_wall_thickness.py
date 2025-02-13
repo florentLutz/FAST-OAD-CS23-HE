@@ -6,7 +6,6 @@ import openmdao.api as om
 import numpy as np
 
 
-# To modify
 class SizingGaseousHydrogenTankWallThickness(om.ExplicitComponent):
     """
     Computation of the wall thickness of the tank from the difference between the inner and
