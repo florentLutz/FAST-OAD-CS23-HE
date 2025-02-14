@@ -270,14 +270,14 @@ def test_search_engine():
     component_list = ["*", "*", "*", "*"]
 
     impacts_value = lca_impacts_search_table(
-        SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+        DATA_FOLDER_PATH / "kodiak_100_ef.xml",
         impact_list,
         phase_list,
         component_list,
         rel=False,
     )
 
-    assert sum(impacts_value) == pytest.approx(1.286e-05, rel=1e-3)
+    assert sum(impacts_value) == pytest.approx(1.214e-05, rel=1e-3)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
