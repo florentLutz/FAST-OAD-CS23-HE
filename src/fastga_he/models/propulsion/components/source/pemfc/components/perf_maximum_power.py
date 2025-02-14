@@ -5,8 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
-MAX_DEFAULT_STACK_POWER = 1000.0
-MIN_DEFAULT_STACK_POWER = 100.0
+MAX_DEFAULT_STACK_POWER = 1000.0  # [kW]
+MIN_DEFAULT_STACK_POWER = 100.0  # [kW]
 
 
 class PerformancesMaximumPower(om.ExplicitComponent):

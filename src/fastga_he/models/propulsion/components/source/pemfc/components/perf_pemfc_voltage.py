@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-DEFAULT_STACK_VOLTAGE = 325.0
+DEFAULT_STACK_VOLTAGE = 325.0  # [V]
 
 
 class PerformancesPEMFCVoltage(om.ExplicitComponent):

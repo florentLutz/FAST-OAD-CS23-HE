@@ -13,7 +13,7 @@ oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = 
     "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.enforce"
 )
 
-MAX_CURRENT_DENSITY = 0.7  # A/cm^2
+MAX_CURRENT_DENSITY = 0.7  # [A/cm^2]
 
 
 @oad.RegisterSubmodel(
@@ -22,7 +22,7 @@ MAX_CURRENT_DENSITY = 0.7  # A/cm^2
 )
 class ConstraintsEffectiveAreaEnforce(om.ExplicitComponent):
     """
-    Class that enforces that the maximum power seen by the pemfc during the mission is used for
+    Class that enforces that the maximum power seen by the PEMFC during the mission is used for
     the sizing.
     """
 

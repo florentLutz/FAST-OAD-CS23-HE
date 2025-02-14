@@ -25,6 +25,8 @@ from ..components.perf_analytical_voltage_adjustment import PerformancesAnalytic
 
 
 class PerformancesPEMFCStack(om.Group):
+    """Class that regroups all the subcomponents for the PEMFC stack performance computation."""
+
     def initialize(self):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"

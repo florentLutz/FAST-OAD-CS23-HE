@@ -7,7 +7,7 @@ import openmdao.api as om
 
 from stdatm import AtmosphereWithPartials
 
-DEFAULT_PRESSURE = 101325.0
+DEFAULT_PRESSURE = 101325.0  # [Pa]
 
 
 class PerformancesAmbientPressure(om.ExplicitComponent):

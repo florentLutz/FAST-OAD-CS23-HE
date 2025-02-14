@@ -9,7 +9,7 @@ import openmdao.api as om
 
 _LOGGER = logging.getLogger(__name__)
 
-DEFAULT_MAX_CURRENT_DENSITY = 0.7
+DEFAULT_MAX_CURRENT_DENSITY = 0.7  # [A/cm^2]
 
 
 class PerformancesCurrentDensity(om.ExplicitComponent):

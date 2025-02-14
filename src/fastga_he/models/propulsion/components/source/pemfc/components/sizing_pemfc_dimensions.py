@@ -8,16 +8,15 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 DIMENSION_RATIO = 0.3528  # Ratio between the effective area length size and the actual FC size
-LENGTH_LAYER_RATIO = 3.428e-3  # in meters
-DEFAULT_FC_POWER_DENSITY = 124  # kW/m^3
+LENGTH_LAYER_RATIO = 3.428e-3  # [m]
+DEFAULT_FC_POWER_DENSITY = 124  # [kW/m^3]
 
 
 class SizingPEMFCDimensions(om.ExplicitComponent):
     """
-    Computing the PEMFC dimensions based on the ratio of its maximum power density to that
-    of the Aerostak 200W reference enables more realistic sizing. The calculation is based on the
-    equations given by :cite: `Fuel Cell and Battery Hybrid System Optimization by
-    J.Hoogendoorn:2018`.
+    Computing the PEMFC dimensions based on the ratio of its maximum power density to that of the
+    Aerostak 200W reference enables more realistic sizing. The calculation is based on the
+    equations given by :cite:`Hoogendoorn:2018`.
     """
 
     def initialize(self):

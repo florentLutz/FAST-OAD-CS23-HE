@@ -10,8 +10,8 @@ DEFAULT_STACK_POWER = 216.0
 
 class PerformancesPEMFCPower(om.ExplicitComponent):
     """
-    Computation of the power at the output of the battery. As of when I wrote this, it will only
-    be used as a post-processing value
+    Computation of the power at the output of the PEMFC. As of when I wrote this, it will only
+    be used as a post-processing value.
     """
 
     def initialize(self):

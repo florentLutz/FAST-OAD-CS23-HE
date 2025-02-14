@@ -5,15 +5,15 @@
 import numpy as np
 import openmdao.api as om
 
-MAX_PEMFC_SYSYEM_POWER_DENSITY = 500  # kW/m^3
-MAX_PEMFC_STACK_POWER_DENSITY = 6000  # kW/m^3
+MAX_PEMFC_SYSYEM_POWER_DENSITY = 500  # [kW/m^3]
+MAX_PEMFC_STACK_POWER_DENSITY = 6000  # [kW/m^3]
 
 
 class PerformancesPEMFCMaxPowerDensityFuelCellSystem(om.ExplicitComponent):
-    # TODO:Proper citation after rebase
     """
-    Computation of the max power density of pemfc system excluding the inlet compressor.
-    Applied in volume calculation. Source: H3D_H2_UnmannedAviation_Brochure 2024.pptx
+    Computation of the max power density of PEMFC system excluding the inlet compressor.
+    Applied in volume calculation.
+    Source: https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf
     """
 
     def initialize(self):
@@ -89,7 +89,8 @@ class PerformancesPEMFCMaxPowerDensityFuelCellSystem(om.ExplicitComponent):
 
 class PerformancesPEMFCMaxPowerDensityFuelCellStack(om.ExplicitComponent):
     """
-    Computation of the max power density of PEMFC system excluding all BOPs. Applied in volume calculation
+    Computation of the max power density of PEMFC system excluding all BOPs.
+    Applied in volume calculation.
     """
 
     def initialize(self):

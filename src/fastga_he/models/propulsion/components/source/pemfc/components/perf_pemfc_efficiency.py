@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 DEFAULT_PEMFC_EFFICIENCY = 0.53
-DEFAULT_PRESSURE_ATM = 1.0
+DEFAULT_PRESSURE_ATM = 1.0  # [atm]
 
 
 class PerformancesPEMFCEfficiency(om.ExplicitComponent):

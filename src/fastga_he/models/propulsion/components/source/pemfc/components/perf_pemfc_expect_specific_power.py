@@ -6,15 +6,15 @@ import numpy as np
 import openmdao.api as om
 
 
-MAX_PEMFC_SYSTEM_SPECIFIC_POWER = 2.06  # kW/kg
-MAX_PEMFC_STACK_SPECIFIC_POWER = 4.5  # kW/kg
+MAX_PEMFC_SYSTEM_SPECIFIC_POWER = 2.06  # [kW/kg]
+MAX_PEMFC_STACK_SPECIFIC_POWER = 4.5  # [kW/kg]
 
 
 class PerformancesPEMFCMaxSpecificPowerFuelCellSystem(om.ExplicitComponent):
-    # TODO:Proper citation after rebase
     """
     Computation of the sizing specific power provide of PEMFC system exclude the inlet compressor.
-    Applied in weight calculation. Source: H3D_H2_UnmannedAviation_Brochure 2024.pptx
+    Applied in weight calculation.
+    Source: https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf
     """
 
     def initialize(self):
@@ -90,7 +90,7 @@ class PerformancesPEMFCMaxSpecificPowerFuelCellSystem(om.ExplicitComponent):
 
 class PerformancesPEMFCMaxSpecificPowerFuelCellStack(om.ExplicitComponent):
     """
-    Computation of the max specific power of PEMFC stack. Applied in weight calculation
+    Computation of the max specific power of PEMFC stack. Applied in weight calculation.
     """
 
     def initialize(self):

@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-DEFAULT_DC_CURRENT = 400.0
+DEFAULT_DC_CURRENT = 400.0  # [A]
 
 
 class PerformancesPEMFCDirectBusConnection(om.ImplicitComponent):

@@ -5,12 +5,12 @@
 import numpy as np
 import openmdao.api as om
 
-DEFAULT_PRESSURE = 101325.0
+DEFAULT_PRESSURE = 101325.0  # [Pa]
 
 
 class PerformancesOperatingPressure(om.ExplicitComponent):
     """
-    Computation of the operational pressure that PEMFC is working.
+    Computation of the operating pressure of PEMFC.
     """
 
     def initialize(self):

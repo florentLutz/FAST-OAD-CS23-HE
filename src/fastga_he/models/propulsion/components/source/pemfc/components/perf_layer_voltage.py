@@ -8,9 +8,9 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
 
-DEFAULT_LAYER_VOLTAGE = 0.7
-DEFAULT_PRESSURE_ATM = 1.0
-DEFAULT_TEMPERATURE = 288.15
+DEFAULT_LAYER_VOLTAGE = 0.7  # [V]
+DEFAULT_PRESSURE_ATM = 1.0  # [atm]
+DEFAULT_TEMPERATURE = 288.15  # [K]
 
 oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE] = (
     "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple"
@@ -22,12 +22,10 @@ oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE] = 
     "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple",
 )
 class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
-    # TODO: Edit citation after rebase
     """
     Computation of the voltage of single layer proton exchange membrane fuel cell inside one
     stack. Assumes it can be estimated with the i-v curve relation. Model based on existing
-    pemfc, Aerostack Ultralight 200, details can be found in :cite:`Fuel Cell and Battery Hybrid
-    System Optimization by J. Hoogendoorn:2018`.
+    pemfc, Aerostack Ultralight 200, details can be found in :cite:`hoogendoorn:2018`.
     """
 
     def initialize(self):
@@ -51,13 +49,13 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
         self.options.declare(
             "activation_loss_coefficient",
             default=0.014,
-            desc="activation loss coefficient of one layer of pemfc (V/ln(A/cm**2))",
+            desc="activation loss coefficient of one layer of pemfc [V/ln(A/cm**2)]",
         )
 
         self.options.declare(
             "ohmic_resistance",
             default=0.24,
-            desc="ohmic resistance of one layer of pemfc [V/ln(A/cm**2)]",
+            desc="ohmic resistance of one layer of pemfc [ohm*cm**2)]",
         )
 
         self.options.declare(
@@ -73,13 +71,7 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
         )
 
         self.options.declare(
-            "exponential_coefficient_in_concentration_loss",
-            default=11.42,
-            desc="exponential coefficient in concentration loss of one layer of pemfc [cm**2/A]",
-        )
-
-        self.options.declare(
-            "max_current_density", default=0.7, desc="maximum current density  of pemfc[A/cm^2]"
+            "max_current_density", default=0.7, desc="maximum current density  of pemfc[A/cm**2]"
         )
 
     def setup(self):
@@ -222,8 +214,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
     """
     Computation of the voltage of single layer proton exchange membrane fuel cell inside one
     stack. Assumes it can be estimated with the i-v curve relation. Model based on analytical i-v
-    curve equation, details can be found in: cite:`Preliminary Propulsion System Sizing Methods
-    for PEM Fuel Cell Aircraft by D.Juschus:2021`.
+    curve equation, details can be found in :cite:`Juschus:2021`.
     """
 
     def initialize(self):
@@ -283,7 +274,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         self.options.declare(
             "area_specific_resistance",
             default=1.0 * 10**-6,
-            desc="Combined ohmic resistance that leads to losses in pemfc [Ωm**2]",
+            desc="Combined ohmic resistance that leads to losses in pemfc [ohm*m**2]",
         )
 
         self.options.declare(
@@ -301,7 +292,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         self.options.declare(
             "max_current_density",
             default=7e3,
-            desc="maximum current density  of pemfc",
+            desc="maximum current density of pemfc [A/m**2]",
         )
 
     def setup(self):

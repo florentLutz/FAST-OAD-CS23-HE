@@ -7,10 +7,9 @@ import openmdao.api as om
 
 
 class PerformancesAnalyticalVoltageAdjustment(om.ExplicitComponent):
-    # TODO: Edit citation after rebase
     """
-    Computation of PEMFC voltage based on cathode pressure in different altitude
-    from:`Preliminary Propulsion System Sizing Methods for PEM Fuel Cell Aircraft by D.Juschus:2021`
+    Computation of PEMFC voltage based on cathode pressure in different altitude from
+    :cite:`juschus:2021`.
     """
 
     def initialize(self):

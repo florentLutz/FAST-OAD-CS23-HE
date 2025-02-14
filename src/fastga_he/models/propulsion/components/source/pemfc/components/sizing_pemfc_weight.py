@@ -5,15 +5,14 @@
 import numpy as np
 import openmdao.api as om
 
-FC_WEIGHT_DENSITY = 8.5034  # kg/m^2
-DEFAULT_FC_SPECIFIC_POWER = 0.345  # kW/kg
+FC_WEIGHT_DENSITY = 8.5034  # [kg/m^2]
+DEFAULT_FC_SPECIFIC_POWER = 0.345  # [kW/kg]
 
 
 class SizingPEMFCWeight(om.ExplicitComponent):
     """
     Computation of the weight the PEMFC based on the layer weight density but adjusted with
-    power density. The calculation is based on the equations given by :cite: `Fuel Cell and
-    Battery Hybrid System Optimization by J. Hoogendoorn:2018`.
+    power density. The calculation is based on the equations given by :cite:`Hoogendoorn:2018`.
     """
 
     def initialize(self):

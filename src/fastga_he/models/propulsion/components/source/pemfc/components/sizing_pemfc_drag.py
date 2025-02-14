@@ -9,9 +9,10 @@ from ..constants import POSSIBLE_POSITION
 
 
 class SizingPEMFCDrag(om.ExplicitComponent):
-    """Class that computes the contribution to profile drag of the pemfc according to the
-    position given in the options. For now this will be 0.0 regardless of the option except when
-    in a pod."""
+    """
+    Class that computes the contribution to profile drag of the PEMFC according to the position
+    given in the options. For now this will be 0.0 regardless of the option except when in a pod.
+    """
 
     def initialize(self):
         self.options.declare(

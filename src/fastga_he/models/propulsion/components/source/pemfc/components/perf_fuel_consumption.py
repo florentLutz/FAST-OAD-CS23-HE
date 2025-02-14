@@ -1,21 +1,20 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
 
-DEFAULT_HYDROGEN_CONSUMPTION = 10.0
+DEFAULT_HYDROGEN_CONSUMPTION = 10.0  # [kg/h]
 FARADAYS_CONSTANT = 96485.3321  # [C/mol]
-H2_MOL_PER_KG = 500.0
+H2_MOL_PER_KG = 500.0  # [kg]
 NUMBER_OF_ELETRONS_FROM_H2 = 2.0
 
 
 class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
-    # TODO: Edit citation after rebase
     """
     Computation of the hydrogen consumption for the required power. Simply based on the
-    results of the currrent density and effective area
+    results of the current density and effective area.
     """
 
     def initialize(self):

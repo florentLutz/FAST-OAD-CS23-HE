@@ -8,7 +8,7 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA
 
-MAX_CURRENT_DENSITY = 0.7  # A/cm^2
+MAX_CURRENT_DENSITY = 0.7  # [A/cm^2]
 
 
 @oad.RegisterSubmodel(
@@ -17,8 +17,8 @@ MAX_CURRENT_DENSITY = 0.7  # A/cm^2
 )
 class ConstraintsEffectiveAreaEnsure(om.ExplicitComponent):
     """
-    Class that ensures that the maximum power seen by the PEMFC stack during the mission is below the
-    one used for sizing, ensuring each component works below its minimum.
+    Class that ensures that the maximum power seen by the PEMFC stack during the mission is below
+    the one used for sizing, ensuring each component works below its minimum.
     """
 
     def initialize(self):

@@ -5,8 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
-MAX_DEFAULT_STACK_CURRENT = 1000.0
-MIN_DEFAULT_STACK_CURRENT = 100.0
+MAX_DEFAULT_STACK_CURRENT = 1000.0  # [A]
+MIN_DEFAULT_STACK_CURRENT = 100.0  # [A]
 
 
 class PerformancesMaximumCurrent(om.ExplicitComponent):
