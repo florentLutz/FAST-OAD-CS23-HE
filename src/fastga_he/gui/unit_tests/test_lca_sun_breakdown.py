@@ -6,6 +6,10 @@ import os
 import os.path as pth
 import pathlib
 
+import time
+
+import pytest
+
 from ..lca_impact import lca_impacts_sun_breakdown
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
@@ -62,6 +66,7 @@ def test_lca_sun_breakdown_kodiak_and_hybrid():
     fig.show()
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_sun_breakdown_kodiak_and_hybrid_paper():
     # Check that we can create a plot
     fig = lca_impacts_sun_breakdown(
@@ -88,6 +93,7 @@ def test_lca_sun_breakdown_kodiak_rel_absolute():
     fig.show()
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_sun_breakdown_kodiak_rel_absolute_paper():
     fig = lca_impacts_sun_breakdown(
         SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
@@ -106,8 +112,9 @@ def test_lca_sun_breakdown_kodiak_rel_absolute_paper():
     fig.update_layout(title_text=None)
 
     fig.show()
-    if not IN_GITHUB_ACTIONS:
-        fig.write_image(RESULT_FOLDER_PATH / "reference_kodiak_sun_breakdown.pdf")
+    fig.write_image(RESULT_FOLDER_PATH / "reference_kodiak_sun_breakdown.pdf")
+    time.sleep(3)
+    fig.write_image(RESULT_FOLDER_PATH / "reference_kodiak_sun_breakdown.pdf")
 
 
 def test_lca_sun_breakdown_kodiak_rel_parent():

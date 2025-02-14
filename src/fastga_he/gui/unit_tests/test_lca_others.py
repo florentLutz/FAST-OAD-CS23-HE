@@ -166,6 +166,7 @@ def test_lca_bar_chart():
     fig.show()
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_bar_chart_relative_paper():
     fig = lca_impacts_bar_chart_simple(
         [
@@ -177,10 +178,9 @@ def test_lca_bar_chart_relative_paper():
 
     fig.show()
     fig.update_layout(height=800, width=1600)
-    if not IN_GITHUB_ACTIONS:
-        fig.write_image(RESULT_FOLDER_PATH / "ga_impacts_evolution.pdf")
-        time.sleep(3)
-        fig.write_image(RESULT_FOLDER_PATH / "ga_impacts_evolution.pdf")
+    fig.write_image(RESULT_FOLDER_PATH / "ga_impacts_evolution.pdf")
+    time.sleep(3)
+    fig.write_image(RESULT_FOLDER_PATH / "ga_impacts_evolution.pdf")
 
 
 def test_lca_bar_chart_normalised_and_weighted():
@@ -213,6 +213,7 @@ def test_lca_bar_chart_relative_contribution():
     fig.show()
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_bar_chart_absolute_phase():
     fig = lca_impacts_bar_chart_with_phases_absolute(
         SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
@@ -222,13 +223,13 @@ def test_lca_bar_chart_absolute_phase():
 
     fig.show()
     fig.update_layout(height=800, width=1600)
-    if not IN_GITHUB_ACTIONS:
-        # Somehow this prevents the ugly footer from appearing !
-        fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
-        time.sleep(3)
-        fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
+    # Somehow this prevents the ugly footer from appearing !
+    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
+    time.sleep(3)
+    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_bar_chart_absolute_phase_hybrid():
     fig = lca_impacts_bar_chart_with_phases_absolute(
         SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml",
@@ -238,11 +239,10 @@ def test_lca_bar_chart_absolute_phase_hybrid():
 
     fig.show()
     fig.update_layout(height=800, width=1600)
-    if not IN_GITHUB_ACTIONS:
-        # Somehow this prevents the ugly footer from appearing !
-        fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
-        time.sleep(3)
-        fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
+    # Somehow this prevents the ugly footer from appearing !
+    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
+    time.sleep(3)
+    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
 
 
 def test_search_engine():
@@ -251,7 +251,7 @@ def test_search_engine():
     component_list = ["*", "*", "*", "turboshaft_1", "*"]
 
     impacts_value = lca_impacts_search_table(
-        SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+        DATA_FOLDER_PATH / "kodiak_100_ef.xml",
         impact_list,
         phase_list,
         component_list,
@@ -259,10 +259,10 @@ def test_search_engine():
     )
 
     # Should be equal to the single score.
-    assert impacts_value[0] == pytest.approx(1.247e-05, rel=1e-3)
-    assert impacts_value[1] == pytest.approx(7.632e-07, rel=1e-3)
-    assert impacts_value[2] == pytest.approx(2.489e-08, rel=1e-3)
-    assert impacts_value[3] == pytest.approx(6.125e-06, rel=1e-3)
+    assert impacts_value[0] == pytest.approx(1.214e-05, rel=1e-3)
+    assert impacts_value[1] == pytest.approx(7.478e-07, rel=1e-3)
+    assert impacts_value[2] == pytest.approx(1.298e-08, rel=1e-3)
+    assert impacts_value[3] == pytest.approx(6.072e-06, rel=1e-3)
     assert impacts_value[4] == pytest.approx(1.179e-05, rel=1e-3)
 
     impact_list = ["*", "*", "*", "*"]
@@ -277,7 +277,7 @@ def test_search_engine():
         rel=False,
     )
 
-    assert sum(impacts_value) == pytest.approx(1.247e-05, rel=1e-3)
+    assert sum(impacts_value) == pytest.approx(1.286e-05, rel=1e-3)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
