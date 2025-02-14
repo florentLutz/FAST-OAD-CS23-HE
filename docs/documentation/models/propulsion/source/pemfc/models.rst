@@ -17,12 +17,12 @@ expression of the fuel cell polarization model is expressed as :eq:`_general_pem
 .. _general_pemfc_iv:
 .. math::
 
-   V_{\text{operating}} = V_r - V_{\text{activation}} - V_{\text{Ohmic}} - V_{\text{mass-transport}}
+   V_{\text{operating}} = V_r - V_{\text{activation}} - V_{\text{ohmic}} - V_{\text{mass-transport}}
 
 Where :math:`V_{\text{operating}}` is the operating voltage for fuel cell in standard conditions, :math:`V_r` is the
-reversible open-circuit voltage defined by the gibbs free energy of the chemical reaction
-
-
+reversible open-circuit voltage defined by the gibbs free energy of the chemical reaction. The :math:`V_{\text{activation}}`
+is the activation loss that results from the overpotential  of both electrode, especially the oxegen reduction reaction
+overpotential.
 
 
 
