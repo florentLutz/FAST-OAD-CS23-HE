@@ -20,7 +20,7 @@ expression of the fuel cell polarization model is expressed as :eq:`_general_pem
    V_{\text{operating}} = V_r - V_{\text{activation}} - V_{\text{Ohmic}} - V_{\text{mass-transport}}
 
 Where :math:`V_{\text{operating}}` is the operating voltage for fuel cell in standard conditions, :math:`V_r` is the
-reversible open-circuit voltage defined by the gibbs free energy of the
+reversible open-circuit voltage defined by the gibbs free energy of the chemical reaction
 
 
 
