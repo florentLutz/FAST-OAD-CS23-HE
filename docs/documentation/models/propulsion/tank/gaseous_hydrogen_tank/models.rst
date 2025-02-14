@@ -18,7 +18,7 @@ and the storage pressure (:math:`P`) are applied in this calculation.
     V_{inner} = \frac{Z*m_{H2}*R*T}{P}
 
 
-The Hydrogen gas compressibility factor (:math:`Z`) is expressed as:
+The hydrogen gas compressibility factor (:math:`Z`) is expressed as:
 
 .. math::
     Z = 0.99704 + 6.4149*10^{-9}*P
