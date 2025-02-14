@@ -27,8 +27,8 @@ from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
 from ..components.perf_pemfc_power import PerformancesPEMFCPower
 from ..components.perf_pemfc_specific_power import PerformancesPEMFCSpecificPower
 from ..components.perf_pemfc_voltage import PerformancesPEMFCVoltage
-from ..components.perf_operation_pressure import PerformancesOperationPressure
-from ..components.perf_operation_temperature import PerformancesOperationTemperature
+from ..components.perf_operating_pressure import PerformancesOperatingPressure
+from ..components.perf_operating_temperature import PerformancesOperatingTemperature
 from ..components.perf_pemfc_expect_specific_power import (
     PerformancesPEMFCMaxSpecificPowerFuelCellSystem,
 )
@@ -341,7 +341,7 @@ def test_ambient_pressure():
     problem.check_partials(compact_print=True)
 
 
-def test_operation_pressure():
+def test_operating_pressure():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "ambient_pressure",
@@ -350,16 +350,16 @@ def test_operation_pressure():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesOperationPressure(number_of_points=NB_POINTS_TEST),
+        PerformancesOperatingPressure(number_of_points=NB_POINTS_TEST),
         ivc,
     )
-    assert problem.get_val("operation_pressure", units="atm") == pytest.approx(
+    assert problem.get_val("operating_pressure", units="atm") == pytest.approx(
         np.ones(NB_POINTS_TEST), rel=1e-2
     )
     problem.check_partials(compact_print=True)
 
 
-def test_operation_temperature():
+def test_operating_temperature():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "altitude",
@@ -368,12 +368,12 @@ def test_operation_temperature():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesOperationTemperature(
+        PerformancesOperatingTemperature(
             pemfc_stack_id="pemfc_stack_1", number_of_points=NB_POINTS_TEST
         ),
         ivc,
     )
-    assert problem.get_val("operation_temperature", units="K") == pytest.approx(
+    assert problem.get_val("operating_temperature", units="K") == pytest.approx(
         np.full(NB_POINTS_TEST, 288.15), rel=1e-2
     )
     problem.check_partials(compact_print=True)
@@ -382,7 +382,7 @@ def test_operation_temperature():
 def test_analytical_voltage_adjustment():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "operation_pressure",
+        "operating_pressure",
         units="atm",
         val=np.ones(NB_POINTS_TEST),
     )
@@ -405,7 +405,7 @@ def test_single_layer_voltage_system():
         val=np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]),
     )
     ivc.add_output(
-        name="operation_pressure",
+        name="operating_pressure",
         units="atm",
         val=np.full(7, 1.2),
     )
@@ -429,12 +429,12 @@ def test_single_layer_voltage_stack():
         val=np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]),
     )
     ivc.add_output(
-        name="operation_pressure",
+        name="operating_pressure",
         units="atm",
         val=np.full(7, 1.2),
     )
     ivc.add_output(
-        name="operation_temperature",
+        name="operating_temperature",
         units="degC",
         val=np.full(7, 50.0),
     )
@@ -712,7 +712,7 @@ def test_pemfc_efficiency():
         units="V",
     )
     ivc.add_output(
-        "operation_pressure",
+        "operating_pressure",
         np.full(NB_POINTS_TEST, 1.2),
         units="atm",
     )
@@ -800,7 +800,7 @@ def test_fuel_consumed():
     problem.check_partials(compact_print=True)
 
 
-def test_performances_pemfc_stack_system():
+def test_performances_pemfc_stack_simple():
     oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
         "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple"
     )
@@ -855,7 +855,7 @@ def test_performances_pemfc_stack_system():
     problem.check_partials(compact_print=True)
 
 
-def test_performances_pemfc_stack_only_stack():
+def test_performances_pemfc_stack_analytical():
     oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
         "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.analytical"
     )

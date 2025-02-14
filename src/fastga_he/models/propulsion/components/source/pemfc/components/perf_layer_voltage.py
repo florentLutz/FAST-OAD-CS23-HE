@@ -100,7 +100,7 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
         )
 
         self.add_input(
-            "operation_pressure",
+            "operating_pressure",
             units="atm",
             val=np.full(number_of_points, DEFAULT_PRESSURE_ATM),
         )
@@ -121,7 +121,7 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
 
         self.declare_partials(
             of="single_layer_pemfc_voltage",
-            wrt=["fc_current_density", "operation_pressure"],
+            wrt=["fc_current_density", "operating_pressure"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -157,11 +157,11 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
             np.full_like(inputs["fc_current_density"], self.options["max_current_density"]),
         )
 
-        operation_pressure = inputs["operation_pressure"]
+        operating_pressure = inputs["operating_pressure"]
 
         nominal_pressure = inputs["nominal_pressure"]
 
-        pressure_ratio_log = np.log(operation_pressure / nominal_pressure)
+        pressure_ratio_log = np.log(operating_pressure / nominal_pressure)
 
         pressure_coeff = -0.0032 * pressure_ratio_log**2 + 0.0019 * pressure_ratio_log + 0.0542
 
@@ -185,11 +185,11 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
         m = self.options["coefficient_in_concentration_loss"]
         n = self.options["exponential_coefficient_in_concentration_loss"]
 
-        operation_pressure = inputs["operation_pressure"]
+        operating_pressure = inputs["operating_pressure"]
 
         nominal_pressure = inputs["nominal_pressure"]
 
-        pressure_ratio_log = np.log(operation_pressure / nominal_pressure)
+        pressure_ratio_log = np.log(operating_pressure / nominal_pressure)
 
         i = np.clip(
             inputs["fc_current_density"],
@@ -205,9 +205,9 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
 
         partials["single_layer_pemfc_voltage", "fc_current_density"] = partials_j
 
-        partials["single_layer_pemfc_voltage", "operation_pressure"] = -(
+        partials["single_layer_pemfc_voltage", "operating_pressure"] = -(
             48 * pressure_ratio_log**2 - 19 * pressure_ratio_log - 271
-        ) / (5000 * operation_pressure)
+        ) / (5000 * operating_pressure)
 
         partials["single_layer_pemfc_voltage", "nominal_pressure"] = (
             48 * pressure_ratio_log**2 - 19 * pressure_ratio_log - 271
@@ -323,13 +323,13 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         )
 
         self.add_input(
-            "operation_pressure",
+            "operating_pressure",
             units="atm",
             val=np.full(number_of_points, DEFAULT_PRESSURE_ATM),
         )
 
         self.add_input(
-            "operation_temperature",
+            "operating_temperature",
             units="K",
             val=np.full(number_of_points, DEFAULT_TEMPERATURE),
         )
@@ -349,8 +349,8 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
             of="*",
             wrt=[
                 "fc_current_density",
-                "operation_pressure",
-                "operation_temperature",
+                "operating_pressure",
+                "operating_temperature",
                 "analytical_voltage_adjust_factor",
             ],
             method="exact",
@@ -390,7 +390,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
             np.full_like(inputs["fc_current_density"], self.options["max_current_density"]),
         )
 
-        p_o2 = inputs["operation_pressure"]
+        p_o2 = inputs["operating_pressure"]
 
         p_h2 = inputs[
             "data:propulsion:he_power_train:pemfc_stack:"
@@ -398,7 +398,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
             + ":hydrogen_reactant_pressure"
         ]
 
-        t = inputs["operation_temperature"]
+        t = inputs["operating_temperature"]
 
         outputs["single_layer_pemfc_voltage"] = vf * (
             e0
@@ -417,13 +417,13 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         gas_const = self.options["gas_constant"]
         faraday_const = self.options["faraday_constant"]
         t0 = self.options["standard_temperature"] * np.ones(number_of_points)
-        t = inputs["operation_temperature"]
+        t = inputs["operating_temperature"]
         a = self.options["cathode_transfer_coefficient"]
         r = self.options["area_specific_resistance"]
         c = self.options["mass_transport_loss_constant"]
         jlim = self.options["limiting_current_density"] * np.ones(number_of_points)
         jleak = self.options["leakage_current_density"] * np.ones(number_of_points)
-        p_o2 = inputs["operation_pressure"]
+        p_o2 = inputs["operating_pressure"]
         vf = inputs["analytical_voltage_adjust_factor"]
 
         p_h2 = inputs[
@@ -451,13 +451,13 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
 
         partials["single_layer_pemfc_voltage", "fc_current_density"] = partials_j
 
-        partials["single_layer_pemfc_voltage", "operation_temperature"] = vf * (
+        partials["single_layer_pemfc_voltage", "operating_temperature"] = vf * (
             -ds / (2 * faraday_const) * np.ones(number_of_points)
             + gas_const / (2 * faraday_const) * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
             - gas_const / (2 * a * faraday_const) * np.log(j + jleak)
         )
 
-        partials["single_layer_pemfc_voltage", "operation_pressure"] = vf * (
+        partials["single_layer_pemfc_voltage", "operating_pressure"] = vf * (
             gas_const * t / (4 * faraday_const * p_o2)
         )
 

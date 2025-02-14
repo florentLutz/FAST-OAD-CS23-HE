@@ -11,7 +11,18 @@ Fuel cell Layer voltage calculation
 ***********************************
 The Proton-Exchange Membrane Fuel Cell (PEMFC) stack are consisted with multiple layers of single layer PEMFC. With the
 maximum current density (:math:`A/cm^2`) derived with the constraint component to ensure positive voltage, the PEMFC
-layer voltage can be calculated with these two polarization curve derived from different PEMFC systems.
+layer voltage can be calculated with these two polarization curve derived from different PEMFC systems. The general
+expression of the fuel cell polarization model is expressed as :eq:`_general_pemfc_iv`
+
+.. _general_pemfc_iv:
+.. math::
+
+   V_{\text{operating}} = V_r - V_{\text{activation}} - V_{\text{Ohmic}} - V_{\text{mass-transport}}
+
+
+
+
+
 
 Simple PEMFC polarization model
 ===============================

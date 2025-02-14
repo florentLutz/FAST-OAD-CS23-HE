@@ -54,7 +54,7 @@
                         <number_of_layers>35.0</number_of_layers>
                         <hydrogen_reactant_pressure units="atm">1.0</hydrogen_reactant_pressure>
                         <effective_area units="cm**2">16.8</effective_area>
-                        <operation_pressure units="atm">1.2</operation_pressure>
+                        <operating_pressure units="atm">1.2</operating_pressure>
                         <dimension>
                             <length units="m">0.11998</length>
                             <width units="m">0.1162</width>

@@ -18,9 +18,9 @@ from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
 from ..components.perf_pemfc_voltage import PerformancesPEMFCVoltage
-from ..components.perf_operation_pressure import PerformancesOperationPressure
+from ..components.perf_operating_pressure import PerformancesOperatingPressure
 from ..components.perf_ambient_pressure import PerformancesAmbientPressure
-from ..components.perf_operation_temperature import PerformancesOperationTemperature
+from ..components.perf_operating_temperature import PerformancesOperatingTemperature
 from ..components.perf_analytical_voltage_adjustment import PerformancesAnalyticalVoltageAdjustment
 
 
@@ -79,8 +79,8 @@ class PerformancesPEMFCStack(om.Group):
         )
 
         self.add_subsystem(
-            "pemfc_operation_pressure",
-            PerformancesOperationPressure(
+            "pemfc_operating_pressure",
+            PerformancesOperatingPressure(
                 number_of_points=number_of_points, compressor_connection=compressor_connection
             ),
             promotes=["*"],
@@ -94,7 +94,7 @@ class PerformancesPEMFCStack(om.Group):
 
         self.add_subsystem(
             "pemfc_ambient_temperature",
-            PerformancesOperationTemperature(number_of_points=number_of_points),
+            PerformancesOperatingTemperature(number_of_points=number_of_points),
             promotes=["*"],
         )
 

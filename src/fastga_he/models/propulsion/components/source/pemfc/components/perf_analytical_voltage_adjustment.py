@@ -22,7 +22,7 @@ class PerformancesAnalyticalVoltageAdjustment(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            name="operation_pressure",
+            name="operating_pressure",
             units="atm",
             val=np.full(number_of_points, np.nan),
         )
@@ -41,13 +41,13 @@ class PerformancesAnalyticalVoltageAdjustment(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        p = inputs["operation_pressure"]
+        p = inputs["operating_pressure"]
         outputs["analytical_voltage_adjust_factor"] = (
             -0.022830 * p**4 + 0.230982 * p**3 - 0.829603 * p**2 + 1.291515 * p + 0.329935
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        p = inputs["operation_pressure"]
-        partials["analytical_voltage_adjust_factor", "operation_pressure"] = (
+        p = inputs["operating_pressure"]
+        partials["analytical_voltage_adjust_factor", "operating_pressure"] = (
             -0.09132 * p**3 + 0.692946 * p**2 - 1.659206 * p + 1.291515
         )

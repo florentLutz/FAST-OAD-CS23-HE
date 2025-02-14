@@ -40,7 +40,7 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
         )
 
         self.add_input(
-            "operation_pressure",
+            "operating_pressure",
             units="atm",
             val=np.full(number_of_points, DEFAULT_PRESSURE_ATM),
         )
@@ -58,7 +58,7 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt=["single_layer_pemfc_voltage", "operation_pressure"],
+            wrt=["single_layer_pemfc_voltage", "operating_pressure"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -75,10 +75,10 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         e0 = self.options["pemfc_theoretical_electric_potential"]
         pressure_coeff = self.options["pressure coefficient"]
-        operation_pressure = inputs["operation_pressure"]
+        operating_pressure = inputs["operating_pressure"]
         nominal_pressure = inputs["nominal_pressure"]
 
-        e = e0 + pressure_coeff * np.log(operation_pressure / nominal_pressure)
+        e = e0 + pressure_coeff * np.log(operating_pressure / nominal_pressure)
 
         efficiency = inputs["single_layer_pemfc_voltage"] / e
 
@@ -89,9 +89,9 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
 
         e0 = self.options["pemfc_theoretical_electric_potential"]
         pressure_coeff = self.options["pressure coefficient"]
-        operation_pressure = inputs["operation_pressure"]
+        operating_pressure = inputs["operating_pressure"]
         nominal_pressure = inputs["nominal_pressure"]
-        e = e0 + pressure_coeff * np.log(operation_pressure / nominal_pressure)
+        e = e0 + pressure_coeff * np.log(operating_pressure / nominal_pressure)
 
         partials[
             "efficiency",
@@ -100,8 +100,8 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
 
         partials[
             "efficiency",
-            "operation_pressure",
-        ] = -pressure_coeff * inputs["single_layer_pemfc_voltage"] / (operation_pressure * e**2)
+            "operating_pressure",
+        ] = -pressure_coeff * inputs["single_layer_pemfc_voltage"] / (operating_pressure * e**2)
 
         partials[
             "efficiency",

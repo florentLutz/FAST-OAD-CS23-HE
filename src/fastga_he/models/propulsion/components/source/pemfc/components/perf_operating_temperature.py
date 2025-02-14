@@ -9,7 +9,7 @@ from stdatm import AtmosphereWithPartials
 DEFAULT_TEMPERATURE = 300.0
 
 
-class PerformancesOperationTemperature(om.ExplicitComponent):
+class PerformancesOperatingTemperature(om.ExplicitComponent):
     # TODO: Edit citation after rebase
     """
     Computation of the ambient temperature that PEMFC is working based on altitude only applied to the model
@@ -33,7 +33,7 @@ class PerformancesOperationTemperature(om.ExplicitComponent):
         self.add_input("altitude", units="m", val=np.zeros(number_of_points))
 
         self.add_output(
-            name="operation_temperature",
+            name="operating_temperature",
             units="K",
             val=np.full(number_of_points, DEFAULT_TEMPERATURE),
         )
@@ -47,11 +47,11 @@ class PerformancesOperationTemperature(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["operation_temperature"] = AtmosphereWithPartials(
+        outputs["operating_temperature"] = AtmosphereWithPartials(
             inputs["altitude"], altitude_in_feet=False
         ).temperature
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["operation_temperature", "altitude"] = AtmosphereWithPartials(
+        partials["operating_temperature", "altitude"] = AtmosphereWithPartials(
             inputs["altitude"], altitude_in_feet=False
         ).partial_temperature_altitude
