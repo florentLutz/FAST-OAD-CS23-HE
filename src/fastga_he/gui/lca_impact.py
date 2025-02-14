@@ -736,7 +736,7 @@ def _sort_and_cut_off(
     are the contributor and the items are the evolution of the contributor.
     :param lifespan_list: list containing the untreated list containing the value of the aircraft
     lifespan at which the analysis was conducted.
-    :param cutoff_criteria: value of the cutoff criteria, in percent
+    :param cutoff_criteria: value of the cutoff criteria, in percent.
     """
 
     for contributor_name, contributor_value in untreated_dict.items():
@@ -856,10 +856,10 @@ def _safe_add_to_dict_of_list(
     For dictionaries where items are meant to be lists, this function checks if the key exists.
     If it does, it appends to the list, otherwise it creates the lists.
 
-    :param dict_to_update: dictionary in which to add element
-    :param dict_key: dictionary key at which the element is meant to be added
-    :param dict_key: dictionary key at which the element is meant to be added
-    :param element_to_add: element to add to the dictionary
+    :param dict_to_update: dictionary in which to add element.
+    :param dict_key: dictionary key at which the element is meant to be added.
+    :param dict_key: dictionary key at which the element is meant to be added.
+    :param element_to_add: element to add to the dictionary.
     """
     if dict_to_update.get(dict_key):
         dict_to_update[dict_key].append(element_to_add)
@@ -902,8 +902,8 @@ def lca_impacts_bar_chart_simple(
     is done relative to the first design given in the inputs. Can be used with only one design but
     is pointless since it will compare an aircraft to itself.
 
-    :param aircraft_file_paths: paths to the output file that contains the impacts
-    :param names_aircraft: names of the aircraft
+    :param aircraft_file_paths: paths to the output file that contains the impacts.
+    :param names_aircraft: names of the aircraft.
     """
 
     fig = go.Figure()
@@ -970,8 +970,8 @@ def lca_impacts_bar_chart_normalised_weighted(
     is done relative to the first design given in the inputs. Can be used with only one design but
     is pointless since it will compare an aircraft to itself.
 
-    :param aircraft_file_paths: paths to the output file that contains the impacts
-    :param names_aircraft: names of the aircraft
+    :param aircraft_file_paths: paths to the output file that contains the impacts.
+    :param names_aircraft: names of the aircraft.
     """
 
     fig = go.Figure()
@@ -1037,7 +1037,7 @@ def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]
     total value for each impact.
 
     :param aircraft_file_path: path to the output file path.
-    :return: a dict of the components with their contribution to each impact category
+    :return: a dict of the components with their contribution to each impact category.
     """
 
     datafile = oad.DataFile(aircraft_file_path)
@@ -1090,11 +1090,11 @@ def lca_impacts_bar_chart_with_contributors(
     name_aircraft: str = None,
 ) -> go.FigureWidget:
     """
-    Give a bar chart that plot the impact of an aircraft in each category and how each components
-    contributes to it in relative terms
+    Give a bar chart that plot the impact of an aircraft in each category and how each component
+    contributes to it in relative terms.
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
-    :param name_aircraft: name of the aircraft
+    :param name_aircraft: name of the aircraft.
     """
 
     component_and_contribution = _get_component_and_contribution(aircraft_file_path)
