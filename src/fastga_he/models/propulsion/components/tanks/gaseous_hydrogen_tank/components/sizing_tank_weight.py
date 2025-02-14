@@ -11,8 +11,8 @@ from ..constants import POSSIBLE_POSITION
 class SizingGaseousHydrogenTankWeight(om.ExplicitComponent):
     """
     Computation of the weight of the tank. The very simplistic approach we will use is to say
-    that weight of tank is the weight of unused fuel and the weight of the tank itself.
-    :cite:`colozza:2002`
+    that weight of tank is the weight of unused fuel and the weight of the tank itself
+    :cite:`colozza:2002`.
     """
 
     def initialize(self):

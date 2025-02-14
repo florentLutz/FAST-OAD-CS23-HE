@@ -12,7 +12,8 @@ STORAGE_TEMPERATURE = 300.0  # (K)
 class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
     """
     Computation of the volume of hydrogen to be stored in the tank in specific temperature and
-    pressure condition, performed under ideal gas assumption.
+    pressure condition, performed under ideal gas assumption. Hydrogen gas compressibility factor
+    (z) is taken from :cite:`bolz:1973`.
     """
 
     def initialize(self):
@@ -76,7 +77,6 @@ class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
         ]
 
         z = 0.99704 + 6.4149e-9 * tank_pressure
-        # Hydrogen gas compressibility factor :cite:`bolz:1973`.
 
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -100,7 +100,6 @@ class SizingGaseousHydrogenTankInnerVolume(om.ExplicitComponent):
         ]
 
         z = 0.99704 + 6.4149e-9 * tank_pressure
-        # Hydrogen gas compressibility factor :cite:`bolz:1973`.
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
