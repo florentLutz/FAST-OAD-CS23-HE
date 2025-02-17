@@ -36,7 +36,7 @@ NORMALIZATION_FACTOR = {
         "human_toxicity_non-carcinogenic": 1.29e-04,
         "human_toxicity_non-carcinogenicinorganics": 1.29e-04,  # human_toxicity_non-carcinogenic
         "human_toxicity_non-carcinogenicorganics": 1.29e-04,  # human_toxicity_non-carcinogenic
-        "ionising_radiation": 4.22e03,
+        "ionising_radiation_human_health": 4.22e03,
         "land_use": 8.19e05,
         "material_resources_metals_minerals": 6.36e-02,
         "ozone_depletion": 5.23e-02,
@@ -107,7 +107,7 @@ WEIGHTING_FACTOR = {
         "eutrophication_terrestrial": 0.0371,
         "human_toxicity_carcinogenic": 0.0213,
         "human_toxicity_non-carcinogenic": 0.0184,
-        "ionising_radiation": 0.0501,
+        "ionising_radiation_human_health": 0.0501,
         "land_use": 0.0794,
         "material_resources_metals_minerals": 0.0755,
         "ozone_depletion": 0.0631,
@@ -125,7 +125,7 @@ WEIGHTING_FACTOR = {
         "eutrophication_terrestrial": 0.0371,
         "human_toxicity_carcinogenic": 0.0213,
         "human_toxicity_non-carcinogenic": 0.0184,
-        "ionising_radiation": 0.0501,
+        "ionising_radiation_human_health": 0.0501,
         "land_use": 0.0794,
         "material_resources_metals_minerals": 0.0755,
         "ozone_depletion": 0.0631,
