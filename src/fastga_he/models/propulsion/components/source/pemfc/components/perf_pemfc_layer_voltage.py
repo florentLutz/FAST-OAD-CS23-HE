@@ -326,7 +326,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="analytical_voltage_adjust_factor",
+            name="analytical_pressure_volatge_correction",
             val=np.full(number_of_points, 1.0),
         )
 
@@ -342,7 +342,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
                 "fc_current_density",
                 "operating_pressure",
                 "operating_temperature",
-                "analytical_voltage_adjust_factor",
+                "analytical_pressure_volatge_correction",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -373,7 +373,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         jlim = self.options["limiting_current_density"] * np.ones(number_of_points)
         jleak = self.options["leakage_current_density"] * np.ones(number_of_points)
 
-        vf = inputs["analytical_voltage_adjust_factor"]
+        pvc = inputs["analytical_pressure_volatge_correction"]
 
         j = np.clip(
             inputs["fc_current_density"],
@@ -391,7 +391,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
 
         t = inputs["operating_temperature"]
 
-        outputs["single_layer_pemfc_voltage"] = vf * (
+        outputs["single_layer_pemfc_voltage"] = pvc * (
             e0
             - ds / (2 * faraday_const) * (t - t0)
             + gas_const * t / (2 * faraday_const) * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
@@ -415,7 +415,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
         jlim = self.options["limiting_current_density"] * np.ones(number_of_points)
         jleak = self.options["leakage_current_density"] * np.ones(number_of_points)
         p_o2 = inputs["operating_pressure"]
-        vf = inputs["analytical_voltage_adjust_factor"]
+        pvc = inputs["analytical_pressure_volatge_correction"]
 
         p_h2 = inputs[
             "data:propulsion:he_power_train:pemfc_stack:"
@@ -431,7 +431,7 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
 
         partials_j = np.where(
             inputs["fc_current_density"] == j,
-            vf
+            pvc
             * (
                 -gas_const * t / (2 * faraday_const * a * (j + jleak))
                 - c / (-j + jlim - jleak)
@@ -442,13 +442,13 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
 
         partials["single_layer_pemfc_voltage", "fc_current_density"] = partials_j
 
-        partials["single_layer_pemfc_voltage", "operating_temperature"] = vf * (
+        partials["single_layer_pemfc_voltage", "operating_temperature"] = pvc * (
             -ds / (2 * faraday_const) * np.ones(number_of_points)
             + gas_const / (2 * faraday_const) * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
             - gas_const / (2 * a * faraday_const) * np.log(j + jleak)
         )
 
-        partials["single_layer_pemfc_voltage", "operating_pressure"] = vf * (
+        partials["single_layer_pemfc_voltage", "operating_pressure"] = pvc * (
             gas_const * t / (4 * faraday_const * p_o2)
         )
 
@@ -457,9 +457,9 @@ class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
             "data:propulsion:he_power_train:pemfc_stack:"
             + pemfc_stack_id
             + ":hydrogen_reactant_pressure",
-        ] = vf * (gas_const * t / (2 * faraday_const * p_h2))
+        ] = pvc * (gas_const * t / (2 * faraday_const * p_h2))
 
-        partials["single_layer_pemfc_voltage", "analytical_voltage_adjust_factor"] = (
+        partials["single_layer_pemfc_voltage", "analytical_pressure_volatge_correction"] = (
             e0
             - ds / (2 * faraday_const) * (t - t0)
             + gas_const * t / (2 * faraday_const) * np.log(p_h2 * np.sqrt(p_o2 * 0.21))

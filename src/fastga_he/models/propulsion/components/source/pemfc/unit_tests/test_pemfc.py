@@ -393,7 +393,7 @@ def test_analytical_voltage_adjustment():
         PerformancesAnalyticalVoltageAdjustment(number_of_points=NB_POINTS_TEST),
         ivc,
     )
-    assert problem.get_val("analytical_voltage_adjust_factor") == pytest.approx(
+    assert problem.get_val("analytical_pressure_volatge_correction") == pytest.approx(
         np.full(NB_POINTS_TEST, 1.0), rel=1e-2
     )
     problem.check_partials(compact_print=True)

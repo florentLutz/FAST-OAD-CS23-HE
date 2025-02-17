@@ -7,7 +7,7 @@ import openmdao.api as om
 
 from ..constants import POSSIBLE_POSITION
 
-DIMENSION_RATIO = 0.3528  # Ratio between the effective area length size and the actual FC size
+AREA_RATIO = 0.12446784  # Ratio between the effective area length size and the actual FC size
 LENGTH_LAYER_RATIO = 3.428e-3  # [m]
 DEFAULT_FC_POWER_DENSITY = 124  # [kW/m^3]
 
@@ -103,7 +103,7 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_power_density"
         ]
 
-        pemfc_area = effective_area / DIMENSION_RATIO**2
+        pemfc_area = effective_area / AREA_RATIO
         adjust_factor = DEFAULT_FC_POWER_DENSITY / max_power_density
 
         outputs[
@@ -143,7 +143,7 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
             ]
-            / DIMENSION_RATIO**2
+            / AREA_RATIO
         )
 
         partials[
@@ -157,14 +157,14 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = 0.5 * np.sqrt(2 * adjust_factor) / np.sqrt(effective_area * DIMENSION_RATIO**2)
+            ] = 0.5 * np.sqrt(2 * adjust_factor) / np.sqrt(effective_area * AREA_RATIO)
 
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
                 + ":dimension:height",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = 0.5 * np.sqrt(adjust_factor) / np.sqrt(2 * effective_area * DIMENSION_RATIO**2)
+            ] = 0.5 * np.sqrt(adjust_factor) / np.sqrt(2 * effective_area * AREA_RATIO)
 
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
@@ -186,14 +186,14 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = 0.5 * np.sqrt(adjust_factor) / np.sqrt(effective_area * DIMENSION_RATIO**2)
+            ] = 0.5 * np.sqrt(adjust_factor) / np.sqrt(effective_area * AREA_RATIO)
 
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:"
                 + pemfc_stack_id
                 + ":dimension:height",
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-            ] = 0.5 * np.sqrt(adjust_factor) / np.sqrt(effective_area * DIMENSION_RATIO**2)
+            ] = 0.5 * np.sqrt(adjust_factor) / np.sqrt(effective_area * AREA_RATIO)
 
             partials[
                 "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",

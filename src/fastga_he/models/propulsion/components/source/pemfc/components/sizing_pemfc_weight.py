@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-FC_WEIGHT_DENSITY = 8.5034  # [kg/m^2]
+WEIGHT_AREA_DENSITY = 8.5034  # [kg/m^2]
 DEFAULT_FC_SPECIFIC_POWER = 0.345  # [kW/kg]
 
 
@@ -70,7 +70,7 @@ class SizingPEMFCWeight(om.ExplicitComponent):
         adjust_factor = DEFAULT_FC_SPECIFIC_POWER / max_specific_power
 
         outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":mass"] = (
-            FC_WEIGHT_DENSITY * adjust_factor * effective_area * number_of_layers
+            WEIGHT_AREA_DENSITY * adjust_factor * effective_area * number_of_layers
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -89,18 +89,18 @@ class SizingPEMFCWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":mass",
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers",
-        ] = FC_WEIGHT_DENSITY * adjust_factor * effective_area
+        ] = WEIGHT_AREA_DENSITY * adjust_factor * effective_area
 
         partials[
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":mass",
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-        ] = FC_WEIGHT_DENSITY * adjust_factor * number_of_layers
+        ] = WEIGHT_AREA_DENSITY * adjust_factor * number_of_layers
 
         partials[
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":mass",
             "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":max_specific_power",
         ] = (
-            -FC_WEIGHT_DENSITY
+            -WEIGHT_AREA_DENSITY
             * DEFAULT_FC_SPECIFIC_POWER
             * number_of_layers
             * effective_area
