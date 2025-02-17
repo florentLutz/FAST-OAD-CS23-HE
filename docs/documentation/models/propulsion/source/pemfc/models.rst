@@ -19,19 +19,55 @@ expression of the fuel cell polarization model is expressed as :eq:`_general_pem
 
    V_{\text{operating}} = V_r - V_{\text{activation}} - V_{\text{ohmic}} - V_{\text{mass-transport}}
 
-Where :math:`V_{\text{operating}}` is the operating voltage for fuel cell in standard conditions, :math:`V_r` is the
-reversible open-circuit voltage defined by the gibbs free energy of the chemical reaction. The :math:`V_{\text{activation}}`
-is the activation loss that results from the overpotential  of both electrode, especially the oxegen reduction reaction
-overpotential.
-
-
+The :math:`V_{\text{operating}}` represents the operating voltage of the fuel cell under standard conditions, while
+:math:`V_r` is the reversible open-circuit voltage, determined by the Gibbs free energy of the chemical reaction.
+:math:`V_{\text{activation}}` corresponds to the activation loss caused by the overpotential at both electrodes,
+particularly the oxygen reduction reaction overpotential. :math:`V_{\text{ohmic}}` denotes the ohmic loss due to the
+electrical resistance of the electrodes, and :math:`V_{\text{mass-transport}}` represents the mass-transport loss, which
+occurs when reactant gases, such as oxygen or fuel, face diffusion limitations at the electrodes.
 
 Simple PEMFC polarization model
 ===============================
+The simple PEMFC polarization model is based on an empircal model of Aerostak 200W PEMFC derived by
+:cite:`hoogendoorn:2018`. This model utilize the empirical open circuit voltage :math:`V_0` and the voltage losses in
+simplified form obtained with curve fitting. The voltage difference due to operating pressure variation is also
+considered in this model shown as :math:`\Delta V_p`.
 
 .. math::
-    V = V_0 - B \cdot \ln{(j)} - R \cdot j - m \cdot e^{n \cdot j} + C \cdot \ln{(\frac{P_{op}}{P_{amb}})} \\
-    C = -0.0032  \ln{(\frac{P_{op}}{P_{amb}})} ^ 2 + 0.0019 \ln{(\frac{P_{op}}{P_{amb}})} + 0.0542
+    V = V_0 - V_{\text{activation}} - V_{\text{ohmic}} - V_{\text{mass-transport}} + \Delta V_p \\
+
+With
+
+.. math::
+    V_{\text{activation}} = B \cdot \ln{(j)} \\
+    V_{\text{ohmic}} =  R \cdot j \\
+    V_{\text{mass-transport}} =  m \cdot e^{n \cdot j} \\
+    \Delta V_p = C \cdot \ln{(\frac{P_{op}}{P_{nom}})} \\
+    C = -0.0032  \ln{(\frac{P_{op}}{P_{nom}})} ^ 2 + 0.0019 \ln{(\frac{P_{op}}{P_{nom}})} + 0.0542
+
+And
+
+.. raw:: html
+
+   <div align="center">
+
++------------+-----------+----------------+
+| Parameter  | Value     | Unit           |
++------------+-----------+----------------+
+| V₀         | 0.83      | [V]            |
++------------+-----------+----------------+
+| B          | 0.014     | [V/ln(A/cm²)]  |
++------------+-----------+----------------+
+| R          | 0.24      | [Ω cm²]        |
++------------+-----------+----------------+
+| m          | 5.63E-06  | [V]            |
++------------+-----------+----------------+
+| n          | 11.42     | [cm²/A]        |
++------------+-----------+----------------+
+
+.. raw:: html
+
+   </div>
 
 Analytical PEMFC polarization model
 ===================================

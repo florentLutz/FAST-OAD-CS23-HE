@@ -20,9 +20,10 @@ produces electricity with H₂O as the only byproduct.
 
    \text{Overall Reaction:} \quad \text{H}_2 + \frac{1}{2} \text{O}_2 \rightarrow \text{H}_2\text{O}
 
-.. image::../../../../img/pemfc_reaction_schematic.svg
-  :width: 600
-  :name: 1
+.. image:: ../../../../../img/pemfc_reaction_schematic.png
+   :width: 600
+   :name: fig-1
+   :alt: Schematic diagram of PEMFC reaction
 
 This component can be activated through the powertrain configuration file (PT file). The registered installation
 positions can be found at tank position options in :ref:`options <options-pemfc>`.
