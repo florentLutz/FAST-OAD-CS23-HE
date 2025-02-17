@@ -18,10 +18,12 @@ from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
 from ..components.perf_pemfc_voltage import PerformancesPEMFCVoltage
-from ..components.perf_operating_pressure import PerformancesOperatingPressure
+from ..components.perf_pemfc_operating_pressure import PerformancesOperatingPressure
 from ..components.perf_ambient_pressure import PerformancesAmbientPressure
-from ..components.perf_operating_temperature import PerformancesOperatingTemperature
-from ..components.perf_analytical_voltage_adjustment import PerformancesAnalyticalVoltageAdjustment
+from ..components.perf_pemfc_operating_temperature import PerformancesOperatingTemperature
+from ..components.perf_pemfc_analytical_voltage_adjustment import (
+    PerformancesAnalyticalVoltageAdjustment,
+)
 
 
 class PerformancesPEMFCStack(om.Group):

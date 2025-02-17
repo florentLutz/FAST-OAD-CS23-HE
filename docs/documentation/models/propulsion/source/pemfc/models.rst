@@ -76,8 +76,9 @@ The analytical PEMFC polarization model is based on the thermodynamic characteri
 operating temperature and pressure, represented by :math:`V_T` and :math:`V_{P_e}`, respectively. The variable
 :math:`p_{O_2}` denotes the operating pressure at the cathode, :math:`p_{H_2}` refers to the operating pressure at the
 anode, and :math:`T` is the operating temperature of the fuel cell. The constants :math:`R` and :math:`Fr` represent the
-gas constant and Faraday's constant. The voltage adjustment factor :math:`VAF` adjusts for changes in ambient pressure
-:math:`P_{\text{amb}}`. The current density, :math:`j`, is expressed in [A/m²] for this model.
+gas constant and Faraday's constant. The voltage adjustment factor :math:`VAF`,obtained from
+`juschus' github repository <https://github.com/danieljuschus/pemfc-aircraft-sizing>`_ , adjusts for changes in ambient
+pressure :math:`P_{\text{amb}}`. The current density, :math:`j`, is expressed in [A/m²] for this model.
 
 .. math::
     V = VAF [E_0 - V_T + V_{P_e} - V_{\text{activation}} - V_{\text{ohmic}}
