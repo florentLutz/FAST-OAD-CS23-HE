@@ -21,7 +21,7 @@ from ..lca_impact import (
     lca_impacts_bar_chart_simple,
     lca_impacts_bar_chart_normalised_weighted,
     lca_impacts_bar_chart_with_contributors,
-    lca_impacts_bar_chart_with_phases_absolute,
+    lca_impacts_bar_chart_with_components_absolute,
     lca_impacts_search_table,
 )
 
@@ -215,7 +215,7 @@ def test_lca_bar_chart_relative_contribution():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_bar_chart_absolute_phase():
-    fig = lca_impacts_bar_chart_with_phases_absolute(
+    fig = lca_impacts_bar_chart_with_components_absolute(
         SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
         name_aircraft="Hybrid Kodiak 100",
     )
@@ -224,14 +224,14 @@ def test_lca_bar_chart_absolute_phase():
     fig.show()
     fig.update_layout(height=800, width=1600)
     # Somehow this prevents the ugly footer from appearing !
-    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
+    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution_ref.pdf")
     time.sleep(3)
-    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
+    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution_ref.pdf")
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_bar_chart_absolute_phase_hybrid():
-    fig = lca_impacts_bar_chart_with_phases_absolute(
+    fig = lca_impacts_bar_chart_with_components_absolute(
         SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml",
         name_aircraft="Hybrid Kodiak 100",
     )
@@ -240,9 +240,9 @@ def test_lca_bar_chart_absolute_phase_hybrid():
     fig.show()
     fig.update_layout(height=800, width=1600)
     # Somehow this prevents the ugly footer from appearing !
-    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
+    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution_hyb.pdf")
     time.sleep(3)
-    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution.pdf")
+    fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution_hyb.pdf")
 
 
 def test_search_engine():

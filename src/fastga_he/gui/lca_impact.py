@@ -1167,13 +1167,13 @@ def lca_impacts_bar_chart_with_contributors(
     return go.FigureWidget(fig)
 
 
-def lca_impacts_bar_chart_with_phases_absolute(
+def lca_impacts_bar_chart_with_components_absolute(
     aircraft_file_path: Union[str, pathlib.Path],
     name_aircraft: str = None,
 ) -> go.FigureWidget:
     """
-    Give a bar chart that plot the weighted impact of an aircraft in each category and how each
-    phase contributes to it in absolute terms
+    Provide a bar chart of the weighted impacts of an aircraft, showing the absolute value of each
+    component's contribution across all impact categories.
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft
@@ -1231,7 +1231,9 @@ def lca_impacts_bar_chart_with_phases_absolute(
 
         component_counter += 1
 
-    title_text = "Contribution of each phase to each impact category for " + name_aircraft
+    title_text = (
+        "Absolute contribution of each component to each impact category for " + name_aircraft
+    )
 
     fig.update_layout(
         plot_bgcolor="white",
