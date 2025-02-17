@@ -142,7 +142,7 @@ the effective area :math:`A_{eff}` and the stack cross-section area :math:`A_{cr
     A_{cross} = \frac {A_{cross} \cdot DAF } {AR}
 
 Where :math:`DAF` is the dimension adjustment factor, calculated as the power density of the Aerostak 200W divided by
-the maximum expected power density of the fuel cell. This factor adjusts the size based on whether the calculation
+the maximum expected power density of the fuel cell. This factor adjusts the dimension based on whether the calculation
 considers the entire system or just the fuel cell stack.
 
 .. math::
@@ -154,7 +154,7 @@ considers the entire system or just the fuel cell stack.
    \end{cases}
 
 PEMFC weight calculation
-==========================
+========================
 The PEMFC weight is calculated with the weight area density :math:`WAD`, which is the total weight divided by the total
 effective area of the PEMFC. Utilizing the :math:`WAD` of Aerostak 200W provided by :cite:`hoogendoorn:2018`, the weight
 of the PEMFC stack can be expressed as:
