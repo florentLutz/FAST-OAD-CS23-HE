@@ -77,7 +77,7 @@ class PerformancesPEMFCStack(om.Group):
         )
 
         self.add_subsystem(
-            "pemfc_ambient_pressure",
+            "ambient_pressure",
             PerformancesAmbientPressure(number_of_points=number_of_points),
             promotes=["*"],
         )
