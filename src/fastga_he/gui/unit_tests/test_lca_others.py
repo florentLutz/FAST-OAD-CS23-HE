@@ -28,8 +28,6 @@ from ..lca_impact import (
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
 RESULT_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 
-PATH_TO_CURRENT_FILE = pathlib.Path(__file__)
-
 SENSITIVITY_STUDIES_FOLDER_PATH = (
     pathlib.Path(__file__).parents[2]
     / "models"
@@ -85,9 +83,9 @@ def test_lca_single_score_sensitivity_analysis_two_plots():
     fig.show()
 
     fig.update_layout(height=800.0, width=1600.0)
-    fig.write_image(PATH_TO_CURRENT_FILE.parent / "results" / "ga_single_score_evolution.pdf")
+    fig.write_image(RESULT_FOLDER_PATH / "ga_single_score_evolution.pdf")
     time.sleep(3)
-    fig.write_image(PATH_TO_CURRENT_FILE.parent / "results" / "ga_single_score_evolution.pdf")
+    fig.write_image(RESULT_FOLDER_PATH / "ga_single_score_evolution.pdf")
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -214,10 +212,22 @@ def test_lca_bar_chart_relative_contribution():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_relative_contribution_ref_paper():
+    fig = lca_impacts_bar_chart_with_contributors(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+        name_aircraft="the reference Kodiak 100",
+    )
+
+    # TODO: beautify names, put phase and aggregate production
+
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_bar_chart_absolute_phase():
     fig = lca_impacts_bar_chart_with_components_absolute(
         SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
-        name_aircraft="Hybrid Kodiak 100",
+        name_aircraft="Reference Kodiak 100",
     )
     fig.update_layout(title_text=None)
 
@@ -231,7 +241,12 @@ def test_lca_bar_chart_absolute_phase_paper():
         SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
         name_aircraft="Hybrid Kodiak 100",
         separate_phase=True,
-        legend_rename={"manufacturing": "line testing"}
+        legend_rename={
+            "manufacturing": "line testing",
+            "turboshaft: operation": "kerosene combustion",
+            "kerosene for mission: operation": "kerosene production",
+        },
+        aggregate_phase=["production"],
     )
     fig.update_layout(title_text=None)
 

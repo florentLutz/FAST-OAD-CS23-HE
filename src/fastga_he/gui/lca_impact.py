@@ -1034,7 +1034,9 @@ def lca_impacts_bar_chart_normalised_weighted(
 
 
 def _get_component_and_contribution(
-    aircraft_file_path: Union[str, pathlib.Path], separate_phase: bool = False
+    aircraft_file_path: Union[str, pathlib.Path],
+    separate_phase: bool = False,
+    aggregate_phase: list = None,
 ) -> dict:
     """
     Returns a dict of the components and their impact in each category. Also return a dict with the
@@ -1044,6 +1046,8 @@ def _get_component_and_contribution(
     :return: a dict of the components with their contribution to each impact category.
     :param separate_phase: by default, all contribution of one component, regardless of the phase
     is aggregated, this segregates them.
+    :param aggregate_phase: by default only the manufacturing and distribution are aggregated.
+    Additional phase specified here can be aggregated.
     """
 
     datafile = oad.DataFile(aircraft_file_path)
@@ -1060,19 +1064,31 @@ def _get_component_and_contribution(
                 impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
                 contribution = datafile[name].value[0]
 
-                if separate_phase:
-                    key_name = component_name + ": " + phase_name
-                else:
-                    key_name = component_name
-
-                if contribution != 0.0:
-                    if key_name in component_and_impacts:
-                        if impact_name in component_and_impacts[key_name]:
-                            component_and_impacts[key_name][impact_name] += contribution
+                if aggregate_phase and phase_name in aggregate_phase:
+                    if contribution != 0.0:
+                        key_name = phase_name
+                        if key_name in component_and_impacts:
+                            if impact_name in component_and_impacts[key_name]:
+                                component_and_impacts[key_name][impact_name] += contribution
+                            else:
+                                component_and_impacts[key_name][impact_name] = contribution
                         else:
-                            component_and_impacts[key_name][impact_name] = contribution
+                            component_and_impacts[key_name] = {impact_name: contribution}
+
+                else:
+                    if separate_phase:
+                        key_name = component_name + ": " + phase_name
                     else:
-                        component_and_impacts[key_name] = {impact_name: contribution}
+                        key_name = component_name
+
+                    if contribution != 0.0:
+                        if key_name in component_and_impacts:
+                            if impact_name in component_and_impacts[key_name]:
+                                component_and_impacts[key_name][impact_name] += contribution
+                            else:
+                                component_and_impacts[key_name][impact_name] = contribution
+                        else:
+                            component_and_impacts[key_name] = {impact_name: contribution}
 
             elif "manufacturing:sum" in name:
                 component_name = "manufacturing"
@@ -1183,6 +1199,7 @@ def lca_impacts_bar_chart_with_components_absolute(
     name_aircraft: str = None,
     separate_phase: bool = False,
     legend_rename: dict = None,
+    aggregate_phase: list = None,
 ) -> go.FigureWidget:
     """
     Provide a bar chart of the weighted impacts of an aircraft, showing the absolute value of each
@@ -1194,9 +1211,13 @@ def lca_impacts_bar_chart_with_components_absolute(
     is aggregated, this segregates them.
     :param legend_rename: legend names are set by the code by default, if any renaming is to be
     done, pass here the legend to be renamed as key and how to rename it as item.
+    :param aggregate_phase: by default only the manufacturing and distribution are aggregated.
+    Additional phase specified here can be aggregated.
     """
 
-    component_and_contribution = _get_component_and_contribution(aircraft_file_path, separate_phase)
+    component_and_contribution = _get_component_and_contribution(
+        aircraft_file_path, separate_phase, aggregate_phase
+    )
 
     fig = go.Figure()
 
