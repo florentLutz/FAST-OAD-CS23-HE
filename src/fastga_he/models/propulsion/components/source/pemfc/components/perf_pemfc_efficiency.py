@@ -12,7 +12,8 @@ DEFAULT_PRESSURE_ATM = 1.0  # [atm]
 class PerformancesPEMFCEfficiency(om.ExplicitComponent):
     """
     Computation of efficiency of PEMFC with dividing the actual voltage provided by the fuel cell
-    with reversible voltage considering the deviation in different operating pressure.
+    with reversible voltage considering the deviation in different operating pressure. The
+    pressure coefficient is given by the model from :cite:`hoogendoorn:2018`.
     """
 
     def initialize(self):

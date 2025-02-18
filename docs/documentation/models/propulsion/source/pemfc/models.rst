@@ -71,7 +71,7 @@ Pₙₒₘ        101325      Pa
    </div>
 
 This table proivdes the parameter values that has been considered to model Aerostak 200W in hoogendoorn's research
-:cite:`hoogendoorn:2018`.
+:cite:`hoogendoorn:2018`, all of which can be found as options in the simple polarization model class.
 
 Analytical PEMFC polarization model
 ===================================
@@ -123,7 +123,8 @@ j₀          1.0    A/m²
 
    </div>
 
-This table provides the parameter values that has been considered in juschus' research :cite:`juschus:2021`.
+This table provides the parameter values that has been considered in juschus' research :cite:`juschus:2021`, all of
+which can be found as options in the analytical polarization model class.
 
 ******************************
 Sizing calculation
