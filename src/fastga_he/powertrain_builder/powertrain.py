@@ -462,7 +462,10 @@ class FASTGAHEPowerTrainConfigurator:
             # to impart less burden during the writing of the pt file, we won't ask the user to
             # set the option accordingly, rather, we will do it here.
 
-            if target_id == "fastga_he.pt_component.battery_pack" and (
+            if (
+                target_id == "fastga_he.pt_component.battery_pack"
+                or target_id == "fastga_he.pt_component.pemfc_stack"
+            ) and (
                 source_id == "fastga_he.pt_component.dc_bus"
                 or source_id == "fastga_he.pt_component.dc_splitter"
                 or source_id == "fastga_he.pt_component.dc_sspc"
@@ -482,11 +485,10 @@ class FASTGAHEPowerTrainConfigurator:
                 for current_output in current_outputs:
                     target_outputs.append(tuple(reversed(current_output)))
 
-            # Same idea also applies to PEMFC
-            if target_id == "fastga_he.pt_component.pemfc_stack" and (
-                source_id == "fastga_he.pt_component.dc_bus"
-                or source_id == "fastga_he.pt_component.dc_splitter"
-                or source_id == "fastga_he.pt_component.dc_sspc"
+            # Compressor connection for PEMFC
+            if (
+                target_id == "fastga_he.pt_component.pemfc_stack"
+                and source_id == "fastga_he.pt_component.compressor"
             ):
                 # First we'll check if the option has already been set or no, just to avoid
                 # losing time
@@ -495,7 +497,7 @@ class FASTGAHEPowerTrainConfigurator:
                 target_option = self._components_options[target_index]
 
                 if not target_option:
-                    self._components_options[target_index] = {"direct_bus_connection": True}
+                    self._components_options[target_index] = {"compressor_connection": True}
 
                 current_outputs = resources.DICTIONARY_OUT[target_id]
 
