@@ -11,7 +11,7 @@ MAX_PEMFC_STACK_POWER_DENSITY = 6000  # [kW/m^3]
 
 class PerformancesPEMFCMaxPowerDensityFuelCellSystem(om.ExplicitComponent):
     """
-    Computation of the max power density of PEMFC system excluding the inlet compressor.
+    Computation of the maximum power density of PEMFC system excluding the inlet compressor.
     Applied in volume calculation.
     Source: https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf
     """
@@ -89,8 +89,8 @@ class PerformancesPEMFCMaxPowerDensityFuelCellSystem(om.ExplicitComponent):
 
 class PerformancesPEMFCMaxPowerDensityFuelCellStack(om.ExplicitComponent):
     """
-    Computation of the max power density of PEMFC system excluding all BOPs.
-    Applied in volume calculation.
+    Computation of the maximum power density of PEMFC stack excluding all BoPs. Applied in volume
+    calculation.
     """
 
     def initialize(self):

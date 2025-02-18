@@ -23,9 +23,8 @@ oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE] = 
 )
 class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
     """
-    Computation of the voltage of single layer proton exchange membrane fuel cell inside one
-    stack. Assumes it can be estimated with the i-v curve relation. Model based on existing
-    pemfc, Aerostack Ultralight 200, details can be found in :cite:`hoogendoorn:2018`.
+    Computation of the single layer voltage of PEMFC. Model based on existing pemfc, Aerostack
+    Ultralight 200W, details can be found in :cite:`hoogendoorn:2018`.
     """
 
     def initialize(self):
@@ -212,9 +211,8 @@ class PerformancesSinglePEMFCVoltageSimple(om.ExplicitComponent):
 )
 class PerformancesSinglePEMFCVoltageAnalytical(om.ExplicitComponent):
     """
-    Computation of the voltage of single layer proton exchange membrane fuel cell inside one
-    stack. Assumes it can be estimated with the i-v curve relation. Model based on analytical i-v
-    curve equation, details can be found in :cite:`Juschus:2021`.
+    Computation of the single layer voltage of PEMFC. Model based on analytical i-v curve equation,
+    details can be found in :cite:`Juschus:2021`.
     """
 
     def initialize(self):

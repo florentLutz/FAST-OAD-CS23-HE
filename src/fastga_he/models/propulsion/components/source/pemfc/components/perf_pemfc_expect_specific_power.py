@@ -12,8 +12,8 @@ MAX_PEMFC_STACK_SPECIFIC_POWER = 4.5  # [kW/kg]
 
 class PerformancesPEMFCMaxSpecificPowerFuelCellSystem(om.ExplicitComponent):
     """
-    Computation of the sizing specific power provide of PEMFC system exclude the inlet compressor.
-    Applied in weight calculation.
+    Computation of the maximum specific power provide of PEMFC system exclude the inlet
+    compressor. Applied in weight calculation.
     Source: https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf
     """
 
@@ -90,7 +90,8 @@ class PerformancesPEMFCMaxSpecificPowerFuelCellSystem(om.ExplicitComponent):
 
 class PerformancesPEMFCMaxSpecificPowerFuelCellStack(om.ExplicitComponent):
     """
-    Computation of the max specific power of PEMFC stack. Applied in weight calculation.
+    Computation of the maximum specific power of PEMFC stack excluding all BoPs. Applied in weight
+    calculation.
     """
 
     def initialize(self):

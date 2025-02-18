@@ -2,8 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 """
-This regression model is  construct based on the data provided by, Source: H3D_H2_UnmannedAviation_Brochure 2024.pptx.
-The specific power is utilized in weight calculation for PEMFC.
+This regression model is  construct based on the data provided by, Source:
+H3D_H2_UnmannedAviation_Brochure 2024.pptx. The specific power is utilized in weight calculation
+for PEMFC.
 """
 
 import numpy as np

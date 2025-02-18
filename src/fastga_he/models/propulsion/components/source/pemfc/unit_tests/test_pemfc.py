@@ -384,7 +384,7 @@ def test_operating_temperature():
 def test_analytical_voltage_adjustment():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "operating_pressure",
+        "ambient_pressure",
         units="atm",
         val=np.ones(NB_POINTS_TEST),
     )

@@ -14,7 +14,7 @@ NUMBER_OF_ELETRONS_FROM_H2 = 2.0
 class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
     """
     Computation of the hydrogen consumption for the required power. Simply based on the
-    results of the current density and effective area.
+    results of the PEMFC current density and effective area.
     """
 
     def initialize(self):

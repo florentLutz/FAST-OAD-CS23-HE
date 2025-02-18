@@ -9,7 +9,7 @@ import openmdao.api as om
 class PerformancesPEMFCFuelConsumed(om.ExplicitComponent):
     """
     Computation of the hydrogen at each flight point for the required power. Simply based on the
-    results of the hydrogen consumption and time.
+    results of the hydrogen consumption and time steps.
     """
 
     def initialize(self):

@@ -12,7 +12,7 @@ DEFAULT_TEMPERATURE = 300.0  # [K]
 class PerformancesOperatingTemperature(om.ExplicitComponent):
     """
     Computation of the ambient temperature that PEMFC is working based on altitude only applied
-    to the model from :cite:`Juschus:2021`.
+    to the analytical polarization model from :cite:`Juschus:2021`.
     """
 
     def initialize(self):

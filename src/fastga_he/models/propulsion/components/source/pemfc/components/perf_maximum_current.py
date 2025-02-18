@@ -11,7 +11,7 @@ MIN_DEFAULT_STACK_CURRENT = 100.0  # [A]
 
 class PerformancesMaximumCurrent(om.ExplicitComponent):
     """
-    Class to identify the maximum current output from PEMFC.
+    Computation that identifies the maximum/minimum current output from PEMFC.
     """
 
     def initialize(self):

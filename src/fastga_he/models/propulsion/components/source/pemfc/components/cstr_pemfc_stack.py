@@ -10,7 +10,8 @@ from ..constants import SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA
 
 class ConstraintsPEMFCStack(om.Group):
     """
-    Class that gather the different constraints for the PEMFC, be they ensure or enforce.
+    Class that gather the different constraints for the PEMFC, ensure or enforce depends on user's
+    choice.
     """
 
     def initialize(self):

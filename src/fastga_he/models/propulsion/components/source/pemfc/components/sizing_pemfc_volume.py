@@ -8,7 +8,8 @@ import openmdao.api as om
 
 class SizingPEMFCVolume(om.ExplicitComponent):
     """
-    Computation of the volume the PEMFC based on number of layers.
+    Computation of the volume the PEMFC based on number of layers.The calculation is based on the
+    equations given by :cite:`Hoogendoorn:2018`.
     """
 
     def initialize(self):

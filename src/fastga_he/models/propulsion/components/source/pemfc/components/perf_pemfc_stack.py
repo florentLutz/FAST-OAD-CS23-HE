@@ -27,7 +27,7 @@ from ..components.perf_pemfc_analytical_voltage_adjustment import (
 
 
 class PerformancesPEMFCStack(om.Group):
-    """Class that regroups all the subcomponents for the PEMFC stack performance computation."""
+    """Class that regroups all the subcomponents for PEMFC stack performance computation."""
 
     def initialize(self):
         self.options.declare(

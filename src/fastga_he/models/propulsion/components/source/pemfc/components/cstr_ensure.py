@@ -18,7 +18,7 @@ MAX_CURRENT_DENSITY = 0.7  # [A/cm^2]
 class ConstraintsEffectiveAreaEnsure(om.ExplicitComponent):
     """
     Class that ensures that the maximum power seen by the PEMFC stack during the mission is below
-    the one used for sizing, ensuring each component works below its minimum.
+    the one used for sizing, ensuring each component works below its maximum.
     """
 
     def initialize(self):

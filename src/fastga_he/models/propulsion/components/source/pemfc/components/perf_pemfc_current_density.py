@@ -2,19 +2,14 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import logging
 import numpy as np
 import openmdao.api as om
 
-
-_LOGGER = logging.getLogger(__name__)
-
 DEFAULT_MAX_CURRENT_DENSITY = 0.7  # [A/cm^2]
-
 
 class PerformancesCurrentDensity(om.ExplicitComponent):
     """
-    Computation of the current density, assume each stack provide an equal amount of current.
+    Computation of the current density, simply based on the current and effective area.
     """
 
     def initialize(self):

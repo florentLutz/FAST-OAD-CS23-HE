@@ -8,8 +8,7 @@ import openmdao.api as om
 
 class PerformancesPEMFCSpecificPower(om.ExplicitComponent):
     """
-    Computation of the power provide per kilogram of PEMFC. As of when I wrote this, it will only
-    be used as a post-processing value.
+    Computation of the specific power of PEMFC, which only considered in post-processing.
     """
 
     def initialize(self):

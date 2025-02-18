@@ -11,7 +11,7 @@ MIN_DEFAULT_STACK_POWER = 100.0  # [kW]
 
 class PerformancesMaximumPower(om.ExplicitComponent):
     """
-    Class to identify the maximum power output from PEMFC.
+    Computation that identifies the maximum/minimum power output from PEMFC.
     """
 
     def initialize(self):

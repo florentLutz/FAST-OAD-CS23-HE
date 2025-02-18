@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesAnalyticalVoltageAdjustment(om.ExplicitComponent):
     """
-    Computation of PEMFC voltage based on cathode pressure in different altitude from
+    Computation of PEMFC voltage based on ambient pressure in different altitude from
     :cite:`juschus:2021`.
     """
 
@@ -21,7 +21,7 @@ class PerformancesAnalyticalVoltageAdjustment(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            name="operating_pressure",
+            name="ambient_pressure",
             units="atm",
             val=np.full(number_of_points, np.nan),
         )
@@ -40,13 +40,13 @@ class PerformancesAnalyticalVoltageAdjustment(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        p = inputs["operating_pressure"]
+        p = inputs["ambient_pressure"]
         outputs["analytical_pressure_volatge_correction"] = (
             -0.022830 * p**4 + 0.230982 * p**3 - 0.829603 * p**2 + 1.291515 * p + 0.329935
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        p = inputs["operating_pressure"]
-        partials["analytical_pressure_volatge_correction", "operating_pressure"] = (
+        p = inputs["ambient_pressure"]
+        partials["analytical_pressure_volatge_correction", "ambient_pressure"] = (
             -0.09132 * p**3 + 0.692946 * p**2 - 1.659206 * p + 1.291515
         )
