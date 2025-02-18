@@ -223,6 +223,19 @@ def test_lca_bar_chart_absolute_phase():
 
     fig.show()
     fig.update_layout(height=800, width=1600)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_absolute_phase_paper():
+    fig = lca_impacts_bar_chart_with_components_absolute(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+        name_aircraft="Hybrid Kodiak 100",
+        separate_phase=True,
+    )
+    fig.update_layout(title_text=None)
+
+    fig.show()
+    fig.update_layout(height=800, width=1600)
     # Somehow this prevents the ugly footer from appearing !
     fig.write_image(RESULT_FOLDER_PATH / "ga_component_contribution_ref.pdf")
     time.sleep(3)

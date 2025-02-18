@@ -1033,13 +1033,17 @@ def lca_impacts_bar_chart_normalised_weighted(
     return go.FigureWidget(fig)
 
 
-def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]) -> dict:
+def _get_component_and_contribution(
+    aircraft_file_path: Union[str, pathlib.Path], separate_phase: bool = False
+) -> dict:
     """
     Returns a dict of the components and their impact in each category. Also return a dict with the
     total value for each impact.
 
     :param aircraft_file_path: path to the output file path.
     :return: a dict of the components with their contribution to each impact category.
+    :param separate_phase: by default, all contribution of one component, regardless of the phase
+    is aggregated, this segregates them.
     """
 
     datafile = oad.DataFile(aircraft_file_path)
@@ -1052,16 +1056,23 @@ def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]
         if LCA_PREFIX in name and "_weighted:" in name:
             if _depth_lca_detail(name) >= 4:
                 component_name = _get_component_from_variable_name(name)
+                phase_name = name.split(":")[-2]
                 impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
                 contribution = datafile[name].value[0]
+
+                if separate_phase:
+                    key_name = component_name + ": " + phase_name
+                else:
+                    key_name = component_name
+
                 if contribution != 0.0:
-                    if component_name in component_and_impacts:
-                        if impact_name in component_and_impacts[component_name]:
-                            component_and_impacts[component_name][impact_name] += contribution
+                    if key_name in component_and_impacts:
+                        if impact_name in component_and_impacts[key_name]:
+                            component_and_impacts[key_name][impact_name] += contribution
                         else:
-                            component_and_impacts[component_name][impact_name] = contribution
+                            component_and_impacts[key_name][impact_name] = contribution
                     else:
-                        component_and_impacts[component_name] = {impact_name: contribution}
+                        component_and_impacts[key_name] = {impact_name: contribution}
 
             elif "manufacturing:sum" in name:
                 component_name = "manufacturing"
@@ -1170,6 +1181,7 @@ def lca_impacts_bar_chart_with_contributors(
 def lca_impacts_bar_chart_with_components_absolute(
     aircraft_file_path: Union[str, pathlib.Path],
     name_aircraft: str = None,
+    separate_phase: bool = False,
 ) -> go.FigureWidget:
     """
     Provide a bar chart of the weighted impacts of an aircraft, showing the absolute value of each
@@ -1177,9 +1189,11 @@ def lca_impacts_bar_chart_with_components_absolute(
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft
+    :param separate_phase: by default, all contribution of one component, regardless of the phase
+    is aggregated, this segregates them.
     """
 
-    component_and_contribution = _get_component_and_contribution(aircraft_file_path)
+    component_and_contribution = _get_component_and_contribution(aircraft_file_path, separate_phase)
 
     fig = go.Figure()
 
@@ -1188,14 +1202,25 @@ def lca_impacts_bar_chart_with_components_absolute(
 
     component_counter = 0
 
-    beautified_component_names = []
+    components_type = {}
 
     for component_name in component_and_contribution:
-        beautified_component_name = component_name.replace("_", " ")
-        if beautified_component_name[-1].isdigit():
-            beautified_component_names.append(beautified_component_name[:-2])
+        if separate_phase:
+            beautified_component_name = component_name.split(":")[0].replace("_", " ")
         else:
-            beautified_component_names.append(beautified_component_name)
+            beautified_component_name = component_name.replace("_", " ")
+
+        if beautified_component_name[-1].isdigit():
+            component_type = beautified_component_name[:-2]
+            if component_type in components_type:
+                existing_component_of_that_type = components_type[component_type]
+                # To avoid duplication
+                existing_component_of_that_type.append(beautified_component_name)
+                components_type[component_type] = list(set(existing_component_of_that_type))
+            else:
+                components_type[component_type] = [beautified_component_name]
+        else:
+            components_type[beautified_component_name] = [beautified_component_name]
 
     for component, impacts in component_and_contribution.items():
         impact_contributions = []
@@ -1208,15 +1233,22 @@ def lca_impacts_bar_chart_with_components_absolute(
             impact_contributions.append(contribution)
 
         # If there are only one component of each type, we don't put the number
-        beautified_component_name = component.replace("_", " ")
+
+        if separate_phase:
+            component_name = component.split(":")[0]
+            beautified_component_name = component_name.replace("_", " ")
+        else:
+            component_name = component
+            beautified_component_name = component_name.replace("_", " ")
+
         if beautified_component_name[-1].isdigit():
             component_type = " ".join(beautified_component_name.split(" ")[:-1])
-            if beautified_component_names.count(component_type) == 1:
-                final_name = component_type
+            if len(components_type[component_type]) == 1:
+                final_name = component.replace(component_name, component_type)
             else:
-                final_name = beautified_component_name
+                final_name = component.replace(component_name, beautified_component_name)
         else:
-            final_name = beautified_component_name
+            final_name = component.replace(component_name, beautified_component_name)
 
         bar_chart = go.Bar(
             name=final_name,
