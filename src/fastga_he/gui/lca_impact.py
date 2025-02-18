@@ -1117,6 +1117,9 @@ def _get_component_and_contribution(
 def lca_impacts_bar_chart_with_contributors(
     aircraft_file_path: Union[str, pathlib.Path],
     name_aircraft: str = None,
+    separate_phase: bool = False,
+    legend_rename: dict = None,
+    aggregate_phase: list = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that plot the impact of an aircraft in each category and how each component
@@ -1124,9 +1127,17 @@ def lca_impacts_bar_chart_with_contributors(
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft.
+    :param separate_phase: by default, all contribution of one component, regardless of the phase
+    is aggregated, this segregates them.
+    :param legend_rename: legend names are set by the code by default, if any renaming is to be
+    done, pass here the legend to be renamed as key and how to rename it as item.
+    :param aggregate_phase: by default only the manufacturing and distribution are aggregated.
+    Additional phase specified here can be aggregated.
     """
 
-    component_and_contribution = _get_component_and_contribution(aircraft_file_path)
+    component_and_contribution = _get_component_and_contribution(
+        aircraft_file_path, separate_phase, aggregate_phase
+    )
 
     fig = go.Figure()
 
@@ -1139,6 +1150,18 @@ def lca_impacts_bar_chart_with_contributors(
         impact_contributions = []
         beautified_impact_names = []
 
+        if separate_phase:
+            component_name = component.split(":")[0]
+            beautified_component_name = component_name.replace("_", " ")
+        else:
+            component_name = component
+            beautified_component_name = component.replace("_", " ")
+
+        final_name = component.replace(component_name, beautified_component_name)
+
+        if legend_rename and final_name in legend_rename:
+            final_name = legend_rename[final_name]
+
         for impact_name, contribution in impacts.items():
             beautified_impact_name = impact_name.replace("_", " ")
             beautified_impact_names.append(beautified_impact_name)
@@ -1146,7 +1169,7 @@ def lca_impacts_bar_chart_with_contributors(
             impact_contributions.append(contribution / impact_score_dict[impact_name] * 100.0)
 
         bar_chart = go.Bar(
-            name=component,
+            name=final_name,
             x=beautified_impact_names,
             y=impact_contributions,
             marker=dict(

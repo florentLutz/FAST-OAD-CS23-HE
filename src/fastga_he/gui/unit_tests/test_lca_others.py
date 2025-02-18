@@ -216,9 +216,19 @@ def test_lca_bar_chart_relative_contribution_ref_paper():
     fig = lca_impacts_bar_chart_with_contributors(
         SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
         name_aircraft="the reference Kodiak 100",
+        separate_phase=True,
+        legend_rename={
+            "manufacturing": "line testing",
+            "turboshaft: operation": "kerosene combustion",
+            "kerosene for mission: operation": "kerosene production",
+        },
+        aggregate_phase=["production"],
     )
 
-    # TODO: beautify names, put phase and aggregate production
+    fig.update_layout(height=800, width=1600)
+    fig.write_image(RESULT_FOLDER_PATH / "ga_relative_contribution_ref.pdf")
+    time.sleep(3)
+    fig.write_image(RESULT_FOLDER_PATH / "ga_relative_contribution_ref.pdf")
 
     fig.show()
 
@@ -348,7 +358,8 @@ def test_search_engine_paper():
         * 2.0
     )
     energy_mission_ref_design = fuel_burned_ref_design * 11.9  # in kWh
-    print("Energy required per FU", energy_mission_ref_design * flights_per_fu_ref_design)
+    energy_per_pax_km = energy_mission_ref_design * flights_per_fu_ref_design
+    print("Energy required per FU", energy_per_pax_km)
 
     impact_list_ref_design = ["*", "*", "*"]
     phase_list_ref_design = ["operation", "*", "*"]
@@ -403,7 +414,8 @@ def test_search_engine_paper():
     energy_mission_hybrid_design = (
         fuel_burned_hybrid_design * 11.9 + electricity_used_hybrid_design
     )  # in kWh
-    print("Energy required per FU", energy_mission_hybrid_design * flights_per_fu_hybrid_design)
+    energy_per_pax_km_hybrid = energy_mission_hybrid_design * flights_per_fu_hybrid_design
+    print("Energy required per FU", energy_per_pax_km_hybrid)
 
     impact_list_hybrid_design = ["*", "*", "*", "*", "*"]
     phase_list_hybrid_design = ["operation", "*", "*", "production", "*"]
@@ -429,3 +441,22 @@ def test_search_engine_paper():
     impact_per_kwh_of_energy_used_hybrid = impact_one_flight_hybrid / energy_mission_hybrid_design
     print(impact_per_kwh_of_energy_used_hybrid)
     print("\n")
+
+    print(
+        "Decrease in energy required",
+        (energy_mission_hybrid_design - energy_mission_ref_design)
+        / energy_mission_ref_design
+        * 100.0,
+    )
+    print(
+        "Decrease in energy required per pax.km",
+        (energy_per_pax_km_hybrid - energy_per_pax_km)
+        / energy_per_pax_km
+        * 100.0,
+    )
+    print(
+        "Increase in environmental intensity",
+        (impact_per_kwh_of_energy_used_hybrid - impact_per_kwh_of_energy_used)
+        / impact_per_kwh_of_energy_used
+        * 100.0,
+    )
