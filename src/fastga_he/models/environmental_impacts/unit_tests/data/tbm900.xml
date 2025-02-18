@@ -359,6 +359,7 @@
             <input_mass units="kg" is_input="True">70.0<!--Propeller mass as an input, because of some convention adopted, it must be a different variable than the actual weight--></input_mass>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <mass units="kg" is_input="False">70.0</mass>
+            <material is_input="False">0.0</material>
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.25<!--Solidity of the propeller--></solidity>

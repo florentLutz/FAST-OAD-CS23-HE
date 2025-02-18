@@ -49,6 +49,22 @@ def test_environmental_impact_function_span_hybrid():
         ivc,
     )
 
+    # The fuel stored in the tanks do not consider the fuel necessary for takeoff, it doesn't affect
+    # the sizing but does affect the LCA, this is a temporary fix. For the battery it's not a
+    # problem as there was no energy consumed during takeoff
+    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
+    total_fuel_mission = datafile["data:mission:sizing:fuel"].value[0]
+    problem.set_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
+        units="kg",
+        val=total_fuel_mission / 2.0,
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
+        units="kg",
+        val=total_fuel_mission / 2.0,
+    )
+
     mean_airframe_hours = 3524.9
     std_airframe_hours = 266.5
 
@@ -139,6 +155,21 @@ def test_environmental_impact_function_span_conventional():
     problem = run_system(
         component,
         ivc,
+    )
+
+    # The fuel stored in the tanks do not consider the fuel necessary for takeoff, it doesn't affect
+    # the sizing but does affect the LCA, this is a temporary fix
+    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
+    total_fuel_mission = datafile["data:mission:operational:fuel"].value[0]
+    problem.set_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
+        units="kg",
+        val=total_fuel_mission / 2.0,
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
+        units="kg",
+        val=total_fuel_mission / 2.0,
     )
 
     mean_airframe_hours = 3524.9

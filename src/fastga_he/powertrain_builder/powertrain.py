@@ -2363,6 +2363,10 @@ class FASTGAHEPowerTrainConfigurator:
                                     ":", "__"
                                 ),
                             )
+                            .replace(
+                                "ANCHOR_COMPONENT_MATERIAL",
+                                variable_name_mass.replace("mass", "material").replace(":", "__"),
+                            )
                         )
 
                 clean_dict[component_name] = clean_lines

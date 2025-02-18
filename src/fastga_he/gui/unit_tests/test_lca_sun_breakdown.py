@@ -2,11 +2,28 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import os
 import os.path as pth
+import pathlib
+
+import time
+
+import pytest
 
 from ..lca_impact import lca_impacts_sun_breakdown
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
+RESULT_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
+SENSITIVITY_STUDIES_FOLDER_PATH = (
+    pathlib.Path(__file__).parent.parent.parent
+    / "models"
+    / "environmental_impacts"
+    / "unit_tests"
+    / "results"
+    / "parametric_study"
+)
+
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def test_lca_sun_breakdown_tbm900():
@@ -49,6 +66,22 @@ def test_lca_sun_breakdown_kodiak_and_hybrid():
     fig.show()
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_sun_breakdown_kodiak_and_hybrid_paper():
+    # Check that we can create a plot
+    fig = lca_impacts_sun_breakdown(
+        [
+            pth.join(SENSITIVITY_STUDIES_FOLDER_PATH, "ref_kodiak_op_7077.xml"),
+            pth.join(SENSITIVITY_STUDIES_FOLDER_PATH, "hybrid_kodiak_7077.xml"),
+        ],
+        full_burst=True,
+        rel="single_score",
+        name_aircraft=["Reference Kodiak 100", "Hybrid Kodiak 100"],
+    )
+
+    fig.show()
+
+
 def test_lca_sun_breakdown_kodiak_rel_absolute():
     fig = lca_impacts_sun_breakdown(
         pth.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml"),
@@ -58,6 +91,30 @@ def test_lca_sun_breakdown_kodiak_rel_absolute():
     )
 
     fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_sun_breakdown_kodiak_rel_absolute_paper():
+    fig = lca_impacts_sun_breakdown(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+        full_burst=False,
+        name_aircraft="Reference Kodiak 100",
+        rel="single_score",
+    )
+
+    fig.update_layout(
+        plot_bgcolor="white",
+        title_x=0.5,
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+    )
+    fig.update_traces(maxdepth=3, textfont=dict(size=20), insidetextorientation="tangential")
+    fig.update_layout(title_text=None)
+
+    fig.show()
+    fig.write_image(RESULT_FOLDER_PATH / "reference_kodiak_sun_breakdown.pdf")
+    time.sleep(3)
+    fig.write_image(RESULT_FOLDER_PATH / "reference_kodiak_sun_breakdown.pdf")
 
 
 def test_lca_sun_breakdown_kodiak_rel_parent():

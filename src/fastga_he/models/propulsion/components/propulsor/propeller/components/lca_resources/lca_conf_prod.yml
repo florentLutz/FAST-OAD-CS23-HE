@@ -10,7 +10,11 @@ ANCHOR_COMPONENT_NAME:
       production:
         composite:
           name: 'market for carbon fibre reinforced plastic, injection moulded'
-          amount: 1.0
+          amount: ANCHOR_COMPONENT_MATERIAL
+
+        aluminium:
+          name: 'market for aluminium, cast alloy'
+          amount: 1.0 - ANCHOR_COMPONENT_MATERIAL
 
         # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
         # with the mass

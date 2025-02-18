@@ -256,6 +256,7 @@
             <torque_max units="N*m" is_input="False">2178.0352948856907<!--Maximum value of the propeller torque--></torque_max>
             <wing_chord_ref units="m" is_input="True">1.7974143073361883<!--Value of the wing chord behind the propeller--></wing_chord_ref>
             <mass units="kg" is_input="False">37.72884819682395</mass>
+            <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
           </propeller_1>
         </propeller>
         <turboshaft>

@@ -145,7 +145,11 @@ model:
               production:
                 composite:
                   name: 'market for carbon fibre reinforced plastic, injection moulded'
-                  amount: 1.0
+                  amount: data__propulsion__he_power_train__propeller__propeller_1__material
+        
+                aluminium:
+                  name: 'market for aluminium, cast alloy'
+                  amount: 1.0 - data__propulsion__he_power_train__propeller__propeller_1__material
         
                 # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
                 # with the mass
