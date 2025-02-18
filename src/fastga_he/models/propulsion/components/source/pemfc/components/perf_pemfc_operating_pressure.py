@@ -21,8 +21,6 @@ class PerformancesOperatingPressure(om.ExplicitComponent):
             desc="The PEMFC operation pressure have to adjust based on compressor connection for "
             "oxygen inlet",
         )
-        # powertrain.py under powertrain_builder needed to be modified once the compressor is
-        # integrated, example can be found with direct_bus_connection in battery
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )

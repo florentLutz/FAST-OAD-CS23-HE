@@ -26,14 +26,6 @@ class SizingPEMFCDimensions(om.ExplicitComponent):
             desc="Identifier of the pemfc pack",
             allow_none=False,
         )
-
-        self.options.declare(
-            name="underbelly_ratio",
-            default=0.8,
-            desc="Ratio between underbelly width and fuselage width",
-            allow_none=False,
-        )
-
         self.options.declare(
             name="position",
             default="underbelly",

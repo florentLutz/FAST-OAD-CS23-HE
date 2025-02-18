@@ -17,12 +17,6 @@ class PerformancesOperatingTemperature(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pemfc_stack_id",
-            default=None,
-            desc="Identifier of the PEMFC stack",
-            allow_none=False,
-        )
-        self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 

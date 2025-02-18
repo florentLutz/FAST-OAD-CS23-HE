@@ -256,7 +256,6 @@ def test_pemfc_stack_sizing():
 
 
 def test_constraints_enforce_effective_area():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:current_max",
@@ -303,7 +302,6 @@ def test_constraints_ensure_effective_area():
 
 
 def test_pemfc_current_density():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     dc_current_out = np.linspace(1.68, 9.24, NB_POINTS_TEST)
     ivc.add_output("dc_current_out", dc_current_out, units="A")
@@ -370,9 +368,7 @@ def test_operating_temperature():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesOperatingTemperature(
-            pemfc_stack_id="pemfc_stack_1", number_of_points=NB_POINTS_TEST
-        ),
+        PerformancesOperatingTemperature(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     assert problem.get_val("operating_temperature", units="K") == pytest.approx(
@@ -496,7 +492,6 @@ def test_pemfc_voltage():
 
 
 def test_maximum_current():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
         "dc_current_out",
@@ -526,9 +521,7 @@ def test_maximum_current():
 
 
 def test_maximum_power():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-
     ivc.add_output(
         "power_out",
         units="kW",
@@ -558,7 +551,6 @@ def test_maximum_power():
 
 
 def test_max_specific_power_fuel_cell_system():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:power_max",
@@ -582,7 +574,6 @@ def test_max_specific_power_fuel_cell_system():
 
 
 def test_max_specific_power_fuel_cell_stack():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:power_max",
@@ -606,7 +597,6 @@ def test_max_specific_power_fuel_cell_stack():
 
 
 def test_max_power_density_fuel_cell_system():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:power_max",
@@ -631,7 +621,6 @@ def test_max_power_density_fuel_cell_system():
 
 
 def test_max_power_density_fuel_cell_stack():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:power_max",
@@ -656,7 +645,6 @@ def test_max_power_density_fuel_cell_stack():
 
 
 def test_pemfc_power():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
         "voltage_out",
@@ -704,7 +692,6 @@ def test_pemfc_specifc_power():
 
 
 def test_pemfc_efficiency():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
         "single_layer_pemfc_voltage",

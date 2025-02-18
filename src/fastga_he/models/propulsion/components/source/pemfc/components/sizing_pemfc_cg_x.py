@@ -20,7 +20,6 @@ class SizingPEMFCCGX(om.ExplicitComponent):
             desc="Identifier of the pemfc pack",
             allow_none=False,
         )
-
         self.options.declare(
             name="position",
             default="underbelly",
