@@ -1182,6 +1182,7 @@ def lca_impacts_bar_chart_with_components_absolute(
     aircraft_file_path: Union[str, pathlib.Path],
     name_aircraft: str = None,
     separate_phase: bool = False,
+    legend_rename: dict = None,
 ) -> go.FigureWidget:
     """
     Provide a bar chart of the weighted impacts of an aircraft, showing the absolute value of each
@@ -1191,6 +1192,8 @@ def lca_impacts_bar_chart_with_components_absolute(
     :param name_aircraft: name of the aircraft
     :param separate_phase: by default, all contribution of one component, regardless of the phase
     is aggregated, this segregates them.
+    :param legend_rename: legend names are set by the code by default, if any renaming is to be
+    done, pass here the legend to be renamed as key and how to rename it as item.
     """
 
     component_and_contribution = _get_component_and_contribution(aircraft_file_path, separate_phase)
@@ -1249,6 +1252,9 @@ def lca_impacts_bar_chart_with_components_absolute(
                 final_name = component.replace(component_name, beautified_component_name)
         else:
             final_name = component.replace(component_name, beautified_component_name)
+
+        if legend_rename and final_name in legend_rename:
+            final_name = legend_rename[final_name]
 
         bar_chart = go.Bar(
             name=final_name,

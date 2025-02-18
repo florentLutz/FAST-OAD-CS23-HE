@@ -231,6 +231,7 @@ def test_lca_bar_chart_absolute_phase_paper():
         SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
         name_aircraft="Hybrid Kodiak 100",
         separate_phase=True,
+        legend_rename={"manufacturing": "line testing"}
     )
     fig.update_layout(title_text=None)
 
