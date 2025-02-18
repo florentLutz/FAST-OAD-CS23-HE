@@ -7,6 +7,7 @@ import openmdao.api as om
 
 DEFAULT_MAX_CURRENT_DENSITY = 0.7  # [A/cm^2]
 
+
 class PerformancesCurrentDensity(om.ExplicitComponent):
     """
     Computation of the current density, simply based on the current and effective area.

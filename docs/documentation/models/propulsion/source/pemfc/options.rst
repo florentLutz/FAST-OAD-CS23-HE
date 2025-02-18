@@ -18,10 +18,10 @@ The Proton-Exchange Membrane Fuel Cell (PEMFC) model has four possible installat
 Full system / Pure stack option
 *******************************
 This option offers flexibility in customizing the Balance of Plants (BoPs) for the PEMFC powertrain. It is controlled by
-two adjustment factors, :math:`DAF` and :math:`WAF`, as explained in :ref:`computation logic<models-pemfc>`. To activate this
-option, define the expected maximum power density and the specific power surrogate model in the configuration file. By
-default, the calculation is set to `fastga_he.submodel.propulsion.performances.pemfc.modeling_option.system`, which
-computes the two power-related sizing indicators for full system PEMFC.
+two adjustment factors, :math:`DAF` and :math:`WAF`, as explained in :ref:`computation logic<models-pemfc>`. To activate
+this option, define the expected maximum power density and the specific power surrogate models in the configuration file.
+By default, the calculation is set to `fastga_he.submodel.propulsion.performances.pemfc.modeling_option.system`, which
+computes the two power-related sizing indicators for full system PEMFC excluding the inlet compressor.
 
 .. code-block:: yaml
 

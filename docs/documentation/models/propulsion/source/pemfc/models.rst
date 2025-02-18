@@ -9,8 +9,8 @@ Proton-exchange membrane fuel cell computation
 ***********************************
 Fuel cell Layer voltage calculation
 ***********************************
-The Proton-Exchange Membrane Fuel Cell (PEMFC) stack is consisted with multiple layers of single layer PEMFC. With the
-maximum current density (:math:`A/cm^2`) derived with the constraint component to ensure positive voltage, the PEMFC
+The Proton-Exchange Membrane Fuel Cell (PEMFC) stack is consisted of multiple layers of single layer PEMFC. With the
+maximum current density (:math:`A/cm^2`), derived with the constraint component to ensure positive voltage, the PEMFC
 layer voltage can be calculated with these two polarization curve derived from different PEMFC systems. The general
 expression of the fuel cell polarization model is expressed as below given by :cite:`dicks:2018`.
 
@@ -21,18 +21,19 @@ expression of the fuel cell polarization model is expressed as below given by :c
 The :math:`V_{\text{operating}}` represents the operating voltage of the fuel cell under standard conditions, while
 :math:`V_r` is the reversible open-circuit voltage, determined by the Gibbs free energy of the chemical reaction.
 :math:`V_{\text{activation}}` corresponds to the activation loss caused by the kinetic energy barrier at both electrodes
-with low current density :cite:`juschus:2021`, particularly the oxygen reduction reaction. :math:`V_{\text{ohmic}}`
-denotes the ohmic loss due to the electrical resistance of the electrodes, and :math:`V_{\text{mass-transport}}`
-represents the mass-transport loss, which occurs when reactant gases, such as oxygen or fuel, face diffusion limitations
-at the electrodes.
+especially with low current density :cite:`juschus:2021`, the losses of the oxygen reduce reation is significant more
+pronounced than the other side. :math:`V_{\text{ohmic}}` denotes the ohmic loss due to the electrical resistance of the
+electrodes, and :math:`V_{\text{mass-transport}}` represents the mass-transport loss, which occurs when reactant gases,
+such as oxygen or fuel, face diffusion limitations at the electrodes.
 
 Simple PEMFC polarization model
 ===============================
 The simple PEMFC polarization model is based on an empircal model of Aerostak 200W PEMFC derived by
-:cite:`hoogendoorn:2018`. This model utilize the empirical open circuit voltage :math:`V_0` and the voltage losses in
+:cite:`hoogendoorn:2018`. This model utilizes the empirical open circuit voltage :math:`V_0` and the voltage losses in
 simplified form obtained with curve fitting. The voltage deviation due to operating pressure variation is also
-considered in this model shown as :math:`\Delta V_p`. The pressure ratio :math:`P_R` is the ration between the operating pressure :math:`P_{op}` and the nominal operating
-pressure :math:`P_{nom}`. The unit of current density :math:`j` is expressed in [A/cm²] for this model.
+considered in this model shown as :math:`\Delta V_p`. The pressure ratio :math:`P_R` is the ration between the operating
+pressure :math:`P_{op}` and the nominal operating pressure :math:`P_{nom}`. The unit of current density :math:`j` is
+expressed in [A/cm²] for this model.
 
 .. math::
     V = V_0 - V_{\text{activation}} - V_{\text{ohmic}} - V_{\text{mass-transport}} + \Delta V_p \\
@@ -78,7 +79,7 @@ The analytical PEMFC polarization model is based on the thermodynamic characteri
 :cite:`juschus:2021`. It accounts for voltage losses under typical operational conditions, as well as variations in
 operating temperature and pressure, represented by :math:`V_T` and :math:`V_{P_e}`, respectively. The variable
 :math:`p_{O_2}` denotes the operating pressure at the cathode, :math:`p_{H_2}` refers to the operating pressure at the
-anode, and :math:`T` is the operating temperature of the fuel cell. The constants :math:`R` and :math:`Fr` represent the
+anode, and :math:`T` is the operating temperature of the fuel cell. The constants :math:`R` and :math:`Fr` are the
 gas constant and Faraday's constant. The pressure voltage correction :math:`PVC`, obtained from
 `juschus' github repository <https://github.com/danieljuschus/pemfc-aircraft-sizing>`_ , adjusts for changes in ambient
 pressure :math:`P_{\text{amb}}`. The current density, :math:`j`, is expressed in [A/m²] for this model.
@@ -122,7 +123,7 @@ j₀          1.0    A/m²
 
    </div>
 
-This table proivdes the parameter values that has been considered in juschus' research :cite:`juschus:2021`.
+This table provides the parameter values that has been considered in juschus' research :cite:`juschus:2021`.
 
 ******************************
 Sizing calculation
@@ -136,7 +137,7 @@ The PEMFC length is calculated by multiplying the number of layers, :math:`N_{la
    L_{pemfc} = LLR \cdot N_{layers}
 
 Utilizing the area ratio :math:`AR` of Aerostak 200W provided by :cite:`hoogendoorn:2018`, the conversion between
-the effective area :math:`A_{eff}` and the stack cross-section area :math:`A_{cross}` can be expressd as:
+the effective area :math:`A_{eff}` and the stack cross-section area :math:`A_{cross}` can be achieved as:
 
 .. math::
     A_{cross} = \frac {A_{cross} \cdot DAF } {AR}
@@ -163,7 +164,7 @@ of the PEMFC stack can be expressed as:
 
     M_{pemfc} = A_{eff} \cdot N_{layers} \cdot WAD \cdot WAF
 
-Where  :math:`A_{eff}` is the effective area, :math:`N_{layers}` is number of layers, and :math:`WAF` is the weight
+Where :math:`A_{eff}` is the effective area, :math:`N_{layers}` is number of layers, and :math:`WAF` is the weight
 adjust factor. :math:`WAF` is calculated as the specific power of the Aerostak 200W divided by the maximum expected
 specific power of the fuel cell. This factor adjusts the mass based on whether the calculation considers the entire
 system or just the fuel cell stack.
