@@ -661,11 +661,16 @@ class LCACore(om.ExplicitComponent):
 
         shutil.copy(lca_conf_file_path, tmp_copy_path)
 
+        next_line_to_ignore = False
+
         with open(tmp_copy_path, "w") as new_file:
             with open(lca_conf_file_path, "r") as old_file:
                 for line in old_file:
-                    if "electricity, high voltage, European attribute mix" not in line:
-                        new_file.write(line)
+                    if "market group for electricity, high voltage" not in line:
+                        if not next_line_to_ignore:
+                            new_file.write(line)
+                        else:
+                            next_line_to_ignore = False
                     else:
                         # line should be starting with "name:"
                         indent_pattern = line.split("name")[0]
@@ -678,6 +683,9 @@ class LCACore(om.ExplicitComponent):
                             new_file.write(indent_pattern + "loc: 'FR'\n")
                         if self.options["electric_mix"] == "slovenia":
                             new_file.write(indent_pattern + "loc: 'SI'\n")
+
+                        next_line_to_ignore = True
+
 
         pathlib.Path.unlink(lca_conf_file_path)
         shutil.move(tmp_copy_path, lca_conf_file_path)

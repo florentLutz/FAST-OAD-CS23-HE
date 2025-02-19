@@ -20,7 +20,8 @@ ANCHOR_COMPONENT_NAME:
         # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
         # with the mass
         electricity:
-          name: 'electricity, high voltage, European attribute mix'
+          name: 'market group for electricity, high voltage'
+          loc: 'RER'
           amount: 4516 / 112.8 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
 
         gas:
