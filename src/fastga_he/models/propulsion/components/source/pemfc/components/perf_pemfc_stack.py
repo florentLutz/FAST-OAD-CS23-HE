@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
 
-from ..components.perf_direct_bus_connection import PerformancesPEMFCDirectBusConnection
+from ..components.perf_direct_bus_connection import PerformancesPEMFCStackDirectBusConnection
 from ..components.perf_pemfc_power import PerformancesPEMFCPower
 from ..components.perf_pemfc_specific_power import PerformancesPEMFCSpecificPower
 from ..components.perf_maximum_current import PerformancesMaximumCurrent
@@ -14,11 +14,11 @@ from ..components.perf_maximum_power import PerformancesMaximumPower
 from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
 
 from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
-from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
+from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
 from ..components.perf_pemfc_voltage import PerformancesPEMFCVoltage
 from ..components.perf_pemfc_operating_pressure import PerformancesOperatingPressure
-from ..components.perf_ambient_pressure import PerformancesAmbientPressure
+from ..components.perf_ambient_pressure import PerformancesPEMFCStackAmbientPressure
 from ..components.perf_pemfc_operating_temperature import PerformancesOperatingTemperature
 from ..components.perf_pemfc_analytical_voltage_adjustment import (
     PerformancesPEMFCStackAnalyticalVoltageAdjustment,
@@ -89,7 +89,7 @@ class PerformancesPEMFCStack(om.Group):
 
         self.add_subsystem(
             "ambient_pressure",
-            PerformancesAmbientPressure(number_of_points=number_of_points),
+            PerformancesPEMFCStackAmbientPressure(number_of_points=number_of_points),
             promotes=["*"],
         )
 
@@ -134,7 +134,7 @@ class PerformancesPEMFCStack(om.Group):
         if self.options["direct_bus_connection"]:
             self.add_subsystem(
                 "direct_bus_connection",
-                PerformancesPEMFCDirectBusConnection(number_of_points=number_of_points),
+                PerformancesPEMFCStackDirectBusConnection(number_of_points=number_of_points),
                 promotes=["*"],
             )
 
@@ -147,7 +147,7 @@ class PerformancesPEMFCStack(om.Group):
         )
         self.add_subsystem(
             "fuel_consumed",
-            PerformancesPEMFCFuelConsumed(
+            PerformancesPEMFCStackFuelConsumed(
                 number_of_points=number_of_points,
             ),
             promotes=["*"],

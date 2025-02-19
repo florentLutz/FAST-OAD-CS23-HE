@@ -9,9 +9,9 @@ import openmdao.api as om
 DEFAULT_DC_CURRENT = 400.0  # [A]
 
 
-class PerformancesPEMFCDirectBusConnection(om.ImplicitComponent):
+class PerformancesPEMFCStackDirectBusConnection(om.ImplicitComponent):
     """
-    In case we attempt to directly plug the battery into a bus, a small change to its
+    In case we attempt to directly plug the PEMFC  into a bus, a small change to its
     inputs/outputs will be required. This is what this component does.
     """
 
@@ -32,7 +32,7 @@ class PerformancesPEMFCDirectBusConnection(om.ImplicitComponent):
             "dc_current_out",
             val=np.full(number_of_points, DEFAULT_DC_CURRENT),
             units="A",
-            desc="Current at the output side of the battery",
+            desc="Current at the output side of PEMFC",
             lower=-1000.0,
             upper=1000.0,
         )

@@ -8,7 +8,7 @@ import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
 
-from ..components.perf_ambient_pressure import PerformancesAmbientPressure
+from ..components.perf_ambient_pressure import PerformancesPEMFCStackAmbientPressure
 from ..components.sizing_pemfc_weight import SizingPEMFCWeight
 from ..components.sizing_pemfc_cg_x import SizingPEMFCCGX
 from ..components.sizing_pemfc_cg_y import SizingPEMFCCGY
@@ -17,7 +17,7 @@ from ..components.sizing_pemfc_dimensions import SizingPEMFCDimensions
 from ..components.sizing_pemfc_drag import SizingPEMFCDrag
 
 from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
-from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
+from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
 from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCStackSingleVoltageSimple
 from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCStackSingleVoltageAnalytical
 from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
@@ -332,7 +332,7 @@ def test_ambient_pressure():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesAmbientPressure(number_of_points=NB_POINTS_TEST),
+        PerformancesPEMFCStackAmbientPressure(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     assert problem.get_val("ambient_pressure", units="atm") == pytest.approx(
@@ -777,7 +777,7 @@ def test_fuel_consumed():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCFuelConsumed(
+        PerformancesPEMFCStackFuelConsumed(
             number_of_points=NB_POINTS_TEST,
         ),
         ivc,

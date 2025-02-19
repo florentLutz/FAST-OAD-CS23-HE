@@ -6,10 +6,10 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesPEMFCFuelConsumed(om.ExplicitComponent):
+class PerformancesPEMFCStackFuelConsumed(om.ExplicitComponent):
     """
-    Computation of the hydrogen at each flight point for the required power. Simply based on the
-    results of the hydrogen consumption and time steps.
+    Computation of the hydrogen consumed at each flight point for the required power. Simply based
+    on the results of the hydrogen consumption and time steps.
     """
 
     def initialize(self):
@@ -21,9 +21,9 @@ class PerformancesPEMFCFuelConsumed(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(name="fuel_consumption", units="kg/h", val=np.full(number_of_points, np.nan))
-        self.add_input("time_step", units="h", val=np.full(number_of_points, np.nan))
+        self.add_input(name="time_step", units="h", val=np.full(number_of_points, np.nan))
 
-        self.add_output(name="fuel_consumed_t", val=np.full(number_of_points, 2.0), units="kg")
+        self.add_output(name="fuel_consumed_t", val=np.full(number_of_points, 0.7), units="kg")
 
         self.declare_partials(
             of="*",

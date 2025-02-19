@@ -7,12 +7,13 @@ import openmdao.api as om
 
 from stdatm import AtmosphereWithPartials
 
-DEFAULT_PRESSURE = 101325.0  # [Pa]
+DEFAULT_PRESSURE = AtmosphereWithPartials(0).pressure  # [Pa]
 
 
-class PerformancesAmbientPressure(om.ExplicitComponent):
+class PerformancesPEMFCStackAmbientPressure(om.ExplicitComponent):
     """
-    Computation of the ambient pressure that PEMFC is working based on altitude.
+    Computation of the ambient pressure that PEMFC is working under. The ambient pressure varies
+    based on the change of operating altitude of PEMFC.
     """
 
     def initialize(self):
