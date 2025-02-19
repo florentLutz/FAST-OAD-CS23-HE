@@ -21,14 +21,22 @@ class ConstraintsPEMFCStack(om.Group):
             desc="Identifier of the pemfc stack",
             allow_none=False,
         )
+        self.options.declare(
+            "max_current_density",
+            default=0.7,
+            desc="maximum current density of pemfc [A/cm**2]",
+        )
 
     def setup(self):
-        option_pemfc_stack_id = {"pemfc_stack_id": self.options["pemfc_stack_id"]}
+        options_constraints = {
+            "pemfc_stack_id": self.options["pemfc_stack_id"],
+            "max_current_density": self.options["max_current_density"],
+        }
 
         self.add_subsystem(
             name="constraints_pemfc_effective_area",
             subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA, options=option_pemfc_stack_id
+                SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA, options=options_constraints
             ),
             promotes=["*"],
         )

@@ -8,17 +8,16 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA
 
-MAX_CURRENT_DENSITY = 0.7  # [A/cm^2]
-
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA,
     "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure",
 )
-class ConstraintsEffectiveAreaEnsure(om.ExplicitComponent):
+class ConstraintsPEMFCStackEffectiveAreaEnsure(om.ExplicitComponent):
     """
-    Class that ensures that the maximum power seen by the PEMFC stack during the mission is below
-    the one used for sizing, ensuring each component works below its maximum.
+    Class that ensures that the maximum current seen by the PEMFC stack during the mission is below
+    the one used for sizing, ensuring each component works below its maximum. This is achieved by
+    monitoring the amount of PEMFC effective area.
     """
 
     def initialize(self):
@@ -28,26 +27,31 @@ class ConstraintsEffectiveAreaEnsure(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            "max_current_density",
+            default=0.7,
+            desc="maximum current density of pemfc [A/cm**2]",
+        )
 
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
-
+        max_current_density = self.options["max_current_density"]
         self.add_input(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":current_max",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max",
             units="A",
             val=np.nan,
-            desc="Maximum current the PEMFC stack has be given during mission",
+            desc="Maximum current the PEMFC stack has to provide during mission",
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             units="cm**2",
             val=np.nan,
             desc="Effective area of PEMFC chemical reaction",
         )
 
         self.add_output(
-            "constraints:propulsion:he_power_train:pemfc_stack:"
+            "constraints:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
             + ":effective_area",
             units="cm**2",
@@ -56,33 +60,33 @@ class ConstraintsEffectiveAreaEnsure(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="constraints:propulsion:he_power_train:pemfc_stack:"
+            of="constraints:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
             + ":effective_area",
-            wrt="data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
+            wrt="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             val=-1.0,
         )
         self.declare_partials(
-            of="constraints:propulsion:he_power_train:pemfc_stack:"
+            of="constraints:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
             + ":effective_area",
-            wrt="data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":current_max",
-            val=1 / MAX_CURRENT_DENSITY,
+            wrt="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max",
+            val=1 / max_current_density,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
-
+        max_current_density = self.options["max_current_density"]
         outputs[
-            "constraints:propulsion:he_power_train:pemfc_stack:"
+            "constraints:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
             + ":effective_area"
         ] = (
             -inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
             ]
             + inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":current_max"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max"
             ]
-            / MAX_CURRENT_DENSITY
+            / max_current_density
         )

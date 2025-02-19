@@ -21,7 +21,7 @@ oad.RegisterSubmodel.active_models[SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE] = 
     SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE,
     "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple",
 )
-class PerformancesPEMFCSingleVoltageSimple(om.ExplicitComponent):
+class PerformancesPEMFCStackSingleVoltageSimple(om.ExplicitComponent):
     """
     Computation of the single layer voltage of PEMFC. Model based on existing PEMFC, Aerostack
     Ultralight 200W, details can be found in :cite:`hoogendoorn:2018`.
@@ -205,7 +205,7 @@ class PerformancesPEMFCSingleVoltageSimple(om.ExplicitComponent):
     SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE,
     "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.analytical",
 )
-class PerformancesPEMFCSingleVoltageAnalytical(om.ExplicitComponent):
+class PerformancesPEMFCStackSingleVoltageAnalytical(om.ExplicitComponent):
     """
     Computation of the single layer voltage of PEMFC. Model based on analytical i-v curve equation,
     details can be found in :cite:`Juschus:2021`.

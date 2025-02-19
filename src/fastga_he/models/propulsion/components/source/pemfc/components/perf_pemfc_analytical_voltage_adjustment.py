@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesPEMFCAnalyticalVoltageAdjustment(om.ExplicitComponent):
+class PerformancesPEMFCStackAnalyticalVoltageAdjustment(om.ExplicitComponent):
     """
     Computation of PEMFC voltage correction factor based on ambient pressure in different altitude
     from :cite:`juschus:2021`.

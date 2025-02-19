@@ -42,13 +42,15 @@ class SizingPEMFCStack(om.Group):
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
-        max_current_density =self.options["max_current_density"]
+        max_current_density = self.options["max_current_density"]
         # It was decided to add the constraints computation at the beginning of the sizing to
         # ensure that both are ran along and to avoid having an additional id to add in the
         # configuration file.
         self.add_subsystem(
             name="constraints_pemfc",
-            subsys=ConstraintsPEMFCStack(pemfc_stack_id=pemfc_stack_id,max_current_density=max_current_density),
+            subsys=ConstraintsPEMFCStack(
+                pemfc_stack_id=pemfc_stack_id, max_current_density=max_current_density
+            ),
             promotes=["*"],
         )
         self.add_subsystem(

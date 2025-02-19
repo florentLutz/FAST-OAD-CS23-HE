@@ -21,10 +21,13 @@ from ..components.perf_pemfc_operating_pressure import PerformancesOperatingPres
 from ..components.perf_ambient_pressure import PerformancesAmbientPressure
 from ..components.perf_pemfc_operating_temperature import PerformancesOperatingTemperature
 from ..components.perf_pemfc_analytical_voltage_adjustment import (
-    PerformancesPEMFCAnalyticalVoltageAdjustment,
+    PerformancesPEMFCStackAnalyticalVoltageAdjustment,
 )
 
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE, SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION
+from ..constants import (
+    SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE,
+    SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION,
+)
 
 
 class PerformancesPEMFCStack(om.Group):
@@ -69,7 +72,7 @@ class PerformancesPEMFCStack(om.Group):
         option_layer_voltage = {
             "number_of_points": number_of_points,
             "pemfc_stack_id": pemfc_stack_id,
-            "max_current_density": max_current_density
+            "max_current_density": max_current_density,
         }
 
         option_max_power_group = {
@@ -100,7 +103,7 @@ class PerformancesPEMFCStack(om.Group):
 
         self.add_subsystem(
             "pemfc_analytical_voltage_adjustment",
-            PerformancesPEMFCAnalyticalVoltageAdjustment(number_of_points=number_of_points),
+            PerformancesPEMFCStackAnalyticalVoltageAdjustment(number_of_points=number_of_points),
             promotes=["*"],
         )
 
