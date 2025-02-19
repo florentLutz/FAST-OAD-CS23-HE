@@ -18,8 +18,8 @@ from ..components.sizing_pemfc_drag import SizingPEMFCDrag
 
 from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
-from ..components.perf_pemfc_layer_voltage import PerformancesSinglePEMFCVoltageSimple
-from ..components.perf_pemfc_layer_voltage import PerformancesSinglePEMFCVoltageAnalytical
+from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCSingleVoltageSimple
+from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCSingleVoltageAnalytical
 from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
 from ..components.perf_maximum_current import PerformancesMaximumCurrent
 from ..components.perf_maximum_power import PerformancesMaximumPower
@@ -258,7 +258,7 @@ def test_pemfc_stack_sizing():
 def test_constraints_enforce_effective_area():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:current_max",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:current_max",
         val=7,
         units="A",
     )
@@ -269,7 +269,7 @@ def test_constraints_enforce_effective_area():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:effective_area", units="cm**2"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area", units="cm**2"
     ) == pytest.approx(10, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -389,13 +389,13 @@ def test_analytical_voltage_adjustment():
         PerformancesAnalyticalVoltageAdjustment(number_of_points=NB_POINTS_TEST),
         ivc,
     )
-    assert problem.get_val("analytical_pressure_volatge_correction") == pytest.approx(
+    assert problem.get_val("ambient_pressure_voltage_correction") == pytest.approx(
         np.full(NB_POINTS_TEST, 1.0), rel=1e-2
     )
     problem.check_partials(compact_print=True)
 
 
-def test_single_layer_voltage_system():
+def test_single_layer_voltage_simple():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fc_current_density",
@@ -409,7 +409,7 @@ def test_single_layer_voltage_system():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesSinglePEMFCVoltageSimple(pemfc_stack_id="pemfc_stack_1", number_of_points=7),
+        PerformancesPEMFCSingleVoltageSimple(pemfc_stack_id="pemfc_stack_1", number_of_points=7),
         ivc,
     )
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
@@ -419,7 +419,7 @@ def test_single_layer_voltage_system():
     problem.check_partials(compact_print=True)
 
 
-def test_single_layer_voltage_stack():
+def test_single_layer_voltage_analytical():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fc_current_density",
@@ -439,7 +439,7 @@ def test_single_layer_voltage_stack():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesSinglePEMFCVoltageAnalytical(
+        PerformancesPEMFCSingleVoltageAnalytical(
             pemfc_stack_id="pemfc_stack_1", number_of_points=7
         ),
         ivc,

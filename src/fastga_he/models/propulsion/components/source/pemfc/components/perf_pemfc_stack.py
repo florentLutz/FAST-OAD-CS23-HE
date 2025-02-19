@@ -12,8 +12,7 @@ from ..components.perf_pemfc_specific_power import PerformancesPEMFCSpecificPowe
 from ..components.perf_maximum_current import PerformancesMaximumCurrent
 from ..components.perf_maximum_power import PerformancesMaximumPower
 from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION
+
 from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
@@ -22,8 +21,10 @@ from ..components.perf_pemfc_operating_pressure import PerformancesOperatingPres
 from ..components.perf_ambient_pressure import PerformancesAmbientPressure
 from ..components.perf_pemfc_operating_temperature import PerformancesOperatingTemperature
 from ..components.perf_pemfc_analytical_voltage_adjustment import (
-    PerformancesAnalyticalVoltageAdjustment,
+    PerformancesPEMFCAnalyticalVoltageAdjustment,
 )
+
+from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE, SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION
 
 
 class PerformancesPEMFCStack(om.Group):
@@ -53,15 +54,22 @@ class PerformancesPEMFCStack(om.Group):
             desc="The PEMFC operation pressure have to adjust based on compressor connection for "
             "oxygen inlet",
         )
+        self.options.declare(
+            "max_current_density",
+            default=0.7,
+            desc="maximum current density of pemfc [A/cm**2]",
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
         compressor_connection = self.options["compressor_connection"]
         direct_bus_connection = self.options["direct_bus_connection"]
+        max_current_density = self.options["max_current_density"]
         option_layer_voltage = {
             "number_of_points": number_of_points,
             "pemfc_stack_id": pemfc_stack_id,
+            "max_current_density": max_current_density
         }
 
         option_max_power_group = {
@@ -92,7 +100,7 @@ class PerformancesPEMFCStack(om.Group):
 
         self.add_subsystem(
             "pemfc_analytical_voltage_adjustment",
-            PerformancesAnalyticalVoltageAdjustment(number_of_points=number_of_points),
+            PerformancesPEMFCAnalyticalVoltageAdjustment(number_of_points=number_of_points),
             promotes=["*"],
         )
 
