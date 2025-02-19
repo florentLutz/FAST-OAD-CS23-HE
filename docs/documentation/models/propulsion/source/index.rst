@@ -1,14 +1,14 @@
 .. _source-index:
 
 =======================
-Power Source components
+Power source components
 =======================
 
-Here contains the documentation of the propulsion source components available in FAST-OAD-CS23-HE powertrain building.
+Here you will find the documentation of the power source components available in FAST-OAD-CS23-HE.
 
 .. toctree::
    :maxdepth: 1
 
-    Proton-exchange membrane fuel cell <pemfc/index>
+    PEMFC <pemfc/index>
 
 
