@@ -18,8 +18,8 @@ from ..components.sizing_pemfc_drag import SizingPEMFCDrag
 
 from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCFuelConsumed
-from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCSingleVoltageSimple
-from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCSingleVoltageAnalytical
+from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCStackSingleVoltageSimple
+from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCStackSingleVoltageAnalytical
 from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
 from ..components.perf_maximum_current import PerformancesMaximumCurrent
 from ..components.perf_maximum_power import PerformancesMaximumPower
@@ -42,11 +42,11 @@ from ..components.perf_pemfc_expect_power_density import (
     PerformancesPEMFCMaxPowerDensityFuelCellStack,
 )
 from ..components.perf_pemfc_analytical_voltage_adjustment import (
-    PerformancesAnalyticalVoltageAdjustment,
+    PerformancesPEMFCStackAnalyticalVoltageAdjustment,
 )
 
-from ..components.cstr_ensure import ConstraintsEffectiveAreaEnsure
-from ..components.cstr_enforce import ConstraintsEffectiveAreaEnforce
+from ..components.cstr_ensure import ConstraintsPEMFCStackEffectiveAreaEnsure
+from ..components.cstr_enforce import ConstraintsPEMFCStackEffectiveAreaEnforce
 
 from ..components.sizing_pemfc_stack import SizingPEMFCStack
 from ..components.perf_pemfc_stack import PerformancesPEMFCStack
@@ -265,7 +265,7 @@ def test_constraints_enforce_effective_area():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        ConstraintsEffectiveAreaEnforce(pemfc_stack_id="pemfc_stack_1"),
+        ConstraintsPEMFCStackEffectiveAreaEnforce(pemfc_stack_id="pemfc_stack_1"),
         ivc,
     )
     assert problem.get_val(
@@ -278,23 +278,23 @@ def test_constraints_enforce_effective_area():
 def test_constraints_ensure_effective_area():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(ConstraintsEffectiveAreaEnsure(pemfc_stack_id="pemfc_stack_1")),
+        list_inputs(ConstraintsPEMFCStackEffectiveAreaEnsure(pemfc_stack_id="pemfc_stack_1")),
         __file__,
         XML_FILE,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:current_max",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:current_max",
         val=14,
         units="A",
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        ConstraintsEffectiveAreaEnsure(pemfc_stack_id="pemfc_stack_1"),
+        ConstraintsPEMFCStackEffectiveAreaEnsure(pemfc_stack_id="pemfc_stack_1"),
         ivc,
     )
     assert problem.get_val(
-        "constraints:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:effective_area",
+        "constraints:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
         units="cm**2",
     ) == pytest.approx(3.2, rel=1e-2)
 
@@ -386,7 +386,7 @@ def test_analytical_voltage_adjustment():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesAnalyticalVoltageAdjustment(number_of_points=NB_POINTS_TEST),
+        PerformancesPEMFCStackAnalyticalVoltageAdjustment(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     assert problem.get_val("ambient_pressure_voltage_correction") == pytest.approx(
@@ -409,7 +409,9 @@ def test_single_layer_voltage_simple():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCSingleVoltageSimple(pemfc_stack_id="pemfc_stack_1", number_of_points=7),
+        PerformancesPEMFCStackSingleVoltageSimple(
+            pemfc_stack_id="pemfc_stack_1", number_of_points=7, max_current_density=0.8
+        ),
         ivc,
     )
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
@@ -439,8 +441,8 @@ def test_single_layer_voltage_analytical():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCSingleVoltageAnalytical(
-            pemfc_stack_id="pemfc_stack_1", number_of_points=7
+        PerformancesPEMFCStackSingleVoltageAnalytical(
+            pemfc_stack_id="pemfc_stack_1", number_of_points=7, max_current_density=2.0
         ),
         ivc,
     )

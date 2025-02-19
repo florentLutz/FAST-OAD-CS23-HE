@@ -143,8 +143,9 @@ class PerformancesPEMFCStackSingleVoltageSimple(om.ExplicitComponent):
         resistance = self.options["ohmic_resistance"]
         m_loss = self.options["coefficient_in_concentration_loss"]
         n_loss = self.options["exponential_coefficient_in_concentration_loss"]
+        max_current_density = self.options["max_current_density"]
 
-        i_clipped = np.clip(inputs["fc_current_density"], 1e-2, self.options["max_current_density"])
+        i_clipped = np.clip(inputs["fc_current_density"], 1e-3, max_current_density)
 
         operating_pressure = inputs["operating_pressure"]
 
@@ -173,6 +174,7 @@ class PerformancesPEMFCStackSingleVoltageSimple(om.ExplicitComponent):
         resistance = self.options["ohmic_resistance"]
         m_loss = self.options["coefficient_in_concentration_loss"]
         n_loss = self.options["exponential_coefficient_in_concentration_loss"]
+        max_current_density = self.options["max_current_density"]
 
         operating_pressure = inputs["operating_pressure"]
 
@@ -180,7 +182,7 @@ class PerformancesPEMFCStackSingleVoltageSimple(om.ExplicitComponent):
 
         pressure_ratio_log = np.log(operating_pressure / nominal_pressure)
 
-        i_clipped = np.clip(inputs["fc_current_density"], 1e-2, self.options["max_current_density"])
+        i_clipped = np.clip(inputs["fc_current_density"], 1e-3, max_current_density)
 
         partials_j = np.where(
             inputs["fc_current_density"] == i_clipped,
@@ -358,14 +360,14 @@ class PerformancesPEMFCStackSingleVoltageAnalytical(om.ExplicitComponent):
         a_transfer = self.options["cathode_transfer_coefficient"]
         resistance = self.options["area_specific_resistance"]
         c_loss = self.options["mass_transport_loss_constant"]
-        jlim = np.full(number_of_points, self.options["max_current_density"] * 10000)
+        max_current_density = self.options["max_current_density"]
+
+        jlim = np.full(number_of_points, max_current_density * 10000)
         jleak = np.full(number_of_points, self.options["leakage_current_density"])
 
         pvc = inputs["ambient_pressure_voltage_correction"]
 
-        j_clipped = np.clip(
-            inputs["fc_current_density"], 10.0, self.options["max_current_density"] * 10000
-        )
+        j_clipped = np.clip(inputs["fc_current_density"], 10.0, max_current_density * 10000)
 
         p_o2 = inputs["operating_pressure"]
 
@@ -398,7 +400,9 @@ class PerformancesPEMFCStackSingleVoltageAnalytical(om.ExplicitComponent):
         a_transfer = self.options["cathode_transfer_coefficient"]
         resistance = self.options["area_specific_resistance"]
         c_loss = self.options["mass_transport_loss_constant"]
-        jlim = np.full(number_of_points, self.options["max_current_density"] * 10000)
+        max_current_density = self.options["max_current_density"]
+
+        jlim = np.full(number_of_points, max_current_density * 10000)
         jleak = np.full(number_of_points, self.options["leakage_current_density"])
         p_o2 = inputs["operating_pressure"]
         pvc = inputs["ambient_pressure_voltage_correction"]
@@ -409,9 +413,7 @@ class PerformancesPEMFCStackSingleVoltageAnalytical(om.ExplicitComponent):
             + ":hydrogen_reactant_pressure"
         ]
 
-        j_clipped = np.clip(
-            inputs["fc_current_density"], 10.0, self.options["max_current_density"] * 10000
-        )
+        j_clipped = np.clip(inputs["fc_current_density"], 10.0, max_current_density * 10000)
 
         partials_j = np.where(
             inputs["fc_current_density"] == j_clipped,
@@ -419,7 +421,7 @@ class PerformancesPEMFCStackSingleVoltageAnalytical(om.ExplicitComponent):
             * (
                 -gas_const * temp_op / (2 * faraday_const * a_transfer * (j_clipped + jleak))
                 - c_loss / (-j_clipped + jlim - jleak)
-                - resistance * np.ones(number_of_points)
+                - np.full(number_of_points, resistance)
             ),
             1e-6,
         )
@@ -427,7 +429,7 @@ class PerformancesPEMFCStackSingleVoltageAnalytical(om.ExplicitComponent):
         partials["single_layer_pemfc_voltage", "fc_current_density"] = partials_j
 
         partials["single_layer_pemfc_voltage", "operating_temperature"] = pvc * (
-            -ds / (2 * faraday_const) * np.ones(number_of_points)
+            -ds / np.full(number_of_points, 2 * faraday_const)
             + gas_const / (2 * faraday_const) * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
             - gas_const / (2 * a_transfer * faraday_const) * np.log(j_clipped + jleak)
         )

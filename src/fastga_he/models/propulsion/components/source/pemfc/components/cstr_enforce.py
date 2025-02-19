@@ -20,7 +20,8 @@ oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = 
 class ConstraintsPEMFCStackEffectiveAreaEnforce(om.ExplicitComponent):
     """
     Class that enforces that the maximum current seen by the PEMFC during the mission is used for
-    the sizing.
+    the sizing. The effective area is defined by dividing the maximum current with maximum
+    current density of PEMFC.
     """
 
     def initialize(self):
