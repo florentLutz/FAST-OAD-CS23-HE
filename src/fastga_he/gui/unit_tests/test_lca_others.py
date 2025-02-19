@@ -450,9 +450,7 @@ def test_search_engine_paper():
     )
     print(
         "Decrease in energy required per pax.km",
-        (energy_per_pax_km_hybrid - energy_per_pax_km)
-        / energy_per_pax_km
-        * 100.0,
+        (energy_per_pax_km_hybrid - energy_per_pax_km) / energy_per_pax_km * 100.0,
     )
     print(
         "Increase in environmental intensity",
@@ -460,3 +458,84 @@ def test_search_engine_paper():
         / impact_per_kwh_of_energy_used
         * 100.0,
     )
+
+
+def test_search_engine_paper_climate_change():
+    ref_design_datafile = oad.DataFile(SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml")
+    flights_per_fu_ref_design = ref_design_datafile[
+        "data:environmental_impact:flight_per_fu"
+    ].value[0]
+    print("Flights per FU design", flights_per_fu_ref_design)
+    print("FU per flights design", 1.0 / flights_per_fu_ref_design)
+
+    fuel_burned_ref_design = (
+        ref_design_datafile[
+            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission"
+        ].value[0]
+        * 2.0
+    )
+    energy_mission_ref_design = fuel_burned_ref_design * 11.9  # in kWh
+
+    impact_kerosene_combustion_one_fu = ref_design_datafile[
+        "data:environmental_impact:climate_change:operation:turboshaft_1"
+    ].value[0]
+    impact_kerosene_production_one_fu = ref_design_datafile[
+        "data:environmental_impact:climate_change:operation:kerosene_for_mission"
+    ].value[0]
+
+    total_impact_kerosene_one_fu = (
+        impact_kerosene_combustion_one_fu + impact_kerosene_production_one_fu
+    )
+
+    impact_one_flight = total_impact_kerosene_one_fu / flights_per_fu_ref_design
+    impact_per_kwh_of_energy_used = impact_one_flight / energy_mission_ref_design
+
+    print("Kg of CO2eq for 1 kWh of kerosene", impact_per_kwh_of_energy_used)
+
+    ################################################################################################
+    # Hybrid
+
+    hybrid_design_datafile = oad.DataFile(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml"
+    )
+    flights_per_fu_hybrid_design = hybrid_design_datafile[
+        "data:environmental_impact:flight_per_fu"
+    ].value[0]
+    fu_per_flights_hybrid_design = 1.0 / flights_per_fu_hybrid_design
+    print("Flights per FU hybrid design", flights_per_fu_hybrid_design)
+    print("FU per flights hybrid design", fu_per_flights_hybrid_design)
+
+    # Not available here directly, have to rely on the amount of kerosene in the tanks
+    fuel_burned_hybrid_design = (
+        hybrid_design_datafile[
+            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission"
+        ].value[0]
+        * 2.0
+    )
+    electricity_used_hybrid_design = hybrid_design_datafile[
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission"
+    ].value[0]
+    electricity_unit = hybrid_design_datafile[
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission"
+    ].units
+    if electricity_unit == "W*h":
+        electricity_used_hybrid_design /= 1000.0
+    energy_mission_hybrid_design = electricity_used_hybrid_design  # in kWh
+
+    impact_battery_production_one_fu = hybrid_design_datafile[
+        "data:environmental_impact:climate_change:production:battery_pack_1"
+    ].value[0]
+    impact_electricity_production_one_fu = hybrid_design_datafile[
+        "data:environmental_impact:climate_change:operation:electricity_for_mission"
+    ].value[0]
+
+    total_impact_electricity_one_fu = (
+        impact_battery_production_one_fu + impact_electricity_production_one_fu
+    )
+
+    impact_one_flight_electricity = total_impact_electricity_one_fu / flights_per_fu_hybrid_design
+    impact_per_kwh_of_electricity_used = (
+        impact_one_flight_electricity / energy_mission_hybrid_design
+    )
+
+    print("Kg of CO2eq for 1 kWh of electricity", impact_per_kwh_of_electricity_used)
