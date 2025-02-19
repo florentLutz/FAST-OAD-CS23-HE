@@ -5,10 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
-DEFAULT_MAX_CURRENT_DENSITY = 0.7  # [A/cm^2]
 
-
-class PerformancesCurrentDensity(om.ExplicitComponent):
+class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
     """
     Computation of the current density, simply based on the current and effective area.
     """
@@ -23,13 +21,20 @@ class PerformancesCurrentDensity(om.ExplicitComponent):
             desc="Identifier of the pemfc stack",
             allow_none=False,
         )
+        self.options.declare(
+            "max_current_density",
+            default=0.7,
+            desc="maximum current density of pemfc [A/cm**2]",
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
+        max_current_density = self.options["max_current_density"]
+
         self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
         self.add_input(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             units="cm**2",
             val=np.nan,
             desc="Effective fuel cell area in the stack",
@@ -37,14 +42,14 @@ class PerformancesCurrentDensity(om.ExplicitComponent):
 
         self.add_output(
             "fc_current_density",
-            val=np.full(number_of_points, DEFAULT_MAX_CURRENT_DENSITY),
+            val=np.full(number_of_points, max_current_density),
             units="A/cm**2",
             desc="Current density of the pemfc stack",
         )
 
         self.declare_partials(
             of="*",
-            wrt="data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
+            wrt="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -64,7 +69,7 @@ class PerformancesCurrentDensity(om.ExplicitComponent):
         outputs["fc_current_density"] = (
             inputs["dc_current_out"]
             / inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
             ]
         )
 
@@ -75,17 +80,17 @@ class PerformancesCurrentDensity(om.ExplicitComponent):
         partials["fc_current_density", "dc_current_out"] = (
             np.ones(number_of_points)
             / inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
             ]
         )
 
         partials[
             "fc_current_density",
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
         ] = (
             -inputs["dc_current_out"]
             / inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
             ]
             ** 2
         )

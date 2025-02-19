@@ -37,7 +37,7 @@ class SizingPEMFCCGY(om.ExplicitComponent):
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
 
         self.add_output(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:y",
             units="m",
             val=0.0,
             desc="Y position of the pemfc center of gravity",
@@ -45,7 +45,7 @@ class SizingPEMFCCGY(om.ExplicitComponent):
 
         if position == "wing_pod":
             self.add_input(
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:y_ratio",
                 val=np.nan,
                 desc="X position of the pemfc center of gravity as a ratio of the wing half-span",
             )
@@ -57,16 +57,16 @@ class SizingPEMFCCGY(om.ExplicitComponent):
         position = self.options["position"]
 
         if position == "wing_pod":
-            outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y"] = (
+            outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
                 * inputs[
-                    "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y_ratio"
+                    "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:y_ratio"
                 ]
                 / 2.0
             )
 
         else:
-            outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y"] = 0.0
+            outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
@@ -74,16 +74,16 @@ class SizingPEMFCCGY(om.ExplicitComponent):
 
         if position == "wing_pod":
             partials[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y",
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:y",
                 "data:geometry:wing:span",
             ] = (
                 inputs[
-                    "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y_ratio"
+                    "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:y_ratio"
                 ]
                 / 2.0
             )
 
             partials[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y",
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:y",
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:y_ratio",
             ] = inputs["data:geometry:wing:span"] / 2.0

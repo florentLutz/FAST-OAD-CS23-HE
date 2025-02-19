@@ -24,28 +24,28 @@ class SizingPEMFCVolume(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:length",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length",
             units="m",
             val=np.nan,
             desc="Length of the pemfc, as in the size of the pemfc along the X-axis",
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
             units="m",
             val=np.nan,
             desc="Width of the pemfc, as in the size of the pemfc along the Y-axis",
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:height",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height",
             units="m",
             val=np.nan,
             desc="Height of the pemfc, as in the size of the pemfc along the Z-axis",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":volume",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
             units="m**3",
             val=5.0,
             desc="Volume of the pemfc stack",
@@ -56,15 +56,15 @@ class SizingPEMFCVolume(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
-        outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":volume"] = (
+        outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume"] = (
             inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:height"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height"
             ]
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:length"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length"
             ]
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width"
             ]
         )
 
@@ -72,37 +72,37 @@ class SizingPEMFCVolume(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         partials[
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":volume",
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:length",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length",
         ] = (
             inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:height"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height"
             ]
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width"
             ]
         )
 
         partials[
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":volume",
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:height",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height",
         ] = (
             inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:length"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length"
             ]
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width"
             ]
         )
 
         partials[
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":volume",
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
         ] = (
             inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:length"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length"
             ]
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:height"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height"
             ]
         )

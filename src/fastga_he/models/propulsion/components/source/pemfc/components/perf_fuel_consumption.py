@@ -5,16 +5,15 @@
 import numpy as np
 import openmdao.api as om
 
-DEFAULT_HYDROGEN_CONSUMPTION = 10.0  # [kg/h]
-FARADAYS_CONSTANT = 96485.3321  # [C/mol]
-H2_MOL_PER_KG = 500.0  # [kg]
-NUMBER_OF_ELETRONS_FROM_H2 = 2.0
+from ..constants import FARADAY_CONSTANT, H2_MOL_PER_KG, NUMBER_OF_ELETRONS_FROM_H2
+
+DEFAULT_HYDROGEN_CONSUMPTION = 30.0  # [kg/h]
 
 
-class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
+class PerformancesPEMFCStackFuelConsumption(om.ExplicitComponent):
     """
     Computation of the hydrogen consumption for the required power. Simply based on the
-    results of the PEMFC current density and effective area.
+    results of the number of layers,  current density, and effective area.
     """
 
     def initialize(self):
@@ -33,7 +32,7 @@ class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             units="cm**2",
             val=np.nan,
             desc="Effective fuel cell area in the stack",
@@ -48,7 +47,7 @@ class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
             val=np.nan,
             desc="Total number of layers in the pemfc stacks",
         )
@@ -63,8 +62,8 @@ class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
         self.declare_partials(
             of="*",
             wrt=[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":number_of_layers",
             ],
@@ -86,14 +85,14 @@ class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
 
         outputs["fuel_consumption"] = (
             inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
             ]
             * inputs["fc_current_density"]
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
             ]
             * 3600
-            / (NUMBER_OF_ELETRONS_FROM_H2 * FARADAYS_CONSTANT * H2_MOL_PER_KG)
+            / (NUMBER_OF_ELETRONS_FROM_H2 * FARADAY_CONSTANT * H2_MOL_PER_KG)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -102,34 +101,34 @@ class PerformancesPEMFCFuelConsumption(om.ExplicitComponent):
 
         partials[
             "fuel_consumption",
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
         ] = (
             inputs["fc_current_density"]
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
             ]
             * 3600
-            / (NUMBER_OF_ELETRONS_FROM_H2 * FARADAYS_CONSTANT * H2_MOL_PER_KG)
+            / (NUMBER_OF_ELETRONS_FROM_H2 * FARADAY_CONSTANT * H2_MOL_PER_KG)
         )
         partials["fuel_consumption", "fc_current_density"] = (
             np.ones(number_of_points)
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
             ]
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
             ]
             * 3600
-            / (NUMBER_OF_ELETRONS_FROM_H2 * FARADAYS_CONSTANT * H2_MOL_PER_KG)
+            / (NUMBER_OF_ELETRONS_FROM_H2 * FARADAY_CONSTANT * H2_MOL_PER_KG)
         )
         partials[
             "fuel_consumption",
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":effective_area",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
         ] = (
             inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
             ]
             * inputs["fc_current_density"]
             * 3600
-            / (NUMBER_OF_ELETRONS_FROM_H2 * FARADAYS_CONSTANT * H2_MOL_PER_KG)
+            / (NUMBER_OF_ELETRONS_FROM_H2 * FARADAY_CONSTANT * H2_MOL_PER_KG)
         )

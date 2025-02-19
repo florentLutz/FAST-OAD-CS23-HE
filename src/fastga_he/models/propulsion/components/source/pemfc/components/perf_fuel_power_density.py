@@ -5,12 +5,10 @@
 import numpy as np
 import openmdao.api as om
 
-DEFAULT_STACK_POWER = 216.0  # [kW]
 
-
-class PerformancesPEMFCStackPower(om.ExplicitComponent):
+class PerformancesPEMFCStackHydrogenPowerDensity(om.ExplicitComponent):
     """
-    Computation of the power at the output of the PEMFC, which only considered in post-processing.
+    Computation of the hydrogen power density of PEMFC, which only considered in post-processing.
     """
 
     def initialize(self):
@@ -21,10 +19,11 @@ class PerformancesPEMFCStackPower(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("voltage_out", units="V", val=np.full(number_of_points, np.nan))
-        self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
+        self.add_input(name="fuel_consumed_t", units="kg", val=np.full(number_of_points, np.nan))
 
-        self.add_output("power_out", units="kW", val=np.full(number_of_points, DEFAULT_STACK_POWER))
+        self.add_input("power_out", units="kW", val=np.full(number_of_points, np.nan))
+
+        self.add_output("specific_power", units="kW/kg", val=np.full(number_of_points, 5.0))
 
         self.declare_partials(
             of="*",
@@ -35,8 +34,10 @@ class PerformancesPEMFCStackPower(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["power_out"] = inputs["voltage_out"] * inputs["dc_current_out"] / 1000.0
+        outputs["specific_power"] = inputs["power_out"] / inputs["fuel_consumed_t"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["power_out", "voltage_out"] = inputs["dc_current_out"] / 1000.0
-        partials["power_out", "dc_current_out"] = inputs["voltage_out"] / 1000.0
+        partials["specific_power", "power_out"] = 1 / inputs["fuel_consumed_t"]
+        partials["specific_power", "fuel_consumed_t"] = (
+            -inputs["power_out"] / inputs["fuel_consumed_t"] ** 2
+        )

@@ -16,30 +16,23 @@ from ..components.sizing_pemfc_volume import SizingPEMFCVolume
 from ..components.sizing_pemfc_dimensions import SizingPEMFCDimensions
 from ..components.sizing_pemfc_drag import SizingPEMFCDrag
 
-from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
+from ..components.perf_fuel_consumption import PerformancesPEMFCStackFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
 from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCStackSingleVoltageSimple
 from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCStackSingleVoltageAnalytical
-from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
-from ..components.perf_maximum_current import PerformancesMaximumCurrent
-from ..components.perf_maximum_power import PerformancesMaximumPower
-from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
-from ..components.perf_pemfc_power import PerformancesPEMFCPower
-from ..components.perf_pemfc_specific_power import PerformancesPEMFCSpecificPower
-from ..components.perf_pemfc_voltage import PerformancesPEMFCVoltage
-from ..components.perf_pemfc_operating_pressure import PerformancesOperatingPressure
-from ..components.perf_pemfc_operating_temperature import PerformancesOperatingTemperature
+from ..components.perf_pemfc_current_density import PerformancesPEMFCStackCurrentDensity
+from ..components.perf_maximum import PerformancesPEMFCStackMaximum
+from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackEfficiency
+from ..components.perf_pemfc_power import PerformancesPEMFCStackPower
+from ..components.perf_fuel_power_density import PerformancesPEMFCStackHydrogenPowerDensity
+from ..components.perf_pemfc_voltage import PerformancesPEMFCStackVoltage
+from ..components.perf_pemfc_operating_pressure import PerformancesPEMFCStackOperatingPressure
+from ..components.perf_pemfc_operating_temperature import PerformancesPEMFCStackOperatingTemperature
 from ..components.perf_pemfc_expect_specific_power import (
-    PerformancesPEMFCMaxSpecificPowerFuelCellSystem,
-)
-from ..components.perf_pemfc_expect_specific_power import (
-    PerformancesPEMFCMaxSpecificPowerFuelCellStack,
+    PerformancesPEMFCStackExpectedSpecificPower,
 )
 from ..components.perf_pemfc_expect_power_density import (
-    PerformancesPEMFCMaxPowerDensityFuelCellSystem,
-)
-from ..components.perf_pemfc_expect_power_density import (
-    PerformancesPEMFCMaxPowerDensityFuelCellStack,
+    PerformancesPEMFCStackExpectedPowerDensity,
 )
 from ..components.perf_pemfc_analytical_voltage_adjustment import (
     PerformancesPEMFCStackAnalyticalVoltageAdjustment,
@@ -73,7 +66,7 @@ def test_pemfc_weight():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:mass", units="kg"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
     ) == pytest.approx(0.5, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -93,7 +86,7 @@ def test_pemfc_volume():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:volume", units="L"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:volume", units="L"
     ) == pytest.approx(1.62, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -120,13 +113,13 @@ def test_pemfc_dimensions():
             ivc,
         )
         assert problem.get_val(
-            "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:dimension:length", units="m"
+            "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:dimension:length", units="m"
         ) == pytest.approx(length, rel=1e-2)
         assert problem.get_val(
-            "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:dimension:width", units="m"
+            "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:dimension:width", units="m"
         ) == pytest.approx(width, rel=1e-2)
         assert problem.get_val(
-            "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:dimension:height", units="m"
+            "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:dimension:height", units="m"
         ) == pytest.approx(height, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -149,7 +142,7 @@ def test_pemfc_cg_x():
             ivc,
         )
         assert problem.get_val(
-            "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:CG:x", units="m"
+            "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:CG:x", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -172,7 +165,7 @@ def test_pemfc_cg_y():
             ivc,
         )
         assert problem.get_val(
-            "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:CG:y", units="m"
+            "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:CG:y", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -207,11 +200,11 @@ def test_pemfc_drag():
 
             if ls_option:
                 assert problem.get_val(
-                    "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:low_speed:CD0",
+                    "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:low_speed:CD0",
                 ) == pytest.approx(ls_drag, rel=1e-2)
             else:
                 assert problem.get_val(
-                    "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:cruise:CD0",
+                    "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cruise:CD0",
                 ) == pytest.approx(cruise_drag, rel=1e-2)
 
             problem.check_partials(compact_print=True)
@@ -225,7 +218,7 @@ def test_pemfc_stack_sizing():
         XML_FILE,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:current_max",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:current_max",
         val=11.76,
         units="A",
     )
@@ -236,19 +229,19 @@ def test_pemfc_stack_sizing():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:mass", units="kg"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
     ) == pytest.approx(0.5, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:CG:x", units="m"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:CG:x", units="m"
     ) == pytest.approx(1.2387, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:CG:y", units="m"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:CG:y", units="m"
     ) == pytest.approx(0.0, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:low_speed:CD0",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:low_speed:CD0",
     ) == pytest.approx(3.3705e-5, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:cruise:CD0",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cruise:CD0",
     ) == pytest.approx(3.324e-5, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -306,14 +299,16 @@ def test_pemfc_current_density():
     dc_current_out = np.linspace(1.68, 9.24, NB_POINTS_TEST)
     ivc.add_output("dc_current_out", dc_current_out, units="A")
     ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:effective_area",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
         units="cm**2",
         val=16.8,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesCurrentDensity(number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"),
+        PerformancesPEMFCStackCurrentDensity(
+            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+        ),
         ivc,
     )
     assert problem.get_val("fc_current_density", units="A/cm**2") == pytest.approx(
@@ -350,7 +345,7 @@ def test_operating_pressure():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesOperatingPressure(number_of_points=NB_POINTS_TEST),
+        PerformancesPEMFCStackOperatingPressure(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     assert problem.get_val("operating_pressure", units="atm") == pytest.approx(
@@ -368,7 +363,7 @@ def test_operating_temperature():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesOperatingTemperature(number_of_points=NB_POINTS_TEST),
+        PerformancesPEMFCStackOperatingTemperature(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     assert problem.get_val("operating_temperature", units="K") == pytest.approx(
@@ -463,12 +458,14 @@ def test_pemfc_voltage():
         units="V",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:number_of_layers", val=35.0
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:number_of_layers", val=35.0
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCVoltage(number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"),
+        PerformancesPEMFCStackVoltage(
+            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+        ),
         ivc,
     )
     assert problem.get_val("voltage_out", units="V") == pytest.approx(
@@ -479,7 +476,7 @@ def test_pemfc_voltage():
 
     # Check with the other battery mode
     problem = run_system(
-        PerformancesPEMFCVoltage(
+        PerformancesPEMFCStackVoltage(
             number_of_points=NB_POINTS_TEST,
             direct_bus_connection=True,
             pemfc_stack_id="pemfc_stack_1",
@@ -493,8 +490,13 @@ def test_pemfc_voltage():
     problem.check_partials(compact_print=True)
 
 
-def test_maximum_current():
+def test_maximum():
     ivc = om.IndepVarComp()
+    ivc.add_output(
+        "power_out",
+        units="kW",
+        val=np.array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0]),
+    )
     ivc.add_output(
         "dc_current_out",
         units="A",
@@ -503,47 +505,20 @@ def test_maximum_current():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesMaximumCurrent(number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"),
+        PerformancesPEMFCStackMaximum(
+            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+        ),
         ivc,
     )
+
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:current_min", units="A"
-    ) == pytest.approx(
-        3.57,
-        rel=1e-2,
-    )
-    assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:current_max", units="A"
+        "data:propulsion:he_power_train:PEMFC_stack:PEMFC_stack_1:current_max", units="A"
     ) == pytest.approx(
         4.01,
         rel=1e-2,
     )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_maximum_power():
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "power_out",
-        units="kW",
-        val=np.array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0]),
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesMaximumPower(number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"),
-        ivc,
-    )
-
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:power_min", units="kW"
-    ) == pytest.approx(
-        10.0,
-        rel=1e-2,
-    )
-    assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:power_max", units="kW"
+        "data:propulsion:he_power_train:PEMFC_stack:PEMFC_stack_1:power_max", units="kW"
     ) == pytest.approx(
         100.0,
         rel=1e-2,
@@ -552,21 +527,21 @@ def test_maximum_power():
     problem.check_partials(compact_print=True)
 
 
-def test_max_specific_power_fuel_cell_system():
+def test_pemfc_expected_specific_power():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:power_max",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max",
         units="kW",
         val=0.2,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCMaxSpecificPowerFuelCellSystem(pemfc_stack_id="pemfc_stack_1"),
+        PerformancesPEMFCStackExpectedSpecificPower(pemfc_stack_id="pemfc_stack_1"),
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:max_specific_power", units="kW/kg"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:max_specific_power", units="kW/kg"
     ) == pytest.approx(
         0.4677,
         rel=1e-2,
@@ -575,71 +550,24 @@ def test_max_specific_power_fuel_cell_system():
     problem.check_partials(compact_print=True)
 
 
-def test_max_specific_power_fuel_cell_stack():
+def test_pemfc_expected_power_density():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:power_max",
-        units="kW",
-        val=600.0,
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesPEMFCMaxSpecificPowerFuelCellStack(pemfc_stack_id="pemfc_stack_1"),
-        ivc,
-    )
-    assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:max_specific_power", units="kW/kg"
-    ) == pytest.approx(
-        3.37,
-        rel=1e-2,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_max_power_density_fuel_cell_system():
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:power_max",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max",
         units="kW",
         val=0.2,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCMaxPowerDensityFuelCellSystem(pemfc_stack_id="pemfc_stack_1"),
+        PerformancesPEMFCStackExpectedPowerDensity(pemfc_stack_id="pemfc_stack_1"),
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:max_power_density",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:max_power_density",
         units="kW/m**3",
     ) == pytest.approx(
         230.0,
-        rel=1e-2,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_max_power_density_fuel_cell_stack():
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:power_max",
-        units="kW",
-        val=600.0,
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesPEMFCMaxPowerDensityFuelCellStack(pemfc_stack_id="pemfc_stack_1"),
-        ivc,
-    )
-    assert problem.get_val(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:max_power_density",
-        units="kW/m**3",
-    ) == pytest.approx(
-        6000.0,
         rel=1e-2,
     )
 
@@ -657,7 +585,7 @@ def test_pemfc_power():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCPower(number_of_points=NB_POINTS_TEST),
+        PerformancesPEMFCStackPower(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     assert problem.get_val("power_out", units="kW") == pytest.approx(
@@ -668,22 +596,18 @@ def test_pemfc_power():
     problem.check_partials(compact_print=True)
 
 
-def test_pemfc_specifc_power():
+def test_hydrogen_power_density():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "power_out",
         units="kW",
         val=np.array([802.0, 786.0, 770.0, 760.0, 750.0, 740.0, 734.0, 726.0, 720.0, 714.0]),
     )
-    ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:mass", 1000.0, units="kg"
-    )
+    ivc.add_output("fuel_consumed_t", np.full(NB_POINTS_TEST, 1000.0), units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCSpecificPower(
-            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
-        ),
+        PerformancesPEMFCStackHydrogenPowerDensity(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     assert problem.get_val("specific_power", units="kW/kg") == pytest.approx(
@@ -711,7 +635,7 @@ def test_pemfc_efficiency():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCEfficiency(number_of_points=NB_POINTS_TEST),
+        PerformancesPEMFCStackEfficiency(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     # Not computed with proper losses, to test only
@@ -725,7 +649,7 @@ def test_pemfc_efficiency():
 def test_fuel_consumption():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:effective_area",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
         units="cm**2",
         val=16.8,
     )
@@ -738,11 +662,11 @@ def test_fuel_consumption():
         shape=NB_POINTS_TEST,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:pemfc_stack:pemfc_stack_1:number_of_layers", val=35.0
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:number_of_layers", val=35.0
     )
 
     problem = run_system(
-        PerformancesPEMFCFuelConsumption(
+        PerformancesPEMFCStackFuelConsumption(
             number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
         ),
         ivc,

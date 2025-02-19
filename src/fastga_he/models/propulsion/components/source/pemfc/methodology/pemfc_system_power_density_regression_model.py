@@ -3,8 +3,8 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 """
 This regression model is construct based on the data provided by, Source:
-H3D_H2_UnmannedAviation_Brochure 2024.pptx. The specific power is utilized in weight calculation
-for PEMFC.
+H3D_H2_UnmannedAviation_Brochure 2024.pptx. The power density of full PEMFC system is utilized in
+dimension calculation.
 """
 
 import numpy as np
@@ -15,7 +15,7 @@ from scipy import optimize
 
 # Data points from the graph
 x = np.array([0.3, 0.8, 1.2, 2.0])
-y = np.array([0.486, 0.645, 0.57, 0.667])
+y = np.array([208.0, 235.0, 252.0, 240.0])
 
 
 # Logarithmic fit

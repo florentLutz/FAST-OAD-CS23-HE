@@ -47,7 +47,7 @@
         </geometry>
         <propulsion>
             <he_power_train>
-                <pemfc_stack>
+                <PEMFC_stack>
                     <pemfc_stack_1>
                         <max_specific_power units="kW/kg">0.345</max_specific_power>
                         <max_power_density units="kW/m**3">124</max_power_density>
@@ -65,7 +65,7 @@
                             <y_ratio>0.34</y_ratio>
                         </CG>
                     </pemfc_stack_1>
-                </pemfc_stack>
+                </PEMFC_stack>
             </he_power_train>
         </propulsion>
     </data>

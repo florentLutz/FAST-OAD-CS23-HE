@@ -8,7 +8,7 @@ import openmdao.api as om
 DEFAULT_STACK_VOLTAGE = 325.0  # [V]
 
 
-class PerformancesPEMFCVoltage(om.ExplicitComponent):
+class PerformancesPEMFCStackVoltage(om.ExplicitComponent):
     """
     Computation of the voltage at the output of PEMFC, assumes for now that it is equal to
     the voltage output of the modules. May change in the future hence why it is in a separate
@@ -52,7 +52,7 @@ class PerformancesPEMFCVoltage(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
             val=np.nan,
             desc="Total number of layers in the pemfc stacks",
         )
@@ -63,7 +63,7 @@ class PerformancesPEMFCVoltage(om.ExplicitComponent):
 
         self.declare_partials(
             of=self.output_name,
-            wrt="data:propulsion:he_power_train:pemfc_stack:"
+            wrt="data:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
             + ":number_of_layers",
             method="exact",
@@ -85,7 +85,7 @@ class PerformancesPEMFCVoltage(om.ExplicitComponent):
         outputs[self.output_name] = (
             inputs["single_layer_pemfc_voltage"]
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
             ]
         )
 
@@ -96,11 +96,11 @@ class PerformancesPEMFCVoltage(om.ExplicitComponent):
         partials[self.output_name, "single_layer_pemfc_voltage"] = (
             np.ones(number_of_points)
             * inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
             ]
         )
 
         partials[
             self.output_name,
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":number_of_layers",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
         ] = inputs["single_layer_pemfc_voltage"]

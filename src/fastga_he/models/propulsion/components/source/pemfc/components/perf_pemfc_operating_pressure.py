@@ -5,10 +5,10 @@
 import numpy as np
 import openmdao.api as om
 
-DEFAULT_PRESSURE = 101325.0  # [Pa]
+from ..constants import DEFAULT_PRESSURE
 
 
-class PerformancesOperatingPressure(om.ExplicitComponent):
+class PerformancesPEMFCStackOperatingPressure(om.ExplicitComponent):
     """
     Computation of the operating pressure of PEMFC.
     """
@@ -31,10 +31,10 @@ class PerformancesOperatingPressure(om.ExplicitComponent):
 
         if compressor_connection:
             self.add_input(
-                "output_pressure",
+                "input_pressure",
                 units="Pa",
                 val=np.full(number_of_points, np.nan),
-                desc="Output absolute pressure from the compressor if applicable",
+                desc="Input pressure from the compressor if applicable",
             )
         else:
             self.add_input("ambient_pressure", units="Pa", val=np.full(number_of_points, np.nan))
@@ -56,15 +56,15 @@ class PerformancesOperatingPressure(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         compressor_connection = self.options["compressor_connection"]
         if compressor_connection:
-            outputs["operating_pressure"] = inputs["output_pressure"]
+            outputs["operating_pressure"] = inputs["input_pressure"]
         else:
             outputs["operating_pressure"] = inputs["ambient_pressure"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         compressor_connection = self.options["compressor_connection"]
         if compressor_connection:
-            partials["operating_pressure", "output_pressure"] = np.ones_like(
-                inputs["output_pressure"]
+            partials["operating_pressure", "input_pressure"] = np.ones_like(
+                inputs["input_pressure"]
             )
         else:
             partials["operating_pressure", "ambient_pressure"] = np.ones_like(

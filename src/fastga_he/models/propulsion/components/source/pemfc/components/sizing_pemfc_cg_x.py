@@ -34,7 +34,7 @@ class SizingPEMFCCGX(om.ExplicitComponent):
         position = self.options["position"]
 
         self.add_output(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:x",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:x",
             units="m",
             val=2.9,
             desc="X position of the pemfc center of gravity",
@@ -53,7 +53,7 @@ class SizingPEMFCCGX(om.ExplicitComponent):
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
             self.add_input(
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":dimension:length",
                 units="m",
@@ -65,7 +65,7 @@ class SizingPEMFCCGX(om.ExplicitComponent):
 
             self.declare_partials(
                 of="*",
-                wrt="data:propulsion:he_power_train:pemfc_stack:"
+                wrt="data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":dimension:length",
                 val=-0.5,
@@ -77,7 +77,7 @@ class SizingPEMFCCGX(om.ExplicitComponent):
             self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
 
             self.add_input(
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":dimension:length",
                 units="m",
@@ -91,7 +91,7 @@ class SizingPEMFCCGX(om.ExplicitComponent):
 
             self.declare_partials(
                 of="*",
-                wrt="data:propulsion:he_power_train:pemfc_stack:"
+                wrt="data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":dimension:length",
                 val=0.5,
@@ -113,36 +113,36 @@ class SizingPEMFCCGX(om.ExplicitComponent):
         position = self.options["position"]
 
         if position == "wing_pod":
-            outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:x"] = (
+            outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:x"] = (
                 inputs["data:geometry:wing:MAC:at25percent:x"]
                 + 0.25 * inputs["data:geometry:wing:MAC:length"]
             )
 
         elif position == "in_the_front":
-            outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:x"] = (
+            outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 - 0.5
                 * inputs[
-                    "data:propulsion:he_power_train:pemfc_stack:"
+                    "data:propulsion:he_power_train:PEMFC_stack:"
                     + pemfc_stack_id
                     + ":dimension:length"
                 ]
             )
 
         elif position == "in_the_back":
-            outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:x"] = (
+            outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + inputs["data:geometry:cabin:length"]
                 + 0.5
                 * inputs[
-                    "data:propulsion:he_power_train:pemfc_stack:"
+                    "data:propulsion:he_power_train:PEMFC_stack:"
                     + pemfc_stack_id
                     + ":dimension:length"
                 ]
             )
 
         else:
-            outputs["data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":CG:x"] = (
+            outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:x"] = (
                 inputs["data:geometry:fuselage:front_length"]
                 + 0.5 * inputs["data:geometry:cabin:length"]
             )

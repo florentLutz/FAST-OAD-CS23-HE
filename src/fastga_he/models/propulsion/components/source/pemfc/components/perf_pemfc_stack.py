@@ -7,27 +7,27 @@ import openmdao.api as om
 import fastoad.api as oad
 
 from ..components.perf_direct_bus_connection import PerformancesPEMFCStackDirectBusConnection
-from ..components.perf_pemfc_power import PerformancesPEMFCPower
-from ..components.perf_pemfc_specific_power import PerformancesPEMFCSpecificPower
-from ..components.perf_maximum_current import PerformancesMaximumCurrent
-from ..components.perf_maximum_power import PerformancesMaximumPower
-from ..components.perf_pemfc_current_density import PerformancesCurrentDensity
+from ..components.perf_pemfc_power import PerformancesPEMFCStackPower
+from ..components.perf_fuel_power_density import PerformancesPEMFCStackHydrogenPowerDensity
+from ..components.perf_maximum import PerformancesPEMFCStackMaximum
+from ..components.perf_pemfc_current_density import PerformancesPEMFCStackCurrentDensity
 
-from ..components.perf_fuel_consumption import PerformancesPEMFCFuelConsumption
+from ..components.perf_fuel_consumption import PerformancesPEMFCStackFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
-from ..components.perf_pemfc_efficiency import PerformancesPEMFCEfficiency
-from ..components.perf_pemfc_voltage import PerformancesPEMFCVoltage
-from ..components.perf_pemfc_operating_pressure import PerformancesOperatingPressure
+from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackEfficiency
+from ..components.perf_pemfc_voltage import PerformancesPEMFCStackVoltage
+from ..components.perf_pemfc_operating_pressure import PerformancesPEMFCStackOperatingPressure
 from ..components.perf_ambient_pressure import PerformancesPEMFCStackAmbientPressure
-from ..components.perf_pemfc_operating_temperature import PerformancesOperatingTemperature
+from ..components.perf_pemfc_operating_temperature import PerformancesPEMFCStackOperatingTemperature
+from ..components.perf_pemfc_expect_specific_power import (
+    PerformancesPEMFCStackExpectedSpecificPower,
+)
+from ..components.perf_pemfc_expect_power_density import PerformancesPEMFCStackExpectedPowerDensity
 from ..components.perf_pemfc_analytical_voltage_adjustment import (
     PerformancesPEMFCStackAnalyticalVoltageAdjustment,
 )
 
-from ..constants import (
-    SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE,
-    SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION,
-)
+from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
 
 
 class PerformancesPEMFCStack(om.Group):
@@ -75,14 +75,12 @@ class PerformancesPEMFCStack(om.Group):
             "max_current_density": max_current_density,
         }
 
-        option_max_power_group = {
-            "pemfc_stack_id": pemfc_stack_id,
-        }
-
         self.add_subsystem(
             "pemfc_current_density",
-            PerformancesCurrentDensity(
-                number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
+            PerformancesPEMFCStackCurrentDensity(
+                number_of_points=number_of_points,
+                pemfc_stack_id=pemfc_stack_id,
+                max_current_density=max_current_density,
             ),
             promotes=["*"],
         )
@@ -95,7 +93,7 @@ class PerformancesPEMFCStack(om.Group):
 
         self.add_subsystem(
             "pemfc_operating_pressure",
-            PerformancesOperatingPressure(
+            PerformancesPEMFCStackOperatingPressure(
                 number_of_points=number_of_points, compressor_connection=compressor_connection
             ),
             promotes=["*"],
@@ -109,7 +107,7 @@ class PerformancesPEMFCStack(om.Group):
 
         self.add_subsystem(
             "pemfc_ambient_temperature",
-            PerformancesOperatingTemperature(number_of_points=number_of_points),
+            PerformancesPEMFCStackOperatingTemperature(number_of_points=number_of_points),
             promotes=["*"],
         )
 
@@ -123,7 +121,7 @@ class PerformancesPEMFCStack(om.Group):
 
         self.add_subsystem(
             "pemfc_voltage",
-            PerformancesPEMFCVoltage(
+            PerformancesPEMFCStackVoltage(
                 number_of_points=number_of_points,
                 direct_bus_connection=direct_bus_connection,
                 pemfc_stack_id=pemfc_stack_id,
@@ -140,7 +138,7 @@ class PerformancesPEMFCStack(om.Group):
 
         self.add_subsystem(
             "fuel_consumption",
-            PerformancesPEMFCFuelConsumption(
+            PerformancesPEMFCStackFuelConsumption(
                 number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
             ),
             promotes=["*"],
@@ -154,45 +152,39 @@ class PerformancesPEMFCStack(om.Group):
         )
         self.add_subsystem(
             "pemfc_efficiency",
-            PerformancesPEMFCEfficiency(number_of_points=number_of_points),
+            PerformancesPEMFCStackEfficiency(number_of_points=number_of_points),
             promotes=["*"],
         )
 
         self.add_subsystem(
             "pemfc_power",
-            PerformancesPEMFCPower(number_of_points=number_of_points),
+            PerformancesPEMFCStackPower(number_of_points=number_of_points),
             promotes=["*"],
         )
 
         self.add_subsystem(
-            "maximum_power",
-            PerformancesMaximumPower(
+            "maximum",
+            PerformancesPEMFCStackMaximum(
                 number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
             ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "hydrogen_power_density",
+            PerformancesPEMFCStackHydrogenPowerDensity(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "pemfc_specific_power",
+            PerformancesPEMFCStackExpectedSpecificPower(pemfc_stack_id=pemfc_stack_id),
             promotes=["*"],
         )
 
         self.add_subsystem(
             "pemfc_power_density",
-            PerformancesPEMFCSpecificPower(
-                number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
-            ),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            name="maximum_power_related_parameters_group",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_PERFORMANCES_PEMFC_MODELING_OPTION, options=option_max_power_group
-            ),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "maximum_current",
-            PerformancesMaximumCurrent(
-                number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
-            ),
+            PerformancesPEMFCStackExpectedPowerDensity(pemfc_stack_id=pemfc_stack_id),
             promotes=["*"],
         )
 

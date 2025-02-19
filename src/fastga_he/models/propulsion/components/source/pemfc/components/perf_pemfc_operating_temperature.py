@@ -4,15 +4,15 @@
 
 import numpy as np
 import openmdao.api as om
+
 from stdatm import AtmosphereWithPartials
+from ..constants import DEFAULT_TEMPERATURE
 
-DEFAULT_TEMPERATURE = 300.0  # [K]
 
-
-class PerformancesOperatingTemperature(om.ExplicitComponent):
+class PerformancesPEMFCStackOperatingTemperature(om.ExplicitComponent):
     """
     Computation of the ambient temperature that PEMFC is working based on altitude only applied
-    to the analytical polarization model from :cite:`Juschus:2021`.
+    to the analytical polarization model from :cite:`juschus:2021`.
     """
 
     def initialize(self):

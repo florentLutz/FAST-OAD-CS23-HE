@@ -105,7 +105,7 @@ class PerformancesPEMFCStackSingleVoltageSimple(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:pemfc_stack:"
+            "data:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
             + ":hydrogen_reactant_pressure",
             units="atm",
@@ -129,7 +129,7 @@ class PerformancesPEMFCStackSingleVoltageSimple(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:pemfc_stack:"
+            of="data:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
             + ":hydrogen_reactant_pressure",
             wrt="nominal_pressure",
@@ -164,7 +164,7 @@ class PerformancesPEMFCStackSingleVoltageSimple(om.ExplicitComponent):
         )
         # This output is to for tank connection
         outputs[
-            "data:propulsion:he_power_train:pemfc_stack:"
+            "data:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
             + ":hydrogen_reactant_pressure"
         ] = nominal_pressure

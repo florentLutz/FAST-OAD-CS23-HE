@@ -41,7 +41,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
 
         # At least one input is needed regardless of the case
         self.add_input(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
             units="m",
             val=np.nan,
             desc="Width of the pemfc, as in the size of the pemfc along the Y-axis",
@@ -49,7 +49,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
 
         if position == "underbelly":
             self.add_input(
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":dimension:length",
                 units="m",
@@ -58,7 +58,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             )
 
             self.add_input(
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":dimension:height",
                 units="m",
@@ -74,7 +74,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
         self.add_output(
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":" + ls_tag + ":CD0",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":" + ls_tag + ":CD0",
             val=0.0,
         )
 
@@ -98,7 +98,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             frontal_area = (
                 np.pi
                 * inputs[
-                    "data:propulsion:he_power_train:pemfc_stack:"
+                    "data:propulsion:he_power_train:PEMFC_stack:"
                     + pemfc_stack_id
                     + ":dimension:width"
                 ]
@@ -114,15 +114,15 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             wet_area = inputs["data:geometry:fuselage:wet_area"]
 
             belly_width = inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width"
             ]
 
             belly_length = inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:length"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length"
             ]
 
             belly_height = inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:height"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height"
             ]
 
             added_wet_area = (
@@ -137,7 +137,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             cd0 = 0.0
 
         outputs[
-            "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":" + ls_tag + ":CD0"
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":" + ls_tag + ":CD0"
         ] = cd0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -150,7 +150,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             frontal_area = (
                 np.pi
                 * inputs[
-                    "data:propulsion:he_power_train:pemfc_stack:"
+                    "data:propulsion:he_power_train:PEMFC_stack:"
                     + pemfc_stack_id
                     + ":dimension:width"
                 ]
@@ -159,7 +159,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             )
 
             partials[
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":"
                 + ls_tag
@@ -168,17 +168,17 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             ] = -0.10 * frontal_area / inputs["data:geometry:wing:area"] ** 2.0
 
             partials[
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":"
                 + ls_tag
                 + ":CD0",
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
             ] = (
                 0.10
                 * np.pi
                 * inputs[
-                    "data:propulsion:he_power_train:pemfc_stack:"
+                    "data:propulsion:he_power_train:PEMFC_stack:"
                     + pemfc_stack_id
                     + ":dimension:width"
                 ]
@@ -190,15 +190,15 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             wet_area = inputs["data:geometry:fuselage:wet_area"]
 
             belly_width = inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width"
             ]
 
             belly_length = inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:length"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length"
             ]
 
             belly_height = inputs[
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:height"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height"
             ]
 
             added_wet_area = (
@@ -208,38 +208,38 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             )
 
             partials[
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":"
                 + ls_tag
                 + ":CD0",
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
             ] = (belly_length + 2.0 * belly_height) / wet_area * cd0_fus
 
             partials[
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":"
                 + ls_tag
                 + ":CD0",
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":dimension:height",
             ] = (2.0 * belly_width + 2.0 * belly_length) / wet_area * cd0_fus
 
             partials[
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":"
                 + ls_tag
                 + ":CD0",
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":dimension:length",
             ] = (belly_width + 2.0 * belly_height) / wet_area * cd0_fus
 
             partials[
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":"
                 + ls_tag
@@ -248,7 +248,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             ] = -added_wet_area / wet_area**2.0 * cd0_fus
 
             partials[
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":"
                 + ls_tag
@@ -258,10 +258,10 @@ class SizingPEMFCDrag(om.ExplicitComponent):
 
         else:
             partials[
-                "data:propulsion:he_power_train:pemfc_stack:"
+                "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":"
                 + ls_tag
                 + ":CD0",
-                "data:propulsion:he_power_train:pemfc_stack:" + pemfc_stack_id + ":dimension:width",
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
             ] = 0.0

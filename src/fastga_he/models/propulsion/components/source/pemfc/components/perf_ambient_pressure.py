@@ -6,8 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 from stdatm import AtmosphereWithPartials
-
-DEFAULT_PRESSURE = AtmosphereWithPartials(0).pressure  # [Pa]
+from ..constants import DEFAULT_PRESSURE
 
 
 class PerformancesPEMFCStackAmbientPressure(om.ExplicitComponent):

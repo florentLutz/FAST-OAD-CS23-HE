@@ -4,16 +4,18 @@
 
 import numpy as np
 import openmdao.api as om
+from ..constants import HHV_HYDROGEN_EQUIVALENT_VOLTAGE
 
 DEFAULT_PEMFC_EFFICIENCY = 0.53
-DEFAULT_PRESSURE_ATM = 1.0  # [atm]
 
 
-class PerformancesPEMFCEfficiency(om.ExplicitComponent):
+class PerformancesPEMFCStackEfficiency(om.ExplicitComponent):
     """
     Computation of efficiency of PEMFC with dividing the actual voltage provided by the fuel cell
-    with reversible voltage considering the deviation in different operating pressure. The
-    pressure coefficient is given by the model from :cite:`hoogendoorn:2018`.
+    with the higher heating value (HHV) of hydrogen. The convertion into voltage form is simply
+    calculated by dividing the HHV of hydrogen (285.5 kJ/mol) by the amount of electrons produced by
+    single hydrogen particle and the Faraday's constant.
+    source: https://www.nrel.gov/docs/fy10osti/47302.pdf
     """
 
     def initialize(self):
@@ -21,30 +23,8 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
-        self.options.declare(
-            "pressure coefficient", default=0.06, desc="pressure coefficient of one layer of pemfc"
-        )
-
-        self.options.declare(
-            "pemfc_theoretical_electric_potential",
-            default=1.229,
-            desc="pemfc_theoretical_electric_potential of one layer of pemfc [V]",
-        )
-
     def setup(self):
         number_of_points = self.options["number_of_points"]
-
-        self.add_input(
-            "nominal_pressure",
-            units="atm",
-            val=DEFAULT_PRESSURE_ATM,
-        )
-
-        self.add_input(
-            "operating_pressure",
-            units="atm",
-            val=np.full(number_of_points, DEFAULT_PRESSURE_ATM),
-        )
 
         self.add_input(
             "single_layer_pemfc_voltage",
@@ -59,52 +39,22 @@ class PerformancesPEMFCEfficiency(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt=["single_layer_pemfc_voltage", "operating_pressure"],
+            wrt="*",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
 
-        self.declare_partials(
-            of="*",
-            wrt="nominal_pressure",
-            method="exact",
-            rows=np.arange(number_of_points),
-            cols=np.zeros(number_of_points),
-        )
-
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        e0 = self.options["pemfc_theoretical_electric_potential"]
-        pressure_coeff = self.options["pressure coefficient"]
-        operating_pressure = inputs["operating_pressure"]
-        nominal_pressure = inputs["nominal_pressure"]
+        hhv = HHV_HYDROGEN_EQUIVALENT_VOLTAGE
 
-        e = e0 + pressure_coeff * np.log(operating_pressure / nominal_pressure)
-
-        efficiency = inputs["single_layer_pemfc_voltage"] / e
-
-        outputs["efficiency"] = efficiency
+        outputs["efficiency"] = inputs["single_layer_pemfc_voltage"] / hhv
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         number_of_points = self.options["number_of_points"]
-
-        e0 = self.options["pemfc_theoretical_electric_potential"]
-        pressure_coeff = self.options["pressure coefficient"]
-        operating_pressure = inputs["operating_pressure"]
-        nominal_pressure = inputs["nominal_pressure"]
-        e = e0 + pressure_coeff * np.log(operating_pressure / nominal_pressure)
+        hhv = HHV_HYDROGEN_EQUIVALENT_VOLTAGE
 
         partials[
             "efficiency",
             "single_layer_pemfc_voltage",
-        ] = np.ones(number_of_points) / e
-
-        partials[
-            "efficiency",
-            "operating_pressure",
-        ] = -pressure_coeff * inputs["single_layer_pemfc_voltage"] / (operating_pressure * e**2)
-
-        partials[
-            "efficiency",
-            "nominal_pressure",
-        ] = pressure_coeff * inputs["single_layer_pemfc_voltage"] / (nominal_pressure * e**2)
+        ] = np.full(number_of_points, 1 / hhv)
