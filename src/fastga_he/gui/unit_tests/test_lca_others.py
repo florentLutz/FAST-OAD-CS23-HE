@@ -529,13 +529,37 @@ def test_search_engine_paper_climate_change():
         "data:environmental_impact:climate_change:operation:electricity_for_mission"
     ].value[0]
 
-    total_impact_electricity_one_fu = (
+    total_impact_electricity_one_fu_co2eq = (
         impact_battery_production_one_fu + impact_electricity_production_one_fu
     )
 
-    impact_one_flight_electricity = total_impact_electricity_one_fu / flights_per_fu_hybrid_design
+    impact_one_flight_electricity = total_impact_electricity_one_fu_co2eq / flights_per_fu_hybrid_design
     impact_per_kwh_of_electricity_used = (
         impact_one_flight_electricity / energy_mission_hybrid_design
     )
 
     print("Kg of CO2eq for 1 kWh of electricity", impact_per_kwh_of_electricity_used)
+
+    impact_list_hybrid_design = [ "*", "*"]
+    phase_list_hybrid_design = ["*", "production"]
+    component_list_hybrid_design = [
+        "electricity_for_mission",
+        "battery_pack_1",
+    ]
+
+    impacts_value_hybrid_design = lca_impacts_search_table(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml",
+        impact_list_hybrid_design,
+        phase_list_hybrid_design,
+        component_list_hybrid_design,
+        rel=False,
+    )
+
+    total_impact_electricity_one_fu_single_score = sum(impacts_value_hybrid_design)
+
+    impact_one_flight_electricity_single_score = total_impact_electricity_one_fu_single_score / flights_per_fu_hybrid_design
+    impact_per_kwh_of_electricity_used_single_score = (
+            impact_one_flight_electricity_single_score / energy_mission_hybrid_design
+    )
+
+    print("Single score for 1 kWh of electricity", impact_per_kwh_of_electricity_used_single_score * 1e5)
