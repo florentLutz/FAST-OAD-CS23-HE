@@ -61,9 +61,9 @@ ANCHOR_COMPONENT_NAME:
         water_in:
           name: 'market for water, decarbonised'
           loc: 'RoW'
-          amount: 23 / 237 # In m**3 but since 1m**3 = 1kg
+          amount: 23000 / 237 # In m**3 in the source, in kg here (1m**3 = 1000kg)
 
-        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In m**3
           amount: 22 / 237
           name: 'water'
           categories:

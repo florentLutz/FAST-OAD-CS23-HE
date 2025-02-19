@@ -85,10 +85,10 @@ assembly:  # Airframe assembly, assumed to be the same as aircraft assembly give
         water_in:
           name: 'market for water, decarbonised'
           loc: 'RoW'
-          amount: 537530 / 5485.0 # In m**3 but since 1m**3 = 1kg
+          amount: 537530 / 5485.0 # In kg
 
-        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-          amount: 499135 / 5485.0
+        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In kg in the source but needs to be in m**3 here
+          amount: 499.135 / 5485.0
           name: 'water'
           categories:
             - 'water'
