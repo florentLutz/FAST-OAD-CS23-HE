@@ -181,7 +181,8 @@ Membrane Fuel Cell (PEMFC) component.
 
 .. raw:: html
 
-   <a href="../../../../../../../n2/n2_performance_pemfc.html" target="_blank">PEMFC performance N2 diagram</a><br>
+   <a href="../../../../../../../n2/n2_performance_pemfc_simple.html" target="_blank">PEMFC performance N2 diagram with simple polarization model</a><br>
+   <a href="../../../../../../../n2/n2_performance_pemfc_analytical.html" target="_blank">PEMFC performance N2 diagram with analytical polarization model</a><br>
    <a href="../../../../../../../n2/n2_sizing_pemfc.html" target="_blank">PEMFC sizing N2 diagram</a>
 
 
