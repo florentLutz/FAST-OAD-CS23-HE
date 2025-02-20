@@ -16,16 +16,11 @@ from ..components.perf_fuel_consumption import PerformancesPEMFCStackFuelConsump
 from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackEfficiency
 from ..components.perf_pemfc_voltage import PerformancesPEMFCStackVoltage
-from ..components.perf_pemfc_operating_pressure import PerformancesPEMFCStackOperatingPressure
-from ..components.perf_ambient_pressure import PerformancesPEMFCStackAmbientPressure
-from ..components.perf_pemfc_operating_temperature import PerformancesPEMFCStackOperatingTemperature
 from ..components.perf_pemfc_expect_specific_power import (
     PerformancesPEMFCStackExpectedSpecificPower,
 )
 from ..components.perf_pemfc_expect_power_density import PerformancesPEMFCStackExpectedPowerDensity
-from ..components.perf_pemfc_analytical_voltage_adjustment import (
-    PerformancesPEMFCStackAnalyticalVoltageAdjustment,
-)
+
 
 from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
 
@@ -73,6 +68,7 @@ class PerformancesPEMFCStack(om.Group):
             "number_of_points": number_of_points,
             "pemfc_stack_id": pemfc_stack_id,
             "max_current_density": max_current_density,
+            "compressor_connection": compressor_connection,
         }
 
         self.add_subsystem(
@@ -82,32 +78,6 @@ class PerformancesPEMFCStack(om.Group):
                 pemfc_stack_id=pemfc_stack_id,
                 max_current_density=max_current_density,
             ),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "ambient_pressure",
-            PerformancesPEMFCStackAmbientPressure(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "pemfc_operating_pressure",
-            PerformancesPEMFCStackOperatingPressure(
-                number_of_points=number_of_points, compressor_connection=compressor_connection
-            ),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "pemfc_analytical_voltage_adjustment",
-            PerformancesPEMFCStackAnalyticalVoltageAdjustment(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "pemfc_ambient_temperature",
-            PerformancesPEMFCStackOperatingTemperature(number_of_points=number_of_points),
             promotes=["*"],
         )
 

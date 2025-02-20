@@ -34,8 +34,12 @@ from ..components.perf_pemfc_expect_specific_power import (
 from ..components.perf_pemfc_expect_power_density import (
     PerformancesPEMFCStackExpectedPowerDensity,
 )
-from ..components.perf_pemfc_analytical_voltage_adjustment import (
-    PerformancesPEMFCStackAnalyticalVoltageAdjustment,
+from ..components.perf_pemfc_voltage_adjustment import (
+    PerformancesPEMFCStackVoltageAdjustment,
+)
+from ..components.perf_pemfc_polarization_curve import (
+    PerformancesPEMFCStackPolarizationCurveSimple,
+    PerformancesPEMFCStackPolarizationCurveAnalytical,
 )
 
 from ..components.cstr_ensure import ConstraintsPEMFCStackEffectiveAreaEnsure
@@ -383,7 +387,7 @@ def test_analytical_voltage_adjustment():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackAnalyticalVoltageAdjustment(number_of_points=NB_POINTS_TEST),
+        PerformancesPEMFCStackVoltageAdjustment(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     assert problem.get_val("ambient_pressure_voltage_correction") == pytest.approx(
@@ -392,7 +396,7 @@ def test_analytical_voltage_adjustment():
     problem.check_partials(compact_print=True)
 
 
-def test_single_layer_voltage_simple():
+def test_pemfc_polarization_curve_simple():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fc_current_density",
@@ -406,7 +410,7 @@ def test_single_layer_voltage_simple():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackSingleVoltageSimple(
+        PerformancesPEMFCStackPolarizationCurveSimple(
             pemfc_stack_id="pemfc_stack_1", number_of_points=7, max_current_density=0.8
         ),
         ivc,
@@ -418,7 +422,7 @@ def test_single_layer_voltage_simple():
     problem.check_partials(compact_print=True)
 
 
-def test_single_layer_voltage_analytical():
+def test_pemfc_polarization_curve_analytical():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "fc_current_density",
@@ -438,7 +442,7 @@ def test_single_layer_voltage_analytical():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackSingleVoltageAnalytical(
+        PerformancesPEMFCStackPolarizationCurveAnalytical(
             pemfc_stack_id="pemfc_stack_1", number_of_points=7, max_current_density=2.0
         ),
         ivc,
@@ -705,6 +709,96 @@ def test_fuel_consumed():
 
     assert problem.get_val("fuel_consumed_t", units="kg") == pytest.approx(
         np.array([5.12, 5.5, 5.9, 6.33, 6.81, 7.33, 7.89, 8.44, 9.1, 9.72]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_performances_pemfc_layer_voltage_simple():
+    oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
+        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.simple"
+    )
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesPEMFCStackSingleVoltageSimple(
+                number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    fc_current_density = np.linspace(1.68, 9.24, NB_POINTS_TEST) / 16.8
+    ivc.add_output("fc_current_density", fc_current_density, units="A/cm**2")
+    ivc.add_output("time_step", units="h", val=np.full(NB_POINTS_TEST, 1))
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPEMFCStackSingleVoltageSimple(
+            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
+        [
+            0.84175546,
+            0.82406536,
+            0.80801377,
+            0.79284721,
+            0.77821938,
+            0.76392795,
+            0.74982252,
+            0.73575584,
+            0.72154143,
+            0.70689839,
+        ],
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_performances_pemfc_layer_voltage_analytical():
+    oad.RegisterSubmodel.active_models["submodel.propulsion.performances.pemfc.layer_voltage"] = (
+        "fastga_he.submodel.propulsion.performances.pemfc.layer_voltage.analytical"
+    )
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesPEMFCStackSingleVoltageAnalytical(
+                number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    fc_current_density = np.linspace(1.68, 9.24, NB_POINTS_TEST) / 16.8
+    ivc.add_output("fc_current_density", fc_current_density, units="A/cm**2")
+    ivc.add_output("time_step", units="h", val=np.full(NB_POINTS_TEST, 1))
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPEMFCStackSingleVoltageAnalytical(
+            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
+        [
+            0.84325858,
+            0.78297622,
+            0.72264112,
+            0.65948763,
+            0.59139492,
+            0.51610645,
+            0.43069227,
+            0.33080952,
+            0.2092322,
+            0.0521712,
+        ],
         rel=1e-2,
     )
 
