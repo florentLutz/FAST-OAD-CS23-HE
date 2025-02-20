@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-WEIGHT_AREA_DENSITY = 8.5034  # [kg/m^2]
+CELL_DENSITY = 8.5034  # [kg/m^2]
 DEFAULT_FC_SPECIFIC_POWER = 0.345  # [kW/kg]
 
 
@@ -65,10 +65,10 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
         number_of_layers = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
         ]
-        adjust_factor = DEFAULT_FC_SPECIFIC_POWER / specific_power
+        specific_power_ratio = DEFAULT_FC_SPECIFIC_POWER / specific_power
 
         outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass"] = (
-            WEIGHT_AREA_DENSITY * adjust_factor * effective_area * number_of_layers
+            CELL_DENSITY * specific_power_ratio * effective_area * number_of_layers
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -82,23 +82,23 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
         number_of_layers = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
         ]
-        adjust_factor = DEFAULT_FC_SPECIFIC_POWER / specific_power
+        specific_power_ratio = DEFAULT_FC_SPECIFIC_POWER / specific_power
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
-        ] = WEIGHT_AREA_DENSITY * adjust_factor * effective_area
+        ] = CELL_DENSITY * specific_power_ratio * effective_area
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
-        ] = WEIGHT_AREA_DENSITY * adjust_factor * number_of_layers
+        ] = CELL_DENSITY * specific_power_ratio * number_of_layers
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power",
         ] = (
-            -WEIGHT_AREA_DENSITY
+            -CELL_DENSITY
             * DEFAULT_FC_SPECIFIC_POWER
             * number_of_layers
             * effective_area

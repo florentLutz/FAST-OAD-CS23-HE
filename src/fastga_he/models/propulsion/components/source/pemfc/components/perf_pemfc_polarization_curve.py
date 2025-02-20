@@ -18,13 +18,6 @@ class PerformancesPEMFCStackPolarizationCurveSimple(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pemfc_stack_id",
-            default=None,
-            desc="Identifier of PEMFC stack",
-            allow_none=False,
-        )
-
-        self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
@@ -66,7 +59,6 @@ class PerformancesPEMFCStackPolarizationCurveSimple(om.ExplicitComponent):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        pemfc_stack_id = self.options["pemfc_stack_id"]
         self.add_input(
             "fc_current_density",
             units="A/cm**2",
@@ -93,14 +85,6 @@ class PerformancesPEMFCStackPolarizationCurveSimple(om.ExplicitComponent):
             val=np.full(number_of_points, DEFAULT_LAYER_VOLTAGE),
         )
 
-        self.add_output(
-            "data:propulsion:he_power_train:PEMFC_stack:"
-            + pemfc_stack_id
-            + ":hydrogen_reactant_pressure",
-            units="atm",
-            val=DEFAULT_PRESSURE_ATM,
-        )
-
         self.declare_partials(
             of="single_layer_pemfc_voltage",
             wrt=["fc_current_density", "operating_pressure"],
@@ -117,16 +101,7 @@ class PerformancesPEMFCStackPolarizationCurveSimple(om.ExplicitComponent):
             cols=np.zeros(number_of_points),
         )
 
-        self.declare_partials(
-            of="data:propulsion:he_power_train:PEMFC_stack:"
-            + pemfc_stack_id
-            + ":hydrogen_reactant_pressure",
-            wrt="nominal_pressure",
-            val=1.0,
-        )
-
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pemfc_stack_id = self.options["pemfc_stack_id"]
         ocv = self.options["open_circuit_voltage"]
         active_loss_coeff = self.options["activation_loss_coefficient"]
         resistance = self.options["ohmic_resistance"]
@@ -151,12 +126,6 @@ class PerformancesPEMFCStackPolarizationCurveSimple(om.ExplicitComponent):
             - m_loss * np.exp(n_loss * i_clipped)
             + pressure_coeff * pressure_ratio_log
         )
-        # This output is to for tank connection
-        outputs[
-            "data:propulsion:he_power_train:PEMFC_stack:"
-            + pemfc_stack_id
-            + ":hydrogen_reactant_pressure"
-        ] = nominal_pressure
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         active_loss_coeff = self.options["activation_loss_coefficient"]

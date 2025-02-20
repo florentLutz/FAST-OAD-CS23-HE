@@ -410,9 +410,7 @@ def test_pemfc_polarization_curve_simple():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackPolarizationCurveSimple(
-            pemfc_stack_id="pemfc_stack_1", number_of_points=7, max_current_density=0.8
-        ),
+        PerformancesPEMFCStackPolarizationCurveSimple(number_of_points=7, max_current_density=0.8),
         ivc,
     )
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(

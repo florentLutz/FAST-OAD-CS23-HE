@@ -55,7 +55,6 @@ class PerformancesPEMFCStackSingleVoltageSimple(om.Group):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        pemfc_stack_id = self.options["pemfc_stack_id"]
         max_current_density = self.options["max_current_density"]
         compressor_connection = self.options["compressor_connection"]
 
@@ -76,7 +75,6 @@ class PerformancesPEMFCStackSingleVoltageSimple(om.Group):
         self.add_subsystem(
             "polarization_curve",
             PerformancesPEMFCStackPolarizationCurveSimple(
-                pemfc_stack_id=pemfc_stack_id,
                 number_of_points=number_of_points,
                 max_current_density=max_current_density,
             ),
