@@ -21,7 +21,7 @@ expression of the fuel cell polarization model is expressed as below given by :c
 The :math:`V_{\text{operating}}` represents the operating voltage of the fuel cell under standard conditions, while
 :math:`V_r` is the reversible open-circuit voltage, determined by the Gibbs free energy of the chemical reaction.
 :math:`V_{\text{activation}}` corresponds to the activation loss caused by the kinetic energy barrier at both electrodes
-especially with low current density :cite:`juschus:2021`, the losses of the oxygen reduce reation is significant more
+especially with low current density :cite:`juschus:2021`, the losses of the oxygen reduce reaction is significant more
 pronounced than the other side. :math:`V_{\text{ohmic}}` denotes the ohmic loss due to the electrical resistance of the
 electrodes, and :math:`V_{\text{mass-transport}}` represents the mass-transport loss, which occurs when reactant gases,
 such as oxygen or fuel, face diffusion limitations at the electrodes.
@@ -71,7 +71,7 @@ Pₙₒₘ        101325      Pa
    </div>
 
 This table proivdes the parameter values that has been considered to model Aerostak 200W in hoogendoorn's research
-:cite:`hoogendoorn:2018`, all of which can be found as options in the simple polarization model class.
+:cite:`hoogendoorn:2018`.
 
 Analytical PEMFC polarization model
 ===================================
@@ -123,13 +123,12 @@ j₀          1.0    A/m²
 
    </div>
 
-This table provides the parameter values that has been considered in juschus' research :cite:`juschus:2021`, all of
-which can be found as options in the analytical polarization model class.
+This table provides the parameter values that has been considered in juschus' research :cite:`juschus:2021`.
 
 ******************************
 Sizing calculation
 ******************************
-PEMFC dimesion calculation
+PEMFC dimension calculation
 ==========================
 The PEMFC length is calculated by multiplying the number of layers, :math:`N_{layers}`, by the length layer ratio,
 :math:`LLR`, which is the total length of the Aerostak 200W divided by the number of single-layer fuel cells.

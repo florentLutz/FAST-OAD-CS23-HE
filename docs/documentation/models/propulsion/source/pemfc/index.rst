@@ -2,11 +2,12 @@
 Proton-exchange membrane fuel cell model
 ========================================
 
-The Proton-Exchange Membrane Fuel Cell (PEMFC) in FAST-OAD-CS23-HE generates electric energy through the Hydrogen
-Oxidation Reaction (HOR) at the anode, where hydrogen gas (H₂) splits into protons (H⁺) and electrons (e⁻). The H⁺
-ions pass through the membrane, while the e⁻ travel through an external circuit, creating an electric current. At
-the cathode, the Oxygen Reduction Reaction (ORR) combines oxygen (O₂) with H⁺ and e⁻ to form water (H₂O). This process
-produces electricity with H₂O as the only byproduct.
+This power source model in FAST-OAD-CS23-HE represent PEMFC stack that generates electric energy through the Hydrogen
+Oxidation Reaction (HOR) at the anode, where hydrogen gas (:math:`\text{H}_2`) splits into protons (:math:`\text{H}^+`)
+and electrons (:math:`\text{e}^-`). The :math:`\text{H}^+` ions pass through the membrane, while the :math:`\text{e}^-`
+travel through an external circuit, creating an electric current. At the cathode, the Oxygen Reduction Reaction (ORR)
+combines oxygen (:math:`\text{O}_2`) with :math:`\text{H}^+` and :math:`\text{e}^-` to form
+water (:math:`\text{H}_2\text{O}`). This process produces electricity with :math:`\text{H}_2\text{O}` as the only byproduct.
 
 .. math::
 
@@ -20,10 +21,6 @@ produces electricity with H₂O as the only byproduct.
 
    \text{Overall Reaction:} \quad \text{H}_2 + \frac{1}{2} \text{O}_2 \rightarrow \text{H}_2\text{O}
 
-.. image:: ../../../../../img/pemfc_reaction_schematic.png
-   :width: 600
-   :name: fig-1
-   :alt: Schematic diagram of PEMFC reaction
 
 This component can be activated through the powertrain configuration file (PT file). The registered installation
 positions can be found at tank position options in :ref:`options <options-pemfc>`.
@@ -45,4 +42,4 @@ A brief description of the PEMFC component is presented here:
 
     PEMFC computation logic <models>
     PEMFC options <options>
-    PEMFC model assumption <assumptions>
+    PEMFC model assumptions <assumptions>

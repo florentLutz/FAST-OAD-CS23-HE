@@ -1,8 +1,8 @@
 .. _assumptions-pemfc:
 
-=================
-PEMFC assumptions
-=================
+=======================
+PEMFC stack assumptions
+=======================
 The following assumptions have been made in the calculation of PEMFC.
 
 * The hydrogen and oxygen (or air) in PEMFC are consider as ideal gas.
