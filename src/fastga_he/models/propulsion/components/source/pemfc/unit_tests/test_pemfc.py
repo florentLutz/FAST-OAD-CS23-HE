@@ -9,12 +9,12 @@ import openmdao.api as om
 import fastoad.api as oad
 
 from ..components.perf_ambient_pressure import PerformancesPEMFCStackAmbientPressure
-from ..components.sizing_pemfc_weight import SizingPEMFCWeight
-from ..components.sizing_pemfc_cg_x import SizingPEMFCCGX
-from ..components.sizing_pemfc_cg_y import SizingPEMFCCGY
-from ..components.sizing_pemfc_volume import SizingPEMFCVolume
-from ..components.sizing_pemfc_dimensions import SizingPEMFCDimensions
-from ..components.sizing_pemfc_drag import SizingPEMFCDrag
+from ..components.sizing_pemfc_weight import SizingPEMFCStackWeight
+from ..components.sizing_pemfc_cg_x import SizingPEMFCStackCGX
+from ..components.sizing_pemfc_cg_y import SizingPEMFCStackCGY
+from ..components.sizing_pemfc_volume import SizingPEMFCStackVolume
+from ..components.sizing_pemfc_dimensions import SizingPEMFCStackDimensions
+from ..components.sizing_pemfc_drag import SizingPEMFCStackDrag
 
 from ..components.perf_fuel_consumption import PerformancesPEMFCStackFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
@@ -55,14 +55,14 @@ NB_POINTS_TEST = 10
 def test_pemfc_weight():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingPEMFCWeight(pemfc_stack_id="pemfc_stack_1")),
+        list_inputs(SizingPEMFCStackWeight(pemfc_stack_id="pemfc_stack_1")),
         __file__,
         XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        SizingPEMFCWeight(pemfc_stack_id="pemfc_stack_1"),
+        SizingPEMFCStackWeight(pemfc_stack_id="pemfc_stack_1"),
         ivc,
     )
     assert problem.get_val(
@@ -75,14 +75,14 @@ def test_pemfc_weight():
 def test_pemfc_volume():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingPEMFCVolume(pemfc_stack_id="pemfc_stack_1")),
+        list_inputs(SizingPEMFCStackVolume(pemfc_stack_id="pemfc_stack_1")),
         __file__,
         XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        SizingPEMFCVolume(pemfc_stack_id="pemfc_stack_1"),
+        SizingPEMFCStackVolume(pemfc_stack_id="pemfc_stack_1"),
         ivc,
     )
     assert problem.get_val(
@@ -102,14 +102,16 @@ def test_pemfc_dimensions():
     ):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingPEMFCDimensions(pemfc_stack_id="pemfc_stack_1", position=option)),
+            list_inputs(
+                SizingPEMFCStackDimensions(pemfc_stack_id="pemfc_stack_1", position=option)
+            ),
             __file__,
             XML_FILE,
         )
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
-            SizingPEMFCDimensions(pemfc_stack_id="pemfc_stack_1", position=option),
+            SizingPEMFCStackDimensions(pemfc_stack_id="pemfc_stack_1", position=option),
             ivc,
         )
         assert problem.get_val(
@@ -131,14 +133,14 @@ def test_pemfc_cg_x():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingPEMFCCGX(pemfc_stack_id="pemfc_stack_1", position=option)),
+            list_inputs(SizingPEMFCStackCGX(pemfc_stack_id="pemfc_stack_1", position=option)),
             __file__,
             XML_FILE,
         )
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
-            SizingPEMFCCGX(pemfc_stack_id="pemfc_stack_1", position=option),
+            SizingPEMFCStackCGX(pemfc_stack_id="pemfc_stack_1", position=option),
             ivc,
         )
         assert problem.get_val(
@@ -154,14 +156,14 @@ def test_pemfc_cg_y():
     for option, expected_value in zip(POSSIBLE_POSITION, expected_values):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
-            list_inputs(SizingPEMFCCGY(pemfc_stack_id="pemfc_stack_1", position=option)),
+            list_inputs(SizingPEMFCStackCGY(pemfc_stack_id="pemfc_stack_1", position=option)),
             __file__,
             XML_FILE,
         )
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
-            SizingPEMFCCGY(pemfc_stack_id="pemfc_stack_1", position=option),
+            SizingPEMFCStackCGY(pemfc_stack_id="pemfc_stack_1", position=option),
             ivc,
         )
         assert problem.get_val(
@@ -182,7 +184,7 @@ def test_pemfc_drag():
         for ls_option in [True, False]:
             ivc = get_indep_var_comp(
                 list_inputs(
-                    SizingPEMFCDrag(
+                    SizingPEMFCStackDrag(
                         pemfc_stack_id="pemfc_stack_1", position=option, low_speed_aero=ls_option
                     )
                 ),
@@ -192,7 +194,7 @@ def test_pemfc_drag():
 
             # Run problem and check obtained value(s) is/(are) correct
             problem = run_system(
-                SizingPEMFCDrag(
+                SizingPEMFCStackDrag(
                     pemfc_stack_id="pemfc_stack_1", position=option, low_speed_aero=ls_option
                 ),
                 ivc,
@@ -233,16 +235,16 @@ def test_pemfc_stack_sizing():
     ) == pytest.approx(0.5, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:CG:x", units="m"
-    ) == pytest.approx(1.2387, rel=1e-2)
+    ) == pytest.approx(2.037, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:CG:y", units="m"
     ) == pytest.approx(0.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:low_speed:CD0",
-    ) == pytest.approx(3.3705e-5, rel=1e-2)
+    ) == pytest.approx(0.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cruise:CD0",
-    ) == pytest.approx(3.324e-5, rel=1e-2)
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
@@ -512,13 +514,13 @@ def test_maximum():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack:PEMFC_stack_1:current_max", units="A"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:current_max", units="A"
     ) == pytest.approx(
         4.01,
         rel=1e-2,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack:PEMFC_stack_1:power_max", units="kW"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max", units="kW"
     ) == pytest.approx(
         100.0,
         rel=1e-2,
@@ -541,7 +543,7 @@ def test_pemfc_expected_specific_power():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:max_specific_power", units="kW/kg"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:specific_power", units="kW/kg"
     ) == pytest.approx(
         0.4677,
         rel=1e-2,
@@ -564,7 +566,7 @@ def test_pemfc_expected_power_density():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:max_power_density",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_density",
         units="kW/m**3",
     ) == pytest.approx(
         230.0,
@@ -626,12 +628,6 @@ def test_pemfc_efficiency():
         ),
         units="V",
     )
-    ivc.add_output(
-        "operating_pressure",
-        np.full(NB_POINTS_TEST, 1.2),
-        units="atm",
-    )
-    ivc.add_output("nominal_pressure", 1, units="atm")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -640,7 +636,7 @@ def test_pemfc_efficiency():
     )
     # Not computed with proper losses, to test only
     assert problem.get_val("efficiency") == pytest.approx(
-        [0.6843, 0.67, 0.6570, 0.6449, 0.6330, 0.6216, 0.6102, 0.5989, 0.5874, 0.5756], rel=1e-2
+        [0.5734, 0.5615, 0.5506, 0.5403, 0.5305, 0.5208, 0.5113, 0.5018, 0.4922, 0.4823], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -762,7 +758,19 @@ def test_performances_pemfc_stack_simple():
     )
 
     assert problem.get_val("efficiency") == pytest.approx(
-        [0.6843, 0.67, 0.6570, 0.6449, 0.6330, 0.6216, 0.6102, 0.5989, 0.5874, 0.5756], rel=1e-2
+        [
+            0.56598147,
+            0.55403677,
+            0.54319843,
+            0.53295767,
+            0.52308067,
+            0.51343082,
+            0.50390656,
+            0.49440847,
+            0.48481062,
+            0.47492335,
+        ],
+        rel=1e-2,
     )
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
@@ -794,16 +802,16 @@ def test_performances_pemfc_stack_analytical():
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
         [
-            0.90045315,
-            0.87104179,
-            0.84551353,
-            0.82201006,
-            0.79965299,
-            0.77794886,
-            0.75658583,
-            0.73534818,
-            0.71407501,
-            0.69263817,
+            0.84325858,
+            0.78297622,
+            0.72264112,
+            0.65948763,
+            0.59139492,
+            0.51610645,
+            0.43069227,
+            0.33080952,
+            0.2092322,
+            0.0521712,
         ],
         rel=1e-2,
     )
@@ -818,16 +826,16 @@ def test_performances_pemfc_stack_analytical():
 
     assert problem.get_val("efficiency") == pytest.approx(
         [
-            0.7326714,
-            0.70874027,
-            0.6879687,
-            0.66884464,
-            0.65065337,
-            0.63299337,
-            0.61561092,
-            0.59833049,
-            0.58102117,
-            0.56357866,
+            0.56938459,
+            0.52868077,
+            0.48794134,
+            0.44529888,
+            0.39932135,
+            0.34848511,
+            0.2908118,
+            0.22336902,
+            0.14127765,
+            0.03522701,
         ],
         rel=1e-2,
     )

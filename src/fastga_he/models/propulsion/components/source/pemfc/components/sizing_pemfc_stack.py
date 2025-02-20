@@ -4,12 +4,12 @@
 
 import openmdao.api as om
 
-from .sizing_pemfc_weight import SizingPEMFCWeight
-from .sizing_pemfc_dimensions import SizingPEMFCDimensions
-from .sizing_pemfc_volume import SizingPEMFCVolume
-from .sizing_pemfc_cg_x import SizingPEMFCCGX
-from .sizing_pemfc_cg_y import SizingPEMFCCGY
-from .sizing_pemfc_drag import SizingPEMFCDrag
+from .sizing_pemfc_weight import SizingPEMFCStackWeight
+from .sizing_pemfc_dimensions import SizingPEMFCStackDimensions
+from .sizing_pemfc_volume import SizingPEMFCStackVolume
+from .sizing_pemfc_cg_x import SizingPEMFCStackCGX
+from .sizing_pemfc_cg_y import SizingPEMFCStackCGY
+from .sizing_pemfc_drag import SizingPEMFCStackDrag
 from .cstr_pemfc_stack import ConstraintsPEMFCStack
 
 from ..constants import POSSIBLE_POSITION
@@ -22,21 +22,21 @@ class SizingPEMFCStack(om.Group):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of the pemfc pack",
+            desc="Identifier of PEMFC pack",
             allow_none=False,
         )
         self.options.declare(
             name="position",
-            default="underbelly",
+            default="in_the_back",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the pemfc, possible position include "
+            desc="Option to give the position of PEMFC, possible position include "
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
         self.options.declare(
             "max_current_density",
             default=0.7,
-            desc="maximum current density of pemfc [A/cm**2]",
+            desc="maximum current density of PEMFC [A/cm**2]",
         )
 
     def setup(self):
@@ -55,34 +55,34 @@ class SizingPEMFCStack(om.Group):
         )
         self.add_subsystem(
             name="pemfc_weight",
-            subsys=SizingPEMFCWeight(pemfc_stack_id=pemfc_stack_id),
+            subsys=SizingPEMFCStackWeight(pemfc_stack_id=pemfc_stack_id),
             promotes=["*"],
         )
         self.add_subsystem(
             name="pemfc_dimension",
-            subsys=SizingPEMFCDimensions(pemfc_stack_id=pemfc_stack_id),
+            subsys=SizingPEMFCStackDimensions(pemfc_stack_id=pemfc_stack_id),
             promotes=["*"],
         )
         self.add_subsystem(
             name="pemfc_volume",
-            subsys=SizingPEMFCVolume(pemfc_stack_id=pemfc_stack_id),
+            subsys=SizingPEMFCStackVolume(pemfc_stack_id=pemfc_stack_id),
             promotes=["*"],
         )
         self.add_subsystem(
             name="pemfc_CG_x",
-            subsys=SizingPEMFCCGX(pemfc_stack_id=pemfc_stack_id, position=position),
+            subsys=SizingPEMFCStackCGX(pemfc_stack_id=pemfc_stack_id, position=position),
             promotes=["*"],
         )
         self.add_subsystem(
             name="pemfc_CG_y",
-            subsys=SizingPEMFCCGY(pemfc_stack_id=pemfc_stack_id, position=position),
+            subsys=SizingPEMFCStackCGY(pemfc_stack_id=pemfc_stack_id, position=position),
             promotes=["*"],
         )
         for low_speed_aero in [True, False]:
             system_name = "pemfc_drag_ls" if low_speed_aero else "pemfc_drag_cruise"
             self.add_subsystem(
                 name=system_name,
-                subsys=SizingPEMFCDrag(
+                subsys=SizingPEMFCStackDrag(
                     pemfc_stack_id=pemfc_stack_id,
                     position=position,
                     low_speed_aero=low_speed_aero,

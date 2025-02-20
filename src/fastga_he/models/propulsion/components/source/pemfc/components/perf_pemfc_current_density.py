@@ -18,7 +18,7 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of the pemfc stack",
+            desc="Identifier of PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
@@ -44,7 +44,7 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
             "fc_current_density",
             val=np.full(number_of_points, max_current_density),
             units="A/cm**2",
-            desc="Current density of the pemfc stack",
+            desc="Current density of PEMFC stack",
         )
 
         self.declare_partials(

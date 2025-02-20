@@ -9,17 +9,17 @@ WEIGHT_AREA_DENSITY = 8.5034  # [kg/m^2]
 DEFAULT_FC_SPECIFIC_POWER = 0.345  # [kW/kg]
 
 
-class SizingPEMFCWeight(om.ExplicitComponent):
+class SizingPEMFCStackWeight(om.ExplicitComponent):
     """
     Computation of the weight the PEMFC based on the layer weight density but adjusted with
-    power density. The calculation is based on the equations given by :cite:`Hoogendoorn:2018`.
+    power density. The calculation is based on the equations given by :cite:`hoogendoorn:2018`.
     """
 
     def initialize(self):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of the PEMFC stack",
+            desc="Identifier of PEMFC stack",
             allow_none=False,
         )
 
@@ -40,9 +40,7 @@ class SizingPEMFCWeight(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack:"
-            + pemfc_stack_id
-            + ":max_specific_power",
+            name="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power",
             units="kW/kg",
             val=np.nan,
         )
@@ -51,15 +49,15 @@ class SizingPEMFCWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
             units="kg",
             val=500.0,
-            desc="Mass of the pemfc stack",
+            desc="Mass of PEMFC stack",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
-        max_specific_power = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":max_specific_power"
+        specific_power = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power"
         ]
         effective_area = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
@@ -67,7 +65,7 @@ class SizingPEMFCWeight(om.ExplicitComponent):
         number_of_layers = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
         ]
-        adjust_factor = DEFAULT_FC_SPECIFIC_POWER / max_specific_power
+        adjust_factor = DEFAULT_FC_SPECIFIC_POWER / specific_power
 
         outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass"] = (
             WEIGHT_AREA_DENSITY * adjust_factor * effective_area * number_of_layers
@@ -75,8 +73,8 @@ class SizingPEMFCWeight(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
-        max_specific_power = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":max_specific_power"
+        specific_power = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power"
         ]
         effective_area = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
@@ -84,7 +82,7 @@ class SizingPEMFCWeight(om.ExplicitComponent):
         number_of_layers = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
         ]
-        adjust_factor = DEFAULT_FC_SPECIFIC_POWER / max_specific_power
+        adjust_factor = DEFAULT_FC_SPECIFIC_POWER / specific_power
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
@@ -98,11 +96,11 @@ class SizingPEMFCWeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":max_specific_power",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power",
         ] = (
             -WEIGHT_AREA_DENSITY
             * DEFAULT_FC_SPECIFIC_POWER
             * number_of_layers
             * effective_area
-            / max_specific_power**2
+            / specific_power**2
         )

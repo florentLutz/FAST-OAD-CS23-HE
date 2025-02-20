@@ -6,17 +6,17 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingPEMFCVolume(om.ExplicitComponent):
+class SizingPEMFCStackVolume(om.ExplicitComponent):
     """
-    Computation of the volume the PEMFC based on number of layers.The calculation is based on the
-    equations given by :cite:`Hoogendoorn:2018`.
+    Computation of the volume the PEMFC based on number of layers. The calculation is based on the
+    equations given by :cite:`hoogendoorn:2018`.
     """
 
     def initialize(self):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of the PEMFC stack",
+            desc="Identifier of PEMFC stack",
             allow_none=False,
         )
 
@@ -27,28 +27,28 @@ class SizingPEMFCVolume(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length",
             units="m",
             val=np.nan,
-            desc="Length of the pemfc, as in the size of the pemfc along the X-axis",
+            desc="Length of PEMFC, as in the size of PEMFC along the X-axis",
         )
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
             units="m",
             val=np.nan,
-            desc="Width of the pemfc, as in the size of the pemfc along the Y-axis",
+            desc="Width of PEMFC, as in the size of PEMFC along the Y-axis",
         )
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height",
             units="m",
             val=np.nan,
-            desc="Height of the pemfc, as in the size of the pemfc along the Z-axis",
+            desc="Height of PEMFC, as in the size of PEMFC along the Z-axis",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
             units="m**3",
             val=5.0,
-            desc="Volume of the pemfc stack",
+            desc="Volume of PEMFC stack",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

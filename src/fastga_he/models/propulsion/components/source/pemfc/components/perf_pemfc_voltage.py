@@ -36,7 +36,7 @@ class PerformancesPEMFCStackVoltage(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of the PEMFC stack",
+            desc="Identifier of PEMFC stack",
             allow_none=False,
         )
 
@@ -54,7 +54,7 @@ class PerformancesPEMFCStackVoltage(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
             val=np.nan,
-            desc="Total number of layers in the pemfc stacks",
+            desc="Total number of layers in PEMFC stacks",
         )
 
         self.add_output(

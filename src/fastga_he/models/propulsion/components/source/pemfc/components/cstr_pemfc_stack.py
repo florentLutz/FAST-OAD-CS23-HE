@@ -18,7 +18,7 @@ class ConstraintsPEMFCStack(om.Group):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of the pemfc stack",
+            desc="Identifier of PEMFC stack",
             allow_none=False,
         )
         self.options.declare(

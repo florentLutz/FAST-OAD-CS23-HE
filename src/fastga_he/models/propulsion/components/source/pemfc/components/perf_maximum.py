@@ -20,7 +20,7 @@ class PerformancesPEMFCStackMaximum(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of the PEMFC stack",
+            desc="Identifier of PEMFC stack",
             allow_none=False,
         )
 
@@ -36,14 +36,14 @@ class PerformancesPEMFCStackMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
             units="kW",
             val=MAX_DEFAULT_STACK_POWER,
-            desc="Maximum power to the pemfc during the mission",
+            desc="Maximum power to PEMFC during the mission",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max",
             units="A",
             val=MAX_DEFAULT_STACK_CURRENT,
-            desc="Maximum current to the pemfc during the mission",
+            desc="Maximum current to PEMFC during the mission",
         )
 
         self.declare_partials(

@@ -8,7 +8,7 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingPEMFCDrag(om.ExplicitComponent):
+class SizingPEMFCStackDrag(om.ExplicitComponent):
     """
     Computation of PEMFC contribution to profile drag according to the position given in the
     options. The influence will be calculated if positioned outside the fuselage.
@@ -18,15 +18,15 @@ class SizingPEMFCDrag(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of the PEMFC stack",
+            desc="Identifier of PEMFC stack",
             allow_none=False,
         )
 
         self.options.declare(
             name="position",
-            default="underbelly",
+            default="in_the_back",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the pemfc, possible position include "
+            desc="Option to give the position of PEMFC, possible position include "
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
@@ -44,7 +44,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
             units="m",
             val=np.nan,
-            desc="Width of the pemfc, as in the size of the pemfc along the Y-axis",
+            desc="Width of PEMFC, as in the size of PEMFC along the Y-axis",
         )
 
         if position == "underbelly":
@@ -54,7 +54,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
                 + ":dimension:length",
                 units="m",
                 val=np.nan,
-                desc="Length of the pemfc, as in the size of the pemfc along the X-axis",
+                desc="Length of PEMFC, as in the size of PEMFC along the X-axis",
             )
 
             self.add_input(
@@ -63,7 +63,7 @@ class SizingPEMFCDrag(om.ExplicitComponent):
                 + ":dimension:height",
                 units="m",
                 val=np.nan,
-                desc="height of the pemfc, as in the size of the pemfc along the Z-axis",
+                desc="height of PEMFC, as in the size of PEMFC along the Z-axis",
             )
 
             self.add_input("data:geometry:fuselage:wet_area", val=np.nan, units="m**2")
