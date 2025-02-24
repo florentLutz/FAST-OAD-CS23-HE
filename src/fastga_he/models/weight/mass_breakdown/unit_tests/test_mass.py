@@ -37,8 +37,16 @@ def test_compute_wing_mass_analytical():
 
 def test_payload_mass():
     """Tests propulsion weight computation from sample XML data."""
+
+    inputs_list = [
+        "data:weight:aircraft:target_MTOW",
+        "data:weight:aircraft:OWE",
+        "data:mission:sizing:fuel",
+        "data:weight:aircraft:max_payload",
+    ]
+
     # Research independent input value in .xml file
-    ivc = get_indep_var_comp(list_inputs(ComputePayloadForRetrofit()), __file__, XML_FILE)
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(ComputePayloadForRetrofit(), ivc)

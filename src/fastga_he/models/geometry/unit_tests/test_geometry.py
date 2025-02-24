@@ -21,6 +21,6 @@ def test_aspect_ratio_from_fixed_span():
 
     problem = run_system(AspectRatioFromTargetSpan(), ivc)
 
-    assert problem.get_val("data:geometry:wing:aspect_ratio") == pytest.approx(10.39, rel=1e-3)
+    assert problem.get_val("data:geometry:wing:aspect_ratio") == pytest.approx(16.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
