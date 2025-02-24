@@ -136,7 +136,7 @@ class PerformancesPEMFCStackSingleVoltageAnalytical(om.Group):
         )
 
         self.add_subsystem(
-            "pemfc_analytical_voltage_adjustment",
+            "pemfc_voltage_adjustment",
             PerformancesPEMFCStackVoltageAdjustment(number_of_points=number_of_points),
             promotes=["*"],
         )
