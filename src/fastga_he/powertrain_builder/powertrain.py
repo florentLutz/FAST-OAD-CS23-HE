@@ -485,7 +485,8 @@ class FASTGAHEPowerTrainConfigurator:
                 for current_output in current_outputs:
                     target_outputs.append(tuple(reversed(current_output)))
 
-            # Compressor connection for PEMFC
+            # Compressor connection for PEMFC.This if condition won't be activated until the
+            # implementation of the compressor component.
             if (
                 target_id == "fastga_he.pt_component.pemfc_stack"
                 and source_id == "fastga_he.pt_component.compressor"
