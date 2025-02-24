@@ -460,6 +460,7 @@ def test_search_engine_paper():
     )
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_search_engine_paper_climate_change():
     ref_design_datafile = oad.DataFile(SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml")
     flights_per_fu_ref_design = ref_design_datafile[
