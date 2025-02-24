@@ -686,7 +686,6 @@ class LCACore(om.ExplicitComponent):
 
                         next_line_to_ignore = True
 
-
         pathlib.Path.unlink(lca_conf_file_path)
         shutil.move(tmp_copy_path, lca_conf_file_path)
 

@@ -505,13 +505,6 @@ def test_search_engine_paper_climate_change():
     print("Flights per FU hybrid design", flights_per_fu_hybrid_design)
     print("FU per flights hybrid design", fu_per_flights_hybrid_design)
 
-    # Not available here directly, have to rely on the amount of kerosene in the tanks
-    fuel_burned_hybrid_design = (
-        hybrid_design_datafile[
-            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission"
-        ].value[0]
-        * 2.0
-    )
     electricity_used_hybrid_design = hybrid_design_datafile[
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission"
     ].value[0]
@@ -533,14 +526,16 @@ def test_search_engine_paper_climate_change():
         impact_battery_production_one_fu + impact_electricity_production_one_fu
     )
 
-    impact_one_flight_electricity = total_impact_electricity_one_fu_co2eq / flights_per_fu_hybrid_design
+    impact_one_flight_electricity = (
+        total_impact_electricity_one_fu_co2eq / flights_per_fu_hybrid_design
+    )
     impact_per_kwh_of_electricity_used = (
         impact_one_flight_electricity / energy_mission_hybrid_design
     )
 
     print("Kg of CO2eq for 1 kWh of electricity", impact_per_kwh_of_electricity_used)
 
-    impact_list_hybrid_design = [ "*", "*"]
+    impact_list_hybrid_design = ["*", "*"]
     phase_list_hybrid_design = ["*", "production"]
     component_list_hybrid_design = [
         "electricity_for_mission",
@@ -557,9 +552,14 @@ def test_search_engine_paper_climate_change():
 
     total_impact_electricity_one_fu_single_score = sum(impacts_value_hybrid_design)
 
-    impact_one_flight_electricity_single_score = total_impact_electricity_one_fu_single_score / flights_per_fu_hybrid_design
+    impact_one_flight_electricity_single_score = (
+        total_impact_electricity_one_fu_single_score / flights_per_fu_hybrid_design
+    )
     impact_per_kwh_of_electricity_used_single_score = (
-            impact_one_flight_electricity_single_score / energy_mission_hybrid_design
+        impact_one_flight_electricity_single_score / energy_mission_hybrid_design
     )
 
-    print("Single score for 1 kWh of electricity", impact_per_kwh_of_electricity_used_single_score * 1e5)
+    print(
+        "Single score for 1 kWh of electricity",
+        impact_per_kwh_of_electricity_used_single_score * 1e5,
+    )
