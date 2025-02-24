@@ -66,16 +66,13 @@ class SizingPEMFCStackSpecificPower(om.ExplicitComponent):
         ]
 
         unclipped_specific_power = 0.0845 * np.log(power_max) + 0.6037
-        if (
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
+        ] = np.where(
             unclipped_specific_power <= MAX_PEMFC_SPECIFIC_POWER
-            and unclipped_specific_power >= 0.05
-        ):
-            partials[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power",
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
-            ] = 0.0845 / power_max
-        else:
-            partials[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power",
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
-            ] = 0.0
+            and unclipped_specific_power >= 0.05,
+            0.0845 / power_max,
+            1e-6,
+        )

@@ -65,13 +65,11 @@ class SizingPEMFCStackPowerDensity(om.ExplicitComponent):
         ]
 
         unclipped_power_density = 19.816 * np.log(power_max) + 236.48
-        if unclipped_power_density <= MAX_PEMFC_POWER_DENSITY and unclipped_power_density >= 230.0:
-            partials[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density",
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
-            ] = 19.816 / power_max
-        else:
-            partials[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density",
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
-            ] = 0.0
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
+        ] = np.where(
+            unclipped_power_density <= MAX_PEMFC_POWER_DENSITY and unclipped_power_density >= 230.0,
+            19.816 / power_max,
+            1e-6,
+        )
