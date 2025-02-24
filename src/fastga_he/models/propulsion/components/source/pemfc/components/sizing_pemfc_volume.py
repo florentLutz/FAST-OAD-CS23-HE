@@ -5,6 +5,9 @@
 import numpy as np
 import openmdao.api as om
 
+DEFAULT_FC_POWER_DENSITY = 124  # [kW/m^3]
+DEFAULT_FC_VOLUME = 1.62e-3  # [m^3]
+
 
 class SizingPEMFCStackVolume(om.ExplicitComponent):
     """
@@ -24,24 +27,9 @@ class SizingPEMFCStackVolume(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length",
-            units="m",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density",
+            units="kW/m**3",
             val=np.nan,
-            desc="Length of PEMFC, as in the size of PEMFC along the X-axis",
-        )
-
-        self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
-            units="m",
-            val=np.nan,
-            desc="Width of PEMFC, as in the size of PEMFC along the Y-axis",
-        )
-
-        self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height",
-            units="m",
-            val=np.nan,
-            desc="Height of PEMFC, as in the size of PEMFC along the Z-axis",
         )
 
         self.add_output(
@@ -57,14 +45,10 @@ class SizingPEMFCStackVolume(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume"] = (
-            inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height"
-            ]
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length"
-            ]
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width"
+            DEFAULT_FC_VOLUME
+            * DEFAULT_FC_POWER_DENSITY
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
             ]
         )
 
@@ -73,36 +57,12 @@ class SizingPEMFCStackVolume(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density",
         ] = (
-            inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height"
+            -DEFAULT_FC_VOLUME
+            * DEFAULT_FC_POWER_DENSITY
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
             ]
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width"
-            ]
-        )
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height",
-        ] = (
-            inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length"
-            ]
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width"
-            ]
-        )
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
-        ] = (
-            inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length"
-            ]
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height"
-            ]
+            ** 2
         )

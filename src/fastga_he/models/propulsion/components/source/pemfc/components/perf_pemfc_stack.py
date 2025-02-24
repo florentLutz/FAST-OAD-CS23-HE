@@ -16,11 +16,6 @@ from ..components.perf_fuel_consumption import PerformancesPEMFCStackFuelConsump
 from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackEfficiency
 from ..components.perf_pemfc_voltage import PerformancesPEMFCStackVoltage
-from ..components.perf_pemfc_expect_specific_power import (
-    PerformancesPEMFCStackExpectedSpecificPower,
-)
-from ..components.perf_pemfc_expect_power_density import PerformancesPEMFCStackExpectedPowerDensity
-
 
 from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
 
@@ -143,18 +138,6 @@ class PerformancesPEMFCStack(om.Group):
         self.add_subsystem(
             "hydrogen_power_density",
             PerformancesPEMFCStackHydrogenPowerDensity(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "pemfc_specific_power",
-            PerformancesPEMFCStackExpectedSpecificPower(pemfc_stack_id=pemfc_stack_id),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "pemfc_power_density",
-            PerformancesPEMFCStackExpectedPowerDensity(pemfc_stack_id=pemfc_stack_id),
             promotes=["*"],
         )
 
