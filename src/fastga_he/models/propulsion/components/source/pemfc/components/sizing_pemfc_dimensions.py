@@ -36,6 +36,18 @@ class SizingPEMFCStackDimensions(om.ExplicitComponent):
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
+            units="m**3",
+            val=np.nan,
+        )
+
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
+            val=np.nan,
+            desc="Number of layer in 1 PEMFC stack",
+        )
+
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length",
             units="m",
@@ -55,18 +67,6 @@ class SizingPEMFCStackDimensions(om.ExplicitComponent):
             units="m",
             val=1.5,
             desc="Height of PEMFC, as in the size of PEMFC along the Z-axis",
-        )
-
-        self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
-            units="m**3",
-            val=np.nan,
-        )
-
-        self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
-            val=np.nan,
-            desc="Number of layer in 1 PEMFC stack",
         )
 
         self.declare_partials(of="*", wrt="*")

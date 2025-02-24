@@ -22,6 +22,7 @@ class PerformancesPEMFCStackPower(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("voltage_out", units="V", val=np.full(number_of_points, np.nan))
+
         self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
 
         self.add_output("power_out", units="kW", val=np.full(number_of_points, DEFAULT_STACK_POWER))

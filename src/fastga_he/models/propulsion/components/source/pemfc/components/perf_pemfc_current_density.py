@@ -33,6 +33,7 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
         max_current_density = self.options["max_current_density"]
 
         self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
+
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             units="cm**2",
