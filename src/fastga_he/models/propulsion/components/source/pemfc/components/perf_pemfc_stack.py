@@ -59,12 +59,6 @@ class PerformancesPEMFCStack(om.Group):
         compressor_connection = self.options["compressor_connection"]
         direct_bus_connection = self.options["direct_bus_connection"]
         max_current_density = self.options["max_current_density"]
-        option_layer_voltage = {
-            "number_of_points": number_of_points,
-            "pemfc_stack_id": pemfc_stack_id,
-            "max_current_density": max_current_density,
-            "compressor_connection": compressor_connection,
-        }
 
         self.add_subsystem(
             "pemfc_current_density",
@@ -75,6 +69,13 @@ class PerformancesPEMFCStack(om.Group):
             ),
             promotes=["*"],
         )
+
+        option_layer_voltage = {
+            "number_of_points": number_of_points,
+            "pemfc_stack_id": pemfc_stack_id,
+            "max_current_density": max_current_density,
+            "compressor_connection": compressor_connection,
+        }
 
         self.add_subsystem(
             name="pemfc_layer_voltage",
