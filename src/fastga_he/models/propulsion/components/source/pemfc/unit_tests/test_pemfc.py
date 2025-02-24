@@ -136,7 +136,7 @@ def test_pemfc_power_density():
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_density",
         units="kW/m**3",
     ) == pytest.approx(
-        230.0,
+        204.59,
         rel=1e-2,
     )
 

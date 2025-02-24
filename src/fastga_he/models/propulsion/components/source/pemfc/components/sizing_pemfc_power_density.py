@@ -56,7 +56,7 @@ class SizingPEMFCStackPowerDensity(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
-        ] = np.clip(unclipped_power_density, 230.0, MAX_PEMFC_POWER_DENSITY)
+        ] = np.clip(unclipped_power_density, 70.0, MAX_PEMFC_POWER_DENSITY)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
@@ -69,7 +69,7 @@ class SizingPEMFCStackPowerDensity(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
         ] = np.where(
-            unclipped_power_density <= MAX_PEMFC_POWER_DENSITY and unclipped_power_density >= 230.0,
+            unclipped_power_density <= MAX_PEMFC_POWER_DENSITY and unclipped_power_density >= 70.0,
             19.816 / power_max,
             1e-6,
         )
