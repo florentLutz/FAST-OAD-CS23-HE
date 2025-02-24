@@ -127,9 +127,9 @@ j₀          1.0    A/m²
 
 This table provides the parameter values that has been considered in juschus' research :cite:`juschus:2021`.
 
-******************************
+******************
 Sizing calculation
-******************************
+******************
 PEMFC dimension calculation
 ===========================
 The PEMFC length is calculated by multiplying the number of layers, :math:`N_{layers}`, by the cell length,
@@ -138,15 +138,15 @@ The PEMFC length is calculated by multiplying the number of layers, :math:`N_{la
 .. math::
    L_{pemfc} = L_c \cdot N_{layers}
 
-Utilizing the area ratio :math:`AR` of Aerostak 200W provided by :cite:`hoogendoorn:2018`, the conversion between
-the effective area :math:`A_{eff}` and the stack cross-section area :math:`A_{cross}` can be achieved as:
+Utilizing the reference stack volume :math:`V_[ref]` of Aerostak 200W provided by :cite:`hoogendoorn:2018`, the stack
+cross-section area :math:`A_{cross}` can be achieved as:
 
 .. math::
-    A_{cross} = \frac {\lambda_{pd} \cdot A_{cross} } {AR}
+    A_{cross} = \frac {\lambda_{pd} \cdot V_{ref}} {L_{pemfc}}
 
 Where :math:`\lambda_{pd}` is the power density ratio, calculated as the power density of the Aerostak 200W
-divided by the maximum expected power density of the fuel cell. This factor adjusts the dimension based on whether the
-calculation considers the entire system or just the fuel cell stack.
+divided by the maximum expected power density of the fuel cell. This factor adjusts the dimension to consider all
+variety of different PEMFC stacks.
 
 .. math::
 
