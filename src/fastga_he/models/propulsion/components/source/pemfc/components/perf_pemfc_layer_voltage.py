@@ -40,11 +40,7 @@ class PerformancesPEMFCStackSingleVoltageSimple(om.Group):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
-        self.options.declare(
-            "max_current_density",
-            default=0.7,
-            desc="maximum current density of pemfc [A/cm**2]",
-        )
+
         self.options.declare(
             name="compressor_connection",
             default=False,
@@ -102,11 +98,7 @@ class PerformancesPEMFCStackSingleVoltageAnalytical(om.Group):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
-        self.options.declare(
-            "max_current_density",
-            default=0.7,
-            desc="maximum current density of pemfc [A/cm**2]",
-        )
+
         self.options.declare(
             name="compressor_connection",
             default=False,

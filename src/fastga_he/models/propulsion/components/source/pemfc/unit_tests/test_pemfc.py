@@ -462,7 +462,7 @@ def test_pemfc_polarization_curve_simple():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackPolarizationCurveSimple(number_of_points=7, max_current_density=0.8),
+        PerformancesPEMFCStackPolarizationCurveSimple(number_of_points=7),
         ivc,
     )
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
@@ -493,7 +493,7 @@ def test_pemfc_polarization_curve_analytical():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesPEMFCStackPolarizationCurveAnalytical(
-            pemfc_stack_id="pemfc_stack_1", number_of_points=7, max_current_density=2.0
+            pemfc_stack_id="pemfc_stack_1", number_of_points=7
         ),
         ivc,
     )
@@ -643,7 +643,7 @@ def test_pemfc_efficiency():
     )
     # Not computed with proper losses, to test only
     assert problem.get_val("efficiency") == pytest.approx(
-        [0.5734, 0.5615, 0.5506, 0.5403, 0.5305, 0.5208, 0.5113, 0.5018, 0.4922, 0.4823], rel=1e-2
+        [0.5447, 0.5334, 0.5231, 0.5133, 0.5039, 0.4948, 0.4857, 0.4767, 0.4676, 0.4582], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)

@@ -7,6 +7,7 @@ import openmdao.api as om
 from ..constants import HHV_HYDROGEN_EQUIVALENT_VOLTAGE
 
 DEFAULT_PEMFC_EFFICIENCY = 0.53
+FUEL_UTILIZATION_COEFFICIENT = 0.95
 
 
 class PerformancesPEMFCStackEfficiency(om.ExplicitComponent):
@@ -46,15 +47,18 @@ class PerformancesPEMFCStackEfficiency(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        hhv = HHV_HYDROGEN_EQUIVALENT_VOLTAGE
-
-        outputs["efficiency"] = inputs["single_layer_pemfc_voltage"] / hhv
+        outputs["efficiency"] = (
+            inputs["single_layer_pemfc_voltage"]
+            * FUEL_UTILIZATION_COEFFICIENT
+            / HHV_HYDROGEN_EQUIVALENT_VOLTAGE
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         number_of_points = self.options["number_of_points"]
-        hhv = HHV_HYDROGEN_EQUIVALENT_VOLTAGE
 
         partials[
             "efficiency",
             "single_layer_pemfc_voltage",
-        ] = np.full(number_of_points, 1 / hhv)
+        ] = np.full(
+            number_of_points, FUEL_UTILIZATION_COEFFICIENT / HHV_HYDROGEN_EQUIVALENT_VOLTAGE
+        )
