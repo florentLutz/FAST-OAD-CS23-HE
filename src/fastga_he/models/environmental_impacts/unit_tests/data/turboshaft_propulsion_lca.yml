@@ -42,18 +42,18 @@ model:
             name: market for aluminium, cast alloy
             amount: data__weight__airframe__vertical_tail__mass_per_fu
         
-        landing_gear:
-            custom_attributes:
-                - attribute: "component"
-                  value: landing_gear_production
-        
-            name: 'market for aluminium, cast alloy'
-            amount: data__weight__airframe__landing_gear__mass_per_fu
-        
         flight_controls:
             custom_attributes:
                 - attribute: "component"
                   value: flight_controls_production
+        
+            name: 'market for aluminium, cast alloy'
+            amount: data__weight__airframe__flight_controls__mass_per_fu
+        
+        landing_gear:
+            custom_attributes:
+                - attribute: "component"
+                  value: landing_gear_production
         
             name: 'market for steel, unalloyed'
             amount: data__weight__airframe__landing_gear__mass_per_fu
@@ -71,7 +71,8 @@ model:
                 # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
                 # with the mass
                 electricity:
-                  name: 'electricity, high voltage, European attribute mix'
+                  name: 'market group for electricity, high voltage'
+                  loc: 'RER'
                   amount: 219520.67 / 5485.0 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
         
                 gas:
@@ -97,10 +98,10 @@ model:
                 water_in:
                   name: 'market for water, decarbonised'
                   loc: 'RoW'
-                  amount: 537530 / 5485.0 # In m**3 but since 1m**3 = 1kg
+                  amount: 537530 / 5485.0 # In kg
         
-                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-                  amount: 499135 / 5485.0
+                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In kg in the source but needs to be in m**3 here
+                  amount: 499.135 / 5485.0
                   name: 'water'
                   categories:
                     - 'water'
@@ -154,7 +155,8 @@ model:
                 # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
                 # with the mass
                 electricity:
-                  name: 'electricity, high voltage, European attribute mix'
+                  name: 'market group for electricity, high voltage'
+                  loc: 'RER'
                   amount: 13361 / 333.9 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
         
                 gas:
@@ -180,9 +182,9 @@ model:
                 water_in:
                   name: 'market for water, decarbonised'
                   loc: 'RoW'
-                  amount: 33 / 333.9 # In m**3 but since 1m**3 = 1kg
+                  amount: 33000 / 333.9 # In m**3 in the source, in kg here (1m**3 = 1000kg)
         
-                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In m**3
                   amount: 30 / 333.9
                   name: 'water'
                   categories:
@@ -253,7 +255,8 @@ model:
                 # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
                 # with the mass
                 electricity:
-                  name: 'electricity, high voltage, European attribute mix'
+                  name: 'market group for electricity, high voltage'
+                  loc: 'RER'
                   amount: 9484 / 237 # We are giving here the amount for 1 kg of turboshaft since we are defining a custom process
         
                 gas:
@@ -279,9 +282,9 @@ model:
                 water_in:
                   name: 'market for water, decarbonised'
                   loc: 'RoW'
-                  amount: 23 / 237 # In m**3 but since 1m**3 = 1kg
+                  amount: 23000 / 237 # In m**3 in the source, in kg here (1m**3 = 1000kg)
         
-                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In m**3
                   amount: 22 / 237
                   name: 'water'
                   categories:
@@ -337,7 +340,8 @@ model:
                 # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
                 # with the mass
                 electricity:
-                  name: 'electricity, high voltage, European attribute mix'
+                  name: 'market group for electricity, high voltage'
+                  loc: 'RER'
                   amount: 918 / 22.9 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
         
                 gas:
@@ -363,9 +367,9 @@ model:
                 water_in:
                   name: 'market for water, decarbonised'
                   loc: 'RoW'
-                  amount: 2 / 22.9 # In m**3 but since 1m**3 = 1kg
+                  amount: 2000 / 22.9  # In m**3 in the source, in kg here (1m**3 = 1000kg)
         
-                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In m**3
                   amount: 2 / 22.9
                   name: 'water'
                   categories:
@@ -584,28 +588,24 @@ model:
 
 
 methods:
-    - "('EF v3.1', 'acidification', 'accumulated exceedance (AE)')"
-    - "('EF v3.1', 'climate change', 'global warming potential (GWP100)')"
-    - "('EF v3.1', 'climate change: biogenic', 'global warming potential (GWP100)')"
-    - "('EF v3.1', 'climate change: fossil', 'global warming potential (GWP100)')"
-    - "('EF v3.1', 'climate change: land use and land use change', 'global warming potential (GWP100)')"
-    - "('EF v3.1', 'ecotoxicity: freshwater', 'comparative toxic unit for ecosystems (CTUe)')"
-    - "('EF v3.1', 'ecotoxicity: freshwater, inorganics', 'comparative toxic unit for ecosystems (CTUe)')"
-    - "('EF v3.1', 'ecotoxicity: freshwater, organics', 'comparative toxic unit for ecosystems (CTUe)')"
-    - "('EF v3.1', 'energy resources: non-renewable', 'abiotic depletion potential (ADP): fossil fuels')"
-    - "('EF v3.1', 'eutrophication: freshwater', 'fraction of nutrients reaching freshwater end compartment (P)')"
-    - "('EF v3.1', 'eutrophication: marine', 'fraction of nutrients reaching marine end compartment (N)')"
-    - "('EF v3.1', 'eutrophication: terrestrial', 'accumulated exceedance (AE)')"
-    - "('EF v3.1', 'human toxicity: carcinogenic', 'comparative toxic unit for human (CTUh)')"
-    - "('EF v3.1', 'human toxicity: carcinogenic, inorganics', 'comparative toxic unit for human (CTUh)')"
-    - "('EF v3.1', 'human toxicity: carcinogenic, organics', 'comparative toxic unit for human (CTUh)')"
-    - "('EF v3.1', 'human toxicity: non-carcinogenic', 'comparative toxic unit for human (CTUh)')"
-    - "('EF v3.1', 'human toxicity: non-carcinogenic, inorganics', 'comparative toxic unit for human (CTUh)')"
-    - "('EF v3.1', 'human toxicity: non-carcinogenic, organics', 'comparative toxic unit for human (CTUh)')"
-    - "('EF v3.1', 'ionising radiation: human health', 'human exposure efficiency relative to u235')"
-    - "('EF v3.1', 'land use', 'soil quality index')"
-    - "('EF v3.1', 'material resources: metals/minerals', 'abiotic depletion potential (ADP): elements (ultimate reserves)')"
-    - "('EF v3.1', 'ozone depletion', 'ozone depletion potential (ODP)')"
-    - "('EF v3.1', 'particulate matter formation', 'impact on human health')"
-    - "('EF v3.1', 'photochemical oxidant formation: human health', 'tropospheric ozone concentration increase')"
-    - "('EF v3.1', 'water use', 'user deprivation potential (deprivation-weighted water consumption)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'acidification: terrestrial', 'terrestrial acidification potential (TAP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'climate change',  'global warming potential (GWP100)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: freshwater', 'freshwater ecotoxicity potential (FETP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: marine', 'marine ecotoxicity potential (METP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: terrestrial', 'terrestrial ecotoxicity potential (TETP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'energy resources: non-renewable, fossil', 'fossil fuel potential (FFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: freshwater', 'freshwater eutrophication potential (FEP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: marine', 'marine eutrophication potential (MEP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: carcinogenic', 'human toxicity potential (HTPc)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: non-carcinogenic', 'human toxicity potential (HTPnc)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ionising radiation', 'ionising radiation potential (IRP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'land use', 'agricultural land occupation (LOP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'material resources: metals/minerals', 'surplus ore potential (SOP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ozone depletion', 'ozone depletion potential (ODPinfinite)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'particulate matter formation', 'particulate matter formation potential (PMFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: human health', 'photochemical oxidant formation potential: humans (HOFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: terrestrial ecosystems', 'photochemical oxidant formation potential: ecosystems (EOFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'water use', 'water consumption potential (WCP)')"
+    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: ecosystem quality', 'ecosystem quality')"
+    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: human health', 'human health')"
+    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: natural resources', 'natural resources')"

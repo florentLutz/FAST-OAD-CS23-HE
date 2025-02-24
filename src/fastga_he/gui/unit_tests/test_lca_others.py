@@ -219,7 +219,7 @@ def test_lca_bar_chart_relative_contribution_ref_paper():
         separate_phase=True,
         legend_rename={
             "manufacturing": "line testing",
-            "turboshaft: operation": "kerosene combustion",
+            "turboshaft 1: operation": "kerosene combustion",
             "kerosene for mission: operation": "kerosene production",
         },
         aggregate_phase=["production"],

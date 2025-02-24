@@ -42,18 +42,18 @@ model:
             name: market for carbon fibre reinforced plastic, injection moulded
             amount: data__weight__airframe__vertical_tail__mass_per_fu
         
-        landing_gear:
-            custom_attributes:
-                - attribute: "component"
-                  value: landing_gear_production
-        
-            name: 'market for aluminium, cast alloy'
-            amount: data__weight__airframe__landing_gear__mass_per_fu
-        
         flight_controls:
             custom_attributes:
                 - attribute: "component"
                   value: flight_controls_production
+        
+            name: 'market for aluminium, cast alloy'
+            amount: data__weight__airframe__flight_controls__mass_per_fu
+        
+        landing_gear:
+            custom_attributes:
+                - attribute: "component"
+                  value: landing_gear_production
         
             name: 'market for steel, unalloyed'
             amount: data__weight__airframe__landing_gear__mass_per_fu
