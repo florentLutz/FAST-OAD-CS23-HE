@@ -564,3 +564,42 @@ def test_search_engine_paper_climate_change():
         "Single score for 1 kWh of electricity",
         impact_per_kwh_of_electricity_used_single_score * 1e5,
     )
+
+
+def test_carbon_intensity_avgas():
+    datafile = oad.DataFile(DATA_FOLDER_PATH / "sr22_lca.xml")
+
+    impact_avgas_combustion_one_fu = datafile[
+        "data:environmental_impact:climate_change:operation:ice_1"
+    ].value[0]
+    impact_avgas_production_one_fu = datafile[
+        "data:environmental_impact:climate_change:operation:gasoline_for_mission"
+    ].value[0]
+
+    quantity_avgas_one_fu = datafile["data:LCA:operation:he_power_train:gasoline:mass_per_fu"].value[0]
+
+    impact_avgas_per_kg = (
+        impact_avgas_production_one_fu + impact_avgas_combustion_one_fu
+    ) / quantity_avgas_one_fu
+    impact_production_avgas_per_kg = impact_avgas_production_one_fu / quantity_avgas_one_fu
+
+    print(impact_avgas_per_kg, "Kg of CO2eq for 1 kg of AvGas")
+    print(impact_production_avgas_per_kg, "Kg of CO2eq for the production 1 kg of AvGas")
+
+
+def test_carbon_intensity_kerosene():
+    datafile = oad.DataFile(DATA_FOLDER_PATH / "tbm900_lca.xml")
+
+    impact_kero_combustion_one_fu = datafile[
+        "data:environmental_impact:climate_change:operation:turboshaft_1"
+    ].value[0]
+    impact_kero_production_one_fu = datafile[
+        "data:environmental_impact:climate_change:operation:kerosene_for_mission"
+    ].value[0]
+
+    quantity_kero_one_fu = datafile["data:LCA:operation:he_power_train:kerosene:mass_per_fu"].value[0]
+
+    impact_kero_per_kg = (
+        impact_kero_production_one_fu + impact_kero_combustion_one_fu
+    ) / quantity_kero_one_fu
+    print(impact_kero_per_kg, "Kg of CO2eq for 1 kg of AvGas")
