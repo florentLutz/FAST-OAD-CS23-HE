@@ -1,3 +1,5 @@
+.. _options-lca:
+
 =============================
 Life Cycle Assessment options
 =============================
@@ -105,6 +107,8 @@ The first step of the LCA module is to write the :ref:`LCA configuration file <m
 
 .. note::
     As explained in the :ref:`assumptions-lca` section, we will consider that the landing gear is always made of steel.
+
+.. _aircraft_delivery:
 
 Aircraft delivery method
 ========================

@@ -576,7 +576,9 @@ def test_carbon_intensity_avgas():
         "data:environmental_impact:climate_change:operation:gasoline_for_mission"
     ].value[0]
 
-    quantity_avgas_one_fu = datafile["data:LCA:operation:he_power_train:gasoline:mass_per_fu"].value[0]
+    quantity_avgas_one_fu = datafile[
+        "data:LCA:operation:he_power_train:gasoline:mass_per_fu"
+    ].value[0]
 
     impact_avgas_per_kg = (
         impact_avgas_production_one_fu + impact_avgas_combustion_one_fu
@@ -597,7 +599,9 @@ def test_carbon_intensity_kerosene():
         "data:environmental_impact:climate_change:operation:kerosene_for_mission"
     ].value[0]
 
-    quantity_kero_one_fu = datafile["data:LCA:operation:he_power_train:kerosene:mass_per_fu"].value[0]
+    quantity_kero_one_fu = datafile["data:LCA:operation:he_power_train:kerosene:mass_per_fu"].value[
+        0
+    ]
 
     impact_kero_per_kg = (
         impact_kero_production_one_fu + impact_kero_combustion_one_fu
