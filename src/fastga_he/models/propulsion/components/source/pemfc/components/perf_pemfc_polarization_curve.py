@@ -18,7 +18,7 @@ DEFAULT_PRESSURE_ATM = 1.0  # [atm]
 DEFAULT_TEMPERATURE = 288.15  # [K]
 
 
-class PerformancesPEMFCStackPolarizationCurveSimple(om.ExplicitComponent):
+class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
     """
     Computation of PEMFC polarization curve. Model based on existing PEMFC, Aerostack
     Ultralight 200W, details can be found in :cite:`hoogendoorn:2018`.

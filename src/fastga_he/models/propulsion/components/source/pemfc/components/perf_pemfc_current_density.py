@@ -5,6 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
+from ..constants import MAX_CURRENT_DENSITY_EMPIRICAL
+
 
 class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
     """
@@ -21,16 +23,10 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
             desc="Identifier of PEMFC stack",
             allow_none=False,
         )
-        self.options.declare(
-            "max_current_density",
-            default=0.7,
-            desc="maximum current density of pemfc [A/cm**2]",
-        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
-        max_current_density = self.options["max_current_density"]
 
         self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
 
@@ -43,7 +39,7 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
 
         self.add_output(
             "fc_current_density",
-            val=np.full(number_of_points, max_current_density),
+            val=np.full(number_of_points, MAX_CURRENT_DENSITY_EMPIRICAL),
             units="A/cm**2",
             desc="Current density of PEMFC stack",
         )

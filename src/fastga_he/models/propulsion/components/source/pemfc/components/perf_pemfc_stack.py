@@ -4,20 +4,20 @@
 
 import numpy as np
 import openmdao.api as om
-import fastoad.api as oad
 
 from ..components.perf_direct_bus_connection import PerformancesPEMFCStackDirectBusConnection
 from ..components.perf_pemfc_power import PerformancesPEMFCStackPower
 from ..components.perf_fuel_power_density import PerformancesPEMFCStackHydrogenPowerDensity
 from ..components.perf_maximum import PerformancesPEMFCStackMaximum
 from ..components.perf_pemfc_current_density import PerformancesPEMFCStackCurrentDensity
-
 from ..components.perf_fuel_consumption import PerformancesPEMFCStackFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackEfficiency
 from ..components.perf_pemfc_voltage import PerformancesPEMFCStackVoltage
-
-from ..constants import SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE
+from ..components.perf_pemfc_layer_voltage import (
+    PerformancesPEMFCStackSingleVoltageEmpirical,
+    PerformancesPEMFCStackSingleVoltageAnalytical,
+)
 
 
 class PerformancesPEMFCStack(om.Group):
@@ -25,13 +25,13 @@ class PerformancesPEMFCStack(om.Group):
 
     def initialize(self):
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
-        )
-        self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of the battery pack",
+            desc="Identifier of PEMFC stack",
             allow_none=False,
+        )
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
             name="direct_bus_connection",
@@ -48,9 +48,11 @@ class PerformancesPEMFCStack(om.Group):
             "oxygen inlet",
         )
         self.options.declare(
-            "max_current_density",
-            default=0.7,
-            desc="maximum current density of pemfc [A/cm**2]",
+            "model_fidelity",
+            default="empirical",
+            desc="Define the polarization model to choose between empirical and analytical. The "
+            "computation is by default using the Aerostak 200W empirical polarization model "
+            "to calculate.",
         )
 
     def setup(self):
@@ -58,32 +60,37 @@ class PerformancesPEMFCStack(om.Group):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         compressor_connection = self.options["compressor_connection"]
         direct_bus_connection = self.options["direct_bus_connection"]
-        max_current_density = self.options["max_current_density"]
+        model_fidelity = self.options["model_fidelity"]
 
         self.add_subsystem(
             "pemfc_current_density",
             PerformancesPEMFCStackCurrentDensity(
                 number_of_points=number_of_points,
                 pemfc_stack_id=pemfc_stack_id,
-                max_current_density=max_current_density,
             ),
             promotes=["*"],
         )
 
-        option_layer_voltage = {
-            "number_of_points": number_of_points,
-            "pemfc_stack_id": pemfc_stack_id,
-            "max_current_density": max_current_density,
-            "compressor_connection": compressor_connection,
-        }
+        if model_fidelity == "analytical":
+            self.add_subsystem(
+                "pemfc_layer_voltage",
+                PerformancesPEMFCStackSingleVoltageAnalytical(
+                    number_of_points=number_of_points,
+                    pemfc_stack_id=pemfc_stack_id,
+                    compressor_connection=compressor_connection,
+                ),
+                promotes=["*"],
+            )
 
-        self.add_subsystem(
-            name="pemfc_layer_voltage",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_PERFORMANCES_PEMFC_LAYER_VOLTAGE, options=option_layer_voltage
-            ),
-            promotes=["*"],
-        )
+        else:
+            self.add_subsystem(
+                "pemfc_layer_voltage",
+                PerformancesPEMFCStackSingleVoltageEmpirical(
+                    number_of_points=number_of_points,
+                    compressor_connection=compressor_connection,
+                ),
+                promotes=["*"],
+            )
 
         self.add_subsystem(
             "pemfc_voltage",

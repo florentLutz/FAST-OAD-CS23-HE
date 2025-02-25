@@ -1002,7 +1002,7 @@ PEMFC_STACK = {
     CN: "PEMFCStack",
     CN_ID: "pemfc_stack_id",
     CT: "pemfc_stack",
-    ATT: ["max_current_density"],
+    ATT: ["model_fidelity"],
     PT: ["time_step", "altitude"],
     SPT: [],
     PTS: [],

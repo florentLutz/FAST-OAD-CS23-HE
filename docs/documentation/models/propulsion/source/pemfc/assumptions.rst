@@ -11,3 +11,4 @@ The following assumptions have been made in the calculation of PEMFC.
 * The oxygen partial pressure is set to 21% of the operating pressure.
 * The operating pressure is equivalent to ambient pressure if no compressor is connected.
 * The pressure of both electrodes in simple polarization model are assumed the same.
+* The fuel utilization coefficient is set to 95% to consider trapped hydrogen in PEMFC.

@@ -23,7 +23,8 @@ water (:math:`\text{H}_2\text{O}`). This process produces electricity with :math
 
 
 This component can be activated through the powertrain configuration file (PT file). The registered installation
-positions can be found at tank position options in :ref:`options <options-pemfc>`.
+positions and polarization model option can be found at PEMFC position options and model fidelity options respectively
+in :ref:`options <options-pemfc>`.
 
 .. code-block:: yaml
 
