@@ -1044,10 +1044,12 @@ def _get_component_and_contribution(
 
     :param aircraft_file_path: path to the output file path.
     :return: a dict of the components with their contribution to each impact category.
-    :param separate_phase: by default, all contribution of one component, regardless of the phase
-    is aggregated, this segregates them.
-    :param aggregate_phase: by default only the manufacturing and distribution are aggregated.
-    Additional phase specified here can be aggregated.
+    :param separate_phase: by default, the contribution in each phase of a components are summed
+    together and only the total is shown, this allows to see the contribution in each phase of
+    each component
+    :param aggregate_phase: for compactness, it may be preferable to aggregate the contribution
+    of all components to a phase. This options is a list of phases to aggregate. Please note that
+    the aggregation of the manufacturing and distribution can't be changed (see the documentation).
     """
 
     datafile = oad.DataFile(aircraft_file_path)
@@ -1127,12 +1129,14 @@ def lca_impacts_bar_chart_with_contributors(
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft.
-    :param separate_phase: by default, all contribution of one component, regardless of the phase
-    is aggregated, this segregates them.
+    :param separate_phase: by default, the contribution in each phase of a components are summed
+    together and only the total is shown, this allows to see the contribution in each phase of
+    each component
     :param legend_rename: legend names are set by the code by default, if any renaming is to be
     done, pass here the legend to be renamed as key and how to rename it as item.
-    :param aggregate_phase: by default only the manufacturing and distribution are aggregated.
-    Additional phase specified here can be aggregated.
+    :param aggregate_phase: for compactness, it may be preferable to aggregate the contribution
+    of all components to a phase. This options is a list of phases to aggregate. Please note that
+    the aggregation of the manufacturing and distribution can't be changed (see the documentation).
     """
 
     component_and_contribution = _get_component_and_contribution(
