@@ -25,14 +25,14 @@ class ConstraintsPEMFCStack(om.Group):
             "model_fidelity",
             default="empirical",
             desc="Define the polarization model to choose between empirical and analytical. The "
-                 "computation is by default using the Aerostak 200W empirical polarization model "
-                 "to calculate.",
+            "computation is by default using the Aerostak 200W empirical polarization model "
+            "to calculate.",
         )
 
     def setup(self):
         options_constraints = {
             "pemfc_stack_id": self.options["pemfc_stack_id"],
-            "model_fidelity": self.options["model_fidelity"]
+            "model_fidelity": self.options["model_fidelity"],
         }
 
         self.add_subsystem(

@@ -27,8 +27,8 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
             "model_fidelity",
             default="empirical",
             desc="Define the polarization model to choose between empirical and analytical. The "
-                 "computation is by default using the Aerostak 200W empirical polarization model "
-                 "to calculate.",
+            "computation is by default using the Aerostak 200W empirical polarization model "
+            "to calculate.",
         )
 
     def setup(self):
