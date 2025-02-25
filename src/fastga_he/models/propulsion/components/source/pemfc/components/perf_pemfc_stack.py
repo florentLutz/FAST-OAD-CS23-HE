@@ -67,6 +67,7 @@ class PerformancesPEMFCStack(om.Group):
             PerformancesPEMFCStackCurrentDensity(
                 number_of_points=number_of_points,
                 pemfc_stack_id=pemfc_stack_id,
+                model_fidelity=model_fidelity,
             ),
             promotes=["*"],
         )

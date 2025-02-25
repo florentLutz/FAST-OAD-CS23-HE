@@ -15,14 +15,14 @@ class PerformancesPEMFCStackOperatingPressure(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
             name="compressor_connection",
             default=False,
             types=bool,
             desc="The PEMFC operation pressure have to adjust based on compressor connection for "
             "oxygen inlet",
-        )
-        self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):

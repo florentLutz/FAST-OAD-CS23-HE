@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA
+from ..constants import SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA, MAX_CURRENT_DENSITY_EMPIRICAL, MAX_CURRENT_DENSITY_ANALYTICAL
 
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = (
     "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.enforce"
@@ -32,14 +32,20 @@ class ConstraintsPEMFCStackEffectiveAreaEnforce(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
-            "max_current_density",
-            default=0.7,
-            desc="maximum current density of pemfc [A/cm**2]",
+            "model_fidelity",
+            default="empirical",
+            desc="Define the polarization model to choose between empirical and analytical. The "
+                 "computation is by default using the Aerostak 200W empirical polarization model "
+                 "to calculate.",
         )
 
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
-        max_current_density = self.options["max_current_density"]
+        model_fidelity = self.options["model_fidelity"]
+        if model_fidelity == "analytical":
+            max_current_density = MAX_CURRENT_DENSITY_ANALYTICAL
+        else:
+            max_current_density = MAX_CURRENT_DENSITY_EMPIRICAL
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max",
             units="A",
@@ -57,12 +63,16 @@ class ConstraintsPEMFCStackEffectiveAreaEnforce(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             wrt="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max",
-            val=1 / max_current_density,
+            val= 1.0 / max_current_density,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
-        max_current_density = self.options["max_current_density"]
+        model_fidelity = self.options["model_fidelity"]
+        if model_fidelity == "analytical":
+            max_current_density = MAX_CURRENT_DENSITY_ANALYTICAL
+        else:
+            max_current_density = MAX_CURRENT_DENSITY_EMPIRICAL
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
         ] = (

@@ -22,15 +22,17 @@ class ConstraintsPEMFCStack(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            "max_current_density",
-            default=0.7,
-            desc="maximum current density of pemfc [A/cm**2]",
+            "model_fidelity",
+            default="empirical",
+            desc="Define the polarization model to choose between empirical and analytical. The "
+                 "computation is by default using the Aerostak 200W empirical polarization model "
+                 "to calculate.",
         )
 
     def setup(self):
         options_constraints = {
             "pemfc_stack_id": self.options["pemfc_stack_id"],
-            "max_current_density": self.options["max_current_density"],
+            "model_fidelity": self.options["model_fidelity"]
         }
 
         self.add_subsystem(

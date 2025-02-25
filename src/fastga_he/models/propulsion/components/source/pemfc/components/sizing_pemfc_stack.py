@@ -36,22 +36,24 @@ class SizingPEMFCStack(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            "max_current_density",
-            default=0.7,
-            desc="maximum current density of PEMFC [A/cm**2]",
+            "model_fidelity",
+            default="empirical",
+            desc="Define the polarization model to choose between empirical and analytical. The "
+                 "computation is by default using the Aerostak 200W empirical polarization model "
+                 "to calculate.",
         )
 
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
-        max_current_density = self.options["max_current_density"]
+        model_fidelity = self.options["model_fidelity"]
         # It was decided to add the constraints computation at the beginning of the sizing to
         # ensure that both are ran along and to avoid having an additional id to add in the
         # configuration file.
         self.add_subsystem(
             name="constraints_pemfc",
             subsys=ConstraintsPEMFCStack(
-                pemfc_stack_id=pemfc_stack_id, max_current_density=max_current_density
+                pemfc_stack_id=pemfc_stack_id, model_fidelity=model_fidelity
             ),
             promotes=["*"],
         )

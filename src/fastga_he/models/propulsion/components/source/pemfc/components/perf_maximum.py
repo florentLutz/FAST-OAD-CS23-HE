@@ -15,14 +15,15 @@ class PerformancesPEMFCStackMaximum(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
-        )
-        self.options.declare(
             name="pemfc_stack_id",
             default=None,
             desc="Identifier of PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+
 
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
