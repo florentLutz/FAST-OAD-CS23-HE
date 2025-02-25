@@ -19,12 +19,12 @@ of the fuel cell polarization model that calculates the single layer operating v
 The :math:`V_{\text{operating}}` represents the operating voltage of the fuel cell under standard conditions, while
 :math:`V_r` is the reversible open-circuit voltage, determined by the Gibbs free energy of the chemical reaction.
 :math:`V_{\text{activation}}` corresponds to the activation loss caused by the kinetic energy barrier at both electrodes
-:cite:`juschus:2021`, the losses of the oxygen reduce reaction is significant more pronounced than the other side under
-low current density. :math:`V_{\text{ohmic}}` denotes the ohmic loss due to the electrical resistance of the
+. The losses of the oxygen reduce reaction is significant more pronounced than the other side under
+low current density :cite:`juschus:2021`. :math:`V_{\text{ohmic}}` denotes the ohmic loss due to the electrical resistance of the
 electrodes, and :math:`V_{\text{mass-transport}}` represents the mass-transport loss, which occurs when reactant gases,
 such as oxygen or fuel, face diffusion limitations at the electrodes.
 
-There are two polarization curve implemented in this component to model single layer voltage. The empirical PEMFC polarization
+There are two polarization curve implemented in this component to model single layer operating voltage. The empirical PEMFC polarization
 model is based on an empirical model of Aerostak 200W PEMFC derived by :cite:`hoogendoorn:2018`. The analytical PEMFC
 polarization model is based on the thermodynamic characteristics of fuel cells, as outlined in :cite:`juschus:2021`.
 
@@ -33,7 +33,7 @@ polarization model is based on the thermodynamic characteristics of fuel cells, 
 Empirical PEMFC polarization model
 ===============================
 This model utilizes the empirical open circuit voltage :math:`V_0` and the voltage losses in
-simplified form obtained with curve fitting. The voltage deviation due to operating pressure variation is also
+simplified form obtained with curve fitting :cite:`hoogendoorn:2018`. The voltage deviation due to operating pressure variation is also
 considered in this model shown as :math:`\Delta V_p`. The pressure ratio :math:`P_R` is the ratio between the operating
 pressure :math:`P_{op}` and the nominal operating pressure :math:`P_{nom}`. The unit of current density :math:`j` is
 expressed in [:math:`A/cm^2`] for this model.
@@ -134,13 +134,14 @@ Sizing calculation
 ******************
 PEMFC dimension calculation
 ===========================
-The PEMFC length is calculated by multiplying the number of layers, :math:`N_{layers}`. The cell length,
-:math:`L_c`, which is the total length of the Aerostak 200W divided by the number of single-layer fuel cells.
+The PEMFC length is calculated by multiplying the number of layers, :math:`N_{layers}`, with the cell length.
+:math:`L_c` is the cell length calculates from dividing total length of the Aerostak 200W by the number of single-layer
+fuel cells.
 
 .. math::
    L_{pemfc} = L_c \cdot N_{layers}
 
-Utilizing the reference stack volume :math:`V_{ref}` of Aerostak 200W provided by :cite:`hoogendoorn:2018`, the stack
+Then, utilizing the reference stack volume :math:`V_{ref}` of Aerostak 200W provided by :cite:`hoogendoorn:2018`, the stack
 cross-section area :math:`A_{cross}` can be expressed as:
 
 .. math::
@@ -149,6 +150,8 @@ cross-section area :math:`A_{cross}` can be expressed as:
 Where :math:`\lambda_{pd}` is the power density ratio, calculated as the power density of the Aerostak 200W
 divided by the power density of the fuel cell. This factor adjusts the dimension to consider all variety of different
 PEMFC stacks.
+
+Finally, the Height :math:`H_{pemfc}` and width :math:`W_{pemfc}` of the PEMFC stack can be obtained as:
 
 .. math::
 
@@ -172,8 +175,8 @@ the weight of the PEMFC stack can be expressed as:
 
 Where :math:`A_{eff}` is the effective area, :math:`N_{layers}` is number of layers, and :math:`\lambda_{sp}` is the
 specific power ratio. :math:`\lambda_{sp}` is calculated as the specific power of the Aerostak 200W divided by the
-specific power of the fuel cell. This factor adjusts the mass based on whether the calculation
-considers all variety of different PEMFC stacks.
+specific power of the fuel cell. This factor adjusts the mass based on whether the calculation considers all variety of
+different PEMFC stacks.
 
 *******************************
 Component Computation Structure
