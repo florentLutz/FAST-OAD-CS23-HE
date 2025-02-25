@@ -56,6 +56,7 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
+
         specific_power = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power"
         ]
@@ -65,6 +66,7 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
         number_of_layers = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
         ]
+
         specific_power_ratio = DEFAULT_FC_SPECIFIC_POWER / specific_power
 
         outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass"] = (
@@ -73,6 +75,7 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
+
         specific_power = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power"
         ]
@@ -82,6 +85,7 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
         number_of_layers = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
         ]
+
         specific_power_ratio = DEFAULT_FC_SPECIFIC_POWER / specific_power
 
         partials[

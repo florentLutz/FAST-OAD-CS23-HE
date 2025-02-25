@@ -50,9 +50,8 @@ class PerformancesPEMFCStack(om.Group):
         self.options.declare(
             "model_fidelity",
             default="empirical",
-            desc="Define the polarization model to choose between empirical and analytical. The "
-            "computation is by default using the Aerostak 200W empirical polarization model "
-            "to calculate.",
+            desc="Select the polarization model between empirical and analytical. The "
+                 "Aerostak 200W empirical polarization model is set as default.",
         )
 
     def setup(self):

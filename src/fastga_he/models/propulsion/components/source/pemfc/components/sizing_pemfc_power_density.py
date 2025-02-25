@@ -65,6 +65,7 @@ class SizingPEMFCStackPowerDensity(om.ExplicitComponent):
         ]
 
         unclipped_power_density = 19.816 * np.log(power_max) + 236.48
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",

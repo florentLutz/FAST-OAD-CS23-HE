@@ -86,8 +86,8 @@ class PerformancesPEMFCStackSingleVoltageAnalytical(om.Group):
         )
 
     def setup(self):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
+        number_of_points = self.options["number_of_points"]
         compressor_connection = self.options["compressor_connection"]
 
         self.add_subsystem(

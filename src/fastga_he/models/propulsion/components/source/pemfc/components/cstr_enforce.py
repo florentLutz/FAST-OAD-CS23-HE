@@ -38,18 +38,19 @@ class ConstraintsPEMFCStackEffectiveAreaEnforce(om.ExplicitComponent):
         self.options.declare(
             "model_fidelity",
             default="empirical",
-            desc="Define the polarization model to choose between empirical and analytical. The "
-            "computation is by default using the Aerostak 200W empirical polarization model "
-            "to calculate.",
+            desc="Select the polarization model between empirical and analytical. The "
+            "Aerostak 200W empirical polarization model is set as default.",
         )
 
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         model_fidelity = self.options["model_fidelity"]
+
         if model_fidelity == "analytical":
             max_current_density = MAX_CURRENT_DENSITY_ANALYTICAL
         else:
             max_current_density = MAX_CURRENT_DENSITY_EMPIRICAL
+
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max",
             units="A",
@@ -73,10 +74,12 @@ class ConstraintsPEMFCStackEffectiveAreaEnforce(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         model_fidelity = self.options["model_fidelity"]
+
         if model_fidelity == "analytical":
             max_current_density = MAX_CURRENT_DENSITY_ANALYTICAL
         else:
             max_current_density = MAX_CURRENT_DENSITY_EMPIRICAL
+
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
         ] = (

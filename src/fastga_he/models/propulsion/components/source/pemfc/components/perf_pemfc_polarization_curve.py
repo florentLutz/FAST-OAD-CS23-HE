@@ -213,8 +213,8 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         )
 
     def setup(self):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
+        number_of_points = self.options["number_of_points"]
 
         self.add_input(
             "fc_current_density",
@@ -287,8 +287,8 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
+        number_of_points = self.options["number_of_points"]
         e0 = REVERSIBLE_ELECTRIC_POTENTIAL
         ds = self.options["entropy_difference"]
         t0 = np.full(number_of_points, self.options["standard_temperature"])
@@ -328,8 +328,8 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
+        number_of_points = self.options["number_of_points"]
         e0 = REVERSIBLE_ELECTRIC_POTENTIAL
         ds = self.options["entropy_difference"]
         t0 = np.full(number_of_points, self.options["standard_temperature"])

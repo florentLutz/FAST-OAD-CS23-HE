@@ -11,7 +11,7 @@ DEFAULT_DC_CURRENT = 400.0  # [A]
 
 class PerformancesPEMFCStackDirectBusConnection(om.ImplicitComponent):
     """
-    In case we attempt to directly plug the PEMFC  into a bus, a small change to its
+    In case we attempt to directly plug the PEMFC into a bus, a small change to its
     inputs/outputs will be required. This is what this component does.
     """
 

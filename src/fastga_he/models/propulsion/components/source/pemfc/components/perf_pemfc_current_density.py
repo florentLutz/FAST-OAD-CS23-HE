@@ -26,15 +26,15 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
         self.options.declare(
             "model_fidelity",
             default="empirical",
-            desc="Define the polarization model to choose between empirical and analytical. The "
-            "computation is by default using the Aerostak 200W empirical polarization model "
-            "to calculate.",
+            desc="Select the polarization model between empirical and analytical. The "
+                 "Aerostak 200W empirical polarization model is set as default.",
         )
 
     def setup(self):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
+        number_of_points = self.options["number_of_points"]
         model_fidelity = self.options["model_fidelity"]
+
         if model_fidelity == "analytical":
             max_current_density = MAX_CURRENT_DENSITY_ANALYTICAL
         else:
@@ -83,15 +83,12 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
+        number_of_points = self.options["number_of_points"]
 
-        partials["fc_current_density", "dc_current_out"] = (
-            np.ones(number_of_points)
-            / inputs[
+        partials["fc_current_density", "dc_current_out"] = np.full(number_of_points,inputs[
                 "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
-            ]
-        )
+            ]*-1)
 
         partials[
             "fc_current_density",

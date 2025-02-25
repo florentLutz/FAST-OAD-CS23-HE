@@ -74,13 +74,16 @@ class SizingPEMFCStackDimensions(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
+
         number_of_layers = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
         ]
         volume = inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume"]
+
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length"
         ] = CELL_LENGTH * number_of_layers
+
         area = volume / (CELL_LENGTH * number_of_layers)
 
         if position in "underbelly":
@@ -104,6 +107,7 @@ class SizingPEMFCStackDimensions(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
+
         number_of_layers = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
         ]
