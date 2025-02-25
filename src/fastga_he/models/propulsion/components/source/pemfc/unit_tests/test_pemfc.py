@@ -877,22 +877,26 @@ def test_performances_pemfc_stack_analytical():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStack(number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"),
+        PerformancesPEMFCStack(
+            number_of_points=NB_POINTS_TEST,
+            pemfc_stack_id="pemfc_stack_1",
+            model_fidelity="analytical",
+        ),
         ivc,
     )
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
         [
-            0.83821855,
-            0.82052846,
-            0.80447687,
-            0.7893103,
-            0.77468248,
-            0.76039104,
-            0.74628561,
-            0.73221894,
-            0.71800453,
-            0.70336148,
+            0.90045225,
+            0.87104092,
+            0.84551269,
+            0.82200924,
+            0.79965219,
+            0.77794808,
+            0.75658507,
+            0.73534744,
+            0.7140743,
+            0.69263748,
         ],
         rel=1e-2,
     )
@@ -907,16 +911,16 @@ def test_performances_pemfc_stack_analytical():
 
     assert problem.get_val("efficiency") == pytest.approx(
         [
-            0.53768239,
-            0.52633493,
-            0.5160385,
-            0.50630978,
-            0.49692664,
-            0.48775928,
-            0.47871123,
-            0.46968804,
-            0.46057009,
-            0.45117718,
+            0.57760273,
+            0.55873658,
+            0.54236128,
+            0.52728479,
+            0.51294367,
+            0.49902139,
+            0.4853179,
+            0.47169485,
+            0.45804901,
+            0.44429818,
         ],
         rel=1e-2,
     )

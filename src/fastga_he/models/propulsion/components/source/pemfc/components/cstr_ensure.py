@@ -32,10 +32,10 @@ class ConstraintsPEMFCStackEffectiveAreaEnsure(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
-            "model_fidelity",
+            name="model_fidelity",
             default="empirical",
             desc="Select the polarization model between empirical and analytical. The "
-                 "Aerostak 200W empirical polarization model is set as default.",
+            "Aerostak 200W empirical polarization model is set as default.",
         )
 
     def setup(self):

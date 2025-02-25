@@ -7,10 +7,10 @@ Proton-exchange membrane fuel cell computation
 ***********************************
 Fuel cell Layer voltage calculation
 ***********************************
-The Proton-Exchange Membrane Fuel Cell (PEMFC) stack is consisted of multiple layers of single layer PEMFC. To calculate
-the PEMFC voltage, the single layer voltage, calculated by subtracting the reversible open-circuit voltage with the
-losses from different factors. The equation below, from :cite:`dicks:2018`, is the general representation
-of the fuel cell polarization model that calculates the single layer operating voltage.
+The Proton-Exchange Membrane Fuel Cell (PEMFC) system is composed of multiple single-layer PEMFCs, each
+serving as a base unit of the overall stack. The single layer operating voltage is calculated by subtracting the
+reversible open-circuit voltage with the losses from different factors. The equation below, from :cite:`dicks:2018`, is
+the general representation of the fuel cell polarization model that demonstrates the calculation of single layer operating voltage.
 
 .. math::
 
@@ -19,10 +19,9 @@ of the fuel cell polarization model that calculates the single layer operating v
 The :math:`V_{\text{operating}}` represents the operating voltage of the fuel cell under standard conditions, while
 :math:`V_r` is the reversible open-circuit voltage, determined by the Gibbs free energy of the chemical reaction.
 :math:`V_{\text{activation}}` corresponds to the activation loss caused by the kinetic energy barrier at both electrodes
-. The losses of the oxygen reduce reaction is significant more pronounced than the other side under
-low current density :cite:`juschus:2021`. :math:`V_{\text{ohmic}}` denotes the ohmic loss due to the electrical resistance of the
-electrodes, and :math:`V_{\text{mass-transport}}` represents the mass-transport loss, which occurs when reactant gases,
-such as oxygen or fuel, face diffusion limitations at the electrodes.
+:cite:`juschus:2021`, :math:`V_{\text{ohmic}}` denotes the ohmic loss due to the electrical resistance of the electrodes
+, and :math:`V_{\text{mass-transport}}` represents the mass-transport loss, which occurs when reactant gases, such as
+oxygen or fuel, face diffusion limitations at the electrodes.
 
 There are two polarization curve implemented in this component to model single layer operating voltage. The empirical PEMFC polarization
 model is based on an empirical model of Aerostak 200W PEMFC derived by :cite:`hoogendoorn:2018`. The analytical PEMFC
@@ -148,8 +147,7 @@ cross-section area :math:`A_{cross}` can be expressed as:
     A_{cross} = \frac {\lambda_{pd} \cdot V_{ref}} {L_{pemfc}}
 
 Where :math:`\lambda_{pd}` is the power density ratio, calculated as the power density of the Aerostak 200W
-divided by the power density of the fuel cell. This factor adjusts the dimension to consider all variety of different
-PEMFC stacks.
+divided by the power density of the fuel cell. This factor adjusts the dimension to consider all variety of PEMFC stacks.
 
 Finally, the Height :math:`H_{pemfc}` and width :math:`W_{pemfc}` of the PEMFC stack can be obtained as:
 
@@ -175,8 +173,7 @@ the weight of the PEMFC stack can be expressed as:
 
 Where :math:`A_{eff}` is the effective area, :math:`N_{layers}` is number of layers, and :math:`\lambda_{sp}` is the
 specific power ratio. :math:`\lambda_{sp}` is calculated as the specific power of the Aerostak 200W divided by the
-specific power of the fuel cell. This factor adjusts the mass based on whether the calculation considers all variety of
-different PEMFC stacks.
+specific power of the fuel cell. This factor adjusts the mass to considers all variety of PEMFC stacks.
 
 *******************************
 Component Computation Structure

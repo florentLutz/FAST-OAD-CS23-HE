@@ -24,10 +24,10 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            "model_fidelity",
+            name="model_fidelity",
             default="empirical",
             desc="Select the polarization model between empirical and analytical. The "
-                 "Aerostak 200W empirical polarization model is set as default.",
+            "Aerostak 200W empirical polarization model is set as default.",
         )
 
     def setup(self):
@@ -86,9 +86,13 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         number_of_points = self.options["number_of_points"]
 
-        partials["fc_current_density", "dc_current_out"] = np.full(number_of_points,inputs[
+        partials["fc_current_density", "dc_current_out"] = np.full(
+            number_of_points,
+            inputs[
                 "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
-            ]*-1)
+            ]
+            * -1,
+        )
 
         partials[
             "fc_current_density",
