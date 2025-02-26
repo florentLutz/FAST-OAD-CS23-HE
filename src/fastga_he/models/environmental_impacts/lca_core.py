@@ -105,6 +105,23 @@ class LCACore(om.ExplicitComponent):
             allow_none=False,
             values=["default", "french", "slovenia"],
         )
+        self.options.declare(
+            name="write_lca_conf",
+            default=True,
+            types=bool,
+            desc="By default the code will write a new configuration file for the LCA in the same "
+            "folder as the powertrain file at each setup of the LCA module. This can be "
+            "turned off if an LCA file is already available",
+        )
+        self.options.declare(
+            name="lca_conf_file_path",
+            default="",
+            types=(str, pathlib.Path),
+            desc="If an existing LCA configuration file is to be used, its path can be provided "
+            "here. If nothing is put for this option, the code will assume it is located in "
+            "the same folder as the powertrain file and will have the same name except for a "
+            "_lca suffix",
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
@@ -644,11 +661,16 @@ class LCACore(om.ExplicitComponent):
 
         shutil.copy(lca_conf_file_path, tmp_copy_path)
 
+        next_line_to_ignore = False
+
         with open(tmp_copy_path, "w") as new_file:
             with open(lca_conf_file_path, "r") as old_file:
                 for line in old_file:
-                    if "electricity, high voltage, European attribute mix" not in line:
-                        new_file.write(line)
+                    if "market group for electricity, high voltage" not in line:
+                        if not next_line_to_ignore:
+                            new_file.write(line)
+                        else:
+                            next_line_to_ignore = False
                     else:
                         # line should be starting with "name:"
                         indent_pattern = line.split("name")[0]
@@ -661,6 +683,8 @@ class LCACore(om.ExplicitComponent):
                             new_file.write(indent_pattern + "loc: 'FR'\n")
                         if self.options["electric_mix"] == "slovenia":
                             new_file.write(indent_pattern + "loc: 'SI'\n")
+
+                        next_line_to_ignore = True
 
         pathlib.Path.unlink(lca_conf_file_path)
         shutil.move(tmp_copy_path, lca_conf_file_path)
@@ -676,26 +700,13 @@ class LCACore(om.ExplicitComponent):
         lca_conf_file_name = power_train_file_name.replace(".yml", "_lca.yml")
         lca_conf_file_path = parent_folder / lca_conf_file_name
 
-        header = {"project": project_name}
-
-        with open(lca_conf_file_path, "w") as new_file:
-            yaml.safe_dump(header, new_file)
-
-        self.write_ecoinvent_version(lca_conf_file_path, ecoinvent_version)
-
-        dict_with_production = self.configurator.get_lca_production_element_list()
-
-        # This function writes the "model: " in the yml so it must be run before anything else
-        # that need to go in the model section in the model section
-        self.write_production(lca_conf_file_path, dict_with_production)
+        self.configurator._get_components()
 
         dict_with_manufacturing, species_list = (
             self.configurator.get_lca_manufacturing_phase_element_list()
         )
         for specie in species_list:
             self.name_to_unit[specie] = "kg"
-
-        self.write_manufacturing(lca_conf_file_path, dict_with_manufacturing)
 
         dict_with_distribution, species_list = (
             self.configurator.get_lca_distribution_phase_element_list()
@@ -704,24 +715,43 @@ class LCACore(om.ExplicitComponent):
         for specie in species_list:
             self.name_to_unit[specie] = "kg"
 
-        self.write_distribution(lca_conf_file_path, dict_with_distribution)
-
         dict_with_use, species_list = self.configurator.get_lca_use_phase_element_list()
 
         for specie in species_list:
             self.name_to_unit[specie] = "kg"
 
-        self.write_use(lca_conf_file_path, dict_with_use)
+        if self.options["write_lca_conf"]:
+            header = {"project": project_name}
 
-        methods_file = RESOURCE_FOLDER_PATH / METHODS_TO_FILE[methods]
+            with open(lca_conf_file_path, "w") as new_file:
+                yaml.safe_dump(header, new_file)
 
-        with open(methods_file, "r") as methods_file_stream:
-            methods_dict = yaml.safe_load(methods_file_stream)
+            self.write_ecoinvent_version(lca_conf_file_path, ecoinvent_version)
 
-        self.write_methods(lca_conf_file_path, methods_dict)
+            dict_with_production = self.configurator.get_lca_production_element_list()
 
-        if self.options["electric_mix"] != "default":
-            self.change_electric_mix(lca_conf_file_path)
+            # This function writes the "model: " in the yml so it must be run before anything else
+            # that need to go in the model section in the model section
+            self.write_production(lca_conf_file_path, dict_with_production)
+
+            self.write_manufacturing(lca_conf_file_path, dict_with_manufacturing)
+
+            self.write_distribution(lca_conf_file_path, dict_with_distribution)
+
+            self.write_use(lca_conf_file_path, dict_with_use)
+
+            methods_file = RESOURCE_FOLDER_PATH / METHODS_TO_FILE[methods]
+
+            with open(methods_file, "r") as methods_file_stream:
+                methods_dict = yaml.safe_load(methods_file_stream)
+
+            self.write_methods(lca_conf_file_path, methods_dict)
+
+            if self.options["electric_mix"] != "default":
+                self.change_electric_mix(lca_conf_file_path)
+
+        elif self.options["lca_conf_file_path"]:
+            lca_conf_file_path = self.options["lca_conf_file_path"]
 
         return lca_conf_file_path
 

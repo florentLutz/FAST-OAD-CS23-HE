@@ -28,8 +28,6 @@ from ..lca_impact import (
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
 RESULT_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 
-PATH_TO_CURRENT_FILE = pathlib.Path(__file__)
-
 SENSITIVITY_STUDIES_FOLDER_PATH = (
     pathlib.Path(__file__).parents[2]
     / "models"
@@ -85,9 +83,9 @@ def test_lca_single_score_sensitivity_analysis_two_plots():
     fig.show()
 
     fig.update_layout(height=800.0, width=1600.0)
-    fig.write_image(PATH_TO_CURRENT_FILE.parent / "results" / "ga_single_score_evolution.pdf")
+    fig.write_image(RESULT_FOLDER_PATH / "ga_single_score_evolution.pdf")
     time.sleep(3)
-    fig.write_image(PATH_TO_CURRENT_FILE.parent / "results" / "ga_single_score_evolution.pdf")
+    fig.write_image(RESULT_FOLDER_PATH / "ga_single_score_evolution.pdf")
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
@@ -214,10 +212,51 @@ def test_lca_bar_chart_relative_contribution():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_relative_contribution_ref_paper():
+    fig = lca_impacts_bar_chart_with_contributors(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+        name_aircraft="the reference Kodiak 100",
+        detailed_component_contributions=True,
+        legend_rename={
+            "manufacturing": "line testing",
+            "turboshaft 1: operation": "kerosene combustion",
+            "kerosene for mission: operation": "kerosene production",
+        },
+        aggregate_phase=["production"],
+    )
+
+    fig.update_layout(height=800, width=1600)
+    fig.write_image(RESULT_FOLDER_PATH / "ga_relative_contribution_ref.pdf")
+    time.sleep(3)
+    fig.write_image(RESULT_FOLDER_PATH / "ga_relative_contribution_ref.pdf")
+
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_bar_chart_absolute_phase():
     fig = lca_impacts_bar_chart_with_components_absolute(
         SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
+        name_aircraft="Reference Kodiak 100",
+    )
+    fig.update_layout(title_text=None)
+
+    fig.show()
+    fig.update_layout(height=800, width=1600)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_absolute_phase_paper():
+    fig = lca_impacts_bar_chart_with_components_absolute(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
         name_aircraft="Hybrid Kodiak 100",
+        detailed_component_contributions=True,
+        legend_rename={
+            "manufacturing": "line testing",
+            "turboshaft: operation": "kerosene combustion",
+            "kerosene for mission: operation": "kerosene production",
+        },
+        aggregate_phase=["production"],
     )
     fig.update_layout(title_text=None)
 
@@ -319,7 +358,8 @@ def test_search_engine_paper():
         * 2.0
     )
     energy_mission_ref_design = fuel_burned_ref_design * 11.9  # in kWh
-    print("Energy required per FU", energy_mission_ref_design * flights_per_fu_ref_design)
+    energy_per_pax_km = energy_mission_ref_design * flights_per_fu_ref_design
+    print("Energy required per FU", energy_per_pax_km)
 
     impact_list_ref_design = ["*", "*", "*"]
     phase_list_ref_design = ["operation", "*", "*"]
@@ -374,7 +414,8 @@ def test_search_engine_paper():
     energy_mission_hybrid_design = (
         fuel_burned_hybrid_design * 11.9 + electricity_used_hybrid_design
     )  # in kWh
-    print("Energy required per FU", energy_mission_hybrid_design * flights_per_fu_hybrid_design)
+    energy_per_pax_km_hybrid = energy_mission_hybrid_design * flights_per_fu_hybrid_design
+    print("Energy required per FU", energy_per_pax_km_hybrid)
 
     impact_list_hybrid_design = ["*", "*", "*", "*", "*"]
     phase_list_hybrid_design = ["operation", "*", "*", "production", "*"]
@@ -400,3 +441,169 @@ def test_search_engine_paper():
     impact_per_kwh_of_energy_used_hybrid = impact_one_flight_hybrid / energy_mission_hybrid_design
     print(impact_per_kwh_of_energy_used_hybrid)
     print("\n")
+
+    print(
+        "Decrease in energy required",
+        (energy_mission_hybrid_design - energy_mission_ref_design)
+        / energy_mission_ref_design
+        * 100.0,
+    )
+    print(
+        "Decrease in energy required per pax.km",
+        (energy_per_pax_km_hybrid - energy_per_pax_km) / energy_per_pax_km * 100.0,
+    )
+    print(
+        "Increase in environmental intensity",
+        (impact_per_kwh_of_energy_used_hybrid - impact_per_kwh_of_energy_used)
+        / impact_per_kwh_of_energy_used
+        * 100.0,
+    )
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_search_engine_paper_climate_change():
+    ref_design_datafile = oad.DataFile(SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml")
+    flights_per_fu_ref_design = ref_design_datafile[
+        "data:environmental_impact:flight_per_fu"
+    ].value[0]
+    print("Flights per FU design", flights_per_fu_ref_design)
+    print("FU per flights design", 1.0 / flights_per_fu_ref_design)
+
+    fuel_burned_ref_design = (
+        ref_design_datafile[
+            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission"
+        ].value[0]
+        * 2.0
+    )
+    energy_mission_ref_design = fuel_burned_ref_design * 11.9  # in kWh
+
+    impact_kerosene_combustion_one_fu = ref_design_datafile[
+        "data:environmental_impact:climate_change:operation:turboshaft_1"
+    ].value[0]
+    impact_kerosene_production_one_fu = ref_design_datafile[
+        "data:environmental_impact:climate_change:operation:kerosene_for_mission"
+    ].value[0]
+
+    total_impact_kerosene_one_fu = (
+        impact_kerosene_combustion_one_fu + impact_kerosene_production_one_fu
+    )
+
+    impact_one_flight = total_impact_kerosene_one_fu / flights_per_fu_ref_design
+    impact_per_kwh_of_energy_used = impact_one_flight / energy_mission_ref_design
+
+    print("Kg of CO2eq for 1 kWh of kerosene", impact_per_kwh_of_energy_used)
+
+    ################################################################################################
+    # Hybrid
+
+    hybrid_design_datafile = oad.DataFile(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml"
+    )
+    flights_per_fu_hybrid_design = hybrid_design_datafile[
+        "data:environmental_impact:flight_per_fu"
+    ].value[0]
+    fu_per_flights_hybrid_design = 1.0 / flights_per_fu_hybrid_design
+    print("Flights per FU hybrid design", flights_per_fu_hybrid_design)
+    print("FU per flights hybrid design", fu_per_flights_hybrid_design)
+
+    electricity_used_hybrid_design = hybrid_design_datafile[
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission"
+    ].value[0]
+    electricity_unit = hybrid_design_datafile[
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission"
+    ].units
+    if electricity_unit == "W*h":
+        electricity_used_hybrid_design /= 1000.0
+    energy_mission_hybrid_design = electricity_used_hybrid_design  # in kWh
+
+    impact_battery_production_one_fu = hybrid_design_datafile[
+        "data:environmental_impact:climate_change:production:battery_pack_1"
+    ].value[0]
+    impact_electricity_production_one_fu = hybrid_design_datafile[
+        "data:environmental_impact:climate_change:operation:electricity_for_mission"
+    ].value[0]
+
+    total_impact_electricity_one_fu_co2eq = (
+        impact_battery_production_one_fu + impact_electricity_production_one_fu
+    )
+
+    impact_one_flight_electricity = (
+        total_impact_electricity_one_fu_co2eq / flights_per_fu_hybrid_design
+    )
+    impact_per_kwh_of_electricity_used = (
+        impact_one_flight_electricity / energy_mission_hybrid_design
+    )
+
+    print("Kg of CO2eq for 1 kWh of electricity", impact_per_kwh_of_electricity_used)
+
+    impact_list_hybrid_design = ["*", "*"]
+    phase_list_hybrid_design = ["*", "production"]
+    component_list_hybrid_design = [
+        "electricity_for_mission",
+        "battery_pack_1",
+    ]
+
+    impacts_value_hybrid_design = lca_impacts_search_table(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml",
+        impact_list_hybrid_design,
+        phase_list_hybrid_design,
+        component_list_hybrid_design,
+        rel=False,
+    )
+
+    total_impact_electricity_one_fu_single_score = sum(impacts_value_hybrid_design)
+
+    impact_one_flight_electricity_single_score = (
+        total_impact_electricity_one_fu_single_score / flights_per_fu_hybrid_design
+    )
+    impact_per_kwh_of_electricity_used_single_score = (
+        impact_one_flight_electricity_single_score / energy_mission_hybrid_design
+    )
+
+    print(
+        "Single score for 1 kWh of electricity",
+        impact_per_kwh_of_electricity_used_single_score * 1e5,
+    )
+
+
+def test_carbon_intensity_avgas():
+    datafile = oad.DataFile(DATA_FOLDER_PATH / "sr22_lca.xml")
+
+    impact_avgas_combustion_one_fu = datafile[
+        "data:environmental_impact:climate_change:operation:ice_1"
+    ].value[0]
+    impact_avgas_production_one_fu = datafile[
+        "data:environmental_impact:climate_change:operation:gasoline_for_mission"
+    ].value[0]
+
+    quantity_avgas_one_fu = datafile[
+        "data:LCA:operation:he_power_train:gasoline:mass_per_fu"
+    ].value[0]
+
+    impact_avgas_per_kg = (
+        impact_avgas_production_one_fu + impact_avgas_combustion_one_fu
+    ) / quantity_avgas_one_fu
+    impact_production_avgas_per_kg = impact_avgas_production_one_fu / quantity_avgas_one_fu
+
+    print(impact_avgas_per_kg, "Kg of CO2eq for 1 kg of AvGas")
+    print(impact_production_avgas_per_kg, "Kg of CO2eq for the production 1 kg of AvGas")
+
+
+def test_carbon_intensity_kerosene():
+    datafile = oad.DataFile(DATA_FOLDER_PATH / "tbm900_lca.xml")
+
+    impact_kero_combustion_one_fu = datafile[
+        "data:environmental_impact:climate_change:operation:turboshaft_1"
+    ].value[0]
+    impact_kero_production_one_fu = datafile[
+        "data:environmental_impact:climate_change:operation:kerosene_for_mission"
+    ].value[0]
+
+    quantity_kero_one_fu = datafile["data:LCA:operation:he_power_train:kerosene:mass_per_fu"].value[
+        0
+    ]
+
+    impact_kero_per_kg = (
+        impact_kero_production_one_fu + impact_kero_combustion_one_fu
+    ) / quantity_kero_one_fu
+    print(impact_kero_per_kg, "Kg of CO2eq for 1 kg of AvGas")

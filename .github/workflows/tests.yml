@@ -53,6 +53,11 @@ jobs:
           poetry run pytest --no-cov src/fastga_he/models/performances
         shell: bash
 
+      - name: Other models unit tests
+        run: |
+          poetry run pytest --no-cov src/fastga_he/models/environmental_impacts src/fastga_he/models/geometry  src/fastga_he/models/load_analysis  src/fastga_he/models/loops  src/fastga_he/models/weight
+        shell: bash
+
       - name: GUI unit tests
         run: |
           poetry run pytest --no-cov src/fastga_he/gui

@@ -147,7 +147,7 @@ class SimpleEnergyImpacts(om.ExplicitComponent):
             self.add_output(
                 "data:environmental_impact:operational:emission_factor",
                 val=0.0,
-                desc="Total emissions during the operational mission per kg of payload per km [kgCO2/kg/km]",
+                desc="Total emissions during the operational mission per kg of payload per km [gCO2/kg/km]",
             )
 
             self.declare_partials(

@@ -30,18 +30,18 @@ vertical_tail:
     name: ANCHOR_AIRFRAME_MATERIAL
     amount: data__weight__airframe__vertical_tail__mass_per_fu
 
-landing_gear:
-    custom_attributes:
-        - attribute: "component"
-          value: landing_gear_production
-
-    name: 'market for aluminium, cast alloy'
-    amount: data__weight__airframe__landing_gear__mass_per_fu
-
 flight_controls:
     custom_attributes:
         - attribute: "component"
           value: flight_controls_production
+
+    name: 'market for aluminium, cast alloy'
+    amount: data__weight__airframe__flight_controls__mass_per_fu
+
+landing_gear:
+    custom_attributes:
+        - attribute: "component"
+          value: landing_gear_production
 
     name: 'market for steel, unalloyed'
     amount: data__weight__airframe__landing_gear__mass_per_fu
@@ -59,7 +59,8 @@ assembly:  # Airframe assembly, assumed to be the same as aircraft assembly give
         # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
         # with the mass
         electricity:
-          name: 'electricity, high voltage, European attribute mix'
+          name: 'market group for electricity, high voltage'
+          loc: 'RER'
           amount: 219520.67 / 5485.0 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
 
         gas:
@@ -85,10 +86,10 @@ assembly:  # Airframe assembly, assumed to be the same as aircraft assembly give
         water_in:
           name: 'market for water, decarbonised'
           loc: 'RoW'
-          amount: 537530 / 5485.0 # In m**3 but since 1m**3 = 1kg
+          amount: 537530 / 5485.0 # In kg
 
-        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-          amount: 499135 / 5485.0
+        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In kg in the source but needs to be in m**3 here
+          amount: 499.135 / 5485.0
           name: 'water'
           categories:
             - 'water'

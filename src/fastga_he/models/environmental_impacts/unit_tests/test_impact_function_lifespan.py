@@ -35,6 +35,8 @@ def test_environmental_impact_function_span_hybrid():
         normalization=True,
         weighting=True,
         aircraft_lifespan_in_hours=True,
+        write_lca_conf=False,
+        lca_conf_file_path=DATA_FOLDER_PATH / "hybrid_propulsion_lca_paper.yml",
     )
 
     ivc = get_indep_var_comp(
@@ -143,6 +145,8 @@ def test_environmental_impact_function_span_conventional():
         weighting=True,
         aircraft_lifespan_in_hours=True,
         use_operational_mission=True,
+        write_lca_conf=False,
+        lca_conf_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_lca_paper.yml",
     )
 
     ivc = get_indep_var_comp(

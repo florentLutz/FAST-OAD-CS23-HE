@@ -1,0 +1,739 @@
+<FASTOAD_model>
+  <data>
+    <TLAR>
+      <aircraft_lifespan is_input="True">15.0<!--Expected lifetime of the aircraft--></aircraft_lifespan>
+      <flight_per_year is_input="True">365.0<!--Average number of flight per year--></flight_per_year>
+      <range units="nmi" is_input="True">971.0<!--design range--></range>
+    </TLAR>
+    <environmental_impact>
+      <aircraft_per_fu is_input="False">2.3022014452604495e-08<!--Number of aircraft required to perform a functional unit, defined here as carrying 85kg over one km--></aircraft_per_fu>
+      <flight_per_fu is_input="False">0.0001260455291280096<!--Number of flight required to perform a functionnal unit, defined here as carrying 85kg over one km--></flight_per_fu>
+      <acidification_terrestrial>
+        <sum is_input="False">0.0001730978132503903<!--kg SO2-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">1.3690302748115464e-07<!--kg SO2-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">4.27272902621476e-08<!--kg SO2-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.00012286275783438973<!--kg SO2-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">4.56246314838471e-05<!--kg SO2-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.00016848738931823682<!--kg SO2-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.5753808872603955e-06<!--kg SO2-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">1.2749911321518733e-08<!--kg SO2-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">3.287781308334612e-08<!--kg SO2-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">1.0464721243677166e-06<!--kg SO2-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">1.3945537077007044e-07<!--kg SO2-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">3.652767465673559e-07<!--kg SO2-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">5.836882764657865e-09<!--kg SO2-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">7.917599154855737e-08<!--kg SO2-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">4.4307936144101875e-06<!--kg SO2-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">7.481185636868159e-08<!--kg SO2-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">1.0987560303578879e-06<!--kg SO2-Eq for component wing in production phase--></wing>
+        </production>
+      </acidification_terrestrial>
+      <climate_change>
+        <sum is_input="False">0.12324383051313248<!--kg CO2-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">9.855931832879444e-05<!--kg CO2-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">3.076025913929107e-05<!--kg CO2-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.03007183484389615<!--kg CO2-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.09122571820320151<!--kg CO2-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.12129755304709766<!--kg CO2-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.0010463832970019752<!--kg CO2-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">2.9303025460788235e-06<!--kg CO2-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">3.0226464835269565e-05<!--kg CO2-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">0.0002726307201441612<!--kg CO2-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">3.633141989710148e-05<!--kg CO2-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">5.601163601362999e-05<!--kg CO2-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">2.3601949647397726e-06<!--kg CO2-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">6.434168321382246e-05<!--kg CO2-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.0018169578885667346<!--kg CO2-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">1.9490256646290105e-05<!--kg CO2-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.000286251913303666<!--kg CO2-Eq for component wing in production phase--></wing>
+        </production>
+      </climate_change>
+      <delivery>
+        <distance units="km" is_input="True">8000.0<!--Distance between the site of assembly of the aircraft and the site of delivery. The variable will have the same name regardless of whether the delivery is done by the air or by land.--></distance>
+        <mission_ratio is_input="False">4.448665733929751<!--Ratio of fuel used during the delivery to fuel used during mission. Will only be used if the aircraft is delivered via the air.--></mission_ratio>
+      </delivery>
+      <ecotoxicity_freshwater>
+        <sum is_input="False">0.0003732369944902947<!--kg 1,4-DCB-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">2.5210162792902734e-07<!--kg 1,4-DCB-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">7.86806517742367e-08<!--kg 1,4-DCB-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.000309875139955293<!--kg 1,4-DCB-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">3.878682056209604e-07<!--kg 1,4-DCB-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.00031026300816091397<!--kg 1,4-DCB-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.1128741066627303e-05<!--kg 1,4-DCB-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">1.6387877274108249e-06<!--kg 1,4-DCB-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">6.70094266606861e-07<!--kg 1,4-DCB-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">9.596396114357684e-06<!--kg 1,4-DCB-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">1.2788386303101982e-06<!--kg 1,4-DCB-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">2.429075740668749e-05<!--kg 1,4-DCB-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">1.4604745338570933e-07<!--kg 1,4-DCB-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">3.131647162863969e-06<!--kg 1,4-DCB-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">6.264320404967747e-05<!--kg 1,4-DCB-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">6.860423618049781e-07<!--kg 1,4-DCB-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">1.0075851859622444e-05<!--kg 1,4-DCB-Eq for component wing in production phase--></wing>
+        </production>
+      </ecotoxicity_freshwater>
+      <ecotoxicity_marine>
+        <sum is_input="False">0.0006980421650502752<!--kg 1,4-DCB-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">5.015998228974872e-07<!--kg 1,4-DCB-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.565487748715636e-07<!--kg 1,4-DCB-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.0005142798618950511<!--kg 1,4-DCB-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.00010304209363380838<!--kg 1,4-DCB-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.0006173219555288595<!--kg 1,4-DCB-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.5359682676198547e-05<!--kg 1,4-DCB-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">1.978703366799087e-06<!--kg 1,4-DCB-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">8.497518101439043e-07<!--kg 1,4-DCB-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">1.2407609444073554e-05<!--kg 1,4-DCB-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">1.6534676224070137e-06<!--kg 1,4-DCB-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">2.984017133968056e-05<!--kg 1,4-DCB-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">2.0641503071630812e-07<!--kg 1,4-DCB-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">3.85172559536269e-06<!--kg 1,4-DCB-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">8.006206092364663e-05<!--kg 1,4-DCB-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">8.870148320191257e-07<!--kg 1,4-DCB-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">1.3027519206245825e-05<!--kg 1,4-DCB-Eq for component wing in production phase--></wing>
+        </production>
+      </ecotoxicity_marine>
+      <ecotoxicity_terrestrial>
+        <sum is_input="False">1.550819616297205<!--kg 1,4-DCB-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.0012570390052288188<!--kg 1,4-DCB-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">0.0003923205456844001<!--kg 1,4-DCB-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.0890349289250388<!--kg 1,4-DCB-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">1.458010627035013<!--kg 1,4-DCB-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">1.5470455559600518<!--kg 1,4-DCB-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.0005194442650463178<!--kg 1,4-DCB-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">6.663852768057065e-06<!--kg 1,4-DCB-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">1.1931236819554264e-05<!--kg 1,4-DCB-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">0.0005299403819025665<!--kg 1,4-DCB-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">7.062111901825163e-05<!--kg 1,4-DCB-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">0.00035756800212609043<!--kg 1,4-DCB-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">4.094817840524944e-06<!--kg 1,4-DCB-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">3.0134596969109352e-05<!--kg 1,4-DCB-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.002124700786239927<!--kg 1,4-DCB-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">3.788521720902338e-05<!--kg 1,4-DCB-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.0005564172965404314<!--kg 1,4-DCB-Eq for component wing in production phase--></wing>
+        </production>
+      </ecotoxicity_terrestrial>
+      <energy_resources_non-renewablefossil>
+        <sum is_input="False">0.03637516464308491<!--kg oil-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">2.9163402539721376e-05<!--kg oil-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">9.101867126481594e-06<!--kg oil-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.03589157703784806<!--kg oil-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.0<!--kg oil-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.03589157703784806<!--kg oil-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.0002640070075203329<!--kg oil-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">6.235189690728603e-07<!--kg oil-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">4.992832075496561e-06<!--kg oil-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">6.679769228418246e-05<!--kg oil-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">8.901619763358804e-06<!--kg oil-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">1.3840457266097326e-05<!--kg oil-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">5.234661537590965e-07<!--kg oil-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">1.0725359554195531e-05<!--kg oil-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.0004453223355706542<!--kg oil-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">4.7753392035578735e-06<!--kg oil-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">7.013504278060083e-05<!--kg oil-Eq for component wing in production phase--></wing>
+        </production>
+      </energy_resources_non-renewablefossil>
+      <eutrophication_freshwater>
+        <sum is_input="False">2.0063205121854198e-06<!--kg P-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">1.1846542179747203e-09<!--kg P-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">3.6972933004458957e-10<!--kg P-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">1.4579611576440403e-06<!--kg P-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.0<!--kg P-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">1.4579611576440403e-06<!--kg P-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">2.9560554009101915e-07<!--kg P-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">9.246681313217123e-10<!--kg P-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">5.743438020231306e-09<!--kg P-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">9.185651635238155e-08<!--kg P-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">1.2241018415381299e-08<!--kg P-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">2.4001056807871526e-08<!--kg P-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">1.0462855275507553e-09<!--kg P-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">1.2373806156686787e-08<!--kg P-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">5.468049709933601e-07<!--kg P-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">6.566784100468886e-09<!--kg P-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">9.644585739044723e-08<!--kg P-Eq for component wing in production phase--></wing>
+        </production>
+      </eutrophication_freshwater>
+      <eutrophication_marine>
+        <sum is_input="False">2.3310223396728114e-06<!--kg N-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">1.851498063019724e-09<!--kg N-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">5.778505896762406e-10<!--kg N-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">2.278649937152833e-06<!--kg N-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.0<!--kg N-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">2.278649937152833e-06<!--kg N-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">2.8026002334841855e-08<!--kg N-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">7.179872953925253e-11<!--kg N-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">5.340595524669245e-10<!--kg N-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">7.493393651998111e-09<!--kg N-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">9.985875072371173e-10<!--kg N-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">3.195703959510536e-09<!--kg N-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">7.248951010220009e-11<!--kg N-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">1.1475399738401705e-09<!--kg N-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">4.994305386728237e-08<!--kg N-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">5.356995915643591e-10<!--kg N-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">7.867779056181841e-09<!--kg N-Eq for component wing in production phase--></wing>
+        </production>
+      </eutrophication_marine>
+      <human_toxicity_carcinogenic>
+        <sum is_input="False">0.0016673169358279029<!--kg 1,4-DCB-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">1.2967701578012016e-06<!--kg 1,4-DCB-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">4.047205964330481e-07<!--kg 1,4-DCB-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.0010141406186887465<!--kg 1,4-DCB-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.000581802308605528<!--kg 1,4-DCB-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.0015959429272942745<!--kg 1,4-DCB-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">2.7536562437056515e-05<!--kg 1,4-DCB-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">5.564161205643288e-07<!--kg 1,4-DCB-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">8.856673493711297e-07<!--kg 1,4-DCB-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">9.665648759698467e-06<!--kg 1,4-DCB-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">1.2880674029721002e-06<!--kg 1,4-DCB-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">1.5806816186520588e-05<!--kg 1,4-DCB-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">1.1592680757350198e-06<!--kg 1,4-DCB-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">1.9345137329173194e-06<!--kg 1,4-DCB-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">6.967251777939407e-05<!--kg 1,4-DCB-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">6.909932045801895e-07<!--kg 1,4-DCB-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">1.0148564509978418e-05<!--kg 1,4-DCB-Eq for component wing in production phase--></wing>
+        </production>
+      </human_toxicity_carcinogenic>
+      <human_toxicity_non-carcinogenic>
+        <sum is_input="False">0.7084480590343426<!--kg 1,4-DCB-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.0005741865724241107<!--kg 1,4-DCB-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">0.00017920302272329047<!--kg 1,4-DCB-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.010361373414212314<!--kg 1,4-DCB-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.6962935366289005<!--kg 1,4-DCB-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.7066549100431128<!--kg 1,4-DCB-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.00039309109089056724<!--kg 1,4-DCB-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">4.580471380593991e-06<!--kg 1,4-DCB-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">8.600895355921898e-06<!--kg 1,4-DCB-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">0.0001915725194862345<!--kg 1,4-DCB-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">2.5529410781439784e-05<!--kg 1,4-DCB-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">0.00017783527447065703<!--kg 1,4-DCB-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">1.6851569359069196e-06<!--kg 1,4-DCB-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">2.202525940884635e-05<!--kg 1,4-DCB-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.0010397593960825098<!--kg 1,4-DCB-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">1.3695439637869024e-05<!--kg 1,4-DCB-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.00020114387773447292<!--kg 1,4-DCB-Eq for component wing in production phase--></wing>
+        </production>
+      </human_toxicity_non-carcinogenic>
+      <ionising_radiation>
+        <sum is_input="False">0.0005069975323988959<!--kBq Co-60-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">2.108665044612517e-07<!--kBq Co-60-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">6.581121329782556e-08<!--kBq Co-60-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.0002595146906903084<!--kBq Co-60-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.0<!--kBq Co-60-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.0002595146906903084<!--kBq Co-60-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.00019430810920964686<!--kBq Co-60-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">5.72014098382602e-08<!--kBq Co-60-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">3.489470148979801e-06<!--kBq Co-60-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">1.7576032717570182e-05<!--kBq Co-60-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">2.342224032748687e-06<!--kBq Co-60-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">2.4714297213077426e-06<!--kBq Co-60-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">3.2810950473635915e-08<!--kBq Co-60-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">7.218214972926466e-06<!--kBq Co-60-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.0002472061639908284<!--kBq Co-60-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">1.256503259456218e-06<!--kBq Co-60-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">1.8454167567880544e-05<!--kBq Co-60-Eq for component wing in production phase--></wing>
+        </production>
+      </ionising_radiation>
+      <land_use>
+        <sum is_input="False">0.00029267800649457944<!--m2*a crop-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">2.1513643201313211e-07<!--m2*a crop-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">6.714385317631656e-08<!--m2*a crop-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.00026476971652159156<!--m2*a crop-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.0<!--m2*a crop-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.00026476971652159156<!--m2*a crop-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.0245376081239541e-05<!--m2*a crop-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">3.89851876488712e-08<!--m2*a crop-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">2.005518773378855e-07<!--m2*a crop-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">6.931747358491937e-06<!--m2*a crop-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">9.237411828308525e-07<!--m2*a crop-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">1.0372203332549753e-06<!--m2*a crop-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">3.432043844977832e-08<!--m2*a crop-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">4.4044774131458387e-07<!--m2*a crop-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">2.7626009687798428e-05<!--m2*a crop-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">4.95547731938692e-07<!--m2*a crop-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">7.278071755291312e-06<!--m2*a crop-Eq for component wing in production phase--></wing>
+        </production>
+      </land_use>
+      <line_test>
+        <duration units="h" is_input="True">10.0<!--Duration of line tests--></duration>
+        <mission_ratio is_input="False">1.3884238763021635<!--Ratio of fuel used during the line tests to fuel used during cruise--></mission_ratio>
+      </line_test>
+      <material_resources_metals_minerals>
+        <sum is_input="False">0.0007346461155783139<!--kg Cu-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">5.863814870426375e-07<!--kg Cu-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.8300904269388332e-07<!--kg Cu-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.0007216632657006764<!--kg Cu-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.0<!--kg Cu-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.0007216632657006764<!--kg Cu-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">4.8999604437693984e-06<!--kg Cu-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">5.48443225413507e-08<!--kg Cu-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">2.9575141619887713e-07<!--kg Cu-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">9.198000715057378e-07<!--kg Cu-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">1.2257475093631564e-07<!--kg Cu-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">3.7015425252598816e-06<!--kg Cu-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">9.165393245788075e-07<!--kg Cu-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">2.7093518861202046e-07<!--kg Cu-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">1.2213459347900964e-05<!--kg Cu-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">6.575612406204017e-08<!--kg Cu-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">9.657551804365328e-07<!--kg Cu-Eq for component wing in production phase--></wing>
+        </production>
+      </material_resources_metals_minerals>
+      <ozone_depletion>
+        <sum is_input="False">8.244942562907187e-09<!--kg CFC-11-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">6.355941023151775e-12<!--kg CFC-11-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.9836824793570064e-12<!--kg CFC-11-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">7.822295308983868e-09<!--kg CFC-11-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.0<!--kg CFC-11-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">7.822295308983868e-09<!--kg CFC-11-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">2.272094172004444e-10<!--kg CFC-11-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">7.465335216054484e-13<!--kg CFC-11-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">4.314003675559408e-12<!--kg CFC-11-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">6.690058510680303e-11<!--kg CFC-11-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">8.915331506265287e-12<!--kg CFC-11-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">2.1346363234179568e-11<!--kg CFC-11-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">2.7769031074344085e-13<!--kg CFC-11-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">9.571934555725188e-12<!--kg CFC-11-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">4.1430763042080945e-10<!--kg CFC-11-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">4.782694968597396e-12<!--kg CFC-11-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">7.024307634088626e-11<!--kg CFC-11-Eq for component wing in production phase--></wing>
+        </production>
+      </ozone_depletion>
+      <particulate_matter_formation>
+        <sum is_input="False">0.0006144597162278689<!--kg PM2.5-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">4.971618977421682e-07<!--kg PM2.5-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.5516370311850029e-07<!--kg PM2.5-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">4.290008357470073e-05<!--kg PM2.5-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.0005689600904496382<!--kg PM2.5-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.000611860174024339<!--kg PM2.5-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">6.04264704310749e-07<!--kg PM2.5-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">5.594825197856482e-09<!--kg PM2.5-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">1.3159012268376056e-08<!--kg PM2.5-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">5.064541949807332e-07<!--kg PM2.5-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">6.749129374255365e-08<!--kg PM2.5-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">1.467873972178075e-07<!--kg PM2.5-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">3.978569262786476e-09<!--kg PM2.5-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">3.152271492884306e-08<!--kg PM2.5-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">1.9472166026692984e-06<!--kg PM2.5-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">3.620619948678275e-08<!--kg PM2.5-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">5.317576912728102e-07<!--kg PM2.5-Eq for component wing in production phase--></wing>
+        </production>
+      </particulate_matter_formation>
+      <photochemical_oxidant_formation_human_health>
+        <sum is_input="False">0.00018861181523711597<!--kg NOx-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">1.504341179743822e-07<!--kg NOx-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">4.695032931179245e-08<!--kg NOx-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">9.273736051423219e-05<!--kg NOx-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">9.240282424453315e-05<!--kg NOx-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.00018514018475876534<!--kg NOx-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.6318413451752462e-06<!--kg NOx-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">7.750938155378446e-09<!--kg NOx-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">3.290139916064794e-08<!--kg NOx-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">5.967489568709173e-07<!--kg NOx-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">7.952418903405418e-08<!--kg NOx-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">1.7669044699448924e-07<!--kg NOx-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">5.935847791346544e-09<!--kg NOx-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">7.362780774470808e-08<!--kg NOx-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">3.2742460310644784e-06<!--kg NOx-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">4.2661334411140364e-08<!--kg NOx-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">6.265637657265505e-07<!--kg NOx-Eq for component wing in production phase--></wing>
+        </production>
+      </photochemical_oxidant_formation_human_health>
+      <photochemical_oxidant_formation_terrestrial_ecosystems>
+        <sum is_input="False">0.00020629513882138985<!--kg NOx-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">1.646038822521987e-07<!--kg NOx-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">5.13726977749575e-08<!--kg NOx-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.000110176175669381<!--kg NOx-Eq for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">9.240282424453315e-05<!--kg NOx-Eq for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.00020257899991391417<!--kg NOx-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.8053770407541944e-06<!--kg NOx-Eq for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">7.878669315890126e-09<!--kg NOx-Eq for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">3.626239606022512e-08<!--kg NOx-Eq for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">6.109749271968545e-07<!--kg NOx-Eq for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">8.141997576374492e-08<!--kg NOx-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">1.86172547771841e-07<!--kg NOx-Eq for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">6.438739983401358e-09<!--kg NOx-Eq for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">8.045919262180083e-08<!--kg NOx-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">3.5001623274485245e-06<!--kg NOx-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">4.367834310534918e-08<!--kg NOx-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">6.415004948752223e-07<!--kg NOx-Eq for component wing in production phase--></wing>
+        </production>
+      </photochemical_oxidant_formation_terrestrial_ecosystems>
+      <total_ecosystem_quality>
+        <sum is_input="False">4.3040386985026067e-10<!--species.yr for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">3.435315172872891e-13<!--species.yr for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.0721582366285139e-13<!--species.yr for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">1.2913281246393486e-10<!--species.yr for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">2.9365351710964336e-10<!--species.yr for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">4.227863295735782e-10<!--species.yr for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">3.801421014111529e-12<!--species.yr for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">1.4309215563635198e-14<!--species.yr for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">1.026087882929258e-13<!--species.yr for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">1.2012631803537127e-12<!--species.yr for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">1.6008319601430278e-13<!--species.yr for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">3.076383786108451e-13<!--species.yr for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">9.853684911043383e-15<!--species.yr for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">2.2245690657279534e-13<!--species.yr for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">7.166792935732371e-12<!--species.yr for the whole production phase--></sum>
+          <vertical_tail is_input="False">8.587780449852566e-14<!--species.yr for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">1.2612807668030562e-12<!--species.yr for component wing in production phase--></wing>
+        </production>
+      </total_ecosystem_quality>
+      <total_human_health>
+        <sum is_input="False">6.68084941357378e-07<!--DALYs for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">5.395078419659715e-10<!--DALYs for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.6837982757947484e-10<!--DALYs for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">6.078015627433799e-08<!--DALYs for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">6.031954290871713e-07<!--DALYs for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">6.639755853615093e-07<!--DALYs for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.544632067398043e-09<!--DALYs for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">9.173174238891019e-12<!--DALYs for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">4.147077347800727e-11<!--DALYs for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">6.508051947322139e-10<!--DALYs for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">8.672785219702374e-11<!--DALYs for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">2.3833909240954e-10<!--DALYs for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">8.963216899903653e-12<!--DALYs for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">9.151039788725616e-11<!--DALYs for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">3.4014683263233497e-09<!--DALYs for the whole production phase--></sum>
+          <vertical_tail is_input="False">4.652579234417325e-11<!--DALYs for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">6.83320764738298e-10<!--DALYs for component wing in production phase--></wing>
+        </production>
+      </total_human_health>
+      <total_natural_resources>
+        <sum is_input="False">0.01631937524543159<!--USD 2013 for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">1.313825350782361e-05<!--USD 2013 for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">4.100435041465627e-06<!--USD 2013 for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">0.016169328571196746<!--USD 2013 for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.0<!--USD 2013 for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">0.016169328571196746<!--USD 2013 for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">8.843644582473086e-05<!--USD 2013 for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">1.3296403521770999e-07<!--USD 2013 for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">1.6785569955104528e-06<!--USD 2013 for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">1.542293365684159e-05<!--USD 2013 for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">2.0552969175137587e-06<!--USD 2013 for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">4.0194812735452516e-06<!--USD 2013 for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">2.9838848559608437e-07<!--USD 2013 for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">3.4678441556580568e-06<!--USD 2013 for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.0001328079856855521<!--USD 2013 for the whole production phase--></sum>
+          <vertical_tail is_input="False">1.102579104260881e-06<!--USD 2013 for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">1.619349523667743e-05<!--USD 2013 for component wing in production phase--></wing>
+        </production>
+      </total_natural_resources>
+      <water_use>
+        <sum is_input="False">5.8264875369590016e-05<!--m3 for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">4.062749215653539e-08<!--m3 for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.2679797386032005e-08<!--m3 for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <gasoline_for_mission is_input="False">5.000050191690661e-05<!--m3 for component gasoline_for_mission in operation phase--></gasoline_for_mission>
+          <ice_1 is_input="False">0.0<!--m3 for component ice_1 in operation phase--></ice_1>
+          <sum is_input="False">5.000050191690661e-05<!--m3 for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">4.346902997360006e-06<!--m3 for component assembly in production phase--></assembly>
+          <flight_controls is_input="False">1.774478181027802e-08<!--m3 for component flight_controls in production phase--></flight_controls>
+          <fuel_system_1 is_input="False">8.548311386692426e-08<!--m3 for component fuel_system_1 in production phase--></fuel_system_1>
+          <fuselage is_input="False">1.3886652859980482e-06<!--m3 for component fuselage in production phase--></fuselage>
+          <horizontal_tail is_input="False">1.850568475021655e-07<!--m3 for component horizontal_tail in production phase--></horizontal_tail>
+          <ice_1 is_input="False">4.2604638524644407e-07<!--m3 for component ice_1 in production phase--></ice_1>
+          <landing_gear is_input="False">1.498627814755818e-08<!--m3 for component landing_gear in production phase--></landing_gear>
+          <propeller_1 is_input="False">1.8885950200442543e-07<!--m3 for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">8.211066163140835e-06<!--m3 for the whole production phase--></sum>
+          <vertical_tail is_input="False">9.927510298760237e-08<!--m3 for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">1.4580458682173828e-06<!--m3 for component wing in production phase--></wing>
+        </production>
+      </water_use>
+      <operation>
+        <sizing>
+          <he_power_train>
+            <ICE>
+              <ice_1>
+                <CO units="g" is_input="True">186307.80232368954</CO>
+                <CO2 units="g" is_input="True">723752.114290022</CO2>
+                <H2O units="g" is_input="True">288800.44044411526</H2O>
+                <HC units="g" is_input="True">4404.848754938659</HC>
+                <NOx units="g" is_input="True">733.090851248603</NOx>
+                <SOx units="g" is_input="True">98.05673806509975</SOx>
+                <lead units="g" is_input="True">185.37392862783142</lead>
+              </ice_1>
+            </ICE>
+          </he_power_train>
+        </sizing>
+      </operation>
+    </environmental_impact>
+    <mission>
+      <sizing>
+        <duration units="s" is_input="True">25928.681157428684</duration>
+      </sizing>
+    </mission>
+    <weight>
+      <aircraft>
+        <OWE units="kg" is_input="True">992.1692414379797<!--operating weight - empty--></OWE>
+        <OWE_per_fu units="kg" is_input="False">2.2841734615814808e-05</OWE_per_fu>
+        <payload units="kg" is_input="True">375.0<!--design payload weight--></payload>
+      </aircraft>
+      <airframe>
+        <flight_controls>
+          <mass units="lbm" is_input="True">48.25596302005408<!--flight controls total mass--></mass>
+          <mass_per_fu units="kg" is_input="False">5.039182067089566e-07</mass_per_fu>
+        </flight_controls>
+        <fuselage>
+          <mass units="lbm" is_input="True">306.19115541544494<!--fuselage total mass using Raymer's formula (not used but implemented)--></mass>
+          <mass_per_fu units="kg" is_input="False">3.197434851377286e-06</mass_per_fu>
+        </fuselage>
+        <horizontal_tail>
+          <mass units="lbm" is_input="True">40.80376353147169<!--horizontal tail total mass--></mass>
+          <mass_per_fu units="kg" is_input="False">4.260977930791793e-07</mass_per_fu>
+        </horizontal_tail>
+        <landing_gear>
+          <mass_per_fu units="kg" is_input="False">1.2854651588003596e-06</mass_per_fu>
+          <front>
+            <mass units="lbm" is_input="True">36.19760752305225<!--front landing gear mass--></mass>
+          </front>
+          <main>
+            <mass units="lbm" is_input="True">86.9004634352471<!--main landing gear mass--></mass>
+          </main>
+        </landing_gear>
+        <vertical_tail>
+          <mass units="lbm" is_input="True">21.889478187621364<!--vertical tail total mass--></mass>
+          <mass_per_fu units="kg" is_input="False">2.285832859561201e-07</mass_per_fu>
+        </vertical_tail>
+        <wing>
+          <mass units="lbm" is_input="True">321.4890971493785<!--wing total mass--></mass>
+          <mass_per_fu units="kg" is_input="False">3.357185292202563e-06</mass_per_fu>
+        </wing>
+      </airframe>
+    </weight>
+    <LCA>
+      <distribution>
+        <he_power_train>
+          <gasoline>
+            <mass_per_fu units="kg" is_input="False">2.3911193202163146e-05</mass_per_fu>
+          </gasoline>
+          <ICE>
+            <ice_1>
+              <CO2_per_fu units="kg" is_input="False">7.412469892670576e-05</CO2_per_fu>
+              <CO_per_fu units="kg" is_input="False">1.9081132175326195e-05</CO_per_fu>
+              <H2O_per_fu units="kg" is_input="False">2.9578145991075823e-05</H2O_per_fu>
+              <HC_per_fu units="kg" is_input="False">4.5113248214521215e-07</HC_per_fu>
+              <NOx_per_fu units="kg" is_input="False">7.50811466547923e-08</NOx_per_fu>
+              <SOx_per_fu units="kg" is_input="False">1.0042701144908524e-08</SOx_per_fu>
+              <lead_per_fu units="kg" is_input="False">1.8985487402517538e-08</lead_per_fu>
+            </ice_1>
+          </ICE>
+        </he_power_train>
+      </distribution>
+      <manufacturing>
+        <he_power_train>
+          <gasoline>
+            <mass_per_fu units="kg" is_input="False">7.462658140293878e-06</mass_per_fu>
+          </gasoline>
+          <ICE>
+            <ice_1>
+              <CO2_per_fu units="kg" is_input="False">2.3134240234911024e-05</CO2_per_fu>
+              <CO_per_fu units="kg" is_input="False">5.955201195954517e-06</CO_per_fu>
+              <H2O_per_fu units="kg" is_input="False">9.231308119543531e-06</H2O_per_fu>
+              <HC_per_fu units="kg" is_input="False">1.4079797113292463e-07</HC_per_fu>
+              <NOx_per_fu units="kg" is_input="False">2.3432746560522786e-08</NOx_per_fu>
+              <SOx_per_fu units="kg" is_input="False">3.134316418923429e-09</SOx_per_fu>
+              <lead_per_fu units="kg" is_input="False">5.92535056339334e-09</lead_per_fu>
+            </ice_1>
+          </ICE>
+        </he_power_train>
+      </manufacturing>
+      <operation>
+        <he_power_train>
+          <gasoline>
+            <mass_per_fu units="kg" is_input="False">0.029427651033290803</mass_per_fu>
+          </gasoline>
+          <ICE>
+            <ice_1>
+              <CO2_per_fu units="kg" is_input="False">0.09122571820320151</CO2_per_fu>
+              <CO_per_fu units="kg" is_input="False">0.023483265524566067</CO_per_fu>
+              <H2O_per_fu units="kg" is_input="False">0.03640200432818074</H2O_per_fu>
+              <HC_per_fu units="kg" is_input="False">0.0005552114920450977</HC_per_fu>
+              <NOx_per_fu units="kg" is_input="False">9.240282424453315e-05</NOx_per_fu>
+              <SOx_per_fu units="kg" is_input="False">1.235961343398214e-05</SOx_per_fu>
+              <lead_per_fu units="kg" is_input="False">2.3365554920432902e-05</lead_per_fu>
+            </ice_1>
+          </ICE>
+        </he_power_train>
+      </operation>
+    </LCA>
+    <propulsion>
+      <he_power_train>
+        <ICE>
+          <ice_1>
+            <mass units="kg" is_input="True">284.46883804944474<!--Installed weight of the ICE engine--></mass>
+            <mass_per_fu units="kg" is_input="False">6.549045700889925e-06<!--Weight of the ICE required for a functional unit--></mass_per_fu>
+          </ice_1>
+        </ICE>
+        <fuel_system>
+          <fuel_system_1>
+            <mass units="lbm" is_input="True">38.96695296184064<!--Weight of the fuel system--></mass>
+            <mass_per_fu units="kg" is_input="False">4.069166964771309e-07<!--Weight of the fuel system required for a functional unit--></mass_per_fu>
+          </fuel_system_1>
+        </fuel_system>
+        <fuel_tank>
+          <fuel_tank_1>
+            <fuel_consumed_mission units="kg" is_input="True">116.73421198226158</fuel_consumed_mission>
+            <mass units="kg" is_input="True">1.1675740627078273</mass>
+            <mass_per_fu units="kg" is_input="False">2.6879906946145748e-08<!--Weight of the generator required for a functional unit--></mass_per_fu>
+          </fuel_tank_1>
+          <fuel_tank_2>
+            <fuel_consumed_mission units="kg" is_input="True">116.73421198226158</fuel_consumed_mission>
+            <mass units="kg" is_input="True">1.1675740627078273</mass>
+            <mass_per_fu units="kg" is_input="False">2.6879906946145748e-08<!--Weight of the generator required for a functional unit--></mass_per_fu>
+          </fuel_tank_2>
+        </fuel_tank>
+        <propeller>
+          <propeller_1>
+            <mass units="kg" is_input="True">36.37794904580757</mass>
+            <mass_per_fu units="kg" is_input="False">8.374936686886917e-07<!--Weight of the propeller required for a functional unit--></mass_per_fu>
+            <material is_input="True">0.0</material>
+          </propeller_1>
+        </propeller>
+      </he_power_train>
+    </propulsion>
+  </data>
+</FASTOAD_model>

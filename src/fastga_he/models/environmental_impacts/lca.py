@@ -5,6 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
+import pathlib
+
 import fastoad.api as oad
 from fastoad.module_management.constants import ModelDomain
 
@@ -130,6 +132,23 @@ class LCA(om.Group):
             types=bool,
             desc="The inputs for the computation of the functional units are requested in "
             "hours instead of years and number of flights per year",
+        )
+        self.options.declare(
+            name="write_lca_conf",
+            default=True,
+            types=bool,
+            desc="By default the code will write a new configuration file for the LCA in the same "
+            "folder as the powertrain file at each setup of the LCA module. This can be "
+            "turned off if an LCA file is already available",
+        )
+        self.options.declare(
+            name="lca_conf_file_path",
+            default="",
+            types=(str, pathlib.Path),
+            desc="If an existing LCA configuration file is to be used, its path can be provided "
+            "here. If nothing is put for this option, the code will assume it is located in "
+            "the same folder as the powertrain file and will have the same name except for a "
+            "_lca suffix",
         )
 
     def setup(self):
@@ -288,6 +307,8 @@ class LCA(om.Group):
                 airframe_material=self.options["airframe_material"],
                 delivery_method=self.options["delivery_method"],
                 electric_mix=self.options["electric_mix"],
+                write_lca_conf=self.options["write_lca_conf"],
+                lca_conf_file_path=self.options["lca_conf_file_path"],
             ),
             promotes=["*"],
         )

@@ -1033,13 +1033,23 @@ def lca_impacts_bar_chart_normalised_weighted(
     return go.FigureWidget(fig)
 
 
-def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]) -> dict:
+def _get_component_and_contribution(
+    aircraft_file_path: Union[str, pathlib.Path],
+    detailed_component_contributions: bool = False,
+    aggregate_phase: list = None,
+) -> dict:
     """
     Returns a dict of the components and their impact in each category. Also return a dict with the
     total value for each impact.
 
     :param aircraft_file_path: path to the output file path.
     :return: a dict of the components with their contribution to each impact category.
+    :param detailed_component_contributions: by default, the contribution in each phase of a components are summed
+    together and only the total is shown, this allows to see the contribution in each phase of
+    each component
+    :param aggregate_phase: for compactness, it may be preferable to aggregate the contribution
+    of all components to a phase. This options is a list of phases to aggregate. Please note that
+    the aggregation of the manufacturing and distribution can't be changed (see the documentation).
     """
 
     datafile = oad.DataFile(aircraft_file_path)
@@ -1052,16 +1062,35 @@ def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]
         if LCA_PREFIX in name and "_weighted:" in name:
             if _depth_lca_detail(name) >= 4:
                 component_name = _get_component_from_variable_name(name)
+                phase_name = name.split(":")[-2]
                 impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
                 contribution = datafile[name].value[0]
-                if contribution != 0.0:
-                    if component_name in component_and_impacts:
-                        if impact_name in component_and_impacts[component_name]:
-                            component_and_impacts[component_name][impact_name] += contribution
+
+                if aggregate_phase and phase_name in aggregate_phase:
+                    if contribution != 0.0:
+                        key_name = phase_name
+                        if key_name in component_and_impacts:
+                            if impact_name in component_and_impacts[key_name]:
+                                component_and_impacts[key_name][impact_name] += contribution
+                            else:
+                                component_and_impacts[key_name][impact_name] = contribution
                         else:
-                            component_and_impacts[component_name][impact_name] = contribution
+                            component_and_impacts[key_name] = {impact_name: contribution}
+
+                else:
+                    if detailed_component_contributions:
+                        key_name = component_name + ": " + phase_name
                     else:
-                        component_and_impacts[component_name] = {impact_name: contribution}
+                        key_name = component_name
+
+                    if contribution != 0.0:
+                        if key_name in component_and_impacts:
+                            if impact_name in component_and_impacts[key_name]:
+                                component_and_impacts[key_name][impact_name] += contribution
+                            else:
+                                component_and_impacts[key_name][impact_name] = contribution
+                        else:
+                            component_and_impacts[key_name] = {impact_name: contribution}
 
             elif "manufacturing:sum" in name:
                 component_name = "manufacturing"
@@ -1090,6 +1119,9 @@ def _get_component_and_contribution(aircraft_file_path: Union[str, pathlib.Path]
 def lca_impacts_bar_chart_with_contributors(
     aircraft_file_path: Union[str, pathlib.Path],
     name_aircraft: str = None,
+    detailed_component_contributions: bool = False,
+    legend_rename: dict = None,
+    aggregate_phase: list = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that plot the impact of an aircraft in each category and how each component
@@ -1097,9 +1129,19 @@ def lca_impacts_bar_chart_with_contributors(
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft.
+    :param detailed_component_contributions: by default, the contribution in each phase of a components are summed
+    together and only the total is shown, this allows to see the contribution in each phase of
+    each component
+    :param legend_rename: legend names are set by the code by default, if any renaming is to be
+    done, pass here the legend to be renamed as key and how to rename it as item.
+    :param aggregate_phase: for compactness, it may be preferable to aggregate the contribution
+    of all components to a phase. This options is a list of phases to aggregate. Please note that
+    the aggregation of the manufacturing and distribution can't be changed (see the documentation).
     """
 
-    component_and_contribution = _get_component_and_contribution(aircraft_file_path)
+    component_and_contribution = _get_component_and_contribution(
+        aircraft_file_path, detailed_component_contributions, aggregate_phase
+    )
 
     fig = go.Figure()
 
@@ -1112,6 +1154,18 @@ def lca_impacts_bar_chart_with_contributors(
         impact_contributions = []
         beautified_impact_names = []
 
+        if detailed_component_contributions:
+            component_name = component.split(":")[0]
+            beautified_component_name = component_name.replace("_", " ")
+        else:
+            component_name = component
+            beautified_component_name = component.replace("_", " ")
+
+        final_name = component.replace(component_name, beautified_component_name)
+
+        if legend_rename and final_name in legend_rename:
+            final_name = legend_rename[final_name]
+
         for impact_name, contribution in impacts.items():
             beautified_impact_name = impact_name.replace("_", " ")
             beautified_impact_names.append(beautified_impact_name)
@@ -1119,7 +1173,7 @@ def lca_impacts_bar_chart_with_contributors(
             impact_contributions.append(contribution / impact_score_dict[impact_name] * 100.0)
 
         bar_chart = go.Bar(
-            name=component,
+            name=final_name,
             x=beautified_impact_names,
             y=impact_contributions,
             marker=dict(
@@ -1170,6 +1224,9 @@ def lca_impacts_bar_chart_with_contributors(
 def lca_impacts_bar_chart_with_components_absolute(
     aircraft_file_path: Union[str, pathlib.Path],
     name_aircraft: str = None,
+    detailed_component_contributions: bool = False,
+    legend_rename: dict = None,
+    aggregate_phase: list = None,
 ) -> go.FigureWidget:
     """
     Provide a bar chart of the weighted impacts of an aircraft, showing the absolute value of each
@@ -1177,9 +1234,17 @@ def lca_impacts_bar_chart_with_components_absolute(
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft
+    :param detailed_component_contributions: by default, all contribution of one component, regardless of the phase
+    is aggregated, this segregates them.
+    :param legend_rename: legend names are set by the code by default, if any renaming is to be
+    done, pass here the legend to be renamed as key and how to rename it as item.
+    :param aggregate_phase: by default only the manufacturing and distribution are aggregated.
+    Additional phase specified here can be aggregated.
     """
 
-    component_and_contribution = _get_component_and_contribution(aircraft_file_path)
+    component_and_contribution = _get_component_and_contribution(
+        aircraft_file_path, detailed_component_contributions, aggregate_phase
+    )
 
     fig = go.Figure()
 
@@ -1188,14 +1253,25 @@ def lca_impacts_bar_chart_with_components_absolute(
 
     component_counter = 0
 
-    beautified_component_names = []
+    components_type = {}
 
     for component_name in component_and_contribution:
-        beautified_component_name = component_name.replace("_", " ")
-        if beautified_component_name[-1].isdigit():
-            beautified_component_names.append(beautified_component_name[:-2])
+        if detailed_component_contributions:
+            beautified_component_name = component_name.split(":")[0].replace("_", " ")
         else:
-            beautified_component_names.append(beautified_component_name)
+            beautified_component_name = component_name.replace("_", " ")
+
+        if beautified_component_name[-1].isdigit():
+            component_type = beautified_component_name[:-2]
+            if component_type in components_type:
+                existing_component_of_that_type = components_type[component_type]
+                # To avoid duplication
+                existing_component_of_that_type.append(beautified_component_name)
+                components_type[component_type] = list(set(existing_component_of_that_type))
+            else:
+                components_type[component_type] = [beautified_component_name]
+        else:
+            components_type[beautified_component_name] = [beautified_component_name]
 
     for component, impacts in component_and_contribution.items():
         impact_contributions = []
@@ -1208,15 +1284,25 @@ def lca_impacts_bar_chart_with_components_absolute(
             impact_contributions.append(contribution)
 
         # If there are only one component of each type, we don't put the number
-        beautified_component_name = component.replace("_", " ")
+
+        if detailed_component_contributions:
+            component_name = component.split(":")[0]
+            beautified_component_name = component_name.replace("_", " ")
+        else:
+            component_name = component
+            beautified_component_name = component_name.replace("_", " ")
+
         if beautified_component_name[-1].isdigit():
             component_type = " ".join(beautified_component_name.split(" ")[:-1])
-            if beautified_component_names.count(component_type) == 1:
-                final_name = component_type
+            if len(components_type[component_type]) == 1:
+                final_name = component.replace(component_name, component_type)
             else:
-                final_name = beautified_component_name
+                final_name = component.replace(component_name, beautified_component_name)
         else:
-            final_name = beautified_component_name
+            final_name = component.replace(component_name, beautified_component_name)
+
+        if legend_rename and final_name in legend_rename:
+            final_name = legend_rename[final_name]
 
         bar_chart = go.Bar(
             name=final_name,

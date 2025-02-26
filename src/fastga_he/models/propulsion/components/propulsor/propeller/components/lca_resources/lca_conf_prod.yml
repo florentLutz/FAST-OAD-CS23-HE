@@ -19,7 +19,8 @@ ANCHOR_COMPONENT_NAME:
         # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
         # with the mass
         electricity:
-          name: 'electricity, high voltage, European attribute mix'
+          name: 'market group for electricity, high voltage'
+          loc: 'RER'
           amount: 13361 / 333.9 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
 
         gas:
@@ -45,9 +46,9 @@ ANCHOR_COMPONENT_NAME:
         water_in:
           name: 'market for water, decarbonised'
           loc: 'RoW'
-          amount: 33 / 333.9 # In m**3 but since 1m**3 = 1kg
+          amount: 33000 / 333.9 # In m**3 in the source, in kg here (1m**3 = 1000kg)
 
-        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In m**3
           amount: 30 / 333.9
           name: 'water'
           categories:
