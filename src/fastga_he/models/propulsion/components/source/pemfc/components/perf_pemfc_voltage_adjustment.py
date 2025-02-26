@@ -8,8 +8,8 @@ import openmdao.api as om
 
 class PerformancesPEMFCStackVoltageAdjustment(om.ExplicitComponent):
     """
-    Computation of PEMFC voltage correction factor based on ambient pressure in different altitude
-    from :cite:`juschus:2021`.
+    Computation of the single-layered PEMFC voltage correction factor based on ambient pressure in
+    different altitude, from :cite:`juschus:2021`.
     """
 
     def initialize(self):

@@ -11,8 +11,8 @@ from ..constants import DEFAULT_PRESSURE
 
 class PerformancesPEMFCStackAmbientPressure(om.ExplicitComponent):
     """
-    Computation of the ambient pressure that PEMFC is working under. The ambient pressure varies
-    based on the change of operating altitude of PEMFC.
+    Computation of the ambient pressure that the PEMFC stack is working under. The ambient pressure
+    varies based on the change of operating altitude of the PEMFC stack.
     """
 
     def initialize(self):

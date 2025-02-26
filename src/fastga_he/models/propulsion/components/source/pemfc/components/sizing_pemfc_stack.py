@@ -24,14 +24,14 @@ class SizingPEMFCStack(om.Group):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC pack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
             name="position",
             default="in_the_back",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of PEMFC, possible position include "
+            desc="Option to give the position of the PEMFC stack, possible position include "
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )

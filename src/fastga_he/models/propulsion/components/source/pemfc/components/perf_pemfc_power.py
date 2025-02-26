@@ -10,7 +10,8 @@ DEFAULT_STACK_POWER = 216.0  # [kW]
 
 class PerformancesPEMFCStackPower(om.ExplicitComponent):
     """
-    Computation of the power at the output of the PEMFC, which only considered in post-processing.
+    Computation of the power at the output of the PEMFC stack, which only considered in
+    post-processing.
     """
 
     def initialize(self):

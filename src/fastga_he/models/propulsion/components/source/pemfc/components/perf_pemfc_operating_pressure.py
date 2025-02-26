@@ -10,7 +10,7 @@ from ..constants import DEFAULT_PRESSURE
 
 class PerformancesPEMFCStackOperatingPressure(om.ExplicitComponent):
     """
-    Computation of the operating pressure of PEMFC.
+    Computation of the operating pressure of the PEMFC stack.
     """
 
     def initialize(self):
@@ -21,8 +21,8 @@ class PerformancesPEMFCStackOperatingPressure(om.ExplicitComponent):
             name="compressor_connection",
             default=False,
             types=bool,
-            desc="The PEMFC operation pressure have to adjust based on compressor connection for "
-            "oxygen inlet",
+            desc="The PEMFC stack operation pressure have to adjust based on compressor "
+            "connection for the oxygen/air inlet",
         )
 
     def setup(self):
@@ -51,6 +51,7 @@ class PerformancesPEMFCStackOperatingPressure(om.ExplicitComponent):
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
+            val=np.ones(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -59,14 +60,3 @@ class PerformancesPEMFCStackOperatingPressure(om.ExplicitComponent):
             outputs["operating_pressure"] = inputs["input_pressure"]
         else:
             outputs["operating_pressure"] = inputs["ambient_pressure"]
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        compressor_connection = self.options["compressor_connection"]
-        if compressor_connection:
-            partials["operating_pressure", "input_pressure"] = np.ones_like(
-                inputs["input_pressure"]
-            )
-        else:
-            partials["operating_pressure", "ambient_pressure"] = np.ones_like(
-                inputs["ambient_pressure"]
-            )

@@ -11,7 +11,7 @@ MAX_PEMFC_SPECIFIC_POWER = 2.06  # [kW/kg]
 
 class SizingPEMFCStackSpecificPower(om.ExplicitComponent):
     """
-    Computation of the maximum specific power provide of PEMFC system exclude the inlet
+    Computation of the maximum specific power provide of the PEMFC system excluding the inlet
     compressor. Applied in weight calculation.
     Source: https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf
     """
@@ -20,7 +20,7 @@ class SizingPEMFCStackSpecificPower(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
 
@@ -31,7 +31,7 @@ class SizingPEMFCStackSpecificPower(om.ExplicitComponent):
             name="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
             units="kW",
             val=np.nan,
-            desc="Maximum power to PEMFC during the mission",
+            desc="Maximum power of the PEMFC stack has to provide during the mission",
         )
 
         self.add_output(

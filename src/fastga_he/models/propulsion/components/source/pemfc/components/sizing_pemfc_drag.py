@@ -10,15 +10,15 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingPEMFCStackDrag(om.ExplicitComponent):
     """
-    Computation of PEMFC contribution to profile drag according to the position given in the
-    options. The influence will be calculated if positioned outside the fuselage.
+    Computation of the PEMFC stack's contribution to profile drag according to the position given
+    in the options. The influence will be calculated if positioned outside the fuselage.
     """
 
     def initialize(self):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
 
@@ -26,7 +26,7 @@ class SizingPEMFCStackDrag(om.ExplicitComponent):
             name="position",
             default="in_the_back",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of PEMFC, possible position include "
+            desc="Option to give the position of the PEMFC stack, possible position include "
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
@@ -44,7 +44,7 @@ class SizingPEMFCStackDrag(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
             units="m",
             val=np.nan,
-            desc="Width of PEMFC, as in the size of PEMFC along the Y-axis",
+            desc="Width of the PEMFC stack, as in the size of the PEMFC stack along the Y-axis",
         )
 
         if position == "underbelly":
@@ -54,7 +54,8 @@ class SizingPEMFCStackDrag(om.ExplicitComponent):
                 + ":dimension:length",
                 units="m",
                 val=np.nan,
-                desc="Length of PEMFC, as in the size of PEMFC along the X-axis",
+                desc="Length of the PEMFC stack, as in the size of the PEMFC stack along the "
+                "X-axis",
             )
 
             self.add_input(
@@ -63,7 +64,7 @@ class SizingPEMFCStackDrag(om.ExplicitComponent):
                 + ":dimension:height",
                 units="m",
                 val=np.nan,
-                desc="height of PEMFC, as in the size of PEMFC along the Z-axis",
+                desc="Height of the PEMFC stack, as in the size of the PEMFC stack along the Z-axis",
             )
 
             self.add_input("data:geometry:fuselage:wet_area", val=np.nan, units="m**2")
@@ -89,7 +90,7 @@ class SizingPEMFCStackDrag(om.ExplicitComponent):
 
         if position == "wing_pod":
             # According to :cite:`gudmundsson:2013`. the drag of a streamlined external tank,
-            # which more or less resemble a podded pemfc can be computed using the following
+            # which more or less resemble a podded PEMFC can be computed using the following
             # formula. It highly depends on the tank/wing interface so we will take a middle.
             # Also, there is no dependency on the tank length
 

@@ -4,18 +4,17 @@
 
 import numpy as np
 import openmdao.api as om
-from ..constants import HHV_HYDROGEN_EQUIVALENT_VOLTAGE
+from ..constants import HHV_HYDROGEN_EQUIVALENT_VOLTAGE, FUEL_UTILIZATION_COEFFICIENT
 
 DEFAULT_PEMFC_EFFICIENCY = 0.53
-FUEL_UTILIZATION_COEFFICIENT = 0.95
 
 
 class PerformancesPEMFCStackEfficiency(om.ExplicitComponent):
     """
-    Computation of efficiency of PEMFC with dividing the actual voltage provided by the fuel cell
-    with the higher heating value (HHV) of hydrogen. The convertion into voltage form is simply
-    calculated by dividing the HHV of hydrogen (285.5 kJ/mol) by the amount of electrons produced by
-    single hydrogen particle and the Faraday's constant.
+    Computation of efficiency of the PEMFC  with dividing the actual voltage provided by the
+    fuel cell with the higher heating value (HHV) of hydrogen. The convertion into voltage form
+    is simply calculated by dividing the HHV of hydrogen (285.5 kJ/mol) by the amount of
+    electrons produced by single hydrogen particle and Faraday's constant.
     source: https://www.nrel.gov/docs/fy10osti/47302.pdf
     """
 
@@ -44,6 +43,9 @@ class PerformancesPEMFCStackEfficiency(om.ExplicitComponent):
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
+            val=np.full(
+                number_of_points, FUEL_UTILIZATION_COEFFICIENT / HHV_HYDROGEN_EQUIVALENT_VOLTAGE
+            ),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -51,14 +53,4 @@ class PerformancesPEMFCStackEfficiency(om.ExplicitComponent):
             inputs["single_layer_pemfc_voltage"]
             * FUEL_UTILIZATION_COEFFICIENT
             / HHV_HYDROGEN_EQUIVALENT_VOLTAGE
-        )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        number_of_points = self.options["number_of_points"]
-
-        partials[
-            "efficiency",
-            "single_layer_pemfc_voltage",
-        ] = np.full(
-            number_of_points, FUEL_UTILIZATION_COEFFICIENT / HHV_HYDROGEN_EQUIVALENT_VOLTAGE
         )

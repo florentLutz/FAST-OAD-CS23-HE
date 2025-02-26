@@ -24,13 +24,12 @@ from ..components.sizing_pemfc_stack import SizingPEMFCStack
 
 from ..components.perf_fuel_consumption import PerformancesPEMFCStackFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
-from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCStackSingleVoltageEmpirical
-from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCStackSingleVoltageAnalytical
+from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCStackSingleLayerVoltageEmpirical
+from ..components.perf_pemfc_layer_voltage import PerformancesPEMFCStackSingleLayerVoltageAnalytical
 from ..components.perf_pemfc_current_density import PerformancesPEMFCStackCurrentDensity
 from ..components.perf_maximum import PerformancesPEMFCStackMaximum
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackEfficiency
 from ..components.perf_pemfc_power import PerformancesPEMFCStackPower
-from ..components.perf_fuel_power_density import PerformancesPEMFCStackHydrogenPowerDensity
 from ..components.perf_pemfc_voltage import PerformancesPEMFCStackVoltage
 from ..components.perf_pemfc_operating_pressure import PerformancesPEMFCStackOperatingPressure
 from ..components.perf_pemfc_operating_temperature import PerformancesPEMFCStackOperatingTemperature
@@ -460,7 +459,9 @@ def test_pemfc_polarization_curve_empirical():
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackPolarizationCurveEmpirical(number_of_points=7),
+        PerformancesPEMFCStackPolarizationCurveEmpirical(
+            number_of_points=7, pemfc_stack_id="pemfc_stack_1"
+        ),
         ivc,
     )
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
@@ -603,27 +604,6 @@ def test_pemfc_power():
     problem.check_partials(compact_print=True)
 
 
-def test_hydrogen_power_density():
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "power_out",
-        units="kW",
-        val=np.array([802.0, 786.0, 770.0, 760.0, 750.0, 740.0, 734.0, 726.0, 720.0, 714.0]),
-    )
-    ivc.add_output("fuel_consumed_t", np.full(NB_POINTS_TEST, 1000.0), units="kg")
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesPEMFCStackHydrogenPowerDensity(number_of_points=NB_POINTS_TEST),
-        ivc,
-    )
-    assert problem.get_val("specific_power", units="kW/kg") == pytest.approx(
-        [0.802, 0.786, 0.77, 0.76, 0.75, 0.74, 0.734, 0.726, 0.72, 0.714],
-        rel=1e-2,
-    )
-    problem.check_partials(compact_print=True)
-
-
 def test_pemfc_efficiency():
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -719,7 +699,11 @@ def test_fuel_consumed():
 def test_performances_pemfc_layer_voltage_empirical():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(PerformancesPEMFCStackSingleVoltageEmpirical(number_of_points=NB_POINTS_TEST)),
+        list_inputs(
+            PerformancesPEMFCStackSingleLayerVoltageEmpirical(
+                number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+            )
+        ),
         __file__,
         XML_FILE,
     )
@@ -729,7 +713,9 @@ def test_performances_pemfc_layer_voltage_empirical():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackSingleVoltageEmpirical(number_of_points=NB_POINTS_TEST),
+        PerformancesPEMFCStackSingleLayerVoltageEmpirical(
+            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+        ),
         ivc,
     )
 
@@ -756,7 +742,7 @@ def test_performances_pemfc_layer_voltage_analytical():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
-            PerformancesPEMFCStackSingleVoltageAnalytical(
+            PerformancesPEMFCStackSingleLayerVoltageAnalytical(
                 number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
             )
         ),
@@ -769,7 +755,7 @@ def test_performances_pemfc_layer_voltage_analytical():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackSingleVoltageAnalytical(
+        PerformancesPEMFCStackSingleLayerVoltageAnalytical(
             number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
         ),
         ivc,

@@ -13,14 +13,14 @@ DEFAULT_HYDROGEN_CONSUMPTION = 30.0  # [kg/h]
 class PerformancesPEMFCStackFuelConsumption(om.ExplicitComponent):
     """
     Computation of the hydrogen consumption for the required power. Simply based on the
-    results of the number of layers,  current density, and effective area.
+    results of the number of layers, current density, and effective area of the PEMFC stack.
     """
 
     def initialize(self):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
@@ -35,7 +35,7 @@ class PerformancesPEMFCStackFuelConsumption(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             units="cm**2",
             val=np.nan,
-            desc="Effective fuel cell area in the stack",
+            desc="Effective area of the PEMFC's polymer electrolyte membrane",
         )
 
         self.add_input(
@@ -43,13 +43,13 @@ class PerformancesPEMFCStackFuelConsumption(om.ExplicitComponent):
             val=np.nan,
             shape=number_of_points,
             units="A/cm**2",
-            desc="Current density of PEMFC stack",
+            desc="Current density of the PEMFC stack",
         )
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
             val=np.nan,
-            desc="Total number of layers in PEMFC stacks",
+            desc="Total number of layers in the PEMFC stack",
         )
 
         self.add_output(

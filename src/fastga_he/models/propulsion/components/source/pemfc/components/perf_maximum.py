@@ -10,14 +10,14 @@ from ..constants import MAX_DEFAULT_STACK_POWER, MAX_DEFAULT_STACK_CURRENT
 
 class PerformancesPEMFCStackMaximum(om.ExplicitComponent):
     """
-    Computation that identifies the maximum power and current output from PEMFC.
+    Computation that identifies the maximum power and current output from the PEMFC stack.
     """
 
     def initialize(self):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
@@ -36,14 +36,14 @@ class PerformancesPEMFCStackMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
             units="kW",
             val=MAX_DEFAULT_STACK_POWER,
-            desc="Maximum power to PEMFC during the mission",
+            desc="Maximum power of the PEMFC stack has to provide during the mission",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max",
             units="A",
             val=MAX_DEFAULT_STACK_CURRENT,
-            desc="Maximum current to PEMFC during the mission",
+            desc="Maximum current the PEMFC stack has to provide during mission",
         )
 
         self.declare_partials(

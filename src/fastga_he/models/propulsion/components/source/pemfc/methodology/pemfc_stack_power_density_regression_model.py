@@ -3,16 +3,12 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 """
 This regression model is construct based on the data provided by :cite:`hoogendoorn:2018`.
-The power density of pure PEMFC stack is utilized in dimension calculation.
+The power density of a pure PEMFC stack is utilized in dimension calculation.
 """
 
 import numpy as np
 import plotly.graph_objects as go
 from scipy import optimize
-
-# Data points from the graph
-x = np.array([0.7, 2.7, 10.5])
-y = np.array([486, 655, 1323])
 
 
 # Linear fit function
@@ -21,6 +17,10 @@ def linear_func(x, m, b):
 
 
 if __name__ == "__main__":
+    # Data points from the graph
+    x = np.array([0.7, 2.7, 10.5])
+    y = np.array([486, 655, 1323])
+
     # Fit linear regression
     linear_params, _ = optimize.curve_fit(linear_func, x, y)
 

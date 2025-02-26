@@ -19,16 +19,17 @@ from ..constants import (
 )
 class ConstraintsPEMFCStackEffectiveAreaEnsure(om.ExplicitComponent):
     """
-    Class that ensures that the maximum current seen by the PEMFC stack during the mission is below
-    the one used for sizing, ensuring each component works below its maximum. This is achieved by
-    adjusting the PEMFC effective area, which is the area of polymer electrolyte membrane.
+    Class that ensuring the maximum current seen by the PEMFC stack during the mission is below
+    the one used for sizing. This ensures each component working below its maximum. This is
+    achieved by adjusting the PEMFC effective area, which is the area of the polymer electrolyte
+    membrane.
     """
 
     def initialize(self):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
@@ -58,7 +59,7 @@ class ConstraintsPEMFCStackEffectiveAreaEnsure(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             units="cm**2",
             val=np.nan,
-            desc="Effective area of PEMFC's polymer electrolyte membrane",
+            desc="Effective area of the PEMFC's polymer electrolyte membrane",
         )
 
         self.add_output(

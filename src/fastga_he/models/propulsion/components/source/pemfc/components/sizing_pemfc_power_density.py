@@ -10,7 +10,7 @@ MAX_PEMFC_POWER_DENSITY = 500  # [kW/m^3]
 
 class SizingPEMFCStackPowerDensity(om.ExplicitComponent):
     """
-    Computation of the maximum power density of PEMFC system excluding the inlet compressor.
+    Computation of the maximum power density of the PEMFC system excluding the inlet compressor.
     Applied in volume calculation.
     Source: https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf
     """
@@ -19,7 +19,7 @@ class SizingPEMFCStackPowerDensity(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
 
@@ -30,7 +30,7 @@ class SizingPEMFCStackPowerDensity(om.ExplicitComponent):
             name="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
             units="kW",
             val=np.nan,
-            desc="Maximum power to PEMFC during the mission",
+            desc="Maximum power of the PEMFC stack has to provide during the mission",
         )
 
         self.add_output(

@@ -23,7 +23,7 @@ The :math:`V_{\text{operating}}` represents the operating voltage of the fuel ce
 , and :math:`V_{\text{mass-transport}}` represents the mass-transport loss, which occurs when reactant gases, such as
 oxygen or fuel, face diffusion limitations at the electrodes.
 
-There are two polarization curve implemented in this component to model single layer operating voltage. The empirical PEMFC polarization
+There are two polarization curve models implemented in this component to model single layer operating voltage. The empirical PEMFC polarization
 model is based on an empirical model of Aerostak 200W PEMFC derived by :cite:`hoogendoorn:2018`. The analytical PEMFC
 polarization model is based on the thermodynamic characteristics of fuel cells, as outlined in :cite:`juschus:2021`.
 
@@ -32,7 +32,7 @@ polarization model is based on the thermodynamic characteristics of fuel cells, 
 Empirical PEMFC polarization model
 ===============================
 This model utilizes the empirical open circuit voltage :math:`V_0` and the voltage losses in
-simplified form obtained with curve fitting :cite:`hoogendoorn:2018`. The voltage deviation due to operating pressure variation is also
+simplified form obtained with curve fitting in :cite:`hoogendoorn:2018`. The voltage deviation due to operating pressure variation is also
 considered in this model shown as :math:`\Delta V_p`. The pressure ratio :math:`P_R` is the ratio between the operating
 pressure :math:`P_{op}` and the nominal operating pressure :math:`P_{nom}`. The unit of current density :math:`j` is
 expressed in [:math:`A/cm^2`] for this model.
@@ -133,7 +133,7 @@ Sizing calculation
 ******************
 PEMFC dimension calculation
 ===========================
-The PEMFC length is calculated by multiplying the number of layers, :math:`N_{layers}`, with the cell length.
+The PEMFC stack length is calculated by multiplying the number of layers, :math:`N_{layers}`, with the cell length.
 :math:`L_c` is the cell length calculates from dividing total length of the Aerostak 200W by the number of single-layer
 fuel cells.
 
@@ -148,8 +148,9 @@ cross-section area :math:`A_{cross}` can be expressed as:
 
 Where :math:`\lambda_{pd}` is the power density ratio, calculated as the power density of the Aerostak 200W
 divided by the power density of the fuel cell. This factor adjusts the dimension to consider all variety of PEMFC stacks.
+The power density of the PEMFC stack is calculated with a regression model of the existing PEMFC models.
 
-Finally, the Height :math:`H_{pemfc}` and width :math:`W_{pemfc}` of the PEMFC stack can be obtained as:
+Finally, the height :math:`H_{pemfc}` and width :math:`W_{pemfc}` of the PEMFC stack can be obtained as:
 
 .. math::
 
@@ -163,8 +164,8 @@ Finally, the Height :math:`H_{pemfc}` and width :math:`W_{pemfc}` of the PEMFC s
 
 PEMFC weight calculation
 ========================
-The PEMFC weight is calculated with the cell density :math:`\rho_{cell}`, which is the total weight divided by the total
-effective area of the PEMFC. Utilizing the :math:`\rho_{cell}` of Aerostak 200W provided by :cite:`hoogendoorn:2018`,
+The PEMFC stack weight is calculated with the cell density :math:`\rho_{cell}`, which is the total weight divided by the total
+effective area of the PEMFC stack. Utilizing the :math:`\rho_{cell}` of Aerostak 200W provided by :cite:`hoogendoorn:2018`,
 the weight of the PEMFC stack can be expressed as:
 
 .. math::
@@ -173,19 +174,20 @@ the weight of the PEMFC stack can be expressed as:
 
 Where :math:`A_{eff}` is the effective area, :math:`N_{layers}` is number of layers, and :math:`\lambda_{sp}` is the
 specific power ratio. :math:`\lambda_{sp}` is calculated as the specific power of the Aerostak 200W divided by the
-specific power of the fuel cell. This factor adjusts the mass to considers all variety of PEMFC stacks.
+specific power of the fuel cell. This factor adjusts the mass to considers all variety of PEMFC stacks and the specific
+power of the PEMFC stack is calculated with a regression model of the existing PEMFC models.
 
 *******************************
 Component Computation Structure
 *******************************
 The following three links are the N2 diagrams representing the performance for both polarization models and sizing
-computation in Proton-Exchange Membrane Fuel Cell (PEMFC) component.
+computation in Proton-Exchange Membrane Fuel Cell (PEMFC) stack component.
 
 .. raw:: html
 
-   <a href="../../../../../../../n2/n2_performance_pemfc_empirical.html" target="_blank">PEMFC performance N2 diagram with empirical polarization model</a><br>
-   <a href="../../../../../../../n2/n2_performance_pemfc_analytical.html" target="_blank">PEMFC performance N2 diagram with analytical polarization model</a><br>
-   <a href="../../../../../../../n2/n2_sizing_pemfc.html" target="_blank">PEMFC sizing N2 diagram</a>
+   <a href="../../../../../../../n2/n2_performance_pemfc_empirical.html" target="_blank">PEMFC stack performance N2 diagram with empirical polarization model</a><br>
+   <a href="../../../../../../../n2/n2_performance_pemfc_analytical.html" target="_blank">PEMFC stack performance N2 diagram with analytical polarization model</a><br>
+   <a href="../../../../../../../n2/n2_sizing_pemfc.html" target="_blank">PEMFC stack sizing N2 diagram</a>
 
 
 

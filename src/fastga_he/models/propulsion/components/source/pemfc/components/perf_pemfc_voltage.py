@@ -10,7 +10,7 @@ DEFAULT_STACK_VOLTAGE = 325.0  # [V]
 
 class PerformancesPEMFCStackVoltage(om.ExplicitComponent):
     """
-    Computation of the voltage at the output of PEMFC, assumes for now that it is equal to
+    Computation of the voltage at the output of the PEMFC stack, assumes for now that it is equal to
     the voltage output of the modules. May change in the future hence why it is in a separate
     module.
     """
@@ -26,7 +26,7 @@ class PerformancesPEMFCStackVoltage(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
@@ -36,7 +36,7 @@ class PerformancesPEMFCStackVoltage(om.ExplicitComponent):
             name="direct_bus_connection",
             default=False,
             types=bool,
-            desc="If the battery is directly connected to a bus, a special mode is required to "
+            desc="If the PEMFC stack is directly connected to a bus, a special mode is required to "
             "interface the two",
         )
 
@@ -54,7 +54,7 @@ class PerformancesPEMFCStackVoltage(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
             val=np.nan,
-            desc="Total number of layers in PEMFC stacks",
+            desc="Total number of layers in the PEMFC stack",
         )
 
         self.add_output(

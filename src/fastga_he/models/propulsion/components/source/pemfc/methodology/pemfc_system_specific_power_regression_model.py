@@ -3,8 +3,8 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 """
 This regression model is construct based on the data provided by, Source:
-H3D_H2_UnmannedAviation_Brochure 2024.pptx. The specific power of full PEMFC system is utilized in
-weight calculation.
+https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf. The specific
+power of a full PEMFC system is utilized in weight calculation.
 """
 
 import numpy as np
@@ -13,17 +13,16 @@ import plotly.graph_objects as go
 from scipy import optimize
 
 
-# Data points from the graph
-x = np.array([0.3, 0.8, 1.2, 2.0])
-y = np.array([0.486, 0.645, 0.57, 0.667])
-
-
 # Logarithmic fit
 def log_func(x, a, b):
     return a * np.log(x) + b
 
 
 if __name__ == "__main__":
+    # Data points from the graph
+    x = np.array([0.3, 0.8, 1.2, 2.0])
+    y = np.array([0.486, 0.645, 0.57, 0.667])
+
     log_params, _ = optimize.curve_fit(log_func, x, y)
 
     y_log = log_func(x, *log_params)

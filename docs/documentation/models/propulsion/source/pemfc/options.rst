@@ -7,17 +7,17 @@ Proton-exchange membrane fuel cell option
 *************************
 Fuel cell position option
 *************************
-The PEMFC model has four possible installation position shown as:
+The PEMFC stack model has four possible installation positions shown as:
 
-| "wing_pod" : Tank installed under the wing with user specified position.
-| "underbelly" : Tank installed under and outside the fuselage.
-| "in_the_front" : Tank installed at the front section inside the fuselage.
-| "in_the_back" : Tank installed at the rear section inside the fuselage.
+| "wing_pod" : Stack installed under the wing with user specified position.
+| "underbelly" : Stack installed under and outside the fuselage.
+| "in_the_front" : Stack installed at the front section inside the fuselage.
+| "in_the_back" : Stack installed at the rear section inside the fuselage.
 
-******************************
+*********************
 Model fidelity option
-******************************
-This option offers flexibility in setting between the two polarization models of PEMFC, empirical model and analytical
+*********************
+This option allows to choose between the two polarization models for PEMFC stacks, empirical model and analytical
 model. :ref:`The empirical model <models-pemfc-empirical>` is based on the empirical data of Aerostak 200W from
 :cite:`hoogendoorn:2018`. :ref:`The analytical model <models-pemfc-analytical>` is derived from standard fuel cell
 polarization curve calculation from :cite:`juschus:2021`.

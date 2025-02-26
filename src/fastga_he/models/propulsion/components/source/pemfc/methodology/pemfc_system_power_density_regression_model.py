@@ -3,8 +3,8 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 """
 This regression model is construct based on the data provided by, Source:
-H3D_H2_UnmannedAviation_Brochure 2024.pptx. The power density of full PEMFC system is utilized in
-dimension calculation.
+https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf. The power density
+of a full PEMFC system is utilized in dimension calculation.
 """
 
 import numpy as np
@@ -13,17 +13,16 @@ import plotly.graph_objects as go
 from scipy import optimize
 
 
-# Data points from the graph
-x = np.array([0.3, 0.8, 1.2, 2.0])
-y = np.array([208.0, 235.0, 252.0, 240.0])
-
-
 # Logarithmic fit
 def log_func(x, a, b):
     return a * np.log(x) + b
 
 
 if __name__ == "__main__":
+    # Data points from the graph
+    x = np.array([0.3, 0.8, 1.2, 2.0])
+    y = np.array([208.0, 235.0, 252.0, 240.0])
+
     log_params, _ = optimize.curve_fit(log_func, x, y)
 
     y_log = log_func(x, *log_params)

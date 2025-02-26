@@ -11,7 +11,7 @@ DEFAULT_FC_SPECIFIC_POWER = 0.345  # [kW/kg]
 
 class SizingPEMFCStackWeight(om.ExplicitComponent):
     """
-    Computation of the weight the PEMFC based on the layer weight density but adjusted with
+    Computation of the weight the PEMFC stack based on the layer weight density but adjusted with
     power density. The calculation is based on the equations given by :cite:`hoogendoorn:2018`.
     """
 
@@ -19,7 +19,7 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
 
@@ -29,14 +29,14 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
             val=np.nan,
-            desc="Number of layer in 1 PEMFC stack",
+            desc="Total number of layers in the PEMFC stack",
         )
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             units="m**2",
             val=np.nan,
-            desc="Effective fuel cell area in the stack",
+            desc="Effective area of the PEMFC's polymer electrolyte membrane",
         )
 
         self.add_input(
@@ -49,7 +49,7 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
             units="kg",
             val=500.0,
-            desc="Mass of PEMFC stack",
+            desc="Mass of the PEMFC stack",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

@@ -10,21 +10,22 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingPEMFCStackCGX(om.ExplicitComponent):
     """
-    Class that computes the x - CG of PEMFC according to the position given in the options.
+    Class that computes the x - CG of the PEMFC stack according to the position given in the
+    options.
     """
 
     def initialize(self):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC pack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
             name="position",
             default="in_the_back",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the PEMFC, possible position include "
+            desc="Option to give the position of the PEMFC stack, possible position include "
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
@@ -37,7 +38,7 @@ class SizingPEMFCStackCGX(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":CG:x",
             units="m",
             val=2.9,
-            desc="X position of PEMFC center of gravity",
+            desc="X position of the PEMFC stack center of gravity",
         )
 
         if position == "wing_pod":
@@ -58,7 +59,8 @@ class SizingPEMFCStackCGX(om.ExplicitComponent):
                 + ":dimension:length",
                 units="m",
                 val=np.nan,
-                desc="Length of PEMFC, as in the size of PEMFC along the X-axis",
+                desc="Length of the PEMFC stack, as in the size of the PEMFC stack along the "
+                "X-axis",
             )
 
             self.declare_partials(of="*", wrt="data:geometry:fuselage:front_length", val=1.0)
@@ -82,7 +84,8 @@ class SizingPEMFCStackCGX(om.ExplicitComponent):
                 + ":dimension:length",
                 units="m",
                 val=np.nan,
-                desc="Length of PEMFC, as in the size of PEMFC along the X-axis",
+                desc="Length of the PEMFC stack, as in the size of the PEMFC stack along the "
+                "X-axis",
             )
 
             self.declare_partials(of="*", wrt="data:geometry:fuselage:front_length", val=1.0)

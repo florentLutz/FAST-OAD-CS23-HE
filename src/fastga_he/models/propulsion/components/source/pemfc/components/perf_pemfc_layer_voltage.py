@@ -14,13 +14,20 @@ from .perf_pemfc_polarization_curve import (
 )
 
 
-class PerformancesPEMFCStackSingleVoltageEmpirical(om.Group):
+class PerformancesPEMFCStackSingleLayerVoltageEmpirical(om.Group):
     """
-    This classes groups all the required calculation to obtain single layer voltage of PEMFC for
-    empirical model.
+    This class groups all the required calculation to obtain single layer voltage of the PEMFC
+    stack for the empirical model.
     """
 
     def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -29,11 +36,12 @@ class PerformancesPEMFCStackSingleVoltageEmpirical(om.Group):
             name="compressor_connection",
             default=False,
             types=bool,
-            desc="The PEMFC operation pressure have to adjust based on compressor connection for "
-            "oxygen inlet",
+            desc="The PEMFC stack operation pressure have to adjust based on compressor "
+            "connection for the oxygen/air inlet",
         )
 
     def setup(self):
+        pemfc_stack_id = self.options["pemfc_stack_id"]
         number_of_points = self.options["number_of_points"]
         compressor_connection = self.options["compressor_connection"]
 
@@ -54,23 +62,24 @@ class PerformancesPEMFCStackSingleVoltageEmpirical(om.Group):
         self.add_subsystem(
             "polarization_curve",
             PerformancesPEMFCStackPolarizationCurveEmpirical(
+                pemfc_stack_id=pemfc_stack_id,
                 number_of_points=number_of_points,
             ),
             promotes=["*"],
         )
 
 
-class PerformancesPEMFCStackSingleVoltageAnalytical(om.Group):
+class PerformancesPEMFCStackSingleLayerVoltageAnalytical(om.Group):
     """
-    This classes groups all the required calculation to obtain single layer voltage of PEMFC for
-    analytical model.
+    This class groups all the required calculation to obtain single layer voltage of the PEMFC
+    stack for the analytical model.
     """
 
     def initialize(self):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
@@ -81,8 +90,8 @@ class PerformancesPEMFCStackSingleVoltageAnalytical(om.Group):
             name="compressor_connection",
             default=False,
             types=bool,
-            desc="The PEMFC operation pressure have to adjust based on compressor connection for "
-            "oxygen inlet",
+            desc="The PEMFC stack operation pressure have to adjust based on compressor "
+            "connection for the oxygen/air inlet",
         )
 
     def setup(self):

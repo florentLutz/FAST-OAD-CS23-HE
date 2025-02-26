@@ -21,14 +21,14 @@ class SizingPEMFCStackDimensions(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC pack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
             name="position",
             default="in_the_back",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of PEMFC, possible position include "
+            desc="Option to give the position of the PEMFC stack, possible position include "
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
@@ -45,28 +45,28 @@ class SizingPEMFCStackDimensions(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
             val=np.nan,
-            desc="Number of layer in 1 PEMFC stack",
+            desc="Total number of layers in the PEMFC stack",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:length",
             units="m",
             val=2.0,
-            desc="Length of PEMFC, as in the size of PEMFC along the X-axis",
+            desc="Length of the PEMFC stack, as in the size of the PEMFC stack along the X-axis",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:width",
             units="m",
             val=1.8,
-            desc="Width of PEMFC, as in the size of PEMFC along the Y-axis",
+            desc="Width of the PEMFC stack, as in the size of the PEMFC stack along the Y-axis",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":dimension:height",
             units="m",
             val=1.5,
-            desc="Height of PEMFC, as in the size of PEMFC along the Z-axis",
+            desc="Height of the PEMFC stack, as in the size of the PEMFC stack along the Z-axis",
         )
 
         self.declare_partials(of="*", wrt="*")

@@ -384,10 +384,10 @@ class FASTGAHEPowerTrainConfigurator:
         This function inspects all the connections detected in the power train file and prepare
         the list necessary to do the connections in the performance file.
 
-        The _get_components method must be ran before hand.
+        The _get_components method must be run before hand.
         """
 
-        # This should do nothing if it has already been ran.
+        # This should do nothing if it has already been run.
         self._get_components()
 
         connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
@@ -457,10 +457,10 @@ class FASTGAHEPowerTrainConfigurator:
             ):
                 self._sspc_list[source_name] = True
 
-            # The possibility to connect a battery directly to a bus has been added. However,
-            # to make it backward compatible (whatever it means today because I have no users) and
-            # to impart less burden during the writing of the pt file, we won't ask the user to
-            # set the option accordingly, rather, we will do it here.
+            # The possibility to connect a battery or a PEMFC stack directly to a bus has been
+            # added. However, to make it backward compatible (whatever it means today because I
+            # have no users) and to impart less burden during the writing of the pt file,
+            # we won't ask the user to set the option accordingly, rather, we will do it here.
 
             if (
                 target_id == "fastga_he.pt_component.battery_pack"
@@ -485,8 +485,8 @@ class FASTGAHEPowerTrainConfigurator:
                 for current_output in current_outputs:
                     target_outputs.append(tuple(reversed(current_output)))
 
-            # Compressor connection for PEMFC.This if condition won't be activated until the
-            # implementation of the compressor component.
+            # Compressor connection for the PEMFC stack. This if condition won't be activated until
+            # the implementation of the compressor component.
             if (
                 target_id == "fastga_he.pt_component.pemfc_stack"
                 and source_id == "fastga_he.pt_component.compressor"

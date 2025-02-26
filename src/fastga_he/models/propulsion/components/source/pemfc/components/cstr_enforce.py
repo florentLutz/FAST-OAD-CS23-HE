@@ -23,16 +23,16 @@ oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = 
 )
 class ConstraintsPEMFCStackEffectiveAreaEnforce(om.ExplicitComponent):
     """
-    Class that enforces that the maximum current seen by the PEMFC during the mission is used for
-    the sizing. The effective area is defined by dividing the maximum current with maximum
-    current density of PEMFC.
+    Class that enforcing the maximum current seen by the PEMFC stack during the mission is used for
+    sizing. The effective area is defined by dividing the maximum current with the maximum
+    current density of the PEMFC stack.
     """
 
     def initialize(self):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
@@ -55,14 +55,14 @@ class ConstraintsPEMFCStackEffectiveAreaEnforce(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max",
             units="A",
             val=np.nan,
-            desc="Maximum current the PEMFC stack has to provide during mission",
+            desc="Maximum current that the PEMFC stack has to provide during mission",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             units="cm**2",
             val=16.8,
-            desc="Effective area of PEMFC's polymer electrolyte membrane",
+            desc="Effective area of the PEMFC's polymer electrolyte membrane",
         )
 
         self.declare_partials(

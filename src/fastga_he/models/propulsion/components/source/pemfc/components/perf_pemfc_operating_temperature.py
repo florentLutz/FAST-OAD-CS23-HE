@@ -11,8 +11,9 @@ from ..constants import DEFAULT_TEMPERATURE
 
 class PerformancesPEMFCStackOperatingTemperature(om.ExplicitComponent):
     """
-    Computation of the ambient temperature that PEMFC is working based on altitude only applied
-    to the analytical polarization model from :cite:`juschus:2021`.
+    Computation of the ambient temperature that the PEMFC stack is working based on altitude.
+    This calculation is only  applied to the analytical polarization model from
+    :cite:`juschus:2021`.
     """
 
     def initialize(self):

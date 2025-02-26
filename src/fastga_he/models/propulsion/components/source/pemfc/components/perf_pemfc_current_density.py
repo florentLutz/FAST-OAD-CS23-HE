@@ -17,7 +17,7 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
@@ -46,14 +46,14 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             units="cm**2",
             val=np.nan,
-            desc="Effective fuel cell area in the stack",
+            desc="Effective area of the PEMFC's polymer electrolyte membrane",
         )
 
         self.add_output(
             "fc_current_density",
             val=np.full(number_of_points, max_current_density),
             units="A/cm**2",
-            desc="Current density of PEMFC stack",
+            desc="Current density of the PEMFC stack",
         )
 
         self.declare_partials(

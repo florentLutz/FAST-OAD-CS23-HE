@@ -19,7 +19,7 @@ class SizingPEMFCStackVolume(om.ExplicitComponent):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
 
@@ -36,7 +36,7 @@ class SizingPEMFCStackVolume(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
             units="m**3",
             val=5.0,
-            desc="Volume of PEMFC stack",
+            desc="Volume of the PEMFC stack",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

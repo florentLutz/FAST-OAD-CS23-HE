@@ -7,7 +7,6 @@ import openmdao.api as om
 
 from ..components.perf_direct_bus_connection import PerformancesPEMFCStackDirectBusConnection
 from ..components.perf_pemfc_power import PerformancesPEMFCStackPower
-from ..components.perf_fuel_power_density import PerformancesPEMFCStackHydrogenPowerDensity
 from ..components.perf_maximum import PerformancesPEMFCStackMaximum
 from ..components.perf_pemfc_current_density import PerformancesPEMFCStackCurrentDensity
 from ..components.perf_fuel_consumption import PerformancesPEMFCStackFuelConsumption
@@ -15,19 +14,19 @@ from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackEfficiency
 from ..components.perf_pemfc_voltage import PerformancesPEMFCStackVoltage
 from ..components.perf_pemfc_layer_voltage import (
-    PerformancesPEMFCStackSingleVoltageEmpirical,
-    PerformancesPEMFCStackSingleVoltageAnalytical,
+    PerformancesPEMFCStackSingleLayerVoltageEmpirical,
+    PerformancesPEMFCStackSingleLayerVoltageAnalytical,
 )
 
 
 class PerformancesPEMFCStack(om.Group):
-    """Class that regroups all the subcomponents for PEMFC stack performance computation."""
+    """Class that regroups all the subcomponents for the PEMFC stack performance computation."""
 
     def initialize(self):
         self.options.declare(
             name="pemfc_stack_id",
             default=None,
-            desc="Identifier of PEMFC stack",
+            desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
         self.options.declare(
@@ -37,15 +36,15 @@ class PerformancesPEMFCStack(om.Group):
             name="direct_bus_connection",
             default=False,
             types=bool,
-            desc="If the battery is directly connected to a bus, a special mode is required to "
+            desc="If the PEMFC stack is directly connected to a bus, a special mode is required to "
             "interface the two",
         )
         self.options.declare(
             name="compressor_connection",
             default=False,
             types=bool,
-            desc="The PEMFC operation pressure have to adjust based on compressor connection for "
-            "oxygen inlet",
+            desc="The PEMFC stack operation pressure have to adjust based on compressor "
+            "connection for the oxygen/air inlet",
         )
         self.options.declare(
             name="model_fidelity",
@@ -74,7 +73,7 @@ class PerformancesPEMFCStack(om.Group):
         if model_fidelity == "analytical":
             self.add_subsystem(
                 "pemfc_layer_voltage",
-                PerformancesPEMFCStackSingleVoltageAnalytical(
+                PerformancesPEMFCStackSingleLayerVoltageAnalytical(
                     number_of_points=number_of_points,
                     pemfc_stack_id=pemfc_stack_id,
                     compressor_connection=compressor_connection,
@@ -85,7 +84,8 @@ class PerformancesPEMFCStack(om.Group):
         else:
             self.add_subsystem(
                 "pemfc_layer_voltage",
-                PerformancesPEMFCStackSingleVoltageEmpirical(
+                PerformancesPEMFCStackSingleLayerVoltageEmpirical(
+                    pemfc_stack_id=pemfc_stack_id,
                     number_of_points=number_of_points,
                     compressor_connection=compressor_connection,
                 ),
@@ -140,12 +140,6 @@ class PerformancesPEMFCStack(om.Group):
             PerformancesPEMFCStackMaximum(
                 number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
             ),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "hydrogen_power_density",
-            PerformancesPEMFCStackHydrogenPowerDensity(number_of_points=number_of_points),
             promotes=["*"],
         )
 

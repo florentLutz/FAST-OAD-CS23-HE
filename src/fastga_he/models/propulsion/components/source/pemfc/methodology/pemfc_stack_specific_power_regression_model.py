@@ -3,7 +3,7 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 """
 This regression model is construct based on the data provided by :cite:`hoogendoorn:2018`.
-The specific power of pure PEMFC stack is utilized in weight calculation.
+The specific power of a pure PEMFC stack is utilized in weight calculation.
 """
 
 import numpy as np
@@ -12,17 +12,16 @@ import plotly.graph_objects as go
 from scipy import optimize
 
 
-# Data points from the graph
-x = np.array([0.012, 0.32, 0.7, 2.4, 2.7])
-y = np.array([0.307692308, 1.684210526, 1.129032258, 1.684, 2.061068702])
-
-
 # Logarithmic fit
 def log_func(x, a, b):
     return a * np.log(x) + b
 
 
 if __name__ == "__main__":
+    # Data points from the graph
+    x = np.array([0.012, 0.32, 0.7, 2.4, 2.7])
+    y = np.array([0.307692308, 1.684210526, 1.129032258, 1.684, 2.061068702])
+
     log_params, _ = optimize.curve_fit(log_func, x, y)
 
     y_log = log_func(x, *log_params)
