@@ -1035,7 +1035,7 @@ def lca_impacts_bar_chart_normalised_weighted(
 
 def _get_component_and_contribution(
     aircraft_file_path: Union[str, pathlib.Path],
-    separate_phase: bool = False,
+    detailed_component_contributions: bool = False,
     aggregate_phase: list = None,
 ) -> dict:
     """
@@ -1044,7 +1044,7 @@ def _get_component_and_contribution(
 
     :param aircraft_file_path: path to the output file path.
     :return: a dict of the components with their contribution to each impact category.
-    :param separate_phase: by default, the contribution in each phase of a components are summed
+    :param detailed_component_contributions: by default, the contribution in each phase of a components are summed
     together and only the total is shown, this allows to see the contribution in each phase of
     each component
     :param aggregate_phase: for compactness, it may be preferable to aggregate the contribution
@@ -1078,7 +1078,7 @@ def _get_component_and_contribution(
                             component_and_impacts[key_name] = {impact_name: contribution}
 
                 else:
-                    if separate_phase:
+                    if detailed_component_contributions:
                         key_name = component_name + ": " + phase_name
                     else:
                         key_name = component_name
@@ -1119,7 +1119,7 @@ def _get_component_and_contribution(
 def lca_impacts_bar_chart_with_contributors(
     aircraft_file_path: Union[str, pathlib.Path],
     name_aircraft: str = None,
-    separate_phase: bool = False,
+    detailed_component_contributions: bool = False,
     legend_rename: dict = None,
     aggregate_phase: list = None,
 ) -> go.FigureWidget:
@@ -1129,7 +1129,7 @@ def lca_impacts_bar_chart_with_contributors(
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft.
-    :param separate_phase: by default, the contribution in each phase of a components are summed
+    :param detailed_component_contributions: by default, the contribution in each phase of a components are summed
     together and only the total is shown, this allows to see the contribution in each phase of
     each component
     :param legend_rename: legend names are set by the code by default, if any renaming is to be
@@ -1140,7 +1140,7 @@ def lca_impacts_bar_chart_with_contributors(
     """
 
     component_and_contribution = _get_component_and_contribution(
-        aircraft_file_path, separate_phase, aggregate_phase
+        aircraft_file_path, detailed_component_contributions, aggregate_phase
     )
 
     fig = go.Figure()
@@ -1154,7 +1154,7 @@ def lca_impacts_bar_chart_with_contributors(
         impact_contributions = []
         beautified_impact_names = []
 
-        if separate_phase:
+        if detailed_component_contributions:
             component_name = component.split(":")[0]
             beautified_component_name = component_name.replace("_", " ")
         else:
@@ -1224,7 +1224,7 @@ def lca_impacts_bar_chart_with_contributors(
 def lca_impacts_bar_chart_with_components_absolute(
     aircraft_file_path: Union[str, pathlib.Path],
     name_aircraft: str = None,
-    separate_phase: bool = False,
+    detailed_component_contributions: bool = False,
     legend_rename: dict = None,
     aggregate_phase: list = None,
 ) -> go.FigureWidget:
@@ -1234,7 +1234,7 @@ def lca_impacts_bar_chart_with_components_absolute(
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft
-    :param separate_phase: by default, all contribution of one component, regardless of the phase
+    :param detailed_component_contributions: by default, all contribution of one component, regardless of the phase
     is aggregated, this segregates them.
     :param legend_rename: legend names are set by the code by default, if any renaming is to be
     done, pass here the legend to be renamed as key and how to rename it as item.
@@ -1243,7 +1243,7 @@ def lca_impacts_bar_chart_with_components_absolute(
     """
 
     component_and_contribution = _get_component_and_contribution(
-        aircraft_file_path, separate_phase, aggregate_phase
+        aircraft_file_path, detailed_component_contributions, aggregate_phase
     )
 
     fig = go.Figure()
@@ -1256,7 +1256,7 @@ def lca_impacts_bar_chart_with_components_absolute(
     components_type = {}
 
     for component_name in component_and_contribution:
-        if separate_phase:
+        if detailed_component_contributions:
             beautified_component_name = component_name.split(":")[0].replace("_", " ")
         else:
             beautified_component_name = component_name.replace("_", " ")
@@ -1285,7 +1285,7 @@ def lca_impacts_bar_chart_with_components_absolute(
 
         # If there are only one component of each type, we don't put the number
 
-        if separate_phase:
+        if detailed_component_contributions:
             component_name = component.split(":")[0]
             beautified_component_name = component_name.replace("_", " ")
         else:

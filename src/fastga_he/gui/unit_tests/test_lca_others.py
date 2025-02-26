@@ -216,7 +216,7 @@ def test_lca_bar_chart_relative_contribution_ref_paper():
     fig = lca_impacts_bar_chart_with_contributors(
         SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
         name_aircraft="the reference Kodiak 100",
-        separate_phase=True,
+        detailed_component_contributions=True,
         legend_rename={
             "manufacturing": "line testing",
             "turboshaft 1: operation": "kerosene combustion",
@@ -250,7 +250,7 @@ def test_lca_bar_chart_absolute_phase_paper():
     fig = lca_impacts_bar_chart_with_components_absolute(
         SENSITIVITY_STUDIES_FOLDER_PATH / "ref_kodiak_op_7077.xml",
         name_aircraft="Hybrid Kodiak 100",
-        separate_phase=True,
+        detailed_component_contributions=True,
         legend_rename={
             "manufacturing": "line testing",
             "turboshaft: operation": "kerosene combustion",
