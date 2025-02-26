@@ -32,7 +32,7 @@ class PerformancesPEMFCStackDirectBusConnection(om.ImplicitComponent):
             "dc_current_out",
             val=np.full(number_of_points, DEFAULT_DC_CURRENT),
             units="A",
-            desc="Current at the output side of the PEMFC",
+            desc="Current at the output side of the PEMFC stack",
             lower=-1000.0,
             upper=1000.0,
         )

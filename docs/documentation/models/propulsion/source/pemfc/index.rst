@@ -2,7 +2,7 @@
 Proton-exchange membrane fuel cell model
 ========================================
 
-This power source model in FAST-OAD-CS23-HE represent a PEMFC stack that generates electric energy through a series of
+This power source model in FAST-OAD-CS23-HE represents a PEMFC stack that generates electric energy through a series of
 chemical reactions. The Hydrogen Oxidation Reaction (HOR) at the anode splits hydrogen gas (:math:`\text{H}_2`) into
 protons (:math:`\text{H}^+`) and electrons (:math:`\text{e}^-`). Then the :math:`\text{H}^+` ions disolve into the
 solution between the membrane, while the :math:`\text{e}^-` travel through an external circuit, creating an electric

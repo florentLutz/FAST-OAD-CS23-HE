@@ -487,24 +487,25 @@ class FASTGAHEPowerTrainConfigurator:
 
             # Compressor connection for the PEMFC stack. This if condition won't be activated until
             # the implementation of the compressor component.
-            if (
-                target_id == "fastga_he.pt_component.pemfc_stack"
-                and source_id == "fastga_he.pt_component.compressor"
-            ):
-                # First we'll check if the option has already been set or no, just to avoid
-                # losing time
 
-                target_index = self._components_name.index(target_name)
-                target_option = self._components_options[target_index]
-
-                if not target_option:
-                    self._components_options[target_index] = {"compressor_connection": True}
-
-                current_outputs = resources.DICTIONARY_OUT[target_id]
-
-                target_outputs = []
-                for current_output in current_outputs:
-                    target_outputs.append(tuple(reversed(current_output)))
+            # if (
+            #     target_id == "fastga_he.pt_component.pemfc_stack"
+            #     and source_id == "fastga_he.pt_component.compressor"
+            # ):
+            #     # First we'll check if the option has already been set or no, just to avoid
+            #     # losing time
+            #
+            #     target_index = self._components_name.index(target_name)
+            #     target_option = self._components_options[target_index]
+            #
+            #     if not target_option:
+            #         self._components_options[target_index] = {"compressor_connection": True}
+            #
+            #     current_outputs = resources.DICTIONARY_OUT[target_id]
+            #
+            #     target_outputs = []
+            #     for current_output in current_outputs:
+            #         target_outputs.append(tuple(reversed(current_output)))
 
             for system_input, system_output in zip(source_inputs, target_outputs):
                 if system_input[0]:

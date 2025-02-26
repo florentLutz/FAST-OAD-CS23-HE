@@ -75,8 +75,7 @@ class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
             name="nominal_pressure",
             units="atm",
             val=DEFAULT_PRESSURE_ATM,
-            desc="The nominal pressure at which the PEMFC stack operates does not affect the layer "
-            "voltage ",
+            desc="The nominal pressure at which the PEMFC stack operates.",
         )
 
         self.add_input(
