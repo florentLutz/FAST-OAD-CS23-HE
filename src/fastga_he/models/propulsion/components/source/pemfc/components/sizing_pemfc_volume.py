@@ -8,7 +8,8 @@ import openmdao.api as om
 
 class SizingPEMFCStackVolume(om.ExplicitComponent):
     """
-    Computation of the volume the PEMFC stack based on power density.
+    Computation of the PEMFC stack volume based on power density, which can be derived from the
+    regression model under the methodology directory.
     """
 
     def initialize(self):

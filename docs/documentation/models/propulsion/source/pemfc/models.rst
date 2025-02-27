@@ -144,11 +144,11 @@ Then, utilizing the reference stack volume :math:`V_{ref}` of Aerostak 200W prov
 cross-section area :math:`A_{cross}` can be expressed as:
 
 .. math::
-    A_{cross} = \frac {\lambda_{pd} \cdot V_{ref}} {L_{pemfc}}
+    A_{cross} = \frac {P_{max}} {\rho_{power}  \cdot L_{pemfc}}
 
-Where :math:`\lambda_{pd}` is the power density ratio, calculated as the power density of the Aerostak 200W
-divided by the power density of the fuel cell. This factor adjusts the dimension to consider all variety of PEMFC stacks.
-The power density of the PEMFC stack is calculated with a regression model of the existing PEMFC models.
+Where :math:`P_{max}` is the maximum expected power from the PEMFC stack and :math:`\rho_{power}` is the power density
+of the fuel cell defined by user. The power density regression model to obtain this parameter can be accessed at the
+methodology folder of the component.
 
 Finally, the height :math:`H_{pemfc}` and width :math:`W_{pemfc}` of the PEMFC stack can be obtained as:
 
@@ -174,8 +174,9 @@ the weight of the PEMFC stack can be expressed as:
 
 Where :math:`A_{eff}` is the effective area, :math:`N_{layers}` is number of layers, and :math:`\lambda_{sp}` is the
 specific power ratio. :math:`\lambda_{sp}` is calculated as the specific power of the Aerostak 200W divided by the
-specific power of the fuel cell. This factor adjusts the mass to considers all variety of PEMFC stacks and the specific
-power of the PEMFC stack is calculated with a regression model of the existing PEMFC models.
+specific power of the fuel cell defined by the user. This factor adjusts the mass to considers all variety of PEMFC
+stacks and the specific power regression model to obtain its denominator can be accessed at the methodology folder of
+the component.
 
 *******************************
 Component Computation Structure
