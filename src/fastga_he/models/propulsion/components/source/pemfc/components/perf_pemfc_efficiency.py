@@ -4,9 +4,11 @@
 
 import numpy as np
 import openmdao.api as om
-from ..constants import HHV_HYDROGEN_EQUIVALENT_VOLTAGE, FUEL_UTILIZATION_COEFFICIENT
-
-DEFAULT_PEMFC_EFFICIENCY = 0.53
+from ..constants import (
+    HHV_HYDROGEN_EQUIVALENT_VOLTAGE,
+    FUEL_UTILIZATION_COEFFICIENT,
+    DEFAULT_PEMFC_EFFICIENCY,
+)
 
 
 class PerformancesPEMFCStackEfficiency(om.ExplicitComponent):
