@@ -5,8 +5,6 @@
 import openmdao.api as om
 
 from .sizing_pemfc_weight import SizingPEMFCStackWeight
-from .sizing_pemfc_power_density import SizingPEMFCStackPowerDensity
-from .sizing_pemfc_specific_power import SizingPEMFCStackSpecificPower
 from .sizing_pemfc_dimensions import SizingPEMFCStackDimensions
 from .sizing_pemfc_volume import SizingPEMFCStackVolume
 from .sizing_pemfc_cg_x import SizingPEMFCStackCGX
@@ -54,16 +52,6 @@ class SizingPEMFCStack(om.Group):
             subsys=ConstraintsPEMFCStack(
                 pemfc_stack_id=pemfc_stack_id, model_fidelity=model_fidelity
             ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="pemfc_specific_power",
-            subsys=SizingPEMFCStackSpecificPower(pemfc_stack_id=pemfc_stack_id),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="pemfc_power_density",
-            subsys=SizingPEMFCStackPowerDensity(pemfc_stack_id=pemfc_stack_id),
             promotes=["*"],
         )
         self.add_subsystem(
