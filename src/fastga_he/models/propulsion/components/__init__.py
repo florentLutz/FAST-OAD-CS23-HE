@@ -89,7 +89,7 @@ from .source.simple_turbo_generator import (
     SlipstreamTurboGenerator,
     PreLCATurboGenerator,
 )
-
+from .source.pemfc import SizingPEMFCStack, PerformancesPEMFCStack, SlipstreamPEMFCStack
 from .tanks.fuel_tanks import (
     SizingFuelTank,
     PerformancesFuelTank,
