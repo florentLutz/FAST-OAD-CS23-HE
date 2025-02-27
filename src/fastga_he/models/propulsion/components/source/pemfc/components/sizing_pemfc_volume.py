@@ -5,14 +5,10 @@
 import numpy as np
 import openmdao.api as om
 
-DEFAULT_FC_POWER_DENSITY = 124  # [kW/m^3]
-DEFAULT_FC_VOLUME = 1.62e-3  # [m^3]
-
 
 class SizingPEMFCStackVolume(om.ExplicitComponent):
     """
-    Computation of the volume the PEMFC based on number of layers. The calculation is based on the
-    equations given by :cite:`hoogendoorn:2018`.
+    Computation of the volume the PEMFC stack based on power density.
     """
 
     def initialize(self):
@@ -32,6 +28,13 @@ class SizingPEMFCStackVolume(om.ExplicitComponent):
             val=np.nan,
         )
 
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
+            units="kW",
+            val=np.nan,
+            desc="Maximum power of the PEMFC stack has to provide during the mission",
+        )
+
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
             units="m**3",
@@ -45,8 +48,7 @@ class SizingPEMFCStackVolume(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume"] = (
-            DEFAULT_FC_VOLUME
-            * DEFAULT_FC_POWER_DENSITY
+            inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max"]
             / inputs[
                 "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
             ]
@@ -59,10 +61,19 @@ class SizingPEMFCStackVolume(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density",
         ] = (
-            -DEFAULT_FC_VOLUME
-            * DEFAULT_FC_POWER_DENSITY
+            -inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max"]
             / inputs[
                 "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
             ]
             ** 2
+        )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
+        ] = (
+            1
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
+            ]
         )

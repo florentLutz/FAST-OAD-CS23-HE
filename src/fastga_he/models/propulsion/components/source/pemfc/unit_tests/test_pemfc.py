@@ -80,6 +80,11 @@ def test_pemfc_volume():
         __file__,
         XML_FILE,
     )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max",
+        units="kW",
+        val=0.2,
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(

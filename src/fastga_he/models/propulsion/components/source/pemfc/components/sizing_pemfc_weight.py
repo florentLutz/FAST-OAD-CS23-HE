@@ -12,7 +12,7 @@ DEFAULT_FC_SPECIFIC_POWER = 0.345  # [kW/kg]
 class SizingPEMFCStackWeight(om.ExplicitComponent):
     """
     Computation of the weight the PEMFC stack based on the layer weight density but adjusted with
-    power density. The calculation is based on the equations given by :cite:`hoogendoorn:2018`.
+    specific power. The calculation is based on the equations given by :cite:`hoogendoorn:2018`.
     """
 
     def initialize(self):
