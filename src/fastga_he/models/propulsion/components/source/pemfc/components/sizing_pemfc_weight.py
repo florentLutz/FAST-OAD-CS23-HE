@@ -12,8 +12,7 @@ DEFAULT_FC_SPECIFIC_POWER = 0.345  # [kW/kg]
 class SizingPEMFCStackWeight(om.ExplicitComponent):
     """
     Computation of the PEMFC stack weight based on the layer weight density, adjusted with
-    specific power, which can be derived from the regression models under the methodology
-    directory. The calculation is based on the equations given by :cite:`hoogendoorn:2018`.
+    specific power. The calculation is based on the equations given by :cite:`hoogendoorn:2018`.
     """
 
     def initialize(self):
@@ -31,6 +30,12 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
             val=np.nan,
             desc="Total number of layers in the PEMFC stack",
+        )
+
+        self.add_input(
+            "settings:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":k_mass",
+            val=1.0,
+            desc="A tuning factor allows the PEMFC stack weight to be changed manually.",
         )
 
         self.add_input(
@@ -68,10 +73,14 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
         ]
 
+        k_mass = inputs[
+            "settings:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":k_mass"
+        ]
+
         specific_power_ratio = DEFAULT_FC_SPECIFIC_POWER / specific_power
 
         outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass"] = (
-            CELL_DENSITY * specific_power_ratio * effective_area * number_of_layers
+            k_mass * CELL_DENSITY * specific_power_ratio * effective_area * number_of_layers
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -86,26 +95,35 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
         number_of_layers = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers"
         ]
+        k_mass = inputs[
+            "settings:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":k_mass"
+        ]
 
         specific_power_ratio = DEFAULT_FC_SPECIFIC_POWER / specific_power
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":number_of_layers",
-        ] = CELL_DENSITY * specific_power_ratio * effective_area
+        ] = k_mass * CELL_DENSITY * specific_power_ratio * effective_area
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
-        ] = CELL_DENSITY * specific_power_ratio * number_of_layers
+        ] = k_mass * CELL_DENSITY * specific_power_ratio * number_of_layers
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":specific_power",
         ] = (
-            -CELL_DENSITY
+            -k_mass
+            * CELL_DENSITY
             * DEFAULT_FC_SPECIFIC_POWER
             * number_of_layers
             * effective_area
             / specific_power**2
         )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
+            "settings:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":k_mass",
+        ] = CELL_DENSITY * specific_power_ratio * effective_area * number_of_layers

@@ -8,8 +8,7 @@ import openmdao.api as om
 
 class SizingPEMFCStackVolume(om.ExplicitComponent):
     """
-    Computation of the PEMFC stack volume based on power density, which can be derived from the
-    regression model under the methodology directory.
+    Computation of the PEMFC stack volume based on power density.
     """
 
     def initialize(self):
@@ -30,6 +29,12 @@ class SizingPEMFCStackVolume(om.ExplicitComponent):
         )
 
         self.add_input(
+            "settings:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":k_volume",
+            val=1.0,
+            desc="A tuning factor allows the PEMFC stack volume to be changed manually.",
+        )
+
+        self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
             units="kW",
             val=np.nan,
@@ -47,34 +52,44 @@ class SizingPEMFCStackVolume(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
+        k_volume = inputs[
+            "settings:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":k_volume"
+        ]
+        power_max = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max"
+        ]
+        power_density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
+        ]
 
         outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume"] = (
-            inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max"]
-            / inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
-            ]
+            k_volume * power_max / power_density
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
+        k_volume = inputs[
+            "settings:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":k_volume"
+        ]
+        power_max = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max"
+        ]
+        power_density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
+        ]
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density",
-        ] = (
-            -inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max"]
-            / inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
-            ]
-            ** 2
-        )
+        ] = -k_volume * power_max / power_density**2
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
-        ] = (
-            1
-            / inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"
-            ]
-        )
+        ] = k_volume / power_density
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":volume",
+            "settings:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":k_volume",
+        ] = power_max / power_density

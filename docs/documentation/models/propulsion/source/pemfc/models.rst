@@ -30,7 +30,7 @@ polarization model is based on the thermodynamic characteristics of fuel cells, 
 .. _models-pemfc-empirical:
 
 Empirical PEMFC polarization model
-===============================
+==================================
 This model utilizes the empirical open circuit voltage :math:`V_0` and the voltage losses in
 simplified form obtained with curve fitting in :cite:`hoogendoorn:2018`. The voltage deviation due to operating pressure variation is also
 considered in this model shown as :math:`\Delta V_p`. The pressure ratio :math:`P_R` is the ratio between the operating
@@ -140,15 +140,12 @@ fuel cells.
 .. math::
    L_{pemfc} = L_c \cdot N_{layers}
 
-Then, utilizing the reference stack volume :math:`V_{ref}` of Aerostak 200W provided by :cite:`hoogendoorn:2018`, the stack
-cross-section area :math:`A_{cross}` can be expressed as:
+Then, utilizing the PEMFC stack volume calculated with the maximum design power :math:`P_{max}` produced by PEMFC, the
+power density of the fuel cell :math:`\rho_{power}`, and the volume tuning factor :math:`k_{volume}`, the cross-section
+area :math:`A_{cross}` is obtained as:
 
 .. math::
-    A_{cross} = \frac {P_{max}} {\rho_{power}  \cdot L_{pemfc}}
-
-Where :math:`P_{max}` is the maximum expected power from the PEMFC stack and :math:`\rho_{power}` is the power density
-of the fuel cell defined by user. The power density regression model to obtain this parameter can be accessed at the
-methodology folder of the component.
+    A_{cross} = \frac {P_{max} \cdot k_{volume}} {\rho_{power}  \cdot L_{pemfc}}
 
 Finally, the height :math:`H_{pemfc}` and width :math:`W_{pemfc}` of the PEMFC stack can be obtained as:
 
@@ -170,13 +167,12 @@ the weight of the PEMFC stack can be expressed as:
 
 .. math::
 
-    M_{pemfc} =\lambda_{sp} \cdot \rho_{cell} \cdot A_{eff} \cdot N_{layers}
+    M_{pemfc} =k_{mass} \cdot \lambda_{sp} \cdot \rho_{cell} \cdot A_{eff} \cdot N_{layers}
 
 Where :math:`A_{eff}` is the effective area, :math:`N_{layers}` is number of layers, and :math:`\lambda_{sp}` is the
 specific power ratio. :math:`\lambda_{sp}` is calculated as the specific power of the Aerostak 200W divided by the
-specific power of the fuel cell defined by the user. This factor adjusts the mass to considers all variety of PEMFC
-stacks and the specific power regression model to obtain its denominator can be accessed at the methodology folder of
-the component.
+specific power of the PEMFC stack. The mass tuning factor :math:`k_{mass}` provides the flexibility to manually adjust
+the weight of the PEMFC stack.
 
 *******************************
 Component Computation Structure
