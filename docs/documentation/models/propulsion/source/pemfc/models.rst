@@ -134,18 +134,19 @@ Sizing calculation
 PEMFC dimension calculation
 ===========================
 The PEMFC stack length is calculated by multiplying the number of layers, :math:`N_{layers}`, with the cell length.
-:math:`L_c` is the cell length calculates from dividing total length of the Aerostak 200W by the number of single-layer
+:math:`L_c` is the cell length calculates from dividing total length of the Aerostak 200W by the number of single-layered
 fuel cells.
 
 .. math::
    L_{pemfc} = L_c \cdot N_{layers}
 
-Then, utilizing the PEMFC stack volume calculated with the maximum design power :math:`P_{max}` produced by PEMFC, the
-power density of the fuel cell :math:`\rho_{power}`, and the volume tuning factor :math:`k_{volume}`, the cross-section
-area :math:`A_{cross}` is obtained as:
+Then, utilizing the PEMFC stack volume calculated with the maximum design power :math:`P_{max}` produced by PEMFC and the
+power density of the fuel cell :math:`\rho_{power}`, the cross-section area :math:`A_{cross}` is obtained as:
 
 .. math::
-    A_{cross} = \frac {P_{max} \cdot k_{volume}} {\rho_{power}  \cdot L_{pemfc}}
+    A_{cross} = \frac { k_{volume} \cdot P_{max}} {\rho_{power}  \cdot L_{pemfc}}
+
+Where the volume tuning factor :math:`k_{volume}` allows users to manually adjust the volume of the PEMFC stack.
 
 Finally, the height :math:`H_{pemfc}` and width :math:`W_{pemfc}` of the PEMFC stack can be obtained as:
 
