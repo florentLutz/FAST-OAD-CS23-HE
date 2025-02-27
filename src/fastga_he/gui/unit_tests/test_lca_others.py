@@ -122,7 +122,6 @@ def test_lca_other_impact_sensitivity_analysis_longer():
     fig.show()
 
 
-
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_unavailable_impact_error():
     try:

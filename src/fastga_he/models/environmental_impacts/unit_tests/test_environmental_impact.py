@@ -13,7 +13,7 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lca import LCA
 from ..lca_equivalent_year_of_life import LCAEquivalentYearOfLife
 from ..lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
-from ..lca_aircraft_per_fu import LCAAircraftPerFU
+from ..lca_aircraft_per_fu import LCAAircraftPerFU, LCAAircraftPerFUFlightHours
 from ..lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from ..lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
 from ..lca_electricty_per_fu import LCAElectricityPerFU
@@ -25,7 +25,7 @@ from ..lca_htp_weight_per_fu import LCAHTPWeightPerFU
 from ..lca_kerosene_per_fu import LCAKerosenePerFU
 from ..lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
 from ..lca_line_test_mission_ratio import LCARatioTestFlightMission
-from ..lca_use_flight_per_fu import LCAUseFlightPerFU
+from ..lca_use_flight_per_fu import LCAUseFlightPerFU, LCAUseFlightPerFUFlightHours
 from ..lca_vtp_weight_per_fu import LCAVTPWeightPerFU
 from ..lca_wing_weight_per_fu import LCAWingWeightPerFU
 from ..simple_energy_impact import SimpleEnergyImpacts
@@ -241,6 +241,44 @@ def test_aircraft_per_fu_pax_km():
     problem.check_partials(compact_print=True)
 
 
+def test_aircraft_per_fu_flight_hours():
+    inputs_list = [
+        "data:TLAR:aircraft_lifespan",
+        "data:TLAR:flight_per_year",
+        "data:mission:sizing:duration",
+        "data:mission:operational:duration",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAAircraftPerFUFlightHours(),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
+        0.00018817, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    problem = run_system(
+        LCAAircraftPerFUFlightHours(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
+        4.70440185e-05, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_use_flight_per_fu_pax_km():
     inputs_list = [
         "data:TLAR:range",
@@ -279,6 +317,42 @@ def test_use_flight_per_fu_pax_km():
 
     problem.check_partials(compact_print=True)
 
+
+def test_use_flight_per_fu_flight_hours():
+    inputs_list = [
+        "data:mission:sizing:duration",
+        "data:mission:operational:duration",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAUseFlightPerFUFlightHours(),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:flight_per_fu") == pytest.approx(
+        1.03023633, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAUseFlightPerFUFlightHours(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:flight_per_fu") == pytest.approx(
+        0.257566, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
 
 def test_wing_weight_per_fu():
     inputs_list = [

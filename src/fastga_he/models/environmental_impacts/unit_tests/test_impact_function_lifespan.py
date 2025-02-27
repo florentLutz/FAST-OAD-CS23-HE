@@ -91,7 +91,6 @@ def test_environmental_impact_function_span_hybrid():
         problem.write_outputs()
 
 
-
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_environmental_impact_function_span_hybrid_longer():
     input_file_name = "hybrid_kodiak.xml"
@@ -150,7 +149,7 @@ def test_environmental_impact_function_span_hybrid_longer():
     for airframe_hours in np.linspace(
         mean_airframe_hours - 3.0 * std_airframe_hours,
         3.0 * mean_airframe_hours + 9.0 * std_airframe_hours,
-        100
+        100,
     ):
         problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
 
@@ -159,6 +158,7 @@ def test_environmental_impact_function_span_hybrid_longer():
         file_name = input_file_name.split(".")[0] + "_" + str(int(airframe_hours)) + ".xml"
         problem.output_file_path = RESULTS2_FOLDER_PATH / file_name
         problem.write_outputs()
+
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_draw_sensitivity_to_lifespan():
