@@ -13,6 +13,7 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
     """
     Computation of the PEMFC stack weight based on the layer weight density, adjusted with
     specific power. The calculation is based on the equations given by :cite:`hoogendoorn:2018`.
+    This computation consider the weight of the PEMFC stack and the BoPs of the PEMFC.
     """
 
     def initialize(self):

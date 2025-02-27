@@ -5,6 +5,10 @@
 import numpy as np
 import openmdao.api as om
 
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 MAX_PEMFC_POWER_DENSITY = 500  # [kW/m^3]
 
 
@@ -53,6 +57,11 @@ class SizingPEMFCStackPowerDensity(om.ExplicitComponent):
         ]
 
         unclipped_power_density = 19.816 * np.log(power_max) + 236.48
+
+        if unclipped_power_density < 70:
+            _LOGGER.info(
+                msg="Power density clipped at 70 [kW/m^3] to prevent unrealistic dimension."
+            )
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_density"

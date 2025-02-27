@@ -91,7 +91,7 @@ class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
             ]
-            * -1,
+            ** -1,
         )
 
         partials[
