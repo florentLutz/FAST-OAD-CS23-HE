@@ -367,7 +367,7 @@ def test_pemfc_current_density():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesPEMFCStackCurrentDensity(
-            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+            pemfc_stack_id="pemfc_stack_1", number_of_points=NB_POINTS_TEST
         ),
         ivc,
     )
@@ -465,7 +465,7 @@ def test_pemfc_polarization_curve_empirical():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesPEMFCStackPolarizationCurveEmpirical(
-            number_of_points=7, pemfc_stack_id="pemfc_stack_1"
+            pemfc_stack_id="pemfc_stack_1", number_of_points=7
         ),
         ivc,
     )
@@ -524,7 +524,7 @@ def test_pemfc_voltage():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesPEMFCStackVoltage(
-            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+            pemfc_stack_id="pemfc_stack_1", number_of_points=NB_POINTS_TEST
         ),
         ivc,
     )
@@ -537,9 +537,9 @@ def test_pemfc_voltage():
     # Check with the other battery mode
     problem = run_system(
         PerformancesPEMFCStackVoltage(
+            pemfc_stack_id="pemfc_stack_1",
             number_of_points=NB_POINTS_TEST,
             direct_bus_connection=True,
-            pemfc_stack_id="pemfc_stack_1",
         ),
         ivc,
     )
@@ -566,7 +566,8 @@ def test_maximum():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesPEMFCStackMaximum(
-            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+            pemfc_stack_id="pemfc_stack_1",
+            number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
@@ -653,7 +654,8 @@ def test_fuel_consumption():
 
     problem = run_system(
         PerformancesPEMFCStackFuelConsumption(
-            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+            pemfc_stack_id="pemfc_stack_1",
+            number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
@@ -706,7 +708,8 @@ def test_performances_pemfc_layer_voltage_empirical():
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesPEMFCStackSingleLayerVoltageEmpirical(
-                number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+                pemfc_stack_id="pemfc_stack_1",
+                number_of_points=NB_POINTS_TEST,
             )
         ),
         __file__,
@@ -719,7 +722,8 @@ def test_performances_pemfc_layer_voltage_empirical():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesPEMFCStackSingleLayerVoltageEmpirical(
-            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+            pemfc_stack_id="pemfc_stack_1",
+            number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
@@ -748,7 +752,8 @@ def test_performances_pemfc_layer_voltage_analytical():
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesPEMFCStackSingleLayerVoltageAnalytical(
-                number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+                pemfc_stack_id="pemfc_stack_1",
+                number_of_points=NB_POINTS_TEST,
             )
         ),
         __file__,
@@ -761,7 +766,8 @@ def test_performances_pemfc_layer_voltage_analytical():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesPEMFCStackSingleLayerVoltageAnalytical(
-            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+            pemfc_stack_id="pemfc_stack_1",
+            number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
@@ -789,7 +795,10 @@ def test_performances_pemfc_stack_empirical():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(
-            PerformancesPEMFCStack(number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1")
+            PerformancesPEMFCStack(
+                pemfc_stack_id="pemfc_stack_1",
+                number_of_points=NB_POINTS_TEST,
+            )
         ),
         __file__,
         XML_FILE,
@@ -800,7 +809,10 @@ def test_performances_pemfc_stack_empirical():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStack(number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"),
+        PerformancesPEMFCStack(
+            pemfc_stack_id="pemfc_stack_1",
+            number_of_points=NB_POINTS_TEST,
+        ),
         ivc,
     )
 
@@ -854,8 +866,8 @@ def test_performances_pemfc_stack_analytical():
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesPEMFCStack(
-                number_of_points=NB_POINTS_TEST,
                 pemfc_stack_id="pemfc_stack_1",
+                number_of_points=NB_POINTS_TEST,
                 model_fidelity="analytical",
             )
         ),
@@ -869,8 +881,8 @@ def test_performances_pemfc_stack_analytical():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesPEMFCStack(
-            number_of_points=NB_POINTS_TEST,
             pemfc_stack_id="pemfc_stack_1",
+            number_of_points=NB_POINTS_TEST,
             model_fidelity="analytical",
         ),
         ivc,
