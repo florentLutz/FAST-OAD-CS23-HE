@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-from ..constants import MAX_DEFAULT_STACK_POWER, MAX_DEFAULT_STACK_CURRENT
+from ..constants import MAX_DEFAULT_POWER, MAX_DEFAULT_CURRENT
 
 
 class PerformancesPEMFCStackMaximum(om.ExplicitComponent):
@@ -35,14 +35,14 @@ class PerformancesPEMFCStackMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
             units="kW",
-            val=MAX_DEFAULT_STACK_POWER,
+            val=MAX_DEFAULT_POWER,
             desc="Maximum power of the PEMFC stack has to provide during the mission",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max",
             units="A",
-            val=MAX_DEFAULT_STACK_CURRENT,
+            val=MAX_DEFAULT_CURRENT,
             desc="Maximum current the PEMFC stack has to provide during mission",
         )
 
