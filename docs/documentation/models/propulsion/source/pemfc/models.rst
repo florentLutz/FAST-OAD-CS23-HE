@@ -161,9 +161,9 @@ Finally, the height :math:`H_{pemfc}` and width :math:`W_{pemfc}` of the PEMFC s
 
 PEMFC weight calculation
 ========================
-The PEMFC stack weight is calculated with the cell density :math:`\rho_{cell}`, which is the total weight divided by the total
-effective area of the PEMFC stack. Utilizing the :math:`\rho_{cell}` of Aerostak 200W provided by :cite:`hoogendoorn:2018`,
-the weight of the PEMFC stack can be expressed as:
+The PEMFC stack weight is calculated with the cell density :math:`\rho_{cell}` of Aerostak 200W provided by
+:cite:`hoogendoorn:2018`, which is the total weight divided by the total effective area of the Aerostak 200W PEMFC stack.
+The weight of the PEMFC stack can be expressed as:
 
 .. math::
 
@@ -171,7 +171,7 @@ the weight of the PEMFC stack can be expressed as:
 
 Where :math:`A_{eff}` is the effective area, :math:`N_{layers}` is number of layers, and :math:`\lambda_{sp}` is the
 specific power ratio. :math:`\lambda_{sp}` is calculated as the specific power of the Aerostak 200W divided by the
-specific power of the PEMFC stack. The mass tuning factor :math:`k_{mass}` provides the flexibility to manually adjust
+specific power of the PEMFC stack. The mass tuning factor :math:`k_{mass}` allows users to manually adjust
 the weight of the PEMFC stack.
 
 *******************************
