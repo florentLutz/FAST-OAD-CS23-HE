@@ -18,6 +18,7 @@ from ..lca import LCA
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "results" / "parametric_study"
+RESULTS2_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "results" / "parametric_study_2"
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
@@ -89,6 +90,75 @@ def test_environmental_impact_function_span_hybrid():
         problem.output_file_path = RESULTS_FOLDER_PATH / file_name
         problem.write_outputs()
 
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_environmental_impact_function_span_hybrid_longer():
+    input_file_name = "hybrid_kodiak.xml"
+
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "hybrid_propulsion.yml",
+        component_level_breakdown=True,
+        airframe_material="aluminium",
+        delivery_method="flight",
+        impact_assessment_method="EF v3.1",
+        normalization=True,
+        weighting=True,
+        aircraft_lifespan_in_hours=True,
+        write_lca_conf=False,
+        lca_conf_file_path=DATA_FOLDER_PATH / "hybrid_propulsion_lca_paper.yml",
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(component),
+        __file__,
+        DATA_FOLDER_PATH / input_file_name,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    # The fuel stored in the tanks do not consider the fuel necessary for takeoff, it doesn't affect
+    # the sizing but does affect the LCA, this is a temporary fix. For the battery it's not a
+    # problem as there was no energy consumed during takeoff
+    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
+    total_fuel_mission = datafile["data:mission:sizing:fuel"].value[0]
+    problem.set_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
+        units="kg",
+        val=total_fuel_mission / 2.0,
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
+        units="kg",
+        val=total_fuel_mission / 2.0,
+    )
+
+    mean_airframe_hours = 3524.9
+    std_airframe_hours = 266.5
+
+    # To have a widespread, we cover values of airframe hours that goes from the average airframe
+    # hours of the fleet (with confidence interval) to an estimate of the average max airframe
+    # hours of the fleet (which we'll estimate as twice the average airframe hours of the fleet,
+    # with the confidence interval)
+
+    print("First run done")
+
+    for airframe_hours in np.linspace(
+        mean_airframe_hours - 3.0 * std_airframe_hours,
+        3.0 * mean_airframe_hours + 9.0 * std_airframe_hours,
+        100
+    ):
+        problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
+
+        problem.run_model()
+
+        file_name = input_file_name.split(".")[0] + "_" + str(int(airframe_hours)) + ".xml"
+        problem.output_file_path = RESULTS2_FOLDER_PATH / file_name
+        problem.write_outputs()
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_draw_sensitivity_to_lifespan():

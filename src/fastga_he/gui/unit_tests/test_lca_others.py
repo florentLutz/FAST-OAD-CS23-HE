@@ -36,6 +36,14 @@ SENSITIVITY_STUDIES_FOLDER_PATH = (
     / "results"
     / "parametric_study"
 )
+SENSITIVITY_STUDIES_FOLDER_PATH_2 = (
+    pathlib.Path(__file__).parents[2]
+    / "models"
+    / "environmental_impacts"
+    / "unit_tests"
+    / "results"
+    / "parametric_study_2"
+)
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
@@ -99,6 +107,20 @@ def test_lca_other_impact_sensitivity_analysis():
     )
 
     fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_other_impact_sensitivity_analysis_longer():
+    # Check that we can create a plot
+    fig = lca_score_sensitivity_simple(
+        results_folder_path=SENSITIVITY_STUDIES_FOLDER_PATH_2,
+        impact_to_plot="material_resources_metals_minerals",
+        prefix="hybrid_kodiak",
+        name="Hybrid Kodiak",
+    )
+
+    fig.show()
+
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
