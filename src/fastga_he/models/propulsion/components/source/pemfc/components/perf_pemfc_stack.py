@@ -63,8 +63,8 @@ class PerformancesPEMFCStack(om.Group):
         self.add_subsystem(
             "pemfc_current_density",
             PerformancesPEMFCStackCurrentDensity(
-                number_of_points=number_of_points,
                 pemfc_stack_id=pemfc_stack_id,
+                number_of_points=number_of_points,
                 model_fidelity=model_fidelity,
             ),
             promotes=["*"],
@@ -74,8 +74,8 @@ class PerformancesPEMFCStack(om.Group):
             self.add_subsystem(
                 "pemfc_layer_voltage",
                 PerformancesPEMFCStackSingleLayerVoltageAnalytical(
-                    number_of_points=number_of_points,
                     pemfc_stack_id=pemfc_stack_id,
+                    number_of_points=number_of_points,
                     compressor_connection=compressor_connection,
                 ),
                 promotes=["*"],
@@ -95,9 +95,9 @@ class PerformancesPEMFCStack(om.Group):
         self.add_subsystem(
             "pemfc_voltage",
             PerformancesPEMFCStackVoltage(
+                pemfc_stack_id=pemfc_stack_id,
                 number_of_points=number_of_points,
                 direct_bus_connection=direct_bus_connection,
-                pemfc_stack_id=pemfc_stack_id,
             ),
             promotes=["*"],
         )
@@ -112,7 +112,7 @@ class PerformancesPEMFCStack(om.Group):
         self.add_subsystem(
             "fuel_consumption",
             PerformancesPEMFCStackFuelConsumption(
-                number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
+                pemfc_stack_id=pemfc_stack_id, number_of_points=number_of_points
             ),
             promotes=["*"],
         )
@@ -138,7 +138,7 @@ class PerformancesPEMFCStack(om.Group):
         self.add_subsystem(
             "maximum",
             PerformancesPEMFCStackMaximum(
-                number_of_points=number_of_points, pemfc_stack_id=pemfc_stack_id
+                pemfc_stack_id=pemfc_stack_id, number_of_points=number_of_points
             ),
             promotes=["*"],
         )
