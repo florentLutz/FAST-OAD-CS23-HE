@@ -24,8 +24,8 @@ The :math:`V_{\text{operating}}` represents the operating voltage of the fuel ce
 oxygen or fuel, face diffusion limitations at the electrodes.
 
 There are two polarization curve models implemented in this component to model single layer operating voltage. The empirical PEMFC polarization
-model is based on an empirical model of Aerostak 200W PEMFC derived by :cite:`hoogendoorn:2018`. The analytical PEMFC
-polarization model is based on the thermodynamic characteristics of fuel cells, as outlined in :cite:`juschus:2021`.
+model is based on Aerostak 200W PEMFC derived by :cite:`hoogendoorn:2018`. The analytical PEMFC polarization model is
+based on the thermodynamic characteristics of fuel cells, as outlined in :cite:`juschus:2021`.
 
 .. _models-pemfc-empirical:
 
