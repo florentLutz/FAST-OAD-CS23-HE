@@ -10,7 +10,8 @@ from ..constants import MAX_CURRENT_DENSITY_EMPIRICAL, MAX_CURRENT_DENSITY_ANALY
 
 class PerformancesPEMFCStackCurrentDensity(om.ExplicitComponent):
     """
-    Computation of the current density, simply based on the current and effective area.
+    Computation of the current density, simply based on the current and effective area of the
+    PEMFC stack.
     """
 
     def initialize(self):

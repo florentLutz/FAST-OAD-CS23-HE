@@ -18,7 +18,7 @@ from ..constants import POSSIBLE_POSITION
 
 
 class SizingPEMFCStack(om.Group):
-    """Class that regroups all the subcomponents for PEMFC stack sizing computation."""
+    """Class that regroups all the subcomponents for PEMFC stack sizing computations."""
 
     def initialize(self):
         self.options.declare(

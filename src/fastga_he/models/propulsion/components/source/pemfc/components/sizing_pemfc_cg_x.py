@@ -10,8 +10,7 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingPEMFCStackCGX(om.ExplicitComponent):
     """
-    Class that computes the x - CG of the PEMFC stack according to the position given in the
-    options.
+    Class that computes x - CG of the PEMFC stack according to the position given in the options.
     """
 
     def initialize(self):

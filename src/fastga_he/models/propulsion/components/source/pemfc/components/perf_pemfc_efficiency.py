@@ -13,7 +13,7 @@ from ..constants import (
 
 class PerformancesPEMFCStackEfficiency(om.ExplicitComponent):
     """
-    Computation of efficiency of the PEMFC  with dividing the actual voltage provided by the
+    Efficiency computation  of the PEMFC with dividing the actual voltage provided by the
     fuel cell with the higher heating value (HHV) of hydrogen. The convertion into voltage form
     is simply calculated by dividing the HHV of hydrogen (285.5 kJ/mol) by the amount of
     electrons produced by single hydrogen particle and Faraday's constant.

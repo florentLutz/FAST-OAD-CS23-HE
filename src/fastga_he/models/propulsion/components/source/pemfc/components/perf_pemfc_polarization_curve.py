@@ -20,8 +20,8 @@ DEFAULT_TEMPERATURE = 288.15  # [K]
 
 class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
     """
-    Computation of the PEMFC polarization curve. Model based on, Aerostack Ultralight 200W PEMFC,
-    details can be found in :cite:`hoogendoorn:2018`.
+    Computation of the PEMFC polarization curve. This model is based on Aerostack Ultralight 200W
+    PEMFC. Details can be found in :cite:`hoogendoorn:2018`.
     """
 
     def initialize(self):
@@ -197,8 +197,8 @@ class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
 
 class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
     """
-    Computation of the single layer voltage of the PEMFC. Model based on analytical i-v curve equation,
-    details can be found in :cite:`Juschus:2021`.
+    Computation of the single layer voltage of the PEMFC.This model is based on analytical i-v
+    curve equation. Details can be found in :cite:`Juschus:2021`.
     """
 
     def initialize(self):

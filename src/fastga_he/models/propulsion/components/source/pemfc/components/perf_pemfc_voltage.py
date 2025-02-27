@@ -10,8 +10,8 @@ DEFAULT_STACK_VOLTAGE = 325.0  # [V]
 
 class PerformancesPEMFCStackVoltage(om.ExplicitComponent):
     """
-    Computation of the voltage at the output of the PEMFC stack, assumes for now that it is equal to
-    the voltage output of the modules. May change in the future hence why it is in a separate
+    Output voltage computation of the PEMFC stack, assumes for now that it is equal to
+    the voltage output of the modules but may change in the future. This is why it is in a separate
     module.
     """
 

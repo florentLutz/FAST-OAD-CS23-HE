@@ -20,7 +20,7 @@ from ..components.perf_pemfc_layer_voltage import (
 
 
 class PerformancesPEMFCStack(om.Group):
-    """Class that regroups all the subcomponents for the PEMFC stack performance computation."""
+    """Class that regroups all the subcomponents for the PEMFC stack performance computations."""
 
     def initialize(self):
         self.options.declare(

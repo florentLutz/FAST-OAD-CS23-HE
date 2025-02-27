@@ -10,7 +10,7 @@ from ..constants import DEFAULT_PRESSURE
 
 class PerformancesPEMFCStackOperatingPressure(om.ExplicitComponent):
     """
-    Computation of the operating pressure of the PEMFC stack.
+    Operating pressure computation of the PEMFC stack.
     """
 
     def initialize(self):

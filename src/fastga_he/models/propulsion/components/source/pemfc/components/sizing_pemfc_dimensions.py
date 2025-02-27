@@ -12,8 +12,8 @@ CELL_LENGTH = 3.428e-3  # [m]
 
 class SizingPEMFCStackDimensions(om.ExplicitComponent):
     """
-    Computing PEMFC dimensions based on the ratio of its maximum power density to that of the
-    Aerostak 200W reference enables more realistic sizing. The calculation is based on the
+    Computing PEMFC dimensions bases on the volume derived with power density and the cell
+    length of Aerostak 200W enables more realistic sizing. The calculation is modified from the
     equations given by :cite:`hoogendoorn:2018`.
     """
 
