@@ -8,13 +8,14 @@ import openmdao.api as om
 from ..constants import (
     FARADAY_CONSTANT,
     GAS_CONSTANT,
-    DEFAULT_PRESSURE_ATM,
-    DEFAULT_LAYER_VOLTAGE,
-    DEFAULT_LAYER_TEMPERATURE,
     REVERSIBLE_ELECTRIC_POTENTIAL,
     MAX_CURRENT_DENSITY_EMPIRICAL,
     MAX_CURRENT_DENSITY_ANALYTICAL,
 )
+
+DEFAULT_LAYER_VOLTAGE = 0.7  # [V]
+DEFAULT_PRESSURE_ATM = 1.0  # [atm]
+DEFAULT_TEMPERATURE = 288.15  # [K]
 
 
 class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
@@ -279,7 +280,7 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         self.add_input(
             "operating_temperature",
             units="K",
-            val=np.full(number_of_points, DEFAULT_LAYER_TEMPERATURE),
+            val=np.full(number_of_points, DEFAULT_TEMPERATURE),
         )
 
         self.add_input(

@@ -14,6 +14,12 @@ from ..components.sizing_pemfc_cg_y import SizingPEMFCStackCGY
 from ..components.sizing_pemfc_volume import SizingPEMFCStackVolume
 from ..components.sizing_pemfc_dimensions import SizingPEMFCStackDimensions
 from ..components.sizing_pemfc_drag import SizingPEMFCStackDrag
+from ..components.sizing_pemfc_specific_power import (
+    SizingPEMFCStackSpecificPower,
+)
+from ..components.sizing_pemfc_power_density import (
+    SizingPEMFCStackPowerDensity,
+)
 from ..components.sizing_pemfc_stack import SizingPEMFCStack
 
 from ..components.perf_fuel_consumption import PerformancesPEMFCStackFuelConsumption
@@ -88,6 +94,53 @@ def test_pemfc_volume():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:volume", units="L"
     ) == pytest.approx(1.62, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_pemfc_specific_power():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max",
+        units="kW",
+        val=0.2,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingPEMFCStackSpecificPower(pemfc_stack_id="pemfc_stack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:specific_power", units="kW/kg"
+    ) == pytest.approx(
+        0.4677,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_pemfc_power_density():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max",
+        units="kW",
+        val=0.2,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingPEMFCStackPowerDensity(pemfc_stack_id="pemfc_stack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_density",
+        units="kW/m**3",
+    ) == pytest.approx(
+        204.59,
+        rel=1e-2,
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -237,7 +290,7 @@ def test_pemfc_stack_sizing():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
-    ) == pytest.approx(0.5, rel=1e-2)
+    ) == pytest.approx(0.293, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:CG:x", units="m"
     ) == pytest.approx(2.037, rel=1e-2)
