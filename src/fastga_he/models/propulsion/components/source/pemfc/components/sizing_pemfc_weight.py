@@ -5,8 +5,9 @@
 import numpy as np
 import openmdao.api as om
 
+from ..constants import DEFAULT_FC_SPECIFIC_POWER
+
 CELL_DENSITY = 8.5034  # [kg/m^2]
-DEFAULT_FC_SPECIFIC_POWER = 0.345  # [kW/kg]
 
 
 class SizingPEMFCStackWeight(om.ExplicitComponent):

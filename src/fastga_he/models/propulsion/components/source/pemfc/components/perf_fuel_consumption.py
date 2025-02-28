@@ -5,9 +5,12 @@
 import numpy as np
 import openmdao.api as om
 
-from ..constants import FARADAY_CONSTANT, H2_MOL_PER_KG, NUMBER_OF_ELETRONS_FROM_H2
-
-DEFAULT_HYDROGEN_CONSUMPTION = 30.0  # [kg/h]
+from ..constants import (
+    FARADAY_CONSTANT,
+    H2_MOL_PER_KG,
+    NUMBER_OF_ELETRONS_FROM_H2,
+    DEFAULT_HYDROGEN_CONSUMPTION,
+)
 
 
 class PerformancesPEMFCStackFuelConsumption(om.ExplicitComponent):
