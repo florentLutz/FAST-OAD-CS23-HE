@@ -13,7 +13,7 @@ class SizingPEMFCStackSpecificPower(om.ExplicitComponent):
     """
     Computation of the maximum specific power provide of the PEMFC system excluding the inlet
     compressor. Applied in weight calculation.The data and the regression model of this
-    calculation can be found under the methodology folder.
+    calculation can be found in the methodology folder.
     Source: https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf
     """
 
