@@ -15,7 +15,8 @@ MAX_PEMFC_POWER_DENSITY = 500  # [kW/m^3]
 class SizingPEMFCStackPowerDensity(om.ExplicitComponent):
     """
     Computation of the maximum power density of the PEMFC system excluding the inlet compressor.
-    Applied in volume calculation.
+    Applied in volume calculation. The data and the regression model of this calculation can be
+    found under the methodology folder.
     Source: https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf
     """
 

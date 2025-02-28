@@ -71,7 +71,9 @@ class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="nominal_pressure",
+            name="data:propulsion:he_power_train:PEMFC_stack:"
+            + pemfc_stack_id
+            + ":nominal_pressure",
             units="atm",
             val=DEFAULT_PRESSURE_ATM,
             desc="The nominal pressure at which the PEMFC stack operates.",
@@ -109,7 +111,9 @@ class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
         self.declare_partials(
             of="single_layer_pemfc_voltage",
             wrt=[
-                "nominal_pressure",
+                "data:propulsion:he_power_train:PEMFC_stack:"
+                + pemfc_stack_id
+                + ":nominal_pressure",
                 "data:propulsion:he_power_train:PEMFC_stack:"
                 + pemfc_stack_id
                 + ":area_ohmic_resistance",
@@ -135,7 +139,9 @@ class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
 
         operating_pressure = inputs["operating_pressure"]
 
-        nominal_pressure = inputs["nominal_pressure"]
+        nominal_pressure = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":nominal_pressure"
+        ]
 
         pressure_ratio_log = np.log(operating_pressure / nominal_pressure)
 
@@ -162,7 +168,9 @@ class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
 
         operating_pressure = inputs["operating_pressure"]
 
-        nominal_pressure = inputs["nominal_pressure"]
+        nominal_pressure = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":nominal_pressure"
+        ]
 
         pressure_ratio_log = np.log(operating_pressure / nominal_pressure)
 
@@ -189,9 +197,10 @@ class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
             48 * pressure_ratio_log**2 - 19 * pressure_ratio_log - 271
         ) / (5000 * operating_pressure)
 
-        partials["single_layer_pemfc_voltage", "nominal_pressure"] = (
-            48 * pressure_ratio_log**2 - 19 * pressure_ratio_log - 271
-        ) / (5000 * nominal_pressure)
+        partials[
+            "single_layer_pemfc_voltage",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":nominal_pressure",
+        ] = (48 * pressure_ratio_log**2 - 19 * pressure_ratio_log - 271) / (5000 * nominal_pressure)
 
 
 class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
