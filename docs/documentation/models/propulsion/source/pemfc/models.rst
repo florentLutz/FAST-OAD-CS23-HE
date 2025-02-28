@@ -54,23 +54,24 @@ And
 
 .. raw:: html
 
-   <div align="center">
+   <div style="display: flex; justify-content: center;">
 
-=========  =========  ============
-Parameter  Value      Unit
-=========  =========  ============
-V₀         0.83         V
-B          0.014       V/ln(A/cm²)
-R          0.24        Ω cm²
-m          5.63*10⁻⁶   V
-n          11.42       cm²/A
-Pₙₒₘ        101325      Pa
-=========  =========  ============
-
+======================  =======================  =============================================
+Parameter                   Value                       Unit
+======================  =======================  =============================================
+:math:`V_0`                   :math:`0.83`                       :math:`\text{V}`
+:math:`B`                   :math:`0.014`           :math:`\text{V}/ln(\text{A}/\text{cm}^2)`
+:math:`R`                   :math:`0.24`               :math:`\Omega \cdot \text{cm}^2`
+:math:`m`                :math:`5.63 × 10^{-6}`                 :math:`\text{V}`
+:math:`n`                   :math:`11.42`                 :math:`\text{cm}^2/\text{A}`
+:math:`P_{\text{nom}}`      :math:`101325`                       :math:`\text{Pa}`
+======================  =======================  =============================================
 
 .. raw:: html
 
    </div>
+
+
 
 This table proivdes the parameter values that has been considered to model Aerostak 200W in hoogendoorn's research
 :cite:`hoogendoorn:2018`.
@@ -106,25 +107,26 @@ And
 
 .. raw:: html
 
-   <div align="center">
+   <div style="display: flex; justify-content: center;">
 
-=========  ======  ===========
-Parameter  Value   Unit
-=========  ======  ===========
-E₀         1.229   V
-ΔS         44.34   J/(mol·K)
-T₀         289.15  K
-α           0.3    –
-ε           0.5    V
-r           10⁻⁶    Ω·m²
-jₗᵢₘ        20000   A/m²
-jₗₑₐₖ         100    A/m²
-j₀          1.0    A/m²
-=========  ======  ===========
+=======================  ================  =============================================
+Parameter                  Value                    Unit
+=======================  ================  =============================================
+:math:`E_0`               :math:`1.229`         :math:`\text{V}`
+:math:`\Delta S`          :math:`44.34`     :math:`\text{J}/(\text{mol} \cdot \text{K})`
+:math:`T_0`               :math:`289.15`        :math:`\text{K}`
+:math:`\alpha`            :math:`0.3`           :math:`–`
+:math:`\epsilon`           :math:`0.5`           :math:`\text{V}`
+:math:`r`                 :math:`10^{-6}`   :math:`\Omega \cdot \text{m}^2`
+:math:`j_{\lim}`          :math:`20000`     :math:`\text{A}/\text{m}^2`
+:math:`j_{\text{leak}}`   :math:`100`       :math:`\text{A}/\text{m}^2`
+:math:`j_0`               :math:`1.0`       :math:`\text{A}/\text{m}^2`
+=======================  ================  =============================================
 
 .. raw:: html
 
    </div>
+
 
 This table provides the parameter values that has been considered in juschus' research :cite:`juschus:2021`.
 
