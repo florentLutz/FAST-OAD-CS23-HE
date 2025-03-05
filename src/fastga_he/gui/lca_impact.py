@@ -266,7 +266,7 @@ def _round_value(value: float) -> float:
     else:
         # For some very obscure reason, if you put a value which is too small here. The graph simply
         # won't display ...
-        return round(value, 5)
+        return round(value, int(np.ceil(abs(np.log10(value))) + 5))
 
 
 def _get_first_parent_name(name_variable: str) -> str:
