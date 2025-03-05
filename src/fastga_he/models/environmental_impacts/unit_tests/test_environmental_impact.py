@@ -782,6 +782,7 @@ def test_pipistrel_lca_comparison_paper():
         weighting=True,
         aircraft_lifespan_in_hours=True,
         ecoinvent_version="3.9.1",
+        functional_unit="Flight hours"
     )
 
     ivc = get_indep_var_comp(

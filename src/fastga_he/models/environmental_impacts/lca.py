@@ -14,7 +14,7 @@ import fastga_he.models.propulsion.components as he_comp
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from .lca_equivalent_year_of_life import LCAEquivalentYearOfLife
 from .lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
-from .lca_aircraft_per_fu import LCAAircraftPerFU
+from .lca_aircraft_per_fu import LCAAircraftPerFU, LCAAircraftPerFUFlightHours
 from .lca_core import LCACore
 from .lca_core_normalization import LCACoreNormalisation
 from .lca_core_weighting import LCACoreWeighting
@@ -30,7 +30,7 @@ from .lca_htp_weight_per_fu import LCAHTPWeightPerFU
 from .lca_kerosene_per_fu import LCAKerosenePerFU
 from .lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
 from .lca_line_test_mission_ratio import LCARatioTestFlightMission
-from .lca_use_flight_per_fu import LCAUseFlightPerFU
+from .lca_use_flight_per_fu import LCAUseFlightPerFU, LCAUseFlightPerFUFlightHours
 from .lca_vtp_weight_per_fu import LCAVTPWeightPerFU
 from .lca_wing_weight_per_fu import LCAWingWeightPerFU
 from .resources.constants import (
@@ -55,6 +55,13 @@ class LCA(om.Group):
             name="power_train_file_path",
             default=None,
             desc="Path to the file containing the description of the power",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="functional_unit",
+            default="PAX.km",
+            desc="Functional unit to be used for the LCA",
+            values=["PAX.km", "Flight hours"],
             allow_none=False,
         )
         self.options.declare(
@@ -168,20 +175,36 @@ class LCA(om.Group):
                 promotes=["*"],
             )
 
-        self.add_subsystem(
-            name="aircraft_per_fu",
-            subsys=LCAAircraftPerFU(
-                use_operational_mission=self.options["use_operational_mission"]
-            ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="flight_per_fu",
-            subsys=LCAUseFlightPerFU(
-                use_operational_mission=self.options["use_operational_mission"]
-            ),
-            promotes=["*"],
-        )
+        if self.options["functional_unit"] == "Flight hours":
+            self.add_subsystem(
+                name="aircraft_per_fu",
+                subsys=LCAAircraftPerFUFlightHours(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                name="flight_per_fu",
+                subsys=LCAUseFlightPerFUFlightHours(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
+        else:
+            self.add_subsystem(
+                name="aircraft_per_fu",
+                subsys=LCAAircraftPerFU(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                name="flight_per_fu",
+                subsys=LCAUseFlightPerFU(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
 
         self.add_subsystem(
             name="line_tests_mission_ratio",
