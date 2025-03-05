@@ -1,0 +1,38 @@
+<FASTOAD_model>
+    <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+        </environmental_impact>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+            </fuselage>
+            <wing>
+                <span units="m">12.0</span>
+                <MAC>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <fuel_system>
+                    <fuel_system_1>
+                        <mass units="kg">10.98</mass>
+                        <total_fuel_flowed units="kg">45</total_fuel_flowed>
+                        <connected_volume units="L">62.59</connected_volume>
+                        <number_engine>2.0</number_engine>
+                        <CG>
+                            <y_ratio>0.224</y_ratio>
+                        </CG>
+                    </fuel_system_1>
+                </fuel_system>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
