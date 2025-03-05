@@ -151,12 +151,6 @@ def _get_impact_sunburst(
         sunburst = go.Sunburst()
         return sunburst
 
-    max_depth = 0
-    for name in names_variables_lca:
-        curr_depth = _depth_lca_detail(name)
-        if curr_depth > max_depth:
-            max_depth = curr_depth
-
     # Because it's the earliest parent ;)
     label_ancestor = _get_ancestor_label(datafile)
 
@@ -270,7 +264,9 @@ def _round_value(value: float) -> float:
     if value == 0.0:
         return value
     else:
-        return round(value, int(np.ceil(abs(np.log10(value))) + 2))
+        # For some very obscure reason, if you put a value which is too small here. The graph simply
+        # won't display ...
+        return round(value, 5)
 
 
 def _get_first_parent_name(name_variable: str) -> str:
