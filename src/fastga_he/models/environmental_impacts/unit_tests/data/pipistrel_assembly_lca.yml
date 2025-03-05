@@ -71,8 +71,8 @@ model:
                 # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
                 # with the mass
                 electricity:
-                  name: 'electricity, high voltage, production mix'
-                  loc: 'FR'
+                  name: 'market group for electricity, high voltage'
+                  loc: 'RER'
                   amount: 219520.67 / 5485.0 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
         
                 gas:
@@ -155,8 +155,8 @@ model:
                 # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
                 # with the mass
                 electricity:
-                  name: 'electricity, high voltage, production mix'
-                  loc: 'FR'
+                  name: 'market group for electricity, high voltage'
+                  loc: 'RER'
                   amount: 13361 / 333.9 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
         
                 gas:
@@ -392,8 +392,8 @@ model:
 
         electricity_for_mission_production:
         
-            name: 'electricity, high voltage, production mix'
-            loc: 'FR'
+            name: 'market group for electricity, high voltage'
+            loc: 'RER'
             # This variable should always exist since we will only add this part to the conf file if
             # there are batteries and if there are batteries the component that computes this value will be added
             amount: data__LCA__manufacturing__he_power_train__electricity__energy_per_fu / 1000
@@ -516,8 +516,8 @@ model:
                 - attribute: "component"
                   value: electricity_for_mission_operation
         
-            name: 'electricity, high voltage, production mix'
-            loc: 'FR'
+            name: 'market group for electricity, high voltage'
+            loc: 'RER'
             # This variable should always exist since we will only add this part to the conf file if
             # there are batteries and if there are batteries the component that computes this value will be added
             amount: data__LCA__operation__he_power_train__electricity__energy_per_fu / 1000

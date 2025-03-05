@@ -772,6 +772,40 @@ def test_lca_pipistrel():
     process_tree(lca_model, outfile=os.path.join(RESULTS_FOLDER_PATH, "lca_pipistrel.html"))
 
 
+def test_pipistrel_lca_comparison_paper():
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
+        component_level_breakdown=True,
+        airframe_material="composite",
+        delivery_method="train",
+        normalization=True,
+        weighting=True,
+        aircraft_lifespan_in_hours=True,
+        ecoinvent_version="3.9.1",
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(component),
+        __file__,
+        "pipistrel_out.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_standard.xml"
+    problem.write_outputs()
+
+    problem.set_val("data:TLAR:max_airframe_hours", units="h", val=500.0)
+    problem.run_model()
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_short.xml"
+    problem.write_outputs()
+
+
 def test_kerosene_per_fu_tbm900():
     inputs_list = [
         "data:environmental_impact:flight_per_fu",
