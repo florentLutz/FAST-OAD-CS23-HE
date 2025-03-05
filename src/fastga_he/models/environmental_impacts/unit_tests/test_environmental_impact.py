@@ -354,6 +354,7 @@ def test_use_flight_per_fu_flight_hours():
 
     problem.check_partials(compact_print=True)
 
+
 def test_wing_weight_per_fu():
     inputs_list = [
         "data:environmental_impact:aircraft_per_fu",

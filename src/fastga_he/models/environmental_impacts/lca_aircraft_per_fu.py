@@ -200,5 +200,5 @@ class LCAAircraftPerFUFlightHours(om.ExplicitComponent):
         partials["data:environmental_impact:aircraft_per_fu", duration_mission_name] = -1.0 / (
             inputs["data:TLAR:aircraft_lifespan"]
             * inputs["data:TLAR:flight_per_year"]
-            * duration_mission ** 2.0
+            * duration_mission**2.0
         )
