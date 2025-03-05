@@ -547,7 +547,9 @@ def test_search_engine_paper_climate_change():
     total_impact_electricity_one_fu_co2eq = (
         impact_battery_production_one_fu + impact_electricity_production_one_fu
     )
-
+    ratio_battery_production = (
+        impact_battery_production_one_fu / total_impact_electricity_one_fu_co2eq
+    )
     impact_one_flight_electricity = (
         total_impact_electricity_one_fu_co2eq / flights_per_fu_hybrid_design
     )
@@ -556,6 +558,14 @@ def test_search_engine_paper_climate_change():
     )
 
     print("Kg of CO2eq for 1 kWh of electricity", impact_per_kwh_of_electricity_used)
+    print(
+        "Kg of CO2eq for producing 1 kWh of electricity",
+        (1.0 - ratio_battery_production) * impact_per_kwh_of_electricity_used,
+    )
+    print(
+        "Kg of CO2eq for producing the battery",
+        ratio_battery_production * impact_per_kwh_of_electricity_used,
+    )
 
     impact_list_hybrid_design = ["*", "*"]
     phase_list_hybrid_design = ["*", "production"]
