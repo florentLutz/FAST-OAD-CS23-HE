@@ -1118,6 +1118,7 @@ def lca_impacts_bar_chart_with_contributors(
     detailed_component_contributions: bool = False,
     legend_rename: dict = None,
     aggregate_phase: list = None,
+    impact_filter_list: list = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that plot the impact of an aircraft in each category and how each component
@@ -1133,6 +1134,7 @@ def lca_impacts_bar_chart_with_contributors(
     :param aggregate_phase: for compactness, it may be preferable to aggregate the contribution
     of all components to a phase. This options is a list of phases to aggregate. Please note that
     the aggregation of the manufacturing and distribution can't be changed (see the documentation).
+    :param impact_filter_list: filter to only show impact in the list in output graph
     """
 
     component_and_contribution = _get_component_and_contribution(
@@ -1163,10 +1165,20 @@ def lca_impacts_bar_chart_with_contributors(
             final_name = legend_rename[final_name]
 
         for impact_name, contribution in impacts.items():
-            beautified_impact_name = impact_name.replace("_", " ")
-            beautified_impact_names.append(beautified_impact_name)
+            if impact_filter_list is not None:
+                beautified_impact_name = impact_name.replace("_", " ")
 
-            impact_contributions.append(contribution / impact_score_dict[impact_name] * 100.0)
+                if beautified_impact_name in impact_filter_list:
+                    beautified_impact_names.append(beautified_impact_name)
+
+                    impact_contributions.append(
+                        contribution / impact_score_dict[impact_name] * 100.0
+                    )
+            else:
+                beautified_impact_name = impact_name.replace("_", " ")
+                beautified_impact_names.append(beautified_impact_name)
+
+                impact_contributions.append(contribution / impact_score_dict[impact_name] * 100.0)
 
         bar_chart = go.Bar(
             name=final_name,

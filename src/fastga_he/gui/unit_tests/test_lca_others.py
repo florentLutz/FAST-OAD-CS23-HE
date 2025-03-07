@@ -231,6 +231,14 @@ def test_lca_bar_chart_relative_contribution():
 
     fig.show()
 
+def test_lca_bar_chart_pipistrel_comparison_paper():
+    fig = lca_impacts_bar_chart_with_contributors(
+        DATA_FOLDER_PATH / "pipistrel_standard.xml",
+        name_aircraft="Pipistrel 4000h lifetime",
+    )
+
+    fig.show()
+
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_bar_chart_relative_contribution_ref_paper():
