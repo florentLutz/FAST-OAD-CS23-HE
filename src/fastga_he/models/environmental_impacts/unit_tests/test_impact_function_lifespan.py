@@ -57,15 +57,81 @@ def test_environmental_impact_function_span_hybrid():
     # problem as there was no energy consumed during takeoff
     datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
     total_fuel_mission = datafile["data:mission:sizing:fuel"].value[0]
+    fuel_reserves = datafile["data:mission:sizing:main_route:reserve:fuel"].value[0]
+    fuel_for_lca = total_fuel_mission - fuel_reserves
+    ratio_fuel = fuel_for_lca / total_fuel_mission
     problem.set_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
         units="kg",
-        val=total_fuel_mission / 2.0,
+        val=fuel_for_lca / 2.0,
     )
     problem.set_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
         units="kg",
-        val=total_fuel_mission / 2.0,
+        val=fuel_for_lca / 2.0,
+    )
+
+    # For now the emissions are computed using emission index which means they are proportional
+    # to the fuel so we can do the following to remove the emissions in reserve
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO",
+        units=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO"
+        ].value[0]
+        * ratio_fuel,
+    )
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2",
+        units=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2"
+        ].value[0]
+        * ratio_fuel,
+    )
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:H2O",
+        units=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:H2O"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:H2O"
+        ].value[0]
+        * ratio_fuel,
+    )
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:HC",
+        units=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:HC"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:HC"
+        ].value[0]
+        * ratio_fuel,
+    )
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:NOx",
+        units=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:NOx"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:NOx"
+        ].value[0]
+        * ratio_fuel,
+    )
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:SOx",
+        units=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:SOx"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:SOx"
+        ].value[0]
+        * ratio_fuel,
     )
 
     mean_airframe_hours = 3524.9
@@ -235,15 +301,82 @@ def test_environmental_impact_function_span_conventional():
     # the sizing but does affect the LCA, this is a temporary fix
     datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
     total_fuel_mission = datafile["data:mission:operational:fuel"].value[0]
+    fuel_reserves = datafile["data:mission:operational:reserve:fuel"].value[0]
+    fuel_for_lca = total_fuel_mission - fuel_reserves
+    ratio_fuel = fuel_for_lca / total_fuel_mission
+
+    # For now the emissions are computed using emission index which means they are proportional
+    # to the fuel so we can do the following to remove the emissions in reserve
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO",
+        units=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:CO"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:CO"
+        ].value[0]
+        * ratio_fuel,
+    )
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2",
+        units=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:CO2"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:CO2"
+        ].value[0]
+        * ratio_fuel,
+    )
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:H2O",
+        units=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:H2O"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:H2O"
+        ].value[0]
+        * ratio_fuel,
+    )
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:HC",
+        units=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:HC"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:HC"
+        ].value[0]
+        * ratio_fuel,
+    )
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:NOx",
+        units=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:NOx"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:NOx"
+        ].value[0]
+        * ratio_fuel,
+    )
+    problem.set_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:SOx",
+        units=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:SOx"
+        ].units,
+        val=datafile[
+            "data:environmental_impact:operation:operational:he_power_train:turboshaft:turboshaft_1:SOx"
+        ].value[0]
+        * ratio_fuel,
+    )
+
     problem.set_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
         units="kg",
-        val=total_fuel_mission / 2.0,
+        val=fuel_for_lca / 2.0,
     )
     problem.set_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
         units="kg",
-        val=total_fuel_mission / 2.0,
+        val=fuel_for_lca / 2.0,
     )
 
     mean_airframe_hours = 3524.9

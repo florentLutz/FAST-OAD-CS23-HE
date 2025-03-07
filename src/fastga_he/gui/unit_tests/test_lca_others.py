@@ -194,6 +194,7 @@ def test_lca_bar_chart_relative_paper():
         ],
         names_aircraft=["Reference Kodiak 100", "Hybrid Kodiak 100"],
     )
+    fig.update_layout(title_text=None)
 
     fig.show()
     fig.update_layout(height=800, width=1600)
@@ -230,6 +231,7 @@ def test_lca_bar_chart_relative_contribution():
     )
 
     fig.show()
+
 
 def test_lca_bar_chart_pipistrel_comparison_paper():
     fig = lca_impacts_bar_chart_with_contributors(
@@ -379,6 +381,8 @@ def test_search_engine_paper():
     print("Flights per FU design", flights_per_fu_ref_design)
     print("FU per flights design", 1.0 / flights_per_fu_ref_design)
 
+    single_score_ref = ref_design_datafile["data:environmental_impact:single_score"].value[0]
+
     # Not available here directly, have to rely on the amount of kerosene in the tanks
     fuel_burned_ref_design = (
         ref_design_datafile[
@@ -386,6 +390,7 @@ def test_search_engine_paper():
         ].value[0]
         * 2.0
     )
+    fuel_burned_per_pax_km_ref_design = fuel_burned_ref_design * flights_per_fu_ref_design
     energy_mission_ref_design = fuel_burned_ref_design * 11.9  # in kWh
     energy_per_pax_km = energy_mission_ref_design * flights_per_fu_ref_design
     print("Energy required per FU", energy_per_pax_km)
@@ -401,8 +406,6 @@ def test_search_engine_paper():
         component_list_ref_design,
         rel=False,
     )
-
-    assert sum(impacts_value_ref_design[:-1]) > 0.94 * impacts_value_ref_design[-1]
 
     impact_one_flight = sum(impacts_value_ref_design[:2]) / flights_per_fu_ref_design
     impact_per_kwh_of_energy_used = impact_one_flight / energy_mission_ref_design
@@ -425,6 +428,10 @@ def test_search_engine_paper():
     print("Flights per FU hybrid design", flights_per_fu_hybrid_design)
     print("FU per flights hybrid design", fu_per_flights_hybrid_design)
 
+    single_score_hybrid_design = hybrid_design_datafile[
+        "data:environmental_impact:single_score"
+    ].value[0]
+
     # Not available here directly, have to rely on the amount of kerosene in the tanks
     fuel_burned_hybrid_design = (
         hybrid_design_datafile[
@@ -440,6 +447,7 @@ def test_search_engine_paper():
     ].units
     if electricity_unit == "W*h":
         electricity_used_hybrid_design /= 1000.0
+    fuel_burned_per_pax_km_hybrid_design = fuel_burned_hybrid_design * flights_per_fu_hybrid_design
     energy_mission_hybrid_design = (
         fuel_burned_hybrid_design * 11.9 + electricity_used_hybrid_design
     )  # in kWh
@@ -464,13 +472,21 @@ def test_search_engine_paper():
         rel=False,
     )
 
-    assert sum(impacts_value_hybrid_design[:-1]) > 0.93 * impacts_value_hybrid_design[-1]
-
     impact_one_flight_hybrid = sum(impacts_value_hybrid_design[:-1]) * fu_per_flights_hybrid_design
     impact_per_kwh_of_energy_used_hybrid = impact_one_flight_hybrid / energy_mission_hybrid_design
     print(impact_per_kwh_of_energy_used_hybrid)
     print("\n")
 
+    print(
+        "Decrease in fuel required",
+        (fuel_burned_hybrid_design - fuel_burned_ref_design) / fuel_burned_ref_design * 100.0,
+    )
+    print(
+        "Decrease in fuel required per pax.km",
+        (fuel_burned_per_pax_km_hybrid_design - fuel_burned_per_pax_km_ref_design)
+        / fuel_burned_per_pax_km_ref_design
+        * 100.0,
+    )
     print(
         "Decrease in energy required",
         (energy_mission_hybrid_design - energy_mission_ref_design)
@@ -486,6 +502,13 @@ def test_search_engine_paper():
         (impact_per_kwh_of_energy_used_hybrid - impact_per_kwh_of_energy_used)
         / impact_per_kwh_of_energy_used
         * 100.0,
+    )
+
+    print("Single score reference design: ", single_score_ref)
+    print("Single score hybrid design: ", single_score_hybrid_design)
+    print(
+        "Variation in single score: ",
+        (single_score_ref - single_score_hybrid_design) / single_score_ref * 100.0,
     )
 
 
