@@ -8,15 +8,15 @@ import numpy as np
 
 class PerformancesFuelOutput(om.ExplicitComponent):
     """
-    Compute the fuel that the system has to output towards engine at each point of the flight,
-    is simply the sum of the fuel consumed by each engine connected at the output.
+    Compute the fuel that the system has to output towards power source at each point of the flight,
+    is simply the sum of the fuel consumed by each power source connected at the output.
     """
 
     def initialize(self):
         self.options.declare(
-            name="fuel_system_id",
+            name="h2_fuel_system_id",
             default=None,
-            desc="Identifier of the fuel system",
+            desc="Identifier of the hydrogen fuel system",
             types=str,
             allow_none=False,
         )
@@ -24,32 +24,34 @@ class PerformancesFuelOutput(om.ExplicitComponent):
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            name="number_of_engines",
+            name="number_of_sources",
             default=1,
             types=int,
-            desc="Number of connections at the output of the fuel system, should always be engine",
+            desc="Number of connections at the output of the hydrogen fuel system, should always be "
+                 "power source",
             allow_none=False,
         )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        fuel_system_id = self.options["fuel_system_id"]
+        h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         self.add_output(
             name="fuel_flowing_t",
             units="kg",
             val=np.full(number_of_points, 5.0),
             shape=number_of_points,
-            desc="Fuel flowing through the fuel system at each time step",
+            desc="Fuel flowing through the hydrogen fuel system at each time step",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":number_engine",
-            val=self.options["number_of_engines"],
-            desc="Number of engine connected to this fuel system",
+            name="data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id +
+                 ":number_source",
+            val=self.options["number_of_sources"],
+            desc="Number of power source connected to this hydrogen fuel system",
         )
 
-        for i in range(self.options["number_of_engines"]):
+        for i in range(self.options["number_of_sources"]):
             # Choice was made to start current numbering at 1 to be consistent with what is done
             # on electrical node (which coincidentally should irritate programmer)
             self.add_input(
@@ -57,7 +59,7 @@ class PerformancesFuelOutput(om.ExplicitComponent):
                 units="kg",
                 val=np.full(number_of_points, np.nan),
                 shape=number_of_points,
-                desc="Fuel consumed by the engine connected at the output number " + str(i + 1),
+                desc="Fuel consumed by the power source connected at the output number " + str(i + 1),
             )
 
             self.declare_partials(
@@ -73,7 +75,7 @@ class PerformancesFuelOutput(om.ExplicitComponent):
 
         fuel_output = np.zeros(number_of_points)
 
-        for i in range(self.options["number_of_engines"]):
+        for i in range(self.options["number_of_sources"]):
             fuel_output += inputs["fuel_consumed_out_t_" + str(i + 1)]
 
         outputs["fuel_flowing_t"] = fuel_output

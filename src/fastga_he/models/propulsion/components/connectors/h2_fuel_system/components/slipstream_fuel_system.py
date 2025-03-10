@@ -15,9 +15,9 @@ class SlipstreamFuelSystem(om.Group):
 
     def initialize(self):
         self.options.declare(
-            name="fuel_system_id",
+            name="h2_fuel_system_id",
             default=None,
-            desc="Identifier of the fuel system",
+            desc="Identifier of the hydrogen fuel system",
             types=str,
             allow_none=False,
         )

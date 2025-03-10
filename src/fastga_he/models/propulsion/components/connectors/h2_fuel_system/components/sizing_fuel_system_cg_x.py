@@ -11,9 +11,9 @@ from ..constants import POSSIBLE_POSITION
 class SizingFuelSystemCGX(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
-            name="fuel_system_id",
+            name="h2_fuel_system_id",
             default=None,
-            desc="Identifier of the fuel system",
+            desc="Identifier of the hydrogen fuel system",
             types=str,
             allow_none=False,
         )
@@ -21,20 +21,20 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
             name="position",
             default="in_the_wing",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the fuel system, possible position include "
+            desc="Option to give the position of the hydrogen fuel system, possible position include "
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
 
     def setup(self):
-        fuel_system_id = self.options["fuel_system_id"]
+        h2_fuel_system_id = self.options["h2_fuel_system_id"]
         position = self.options["position"]
 
         self.add_output(
-            "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:x",
+            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:x",
             units="m",
             val=2.5,
-            desc="X position of the fuel system center of gravity",
+            desc="X position of the hydrogen fuel system center of gravity",
         )
 
         if position == "in_the_wing":
@@ -50,20 +50,20 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        fuel_system_id = self.options["fuel_system_id"]
+        h2_fuel_system_id = self.options["h2_fuel_system_id"]
         position = self.options["position"]
 
         if position == "in_the_wing":
             fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
 
-            outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:x"] = (
+            outputs["data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:x"] = (
                 fa_length
             )
 
         elif position == "in_the_front":
             front_length = inputs["data:geometry:fuselage:front_length"]
 
-            outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:x"] = (
+            outputs["data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:x"] = (
                 front_length
             )
 
@@ -71,6 +71,6 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
             front_length = inputs["data:geometry:fuselage:front_length"]
             cabin_length = inputs["data:geometry:cabin:length"]
 
-            outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:x"] = (
+            outputs["data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:x"] = (
                 front_length + cabin_length
             )

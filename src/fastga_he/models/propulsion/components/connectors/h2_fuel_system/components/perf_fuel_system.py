@@ -11,14 +11,14 @@ from .perf_total_fuel_flowed import PerformancesTotalFuelFlowed
 
 class PerformancesFuelSystem(om.Group):
     """
-    Group that gathers all the components necessary to assess the performances of the fuel system.
+    Group that gathers all the components necessary to assess the performances of the hydrogen fuel system.
     """
 
     def initialize(self):
         self.options.declare(
-            name="fuel_system_id",
+            name="h2_fuel_system_id",
             default=None,
-            desc="Identifier of the fuel system",
+            desc="Identifier of the hydrogen fuel system",
             types=str,
             allow_none=False,
         )
@@ -26,32 +26,32 @@ class PerformancesFuelSystem(om.Group):
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            name="number_of_tanks",
+            name="number_of_tank_stacks",
             default=1,
             types=int,
-            desc="Number of connections at the input of the fuel system, should always be tanks",
+            desc="Number of connections at the input of the hydrogen fuel system, should always be tanks",
             allow_none=False,
         )
         self.options.declare(
-            name="number_of_engines",
+            name="number_of_sources",
             default=1,
             types=int,
-            desc="Number of connections at the output of the fuel system, should always be engine",
+            desc="Number of connections at the output of the hydrogen fuel system, should always be engine",
             allow_none=False,
         )
 
     def setup(self):
-        fuel_system_id = self.options["fuel_system_id"]
+        h2_fuel_system_id = self.options["h2_fuel_system_id"]
         number_of_points = self.options["number_of_points"]
-        number_of_tanks = self.options["number_of_tanks"]
-        number_of_engines = self.options["number_of_engines"]
+        number_of_tank_stacks = self.options["number_of_tank_stacks"]
+        number_of_sources = self.options["number_of_sources"]
 
         self.add_subsystem(
             name="fuel_flow_out",
             subsys=PerformancesFuelOutput(
                 number_of_points=number_of_points,
-                number_of_engines=number_of_engines,
-                fuel_system_id=fuel_system_id,
+                number_of_sources=number_of_sources,
+                h2_fuel_system_id=h2_fuel_system_id,
             ),
             promotes=["*"],
         )
@@ -59,15 +59,15 @@ class PerformancesFuelSystem(om.Group):
             name="fuel_flow_in",
             subsys=PerformancesFuelInput(
                 number_of_points=number_of_points,
-                number_of_tanks=number_of_tanks,
-                fuel_system_id=fuel_system_id,
+                number_of_tanks=number_of_tank_stacks,
+                h2_fuel_system_id=h2_fuel_system_id,
             ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="total_fuel_flowed",
             subsys=PerformancesTotalFuelFlowed(
-                number_of_points=number_of_points, fuel_system_id=fuel_system_id
+                number_of_points=number_of_points, h2_fuel_system_id=h2_fuel_system_id
             ),
             promotes=["*"],
         )

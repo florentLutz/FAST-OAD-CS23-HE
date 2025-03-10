@@ -11,8 +11,6 @@ from ..components.sizing_fuel_system_cg_y import SizingFuelSystemCGY
 from ..components.sizing_fuel_system_volume import SizingFuelSystemCapacityVolume
 from ..components.sizing_fuel_system_weight import SizingFuelSystemWeight
 
-from ..components.pre_lca_prod_weight_per_fu import PreLCAFuelSystemProdWeightPerFU
-
 from ..components.perf_fuel_output import PerformancesFuelOutput
 from ..components.perf_fuel_input import PerformancesFuelInput
 from ..components.perf_total_fuel_flowed import PerformancesTotalFuelFlowed
@@ -24,7 +22,7 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 from ..constants import POSSIBLE_POSITION
 
-XML_FILE = "sample_fuel_system.xml"
+XML_FILE = "sample_hydrogen_pipeline.xml"
 NB_POINTS_TEST = 10
 
 

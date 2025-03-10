@@ -10,15 +10,15 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingFuelSystemCGY(om.ExplicitComponent):
     """
-    Class that computes the Y-CG of the fuel system based on its position. Will be based on simple
+    Class that computes the Y-CG of the hydrogen fuel system based on its position. Will be based on simple
     geometric ratios, no consideration of volume will be implemented for now.
     """
 
     def initialize(self):
         self.options.declare(
-            name="fuel_system_id",
+            name="h2_fuel_system_id",
             default=None,
-            desc="Identifier of the fuel system",
+            desc="Identifier of the hydrogen fuel system",
             types=str,
             allow_none=False,
         )
@@ -26,20 +26,20 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
             name="position",
             default="in_the_wing",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the fuel system, possible position include "
+            desc="Option to give the position of the hydrogen fuel system, possible position include "
             + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
 
     def setup(self):
         position = self.options["position"]
-        fuel_system_id = self.options["fuel_system_id"]
+        h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         # At least one input is needed regardless of the case
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
 
         self.add_output(
-            "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y",
+            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:y",
             units="m",
             val=0.0,
             desc="Y position of the ICE center of gravity",
@@ -47,7 +47,7 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
 
         if position == "in_the_wing":
             self.add_input(
-                "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:y_ratio",
                 val=np.nan,
                 desc="Y position of the ICE center of gravity as a ratio of the wing half-span",
             )
@@ -56,35 +56,35 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         position = self.options["position"]
-        fuel_system_id = self.options["fuel_system_id"]
+        h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         if position == "in_the_wing":
-            outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y"] = (
+            outputs["data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
                 * inputs[
-                    "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y_ratio"
+                    "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:y_ratio"
                 ]
                 / 2.0
             )
 
         else:
-            outputs["data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y"] = 0.0
+            outputs["data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        fuel_system_id = self.options["fuel_system_id"]
+        h2_fuel_system_id = self.options["h2_fuel_system_id"]
         position = self.options["position"]
 
         if position == "in_the_wing":
             partials[
-                "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y",
+                "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:y",
                 "data:geometry:wing:span",
             ] = (
                 inputs[
-                    "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y_ratio"
+                    "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:y_ratio"
                 ]
                 / 2.0
             )
             partials[
-                "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y",
-                "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:y",
+                "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":CG:y_ratio",
             ] = inputs["data:geometry:wing:span"] / 2.0
