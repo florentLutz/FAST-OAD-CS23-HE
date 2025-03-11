@@ -7,6 +7,8 @@ import pathlib
 
 import pytest
 
+import fastoad.api as oad
+
 from lca_modeller.gui.plots import process_tree
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -773,7 +775,6 @@ def test_lca_pipistrel():
 
 
 def test_pipistrel_lca_comparison_paper():
-
     # The analysis we try to replicate here is not exactly the pipistrel we size and test earlier.
     # Rather it looks to be an earlier version of the pipistrel whose empty weight is 370kg as
     # opposed to the 428kg of the Valis Electro. We will, however, try to replicate those result
@@ -815,6 +816,121 @@ def test_pipistrel_lca_comparison_paper():
     problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_alpha_short.xml"
     problem.write_outputs()
 
+
+def test_extract_results_from_pipistrel_lca_comparison_standard():
+    alpha_standard_datafile = oad.DataFile(RESULTS_FOLDER_PATH / "pipistrel_alpha_standard.xml")
+
+    airframe_impact = (
+        alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:flight_controls"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:fuselage"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:horizontal_tail"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:landing_gear"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:vertical_tail"
+        ].value[0]
+        + alpha_standard_datafile["data:environmental_impact:climate_change:production:wing"].value[
+            0
+        ]
+    )
+
+    print("Impact of airframe: ", airframe_impact)
+
+    battery_impact = (
+        alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:battery_pack_1"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:battery_pack_2"
+        ].value[0]
+    )
+
+    print("Impact of battery: ", battery_impact)
+
+    electricity_impact = (
+        alpha_standard_datafile[
+            "data:environmental_impact:climate_change:operation:electricity_for_mission"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:assembly"
+        ].value[0]
+    )
+
+    print("Impact of electricity: ", electricity_impact)
+
+    impact_others = (
+        alpha_standard_datafile["data:environmental_impact:climate_change:sum"].value[0]
+        - airframe_impact
+        - battery_impact
+        - electricity_impact
+    )
+
+    print("Impact of others: ", impact_others)
+
+
+def test_extract_results_from_pipistrel_lca_comparison_short():
+    alpha_short_datafile = oad.DataFile(RESULTS_FOLDER_PATH / "pipistrel_alpha_short.xml")
+
+    airframe_impact = (
+        alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:flight_controls"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:fuselage"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:horizontal_tail"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:landing_gear"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:vertical_tail"
+        ].value[0]
+        + alpha_short_datafile["data:environmental_impact:climate_change:production:wing"].value[
+            0
+        ]
+    )
+
+    print("Impact of airframe: ", airframe_impact)
+
+    battery_impact = (
+        alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:battery_pack_1"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:battery_pack_2"
+        ].value[0]
+    )
+
+    print("Impact of battery: ", battery_impact)
+
+    electricity_impact = (
+        alpha_short_datafile[
+            "data:environmental_impact:climate_change:operation:electricity_for_mission"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:assembly"
+        ].value[0]
+    )
+
+    print("Impact of electricity: ", electricity_impact)
+
+    impact_others = (
+        alpha_short_datafile["data:environmental_impact:climate_change:sum"].value[0]
+        - airframe_impact
+        - battery_impact
+        - electricity_impact
+    )
+
+    print("Impact of others: ", impact_others)
 
 def test_kerosene_per_fu_tbm900():
     inputs_list = [
