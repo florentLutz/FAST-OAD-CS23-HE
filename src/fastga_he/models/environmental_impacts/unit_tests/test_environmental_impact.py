@@ -773,6 +773,13 @@ def test_lca_pipistrel():
 
 
 def test_pipistrel_lca_comparison_paper():
+
+    # The analysis we try to replicate here is not exactly the pipistrel we size and test earlier.
+    # Rather it looks to be an earlier version of the pipistrel whose empty weight is 370kg as
+    # opposed to the 428kg of the Valis Electro. We will, however, try to replicate those result
+    # by adjusting the content of the LCA conf file. We'll make the assumption of a similar
+    # powertrain (but different values).
+
     component = LCA(
         power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
         component_level_breakdown=True,
@@ -783,12 +790,14 @@ def test_pipistrel_lca_comparison_paper():
         aircraft_lifespan_in_hours=True,
         ecoinvent_version="3.9.1",
         functional_unit="Flight hours",
+        write_lca_conf=False,
+        lca_conf_file_path=DATA_FOLDER_PATH / "pipistrel_alpha_electro.yml",
     )
 
     ivc = get_indep_var_comp(
         list_inputs(component),
         __file__,
-        "pipistrel_out.xml",
+        "pipistrel_alpha.xml",
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -797,13 +806,13 @@ def test_pipistrel_lca_comparison_paper():
         ivc,
     )
 
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_standard.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_alpha_standard.xml"
     problem.write_outputs()
 
     problem.set_val("data:TLAR:max_airframe_hours", units="h", val=500.0)
     problem.run_model()
 
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_short.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_alpha_short.xml"
     problem.write_outputs()
 
 
