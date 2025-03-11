@@ -6,9 +6,9 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesH2FuelOutput(om.ExplicitComponent):
+class PerformancesH2FuelAveragePressure(om.ExplicitComponent):
     """
-    Compute the fuel that the system has to output towards power source at each point of the flight,
+    Compute the average pressure that the system has to output towards power source at each point of the flight,
     is simply the sum of the fuel consumed by each power source connected at the output.
     """
 
@@ -23,14 +23,7 @@ class PerformancesH2FuelOutput(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
-        self.options.declare(
-            name="number_of_sources",
-            default=1,
-            types=int,
-            desc="Number of connections at the output of the hydrogen fuel system, should always be "
-                 "power source",
-            allow_none=False,
-        )
+
 
     def setup(self):
         number_of_points = self.options["number_of_points"]

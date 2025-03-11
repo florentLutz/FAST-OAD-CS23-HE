@@ -4,12 +4,12 @@
 
 import openmdao.api as om
 
-from .perf_fuel_output import PerformancesFuelOutput
-from .perf_fuel_input import PerformancesFuelInput
+from .perf_fuel_output import PerformancesH2FuelOutput
+from .perf_fuel_input import PerformancesH2FuelInput
 from .perf_total_fuel_flowed import PerformancesTotalFuelFlowed
 
 
-class PerformancesFuelSystem(om.Group):
+class PerformancesH2FuelSystem(om.Group):
     """
     Group that gathers all the components necessary to assess the performances of the hydrogen fuel system.
     """
@@ -48,7 +48,7 @@ class PerformancesFuelSystem(om.Group):
 
         self.add_subsystem(
             name="fuel_flow_out",
-            subsys=PerformancesFuelOutput(
+            subsys=PerformancesH2FuelOutput(
                 number_of_points=number_of_points,
                 number_of_sources=number_of_sources,
                 h2_fuel_system_id=h2_fuel_system_id,
@@ -57,7 +57,7 @@ class PerformancesFuelSystem(om.Group):
         )
         self.add_subsystem(
             name="fuel_flow_in",
-            subsys=PerformancesFuelInput(
+            subsys=PerformancesH2FuelInput(
                 number_of_points=number_of_points,
                 number_of_tanks=number_of_tank_stacks,
                 h2_fuel_system_id=h2_fuel_system_id,

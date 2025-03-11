@@ -8,7 +8,7 @@ from ..components.sizing_fuel_system_cg_x import SizingFuelSystemCGX
 from ..components.sizing_fuel_system_cg_y import SizingFuelSystemCGY
 from ..components.sizing_fuel_system_volume import SizingFuelSystemCapacityVolume
 from ..components.sizing_fuel_system_weight import SizingFuelSystemWeight
-from ..components.sizing_fuel_system_drag import SizingFuelSystemDrag
+from ..components.sizing_fuel_system_drag import SizingH2FuelSystemDrag
 
 from ..constants import POSSIBLE_POSITION
 
@@ -64,7 +64,7 @@ class SizingFuelSystem(om.Group):
             system_name = "fuel_system_drag_ls" if low_speed_aero else "fuel_system_drag_cruise"
             self.add_subsystem(
                 name=system_name,
-                subsys=SizingFuelSystemDrag(
+                subsys=SizingH2FuelSystemDrag(
                     h2_fuel_system_id=h2_fuel_system_id,
                     position=position,
                     low_speed_aero=low_speed_aero,

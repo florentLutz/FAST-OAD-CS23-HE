@@ -6,6 +6,6 @@
 # flake8: noqa
 
 from .components.sizing_fuel_system import SizingFuelSystem
-from .components.perf_fuel_system import PerformancesFuelSystem
+from .components.perf_fuel_system import PerformancesH2FuelSystem
 from .components.slipstream_fuel_system import SlipstreamFuelSystem
 
