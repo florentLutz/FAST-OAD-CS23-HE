@@ -894,9 +894,7 @@ def test_extract_results_from_pipistrel_lca_comparison_short():
         + alpha_short_datafile[
             "data:environmental_impact:climate_change:production:vertical_tail"
         ].value[0]
-        + alpha_short_datafile["data:environmental_impact:climate_change:production:wing"].value[
-            0
-        ]
+        + alpha_short_datafile["data:environmental_impact:climate_change:production:wing"].value[0]
     )
 
     print("Impact of airframe: ", airframe_impact)
@@ -931,6 +929,7 @@ def test_extract_results_from_pipistrel_lca_comparison_short():
     )
 
     print("Impact of others: ", impact_others)
+
 
 def test_kerosene_per_fu_tbm900():
     inputs_list = [
