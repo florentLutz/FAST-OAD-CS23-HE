@@ -23,6 +23,7 @@ from ..lca_impact import (
     lca_impacts_bar_chart_with_contributors,
     lca_impacts_bar_chart_with_components_absolute,
     lca_impacts_search_table,
+    _get_impact_dict,
 )
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
@@ -669,3 +670,59 @@ def test_carbon_intensity_kerosene():
         impact_kero_production_one_fu + impact_kero_combustion_one_fu
     ) / quantity_kero_one_fu
     print(impact_kero_per_kg, "Kg of CO2eq for 1 kg of AvGas")
+
+
+def test_get_impact_dict():
+    """
+    Tests the function that returns a list of the available impacts and their sum. In the case of
+    EF, whether we choose normalized weighted or raw, the impacts shall be the same except for
+    some impacts whose contribution are sometimes split, like climate change with biogenic, fossil
+    and land use change (though their value will differ). For ReCiPe since we only weigh endpoint
+    impact the list shall be different. This is what we'll test.
+    """
+
+    xml_ef = DATA_FOLDER_PATH / "hybrid_kodiak.xml"
+    ef_weighted_impact_dict = _get_impact_dict(xml_ef, impact_step="weighted")
+    ef_normalized_impact_dict = _get_impact_dict(xml_ef, impact_step="normalized")
+    ef_raw_impact_dict = _get_impact_dict(xml_ef, impact_step="raw")
+
+    ef_raw_impact_list = list(ef_raw_impact_dict.keys())
+    ef_raw_impact_list.remove("climate_change_biogenic")
+    ef_raw_impact_list.remove("climate_change_fossil")
+    ef_raw_impact_list.remove("climate_change_land_use_and_land_use_change")
+    ef_raw_impact_list.remove("ecotoxicity_freshwaterinorganics")
+    ef_raw_impact_list.remove("ecotoxicity_freshwaterorganics")
+    ef_raw_impact_list.remove("human_toxicity_carcinogenicinorganics")
+    ef_raw_impact_list.remove("human_toxicity_carcinogenicorganics")
+    ef_raw_impact_list.remove("human_toxicity_non-carcinogenicinorganics")
+    ef_raw_impact_list.remove("human_toxicity_non-carcinogenicorganics")
+
+    ef_normalized_impact_list = list(ef_normalized_impact_dict.keys())
+    ef_normalized_impact_list.remove("climate_change_biogenic")
+    ef_normalized_impact_list.remove("climate_change_fossil")
+    ef_normalized_impact_list.remove("climate_change_land_use_and_land_use_change")
+    ef_normalized_impact_list.remove("ecotoxicity_freshwaterinorganics")
+    ef_normalized_impact_list.remove("ecotoxicity_freshwaterorganics")
+    ef_normalized_impact_list.remove("human_toxicity_carcinogenicinorganics")
+    ef_normalized_impact_list.remove("human_toxicity_carcinogenicorganics")
+    ef_normalized_impact_list.remove("human_toxicity_non-carcinogenicinorganics")
+    ef_normalized_impact_list.remove("human_toxicity_non-carcinogenicorganics")
+
+    ef_weighted_impact_list = list(ef_weighted_impact_dict.keys())
+    ef_weighted_impact_list.remove("single_score")
+
+    assert ef_normalized_impact_list == ef_raw_impact_list
+    assert ef_normalized_impact_list == ef_weighted_impact_list
+
+    xml_recipe = DATA_FOLDER_PATH / "pipistrel_short.xml"
+    recipe_weighted_impact_dict = _get_impact_dict(xml_recipe, impact_step="weighted")
+    recipe_normalized_impact_dict = _get_impact_dict(xml_recipe, impact_step="normalized")
+    recipe_raw_impact_dict = _get_impact_dict(xml_recipe, impact_step="raw")
+
+    recipe_raw_impact_list = list(recipe_raw_impact_dict.keys())
+    recipe_normalized_impact_list = list(recipe_normalized_impact_dict.keys())
+    recipe_weighted_impact_list = list(recipe_weighted_impact_dict.keys())
+
+    assert recipe_raw_impact_list == recipe_normalized_impact_list
+    assert recipe_raw_impact_list != recipe_weighted_impact_list
+
