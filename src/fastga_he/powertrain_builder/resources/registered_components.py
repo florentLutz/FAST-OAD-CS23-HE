@@ -1006,7 +1006,7 @@ PEMFC_STACK = {
     PT: ["time_step", "altitude"],
     SPT: [],
     PTS: [],
-    IN: [(None, "fuel_consumed_t")],
+    IN: [(None, "fuel_consumed_t"), (None, "fuel_consumption")],
     OUT: [(None, "voltage_out"), ("dc_current_out", None)],
     CTC: "source",
     MP: [

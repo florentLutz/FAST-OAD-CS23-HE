@@ -6,6 +6,7 @@ import openmdao.api as om
 
 from .perf_fuel_output import PerformancesH2FuelOutput
 from .perf_fuel_input import PerformancesH2FuelInput
+from .perf_fuel_maximum import PerformancesH2FuelMaximum
 from .perf_total_fuel_flowed import PerformancesTotalFuelFlowed
 
 
@@ -61,6 +62,14 @@ class PerformancesH2FuelSystem(om.Group):
                 number_of_points=number_of_points,
                 number_of_tanks=number_of_tank_stacks,
                 h2_fuel_system_id=h2_fuel_system_id,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="maximum",
+            subsys=PerformancesH2FuelMaximum(
+                number_of_points=number_of_points,
+                number_of_sources=number_of_sources,
             ),
             promotes=["*"],
         )

@@ -32,7 +32,7 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
             default="from_rear_to_center",
             values=POSSIBLE_POSITION,
             desc="Option to give the position of the hydrogen fuel system, possible position include "
-                 + ", ".join(POSSIBLE_POSITION),
+            + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
         )
         self.options.declare(
@@ -47,7 +47,7 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
             default=1,
             types=int,
             desc="Number of connections at the output of the hydrogen fuel system, should always be "
-                 "power source",
+            "power source",
             allow_none=False,
         )
 
@@ -56,12 +56,10 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
         position = self.options["position"]
         number_of_splits = self.options["number_of_tank_stacks"] + self.options["number_of_sources"]
 
-
-
-
-
         self.add_input(
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":total_fuel_flowed",
+            "data:propulsion:he_power_train:fuel_system:"
+            + h2_fuel_system_id
+            + ":total_fuel_flowed",
             units="kg",
             val=np.nan,
             desc="Total amount of fuel that flowed through the system",
@@ -80,7 +78,9 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":connected_volume",
+            of="data:propulsion:he_power_train:fuel_system:"
+            + h2_fuel_system_id
+            + ":connected_volume",
             wrt="data:propulsion:he_power_train:fuel_system:"
             + h2_fuel_system_id
             + ":total_fuel_flowed",
@@ -116,5 +116,7 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":connected_volume",
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":total_fuel_flowed",
+            "data:propulsion:he_power_train:fuel_system:"
+            + h2_fuel_system_id
+            + ":total_fuel_flowed",
         ] = 1.0 / self.rho_fuel

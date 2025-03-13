@@ -47,10 +47,12 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
 
         if position == "in_the_wing":
             self.add_input(
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:H2_fuel_system:"
+                + h2_fuel_system_id
+                + ":CG:y_ratio",
                 val=np.nan,
                 desc="Y position of the power source center of gravity as a ratio of the wing "
-                     "half-span",
+                "half-span",
             )
 
             self.declare_partials(of="*", wrt="*", method="exact")
@@ -60,16 +62,22 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         if position == "in_the_wing":
-            outputs["data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y"] = (
+            outputs[
+                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y"
+            ] = (
                 inputs["data:geometry:wing:span"]
                 * inputs[
-                    "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio"
+                    "data:propulsion:he_power_train:H2_fuel_system:"
+                    + h2_fuel_system_id
+                    + ":CG:y_ratio"
                 ]
                 / 2.0
             )
 
         else:
-            outputs["data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y"] = 0.0
+            outputs[
+                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y"
+            ] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
@@ -81,11 +89,15 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
                 "data:geometry:wing:span",
             ] = (
                 inputs[
-                    "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio"
+                    "data:propulsion:he_power_train:H2_fuel_system:"
+                    + h2_fuel_system_id
+                    + ":CG:y_ratio"
                 ]
                 / 2.0
             )
             partials[
                 "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y",
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:H2_fuel_system:"
+                + h2_fuel_system_id
+                + ":CG:y_ratio",
             ] = inputs["data:geometry:wing:span"] / 2.0

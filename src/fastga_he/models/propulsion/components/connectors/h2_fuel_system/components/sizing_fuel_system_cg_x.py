@@ -44,20 +44,24 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
         if position == "in_the_wing":
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
-        if (position == "from_front_to_wing" or position == "from_rear_to_wing" or position ==
-             "from_center_to_wing"):
+        if (
+            position == "from_front_to_wing"
+            or position == "from_rear_to_wing"
+            or position == "from_center_to_wing"
+        ):
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
             self.add_input("data:geometry:wing:span", val=np.nan, units="m")
             self.add_input(
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:H2_fuel_system:"
+                + h2_fuel_system_id
+                + ":CG:y_ratio",
                 val=np.nan,
                 desc="Y position of the power source center of gravity as a ratio of the wing "
-                     "half-span",
+                "half-span",
             )
 
         if position == "in_the_back":
             self.add_input("data:geometry:fuselage:rear_length", val=np.nan, units="m")
-
 
         self.declare_partials(of="*", wrt="*", val=1.0)
 
@@ -68,10 +72,9 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
         if position == "in_the_wing":
             fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
 
-            outputs["data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x"]\
-                = (
-                fa_length
-            )
+            outputs[
+                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x"
+            ] = fa_length
 
         elif position == "in_the_back":
             front_length = inputs["data:geometry:fuselage:front_length"]

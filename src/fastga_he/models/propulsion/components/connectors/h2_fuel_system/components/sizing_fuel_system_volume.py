@@ -35,7 +35,9 @@ class SizingFuelSystemCapacityVolume(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":total_fuel_flowed",
+            "data:propulsion:he_power_train:fuel_system:"
+            + h2_fuel_system_id
+            + ":total_fuel_flowed",
             units="kg",
             val=np.nan,
             desc="Total amount of fuel that flowed through the system",
@@ -54,7 +56,9 @@ class SizingFuelSystemCapacityVolume(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":connected_volume",
+            of="data:propulsion:he_power_train:fuel_system:"
+            + h2_fuel_system_id
+            + ":connected_volume",
             wrt="data:propulsion:he_power_train:fuel_system:"
             + h2_fuel_system_id
             + ":total_fuel_flowed",
@@ -90,5 +94,7 @@ class SizingFuelSystemCapacityVolume(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":connected_volume",
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":total_fuel_flowed",
+            "data:propulsion:he_power_train:fuel_system:"
+            + h2_fuel_system_id
+            + ":total_fuel_flowed",
         ] = 1.0 / self.rho_fuel

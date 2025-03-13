@@ -37,7 +37,9 @@ class PerformancesTotalFuelFlowed(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":total_fuel_flowed",
+            "data:propulsion:he_power_train:fuel_system:"
+            + h2_fuel_system_id
+            + ":total_fuel_flowed",
             units="kg",
             val=50.0,
             desc="Total amount of fuel that flowed through the system",

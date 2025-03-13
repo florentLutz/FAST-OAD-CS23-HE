@@ -51,10 +51,10 @@ class PerformancesH2FuelInput(om.ExplicitComponent):
             desc="Fuel flowing through the hydrogen fuel system at each time step",
         )
 
-        self.add_input(name="time_step", units="s", val=np.full(number_of_points, np.nan))
-
         self.add_input(
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":fuel_distribution",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":fuel_distribution",
             val=np.ones(number_of_tank_stacks),
         )
 
@@ -67,23 +67,15 @@ class PerformancesH2FuelInput(om.ExplicitComponent):
                 desc="Fuel drawn from the tank connected at the input number " + str(i + 1),
             )
 
-            self.add_output(
-                name="fuel_mass_flow_rate_in_t_" + str(i + 1),
-                units="kg/s",
-                val=np.full(number_of_points, 2.5),
-                shape=number_of_points,
-                desc="Fuel drawn from the tank connected at the input number " + str(i + 1),
-            )
-
             self.declare_partials(
-                of=["fuel_consumed_in_t_" + str(i + 1),"fuel_mass_flow_rate_in_t_" + str(i + 1)],
-                wrt=["fuel_flowing_t","time_step"],
+                of="fuel_consumed_in_t_" + str(i + 1),
+                wrt="fuel_flowing_t",
                 method="exact",
                 rows=np.arange(number_of_points),
                 cols=np.arange(number_of_points),
             )
             self.declare_partials(
-                of=["fuel_consumed_in_t_" + str(i + 1),"fuel_mass_flow_rate_in_t_" + str(i + 1)],
+                of="fuel_consumed_in_t_" + str(i + 1),
                 wrt="data:propulsion:he_power_train:H2_fuel_system:"
                 + h2_fuel_system_id
                 + ":fuel_distribution",
@@ -96,7 +88,9 @@ class PerformancesH2FuelInput(om.ExplicitComponent):
 
         #  First we rescale the distribution so that at all point it is between 0 and 1
         self.hydrogen_distribution = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":fuel_distribution"
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":fuel_distribution"
         ] / np.sum(
             inputs[
                 "data:propulsion:he_power_train:H2_fuel_system:"
@@ -106,18 +100,14 @@ class PerformancesH2FuelInput(om.ExplicitComponent):
         )
 
         fuel_flow = inputs["fuel_flowing_t"]
-        time_step = inputs["time_step"]
 
         for i in range(number_of_tank_stacks):
             outputs["fuel_consumed_in_t_" + str(i + 1)] = fuel_flow * self.hydrogen_distribution[i]
-            outputs["fuel_mass_flow_rate_in_t_" + str(i + 1)] = fuel_flow * self.hydrogen_distribution[
-                i] / time_step
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
         number_of_tank_stacks = self.options["number_of_tank_stacks"]
         number_of_points = self.options["number_of_points"]
-        time_step = inputs["time_step"]
 
         fuel_flow = inputs["fuel_flowing_t"]
         scale_factor = sum(
@@ -129,14 +119,9 @@ class PerformancesH2FuelInput(om.ExplicitComponent):
         )
 
         for i in range(number_of_tank_stacks):
-            partials["fuel_consumed_in_t_" + str(i + 1), "fuel_flowing_t"] = self.hydrogen_distribution[
-                i
-            ] * np.ones(number_of_points)
-
-            partials["fuel_mass_flow_rate_in_t_" + str(i + 1), "fuel_flowing_t"] = self.hydrogen_distribution[i] / time_step
-
-            partials["fuel_mass_flow_rate_in_t_" + str(i + 1), "time_step"] = -fuel_flow * self.hydrogen_distribution[
-                i] / time_step**2.0
+            partials["fuel_consumed_in_t_" + str(i + 1), "fuel_flowing_t"] = (
+                self.hydrogen_distribution[i] * np.ones(number_of_points)
+            )
 
             base_partials = (
                 (-np.tile(fuel_flow, (number_of_tank_stacks, 1)))
@@ -150,10 +135,3 @@ class PerformancesH2FuelInput(om.ExplicitComponent):
                 + h2_fuel_system_id
                 + ":fuel_distribution",
             ] = np.transpose(base_partials)
-
-            partials[
-                "fuel_mass_flow_rate_in_t_" + str(i + 1),
-                "data:propulsion:he_power_train:H2_fuel_system:"
-                + h2_fuel_system_id
-                + ":fuel_distribution",
-            ] = np.transpose(base_partials / time_step)

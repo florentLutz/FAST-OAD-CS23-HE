@@ -28,7 +28,7 @@ class PerformancesH2FuelOutput(om.ExplicitComponent):
             default=1,
             types=int,
             desc="Number of connections at the output of the hydrogen fuel system, should always be "
-                 "power source",
+            "power source",
             allow_none=False,
         )
 
@@ -44,9 +44,12 @@ class PerformancesH2FuelOutput(om.ExplicitComponent):
             desc="Fuel flowing through the hydrogen fuel system at each time step",
         )
 
+        self.add_input(name="time_step", units="h", val=np.full(number_of_points, np.nan))
+
         self.add_output(
-            name="data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id +
-                 ":number_source",
+            name="data:propulsion:he_power_train:fuel_system:"
+            + h2_fuel_system_id
+            + ":number_source",
             val=self.options["number_of_sources"],
             desc="Number of power source connected to this hydrogen fuel system",
         )
@@ -59,7 +62,8 @@ class PerformancesH2FuelOutput(om.ExplicitComponent):
                 units="kg",
                 val=np.full(number_of_points, np.nan),
                 shape=number_of_points,
-                desc="Fuel consumed by the power source connected at the output number " + str(i + 1),
+                desc="Fuel consumed by the power source connected at the output number "
+                + str(i + 1),
             )
 
             self.declare_partials(

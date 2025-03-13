@@ -107,7 +107,9 @@ def test_fuel_system_weight():
 def test_fuel_system_weight_jet_fuel():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:fuel_type", val=3.0)
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:fuel_type", val=3.0
+    )
     ivc.add_output(
         "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:number_engine", val=1.0
     )
@@ -133,7 +135,9 @@ def test_fuel_output():
 
     problem = run_system(
         PerformancesH2FuelOutput(
-            h2_fuel_system_id="h2_fuel_system_1", number_of_points=NB_POINTS_TEST, number_of_engines=2
+            h2_fuel_system_id="h2_fuel_system_1",
+            number_of_points=NB_POINTS_TEST,
+            number_of_engines=2,
         ),
         ivc,
     )
@@ -151,10 +155,11 @@ def test_fuel_output():
 def test_fuel_input():
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_flowing_t", val=np.linspace(5.0, 4.0, NB_POINTS_TEST), units="kg")
-    ivc.add_output("time_step", val=np.full(NB_POINTS_TEST,1.0), units="s")
     problem = run_system(
         PerformancesH2FuelInput(
-            h2_fuel_system_id="h2_fuel_system_1", number_of_points=NB_POINTS_TEST, number_of_tank_stacks=2
+            h2_fuel_system_id="h2_fuel_system_1",
+            number_of_points=NB_POINTS_TEST,
+            number_of_tank_stacks=2,
         ),
         ivc,
     )
@@ -163,12 +168,6 @@ def test_fuel_input():
         np.linspace(2.5, 2.0, NB_POINTS_TEST), rel=1e-2
     )
     assert problem.get_val("fuel_consumed_in_t_2", units="kg") == pytest.approx(
-        np.linspace(2.5, 2.0, NB_POINTS_TEST), rel=1e-2
-    )
-    assert problem.get_val("fuel_mass_flow_rate_in_t_1", units="kg/s") == pytest.approx(
-        np.linspace(2.5, 2.0, NB_POINTS_TEST), rel=1e-2
-    )
-    assert problem.get_val("fuel_mass_flow_rate_in_t_2", units="kg/s") == pytest.approx(
         np.linspace(2.5, 2.0, NB_POINTS_TEST), rel=1e-2
     )
 
@@ -181,7 +180,9 @@ def test_fuel_input():
 
     problem = run_system(
         PerformancesH2FuelInput(
-            h2_fuel_system_id="h2_fuel_system_1", number_of_points=NB_POINTS_TEST, number_of_tank_stacks=2
+            h2_fuel_system_id="h2_fuel_system_1",
+            number_of_points=NB_POINTS_TEST,
+            number_of_tank_stacks=2,
         ),
         ivc,
     )
@@ -192,13 +193,6 @@ def test_fuel_input():
     assert problem.get_val("fuel_consumed_in_t_2", units="kg") == pytest.approx(
         np.linspace(1.25, 1.0, NB_POINTS_TEST), rel=1e-2
     )
-    assert problem.get_val("fuel_mass_flow_rate_in_t_1", units="kg/s") == pytest.approx(
-        np.linspace(3.75, 3.0, NB_POINTS_TEST), rel=1e-2
-    )
-    assert problem.get_val("fuel_mass_flow_rate_in_t_2", units="kg/s") == pytest.approx(
-        np.linspace(1.25, 1.0, NB_POINTS_TEST), rel=1e-2
-    )
-
 
 def test_total_fuel_flowed():
     ivc = om.IndepVarComp()
@@ -212,7 +206,8 @@ def test_total_fuel_flowed():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:total_fuel_flowed", units="kg"
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:total_fuel_flowed",
+        units="kg",
     ) == pytest.approx(45.0, rel=1e-2)
 
 
@@ -232,7 +227,8 @@ def test_fuel_system_performances():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:total_fuel_flowed", units="kg"
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:total_fuel_flowed",
+        units="kg",
     ) == pytest.approx(45.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:number_engine"
@@ -265,20 +261,3 @@ def test_sizing_tank():
 
     problem.check_partials(compact_print=True)
 
-
-def test_weight_per_fu():
-    inputs_list = [
-        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass",
-        "data:environmental_impact:aircraft_per_fu",
-    ]
-
-    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PreLCAFuelSystemProdWeightPerFU(h2_fuel_system_id="h2_fuel_system_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass_per_fu", units="kg"
-    ) == pytest.approx(1.098e-05, rel=1e-3)
-
-    problem.check_partials(compact_print=True)
