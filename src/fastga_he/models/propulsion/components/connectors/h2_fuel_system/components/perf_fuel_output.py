@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesH2FuelOutput(om.ExplicitComponent):
+class PerformancesH2FuelSystemOutput(om.ExplicitComponent):
     """
     Compute the fuel that the system has to output towards power source at each point of the flight,
     is simply the sum of the fuel consumed by each power source connected at the output.

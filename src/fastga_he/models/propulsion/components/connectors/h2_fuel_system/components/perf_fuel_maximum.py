@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesH2FuelMaximum(om.ExplicitComponent):
+class PerformancesH2FuelSystemMaximum(om.ExplicitComponent):
     """
     Compute the maximum hydrogen mass flow rate of the flight that each source will draw from the
     tanks. This component could contain more maximum/minimum computation in the future.
@@ -42,7 +42,6 @@ class PerformancesH2FuelMaximum(om.ExplicitComponent):
                 name="fuel_mass_flow_rate_max_" + str(i + 1),
                 units="kg/h",
                 val=2.5,
-                shape=number_of_points,
                 desc="Maximum fuel flow rate required from the source connected at the output "
                 "number " + str(i + 1),
             )

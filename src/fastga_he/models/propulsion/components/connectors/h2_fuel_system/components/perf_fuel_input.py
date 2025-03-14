@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesH2FuelInput(om.ExplicitComponent):
+class PerformancesH2FuelSystemInput(om.ExplicitComponent):
     """
     Compute the amount of hydrogen that the system will draw from the tanks at each point of the
     flight. This is simply the hydrogen from the outputs distributed among the input with a

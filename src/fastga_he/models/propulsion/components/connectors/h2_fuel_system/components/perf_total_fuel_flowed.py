@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesTotalFuelFlowed(om.ExplicitComponent):
+class PerformancesTotalH2FuelFlowed(om.ExplicitComponent):
     """
     Computation of the total amount of fuel which has flown through the hydrogen fuel system. We will do
     it like to avoid having to ask for the capacity of all connected tank since those two value

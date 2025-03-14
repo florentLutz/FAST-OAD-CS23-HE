@@ -11,9 +11,9 @@ from ..components.sizing_fuel_system_cg_y import SizingFuelSystemCGY
 from ..components.sizing_fuel_system_volume import SizingFuelSystemCapacityVolume
 from ..components.sizing_fuel_system_weight import SizingFuelSystemWeight
 
-from ..components.perf_fuel_output import PerformancesH2FuelOutput
-from ..components.perf_fuel_input import PerformancesH2FuelInput
-from ..components.perf_total_fuel_flowed import PerformancesTotalFuelFlowed
+from ..components.perf_fuel_output import PerformancesH2FuelSystemOutput
+from ..components.perf_fuel_input import PerformancesH2FuelSystemInput
+from ..components.perf_total_fuel_flowed import PerformancesTotalH2FuelFlowed
 
 from ..components.sizing_fuel_system import SizingFuelSystem
 from ..components.perf_fuel_system import PerformancesH2FuelSystem
@@ -134,7 +134,7 @@ def test_fuel_output():
     ivc.add_output("fuel_consumed_out_t_2", val=np.linspace(4.0, 2.0, NB_POINTS_TEST), units="kg")
 
     problem = run_system(
-        PerformancesH2FuelOutput(
+        PerformancesH2FuelSystemOutput(
             h2_fuel_system_id="h2_fuel_system_1",
             number_of_points=NB_POINTS_TEST,
             number_of_engines=2,
@@ -156,7 +156,7 @@ def test_fuel_input():
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_flowing_t", val=np.linspace(5.0, 4.0, NB_POINTS_TEST), units="kg")
     problem = run_system(
-        PerformancesH2FuelInput(
+        PerformancesH2FuelSystemInput(
             h2_fuel_system_id="h2_fuel_system_1",
             number_of_points=NB_POINTS_TEST,
             number_of_tank_stacks=2,
@@ -179,7 +179,7 @@ def test_fuel_input():
     )
 
     problem = run_system(
-        PerformancesH2FuelInput(
+        PerformancesH2FuelSystemInput(
             h2_fuel_system_id="h2_fuel_system_1",
             number_of_points=NB_POINTS_TEST,
             number_of_tank_stacks=2,
@@ -194,12 +194,13 @@ def test_fuel_input():
         np.linspace(1.25, 1.0, NB_POINTS_TEST), rel=1e-2
     )
 
+
 def test_total_fuel_flowed():
     ivc = om.IndepVarComp()
     ivc.add_output("fuel_flowing_t", val=np.linspace(5.0, 4.0, NB_POINTS_TEST), units="kg")
 
     problem = run_system(
-        PerformancesTotalFuelFlowed(
+        PerformancesTotalH2FuelFlowed(
             h2_fuel_system_id="h2_fuel_system_1", number_of_points=NB_POINTS_TEST
         ),
         ivc,
@@ -260,4 +261,3 @@ def test_sizing_tank():
     ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
-

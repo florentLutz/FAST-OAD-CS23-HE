@@ -4,10 +4,10 @@
 
 import openmdao.api as om
 
-from .perf_fuel_output import PerformancesH2FuelOutput
-from .perf_fuel_input import PerformancesH2FuelInput
-from .perf_fuel_maximum import PerformancesH2FuelMaximum
-from .perf_total_fuel_flowed import PerformancesTotalFuelFlowed
+from .perf_fuel_output import PerformancesH2FuelSystemOutput
+from .perf_fuel_input import PerformancesH2FuelSystemInput
+from .perf_fuel_maximum import PerformancesH2FuelSystemMaximum
+from .perf_total_fuel_flowed import PerformancesTotalH2FuelFlowed
 
 
 class PerformancesH2FuelSystem(om.Group):
@@ -49,7 +49,7 @@ class PerformancesH2FuelSystem(om.Group):
 
         self.add_subsystem(
             name="fuel_flow_out",
-            subsys=PerformancesH2FuelOutput(
+            subsys=PerformancesH2FuelSystemOutput(
                 number_of_points=number_of_points,
                 number_of_sources=number_of_sources,
                 h2_fuel_system_id=h2_fuel_system_id,
@@ -58,7 +58,7 @@ class PerformancesH2FuelSystem(om.Group):
         )
         self.add_subsystem(
             name="fuel_flow_in",
-            subsys=PerformancesH2FuelInput(
+            subsys=PerformancesH2FuelSystemInput(
                 number_of_points=number_of_points,
                 number_of_tanks=number_of_tank_stacks,
                 h2_fuel_system_id=h2_fuel_system_id,
@@ -67,7 +67,7 @@ class PerformancesH2FuelSystem(om.Group):
         )
         self.add_subsystem(
             name="maximum",
-            subsys=PerformancesH2FuelMaximum(
+            subsys=PerformancesH2FuelSystemMaximum(
                 number_of_points=number_of_points,
                 number_of_sources=number_of_sources,
             ),
@@ -75,7 +75,7 @@ class PerformancesH2FuelSystem(om.Group):
         )
         self.add_subsystem(
             name="total_fuel_flowed",
-            subsys=PerformancesTotalFuelFlowed(
+            subsys=PerformancesTotalH2FuelFlowed(
                 number_of_points=number_of_points, h2_fuel_system_id=h2_fuel_system_id
             ),
             promotes=["*"],
