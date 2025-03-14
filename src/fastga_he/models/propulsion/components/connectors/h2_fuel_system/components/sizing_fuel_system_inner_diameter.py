@@ -25,7 +25,7 @@ class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter",
             units="m",
@@ -34,14 +34,14 @@ class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":pipe_pressure",
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":pipe_pressure",
             val=np.nan,
             units="Pa",
             desc="hydrogen transport pressure",
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:h2_fuel_system:"
+            name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":safety_factor",
             val=1.0,
@@ -49,7 +49,7 @@ class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":material:yield_strength",
             val=np.nan,
@@ -59,7 +59,7 @@ class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:h2_fuel_system:"
+            name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
             units="m",
@@ -72,27 +72,27 @@ class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
         safety_factor = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":safety_factor"
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":safety_factor"
         ]
 
         sigma = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":material:yield_strength"
         ]
 
         d_pipe = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter"
         ]
 
         pipe_pressure = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":pipe_pressure"
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":pipe_pressure"
         ]
 
         outputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter"
         ] = 2.0 * d_pipe * sigma / (pipe_pressure * safety_factor + 2.0 * sigma)
@@ -101,39 +101,39 @@ class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         pipe_pressure = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":pipe_pressure"
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":pipe_pressure"
         ]
 
         safety_factor = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":safety_factor"
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":safety_factor"
         ]
 
         sigma = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":material:yield_strength"
         ]
 
         d_pipe = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter"
         ]
 
         partials[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter",
         ] = 2.0 * sigma / (2.0 * sigma + pipe_pressure * safety_factor)
 
         partials[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
-            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":pipe_pressure",
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":pipe_pressure",
         ] = (
             -2.0
             * d_pipe
@@ -143,10 +143,10 @@ class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
-            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":safety_factor",
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":safety_factor",
         ] = (
             -2.0
             * d_pipe
@@ -156,10 +156,10 @@ class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":material:yield_strength",
         ] = 2.0 * (

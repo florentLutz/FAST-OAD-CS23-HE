@@ -12,12 +12,6 @@ class SizingFuelSystemWeight(om.ExplicitComponent):
     Torenbeek approach. Include the weight of fuel tanks, pipes, pumps, vents, ...
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        self.exponent = None
-        self.factor = None
-
     def initialize(self):
         self.options.declare(
             name="h2_fuel_system_id",
@@ -31,62 +25,79 @@ class SizingFuelSystemWeight(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":connected_volume",
-            units="galUS",
+            name="data:propulsion:he_power_train:h2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:inner_diameter",
+            units="m",
             val=np.nan,
-            desc="Capacity of the connected tank in terms of volume",
+            desc="Inner diameter of the hydrogen fuel system",
         )
+
         self.add_input(
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":number_source",
+            name="data:propulsion:he_power_train:h2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:pipe_diameter",
+            units="m",
             val=np.nan,
-            desc="Number of source connected to this hydrogen fuel system",
+            desc="Pipe diameter of the hydrogen fuel system",
         )
+
         self.add_input(
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":fuel_type",
-            val=1.0,
-            desc="Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1",
+            name="data:propulsion:he_power_train:h2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:insulation_thickness",
+            units="m",
+            val=np.nan,
+            desc="Pipe insulation layer thickness",
+        )
+
+        self.add_input(
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            units="m",
+            val=np.nan,
+            desc="Total length of the h2 fuel system",
+        )
+
+        self.add_input(
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":material:density",
+            val=np.nan,
+            units="kg/m**3",
+            desc="pipe wall material yield stress. Some reference (in kg/m^3):"
+            "Steel(306):7700, Aluminum(5083):2660, ",
+        )
+
+        self.add_input(
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":material:insulation_density",
+            val=np.nan,
+            units="kg/m**3",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":mass",
-            units="lbm",
-            val=20.0,
+            units="kg",
+            val=10.0,
             desc="Weight of the hydrogen fuel system",
         )
 
-        self.declare_partials(
-            of="data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":mass",
-            wrt="data:propulsion:he_power_train:fuel_system:"
-            + h2_fuel_system_id
-            + ":connected_volume",
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
-        volume = inputs[
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":connected_volume"
+        inner_d = inputs[
+            "data:propulsion:he_power_train:h2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:inner_diameter"
         ]
-        number_of_source = float(
-            inputs[
-                "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":number_source"
-            ]
-        )
-        fuel_type = inputs[
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":fuel_type"
+        pipe_d = inputs[
+            "data:propulsion:he_power_train:h2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:pipe_diameter"
         ]
-
-        if fuel_type == 3.0:
-            self.exponent = 1.0
-            self.factor = 0.40
-        else:
-            self.exponent = 0.667 if number_of_source == 1.0 else 0.6
-            self.factor = 2.0 if number_of_source == 1.0 else 4.5
-
-        outputs["data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":mass"] = (
-            self.factor * volume**self.exponent
-        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]

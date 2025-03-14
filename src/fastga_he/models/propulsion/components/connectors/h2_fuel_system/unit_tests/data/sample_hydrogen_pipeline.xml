@@ -16,7 +16,11 @@
                   <at25percent>
                     <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
                   </at25percent>
+                  <length units="m">2.0</length>
                 </MAC>
+                <CG>
+                    <y_ratio>0.5</y_ratio>
+                </CG>
             </wing>
         </geometry>
         <propulsion>
@@ -30,6 +34,24 @@
                         <CG>
                             <y_ratio>0.224</y_ratio>
                         </CG>
+                        <length units="m">4.9</length>
+                        <dimension>
+                            <pipe_diameter units="m">0.04</pipe_diameter>
+                            <inner_diameter units="m">0.0373</inner_diameter>
+                            <insulation_thickness units="m">0.005</insulation_thickness>
+                        </dimension>
+                        <material>
+                            <yield_strength units="Pa">240000000000</yield_strength>
+                            <density units="kg/m**3">7700</density>
+                            <insulation_density units="kg/m**3">160</insulation_density>
+                        </material>
+                        <pipe_pressure units="Pa">35000000000</pipe_pressure>
+                        <connection>
+                            <front>0.0<!--number of connection at the front of the fuselage--></front>
+                            <rear>3.0<!--number of connection at the rear of the fuselage--></rear>
+                            <near>0.0<!--number of near connection between source and tank--></near>
+                            <wing>2.0<!--number of connection in the wing--></wing>
+                        </connection>
                     </h2_fuel_system_1>
                 </H2_fuel_system>
             </he_power_train>

@@ -2,20 +2,15 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import logging
-
-import openmdao.api as om
 import numpy as np
+import openmdao.api as om
 
 from ..constants import POSSIBLE_POSITION
 
-_LOGGER = logging.getLogger(__name__)
 
-
-class SizingH2FuelSystemPipeLength(om.ExplicitComponent):
+class SizingH2FuelSystemLength(om.ExplicitComponent):
     """
-    The individual pipe length of the hydrogen fuel system, the number of lines is assumed to be
-    equal to the number of output sources.
+    The length of the hydrogen fuel system. The pipe inside the length
     """
 
     def initialize(self):
@@ -26,95 +21,168 @@ class SizingH2FuelSystemPipeLength(om.ExplicitComponent):
             types=str,
             allow_none=False,
         )
-        self.options.declare(
-            name="position",
-            default="from_rear_to_center",
-            values=POSSIBLE_POSITION,
-            desc="Option to give the position of the hydrogen fuel system, possible position include "
-            + ", ".join(POSSIBLE_POSITION),
-            allow_none=False,
-        )
-        self.options.declare(
-            name="number_of_sources",
-            default=1,
-            types=int,
-            desc="Number of connections at the output of the hydrogen fuel system, should always be "
-            "power source",
-            allow_none=False,
-        )
 
     def setup(self):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
-        position = self.options["position"]
-        number_of_sources = self.options["number_of_sources"]
-        from_wing = (
-            position == "from_front_to_wing"
-            or position == "from_rear_to_wing"
-            or position == "from_center_to_wing"
+        self.add_input(
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:near",
+            val=0.0,
+            desc="Number of near connections for the h2 fuel system",
         )
-        single_position = (
-            position == "in_the_back" or position == "in_the_wing" or position == "at_center"
+        self.add_input(
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:front",
+            val=0.0,
+            desc="Number of front connections for the h2 fuel system",
         )
 
-        for i in range(number_of_sources):
-            self.add_output(
-                name="pipe_length_" + str(i + 1),
-                units="m",
-                val=1.0,
-                desc="The pipe length for the output number " + str(i + 1),
-            )
+        self.add_input(
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:rear",
+            val=0.0,
+            desc="Number of rear connections for the h2 fuel system",
+        )
 
-            if from_wing:
-                self.add_input("data:geometry:wing:span", val=np.nan, units="m")
-                self.add_input(
-                    "data:propulsion:he_power_train:H2_fuel_system:"
-                    + h2_fuel_system_id
-                    + ":CG:y_ratio",
-                    val=np.nan,
-                    desc="Y position of the power source center of gravity as a ratio of the wing "
-                    "half-span",
-                )
+        self.add_input(
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:wing",
+            val=0.0,
+            desc="Number of wing connections for the h2 fuel system",
+        )
 
-            if not single_position:
-                self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
+        self.add_input("data:geometry:cabin:length", val=np.nan, units="m")
+        self.add_input("data:geometry:wing:span", val=np.nan, units="m")
+        self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
+        self.add_input(
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio",
+            val=0.5,
+            desc="Y position of the power source center of gravity as a ratio of the wing "
+            "half-span",
+        )
 
-                self.declare_partials("*", "*", method="exact")
-
-            if single_position:
-                self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
-
-                self.declare_partials("*", "*", val=0.5)
+        self.add_output(
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            units="m",
+            val=5.0,
+            desc="Total length of the h2 fuel system",
+        )
+        self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
-
-        fuel_mass = inputs[
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":total_fuel_flowed"
+        num_front = inputs[
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:front"
         ]
-        fuel_type = inputs[
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":fuel_type"
+        num_rear = inputs[
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:rear"
         ]
-
-        if fuel_type == 1.0:
-            self.rho_fuel = 718.9  # gasoline volume-mass [kg/m**3], cold worst case, Avgas
-        elif fuel_type == 2.0:
-            self.rho_fuel = 860.0  # Diesel volume-mass [kg/m**3], cold worst case
-        elif fuel_type == 3.0:
-            self.rho_fuel = 804.0  # Jet-A1 volume mass [kg/m**3], cold worst case
-        else:
-            self.rho_fuel = 718.9
-            _LOGGER.warning("Fuel type %f does not exist, replaced by type 1!", fuel_type)
+        num_wing = inputs[
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:wing"
+        ]
+        num_near = inputs[
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:near"
+        ]
+        half_span = 0.5 * inputs["data:geometry:wing:span"]
+        half_l_cabin = 0.5 * inputs["data:geometry:cabin:length"]
+        y_ratio = inputs[
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio"
+        ]
+        wing_mac = inputs["data:geometry:wing:MAC:length"]
 
         outputs[
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":connected_volume"
-        ] = fuel_mass / self.rho_fuel
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length"
+        ] = (
+            (num_front + num_rear) * half_l_cabin
+            + num_wing * y_ratio * half_span
+            + wing_mac * num_near
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
+        num_front = inputs[
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:front"
+        ]
+        num_rear = inputs[
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:rear"
+        ]
+        num_wing = inputs[
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:wing"
+        ]
+        num_near = inputs[
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:near"
+        ]
+        half_span = 0.5 * inputs["data:geometry:wing:span"]
+        half_l_cabin = 0.5 * inputs["data:geometry:cabin:length"]
+        y_ratio = inputs[
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio"
+        ]
+        wing_mac = inputs["data:geometry:wing:MAC:length"]
 
         partials[
-            "data:propulsion:he_power_train:fuel_system:" + h2_fuel_system_id + ":connected_volume",
-            "data:propulsion:he_power_train:fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
-            + ":total_fuel_flowed",
-        ] = 1.0 / self.rho_fuel
+            + ":connection:front",
+        ] = half_l_cabin
+
+        partials[
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:rear",
+        ] = half_l_cabin
+
+        partials[
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:geometry:cabin:length",
+        ] = 0.5 * (num_front + num_rear)
+
+        partials[
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:wing",
+        ] = y_ratio * half_span
+
+        partials[
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio",
+        ] = num_wing * half_span
+
+        partials[
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:geometry:wing:span",
+        ] = 0.5 * num_wing * y_ratio
+
+        partials[
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":connection:near",
+        ] = wing_mac
+
+        partials[
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:geometry:wing:MAC:length",
+        ] = num_near

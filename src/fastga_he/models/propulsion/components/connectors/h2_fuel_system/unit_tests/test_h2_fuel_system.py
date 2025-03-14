@@ -10,6 +10,8 @@ from ..components.sizing_fuel_system_cg_x import SizingFuelSystemCGX
 from ..components.sizing_fuel_system_cg_y import SizingFuelSystemCGY
 from ..components.sizing_fuel_system_volume import SizingFuelSystemCapacityVolume
 from ..components.sizing_fuel_system_weight import SizingFuelSystemWeight
+from ..components.sizing_fuel_system_length import SizingH2FuelSystemLength
+from ..components.sizing_fuel_system_inner_diameter import SizingH2FuelSystemInnerDiameter
 
 from ..components.perf_fuel_output import PerformancesH2FuelSystemOutput
 from ..components.perf_fuel_input import PerformancesH2FuelSystemInput
@@ -68,6 +70,41 @@ def test_fuel_system_cg_y():
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
+
+
+def test_h2_fuel_pipe_length():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingH2FuelSystemLength(h2_fuel_system_id="h2_fuel_system_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingH2FuelSystemLength(h2_fuel_system_id="h2_fuel_system_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:length", units="m"
+    ) == pytest.approx(4.9, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_h2_fuel_inner_diameter():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(SizingH2FuelSystemInnerDiameter(h2_fuel_system_id="h2_fuel_system_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(SizingH2FuelSystemInnerDiameter(h2_fuel_system_id="h2_fuel_system_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:inner_diameter",
+        units="m",
+    ) == pytest.approx(0.0373, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_fuel_system_volume():

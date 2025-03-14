@@ -41,6 +41,15 @@ class SizingH2FuelSystemPipeWallThickness(om.ExplicitComponent):
             desc="Pipe diameter of the hydrogen fuel system",
         )
 
+        self.add_input(
+            name="data:propulsion:he_power_train:h2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:insulation_thickness",
+            units="m",
+            val=np.nan,
+            desc="Pipe insulation layer thickness",
+        )
+
         self.add_output(
             name="data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
@@ -66,6 +75,14 @@ class SizingH2FuelSystemPipeWallThickness(om.ExplicitComponent):
             val=-0.5,
         )
 
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:h2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:insulation_thickness",
+            val=1.0,
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
@@ -73,15 +90,23 @@ class SizingH2FuelSystemPipeWallThickness(om.ExplicitComponent):
             "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_wall_thickness"
-        ] = 0.5 * (
-            inputs[
+        ] = (
+            0.5
+            * (
+                inputs[
+                    "data:propulsion:he_power_train:h2_fuel_system:"
+                    + h2_fuel_system_id
+                    + ":dimension:pipe_diameter"
+                ]
+                - inputs[
+                    "data:propulsion:he_power_train:h2_fuel_system:"
+                    + h2_fuel_system_id
+                    + ":dimension:inner_diameter"
+                ]
+            )
+            + inputs[
                 "data:propulsion:he_power_train:h2_fuel_system:"
                 + h2_fuel_system_id
-                + ":dimension:pipe_diameter"
-            ]
-            - inputs[
-                "data:propulsion:he_power_train:h2_fuel_system:"
-                + h2_fuel_system_id
-                + ":dimension:inner_diameter"
+                + ":dimension:insulation_thickness"
             ]
         )
