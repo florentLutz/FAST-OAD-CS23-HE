@@ -6,7 +6,6 @@ import openmdao.api as om
 
 from ..components.sizing_fuel_system_cg_x import SizingFuelSystemCGX
 from ..components.sizing_fuel_system_cg_y import SizingFuelSystemCGY
-from ..components.sizing_fuel_system_volume import SizingFuelSystemCapacityVolume
 from ..components.sizing_fuel_system_weight import SizingFuelSystemWeight
 from ..components.sizing_fuel_system_drag import SizingH2FuelSystemDrag
 
@@ -47,11 +46,6 @@ class SizingFuelSystem(om.Group):
         self.add_subsystem(
             name="fuel_system_cg_y",
             subsys=SizingFuelSystemCGY(h2_fuel_system_id=h2_fuel_system_id, position=position),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="connected_tank_volume",
-            subsys=SizingFuelSystemCapacityVolume(h2_fuel_system_id=h2_fuel_system_id),
             promotes=["*"],
         )
         self.add_subsystem(

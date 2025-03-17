@@ -8,7 +8,8 @@
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
             </cabin>
             <fuselage>
-                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <front_length units="m" is_input="False">1.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m">2.0</rear_length>
             </fuselage>
             <wing>
                 <span units="m">12.0</span>

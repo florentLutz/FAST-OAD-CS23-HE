@@ -37,6 +37,12 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
 
         # At least one input is needed regardless of the case
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
+        self.add_input(
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio",
+            val=np.nan,
+            desc="Y position of the power source center of gravity as a ratio of the wing "
+            "half-span",
+        )
 
         self.add_output(
             "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y",
@@ -47,19 +53,10 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
         wing_related = (
             position == "from_rear_to_wing"
             or position == "from_center_to_wing"
-            or position == "from_center_to_front"
+            or position == "from_front_to_wing"
         )
 
         if position == "in_the_wing" or wing_related:
-            self.add_input(
-                "data:propulsion:he_power_train:H2_fuel_system:"
-                + h2_fuel_system_id
-                + ":CG:y_ratio",
-                val=np.nan,
-                desc="Y position of the power source center of gravity as a ratio of the wing "
-                "half-span",
-            )
-
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -72,7 +69,7 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
         wing_related = (
             position == "from_rear_to_wing"
             or position == "from_center_to_wing"
-            or position == "from_center_to_front"
+            or position == "from_front_to_wing"
         )
 
         if position == "in_the_wing":
@@ -84,11 +81,6 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
                 "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y"
             ] = 0.5 * half_span * y_ratio
 
-        else:
-            outputs[
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y"
-            ] = 0.0
-
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
         position = self.options["position"]
@@ -99,7 +91,7 @@ class SizingFuelSystemCGY(om.ExplicitComponent):
         wing_related = (
             position == "from_rear_to_wing"
             or position == "from_center_to_wing"
-            or position == "from_center_to_front"
+            or position == "from_front_to_wing"
         )
 
         if position == "in_the_wing":

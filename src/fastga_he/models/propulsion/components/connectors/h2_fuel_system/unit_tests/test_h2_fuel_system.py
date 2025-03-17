@@ -8,7 +8,6 @@ import numpy as np
 
 from ..components.sizing_fuel_system_cg_x import SizingFuelSystemCGX
 from ..components.sizing_fuel_system_cg_y import SizingFuelSystemCGY
-from ..components.sizing_fuel_system_volume import SizingFuelSystemCapacityVolume
 from ..components.sizing_fuel_system_length import SizingH2FuelSystemLength
 from ..components.sizing_fuel_system_weight import SizingFuelSystemWeight
 from ..components.sizing_fuel_system_inner_diameter import SizingH2FuelSystemInnerDiameter
@@ -32,7 +31,7 @@ NB_POINTS_TEST = 10
 
 
 def test_fuel_system_cg_x():
-    expected_cg = [2.69, 0.5, 1.98]
+    expected_cg = [2.239, 2.608, 2.663, 2.693, 1.869, 2.4, 3.977, 2.239, 2.693]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
@@ -54,7 +53,7 @@ def test_fuel_system_cg_x():
 
 
 def test_fuel_system_cg_y():
-    expected_cg = [1.344, 0.0, 0.0]
+    expected_cg = [0.0, 0.0, 0.672, 0.672, 0.0, 0.672, 0.0, 0.0, 1.344]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         # Research independent input value in .xml file
@@ -133,23 +132,6 @@ def test_h2_fuel_overall_cross_section():
         "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:overall_wall_thickness",
         units="m",
     ) == pytest.approx(0.00635, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_fuel_system_volume():
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingFuelSystemCapacityVolume(h2_fuel_system_id="h2_fuel_system_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(SizingFuelSystemCapacityVolume(h2_fuel_system_id="h2_fuel_system_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:connected_volume", units="L"
-    ) == pytest.approx(62.59, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

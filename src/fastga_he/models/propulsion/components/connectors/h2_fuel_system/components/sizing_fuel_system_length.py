@@ -179,7 +179,7 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:length",
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":wing_ratio",
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio",
         ] = num_wing * half_span
 
         partials[
