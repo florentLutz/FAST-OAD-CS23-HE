@@ -39,6 +39,8 @@
                             <pipe_diameter units="m">0.04</pipe_diameter>
                             <inner_diameter units="m">0.0373</inner_diameter>
                             <insulation_thickness units="m">0.005</insulation_thickness>
+                            <overall_diameter units="m">0.05</overall_diameter>
+                            <length units="m">2.0</length>
                         </dimension>
                         <material>
                             <yield_strength units="Pa">240000000000</yield_strength>

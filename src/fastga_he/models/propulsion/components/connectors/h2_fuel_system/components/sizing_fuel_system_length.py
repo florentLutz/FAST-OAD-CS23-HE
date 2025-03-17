@@ -5,8 +5,6 @@
 import numpy as np
 import openmdao.api as om
 
-from ..constants import POSSIBLE_POSITION
-
 
 class SizingH2FuelSystemLength(om.ExplicitComponent):
     """
@@ -66,7 +64,9 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:length",
             units="m",
             val=5.0,
             desc="Total length of the h2 fuel system",
@@ -103,7 +103,9 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
         wing_mac = inputs["data:geometry:wing:MAC:length"]
 
         outputs[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length"
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:length"
         ] = (
             (num_front + num_rear) * half_l_cabin
             + num_wing * y_ratio * half_span
@@ -140,49 +142,65 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
         wing_mac = inputs["data:geometry:wing:MAC:length"]
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:length",
             "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":connection:front",
         ] = half_l_cabin
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:length",
             "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":connection:rear",
         ] = half_l_cabin
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:length",
             "data:geometry:cabin:length",
         ] = 0.5 * (num_front + num_rear)
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:length",
             "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":connection:wing",
         ] = y_ratio * half_span
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:length",
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":wing_ratio",
         ] = num_wing * half_span
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:length",
             "data:geometry:wing:span",
         ] = 0.5 * num_wing * y_ratio
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:length",
             "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":connection:near",
         ] = wing_mac
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":length",
+            "data:propulsion:he_power_train:H2_fuel_system:"
+            + h2_fuel_system_id
+            + ":dimension:length",
             "data:geometry:wing:MAC:length",
         ] = num_near
