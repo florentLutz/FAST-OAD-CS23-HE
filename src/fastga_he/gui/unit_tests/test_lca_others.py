@@ -23,6 +23,7 @@ from ..lca_impact import (
     lca_impacts_bar_chart_with_contributors,
     lca_impacts_bar_chart_with_components_absolute,
     lca_impacts_search_table,
+    lca_raw_impact_comparison,
     _get_impact_dict,
 )
 
@@ -283,6 +284,15 @@ def test_lca_bar_chart_pipistrel_comparison_paper_std():
             "manufacturing",
             "distribution",
         ],
+    )
+
+    fig.show()
+
+
+def test_lca_bar_chart_pipistrel_comparison_raw_impact():
+    fig = lca_raw_impact_comparison(
+        [DATA_FOLDER_PATH / "pipistrel_standard.xml", DATA_FOLDER_PATH / "pipistrel_short.xml"],
+        ["Pipistrel with a 4000h lifetime", "Pipistrel with a 500h lifetime"],
     )
 
     fig.show()
