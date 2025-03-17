@@ -7,7 +7,7 @@ import pathlib
 
 from collections import OrderedDict
 
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Tuple
 
 import numpy as np
 
@@ -139,10 +139,12 @@ def _get_impact_variable_list(
 
 def _get_impact_dict(
     aircraft_file_path: Union[str, pathlib.Path], impact_step: str = "weighted"
-) -> dict:
+) -> Tuple[dict, dict]:
     """
     Returns a dict of impacts categories available in the output file and their value. By default,
     the weighted impacts are given, but normalized results and raw results can also be returned.
+    Also returns a dict of the units used for each category for which the information is in the
+    variable description.
     :param aircraft_file_path: path to the output file path.
     :param impact_step: step of the LCIA to consider, by default weighted impacts are considered,
     can also be "normalized" or "raw" results.
@@ -152,10 +154,14 @@ def _get_impact_dict(
 
     names_variable_lca = _get_impact_variable_list(aircraft_file_path, impact_step=impact_step)
     names_impact_categories = {}
+    units_impact_categories = {}
     datafile = oad.DataFile(aircraft_file_path)
     for name_variable_lca in names_variable_lca:
         if _depth_lca_detail(name_variable_lca) <= 2:
             impact_score = datafile[name_variable_lca].value[0]
+            variable_name_for_unit = name_variable_lca.replace("_weighted", "").replace(
+                "_normalized", ""
+            )
             impact_name = name_variable_lca.replace(LCA_PREFIX, "")
             if impact_step == "weighted":
                 impact_name = impact_name.replace("_weighted:sum", "")
@@ -163,9 +169,15 @@ def _get_impact_dict(
                 impact_name = impact_name.replace("_normalized:sum", "")
             else:
                 impact_name = impact_name.replace(":sum", "")
+
+            impact_unit = datafile[variable_name_for_unit].description.split(
+                " for the whole process"
+            )[0]
+
+            units_impact_categories[impact_name] = impact_unit
             names_impact_categories[impact_name] = impact_score
 
-    return names_impact_categories
+    return names_impact_categories, units_impact_categories
 
 
 def _get_impact_sunburst(
@@ -347,7 +359,7 @@ def lca_score_sensitivity_simple(
                 if not names_variables_lca:
                     # Fetch the name of available impacts for plotting
                     names_variables_lca = list(
-                        _get_impact_dict(os.path.join(dirpath, filename)).keys()
+                        _get_impact_dict(os.path.join(dirpath, filename))[0].keys()
                     )
 
                     # Check that the impact we request exists to make it fail as soon as possible
@@ -427,7 +439,7 @@ def lca_score_sensitivity_advanced_impact_category(
     for dirpath, _, filenames in os.walk(results_folder_path):
         for filename in filenames:
             if filename.startswith(prefix):
-                impact_score_dict = _get_impact_dict(os.path.join(dirpath, filename))
+                impact_score_dict, _ = _get_impact_dict(os.path.join(dirpath, filename))
                 impact_score_dict.pop("single_score")
 
                 datafile = oad.DataFile(os.path.join(dirpath, filename))
@@ -933,11 +945,11 @@ def lca_impacts_bar_chart_simple(
 
     fig = go.Figure()
 
-    reference_value = _get_impact_dict(aircraft_file_paths[0])
+    reference_value, _ = _get_impact_dict(aircraft_file_paths[0])
     reference_value.pop("single_score")
 
     for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
-        impact_score_dict = _get_impact_dict(aircraft_file_path)
+        impact_score_dict, _ = _get_impact_dict(aircraft_file_path)
         impact_score_dict.pop("single_score")
         impact_scores = []
         beautified_impact_names = []
@@ -1003,12 +1015,14 @@ def lca_raw_impact_comparison(
     fig = go.Figure()
 
     for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
-        impact_score_dict = _get_impact_dict(aircraft_file_path, impact_step="raw")
+        impact_score_dict, impact_unit_dict = _get_impact_dict(aircraft_file_path, impact_step="raw")
         beautified_impact_names_and_scores = {}
+        beautified_impact_names_and_units = {}
 
         for impact_name, impact_score in impact_score_dict.items():
             beautified_impact_name = impact_name.replace("_", " ")
             beautified_impact_names_and_scores[beautified_impact_name] = impact_score
+            beautified_impact_names_and_units[beautified_impact_name] = impact_unit_dict[impact_name]
 
         if impact_category is None:
             impact_to_plot = list(beautified_impact_names_and_scores.keys())[0]
@@ -1052,7 +1066,7 @@ def lca_raw_impact_comparison(
         gridcolor="lightgrey",
         linewidth=3,
         tickfont=dict(size=20),
-        title="Relative score [%]",
+        title=beautified_impact_names_and_units[impact_to_plot] + " per FU",
     )
     fig.update_yaxes(
         title_font=dict(size=20),
@@ -1077,7 +1091,7 @@ def lca_impacts_bar_chart_normalised_weighted(
     fig = go.Figure()
 
     for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
-        impact_score_dict = _get_impact_dict(aircraft_file_path)
+        impact_score_dict, _ = _get_impact_dict(aircraft_file_path)
         impact_scores = []
         beautified_impact_names = []
 
@@ -1263,7 +1277,7 @@ def lca_impacts_bar_chart_with_contributors(
 
     fig = go.Figure()
 
-    impact_score_dict = _get_impact_dict(aircraft_file_path, impact_step=impact_step)
+    impact_score_dict, _ = _get_impact_dict(aircraft_file_path, impact_step=impact_step)
     if impact_step == "weighted":
         impact_score_dict.pop("single_score")
 
@@ -1415,7 +1429,7 @@ def lca_impacts_bar_chart_with_components_absolute(
 
     fig = go.Figure()
 
-    impact_score_dict = _get_impact_dict(aircraft_file_path)
+    impact_score_dict, _ = _get_impact_dict(aircraft_file_path)
     impact_score_dict.pop("single_score")
 
     component_counter = 0
@@ -1542,7 +1556,7 @@ def lca_impacts_search_table(
 
     datafile = oad.DataFile(aircraft_file_path)
 
-    available_impacts = list(_get_impact_dict(aircraft_file_path).keys())
+    available_impacts = list(_get_impact_dict(aircraft_file_path)[0].keys())
     available_impacts.remove("single_score")
     # For now won't be likely to change a lot, so we will do it like this
     available_phases = ["distribution", "manufacturing", "operation", "production"]

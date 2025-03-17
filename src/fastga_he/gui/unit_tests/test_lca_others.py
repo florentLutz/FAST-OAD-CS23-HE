@@ -737,9 +737,9 @@ def test_get_impact_dict():
     """
 
     xml_ef = DATA_FOLDER_PATH / "hybrid_kodiak.xml"
-    ef_weighted_impact_dict = _get_impact_dict(xml_ef, impact_step="weighted")
-    ef_normalized_impact_dict = _get_impact_dict(xml_ef, impact_step="normalized")
-    ef_raw_impact_dict = _get_impact_dict(xml_ef, impact_step="raw")
+    ef_weighted_impact_dict, _ = _get_impact_dict(xml_ef, impact_step="weighted")
+    ef_normalized_impact_dict, _ = _get_impact_dict(xml_ef, impact_step="normalized")
+    ef_raw_impact_dict, _ = _get_impact_dict(xml_ef, impact_step="raw")
 
     ef_raw_impact_list = list(ef_raw_impact_dict.keys())
     ef_raw_impact_list.remove("climate_change_biogenic")
@@ -770,9 +770,9 @@ def test_get_impact_dict():
     assert ef_normalized_impact_list == ef_weighted_impact_list
 
     xml_recipe = DATA_FOLDER_PATH / "pipistrel_short.xml"
-    recipe_weighted_impact_dict = _get_impact_dict(xml_recipe, impact_step="weighted")
-    recipe_normalized_impact_dict = _get_impact_dict(xml_recipe, impact_step="normalized")
-    recipe_raw_impact_dict = _get_impact_dict(xml_recipe, impact_step="raw")
+    recipe_weighted_impact_dict, _ = _get_impact_dict(xml_recipe, impact_step="weighted")
+    recipe_normalized_impact_dict, recipe_normalised_unit_dict = _get_impact_dict(xml_recipe, impact_step="normalized")
+    recipe_raw_impact_dict, recipe_raw_unit_dict = _get_impact_dict(xml_recipe, impact_step="raw")
 
     recipe_raw_impact_list = list(recipe_raw_impact_dict.keys())
     recipe_normalized_impact_list = list(recipe_normalized_impact_dict.keys())
@@ -780,3 +780,9 @@ def test_get_impact_dict():
 
     assert recipe_raw_impact_list == recipe_normalized_impact_list
     assert recipe_raw_impact_list != recipe_weighted_impact_list
+
+    # In theory normalised results don't have units but for the sake of testing the function,
+    # it should give the result
+
+    assert recipe_raw_unit_dict["climate_change"] == "kg CO2-Eq"
+    assert recipe_raw_unit_dict["climate_change"] == recipe_normalised_unit_dict["climate_change"]
