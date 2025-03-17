@@ -1060,6 +1060,7 @@ def _get_component_and_contribution(
     aircraft_file_path: Union[str, pathlib.Path],
     detailed_component_contributions: bool = False,
     aggregate_phase: list = None,
+    impact_step: str = "weighted",
 ) -> dict:
     """
     Returns a dict of the components and their impact in each category. Also return a dict with the
@@ -1067,12 +1068,14 @@ def _get_component_and_contribution(
 
     :param aircraft_file_path: path to the output file path.
     :return: a dict of the components with their contribution to each impact category.
-    :param detailed_component_contributions: by default, the contribution in each phase of a components are summed
-    together and only the total is shown, this allows to see the contribution in each phase of
-    each component
+    :param detailed_component_contributions: by default, the contribution in each phase of a
+    components are summed together and only the total is shown, this allows to see the contribution
+    in each phase of each component
     :param aggregate_phase: for compactness, it may be preferable to aggregate the contribution
     of all components to a phase. This options is a list of phases to aggregate. Please note that
     the aggregation of the manufacturing and distribution can't be changed (see the documentation).
+    :param impact_step: step of the LCIA to consider, by default weighted impacts are considered,
+    can also be "normalized" results.
     """
 
     datafile = oad.DataFile(aircraft_file_path)
@@ -1080,13 +1083,15 @@ def _get_component_and_contribution(
     names = datafile.names()
     component_and_impacts = {}
 
+    filter_tag = "_" + impact_step
+
     for name in names:
         # We can focus on the weighted value since it'll be relative anyway
-        if LCA_PREFIX in name and "_weighted:" in name:
+        if LCA_PREFIX in name and filter_tag in name:
             if _depth_lca_detail(name) >= 4:
                 component_name = _get_component_from_variable_name(name)
                 phase_name = name.split(":")[-2]
-                impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
+                impact_name = name.replace(LCA_PREFIX, "").split(filter_tag)[0]
                 contribution = datafile[name].value[0]
 
                 if aggregate_phase and phase_name in aggregate_phase:
@@ -1117,7 +1122,7 @@ def _get_component_and_contribution(
 
             elif "manufacturing:sum" in name:
                 component_name = "manufacturing"
-                impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
+                impact_name = name.replace(LCA_PREFIX, "").split(filter_tag)[0]
                 contribution = datafile[name].value[0]
                 if contribution != 0.0:
                     if component_name in component_and_impacts:
@@ -1127,7 +1132,7 @@ def _get_component_and_contribution(
                         component_and_impacts[component_name] = {impact_name: contribution}
             elif "distribution:sum" in name:
                 component_name = "distribution"
-                impact_name = name.replace(LCA_PREFIX, "").split("_weighted")[0]
+                impact_name = name.replace(LCA_PREFIX, "").split(filter_tag)[0]
                 contribution = datafile[name].value[0]
                 if contribution != 0.0:
                     if component_name in component_and_impacts:
@@ -1146,6 +1151,8 @@ def lca_impacts_bar_chart_with_contributors(
     legend_rename: dict = None,
     aggregate_phase: list = None,
     impact_filter_list: list = None,
+    impact_step: str = "weighted",
+    contribution_to_aggregate: list = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that plot the impact of an aircraft in each category and how each component
@@ -1162,18 +1169,33 @@ def lca_impacts_bar_chart_with_contributors(
     of all components to a phase. This options is a list of phases to aggregate. Please note that
     the aggregation of the manufacturing and distribution can't be changed (see the documentation).
     :param impact_filter_list: filter to only show impact in the list in output graph
+    :param impact_step: step of the LCIA to consider, by default weighted impacts are considered,
+    can also be "normalized" results.
+    :param contribution_to_aggregate: rather than use a cutoff criteria (which might not yield the
+    same results depending on the impact categories investigated), contribution to aggregate can
+    be specified here.
     """
 
+    if not contribution_to_aggregate:
+        contribution_to_aggregate = []
+
     component_and_contribution = _get_component_and_contribution(
-        aircraft_file_path, detailed_component_contributions, aggregate_phase
+        aircraft_file_path,
+        detailed_component_contributions,
+        aggregate_phase,
+        impact_step=impact_step,
     )
 
     fig = go.Figure()
 
-    impact_score_dict = _get_impact_dict(aircraft_file_path)
-    impact_score_dict.pop("single_score")
+    impact_score_dict = _get_impact_dict(aircraft_file_path, impact_step=impact_step)
+    if impact_step == "weighted":
+        impact_score_dict.pop("single_score")
+
+    impact_list = list(impact_score_dict.keys())
 
     component_counter = 0
+    current_contribution = dict(zip(impact_list, np.zeros(len(impact_list))))
 
     for component, impacts in component_and_contribution.items():
         impact_contributions = []
@@ -1188,37 +1210,72 @@ def lca_impacts_bar_chart_with_contributors(
 
         final_name = component.replace(component_name, beautified_component_name)
 
-        if legend_rename and final_name in legend_rename:
-            final_name = legend_rename[final_name]
+        if final_name not in contribution_to_aggregate:
+            if legend_rename and final_name in legend_rename:
+                final_name = legend_rename[final_name]
 
-        for impact_name, contribution in impacts.items():
-            if impact_filter_list is not None:
-                beautified_impact_name = impact_name.replace("_", " ")
+            for impact_name, contribution in impacts.items():
+                if impact_filter_list is not None:
+                    beautified_impact_name = impact_name.replace("_", " ")
 
-                if beautified_impact_name in impact_filter_list:
+                    if beautified_impact_name in impact_filter_list:
+                        beautified_impact_names.append(beautified_impact_name)
+                        rel_contribution = contribution / impact_score_dict[impact_name] * 100.0
+
+                        impact_contributions.append(rel_contribution)
+                        current_contribution[impact_name] += rel_contribution
+                else:
+                    beautified_impact_name = impact_name.replace("_", " ")
                     beautified_impact_names.append(beautified_impact_name)
 
-                    impact_contributions.append(
-                        contribution / impact_score_dict[impact_name] * 100.0
-                    )
-            else:
-                beautified_impact_name = impact_name.replace("_", " ")
-                beautified_impact_names.append(beautified_impact_name)
+                    rel_contribution = contribution / impact_score_dict[impact_name] * 100.0
 
-                impact_contributions.append(contribution / impact_score_dict[impact_name] * 100.0)
+                    impact_contributions.append(rel_contribution)
+                    current_contribution[impact_name] += rel_contribution
 
+            bar_chart = go.Bar(
+                name=final_name,
+                x=beautified_impact_names,
+                y=impact_contributions,
+                marker=dict(
+                    pattern_shape=HASH[component_counter // len(HASH)],
+                    color=COLS[component_counter % len(COLS)],
+                ),
+            )
+            fig.add_trace(bar_chart)
+
+            component_counter += 1
+
+    beautified_impact_names_other = []
+    impact_contributions_others = []
+
+    for impact_name in impact_list:
+        # Then we plot the others category
+
+        if impact_filter_list is not None:
+            beautified_impact_name = impact_name.replace("_", " ")
+
+            if beautified_impact_name in impact_filter_list:
+                beautified_impact_names_other.append(beautified_impact_name)
+
+                impact_contributions_others.append(100.0 - current_contribution[impact_name])
+        else:
+            beautified_impact_name = impact_name.replace("_", " ")
+            beautified_impact_names_other.append(beautified_impact_name)
+
+            impact_contributions_others.append(100.0 - current_contribution[impact_name])
+
+    if contribution_to_aggregate:
         bar_chart = go.Bar(
-            name=final_name,
-            x=beautified_impact_names,
-            y=impact_contributions,
+            name="others",
+            x=beautified_impact_names_other,
+            y=impact_contributions_others,
             marker=dict(
                 pattern_shape=HASH[component_counter // len(HASH)],
                 color=COLS[component_counter % len(COLS)],
             ),
         )
         fig.add_trace(bar_chart)
-
-        component_counter += 1
 
     title_text = (
         "Relative contribution of each component to each impact category for " + name_aircraft

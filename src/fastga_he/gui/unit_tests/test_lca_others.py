@@ -234,10 +234,55 @@ def test_lca_bar_chart_relative_contribution():
     fig.show()
 
 
-def test_lca_bar_chart_pipistrel_comparison_paper():
+def test_lca_bar_chart_pipistrel_comparison_paper_short():
+    fig = lca_impacts_bar_chart_with_contributors(
+        DATA_FOLDER_PATH / "pipistrel_short.xml",
+        name_aircraft="the Pipistrel with a 500h lifetime",
+        impact_step="normalized",
+        impact_filter_list=[
+            "climate change",
+            "acidification terrestrial",
+            "particulate matter formation",
+        ],
+        contribution_to_aggregate=[
+            "propeller 1",
+            "motor 1",
+            "inverter 1",
+            "harness 1",
+            "dc sspc 1",
+            "dc sspc 2",
+            "dc splitter 1",
+            "dc bus 1",
+            "manufacturing",
+            "distribution",
+        ],
+    )
+
+    fig.show()
+
+
+def test_lca_bar_chart_pipistrel_comparison_paper_std():
     fig = lca_impacts_bar_chart_with_contributors(
         DATA_FOLDER_PATH / "pipistrel_standard.xml",
-        name_aircraft="Pipistrel 4000h lifetime",
+        name_aircraft="the Pipistrel with a 4000h lifetime",
+        impact_step="normalized",
+        impact_filter_list=[
+            "climate change",
+            "acidification terrestrial",
+            "particulate matter formation",
+        ],
+        contribution_to_aggregate=[
+            "propeller 1",
+            "motor 1",
+            "inverter 1",
+            "harness 1",
+            "dc sspc 1",
+            "dc sspc 2",
+            "dc splitter 1",
+            "dc bus 1",
+            "manufacturing",
+            "distribution",
+        ],
     )
 
     fig.show()
@@ -725,4 +770,3 @@ def test_get_impact_dict():
 
     assert recipe_raw_impact_list == recipe_normalized_impact_list
     assert recipe_raw_impact_list != recipe_weighted_impact_list
-
