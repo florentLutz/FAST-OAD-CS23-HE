@@ -299,11 +299,41 @@ def test_lca_bar_chart_pipistrel_comparison_raw_impact():
     fig.show()
 
 
-def test_lca_bar_chart_pipistrel_advanced_comparison_raw_impact():
+def test_lca_bar_chart_pipistrel_advanced_comparison_raw_impact_without_aggregation():
     fig = lca_raw_impact_comparison_advanced(
-        [DATA_FOLDER_PATH / "pipistrel_alpha_standard.xml", DATA_FOLDER_PATH / "pipistrel_alpha_short.xml"],
+        [
+            DATA_FOLDER_PATH / "pipistrel_alpha_standard.xml",
+            DATA_FOLDER_PATH / "pipistrel_alpha_short.xml",
+        ],
         ["Pipistrel with a 4000h lifetime", "Pipistrel with a 500h lifetime"],
-        impact_category="climate change"
+        impact_category="climate change",
+    )
+
+    fig.show()
+
+
+def test_lca_bar_chart_pipistrel_advanced_comparison_raw_impact_with_aggregation_cc():
+    fig = lca_raw_impact_comparison_advanced(
+        [
+            DATA_FOLDER_PATH / "pipistrel_alpha_short.xml",
+            DATA_FOLDER_PATH / "pipistrel_alpha_standard.xml",
+        ],
+        ["Pipistrel with a 500h lifetime", "Pipistrel with a 4000h lifetime"],
+        impact_category="climate change",
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",  # Just a renaming, should work as well
+            "Battery pack": ["battery_pack_1", "battery_pack_2"],
+            "Use phase": "electricity_for_mission",  # Just a renaming, should work as well
+            "Others": [
+                "propeller_1",
+                "motor_1",
+                "inverter_1",
+                "harness_1",
+                "dc_bus_1",
+                "manufacturing",
+                "distribution",
+            ],
+        },
     )
 
     fig.show()

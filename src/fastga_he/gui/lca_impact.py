@@ -1083,6 +1083,7 @@ def lca_raw_impact_comparison_advanced(
     aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
     names_aircraft: Union[str, List[str]] = None,
     impact_category: str = None,
+    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = None,
 ) -> go.FigureWidget:
     """
     Plots, on bar chart, the comparison in one impact category of one or more designs with a detail
@@ -1092,6 +1093,10 @@ def lca_raw_impact_comparison_advanced(
     :param names_aircraft: names of the aircraft.
     :param impact_category: impact category to plot, by default the first one alphabetically will
     be plotted
+    :param aggregate_and_sort_contributor: dict of contributor to aggregate and name under which to
+    aggregate them. Keys are new names and items are a list of old names. The order in which new
+    names are given will also serve as the order in which we plot contributors starting from the
+    bottom.
     """
 
     fig = go.Figure()
@@ -1148,16 +1153,78 @@ def lca_raw_impact_comparison_advanced(
                     component_contribution
                 )
 
-    component_counter = 0
-    for component, contribution_on_each_aircraft_dict in component_contribution_on_each_aircraft.items():
-        contribution_on_each_aircraft_list = []
-        for aircraft in names_aircraft:
-            if aircraft in contribution_on_each_aircraft_dict:
-                contribution_on_each_aircraft_list.append(contribution_on_each_aircraft_dict[aircraft])
-            else:
-                contribution_on_each_aircraft_list.append(0.)
+    if aggregate_and_sort_contributor:
+        # Now we aggregate the contribution ...
+        component_contribution_aggregated_sorted = {}
+        component_contribution_unsorted = {}
 
-        bar_chart = go.Bar(
+        # But before anything we presort the sorted dict so that it appear in the order we want
+        for name_for_aggregation in aggregate_and_sort_contributor:
+            blank_dict = {}
+            for aircraft in names_aircraft:
+                blank_dict[aircraft] = 0.0
+            component_contribution_aggregated_sorted[name_for_aggregation] = blank_dict
+
+        for (
+            component,
+            contribution_on_each_aircraft_dict,
+        ) in component_contribution_on_each_aircraft.items():
+            component_to_be_sorted = False
+            for (
+                name_for_aggregation,
+                components_to_aggregate,
+            ) in aggregate_and_sort_contributor.items():
+                # This should correspond to the case where we just rename a contributor
+                if type(components_to_aggregate) == str:
+                    if component == components_to_aggregate:
+                        component_to_be_sorted = True
+                        component_contribution_aggregated_sorted[name_for_aggregation] = (
+                            contribution_on_each_aircraft_dict
+                        )
+
+                        # Components can't be aggregated in more than one place so if it is here it
+                        # can't be elsewhere.
+                        break
+                # The type of input we expect should ensure this. Also in that case it means
+                # component contribution can be summed so it means the contribution can already
+                # exist.
+                else:
+                    if component in components_to_aggregate:
+                        component_to_be_sorted = True
+
+                        # It has already been added so we must sum
+                        if name_for_aggregation in component_contribution_aggregated_sorted:
+                            for aircraft in contribution_on_each_aircraft_dict:
+                                component_contribution_aggregated_sorted[name_for_aggregation][
+                                    aircraft
+                                ] += contribution_on_each_aircraft_dict[aircraft]
+
+                        break
+
+            # If the component is not to be aggregated or just renamed, we put it in a different
+            # dict to plot it later in the order.
+            if not component_to_be_sorted:
+                component_contribution_unsorted[component] = contribution_on_each_aircraft_dict
+    else:
+        component_contribution_aggregated_sorted = {}
+        component_contribution_unsorted = component_contribution_on_each_aircraft
+
+    component_counter = 0
+    for dict_to_plot in [component_contribution_aggregated_sorted, component_contribution_unsorted]:
+        for (
+            component,
+            contribution_on_each_aircraft_dict,
+        ) in dict_to_plot.items():
+            contribution_on_each_aircraft_list = []
+            for aircraft in names_aircraft:
+                if aircraft in contribution_on_each_aircraft_dict:
+                    contribution_on_each_aircraft_list.append(
+                        contribution_on_each_aircraft_dict[aircraft]
+                    )
+                else:
+                    contribution_on_each_aircraft_list.append(0.0)
+
+            bar_chart = go.Bar(
                 name=component,
                 x=names_aircraft,
                 y=contribution_on_each_aircraft_list,
@@ -1165,10 +1232,10 @@ def lca_raw_impact_comparison_advanced(
                     pattern_shape=HASH[component_counter // len(HASH)],
                     color=COLS[component_counter % len(COLS)],
                 ),
-        )
-        fig.add_trace(bar_chart)
+            )
+            fig.add_trace(bar_chart)
 
-        component_counter += 1
+            component_counter += 1
 
     fig.update_layout(
         plot_bgcolor="white",
