@@ -58,9 +58,6 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
             )
             self.declare_partials("*", "*", method="exact")
 
-        if position == "in_the_wing" and position == "from_center_to_wing":
-            self.declare_partials("*", "data:geometry:wing:MAC:at25percent:x", val=1.0)
-
         if position == "from_center_to_front":
             self.declare_partials("*", "data:geometry:cabin:length", val=0.25)
 
@@ -77,6 +74,9 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
 
         if not (position == "in_the_wing" or wing_related):
             self.declare_partials(of="*", wrt="data:geometry:fuselage:front_length", val=1.0)
+
+        if position == "in_the_wing" or position == "from_center_to_wing":
+            self.declare_partials("*", "data:geometry:wing:MAC:at25percent:x", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
@@ -187,7 +187,7 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
                 ] = (
                     0.25 * cabin_length**2.0
                     + (span * y_ratio) * (0.5 * cabin_length + front_length - mac25x)
-                ) / (4.0 * total_length) ** 2.0
+                ) / (2.0 * total_length) ** 2.0
 
             if position == "from_rear_to_wing":
                 cg_distance = 0.75 * cabin_length + front_length - mac25x
@@ -208,7 +208,6 @@ class SizingFuelSystemCGX(om.ExplicitComponent):
                     "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x",
                     "data:geometry:cabin:length",
                 ] = (
-                    3.0
-                    * (cabin_length**2.0 + 2.0 * cabin_length * span * y_ratio)
-                    / (4.0 * total_length) ** 2.0
-                )
+                    0.75 * cabin_length**2.0
+                    + (span * y_ratio) * (1.5 * cabin_length + front_length - mac25x)
+                ) / (2.0 * total_length) ** 2.0
