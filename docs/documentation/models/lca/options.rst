@@ -49,6 +49,19 @@ By default, the LCA module only breaks down the impact of the aircraft down to t
 
     As enabling this option makes the module the contribution of each component to each phase it adds a significant number of outputs to the OpenMDAO problem which may affect the computation time.
 
+Functional unit
+===============
+
+Early draft of the Product Environmental Footprint category rules applied to aircraft recommend the use of the transport of one passenger over a kilometer as a functional unit (FU) for the LCA. While this FU is commonly used in literature and is adequate for aircraft whose purpose is to transport passenger, a different unit might be used to evaluate trainer aircraft. In :cite:`arvidsson:2024`, a flight hour is used as the functional unit. These two choices are implemented and which one to use can be selected using option `functional_unit`. By default the `PAX.km` is selected but `Flight hours` can also be used.
+
+.. code:: yaml
+
+    model:
+        lca:
+            id: fastga_he.lca.legacy
+            power_train_file_path: hybrid_propulsion.yml
+            functional_unit: Flight hours
+
 .. _impact-assessment-method-lca:
 
 Impact assessment method
@@ -192,3 +205,22 @@ As the LCA module computes the impact per functional unit (see the :ref:`models-
             id: fastga_he.lca.legacy
             power_train_file_path: hybrid_propulsion.yml
             aircraft_lifespan_in_hours: True
+
+Usage of existing configuration file
+====================================
+
+As explained in :ref:`LCA configuration file <models-lca>`, the LCA module relies on a LCA configuration file to perform the analysis. By default, that configuration file is written at each new instantiation of the LCA module. It is also possible to use an existing configuration file by setting the boolean option `write_lca_conf` to `False` and providing the path to the configuration file using the `lca_conf_file_path` option.
+
+.. code:: yaml
+
+    model:
+        lca:
+            id: fastga_he.lca.legacy
+            power_train_file_path: hybrid_propulsion.yml
+            write_lca_conf: False
+            lca_conf_file_path: path/to/existing/conf_file.yml
+
+.. note::
+    While the option `lca_conf_file_path` allows to specify where to find the LCA configuration in the case where an existing one is used, it can't be used to specify where to write it when it's automatically generated.
+
+    If option `write_lca_conf` is set to `False` but no path is provided in option `lca_conf_file_path`, the code will assumed it is located in the same where it would have been if automatically generated.
