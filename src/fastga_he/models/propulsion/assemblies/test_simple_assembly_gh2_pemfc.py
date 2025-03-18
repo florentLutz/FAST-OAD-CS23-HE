@@ -193,11 +193,10 @@ def test_assembly_sizing():
     ) == pytest.approx(107.3, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
-        units="kg"
+        units="kg",
     ) == pytest.approx(43.6, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:mass",
-        units="kg"
+        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:mass", units="kg"
     ) == pytest.approx(0.084, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
@@ -265,7 +264,7 @@ def test_performances_sizing_assembly_pemfc_gh2_enforce():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
-        units="kg"
+        units="kg",
     ) == pytest.approx(47.6, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
@@ -318,7 +317,7 @@ def test_performances_sizing_assembly_pemfc_gh2_ensure():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
-        units="kg"
+        units="kg",
     ) == pytest.approx(47.6, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
@@ -365,11 +364,10 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(266.6, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
-        units="kg"
+        units="kg",
     ) == pytest.approx(47.6, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:mass",
-        units="kg"
+        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:mass", units="kg"
     ) == pytest.approx(0.084, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
