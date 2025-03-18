@@ -1007,7 +1007,7 @@ GASEOUS_HYDROGEN_TANK = {
     SPT: [],
     PTS: [],
     IN: None,
-    OUT: [("fuel_consumed_t", None), ("hydrogen_reactant_pressure", None)],
+    OUT: [("fuel_consumed_t", None)],
     CTC: "tank",
     MP: [
         {"fuel_remaining_t": "kg"},
