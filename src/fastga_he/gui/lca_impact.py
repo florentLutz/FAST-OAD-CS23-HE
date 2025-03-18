@@ -1475,6 +1475,9 @@ def lca_impacts_bar_chart_with_contributors(
 
     impact_list = list(impact_score_dict.keys())
 
+    if impact_filter_list is None:
+        impact_filter_list = impact_list
+
     component_counter = 0
     current_contribution = dict(zip(impact_list, np.zeros(len(impact_list))))
 
@@ -1552,7 +1555,11 @@ def lca_impacts_bar_chart_with_contributors(
                 final_name = legend_rename[final_name]
 
             for impact_name in impact_filter_list:
-                contribution = impacts[impact_name]
+                # Failsafe
+                if impact_name in impacts:
+                    contribution = impacts[impact_name]
+                else:
+                    contribution = 0.0
 
                 beautified_impact_name = impact_name.replace("_", " ")
                 beautified_impact_names.append(beautified_impact_name)
