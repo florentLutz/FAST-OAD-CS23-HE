@@ -26,6 +26,8 @@
       </flap>
       <fuselage>
         <front_length units="m" is_input="True">0.5<!--length of the front cone of the aircraft--></front_length>
+        <maximum_height units="m" is_input="True">nan<!--maximum height of the fuselage--></maximum_height>
+        <rear_length units="m" is_input="True">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
       </fuselage>
       <wing>
         <area units="m**2" is_input="True">7.105673586278243<!--wing area--></area>
@@ -36,12 +38,6 @@
             <x units="m" is_input="True">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
           </at25percent>
         </MAC>
-        <root>
-          <chord units="m" is_input="True">0.7672311779752663<!--chord length at wing root--></chord>
-        </root>
-        <tip>
-          <chord units="m" is_input="True">0.7672311779752663<!--chord length at wing tip--></chord>
-        </tip>
       </wing>
     </geometry>
     <propulsion>
@@ -440,6 +436,33 @@
             </sheath>
           </harness_1>
         </DC_cable_harness>
+        <PEMFC_stack>
+          <pemfc_stack_1>
+            <current_max units="A" is_input="True">600.0<!--Maximum current that the PEMFC stack has to provide during mission--></current_max>
+            <effective_area units="cm**2" is_input="False">857.1428571428572<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
+            <mass units="kg" is_input="False">107.30165421766272<!--Mass of the PEMFC stack--></mass>
+            <number_of_layers is_input="True">450.0<!--Total number of layers in the PEMFC stack--></number_of_layers>
+            <power_density units="kW/m**3" is_input="False">342.21051020599697</power_density>
+            <power_max units="kW" is_input="True">207.6<!--Maximum power of the PEMFC stack has to provide during the mission--></power_max>
+            <specific_power units="kW/kg" is_input="False">1.0545593112841516</specific_power>
+            <volume units="m**3" is_input="False">0.6066441380629518<!--Volume of the PEMFC stack--></volume>
+            <CG>
+              <x units="m" is_input="False">2.748717183742213<!--X position of the PEMFC stack center of gravity--></x>
+              <y units="m" is_input="False">0.0<!--Y position of the PEMFC stack center of gravity--></y>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <dimension>
+              <height units="m" is_input="False">0.627105109323885<!--Height of the PEMFC stack, as in the size of the PEMFC stack along the Z-axis--></height>
+              <length units="m" is_input="False">1.5426<!--Length of the PEMFC stack, as in the size of the PEMFC stack along the X-axis--></length>
+              <width units="m" is_input="False">0.627105109323885<!--Width of the PEMFC stack, as in the size of the PEMFC stack along the Y-axis--></width>
+            </dimension>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+          </pemfc_stack_1>
+        </PEMFC_stack>
         <PMSM>
           <motor_1>
             <diameter units="m" is_input="False">0.268</diameter>
@@ -486,51 +509,82 @@
             </scaling>
           </motor_1>
         </PMSM>
-        <battery_pack>
-          <battery_pack_1>
-            <SOC_min is_input="True">40.0<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <c_rate_max units="1/h" is_input="True">0.7<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
-            <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
-            <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <mass units="kg" is_input="False">3000.0<!--Mass of the battery pack--></mass>
-            <min_safe_SOC is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_cells is_input="False">30000.0<!--Total number of cells in the battery pack--></number_cells>
-            <number_modules is_input="True">200.0<!--Number of modules in parallel inside the battery pack--></number_modules>
-            <volume units="L" is_input="False">661.1249999999999<!--Volume of the battery pack--></volume>
+        <gaseous_hydrogen_tank>
+          <gaseous_hydrogen_tank_1>
+            <capacity units="kg" is_input="False">14.42<!--Capacity of the tank in terms of weight--></capacity>
+            <diameter_height_ratio is_input="True">0.9<!--Fraction between the tank outer diameter and fuselage height--></diameter_height_ratio>
+            <fuel_consumed_mission units="kg" is_input="True">14.0<!--Amount of hydrogen from that tank which will be consumed during mission--></fuel_consumed_mission>
+            <fuel_total_mission units="kg" is_input="False">14.42<!--Total amount of hydrogen loaded in the tank for the mission--></fuel_total_mission>
+            <gravimetric_index is_input="False">0.24853726138228946<!--Ratio between the maximum capacity and overall system weight--></gravimetric_index>
+            <inner_volume units="m**3" is_input="False">17.811703806932503<!--Capacity of the tank in terms of volume--></inner_volume>
+            <mass units="kg" is_input="False">43.59946927313956<!--Weight of the gaseous hydrogen tanks--></mass>
+            <number_of_tank is_input="True">1.0<!--Number of gaseous hydrogen tank in a stack in fuselage. Default set 1.0 for single tank in fuselage and outside fuselage uses.--></number_of_tank>
+            <safety_factor is_input="True">1.0<!--gaseous hydrogen tank design safety factor--></safety_factor>
+            <tank_pressure units="Pa" is_input="True">1013250.0<!--gaseous hydrogen tank static pressure--></tank_pressure>
+            <trapped_ratio is_input="True">0.03<!--Ratio between the hydrogen reactant pressure for fuel cell or the injection pressure for hydrogen engines and filling pressure of hydrogen tank--></trapped_ratio>
+            <unusable_fuel_mission units="kg" is_input="False">0.42<!--Amount of trapped hydrogen in the tank--></unusable_fuel_mission>
             <CG>
-              <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
-              <y units="m" is_input="False">1.5703687750797755<!--Y position of the battery center of gravity--></y>
-              <y_ratio is_input="True">0.34<!--X position of the battery center of gravity as a ratio of the wing half-span--></y_ratio>
+              <x units="m" is_input="False">3.5992344298155583<!--X position of the tank center of gravity--></x>
+              <y units="m" is_input="False">0.0<!--Y position of the tank center of gravity--></y>
             </CG>
-            <cell>
-              <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
-              <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
-              <volume units="L" is_input="False">0.01763<!--Volume of the cell used for the assembly of the battery pack--></volume>
-            </cell>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <dimension>
-              <height units="m" is_input="False">0.34981294356452425<!--Height of the battery, as in the size of the battery along the Z-axis--></height>
-              <length units="m" is_input="False">0.5114874519835109<!--Length of the battery, as in the size of the battery along the X-axis--></length>
-              <width units="m" is_input="False">3.6949853531288834<!--Width of the battery, as in the size of the battery along the Y-axis--></width>
+              <inner_diameter units="m" is_input="False">3.238451553429702<!--Inner diameter of the gaseous hydrogen tanks--></inner_diameter>
+              <length units="m" is_input="False">3.24363449214669<!--Value of the cylindrical length of the tank in the x-direction, computed differently based on the location of the tank.--></length>
+              <outer_diameter units="m" is_input="False">3.2401785855541823<!--Outer diameter of the gaseous hydrogen tank--></outer_diameter>
+              <rear_length_ratio is_input="True">0.5<!--The ratio between the usable length of the rear fuselage and the the whole rear fuselage length.--></rear_length_ratio>
+              <wall_thickness units="m" is_input="False">0.0008635160622401106<!--Inner diameter of the gaseous hydrogen tanks--></wall_thickness>
             </dimension>
-            <distributed_mass>
-              <chord_slope is_input="False">0.0<!--When battery is considered as a distributed mass, the rate at which the chord varies--></chord_slope>
-              <start_chord units="m" is_input="False">0.7672311779752663<!--When battery is considered as a distributed mass, the chord at the start--></start_chord>
-              <y_ratio_end is_input="False">0.74<!--When battery is considered as a distributed mass, the position of the end as a ratio of the half-span--></y_ratio_end>
-              <y_ratio_start is_input="False">-0.06<!--When battery is considered as a distributed mass, the position of the start as a ratio of the half-span--></y_ratio_start>
-            </distributed_mass>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
-            <module>
-              <mass units="kg" is_input="False">15.0<!--Mass of one module of the battery--></mass>
-              <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
-              <volume units="L" is_input="False">3.3056249999999996<!--Volume of one module of the battery--></volume>
-            </module>
-          </battery_pack_1>
-        </battery_pack>
+            <material>
+              <density units="kg/m**3" is_input="True">1530.0<!--Choice of the tank material,Some reference (in kg/m**3): Steel(ASTM-A514):7860, Aluminum(2014-T6):2800, Titanium(6%Al,4%V):4460, Carbon Composite:1530--></density>
+              <yield_strength units="Pa" is_input="True">1900000000.0<!--gaseous hydrogen tank material yield stress. Some reference (in MPa):Steel(ASTM-A514):690, Aluminum(2014-T6):410, Titanium(6%Al,4%V):825, Carbon Composite:1900--></yield_strength>
+            </material>
+          </gaseous_hydrogen_tank_1>
+        </gaseous_hydrogen_tank>
+        <h2_fuel_system>
+          <h2_fuel_system_1>
+            <mass units="kg" is_input="False">0.08357615058936613<!--Weight of the hydrogen fuel system--></mass>
+            <pipe_pressure units="Pa" is_input="True">1013250.0<!--hydrogen transport pressure--></pipe_pressure>
+            <relative_roughness is_input="False">0.0011250023748046874<!--Inner diameter of the hydrogen fuel system--></relative_roughness>
+            <safety_factor is_input="True">1.0<!--hydrogen fuel system design safety factor--></safety_factor>
+            <CG>
+              <x units="m" is_input="False">1.6080628878066596<!--X position of the hydrogen fuel system center of gravity--></x>
+              <y units="m" is_input="False">0.0<!--Y position of the ICE center of gravity--></y>
+              <y_ratio is_input="True">0.224<!--Y position of the power source center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <connection>
+              <front is_input="True">0.0<!--Number of front connections for the h2 fuel system--></front>
+              <near is_input="True">0.0<!--Number of near connections for the h2 fuel system--></near>
+              <rear is_input="True">1.0<!--Number of rear connections for the h2 fuel system--></rear>
+              <wing is_input="True">0.0<!--Number of wing connections for the h2 fuel system--></wing>
+            </connection>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <dimension>
+              <inner_diameter units="m" is_input="False">0.03999991556267824<!--Inner diameter of the hydrogen fuel system--></inner_diameter>
+              <insulation_thickness units="m" is_input="True">0.005<!--Pipe insulation layer thickness--></insulation_thickness>
+              <length units="m" is_input="False">0.7387085918711065<!--Total length of the h2 fuel system--></length>
+              <overall_diameter units="m" is_input="False">0.05<!--Overall diameter of the hydrogen fuel system--></overall_diameter>
+              <overall_wall_thickness units="m" is_input="False">0.00500004221866088<!--Overall wall thickness of the hydrogen fuel system--></overall_wall_thickness>
+              <pipe_diameter units="m" is_input="True">0.04<!--Pipe diameter of the hydrogen fuel system--></pipe_diameter>
+            </dimension>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+            <material>
+              <density units="kg/m**3" is_input="True">7700.0<!--pipe wall material yield stress. Some reference (in kg/m^3):Steel(306):7700, Aluminum(5083):2660, --></density>
+              <insulation_density units="kg/m**3" is_input="True">160.0</insulation_density>
+              <surface_irregularity units="mm" is_input="True">0.045<!--Pipe inner surface irregularity, the typical value of commercial or welded Steel is considered--></surface_irregularity>
+              <yield_strength units="Pa" is_input="True">240000000000.0<!--pipe wall material yield stress. Some reference (in MPa):Steel(306):240, Aluminum(5083):228, --></yield_strength>
+            </material>
+          </h2_fuel_system_1>
+        </h2_fuel_system>
         <inverter>
           <inverter_1>
             <current_ac_max units="A" is_input="True">400.0</current_ac_max>
@@ -715,14 +769,6 @@
             <voltage_caliber units="V" is_input="False">-285.16105407700354<!--Respected if <0--></voltage_caliber>
           </motor_1>
         </PMSM>
-        <battery_pack>
-          <battery_pack_1>
-            <min_safe_SOC units="percent" is_input="False">-20.0<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
-            <cell>
-              <max_c_rate units="percent" is_input="False">-1.7<!--Constraints on the maximum cell c_rate, respected if <0--></max_c_rate>
-            </cell>
-          </battery_pack_1>
-        </battery_pack>
         <DC_DC_converter>
           <dc_dc_converter_1>
             <inductor>
@@ -730,6 +776,13 @@
             </inductor>
           </dc_dc_converter_1>
         </DC_DC_converter>
+        <gaseous_hydrogen_tank>
+          <gaseous_hydrogen_tank_1>
+            <dimension>
+              <length units="m" is_input="False">0.41915375713244396<!--Constraints on the tank length w.r.t the cabin/rear_fuselage length,  respected if <0--></length>
+            </dimension>
+          </gaseous_hydrogen_tank_1>
+        </gaseous_hydrogen_tank>
         <inverter>
           <inverter_1>
             <inductor>
@@ -769,6 +822,12 @@
             <thickness units="m" is_input="True">0.0002</thickness>
           </shielding_tape>
         </DC_cable_harness>
+        <PEMFC_stack>
+          <pemfc_stack_1>
+            <k_mass is_input="True">1.0<!--A tuning factor allows the PEMFC stack weight to be changed manually.--></k_mass>
+            <k_volume is_input="True">1.0<!--A tuning factor allows the PEMFC stack volume to be changed manually.--></k_volume>
+          </pemfc_stack_1>
+        </PEMFC_stack>
         <DC_DC_converter>
           <dc_dc_converter_1>
             <inductor>

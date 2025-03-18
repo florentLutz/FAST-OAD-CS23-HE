@@ -1,0 +1,212 @@
+<FASTOAD_model>
+  <altitude units="m" is_input="True">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</altitude>
+  <density units="kg/m**3" is_input="True">[1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587, 1.2249908312368587]</density>
+  <exterior_temperature units="degK" is_input="True">[288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15]<!--temperature outside of the cable--></exterior_temperature>
+  <thrust units="N" is_input="True">[1550.0, 1538.888888888889, 1527.7777777777778, 1516.6666666666667, 1505.5555555555557, 1494.4444444444443, 1483.3333333333333, 1472.2222222222222, 1461.111111111111, 1450.0]</thrust>
+  <time_step units="s" is_input="True">[500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0]</time_step>
+  <true_airspeed units="m/s" is_input="True">[81.8, 82.76666666666667, 83.73333333333333, 84.7, 85.66666666666667, 86.63333333333333, 87.6, 88.56666666666666, 89.53333333333333, 90.5]</true_airspeed>
+  <data>
+    <propulsion>
+      <he_power_train>
+        <DC_DC_converter>
+          <dc_dc_converter_1>
+            <current_in_max units="A" is_input="False">594.9689303977257</current_in_max>
+            <losses_max units="W" is_input="False">5018.884891062073</losses_max>
+            <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
+            <voltage_in_max units="V" is_input="False">350.75546455506185</voltage_in_max>
+            <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
+            <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
+            <capacitor>
+              <current_max units="A" is_input="False">371.9875132350299</current_max>
+              <resistance units="ohm" is_input="True">0.0014</resistance>
+            </capacitor>
+            <diode>
+              <current_max units="A" is_input="False">441.79067603677424</current_max>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+              <resistance units="ohm" is_input="True">0.002805</resistance>
+            </diode>
+            <energy_off>
+              <a is_input="True">0.02261044</a>
+              <b is_input="True">0.000254</b>
+              <c is_input="True">-1.158e-07</c>
+            </energy_off>
+            <energy_on>
+              <a is_input="True">0.02379429</a>
+              <b is_input="True">3.326e-05</b>
+              <c is_input="True">3.42e-07</c>
+            </energy_on>
+            <energy_rr>
+              <a is_input="True">0.00637224</a>
+              <b is_input="True">0.00034</b>
+              <c is_input="True">-3.005e-08</c>
+            </energy_rr>
+            <igbt>
+              <current_max units="A" is_input="False">689.5318546539162</current_max>
+              <resistance units="ohm" is_input="True">0.002265</resistance>
+            </igbt>
+            <inductor>
+              <current_max units="A" is_input="False">818.9219621035325</current_max>
+              <resistance units="ohm" is_input="True">0.0014</resistance>
+            </inductor>
+          </dc_dc_converter_1>
+        </DC_DC_converter>
+        <DC_SSPC>
+          <dc_sspc_1337>
+            <current_max units="A" is_input="False">238.3365088068727<!--Maximum current flowing through the SSPC--></current_max>
+            <efficiency is_input="True">0.99<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+            <voltage_max units="V" is_input="False">850.0<!--Maximum voltage at the terminals SSPC--></voltage_max>
+          </dc_sspc_1337>
+          <dc_sspc_1>
+            <current_max units="A" is_input="False">238.3365088068727<!--Maximum current flowing through the SSPC--></current_max>
+            <efficiency is_input="True">0.99<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+            <voltage_max units="V" is_input="False">832.3014472590912<!--Maximum voltage at the terminals SSPC--></voltage_max>
+          </dc_sspc_1>
+          <dc_sspc_2>
+            <current_max units="A" is_input="False">238.33650758495713<!--Maximum current flowing through the SSPC--></current_max>
+            <efficiency is_input="True">0.99<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+            <voltage_max units="V" is_input="False">841.5<!--Maximum voltage at the terminals SSPC--></voltage_max>
+          </dc_sspc_2>
+          <dc_sspc_412>
+            <current_max units="A" is_input="False">238.3365088068727<!--Maximum current flowing through the SSPC--></current_max>
+            <efficiency is_input="True">0.99<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+            <voltage_max units="V" is_input="False">823.9784327865003<!--Maximum voltage at the terminals SSPC--></voltage_max>
+          </dc_sspc_412>
+        </DC_SSPC>
+        <DC_bus>
+          <dc_bus_1>
+            <current_max units="A" is_input="False">238.3365088068727</current_max>
+            <voltage_max units="V" is_input="False">823.9784327865003</voltage_max>
+          </dc_bus_1>
+          <dc_bus_2>
+            <current_max units="A" is_input="False">238.3365088068727</current_max>
+            <voltage_max units="V" is_input="False">841.5</voltage_max>
+          </dc_bus_2>
+        </DC_bus>
+        <DC_cable_harness>
+          <harness_1>
+            <current_max units="A" is_input="False">238.33650758495713<!--Maximum current flowing through the harness, all cables included--></current_max>
+            <length units="m" is_input="True">7.0</length>
+            <losses_max units="W" is_input="False">195.66430401590037<!--Maximum losses in one cable of the harness--></losses_max>
+            <number_cables is_input="True">1.0</number_cables>
+            <temperature_max units="degK" is_input="False">301.90179561526423</temperature_max>
+            <voltage_max units="V" is_input="False">833.085</voltage_max>
+            <cable>
+              <radius units="mm" is_input="True">6.47</radius>
+              <resistance units="ohm" is_input="True">0.00333</resistance>
+            </cable>
+            <properties>
+              <resistance_temperature_scale_factor units="1/degK" is_input="True">0.00393</resistance_temperature_scale_factor>
+            </properties>
+          </harness_1>
+        </DC_cable_harness>
+        <PEMFC_stack>
+          <pemfc_stack_1>
+            <area_ohmic_resistance units="ohm*cm**2" is_input="True">0.24<!--Area ohmic resistance of the single-layered PEMFC--></area_ohmic_resistance>
+            <current_max units="A" is_input="False">594.9689303977257<!--Maximum current the PEMFC stack has to provide during mission--></current_max>
+            <effective_area units="cm**2" is_input="True">2000.0<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
+            <nominal_pressure units="atm" is_input="True">1.0<!--The nominal pressure at which the PEMFC stack operates.--></nominal_pressure>
+            <number_of_layers is_input="True">450.0<!--Total number of layers in the PEMFC stack--></number_of_layers>
+            <power_max units="kW" is_input="False">207.60491737652492<!--Maximum power of the PEMFC stack has to provide during the mission--></power_max>
+          </pemfc_stack_1>
+        </PEMFC_stack>
+        <PMSM>
+          <motor_1>
+            <current_ac_max units="A" is_input="False">186.98174220313672<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
+            <losses_max units="W" is_input="False">17837.99831258149</losses_max>
+            <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the motor rpm--></rpm_max>
+            <shaft_power_max units="W" is_input="False">171526.7765569521</shaft_power_max>
+            <torque_constant units="N*m/A" is_input="True">1.46</torque_constant>
+            <torque_max units="N*m" is_input="False">818.9800308497388<!--Maximum value of the torque the motor has to provide--></torque_max>
+            <voltage_ac_max units="V" is_input="False">413.4513065482845<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
+            <loss_coefficient>
+              <alpha units="W/N**2/m**2" is_input="True">0.025</alpha>
+              <beta units="W*s/rad" is_input="True">3.38</beta>
+              <gamma units="W*s**2/rad**2" is_input="True">0.00825</gamma>
+            </loss_coefficient>
+          </motor_1>
+        </PMSM>
+        <gaseous_hydrogen_tank>
+          <gaseous_hydrogen_tank_1>
+            <fuel_consumed_mission units="kg" is_input="False">13.556743268750669<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
+          </gaseous_hydrogen_tank_1>
+        </gaseous_hydrogen_tank>
+        <h2_fuel_system>
+          <h2_fuel_system_1>
+            <fuel_distribution is_input="True">1.0</fuel_distribution>
+            <number_source is_input="False">1.0<!--Number of power source connected to this hydrogen fuel system--></number_source>
+            <total_fuel_flowed units="kg" is_input="False">13.55674326875067<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
+          </h2_fuel_system_1>
+        </h2_fuel_system>
+        <inverter>
+          <inverter_1>
+            <current_ac_max units="A" is_input="False">186.98174220313672<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
+            <current_dc_max units="A" is_input="False">238.3365088068727<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
+            <losses_max units="W" is_input="False">5046.78903275565</losses_max>
+            <modulation_idx_max is_input="False">0.5068656359036223<!--Maximum modulation index during the mission--></modulation_idx_max>
+            <power_factor is_input="True">1.0</power_factor>
+            <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
+            <voltage_ac_max units="V" is_input="False">413.4513065482845<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
+            <voltage_dc_max units="V" is_input="False">815.7386484586353<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
+            <casing>
+              <temperature_max units="degK" is_input="False">304.9726301091855</temperature_max>
+              <thermal_resistance units="degK/W" is_input="True">0.01<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
+            </casing>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+              <resistance units="ohm" is_input="True">0.00258995</resistance>
+              <temperature_max units="degK" is_input="False">349.83973787822964</temperature_max>
+              <thermal_resistance units="degK/W" is_input="True">0.148195<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
+            </diode>
+            <energy_off>
+              <a is_input="True">0.02087697</a>
+              <b is_input="True">0.000254</b>
+              <c is_input="True">-1.256e-07</c>
+            </energy_off>
+            <energy_on>
+              <a is_input="True">0.02197006</a>
+              <b is_input="True">3.326e-05</b>
+              <c is_input="True">3.707e-07</c>
+            </energy_on>
+            <energy_rr>
+              <a is_input="True">0.0058837</a>
+              <b is_input="True">0.00034</b>
+              <c is_input="True">-3.257e-08</c>
+            </energy_rr>
+            <igbt>
+              <gate_voltage units="V" is_input="True">0.87</gate_voltage>
+              <resistance units="ohm" is_input="True">0.00209135</resistance>
+              <temperature_max units="degK" is_input="False">366.8614448909325</temperature_max>
+              <thermal_resistance units="degK/W" is_input="True">0.114955<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
+            </igbt>
+            <properties>
+              <resistance_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">0.0033</diode>
+                <igbt units="1/degK" is_input="True">0.0041</igbt>
+              </resistance_temperature_scale_factor>
+              <voltage_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">-0.0022</diode>
+                <igbt units="1/degK" is_input="True">-0.00105</igbt>
+              </voltage_temperature_scale_factor>
+            </properties>
+          </inverter_1>
+        </inverter>
+        <propeller>
+          <propeller_1>
+            <activity_factor is_input="True">150.0<!--Activity factor of the propeller--></activity_factor>
+            <advance_ratio_max is_input="False">1.37038158691702<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
+            <blade_twist units="deg" is_input="True">22.6<!--Twist between the propeller blade root and tip--></blade_twist>
+            <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
+            <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the propeller rpm--></rpm_max>
+            <rpm_mission is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
+            <tip_mach_max is_input="False">0.44243515198268096<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
+            <torque_max units="N*m" is_input="False">818.9800308497388<!--Maximum value of the propeller torque--></torque_max>
+          </propeller_1>
+        </propeller>
+      </he_power_train>
+    </propulsion>
+  </data>
+</FASTOAD_model>

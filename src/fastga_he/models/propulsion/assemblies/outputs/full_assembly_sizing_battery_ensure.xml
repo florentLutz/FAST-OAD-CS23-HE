@@ -32,6 +32,8 @@
       </flap>
       <fuselage>
         <front_length units="m" is_input="True">0.5<!--length of the front cone of the aircraft--></front_length>
+        <maximum_height units="m" is_input="True">nan<!--maximum height of the fuselage--></maximum_height>
+        <rear_length units="m" is_input="True">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
       </fuselage>
       <wing>
         <area units="m**2" is_input="True">7.105673586278243<!--wing area--></area>
@@ -42,31 +44,25 @@
             <x units="m" is_input="True">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
           </at25percent>
         </MAC>
-        <root>
-          <chord units="m" is_input="True">0.7672311779752663<!--chord length at wing root--></chord>
-        </root>
-        <tip>
-          <chord units="m" is_input="True">0.7672311779752663<!--chord length at wing tip--></chord>
-        </tip>
       </wing>
     </geometry>
     <propulsion>
       <he_power_train>
         <DC_DC_converter>
           <dc_dc_converter_1>
-            <current_in_caliber units="A" is_input="False">382.90796876097284<!--Current caliber of one arm of the DC/DC converter--></current_in_caliber>
-            <current_in_max units="A" is_input="False">382.92768807591114</current_in_max>
+            <current_in_caliber units="A" is_input="False">678.8718945844383<!--Current caliber of one arm of the DC/DC converter--></current_in_caliber>
+            <current_in_max units="A" is_input="False">682.5227780771647</current_in_max>
             <current_ripple is_input="True">0.1<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
-            <dissipable_heat units="W" is_input="False">3147.6859389129013<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
-            <losses_max units="W" is_input="False">3156.1067733090717</losses_max>
-            <mass units="kg" is_input="False">517.6023713688235<!--Mass of the converter--></mass>
-            <power_density units="kW/kg" is_input="False">0.44909109558159294<!--Power density of the DC/DC converter--></power_density>
+            <dissipable_heat units="W" is_input="False">4692.539640097112<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
+            <losses_max units="W" is_input="False">4728.962426915104</losses_max>
+            <mass units="kg" is_input="False">917.048414813573<!--Mass of the converter--></mass>
+            <power_density units="kW/kg" is_input="False">0.22385764149752968<!--Power density of the DC/DC converter--></power_density>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT module in the converter--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_caliber units="V" is_input="False">850.0<!--Voltage caliber of the converter--></voltage_caliber>
-            <voltage_in_caliber units="V" is_input="False">607.0665407821816</voltage_in_caliber>
-            <voltage_in_max units="V" is_input="False">607.0661362005379</voltage_in_max>
+            <voltage_in_caliber units="V" is_input="False">302.39622072567755</voltage_in_caliber>
+            <voltage_in_max units="V" is_input="False">300.49035890981105</voltage_in_max>
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
             <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
@@ -77,25 +73,25 @@
             </CG>
             <capacitor>
               <aspect_ratio units="A" is_input="True">2.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
-              <capacity units="F" is_input="False">0.0003603235284669443<!--Capacity of the capacitor--></capacity>
-              <current_caliber units="A" is_input="False">294.0239992290266<!--Current caliber of the DC/DC converter--></current_caliber>
-              <current_max units="A" is_input="False">294.02541838732634</current_max>
-              <diameter units="mm" is_input="False">89.6549361885237<!--Diameter of the capacitor--></diameter>
-              <height units="mm" is_input="False">179.3098723770474<!--Diameter of the capacitor--></height>
-              <mass units="kg" is_input="False">1.3948007553559139<!--Capacitor's mass--></mass>
-              <resistance units="ohm" is_input="False">0.003981086067622633<!--Capacitor's resistance--></resistance>
-              <thermal_resistance units="degK/W" is_input="False">3.073601903220223<!--Capacitor's thermal resistance--></thermal_resistance>
+              <capacity units="F" is_input="False">0.00047791752173502894<!--Capacity of the capacitor--></capacity>
+              <current_caliber units="A" is_input="False">389.9806977357836<!--Current caliber of the DC/DC converter--></current_caliber>
+              <current_max units="A" is_input="False">390.992397426788</current_max>
+              <diameter units="mm" is_input="False">98.50561413267262<!--Diameter of the capacitor--></diameter>
+              <height units="mm" is_input="False">197.01122826534524<!--Diameter of the capacitor--></height>
+              <mass units="kg" is_input="False">1.8500033099420479<!--Capacitor's mass--></mass>
+              <resistance units="ohm" is_input="False">0.003297828086321118<!--Capacitor's resistance--></resistance>
+              <thermal_resistance units="degK/W" is_input="False">2.797440378687355<!--Capacitor's thermal resistance--></thermal_resistance>
               <scaling>
-                <capacity is_input="False">0.3603235284669443<!--Scaling factor for the capacitor capacity--></capacity>
-                <diameter is_input="False">0.896549361885237<!--Scaling factor for the capacitor diameter--></diameter>
-                <height is_input="False">1.1568378863035318<!--Scaling factor for the capacitor height--></height>
-                <mass is_input="False">0.9298671702372759<!--Scaling factor for the capacitor mass--></mass>
-                <resistance is_input="False">1.2440893961320727<!--Scaling factor for the capacitor resistance--></resistance>
-                <thermal_resistance is_input="False">1.0245339677400744<!--Scaling factor for the capacitor thermal resistance--></thermal_resistance>
+                <capacity is_input="False">0.477917521735029<!--Scaling factor for the capacitor capacity--></capacity>
+                <diameter is_input="False">0.9850561413267261<!--Scaling factor for the capacitor diameter--></diameter>
+                <height is_input="False">1.271040182357066<!--Scaling factor for the capacitor height--></height>
+                <mass is_input="False">1.2333355399613652<!--Scaling factor for the capacitor mass--></mass>
+                <resistance is_input="False">1.0305712769753492<!--Scaling factor for the capacitor resistance--></resistance>
+                <thermal_resistance is_input="False">0.9324801262291184<!--Scaling factor for the capacitor thermal resistance--></thermal_resistance>
               </scaling>
             </capacitor>
             <contactor>
-              <mass units="kg" is_input="False">1.484506271363508<!--Mass of the contactor--></mass>
+              <mass units="kg" is_input="False">2.209149016978341<!--Mass of the contactor--></mass>
             </contactor>
             <control_card>
               <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
@@ -104,37 +100,37 @@
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <diode>
-              <current_max units="A" is_input="False">372.9385008051954</current_max>
+              <current_max units="A" is_input="False">453.3290566139918</current_max>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
-              <resistance units="ohm" is_input="False">0.0017606009143355317</resistance>
+              <resistance units="ohm" is_input="False">0.0010941059763957537</resistance>
             </diode>
             <energy_off>
-              <a is_input="False">0.014191787974418292</a>
+              <a is_input="False">0.008819329759585298</a>
               <b is_input="False">0.0002539092853205021</b>
-              <c is_input="False">-1.847118341314928e-07</c>
+              <c is_input="False">-2.9723247206070324e-07</c>
             </energy_off>
             <energy_on>
-              <a is_input="False">0.014934845063331552</a>
+              <a is_input="False">0.00928109437368017</a>
               <b is_input="False">3.3256504177779456e-05</b>
-              <c is_input="False">5.453733267309908e-07</c>
+              <c is_input="False">8.775975987809436e-07</c>
             </energy_on>
             <energy_rr>
-              <a is_input="False">0.003999633086352199</a>
+              <a is_input="False">0.0024855277692614904</a>
               <b is_input="False">0.00034030311012866587</b>
-              <c is_input="False">-4.7919960791784564e-08</c>
+              <c is_input="False">-7.711129324315257e-08</c>
             </energy_rr>
             <heat_sink>
               <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
-              <height units="m" is_input="False">0.004468320509140018<!--Height of the heat sink--></height>
+              <height units="m" is_input="False">0.00440007599200575<!--Height of the heat sink--></height>
               <length units="m" is_input="False">0.07150000000000001<!--Length of the heat sink--></length>
-              <mass units="kg" is_input="False">0.16991207079578521<!--Mass of the heat sink, includes tubes and core--></mass>
+              <mass units="kg" is_input="False">0.21421711717556413<!--Mass of the heat sink, includes tubes and core--></mass>
               <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
-              <width units="m" is_input="False">0.18005613247505184<!--Width of the heat sink--></width>
+              <width units="m" is_input="False">0.23546374670718004<!--Width of the heat sink--></width>
               <coolant>
                 <Prandtl_number is_input="False">39.493034825870645<!--Prandtl number of the coolant--></Prandtl_number>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <max_mass_flow units="m**3/s" is_input="False">2.9745774307528106e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
+                <max_mass_flow units="m**3/s" is_input="False">4.4344711566639e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
                 <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
                 <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
@@ -142,56 +138,56 @@
               </coolant>
               <tube>
                 <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
-                <inner_diameter units="m" is_input="False">0.00047888033942667876<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
+                <inner_diameter units="m" is_input="False">0.00043338399467049974<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
                 <length units="m" is_input="False">0.28600000000000003<!--Length of the tube which is useful for the cooling of the inverter--></length>
-                <mass units="kg" is_input="False">0.019975759226602958<!--Wieght of the tube for the cooling of the inverter--></mass>
-                <outer_diameter units="m" is_input="False">0.0029788803394266788<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
+                <mass units="kg" is_input="False">0.019424689248438216<!--Wieght of the tube for the cooling of the inverter--></mass>
+                <outer_diameter units="m" is_input="False">0.0029333839946705<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
                 <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
               </tube>
             </heat_sink>
             <igbt>
-              <current_max units="A" is_input="False">477.965360503491</current_max>
-              <resistance units="ohm" is_input="False">0.0014216617008805633</resistance>
+              <current_max units="A" is_input="False">772.6026534736461</current_max>
+              <resistance units="ohm" is_input="False">0.0008834759488543252</resistance>
             </igbt>
             <inductor>
               <air_gap units="mm" is_input="True">10.0<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">8.973114017847339<!--Mass of the copper in the inductor--></copper_mass>
-              <core_mass units="kg" is_input="False">252.10692676469674<!--Mass of the E-core in the inductor--></core_mass>
-              <current_caliber units="A" is_input="False">606.242290917623<!--Current caliber of the DC/DC converter--></current_caliber>
-              <current_max units="A" is_input="False">606.2458339849098</current_max>
-              <inductance units="H" is_input="False">0.0005841998685551801<!--Inductance of the inductor--></inductance>
-              <iron_surface units="m**2" is_input="False">0.04719343633839145<!--Iron surface of the E-core inductor--></iron_surface>
-              <magnetic_energy_rating units="J" is_input="False">107.35540568332905<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
+              <copper_mass units="kg" is_input="False">10.886402502297164<!--Mass of the copper in the inductor--></copper_mass>
+              <core_mass units="kg" is_input="False">450.2029972121426<!--Mass of the E-core in the inductor--></core_mass>
+              <current_caliber units="A" is_input="False">892.3364463019116<!--Current caliber of the DC/DC converter--></current_caliber>
+              <current_max units="A" is_input="False">895.7801592606585</current_max>
+              <inductance units="H" is_input="False">0.000396898129774292<!--Inductance of the inductor--></inductance>
+              <iron_surface units="m**2" is_input="False">0.06946467427607755<!--Iron surface of the E-core inductor--></iron_surface>
+              <magnetic_energy_rating units="J" is_input="False">158.0179123659635<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
-              <mass units="kg" is_input="False">513.1869675472408<!--Mass of the inductor--></mass>
-              <reluctance units="1/H" is_input="False">96403.03588468787<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.0013850625934190058<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">7.504574664306763<!--Number of turns in the inductor--></turn_number>
+              <mass units="kg" is_input="False">911.2923969265823<!--Mass of the inductor--></mass>
+              <reluctance units="1/H" is_input="False">65495.02440290697<!--Reluctance of the inductor--></reluctance>
+              <resistance units="ohm" is_input="False">0.0007756142805932173<!--Resistance of the inductor--></resistance>
+              <turn_number is_input="False">5.098514753831295<!--Number of turns in the inductor--></turn_number>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
-              <wire_section_area units="m**2" is_input="False">0.0001212484581835246<!--Section area of the copper wire inside the inductor--></wire_section_area>
+              <wire_section_area units="m**2" is_input="False">0.0001784672892603823<!--Section area of the copper wire inside the inductor--></wire_section_area>
               <core_dimension>
-                <B units="m" is_input="False">0.5849610511614454<!--B dimension of the E-core in the inductor--></B>
-                <C units="m" is_input="False">0.2199101696095659<!--C dimension of the E-core in the inductor--></C>
+                <B units="m" is_input="False">0.7096891267005275<!--B dimension of the E-core in the inductor--></B>
+                <C units="m" is_input="False">0.26680042357162687<!--C dimension of the E-core in the inductor--></C>
               </core_dimension>
               <scaling>
-                <core_dimension is_input="False">7.9967334403478505<!--Scaling factor for the dimensions of the E-core--></core_dimension>
-                <core_mass is_input="False">511.3730766018189<!--Scaling factor for the mass of the E-core--></core_mass>
+                <core_dimension is_input="False">9.701833584422795<!--Scaling factor for the dimensions of the E-core--></core_dimension>
+                <core_mass is_input="False">913.1906637163136<!--Scaling factor for the mass of the E-core--></core_mass>
               </scaling>
             </inductor>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <module>
-              <current_caliber units="A" is_input="False">477.9618101684279<!--Current caliber of the DC/DC converter--></current_caliber>
+              <current_caliber units="A" is_input="False">769.1211072368893<!--Current caliber of the DC/DC converter--></current_caliber>
               <height units="m" is_input="False">0.021<!--Height of one module--></height>
-              <length units="m" is_input="False">0.16368739315913802<!--Length of one module--></length>
-              <mass units="kg" is_input="False">0.3661847240673711<!--Weight of the diode and IGBT module--></mass>
+              <length units="m" is_input="False">0.21405795155198185<!--Length of one module--></length>
+              <mass units="kg" is_input="False">0.4826484428947557<!--Weight of the diode and IGBT module--></mass>
               <width units="m" is_input="False">0.065<!--Width of one module--></width>
             </module>
             <scaling>
-              <a is_input="False">0.9414978151526908</a>
-              <c is_input="False">1.0621373559298397</c>
-              <resistance is_input="False">0.9414978151526908</resistance>
+              <a is_input="False">0.5850834098373014</a>
+              <c is_input="False">1.7091580160819762</c>
+              <resistance is_input="False">0.5850834098373014</resistance>
             </scaling>
             <tube>
               <number_of_passes is_input="True">4.0<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
@@ -451,6 +447,35 @@
             </sheath>
           </harness_1>
         </DC_cable_harness>
+        <PEMFC_stack>
+          <pemfc_stack_1>
+            <area_ohmic_resistance units="ohm*cm**2" is_input="True">0.24<!--Area ohmic resistance of the single-layered PEMFC--></area_ohmic_resistance>
+            <current_max units="A" is_input="False">682.5227780771647<!--Maximum current the PEMFC stack has to provide during mission--></current_max>
+            <effective_area units="cm**2" is_input="False">969.8169922634834<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
+            <mass units="kg" is_input="False">121.78554525678685<!--Mass of the PEMFC stack--></mass>
+            <nominal_pressure units="atm" is_input="True">1.0<!--The nominal pressure at which the PEMFC stack operates.--></nominal_pressure>
+            <number_of_layers is_input="True">450.0<!--Total number of layers in the PEMFC stack--></number_of_layers>
+            <power_density units="kW/m**3" is_input="False">341.44140291104117</power_density>
+            <power_max units="kW" is_input="False">199.7334473209843<!--Maximum power of the PEMFC stack has to provide during the mission--></power_max>
+            <specific_power units="kW/kg" is_input="False">1.0512796601727383</specific_power>
+            <volume units="m**3" is_input="False">0.584864334894176<!--Volume of the PEMFC stack--></volume>
+            <CG>
+              <x units="m" is_input="False">2.748717183742213<!--X position of the PEMFC stack center of gravity--></x>
+              <y units="m" is_input="False">0.0<!--Y position of the PEMFC stack center of gravity--></y>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <dimension>
+              <height units="m" is_input="False">0.6157450169514505<!--Height of the PEMFC stack, as in the size of the PEMFC stack along the Z-axis--></height>
+              <length units="m" is_input="False">1.5426<!--Length of the PEMFC stack, as in the size of the PEMFC stack along the X-axis--></length>
+              <width units="m" is_input="False">0.6157450169514505<!--Width of the PEMFC stack, as in the size of the PEMFC stack along the Y-axis--></width>
+            </dimension>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+          </pemfc_stack_1>
+        </PEMFC_stack>
         <PMSM>
           <motor_1>
             <current_ac_max units="A" is_input="False">741.0665236737296<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
@@ -499,56 +524,85 @@
             </scaling>
           </motor_1>
         </PMSM>
-        <battery_pack>
-          <battery_pack_1>
-            <SOC_min units="percent" is_input="False">35.11727665737709<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <c_rate_max units="1/h" is_input="False">0.5715338627998674<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
-            <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
-            <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
-            <cell_weight_fraction is_input="True">0.5<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <mass units="kg" is_input="False">3000.0<!--Mass of the battery pack--></mass>
-            <min_safe_SOC is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
-            <number_cells is_input="False">30000.0<!--Total number of cells in the battery pack--></number_cells>
-            <number_modules is_input="True">200.0<!--Number of modules in parallel inside the battery pack--></number_modules>
-            <volume units="L" is_input="False">661.1249999999999<!--Volume of the battery pack--></volume>
+        <gaseous_hydrogen_tank>
+          <gaseous_hydrogen_tank_1>
+            <capacity units="kg" is_input="False">15.759114229869668<!--Capacity of the tank in terms of weight--></capacity>
+            <diameter_height_ratio is_input="True">0.9<!--Fraction between the tank outer diameter and fuselage height--></diameter_height_ratio>
+            <fuel_consumed_mission units="kg" is_input="False">15.418620602510641<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
+            <fuel_total_mission units="kg" is_input="False">15.759114229869668<!--Total amount of hydrogen loaded in the tank for the mission--></fuel_total_mission>
+            <gravimetric_index is_input="False">0.2485372613822923<!--Ratio between the maximum capacity and overall system weight--></gravimetric_index>
+            <inner_volume units="m**3" is_input="False">19.465788829546028<!--Capacity of the tank in terms of volume--></inner_volume>
+            <mass units="kg" is_input="False">47.64833679868854<!--Weight of the gaseous hydrogen tanks--></mass>
+            <number_of_tank is_input="True">1.0<!--Number of gaseous hydrogen tank in a stack in fuselage. Default set 1.0 for single tank in fuselage and outside fuselage uses.--></number_of_tank>
+            <safety_factor is_input="True">1.0<!--gaseous hydrogen tank design safety factor--></safety_factor>
+            <tank_pressure units="Pa" is_input="True">1013250.0<!--gaseous hydrogen tank static pressure--></tank_pressure>
+            <trapped_ratio is_input="True">0.03<!--Ratio between the hydrogen reactant pressure for fuel cell or the injection pressure for hydrogen engines and filling pressure of hydrogen tank--></trapped_ratio>
+            <unusable_fuel_mission units="kg" is_input="False">0.45900332708358255<!--Amount of trapped hydrogen in the tank--></unusable_fuel_mission>
             <CG>
-              <x units="m" is_input="False">2.8846643019251306<!--X position of the battery center of gravity--></x>
-              <y units="m" is_input="False">1.5703687750797755<!--Y position of the battery center of gravity--></y>
-              <y_ratio is_input="True">0.34<!--X position of the battery center of gravity as a ratio of the wing half-span--></y_ratio>
+              <x units="m" is_input="False">3.6479592981364553<!--X position of the tank center of gravity--></x>
+              <y units="m" is_input="False">0.0<!--Y position of the tank center of gravity--></y>
             </CG>
-            <cell>
-              <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
-              <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">0.17651801711657483<!--Minimum state-of-charge of the battery during the mission--></losses_max>
-              <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
-              <voltage_max units="V" is_input="False">4.047107574670252<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">3.4499218840868138<!--Minimum voltage provided by the cells during the mission--></voltage_min>
-              <volume units="L" is_input="False">0.01763<!--Volume of the cell used for the assembly of the battery pack--></volume>
-            </cell>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <dimension>
-              <height units="m" is_input="False">0.34981294356452425<!--Height of the battery, as in the size of the battery along the Z-axis--></height>
-              <length units="m" is_input="False">0.5114874519835109<!--Length of the battery, as in the size of the battery along the X-axis--></length>
-              <width units="m" is_input="False">3.6949853531288834<!--Width of the battery, as in the size of the battery along the Y-axis--></width>
+              <inner_diameter units="m" is_input="False">3.3357455770852695<!--Inner diameter of the gaseous hydrogen tanks--></inner_diameter>
+              <length units="m" is_input="False">3.341084228788484<!--Value of the cylindrical length of the tank in the x-direction, computed differently based on the location of the tank.--></length>
+              <outer_diameter units="m" is_input="False">3.3375244950884175<!--Outer diameter of the gaseous hydrogen tank--></outer_diameter>
+              <rear_length_ratio is_input="True">0.5<!--The ratio between the usable length of the rear fuselage and the the whole rear fuselage length.--></rear_length_ratio>
+              <wall_thickness units="m" is_input="False">0.000889459001574<!--Inner diameter of the gaseous hydrogen tanks--></wall_thickness>
             </dimension>
-            <distributed_mass>
-              <chord_slope is_input="False">0.0<!--When battery is considered as a distributed mass, the rate at which the chord varies--></chord_slope>
-              <start_chord units="m" is_input="False">0.7672311779752663<!--When battery is considered as a distributed mass, the chord at the start--></start_chord>
-              <y_ratio_end is_input="False">0.74<!--When battery is considered as a distributed mass, the position of the end as a ratio of the half-span--></y_ratio_end>
-              <y_ratio_start is_input="False">-0.06<!--When battery is considered as a distributed mass, the position of the start as a ratio of the half-span--></y_ratio_start>
-            </distributed_mass>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
-            <module>
-              <mass units="kg" is_input="False">15.0<!--Mass of one module of the battery--></mass>
-              <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
-              <volume units="L" is_input="False">3.3056249999999996<!--Volume of one module of the battery--></volume>
-            </module>
-          </battery_pack_1>
-        </battery_pack>
+            <material>
+              <density units="kg/m**3" is_input="True">1530.0<!--Choice of the tank material,Some reference (in kg/m**3): Steel(ASTM-A514):7860, Aluminum(2014-T6):2800, Titanium(6%Al,4%V):4460, Carbon Composite:1530--></density>
+              <yield_strength units="Pa" is_input="True">1900000000.0<!--gaseous hydrogen tank material yield stress. Some reference (in MPa):Steel(ASTM-A514):690, Aluminum(2014-T6):410, Titanium(6%Al,4%V):825, Carbon Composite:1900--></yield_strength>
+            </material>
+          </gaseous_hydrogen_tank_1>
+        </gaseous_hydrogen_tank>
+        <h2_fuel_system>
+          <h2_fuel_system_1>
+            <fuel_distribution is_input="True">1.0</fuel_distribution>
+            <mass units="kg" is_input="False">0.08357615058936613<!--Weight of the hydrogen fuel system--></mass>
+            <number_source is_input="False">1.0<!--Number of power source connected to this hydrogen fuel system--></number_source>
+            <pipe_pressure units="Pa" is_input="True">1013250.0<!--hydrogen transport pressure--></pipe_pressure>
+            <relative_roughness is_input="False">0.0011250023748046874<!--Inner diameter of the hydrogen fuel system--></relative_roughness>
+            <safety_factor is_input="True">1.0<!--hydrogen fuel system design safety factor--></safety_factor>
+            <total_fuel_flowed units="kg" is_input="False">15.418620602510641<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
+            <CG>
+              <x units="m" is_input="False">1.6080628878066596<!--X position of the hydrogen fuel system center of gravity--></x>
+              <y units="m" is_input="False">0.0<!--Y position of the ICE center of gravity--></y>
+              <y_ratio is_input="True">0.224<!--Y position of the power source center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <connection>
+              <front is_input="True">0.0<!--Number of front connections for the h2 fuel system--></front>
+              <near is_input="True">0.0<!--Number of near connections for the h2 fuel system--></near>
+              <rear is_input="True">1.0<!--Number of rear connections for the h2 fuel system--></rear>
+              <wing is_input="True">0.0<!--Number of wing connections for the h2 fuel system--></wing>
+            </connection>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <dimension>
+              <inner_diameter units="m" is_input="False">0.03999991556267824<!--Inner diameter of the hydrogen fuel system--></inner_diameter>
+              <insulation_thickness units="m" is_input="True">0.005<!--Pipe insulation layer thickness--></insulation_thickness>
+              <length units="m" is_input="False">0.7387085918711065<!--Total length of the h2 fuel system--></length>
+              <overall_diameter units="m" is_input="False">0.05<!--Overall diameter of the hydrogen fuel system--></overall_diameter>
+              <overall_wall_thickness units="m" is_input="False">0.00500004221866088<!--Overall wall thickness of the hydrogen fuel system--></overall_wall_thickness>
+              <pipe_diameter units="m" is_input="True">0.04<!--Pipe diameter of the hydrogen fuel system--></pipe_diameter>
+            </dimension>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+            <material>
+              <density units="kg/m**3" is_input="True">7700.0<!--pipe wall material yield stress. Some reference (in kg/m^3):Steel(306):7700, Aluminum(5083):2660, --></density>
+              <insulation_density units="kg/m**3" is_input="True">160.0</insulation_density>
+              <surface_irregularity units="mm" is_input="True">0.045<!--Pipe inner surface irregularity, the typical value of commercial or welded Steel is considered--></surface_irregularity>
+              <yield_strength units="Pa" is_input="True">240000000000.0<!--pipe wall material yield stress. Some reference (in MPa):Steel(306):240, Aluminum(5083):228, --></yield_strength>
+            </material>
+          </h2_fuel_system_1>
+        </h2_fuel_system>
         <inverter>
           <inverter_1>
             <current_ac_max units="A" is_input="False">741.0665236737296<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
@@ -751,22 +805,6 @@
         </propeller>
       </he_power_train>
     </propulsion>
-    <LCA>
-      <operation>
-        <he_power_train>
-          <battery_pack>
-            <battery_pack_1>
-              <CO units="g" is_input="False">0.0</CO>
-              <CO2 units="g" is_input="False">0.0</CO2>
-              <H2O units="g" is_input="False">0.0</H2O>
-              <HC units="g" is_input="False">0.0</HC>
-              <NOx units="g" is_input="False">0.0</NOx>
-              <SOx units="g" is_input="False">0.0</SOx>
-            </battery_pack_1>
-          </battery_pack>
-        </he_power_train>
-      </operation>
-    </LCA>
   </data>
   <constraints>
     <propulsion>
@@ -777,21 +815,20 @@
             <voltage_caliber units="V" is_input="False">-603.7890880804817<!--Respected if <0--></voltage_caliber>
           </motor_1>
         </PMSM>
-        <battery_pack>
-          <battery_pack_1>
-            <min_safe_SOC units="percent" is_input="False">-15.120146264945802<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
-            <cell>
-              <max_c_rate units="percent" is_input="False">-1.8284955690134734<!--Constraints on the maximum cell c_rate, respected if <0--></max_c_rate>
-            </cell>
-          </battery_pack_1>
-        </battery_pack>
         <DC_DC_converter>
           <dc_dc_converter_1>
             <inductor>
-              <air_gap units="m" is_input="False">-0.012050980728165758<!--Constraints on maximum air gap in the inductor, respected if <0--></air_gap>
+              <air_gap units="m" is_input="False">-0.0167959302113444<!--Constraints on maximum air gap in the inductor, respected if <0--></air_gap>
             </inductor>
           </dc_dc_converter_1>
         </DC_DC_converter>
+        <gaseous_hydrogen_tank>
+          <gaseous_hydrogen_tank_1>
+            <dimension>
+              <length units="m" is_input="False">0.5166034937742379<!--Constraints on the tank length w.r.t the cabin/rear_fuselage length,  respected if <0--></length>
+            </dimension>
+          </gaseous_hydrogen_tank_1>
+        </gaseous_hydrogen_tank>
         <inverter>
           <inverter_1>
             <inductor>
@@ -831,6 +868,12 @@
             <thickness units="m" is_input="True">0.0002</thickness>
           </shielding_tape>
         </DC_cable_harness>
+        <PEMFC_stack>
+          <pemfc_stack_1>
+            <k_mass is_input="True">1.0<!--A tuning factor allows the PEMFC stack weight to be changed manually.--></k_mass>
+            <k_volume is_input="True">1.0<!--A tuning factor allows the PEMFC stack volume to be changed manually.--></k_volume>
+          </pemfc_stack_1>
+        </PEMFC_stack>
         <DC_DC_converter>
           <dc_dc_converter_1>
             <inductor>

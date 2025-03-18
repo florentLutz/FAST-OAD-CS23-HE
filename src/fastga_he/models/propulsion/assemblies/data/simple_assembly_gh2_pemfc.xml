@@ -1,0 +1,639 @@
+<FASTOAD_model>
+    <data>
+        <aerodynamics>
+          <cruise>
+              <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
+              <unit_reynolds units="1/m" is_input="False">2948053.940803294<!--unitary reynolds number representative of high speed aerodynamics--></unit_reynolds>
+          </cruise>
+          <low_speed>
+            <mach is_input="False">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
+            <unit_reynolds units="1/m" is_input="False">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
+          </low_speed>
+            <fuselage>
+                <cruise>
+                  <CD0 is_input="False">0.01194819286123646<!--profile drag coefficient for fuselage in cruise conditions--></CD0>
+                </cruise>
+                <low_speed>
+                  <CD0 is_input="False">0.012114342193164637<!--profile drag coefficient for fuselage in low speed conditions--></CD0>
+                </low_speed>
+            </fuselage>
+            <wing>
+                <low_speed>
+                    <CL_ref is_input="False">0.9903832267850955</CL_ref>
+                    <Y_vector units="m" is_input="False">[0.11547445976593405, 0.34642337929780215, 0.5773722988296702, 1.0361325274187763, 1.7227040650651202, 2.4092756027114643, 3.0958471403578085, 3.782418678004152, 4.468990215650496, 5.1555617532968405, 5.5594273636770435, 5.6805870467911035, 5.801746729905164, 5.922906413019226, 6.044066096133287, 6.165225779247348, 6.286385462361408, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing station along the wing span at which chord_vector and Cl_vector are sampled--></Y_vector>
+                    <chord_vector units="m" is_input="False">[1.      , 0.984375, 0.96875 , 0.953125, 0.9375  , 0.921875, 0.90625 , 0.890625, 0.875   , 0.859375, 0.84375 , 0.828125, 0.8125  , 0.796875, 0.78125 , 0.765625, 0.75    , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing chord length at the station along the wing span in Y_vector--></chord_vector>
+                    <CL_vector is_input="False">[1.1017227197335075, 1.1013013453498266, 1.10038811694889, 1.098403873777725, 1.0918579844211873, 1.080610615570361, 1.0628034699038733, 1.0347815173407644, 0.9892716074062258, 0.9114284949703251, 0.8359515927452368, 0.7818631930166186, 0.7254369570766273, 0.660566179673128, 0.5814473768423762, 0.4785864136757275, 0.32879610850232355, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing at the station along the wing span in Y_vector, the total corresponding wing lift coefficient is equal to CL0_clean--></CL_vector>
+                </low_speed>
+                <cruise>
+                  <induced_drag_coefficient is_input="False">0.03568699629812989<!--coefficient to multiply by the lift coefficient squared to get wing induced drag in cruise conditions--></induced_drag_coefficient>
+                  <CD0 is_input="False">0.006225770501969716<!--profile drag coefficient for wing in cruise conditions--></CD0>
+                  <CL0_clean is_input="True">0.2501539747371489<!--wing lift coefficient at zero aircraft angle of attack in cruise conditions and with no flaps deployed--></CL0_clean>
+                  <CL_alpha units="1/rad" is_input="True">4.620008812204601<!--wing lift coefficient slope with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
+                  <CM0_clean is_input="False">-0.015672163858931134<!--wing pitching moment coefficient in cruise conditions and with no flaps deployed--></CM0_clean>
+                </cruise>
+            </wing>
+        </aerodynamics>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <flap>
+                <span_ratio>0.45</span_ratio>
+            </flap>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <wet_area units="m**2" is_input="False">26.657254276457444<!--wing wet area--></wet_area>
+                <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
+                <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+                <root>
+                    <chord units="m" is_input="False">0.7672311779752663<!--chord length at wing root--></chord>
+                </root>
+                <tip>
+                    <chord units="m" is_input="False">0.7672311779752663<!--chord length at wing tip--></chord>
+                </tip>
+                <span units="m" is_input="False">9.237463382822208<!--wing span--></span>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <aux_load>
+                    <dc_aux_load_1>
+                        <power_in_mission units="kW">5.0</power_in_mission>
+                    </dc_aux_load_1>
+                </aux_load>
+                <PEMFC_stack>
+                    <pemfc_stack_1>
+                        <mass units="kg">327.988</mass>
+                        <specific_power units="kW/kg">0.345</specific_power>
+                        <power_density units="kW/m**3">124</power_density>
+                        <power_max units="kW">207.6</power_max>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <current_max units="A">600.</current_max>
+                        <number_of_layers>450.0</number_of_layers>
+                        <effective_area units="cm**2">2000.</effective_area>
+                        <operating_pressure units="atm">1.2</operating_pressure>
+                        <dimension>
+                            <length units="m">1.714</length>
+                            <width units="m">1.2676</width>
+                            <height units="m">1.5426</height>
+                        </dimension>
+                        <volume units="L">2478.665</volume>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                            <x units="m">1.238</x>
+                        </CG>
+                    </pemfc_stack_1>
+                </PEMFC_stack>
+                <h2_fuel_system>
+                    <h2_fuel_system_1>
+                        <mass units="kg">10.98</mass>
+                        <total_fuel_flowed units="kg">45</total_fuel_flowed>
+                        <connected_volume units="L">62.59</connected_volume>
+                        <number_engine>2.0</number_engine>
+                        <CG>
+                            <y_ratio>0.224</y_ratio>
+                        </CG>
+                        <length units="m">4.9</length>
+                        <dimension>
+                            <pipe_diameter units="m">0.04</pipe_diameter>
+                            <inner_diameter units="m">0.0373</inner_diameter>
+                            <insulation_thickness units="m">0.005</insulation_thickness>
+                            <overall_diameter units="m">0.05</overall_diameter>
+                            <length units="m">2.0</length>
+                        </dimension>
+                        <material>
+                            <yield_strength units="Pa">240000000000</yield_strength>
+                            <density units="kg/m**3">7700</density>
+                            <insulation_density units="kg/m**3">160</insulation_density>
+                        </material>
+                        <pipe_pressure units="Pa">1013250</pipe_pressure>
+                        <connection>
+                            <front>0.0<!--number of connection at the front of the fuselage--></front>
+                            <rear>1.0<!--number of connection at the rear of the fuselage--></rear>
+                            <near>0.0<!--number of near connection between source and tank--></near>
+                            <wing>0.0<!--number of connection in the wing--></wing>
+                        </connection>
+                    </h2_fuel_system_1>
+                </h2_fuel_system>
+                <gaseous_hydrogen_tank>
+                    <gaseous_hydrogen_tank_1>
+                        <mass units="kg">16.34</mass>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <CG>
+                            <y_ratio>0.4</y_ratio>
+                            <y units="m">1.85</y>
+                            <x units="m">1.238</x>
+                        </CG>
+                        <fuel_consumed_mission units="kg">14</fuel_consumed_mission>
+                        <unusable_fuel_mission units="kg">0.14</unusable_fuel_mission>
+                        <fuel_total_mission units="kg">14.14</fuel_total_mission>
+                        <capacity units="kg">15.087</capacity>
+                        <inner_volume units="L">18528.125</inner_volume>
+                        <tank_pressure units="Pa">1013250</tank_pressure>
+                        <Safety_factor>1.0</Safety_factor>
+                        <material>
+                            <type>"carbon_composite"</type>
+                            <yield_strength units="Pa">1.9e09</yield_strength>
+                            <density units="kg/m**3">1530</density>
+                        </material>
+                        <dimension>
+                            <inner_diameter units="m">2.09126</inner_diameter>
+                            <outer_diameter units="m">2.09182</outer_diameter>
+                            <wall_thickness units="m">2.794e-4</wall_thickness>
+                            <rear_length_ratio>0.5</rear_length_ratio>
+                            <length units="m">6.09182</length>
+                        </dimension>
+                    </gaseous_hydrogen_tank_1>
+                </gaseous_hydrogen_tank>
+                <DC_DC_converter>
+                    <dc_dc_converter_1>
+                        <losses_max units="W" is_input="True">1958.0316619368884</losses_max>
+                        <CG>
+                            <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <mass units="kg">86.0</mass>
+                        <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
+                        <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
+                        <capacitor>
+                            <current_caliber units="A">400.0</current_caliber>
+                            <current_max units="A">380.0</current_max>
+                            <aspect_ratio units="A">2.0</aspect_ratio>
+                        </capacitor>
+                        <inductor>
+                            <air_gap units="mm">10</air_gap>
+                            <resistance units="ohm">1.4e-3</resistance>
+                            <current_caliber units="A">400.0</current_caliber>
+                            <current_max units="A">380.0</current_max>
+                        </inductor>
+                        <module>
+                            <current_caliber units="A">400.0</current_caliber>
+                        </module>
+                        <igbt>
+                            <current_max units="A">390.0</current_max>
+                            <resistance units="ohm">0.002265</resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                        </igbt>
+                        <diode>
+                            <current_max units="A">380.0</current_max>
+                            <resistance units="ohm">0.002805</resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                        </diode>
+                        <current_in_caliber units="A">400.0</current_in_caliber>
+                        <current_in_max units="A">400.0</current_in_max>
+                        <voltage_caliber units="V">860.0</voltage_caliber>
+                        <voltage_in_caliber units="V">860.0</voltage_in_caliber>
+                        <voltage_in_max units="V">860.0</voltage_in_max>
+                        <voltage_out_max units="V">850.0</voltage_out_max>
+                        <current_ripple>0.1</current_ripple>
+                        <switching_frequency units="Hz">12000.0</switching_frequency>
+                        <switching_frequency_max units="Hz" is_input="True">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
+                        <scaling>
+                            <a>1.5</a>
+                            <resistance>1.5</resistance>
+                            <c>0.666</c>
+                        </scaling>
+                        <energy_on>
+                            <a>0.02379429</a>
+                            <b>3.326e-05</b>
+                            <c>3.420e-7</c>
+                        </energy_on>
+                        <energy_rr>
+                            <a>0.00637224</a>
+                            <b>0.000340</b>
+                            <c>-3.005e-8</c>
+                        </energy_rr>
+                        <energy_off>
+                            <a>0.02261044</a>
+                            <b>0.000254</b>
+                            <c>-1.158e-7</c>
+                        </energy_off>
+                        <heat_sink>
+                            <temperature_rating units="degK">373.15</temperature_rating>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                        </heat_sink>
+                    </dc_dc_converter_1>
+                </DC_DC_converter>
+                <DC_SSPC>
+                    <dc_sspc_412>
+                        <efficiency>0.99</efficiency>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <CG>
+                            <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <mass units="kg">10.0</mass>
+                        <current_caliber units="A">400.0</current_caliber>
+                        <voltage_caliber units="V">750.0</voltage_caliber>
+                        <current_max units="A" is_input="False">227.588167623899<!--Maximum current flowing through the SSPC--></current_max>
+                        <voltage_max units="V" is_input="False">849.1711312831264<!--Maximum voltage at the terminals SSPC--></voltage_max>
+                        <scaling>
+                            <resistance>1.125</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00169875</resistance>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00210375</resistance>
+                        </diode>
+                    </dc_sspc_412>
+                    <dc_sspc_1>
+                        <efficiency>0.99</efficiency>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <CG>
+                            <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <mass units="kg">10.0</mass>
+                        <current_caliber units="A">400.0</current_caliber>
+                        <voltage_caliber units="V">750.0</voltage_caliber>
+                        <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
+                        <voltage_max units="V" is_input="False">846.7684101430876<!--Maximum voltage at the terminals SSPC--></voltage_max>
+                        <scaling>
+                            <resistance>1.125</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00169875</resistance>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00210375</resistance>
+                        </diode>
+                    </dc_sspc_1>
+                    <dc_sspc_2>
+                        <efficiency>0.99</efficiency>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <CG>
+                            <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <mass units="kg">10.0</mass>
+                        <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
+                        <voltage_max units="V" is_input="False">847.5972788599612<!--Maximum voltage at the terminals SSPC--></voltage_max>
+                        <current_caliber units="A">400.0</current_caliber>
+                        <voltage_caliber units="V">750.0</voltage_caliber>
+                        <scaling>
+                            <resistance>1.125</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00169875</resistance>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00210375</resistance>
+                        </diode>
+                    </dc_sspc_2>
+                    <dc_sspc_1337>
+                        <efficiency>0.99</efficiency>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <CG>
+                            <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <mass units="kg">10.0</mass>
+                        <current_max units="A" is_input="False">226.9965558424665<!--Maximum current flowing through the SSPC--></current_max>
+                        <voltage_max units="V" is_input="False">850.0000000000001<!--Maximum voltage at the terminals SSPC--></voltage_max>
+                        <current_caliber units="A">400.0</current_caliber>
+                        <voltage_caliber units="V">750.0</voltage_caliber>
+                        <scaling>
+                            <resistance>1.125</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00169875</resistance>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00210375</resistance>
+                        </diode>
+                    </dc_sspc_1337>
+                </DC_SSPC>
+                <DC_cable_harness>
+                    <harness_1>
+                        <CG>
+                            <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <mass units="kg">8.86</mass>
+                        <material>1.0</material>
+                        <current_caliber units="A">800.0</current_caliber>
+                        <current_max units="A">750.0</current_max>
+                        <voltage_caliber units="V">1000.0</voltage_caliber>
+                        <voltage_max units="V">800.0</voltage_max>
+                        <number_cables>1.0</number_cables>
+                        <length units="m">7.0</length>
+                        <length_span_ratio>0.17</length_span_ratio>
+                        <conductor>
+                            <radius units="m">3.71e-3</radius>
+                            <section units="mm*mm">43.44</section>
+                        </conductor>
+                        <insulation>
+                            <thickness units="m">0.0012</thickness>
+                        </insulation>
+                        <sheath>
+                            <thickness units="mm">1.36</thickness>
+                        </sheath>
+                        <contactor>
+                            <mass units="kg">4.95</mass>
+                        </contactor>
+                        <cable>
+                            <resistance units="ohm">0.00333</resistance>
+                            <initial_temperature units="degK">288.15</initial_temperature>
+                            <resistance_per_length units="ohm/km">0.397</resistance_per_length>
+                            <mass_per_length units="kg/m">0.537</mass_per_length>
+                            <current_caliber units="A">800.0</current_caliber>
+                            <radius units="mm">6.47</radius>
+                            <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
+                            <heat_capacity units="J/degK">7000.0</heat_capacity>
+                        </cable>
+                        <properties>
+                            <resistance_temperature_scale_factor units="degK**-1">0.00393</resistance_temperature_scale_factor>
+                            <density units="kg/m**3">8960.0</density>
+                            <specific_heat units="J/kg/degK">386.0</specific_heat>
+                        </properties>
+                    </harness_1>
+                </DC_cable_harness>
+                <inverter>
+                    <inverter_1>
+                        <CG>
+                            <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <mass units="kg">40.69</mass>
+                        <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <casing>
+                            <mass units="kg">1.0446</mass>
+                            <heat_capacity units="J/degK">208.92</heat_capacity>
+                            <thermal_resistance units="K/W">0.010</thermal_resistance>
+                        </casing>
+                        <module>
+                            <length units="m">0.156</length>
+                            <height units="m">0.021</height>
+                            <width units="m">0.065</width>
+                        </module>
+                        <heat_sink>
+                            <length units="m">0.2145</length>
+                            <width units="m">0.1716</width>
+                            <height units="m">0.005655</height>
+                            <temperature_rating units="degK">373.15</temperature_rating>
+                            <mass units="kg">0.619</mass>
+                            <coolant>
+                                <temperature_in_rating units="degK">323.15</temperature_in_rating>
+                                <temperature_out_rating units="degK">353.15</temperature_out_rating>
+                                <max_mass_flow units="m**3/s">10.5e-5</max_mass_flow>
+                                <Prandtl_number>39.5</Prandtl_number>
+                            </coolant>
+                            <tube>
+                                <inner_diameter units="m">1.27e-3</inner_diameter>
+                                <outer_diameter units="m">3.77e-3</outer_diameter>
+                                <length units="m">0.858</length>
+                                <mass units="kg">0.083</mass>
+                            </tube>
+                        </heat_sink>
+                        <dissipable_heat units="W">11808.0</dissipable_heat>
+                        <losses_max units="W">11000.0</losses_max>
+                        <current_caliber units="A">433.0</current_caliber>
+                        <current_ac_max units="A">400.0</current_ac_max>
+                        <voltage_caliber units="V">500.0</voltage_caliber>
+                        <voltage_ac_max units="V">500.0</voltage_ac_max>
+                        <switching_frequency units="Hz">15.0e3</switching_frequency>
+                        <switching_frequency_max units="Hz" is_input="True">12000.0</switching_frequency_max>
+                        <power_factor>1.0</power_factor>
+                        <capacitor>
+                            <capacity units="F">2.02e-3</capacity>
+                            <current_caliber units="A">199.18</current_caliber>
+                            <mass units="kg">3.832</mass>
+                            <aspect_ratio units="kg">2.0</aspect_ratio>
+                        </capacitor>
+                        <inductor>
+                            <inductance units="H">11.5e-6</inductance>
+                            <mass units="kg">31.064</mass>
+                            <air_gap units="mm">10.0</air_gap>
+                        </inductor>
+                        <contactor>
+                            <mass units="kg">4.85</mass>
+                        </contactor>
+                        <scaling>
+                            <a>1.385</a>
+                            <c>0.722</c>
+                            <resistance>1.385</resistance>
+                        </scaling>
+                        <igbt>
+                            <resistance units="ohm">0.00209135</resistance>
+                            <thermal_resistance units="K/W">0.114955</thermal_resistance>
+                            <gate_voltage units="V">0.87</gate_voltage>
+                        </igbt>
+                        <diode>
+                            <resistance units="ohm">0.00258995</resistance>
+                            <thermal_resistance units="K/W">0.148195</thermal_resistance>
+                            <gate_voltage units="V">1.3</gate_voltage>
+                        </diode>
+                        <energy_on>
+                            <a>0.02197006</a>
+                            <b>3.326e-05</b>
+                            <c>3.707e-7</c>
+                        </energy_on>
+                        <energy_off>
+                            <a>0.02087697</a>
+                            <b>0.000254</b>
+                            <c>-1.256e-7</c>
+                        </energy_off>
+                        <energy_rr>
+                            <a>0.0058837</a>
+                            <b>0.000340</b>
+                            <c>-3.257e-8</c>
+                        </energy_rr>
+                    </inverter_1>
+                </inverter>
+                <PMSM>
+                    <motor_1>
+                        <voltage_ac_max units="V" is_input="True">414.83894592299646<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
+                        <CG>
+                            <x units="m">2.39</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <low_speed>
+                            <CD0>0.000357</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.000352</CD0>
+                        </cruise>
+                        <from_LE units="m">0.15</from_LE>
+                        <mass units="kg">16.19</mass>
+                        <torque_constant units="N*m/A">1.46</torque_constant>
+                        <torque_max units="N*m">150.0</torque_max>
+                        <torque_rating units="N*m">150.0</torque_rating>
+                        <shaft_power_max units="kW">150.0</shaft_power_max>
+                        <voltage_caliber units="V">700.0</voltage_caliber>
+                        <rpm_rating units="min**-1">5000.0</rpm_rating>
+                        <rpm_max units="min**-1">4500.0</rpm_max>
+                        <loss_coefficient>
+                            <alpha units="W/N**2/m**2">0.025</alpha>
+                            <beta units="W*s/rad">3.38</beta>
+                            <gamma units="W*s**2/rad**2">0.00825</gamma>
+                        </loss_coefficient>
+                        <scaling>
+                            <diameter>0.9</diameter>
+                            <length>0.97</length>
+                            <phase_resistance>0.93308789</phase_resistance>
+                            <torque_constant>0.77</torque_constant>
+                            <alpha>1.57</alpha>
+                            <beta>0.51</beta>
+                            <gamma>0.55</gamma>
+                        </scaling>
+                    </motor_1>
+                </PMSM>
+                <propeller>
+                    <propeller_1>
+                        <CG>
+                            <x units="m">2.2</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <y_ratio>0.34</y_ratio>
+                        <flapped_ratio>1.0</flapped_ratio>
+                        <cl_clean_ref>1.0</cl_clean_ref>
+                        <wing_chord_ref>1.0</wing_chord_ref>
+                        <from_wing_AC units="m">0.5</from_wing_AC>
+                        <from_wing_LE_ratio units="m">0.1</from_wing_LE_ratio>
+                        <installation_angle units="deg">0.0</installation_angle>
+                        <from_LE units="m">0.15</from_LE>
+                        <mass units="kg">36.35</mass>
+                        <rpm_mission>2000.0</rpm_mission>
+                        <solidity>0.2</solidity>
+                        <activity_factor>150</activity_factor>
+                        <blade_twist units="deg">22.6</blade_twist>
+                        <diameter units="inch">78.0</diameter>
+                        <number_blades>3</number_blades>
+                        <material>0.0</material>
+                        <torque_rating units="N*m">817.0</torque_rating>
+                        <torque_max units="N*m">817.0</torque_max>
+                    </propeller_1>
+                </propeller>
+                <DC_bus>
+                    <dc_bus_2>
+                        <CG>
+                            <x units="m">2.69</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <mass units="kg">0.96</mass>
+                        <current_caliber units="A">941.2</current_caliber>
+                        <current_max units="A">800.</current_max>
+                        <voltage_caliber units="V">588.2</voltage_caliber>
+                        <voltage_max units="V">500.</voltage_max>
+                        <width units="cm">6.382</width>
+                        <height units="cm">0.953</height>
+                        <length units="cm">30.222</length>
+                        <cross_section>
+                            <area units="cm**2">1.90</area>
+                            <thickness units="cm">0.31</thickness>
+                            <width units="cm">6.16</width>
+                        </cross_section>
+                        <insulation>
+                            <thickness units="cm">0.111</thickness>
+                        </insulation>
+                    </dc_bus_2>
+                    <dc_bus_1>
+                        <CG>
+                            <x units="m">2.39</x>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
+                        <mass units="kg">0.96</mass>
+                        <current_caliber units="A">941.2</current_caliber>
+                        <current_max units="A">800.</current_max>
+                        <voltage_caliber units="V">588.2</voltage_caliber>
+                        <voltage_max units="V">500.</voltage_max>
+                        <width units="cm">6.382</width>
+                        <height units="cm">0.953</height>
+                        <length units="cm">30.222</length>
+                        <cross_section>
+                            <area units="cm**2">1.90</area>
+                            <thickness units="cm">0.31</thickness>
+                            <width units="cm">6.16</width>
+                        </cross_section>
+                        <insulation>
+                            <thickness units="cm">0.111</thickness>
+                        </insulation>
+                    </dc_bus_1>
+                </DC_bus>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
