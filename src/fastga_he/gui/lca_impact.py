@@ -733,7 +733,7 @@ def _prep_lasagna_plot(
 ) -> go.Figure:
     """
     Prepares the lasagna plot by stacking impacts on top of one another and filling below. Having
-    contributors sorted from biggest to smallest is recommended. Thanks @ScottDelbecq for the name
+    contributors sorted from biggest to smallest is recommended. Thanks, @ScottDelbecq for the name
     suggestions
 
     :param treated_data_dict: dictionary containing the data to plot
@@ -1175,7 +1175,7 @@ def lca_raw_impact_comparison_advanced(
                 components_to_aggregate,
             ) in aggregate_and_sort_contributor.items():
                 # This should correspond to the case where we just rename a contributor
-                if type(components_to_aggregate) == str:
+                if components_to_aggregate is str:
                     if component == components_to_aggregate:
                         component_to_be_sorted = True
                         component_contribution_aggregated_sorted[name_for_aggregation] = (
@@ -1186,7 +1186,7 @@ def lca_raw_impact_comparison_advanced(
                         # can't be elsewhere.
                         break
                 # The type of input we expect should ensure this. Also in that case it means
-                # component contribution can be summed so it means the contribution can already
+                # component contribution can be summed, so it means the contribution can already
                 # exist.
                 else:
                     if component in components_to_aggregate:
@@ -1435,7 +1435,7 @@ def lca_impacts_bar_chart_with_contributors(
     aggregate_phase: list = None,
     impact_filter_list: list = None,
     impact_step: str = "weighted",
-    contribution_to_aggregate: list = None,
+    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that plot the impact of an aircraft in each category and how each component
@@ -1443,9 +1443,9 @@ def lca_impacts_bar_chart_with_contributors(
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft.
-    :param detailed_component_contributions: by default, the contribution in each phase of a components are summed
-    together and only the total is shown, this allows to see the contribution in each phase of
-    each component
+    :param detailed_component_contributions: by default, the contribution in each phase of a
+    components are summed together and only the total is shown, this allows to see the contribution
+    in each phase of each component
     :param legend_rename: legend names are set by the code by default, if any renaming is to be
     done, pass here the legend to be renamed as key and how to rename it as item.
     :param aggregate_phase: for compactness, it may be preferable to aggregate the contribution
@@ -1454,13 +1454,11 @@ def lca_impacts_bar_chart_with_contributors(
     :param impact_filter_list: filter to only show impact in the list in output graph
     :param impact_step: step of the LCIA to consider, by default weighted impacts are considered,
     can also be "normalized" results.
-    :param contribution_to_aggregate: rather than use a cutoff criteria (which might not yield the
-    same results depending on the impact categories investigated), contribution to aggregate can
-    be specified here.
+    :param aggregate_and_sort_contributor: dict of contributor to aggregate and name under which to
+    aggregate them. Keys are new names and items are a list of old names. The order in which new
+    names are given will also serve as the order in which we plot contributors starting from the
+    bottom.
     """
-
-    if not contribution_to_aggregate:
-        contribution_to_aggregate = []
 
     component_and_contribution = _get_component_and_contribution(
         aircraft_file_path,
@@ -1480,41 +1478,89 @@ def lca_impacts_bar_chart_with_contributors(
     component_counter = 0
     current_contribution = dict(zip(impact_list, np.zeros(len(impact_list))))
 
-    for component, impacts in component_and_contribution.items():
-        impact_contributions = []
-        beautified_impact_names = []
+    # This is where we should sort and aggregate
+    if aggregate_and_sort_contributor:
+        # Now we aggregate the contribution ...
+        component_contribution_aggregated_sorted = {}
+        component_contribution_unsorted = {}
 
-        if detailed_component_contributions:
-            component_name = component.split(":")[0]
-            beautified_component_name = component_name.replace("_", " ")
-        else:
-            component_name = component
-            beautified_component_name = component.replace("_", " ")
+        # But before anything we presort the sorted dict so that it appear in the order we want
+        for name_for_aggregation in aggregate_and_sort_contributor:
+            blank_dict = {}
+            for aircraft in impact_list:
+                blank_dict[aircraft] = 0.0
 
-        final_name = component.replace(component_name, beautified_component_name)
+            component_contribution_aggregated_sorted[name_for_aggregation] = blank_dict
 
-        if final_name not in contribution_to_aggregate:
+        for (
+            component,
+            contribution_on_each_impact_dict,
+        ) in component_and_contribution.items():
+            component_to_be_sorted = False
+
+            for (
+                name_for_aggregation,
+                components_to_aggregate,
+            ) in aggregate_and_sort_contributor.items():
+                # This should correspond to the case where we just rename a contributor
+                if components_to_aggregate is str:
+                    if component == components_to_aggregate:
+                        component_to_be_sorted = True
+                        component_contribution_aggregated_sorted[name_for_aggregation] = (
+                            contribution_on_each_impact_dict
+                        )
+
+                        # Components can't be aggregated in more than one place so if it is here it
+                        # can't be elsewhere.
+                        break
+                else:
+                    if component in components_to_aggregate:
+                        component_to_be_sorted = True
+
+                        # It has already been added so we must sum
+                        if name_for_aggregation in component_contribution_aggregated_sorted:
+                            for aircraft in contribution_on_each_impact_dict:
+                                component_contribution_aggregated_sorted[name_for_aggregation][
+                                    aircraft
+                                ] += contribution_on_each_impact_dict[aircraft]
+
+                        break
+
+            # If the component is not to be aggregated or just renamed, we put it in a different
+            # dict to plot it later in the order.
+            if not component_to_be_sorted:
+                component_contribution_unsorted[component] = contribution_on_each_impact_dict
+    else:
+        component_contribution_aggregated_sorted = {}
+        component_contribution_unsorted = component_and_contribution
+
+    for dict_to_plot in (component_contribution_aggregated_sorted, component_contribution_unsorted):
+        for component, impacts in dict_to_plot.items():
+            impact_contributions = []
+            beautified_impact_names = []
+
+            if detailed_component_contributions:
+                component_name = component.split(":")[0]
+                beautified_component_name = component_name.replace("_", " ")
+            else:
+                component_name = component
+                beautified_component_name = component.replace("_", " ")
+
+            final_name = component.replace(component_name, beautified_component_name)
+
             if legend_rename and final_name in legend_rename:
                 final_name = legend_rename[final_name]
 
-            for impact_name, contribution in impacts.items():
-                if impact_filter_list is not None:
-                    beautified_impact_name = impact_name.replace("_", " ")
+            for impact_name in impact_filter_list:
+                contribution = impacts[impact_name]
 
-                    if beautified_impact_name in impact_filter_list:
-                        beautified_impact_names.append(beautified_impact_name)
-                        rel_contribution = contribution / impact_score_dict[impact_name] * 100.0
+                beautified_impact_name = impact_name.replace("_", " ")
+                beautified_impact_names.append(beautified_impact_name)
 
-                        impact_contributions.append(rel_contribution)
-                        current_contribution[impact_name] += rel_contribution
-                else:
-                    beautified_impact_name = impact_name.replace("_", " ")
-                    beautified_impact_names.append(beautified_impact_name)
+                rel_contribution = contribution / impact_score_dict[impact_name] * 100.0
 
-                    rel_contribution = contribution / impact_score_dict[impact_name] * 100.0
-
-                    impact_contributions.append(rel_contribution)
-                    current_contribution[impact_name] += rel_contribution
+                impact_contributions.append(rel_contribution)
+                current_contribution[impact_name] += rel_contribution
 
             bar_chart = go.Bar(
                 name=final_name,
@@ -1528,37 +1574,6 @@ def lca_impacts_bar_chart_with_contributors(
             fig.add_trace(bar_chart)
 
             component_counter += 1
-
-    beautified_impact_names_other = []
-    impact_contributions_others = []
-
-    for impact_name in impact_list:
-        # Then we plot the others category
-
-        if impact_filter_list is not None:
-            beautified_impact_name = impact_name.replace("_", " ")
-
-            if beautified_impact_name in impact_filter_list:
-                beautified_impact_names_other.append(beautified_impact_name)
-
-                impact_contributions_others.append(100.0 - current_contribution[impact_name])
-        else:
-            beautified_impact_name = impact_name.replace("_", " ")
-            beautified_impact_names_other.append(beautified_impact_name)
-
-            impact_contributions_others.append(100.0 - current_contribution[impact_name])
-
-    if contribution_to_aggregate:
-        bar_chart = go.Bar(
-            name="others",
-            x=beautified_impact_names_other,
-            y=impact_contributions_others,
-            marker=dict(
-                pattern_shape=HASH[component_counter // len(HASH)],
-                color=COLS[component_counter % len(COLS)],
-            ),
-        )
-        fig.add_trace(bar_chart)
 
     title_text = (
         "Relative contribution of each component to each impact category for " + name_aircraft
