@@ -774,6 +774,7 @@ def test_lca_pipistrel():
     process_tree(lca_model, outfile=os.path.join(RESULTS_FOLDER_PATH, "lca_pipistrel.html"))
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_pipistrel_lca_comparison_paper():
     # The analysis we try to replicate here is not exactly the pipistrel we size and test earlier.
     # Rather it looks to be an earlier version of the pipistrel whose empty weight is 370kg as
@@ -817,6 +818,7 @@ def test_pipistrel_lca_comparison_paper():
     problem.write_outputs()
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_extract_results_from_pipistrel_lca_comparison_standard():
     alpha_standard_datafile = oad.DataFile(RESULTS_FOLDER_PATH / "pipistrel_alpha_standard.xml")
 
@@ -875,6 +877,7 @@ def test_extract_results_from_pipistrel_lca_comparison_standard():
     print("Impact of others: ", impact_others)
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_extract_results_from_pipistrel_lca_comparison_short():
     alpha_short_datafile = oad.DataFile(RESULTS_FOLDER_PATH / "pipistrel_alpha_short.xml")
 
