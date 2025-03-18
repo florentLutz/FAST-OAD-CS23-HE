@@ -24,6 +24,7 @@ from ..lca_impact import (
     lca_impacts_bar_chart_with_components_absolute,
     lca_impacts_search_table,
     lca_raw_impact_comparison,
+    lca_raw_impact_comparison_advanced,
     _get_impact_dict,
 )
 
@@ -237,7 +238,7 @@ def test_lca_bar_chart_relative_contribution():
 
 def test_lca_bar_chart_pipistrel_comparison_paper_short():
     fig = lca_impacts_bar_chart_with_contributors(
-        DATA_FOLDER_PATH / "pipistrel_short.xml",
+        DATA_FOLDER_PATH / "pipistrel_alpha_short.xml",
         name_aircraft="the Pipistrel with a 500h lifetime",
         impact_step="normalized",
         impact_filter_list=[
@@ -264,7 +265,7 @@ def test_lca_bar_chart_pipistrel_comparison_paper_short():
 
 def test_lca_bar_chart_pipistrel_comparison_paper_std():
     fig = lca_impacts_bar_chart_with_contributors(
-        DATA_FOLDER_PATH / "pipistrel_standard.xml",
+        DATA_FOLDER_PATH / "pipistrel_alpha_standard.xml",
         name_aircraft="the Pipistrel with a 4000h lifetime",
         impact_step="normalized",
         impact_filter_list=[
@@ -293,6 +294,16 @@ def test_lca_bar_chart_pipistrel_comparison_raw_impact():
     fig = lca_raw_impact_comparison(
         [DATA_FOLDER_PATH / "pipistrel_standard.xml", DATA_FOLDER_PATH / "pipistrel_short.xml"],
         ["Pipistrel with a 4000h lifetime", "Pipistrel with a 500h lifetime"],
+    )
+
+    fig.show()
+
+
+def test_lca_bar_chart_pipistrel_advanced_comparison_raw_impact():
+    fig = lca_raw_impact_comparison_advanced(
+        [DATA_FOLDER_PATH / "pipistrel_alpha_standard.xml", DATA_FOLDER_PATH / "pipistrel_alpha_short.xml"],
+        ["Pipistrel with a 4000h lifetime", "Pipistrel with a 500h lifetime"],
+        impact_category="climate change"
     )
 
     fig.show()
@@ -771,7 +782,9 @@ def test_get_impact_dict():
 
     xml_recipe = DATA_FOLDER_PATH / "pipistrel_short.xml"
     recipe_weighted_impact_dict, _ = _get_impact_dict(xml_recipe, impact_step="weighted")
-    recipe_normalized_impact_dict, recipe_normalised_unit_dict = _get_impact_dict(xml_recipe, impact_step="normalized")
+    recipe_normalized_impact_dict, recipe_normalised_unit_dict = _get_impact_dict(
+        xml_recipe, impact_step="normalized"
+    )
     recipe_raw_impact_dict, recipe_raw_unit_dict = _get_impact_dict(xml_recipe, impact_step="raw")
 
     recipe_raw_impact_list = list(recipe_raw_impact_dict.keys())

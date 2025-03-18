@@ -1004,7 +1004,7 @@ def lca_raw_impact_comparison(
     impact_category: str = None,
 ) -> go.FigureWidget:
     """
-    Plots, on bar chart, the comparison in one impact category of one or more designs.
+    Plots, on bar chart, the simple comparison in one impact category of one or more designs.
 
     :param aircraft_file_paths: paths to the output file that contains the impacts.
     :param names_aircraft: names of the aircraft.
@@ -1015,14 +1015,18 @@ def lca_raw_impact_comparison(
     fig = go.Figure()
 
     for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
-        impact_score_dict, impact_unit_dict = _get_impact_dict(aircraft_file_path, impact_step="raw")
+        impact_score_dict, impact_unit_dict = _get_impact_dict(
+            aircraft_file_path, impact_step="raw"
+        )
         beautified_impact_names_and_scores = {}
         beautified_impact_names_and_units = {}
 
         for impact_name, impact_score in impact_score_dict.items():
             beautified_impact_name = impact_name.replace("_", " ")
             beautified_impact_names_and_scores[beautified_impact_name] = impact_score
-            beautified_impact_names_and_units[beautified_impact_name] = impact_unit_dict[impact_name]
+            beautified_impact_names_and_units[beautified_impact_name] = impact_unit_dict[
+                impact_name
+            ]
 
         if impact_category is None:
             impact_to_plot = list(beautified_impact_names_and_scores.keys())[0]
@@ -1050,6 +1054,129 @@ def lca_raw_impact_comparison(
         legend_font=dict(size=20),
         title_x=0.5,
         title_text="Comparison of impact in category: " + impact_to_plot,
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=20),
+        title=beautified_impact_names_and_units[impact_to_plot] + " per FU",
+    )
+    fig.update_yaxes(
+        title_font=dict(size=20),
+    )
+
+    return go.FigureWidget(fig)
+
+
+def lca_raw_impact_comparison_advanced(
+    aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
+    names_aircraft: Union[str, List[str]] = None,
+    impact_category: str = None,
+) -> go.FigureWidget:
+    """
+    Plots, on bar chart, the comparison in one impact category of one or more designs with a detail
+    of each contributor
+
+    :param aircraft_file_paths: paths to the output file that contains the impacts.
+    :param names_aircraft: names of the aircraft.
+    :param impact_category: impact category to plot, by default the first one alphabetically will
+    be plotted
+    """
+
+    fig = go.Figure()
+
+    total_impact_score_dict, total_impact_unit_dict = _get_impact_dict(
+        aircraft_file_paths[0], impact_step="raw"
+    )
+    beautified_impact_names_and_scores = {}
+    beautified_impact_names_and_units = {}
+
+    datafile = oad.DataFile(aircraft_file_paths[0])
+
+    for impact_name, impact_score in total_impact_score_dict.items():
+        beautified_impact_name = impact_name.replace("_", " ")
+        beautified_impact_names_and_scores[beautified_impact_name] = impact_score
+        beautified_impact_names_and_units[beautified_impact_name] = total_impact_unit_dict[
+            impact_name
+        ]
+
+    if impact_category is None:
+        impact_to_plot = list(beautified_impact_names_and_scores.keys())[0]
+    elif impact_category in beautified_impact_names_and_scores:
+        impact_to_plot = impact_category
+    else:
+        raise ImpactUnavailableForPlotError(
+            "Impact "
+            + impact_category
+            + " unavailable in the output file. Available impacts include: "
+            + ", ".join(list(beautified_impact_names_and_scores.keys()))
+        )
+
+    un_beautified_impact = impact_to_plot.replace(" ", "_")
+
+    component_contribution_on_each_aircraft = {}
+
+    for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
+        # This can't fetch raw results but with a small cross product everything will be fine !
+        available_components_and_contribution = _get_component_and_contribution(
+            aircraft_file_path, impact_step="normalized"
+        )
+        normalization_coefficient = datafile[
+            LCA_PREFIX + un_beautified_impact + ":normalization_factor"
+        ].value[0]
+
+        for available_component, contribution in available_components_and_contribution.items():
+            component_contribution = contribution[un_beautified_impact] * normalization_coefficient
+
+            if available_component not in component_contribution_on_each_aircraft:
+                component_contribution_on_each_aircraft[available_component] = {
+                    name_aircraft: component_contribution
+                }
+            else:
+                component_contribution_on_each_aircraft[available_component][name_aircraft] = (
+                    component_contribution
+                )
+
+    component_counter = 0
+    for component, contribution_on_each_aircraft_dict in component_contribution_on_each_aircraft.items():
+        contribution_on_each_aircraft_list = []
+        for aircraft in names_aircraft:
+            if aircraft in contribution_on_each_aircraft_dict:
+                contribution_on_each_aircraft_list.append(contribution_on_each_aircraft_dict[aircraft])
+            else:
+                contribution_on_each_aircraft_list.append(0.)
+
+        bar_chart = go.Bar(
+                name=component,
+                x=names_aircraft,
+                y=contribution_on_each_aircraft_list,
+                marker=dict(
+                    pattern_shape=HASH[component_counter // len(HASH)],
+                    color=COLS[component_counter % len(COLS)],
+                ),
+        )
+        fig.add_trace(bar_chart)
+
+        component_counter += 1
+
+    fig.update_layout(
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+        title_x=0.5,
+        title_text="Comparison of impact in category: " + impact_to_plot,
+        barmode="stack",
     )
     fig.update_xaxes(
         ticks="outside",
