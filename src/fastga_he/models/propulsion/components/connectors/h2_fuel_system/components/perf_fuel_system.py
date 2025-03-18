@@ -37,7 +37,7 @@ class PerformancesH2FuelSystem(om.Group):
             name="number_of_sources",
             default=1,
             types=int,
-            desc="Number of connections at the output of the hydrogen fuel system, should always be engine",
+            desc="Number of connections at the output of the hydrogen fuel system",
             allow_none=False,
         )
 
@@ -48,7 +48,7 @@ class PerformancesH2FuelSystem(om.Group):
         number_of_sources = self.options["number_of_sources"]
 
         self.add_subsystem(
-            name="fuel_flow_out",
+            name="h2_fuel_flow_out",
             subsys=PerformancesH2FuelSystemOutput(
                 number_of_points=number_of_points,
                 number_of_sources=number_of_sources,
@@ -57,26 +57,26 @@ class PerformancesH2FuelSystem(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            name="fuel_flow_in",
+            name="h2_fuel_flow_in",
             subsys=PerformancesH2FuelSystemInput(
                 number_of_points=number_of_points,
-                number_of_tanks=number_of_tank_stacks,
+                number_of_tank_stacks=number_of_tank_stacks,
                 h2_fuel_system_id=h2_fuel_system_id,
             ),
             promotes=["*"],
         )
         self.add_subsystem(
-            name="maximum",
-            subsys=PerformancesH2FuelSystemMaximum(
-                number_of_points=number_of_points,
-                number_of_sources=number_of_sources,
+            name="total_h2_fuel_flowed",
+            subsys=PerformancesTotalH2FuelFlowed(
+                number_of_points=number_of_points, h2_fuel_system_id=h2_fuel_system_id
             ),
             promotes=["*"],
         )
         self.add_subsystem(
-            name="total_fuel_flowed",
-            subsys=PerformancesTotalH2FuelFlowed(
-                number_of_points=number_of_points, h2_fuel_system_id=h2_fuel_system_id
+            name="h2_fuel_flow_maximum",
+            subsys=PerformancesH2FuelSystemMaximum(
+                number_of_sources=number_of_sources,
+                number_of_points=number_of_points,
             ),
             promotes=["*"],
         )

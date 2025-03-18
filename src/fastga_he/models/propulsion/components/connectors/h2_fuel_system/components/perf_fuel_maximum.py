@@ -31,7 +31,7 @@ class PerformancesH2FuelSystemMaximum(om.ExplicitComponent):
 
         for i in range(number_of_sources):
             self.add_input(
-                name="fuel_consumption_out_" + str(i + 1),
+                name="fuel_consumption_out_t_" + str(i + 1),
                 units="kg/h",
                 val=np.full(number_of_points, np.nan),
                 shape=number_of_points,
@@ -46,8 +46,8 @@ class PerformancesH2FuelSystemMaximum(om.ExplicitComponent):
                 "number " + str(i + 1),
             )
             self.declare_partials(
-                of="fuel_consumption_out_" + str(i + 1),
-                wrt="fuel_mass_flow_rate_max_" + str(i + 1),
+                of="fuel_mass_flow_rate_max_" + str(i + 1),
+                wrt="fuel_consumption_out_t_" + str(i + 1),
                 method="exact",
             )
 
@@ -56,7 +56,7 @@ class PerformancesH2FuelSystemMaximum(om.ExplicitComponent):
 
         for i in range(number_of_sources):
             outputs["fuel_mass_flow_rate_max_" + str(i + 1)] = np.max(
-                inputs["fuel_consumption_out_" + str(i + 1)]
+                inputs["fuel_consumption_out_t_" + str(i + 1)]
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -65,10 +65,10 @@ class PerformancesH2FuelSystemMaximum(om.ExplicitComponent):
         for i in range(number_of_sources):
             partials[
                 "fuel_mass_flow_rate_max_" + str(i + 1),
-                "fuel_consumption_out_" + str(i + 1),
+                "fuel_consumption_out_t_" + str(i + 1),
             ] = np.where(
-                inputs["fuel_consumption_out_" + str(i + 1)]
-                == np.max(inputs["fuel_consumption_out_" + str(i + 1)]),
+                inputs["fuel_consumption_out_t_" + str(i + 1)]
+                == np.max(inputs["fuel_consumption_out_t_" + str(i + 1)]),
                 1.0,
                 0.0,
             )

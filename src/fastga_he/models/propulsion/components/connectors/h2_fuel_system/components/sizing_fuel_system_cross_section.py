@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingH2FuelSystemOverallCrossSectionDimension(om.ExplicitComponent):
+class SizingH2FuelSystemCrossSectionDimension(om.ExplicitComponent):
     """
-    Computation of the overall cross-section dimension of the hydrogen fuel system.
+    Computation of the cross-section dimensions of the hydrogen fuel system.
     """
 
     def initialize(self):

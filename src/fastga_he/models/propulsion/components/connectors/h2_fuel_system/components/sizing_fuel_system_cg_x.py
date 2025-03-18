@@ -8,7 +8,7 @@ import openmdao.api as om
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingFuelSystemCGX(om.ExplicitComponent):
+class SizingH2FuelSystemCGX(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
             name="h2_fuel_system_id",
