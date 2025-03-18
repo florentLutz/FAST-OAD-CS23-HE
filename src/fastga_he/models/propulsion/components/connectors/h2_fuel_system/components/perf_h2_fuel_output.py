@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -44,10 +44,8 @@ class PerformancesH2FuelSystemOutput(om.ExplicitComponent):
             desc="Fuel flowing through the hydrogen fuel system at each time step",
         )
 
-        self.add_input(name="time_step", units="h", val=np.full(number_of_points, np.nan))
-
         self.add_output(
-            name="data:propulsion:he_power_train:H2_fuel_system:"
+            name="data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":number_source",
             val=self.options["number_of_sources"],
@@ -66,15 +64,6 @@ class PerformancesH2FuelSystemOutput(om.ExplicitComponent):
                 + str(i + 1),
             )
 
-            self.add_output(
-                name="fuel_consumption_out_t_" + str(i + 1),
-                units="kg/h",
-                val=np.full(number_of_points, 5.0),
-                shape=number_of_points,
-                desc="fuel flow rate required from the source connected at the output number "
-                + str(i + 1),
-            )
-
             self.declare_partials(
                 of="fuel_flowing_t",
                 wrt="fuel_consumed_out_t_" + str(i + 1),
@@ -83,35 +72,12 @@ class PerformancesH2FuelSystemOutput(om.ExplicitComponent):
                 cols=np.arange(number_of_points),
             )
 
-            self.declare_partials(
-                of="fuel_consumption_out_t_" + str(i + 1),
-                wrt=["fuel_consumed_out_t_" + str(i + 1), "time_step"],
-                method="exact",
-                rows=np.arange(number_of_points),
-                cols=np.arange(number_of_points),
-            )
-
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         number_of_points = self.options["number_of_points"]
-        time_step = inputs["time_step"]
 
         fuel_output = np.zeros(number_of_points)
 
         for i in range(self.options["number_of_sources"]):
             fuel_output += inputs["fuel_consumed_out_t_" + str(i + 1)]
-            outputs["fuel_consumption_out_t_" + str(i + 1)] = (
-                inputs["fuel_consumed_out_t_" + str(i + 1)] / time_step
-            )
+
         outputs["fuel_flowing_t"] = fuel_output
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        time_step = inputs["time_step"]
-
-        for i in range(self.options["number_of_sources"]):
-            partials[
-                "fuel_consumption_out_t_" + str(i + 1), "fuel_consumed_out_t_" + str(i + 1)
-            ] = 1.0 / time_step
-
-            partials["fuel_consumption_out_t_" + str(i + 1), "time_step"] = (
-                -inputs["fuel_consumed_out_t_" + str(i + 1)] / time_step**2.0
-            )

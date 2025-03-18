@@ -38,7 +38,7 @@ class SizingH2FuelSystemCGX(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x",
+            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x",
             units="m",
             val=2.5,
             desc="X position of the hydrogen fuel system center of gravity",
@@ -49,7 +49,7 @@ class SizingH2FuelSystemCGX(om.ExplicitComponent):
         if wing_related:
             self.add_input("data:geometry:wing:span", val=np.nan, units="m")
             self.add_input(
-                "data:propulsion:he_power_train:H2_fuel_system:"
+                "data:propulsion:he_power_train:h2_fuel_system:"
                 + h2_fuel_system_id
                 + ":CG:y_ratio",
                 val=np.nan,
@@ -92,36 +92,36 @@ class SizingH2FuelSystemCGX(om.ExplicitComponent):
 
         if position == "at_center" or position == "from_rear_to_front":
             outputs[
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x"
+                "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x"
             ] = front_length + 0.5 * cabin_length
 
         elif position == "in_the_back":
             rear_length = inputs["data:geometry:fuselage:rear_length"]
             outputs[
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x"
+                "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x"
             ] = front_length + cabin_length + 0.5 * rear_length
 
         elif position == "from_rear_to_center":
             outputs[
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x"
+                "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x"
             ] = front_length + 0.75 * cabin_length
 
         elif position == "from_center_to_front":
             outputs[
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x"
+                "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x"
             ] = front_length + 0.25 * cabin_length
 
         if position == "in_the_wing" or wing_related:
             mac25x = inputs["data:geometry:wing:MAC:at25percent:x"]
             if position == "in_the_wing" or position == "from_center_to_wing":
                 outputs[
-                    "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x"
+                    "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x"
                 ] = mac25x
 
             elif wing_related:
                 span = inputs["data:geometry:wing:span"]
                 y_ratio = inputs[
-                    "data:propulsion:he_power_train:H2_fuel_system:"
+                    "data:propulsion:he_power_train:h2_fuel_system:"
                     + h2_fuel_system_id
                     + ":CG:y_ratio"
                 ]
@@ -130,14 +130,14 @@ class SizingH2FuelSystemCGX(om.ExplicitComponent):
                 if position == "from_front_to_wing":
                     cg_distance = mac25x - 0.25 * cabin_length - front_length
                     outputs[
-                        "data:propulsion:he_power_train:H2_fuel_system:"
+                        "data:propulsion:he_power_train:h2_fuel_system:"
                         + h2_fuel_system_id
                         + ":CG:x"
                     ] = mac25x - cg_distance * 0.5 * cabin_length / total_length
                 if position == "from_rear_to_wing":
                     cg_distance = 0.75 * cabin_length + front_length - mac25x
                     outputs[
-                        "data:propulsion:he_power_train:H2_fuel_system:"
+                        "data:propulsion:he_power_train:h2_fuel_system:"
                         + h2_fuel_system_id
                         + ":CG:x"
                     ] = mac25x + cg_distance * 0.5 * cabin_length / total_length
@@ -152,17 +152,17 @@ class SizingH2FuelSystemCGX(om.ExplicitComponent):
             span = inputs["data:geometry:wing:span"]
             mac25x = inputs["data:geometry:wing:MAC:at25percent:x"]
             y_ratio = inputs[
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio"
+                "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:y_ratio"
             ]
             total_length = 0.5 * (cabin_length + span * y_ratio)
 
             partials[
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x",
+                "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
             ] = 1.0 - 0.5 * cabin_length / total_length
 
             partials[
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x",
+                "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x",
                 "data:geometry:fuselage:front_length",
             ] = 0.5 * cabin_length / total_length
 
@@ -170,19 +170,19 @@ class SizingH2FuelSystemCGX(om.ExplicitComponent):
                 cg_distance = mac25x - 0.25 * cabin_length - front_length
 
                 partials[
-                    "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x",
+                    "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x",
                     "data:geometry:wing:span",
                 ] = cg_distance * cabin_length * y_ratio / (2.0 * total_length) ** 2.0
 
                 partials[
-                    "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x",
-                    "data:propulsion:he_power_train:H2_fuel_system:"
+                    "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x",
+                    "data:propulsion:he_power_train:h2_fuel_system:"
                     + h2_fuel_system_id
                     + ":CG:y_ratio",
                 ] = cg_distance * cabin_length * span / (2.0 * total_length) ** 2.0
 
                 partials[
-                    "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x",
+                    "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x",
                     "data:geometry:cabin:length",
                 ] = (
                     0.25 * cabin_length**2.0
@@ -193,19 +193,19 @@ class SizingH2FuelSystemCGX(om.ExplicitComponent):
                 cg_distance = 0.75 * cabin_length + front_length - mac25x
 
                 partials[
-                    "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x",
+                    "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x",
                     "data:geometry:wing:span",
                 ] = -cg_distance * cabin_length * y_ratio / (2.0 * total_length) ** 2.0
 
                 partials[
-                    "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x",
-                    "data:propulsion:he_power_train:H2_fuel_system:"
+                    "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x",
+                    "data:propulsion:he_power_train:h2_fuel_system:"
                     + h2_fuel_system_id
                     + ":CG:y_ratio",
                 ] = -cg_distance * cabin_length * span / (2.0 * total_length) ** 2.0
 
                 partials[
-                    "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x",
+                    "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":CG:x",
                     "data:geometry:cabin:length",
                 ] = (
                     0.75 * cabin_length**2.0

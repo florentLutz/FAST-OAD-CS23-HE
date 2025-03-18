@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -25,7 +25,7 @@ class SizingH2FuelSystemWeight(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:H2_fuel_system:"
+            name="data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
             units="m",
@@ -34,7 +34,7 @@ class SizingH2FuelSystemWeight(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:H2_fuel_system:"
+            name="data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter",
             units="m",
@@ -43,7 +43,7 @@ class SizingH2FuelSystemWeight(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:H2_fuel_system:"
+            name="data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_diameter",
             units="m",
@@ -52,7 +52,7 @@ class SizingH2FuelSystemWeight(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:H2_fuel_system:"
+            name="data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:length",
             units="m",
@@ -61,7 +61,7 @@ class SizingH2FuelSystemWeight(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:H2_fuel_system:"
+            name="data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:density",
             val=np.nan,
@@ -71,7 +71,7 @@ class SizingH2FuelSystemWeight(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:H2_fuel_system:"
+            name="data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:insulation_density",
             val=np.nan,
@@ -79,7 +79,7 @@ class SizingH2FuelSystemWeight(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":mass",
+            name="data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":mass",
             units="kg",
             val=10.0,
             desc="Weight of the hydrogen fuel system",
@@ -91,37 +91,37 @@ class SizingH2FuelSystemWeight(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         inner_d = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter"
         ]
         pipe_d = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter"
         ]
         overall_d = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_diameter"
         ]
         length = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:length"
         ]
         pipe_dens = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:density"
         ]
         insulation_dens = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:insulation_density"
         ]
 
-        outputs["data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":mass"] = (
+        outputs["data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":mass"] = (
             0.25
             * length
             * np.pi
@@ -135,39 +135,39 @@ class SizingH2FuelSystemWeight(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         inner_d = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter"
         ]
         pipe_d = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter"
         ]
         overall_d = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_diameter"
         ]
         length = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:length"
         ]
         pipe_dens = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:density"
         ]
         insulation_dens = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:insulation_density"
         ]
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":mass",
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":mass",
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:length",
         ] = (
@@ -180,36 +180,36 @@ class SizingH2FuelSystemWeight(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":mass",
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":mass",
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:density",
         ] = 0.25 * length * np.pi * (pipe_d**2.0 - inner_d**2.0)
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":mass",
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":mass",
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:insulation_density",
         ] = 0.25 * length * np.pi * (overall_d**2.0 - pipe_d**2.0)
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":mass",
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":mass",
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
         ] = -0.5 * length * np.pi * pipe_dens * inner_d
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":mass",
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":mass",
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter",
         ] = 0.5 * length * np.pi * (pipe_dens * pipe_d - insulation_dens * pipe_d)
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":mass",
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:" + h2_fuel_system_id + ":mass",
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_diameter",
         ] = 0.5 * length * np.pi * insulation_dens * overall_d

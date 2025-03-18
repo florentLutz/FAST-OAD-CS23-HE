@@ -26,7 +26,7 @@
         </geometry>
         <propulsion>
             <he_power_train>
-                <H2_fuel_system>
+                <h2_fuel_system>
                     <h2_fuel_system_1>
                         <mass units="kg">10.98</mass>
                         <total_fuel_flowed units="kg">45</total_fuel_flowed>
@@ -56,7 +56,7 @@
                             <wing>2.0<!--number of connection in the wing--></wing>
                         </connection>
                     </h2_fuel_system_1>
-                </H2_fuel_system>
+                </h2_fuel_system>
             </he_power_train>
         </propulsion>
     </data>

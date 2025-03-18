@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -52,7 +52,7 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":fuel_distribution",
             val=np.ones(number_of_tank_stacks),
@@ -76,7 +76,7 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
             )
             self.declare_partials(
                 of="fuel_consumed_in_t_" + str(i + 1),
-                wrt="data:propulsion:he_power_train:H2_fuel_system:"
+                wrt="data:propulsion:he_power_train:h2_fuel_system:"
                 + h2_fuel_system_id
                 + ":fuel_distribution",
                 method="exact",
@@ -88,12 +88,12 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
 
         #  First we rescale the distribution so that at all point it is between 0 and 1
         self.hydrogen_distribution = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":fuel_distribution"
         ] / np.sum(
             inputs[
-                "data:propulsion:he_power_train:H2_fuel_system:"
+                "data:propulsion:he_power_train:h2_fuel_system:"
                 + h2_fuel_system_id
                 + ":fuel_distribution"
             ]
@@ -112,7 +112,7 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
         fuel_flow = inputs["fuel_flowing_t"]
         scale_factor = sum(
             inputs[
-                "data:propulsion:he_power_train:H2_fuel_system:"
+                "data:propulsion:he_power_train:h2_fuel_system:"
                 + h2_fuel_system_id
                 + ":fuel_distribution"
             ]
@@ -131,7 +131,7 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
             base_partials[i, :] = fuel_flow * (1.0 - self.hydrogen_distribution[i]) / scale_factor
             partials[
                 "fuel_consumed_in_t_" + str(i + 1),
-                "data:propulsion:he_power_train:H2_fuel_system:"
+                "data:propulsion:he_power_train:h2_fuel_system:"
                 + h2_fuel_system_id
                 + ":fuel_distribution",
             ] = np.transpose(base_partials)

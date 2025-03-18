@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -37,7 +37,7 @@ class PerformancesTotalH2FuelFlowed(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":total_fuel_flowed",
             units="kg",
@@ -57,7 +57,7 @@ class PerformancesTotalH2FuelFlowed(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         outputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":total_fuel_flowed"
         ] = sum(inputs["fuel_flowing_t"])

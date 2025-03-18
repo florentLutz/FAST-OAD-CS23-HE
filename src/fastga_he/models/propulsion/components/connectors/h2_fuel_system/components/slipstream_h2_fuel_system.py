@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 
-class SlipstreamFuelSystem(om.Group):
+class SlipstreamH2FuelSystem(om.Group):
     """
     Component that computes the variation of aerodynamic coefficient during the mission. This
     component is required as all components are required to provide one component that computes

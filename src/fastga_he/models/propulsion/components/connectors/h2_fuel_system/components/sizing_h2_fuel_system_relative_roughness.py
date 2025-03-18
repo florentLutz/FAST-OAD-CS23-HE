@@ -8,9 +8,9 @@ import openmdao.api as om
 
 class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
     """
-    Computation of the inner relative roughness of the H2 fuel system. The pipe inner surface
-    irregularity is obtained from: https://www.pipeflow.com/pipe-pressure-drop-calculations/pipe
-    -roughness.
+    Computation of the inner relative roughness of the H2 fuel system, which will be part of the
+    pressure loss computation. The pipe inner surface irregularity is obtained from:
+    https://www.pipeflow.com/pipe-pressure-drop-calculations/pipe-roughness.
     """
 
     def initialize(self):
@@ -26,7 +26,7 @@ class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
             units="mm",
@@ -35,16 +35,17 @@ class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:surface_irregularity",
             val=0.045,
             units="mm",
-            desc="Pipe inner surface irregularity",
+            desc="Pipe inner surface irregularity, the typical value of commercial or welded Steel "
+            "is considered",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:H2_fuel_system:"
+            name="data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":relative_roughness",
             val=0.01,
@@ -57,19 +58,19 @@ class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         epsilon = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:surface_irregularity"
         ]
 
         d_inner = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter"
         ]
 
         outputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":relative_roughness"
         ] = epsilon / d_inner
@@ -77,31 +78,31 @@ class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
         epsilon = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:surface_irregularity"
         ]
 
         d_inner = inputs[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter"
         ]
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":relative_roughness",
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
         ] = -epsilon / d_inner**2.0
 
         partials[
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":relative_roughness",
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":material:surface_irregularity",
         ] = 1.0 / d_inner

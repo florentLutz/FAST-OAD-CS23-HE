@@ -27,7 +27,7 @@ class SizingH2FuelSystemDrag(om.ExplicitComponent):
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_output(
-            "data:propulsion:he_power_train:H2_fuel_system:"
+            "data:propulsion:he_power_train:h2_fuel_system:"
             + h2_fuel_system_id
             + ":"
             + ls_tag

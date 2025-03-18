@@ -1,13 +1,12 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 
-from .perf_fuel_output import PerformancesH2FuelSystemOutput
-from .perf_fuel_input import PerformancesH2FuelSystemInput
-from .perf_fuel_maximum import PerformancesH2FuelSystemMaximum
-from .perf_total_fuel_flowed import PerformancesTotalH2FuelFlowed
+from .perf_h2_fuel_output import PerformancesH2FuelSystemOutput
+from .perf_h2_fuel_input import PerformancesH2FuelSystemInput
+from .perf_h2_total_fuel_flowed import PerformancesTotalH2FuelFlowed
 
 
 class PerformancesH2FuelSystem(om.Group):
@@ -69,14 +68,6 @@ class PerformancesH2FuelSystem(om.Group):
             name="total_h2_fuel_flowed",
             subsys=PerformancesTotalH2FuelFlowed(
                 number_of_points=number_of_points, h2_fuel_system_id=h2_fuel_system_id
-            ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="h2_fuel_flow_maximum",
-            subsys=PerformancesH2FuelSystemMaximum(
-                number_of_sources=number_of_sources,
-                number_of_points=number_of_points,
             ),
             promotes=["*"],
         )
