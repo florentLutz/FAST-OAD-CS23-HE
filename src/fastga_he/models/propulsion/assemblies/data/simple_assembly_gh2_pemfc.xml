@@ -102,6 +102,12 @@
                 </PEMFC_stack>
                 <H2_fuel_system>
                     <h2_fuel_system_1>
+                        <low_speed>
+                            <CD0>0.0</CD0>
+                        </low_speed>
+                        <cruise>
+                            <CD0>0.0</CD0>
+                        </cruise>
                         <mass units="kg">10.98</mass>
                         <total_fuel_flowed units="kg">45</total_fuel_flowed>
                         <connected_volume units="L">62.59</connected_volume>
@@ -119,7 +125,7 @@
                             <length units="m">2.0</length>
                         </dimension>
                         <material>
-                            <yield_strength units="Pa">240000000</yield_strength>
+                            <yield_strength units="MPa">240</yield_strength>
                             <density units="kg/m**3">7700</density>
                             <insulation_density units="kg/m**3">160</insulation_density>
                         </material>

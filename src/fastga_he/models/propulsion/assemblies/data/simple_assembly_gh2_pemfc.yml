@@ -46,7 +46,7 @@ power_train_components:
       number_of_sources: 1
   gaseous_hydrogen_tank_1:
     id: fastga_he.pt_component.gaseous_hydrogen_tank
-    position: underbelly
+    position: in_the_cabin
 
 component_connections:
   - source: propeller_1
