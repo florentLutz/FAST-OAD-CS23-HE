@@ -43,6 +43,7 @@
             <fuselage>
                 <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
                 <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <maximum_height units="m" is_input="False">0.99<!--maximum fuselage height--></maximum_height>
                 <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
                 <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
             </fuselage>
@@ -99,7 +100,7 @@
                         </CG>
                     </pemfc_stack_1>
                 </PEMFC_stack>
-                <h2_fuel_system>
+                <H2_fuel_system>
                     <h2_fuel_system_1>
                         <mass units="kg">10.98</mass>
                         <total_fuel_flowed units="kg">45</total_fuel_flowed>
@@ -107,17 +108,18 @@
                         <number_engine>2.0</number_engine>
                         <CG>
                             <y_ratio>0.224</y_ratio>
+                            <x units="m">1.60775</x>
                         </CG>
                         <length units="m">4.9</length>
                         <dimension>
                             <pipe_diameter units="m">0.04</pipe_diameter>
-                            <inner_diameter units="m">0.0373</inner_diameter>
+                            <inner_diameter units="m">0.037</inner_diameter>
                             <insulation_thickness units="m">0.005</insulation_thickness>
                             <overall_diameter units="m">0.05</overall_diameter>
                             <length units="m">2.0</length>
                         </dimension>
                         <material>
-                            <yield_strength units="Pa">240000000000</yield_strength>
+                            <yield_strength units="Pa">240000000</yield_strength>
                             <density units="kg/m**3">7700</density>
                             <insulation_density units="kg/m**3">160</insulation_density>
                         </material>
@@ -129,7 +131,7 @@
                             <wing>0.0<!--number of connection in the wing--></wing>
                         </connection>
                     </h2_fuel_system_1>
-                </h2_fuel_system>
+                </H2_fuel_system>
                 <gaseous_hydrogen_tank>
                     <gaseous_hydrogen_tank_1>
                         <mass units="kg">16.34</mass>

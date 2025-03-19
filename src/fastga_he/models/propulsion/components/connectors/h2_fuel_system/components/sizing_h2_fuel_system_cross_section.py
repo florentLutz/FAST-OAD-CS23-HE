@@ -24,7 +24,7 @@ class SizingH2FuelSystemCrossSectionDimension(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:h2_fuel_system:"
+            name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
             units="m",
@@ -33,7 +33,7 @@ class SizingH2FuelSystemCrossSectionDimension(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:h2_fuel_system:"
+            name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter",
             units="m",
@@ -42,7 +42,7 @@ class SizingH2FuelSystemCrossSectionDimension(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:h2_fuel_system:"
+            name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:insulation_thickness",
             units="m",
@@ -51,7 +51,7 @@ class SizingH2FuelSystemCrossSectionDimension(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:h2_fuel_system:"
+            name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_wall_thickness",
             units="m",
@@ -60,7 +60,7 @@ class SizingH2FuelSystemCrossSectionDimension(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:h2_fuel_system:"
+            name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_diameter",
             units="m",
@@ -69,50 +69,50 @@ class SizingH2FuelSystemCrossSectionDimension(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:h2_fuel_system:"
+            of="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_wall_thickness",
-            wrt="data:propulsion:he_power_train:h2_fuel_system:"
+            wrt="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter",
             val=0.5,
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:h2_fuel_system:"
+            of="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_wall_thickness",
-            wrt="data:propulsion:he_power_train:h2_fuel_system:"
+            wrt="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
             val=-0.5,
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:h2_fuel_system:"
+            of="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_wall_thickness",
-            wrt="data:propulsion:he_power_train:h2_fuel_system:"
+            wrt="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:insulation_thickness",
             val=1.0,
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:h2_fuel_system:"
+            of="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_diameter",
-            wrt="data:propulsion:he_power_train:h2_fuel_system:"
+            wrt="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter",
             val=1.0,
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:h2_fuel_system:"
+            of="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_diameter",
-            wrt="data:propulsion:he_power_train:h2_fuel_system:"
+            wrt="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:insulation_thickness",
             val=2.0,
@@ -121,29 +121,29 @@ class SizingH2FuelSystemCrossSectionDimension(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
         pipe_d = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:pipe_diameter"
         ]
         inner_d = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter"
         ]
         thickness_ins = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:insulation_thickness"
         ]
 
         outputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_wall_thickness"
         ] = 0.5 * (pipe_d - inner_d) + thickness_ins
 
         outputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:overall_diameter"
         ] = pipe_d + 2.0 * thickness_ins

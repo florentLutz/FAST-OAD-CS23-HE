@@ -52,7 +52,7 @@ def test_fuel_system_cg_x():
         )
 
         assert problem.get_val(
-            "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:CG:x", units="m"
+            "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:CG:x", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -76,7 +76,7 @@ def test_fuel_system_cg_y():
         )
 
         assert problem.get_val(
-            "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:CG:y", units="m"
+            "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:CG:y", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
@@ -93,7 +93,7 @@ def test_h2_fuel_pipe_length():
     problem = run_system(SizingH2FuelSystemLength(h2_fuel_system_id="h2_fuel_system_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:dimension:length", units="m"
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:length", units="m"
     ) == pytest.approx(4.9, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -101,18 +101,58 @@ def test_h2_fuel_pipe_length():
 
 def test_h2_fuel_inner_diameter():
     # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingH2FuelSystemInnerDiameter(h2_fuel_system_id="h2_fuel_system_1")),
-        __file__,
-        XML_FILE,
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:pipe_pressure" "",
+        val=70.0,
+        units="MPa",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension" ":pipe_diameter",
+        val=0.04,
+        units="m",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:material" ":yield_strength",
+        val=240,
+        units="MPa",
     )
 
     problem = run_system(SizingH2FuelSystemInnerDiameter(h2_fuel_system_id="h2_fuel_system_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:dimension:inner_diameter",
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:inner_diameter",
         units="m",
-    ) == pytest.approx(0.0373, rel=1e-2)
+    ) == pytest.approx(0.0349, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_h2_fuel_inner_diameter_clipped():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:pipe_pressure" "",
+        val=1013250.0,
+        units="Pa",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension" ":pipe_diameter",
+        val=0.04,
+        units="m",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:material" ":yield_strength",
+        val=240,
+        units="MPa",
+    )
+
+    problem = run_system(SizingH2FuelSystemInnerDiameter(h2_fuel_system_id="h2_fuel_system_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:inner_diameter",
+        units="m",
+    ) == pytest.approx(0.037, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -130,7 +170,7 @@ def test_h2_fuel_relative_roughness():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:relative_roughness",
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:relative_roughness",
     ) == pytest.approx(0.001206, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -149,12 +189,12 @@ def test_h2_fuel_overall_cross_section():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:dimension:overall_diameter",
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:overall_diameter",
         units="m",
     ) == pytest.approx(0.05, rel=1e-2)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:dimension:overall_wall_thickness",
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:overall_wall_thickness",
         units="m",
     ) == pytest.approx(0.00635, rel=1e-2)
 
@@ -172,7 +212,7 @@ def test_fuel_system_weight():
     problem = run_system(SizingH2FuelSystemWeight(h2_fuel_system_id="h2_fuel_system_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:mass", units="kg"
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass", units="kg"
     ) == pytest.approx(2.75, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -196,7 +236,7 @@ def test_fuel_output():
         np.linspace(5.0, 4.0, NB_POINTS_TEST), rel=1e-2
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:number_source"
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:number_source"
     ) == pytest.approx(2, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -224,7 +264,7 @@ def test_fuel_input():
     problem.check_partials(compact_print=True)
 
     ivc.add_output(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:fuel_distribution",
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:fuel_distribution",
         val=np.array([3.0 / 4.0, 1.0 / 4.0]),
     )
 
@@ -257,7 +297,7 @@ def test_total_fuel_flowed():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:total_fuel_flowed",
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:total_fuel_flowed",
         units="kg",
     ) == pytest.approx(45.0, rel=1e-2)
 
@@ -278,11 +318,11 @@ def test_fuel_system_performances():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:total_fuel_flowed",
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:total_fuel_flowed",
         units="kg",
     ) == pytest.approx(45.0, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:number_source"
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:number_source"
     ) == pytest.approx(2, rel=1e-2)
     assert problem.get_val("fuel_consumed_in_t_1", units="kg") == pytest.approx(
         np.linspace(1.0, 0.8, NB_POINTS_TEST), rel=1e-2
@@ -302,13 +342,13 @@ def test_sizing_h2_fuel_system():
     problem = run_system(SizingH2FuelSystem(h2_fuel_system_id="h2_fuel_system_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:mass", units="kg"
-    ) == pytest.approx(6.785, rel=1e-2)
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass", units="kg"
+    ) == pytest.approx(7.4, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:cruise:CD0"
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:cruise:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:low_speed:CD0"
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:low_speed:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

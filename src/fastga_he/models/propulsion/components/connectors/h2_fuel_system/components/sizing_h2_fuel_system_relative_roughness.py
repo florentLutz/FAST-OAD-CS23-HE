@@ -26,7 +26,7 @@ class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
             units="mm",
@@ -35,7 +35,7 @@ class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":material:surface_irregularity",
             val=0.045,
@@ -45,7 +45,7 @@ class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:h2_fuel_system:"
+            name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":relative_roughness",
             val=0.01,
@@ -58,19 +58,19 @@ class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
 
         epsilon = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":material:surface_irregularity"
         ]
 
         d_inner = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter"
         ]
 
         outputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":relative_roughness"
         ] = epsilon / d_inner
@@ -78,31 +78,31 @@ class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
         epsilon = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":material:surface_irregularity"
         ]
 
         d_inner = inputs[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter"
         ]
 
         partials[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":relative_roughness",
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":dimension:inner_diameter",
         ] = -epsilon / d_inner**2.0
 
         partials[
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":relative_roughness",
-            "data:propulsion:he_power_train:h2_fuel_system:"
+            "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":material:surface_irregularity",
         ] = 1.0 / d_inner

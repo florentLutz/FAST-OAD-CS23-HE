@@ -31,6 +31,11 @@ from ..assemblers.delta_cl_from_pt_file import PowerTrainDeltaClFromFile
 from ..assemblers.delta_cd_from_pt_file import PowerTrainDeltaCdFromFile
 from ..assemblers.delta_cm_from_pt_file import PowerTrainDeltaCmFromFile
 
+from ..components.source.pemfc.constants import SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA
+from ..components.tanks.gaseous_hydrogen_tank.constants import (
+    SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY,
+)
+
 from . import outputs
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
@@ -132,16 +137,16 @@ def test_assembly_performances():
     ) * problem.get_val("performances.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                198896.0,
-                199938.0,
-                200961.0,
-                201966.0,
-                202952.0,
-                203920.0,
-                204869.0,
+                198896.7,
+                199938.3,
+                200961.5,
+                201966.2,
+                202952.5,
+                203920.3,
+                204869.5,
                 205800.0,
-                206711.0,
-                207604.0,
+                206711.8,
+                207605.0,
             ]
         ),
         abs=1,
@@ -194,9 +199,9 @@ def test_assembly_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
         units="kg",
-    ) == pytest.approx(43.6, rel=1e-2)
+    ) == pytest.approx(29.07, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:mass", units="kg"
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass", units="kg"
     ) == pytest.approx(0.084, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
@@ -221,9 +226,6 @@ def test_performances_sizing_assembly_pemfc_gh2_enforce():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.battery.state_of_charge"
-    ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce"
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
@@ -265,7 +267,7 @@ def test_performances_sizing_assembly_pemfc_gh2_enforce():
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
         units="kg",
-    ) == pytest.approx(47.6, rel=1e-2)
+    ) == pytest.approx(32.07, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
     ) == pytest.approx(121.8, rel=1e-2)
@@ -275,9 +277,12 @@ def test_performances_sizing_assembly_pemfc_gh2_ensure():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
-    oad.RegisterSubmodel.active_models[
-        "submodel.propulsion.constraints.battery.state_of_charge"
-    ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure"
+    oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY] = (
+        "fastga_he.submodel.propulsion.constraints.gaseous_hydrogen_tank.capacity.ensure"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = (
+        "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure"
+    )
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
@@ -318,10 +323,10 @@ def test_performances_sizing_assembly_pemfc_gh2_ensure():
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
         units="kg",
-    ) == pytest.approx(47.6, rel=1e-2)
+    ) == pytest.approx(30.72, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
-    ) == pytest.approx(121.8, rel=1e-2)
+    ) == pytest.approx(251.21, rel=1e-2)
 
 
 def test_assembly_sizing_from_pt_file():
@@ -365,13 +370,13 @@ def test_assembly_sizing_from_pt_file():
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
         units="kg",
-    ) == pytest.approx(47.6, rel=1e-2)
+    ) == pytest.approx(29.37, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:h2_fuel_system:h2_fuel_system_1:mass", units="kg"
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass", units="kg"
     ) == pytest.approx(0.084, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
-    ) == pytest.approx(121.8, rel=1e-2)
+    ) == pytest.approx(107.3, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass", units="kg"
     ) == pytest.approx(6.40, rel=1e-2)
@@ -386,16 +391,16 @@ def test_assembly_sizing_from_pt_file():
     ) == pytest.approx(6.40, rel=1e-2)
 
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        3389.0, rel=1e-2
+        525.788, rel=1e-2
     )
     assert problem.get_val("data:propulsion:he_power_train:CG:x", units="m") == pytest.approx(
-        2.867, rel=1e-2
+        2.518, rel=1e-2
     )
     assert problem.get_val("data:propulsion:he_power_train:low_speed:CD0") == pytest.approx(
-        0.000357, rel=1e-2
+        0.174969, rel=1e-2
     )
     assert problem.get_val("data:propulsion:he_power_train:cruise:CD0") == pytest.approx(
-        0.000352, rel=1e-2
+        0.17257, rel=1e-2
     )
 
     write_outputs(
@@ -405,7 +410,7 @@ def test_assembly_sizing_from_pt_file():
 
 
 def test_performances_from_pt_file():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_gh2_pemfc.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -450,16 +455,16 @@ def test_performances_from_pt_file():
     assert current_in * voltage_in == pytest.approx(
         np.array(
             [
-                197132.0,
-                198193.0,
-                199229.0,
-                200247.0,
-                201251.0,
-                202246.0,
-                203236.0,
-                204218.0,
-                205181.0,
-                206076.0,
+                198895.0,
+                199936.5,
+                200960.0,
+                201964.4,
+                202950.7,
+                203918.4,
+                204867.5,
+                205798.0,
+                206709.8,
+                207602.8,
             ]
         ),
         abs=1,
@@ -471,70 +476,8 @@ def test_performances_from_pt_file():
     )
 
 
-def test_performances_from_pt_file_aux_load():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_load.yml")
-
-    ivc = get_indep_var_comp(
-        list_inputs(
-            PowerTrainPerformancesFromFile(
-                power_train_file_path=pt_file_path,
-                number_of_points=NB_POINTS_TEST,
-                pre_condition_pt=True,
-            )
-        ),
-        __file__,
-        XML_FILE,
-    )
-
-    altitude = np.full(NB_POINTS_TEST, 0.0)
-    ivc.add_output("altitude", val=altitude, units="m")
-    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
-    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
-    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
-    ivc.add_output(
-        "exterior_temperature",
-        units="degK",
-        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
-    )
-    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
-
-    problem = run_system(
-        PowerTrainPerformancesFromFile(
-            power_train_file_path=pt_file_path,
-            number_of_points=NB_POINTS_TEST,
-            pre_condition_pt=True,
-        ),
-        ivc,
-    )
-
-    # om.n2(problem)
-
-    _, _, residuals = problem.model.component.get_nonlinear_vectors()
-
-    current_in = problem.get_val("component.dc_dc_converter_1.dc_current_in", units="A")
-    voltage_in = problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V")
-
-    assert current_in * voltage_in == pytest.approx(
-        np.array(
-            [
-                202403.0,
-                203468.0,
-                204508.0,
-                205528.0,
-                206537.0,
-                207538.0,
-                208533.0,
-                209519.0,
-                210483.0,
-                211377.0,
-            ]
-        ),
-        abs=1,
-    )
-
-
 def test_mass_from_pt_file():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_gh2_pemfc.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(PowerTrainMassFromFile(power_train_file_path=pt_file_path)),
@@ -548,13 +491,13 @@ def test_mass_from_pt_file():
     )
 
     assert problem.get_val("data:propulsion:he_power_train:mass", units="kg") == pytest.approx(
-        5150.0, rel=1e-2
+        585.3, rel=1e-2
     )
     problem.check_partials(compact_print=True)
 
 
 def test_cg_from_pt_file():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_gh2_pemfc.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(PowerTrainCGFromFile(power_train_file_path=pt_file_path)),
@@ -568,13 +511,13 @@ def test_cg_from_pt_file():
     )
 
     assert problem.get_val("data:propulsion:he_power_train:CG:x", units="m") == pytest.approx(
-        2.868, rel=1e-2
+        1.776, rel=1e-2
     )
     problem.check_partials(compact_print=True)
 
 
 def test_drag_from_pt_file():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_gh2_pemfc.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(PowerTrainDragFromFile(power_train_file_path=pt_file_path)),

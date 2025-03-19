@@ -26,7 +26,7 @@
         </geometry>
         <propulsion>
             <he_power_train>
-                <h2_fuel_system>
+                <H2_fuel_system>
                     <h2_fuel_system_1>
                         <mass units="kg">10.98</mass>
                         <total_fuel_flowed units="kg">45</total_fuel_flowed>
@@ -44,11 +44,11 @@
                             <length units="m">2.0</length>
                         </dimension>
                         <material>
-                            <yield_strength units="Pa">240000000000</yield_strength>
+                            <yield_strength units="MPa">240</yield_strength>
                             <density units="kg/m**3">7700</density>
                             <insulation_density units="kg/m**3">160</insulation_density>
                         </material>
-                        <pipe_pressure units="Pa">35000000000</pipe_pressure>
+                        <pipe_pressure units="MPa">3.5</pipe_pressure>
                         <connection>
                             <front>0.0<!--number of connection at the front of the fuselage--></front>
                             <rear>3.0<!--number of connection at the rear of the fuselage--></rear>
@@ -56,7 +56,7 @@
                             <wing>2.0<!--number of connection in the wing--></wing>
                         </connection>
                     </h2_fuel_system_1>
-                </h2_fuel_system>
+                </H2_fuel_system>
             </he_power_train>
         </propulsion>
     </data>

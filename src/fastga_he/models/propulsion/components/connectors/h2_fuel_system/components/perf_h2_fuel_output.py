@@ -45,7 +45,7 @@ class PerformancesH2FuelSystemOutput(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:h2_fuel_system:"
+            name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":number_source",
             val=self.options["number_of_sources"],

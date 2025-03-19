@@ -15,6 +15,14 @@
         <mach is_input="True">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
         <unit_reynolds units="1/m" is_input="True">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
       </low_speed>
+      <fuselage>
+        <cruise>
+          <CD0 is_input="True">0.01194819286123646<!--profile drag coefficient for fuselage in cruise conditions--></CD0>
+        </cruise>
+        <low_speed>
+          <CD0 is_input="True">0.012114342193164637<!--profile drag coefficient for fuselage in low speed conditions--></CD0>
+        </low_speed>
+      </fuselage>
       <wing>
         <low_speed>
           <CL_vector is_input="True">[1.1017227197335075, 1.1013013453498266, 1.10038811694889, 1.098403873777725, 1.0918579844211873, 1.080610615570361, 1.0628034699038733, 1.0347815173407644, 0.9892716074062258, 0.9114284949703251, 0.8359515927452368, 0.7818631930166186, 0.7254369570766273, 0.660566179673128, 0.5814473768423762, 0.4785864136757275, 0.32879610850232355, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing at the station along the wing span in Y_vector, the total corresponding wing lift coefficient is equal to CL0_clean--></CL_vector>
@@ -32,8 +40,8 @@
       </flap>
       <fuselage>
         <front_length units="m" is_input="True">0.5<!--length of the front cone of the aircraft--></front_length>
-        <maximum_height units="m" is_input="True">nan<!--maximum height of the fuselage--></maximum_height>
-        <rear_length units="m" is_input="True">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+        <maximum_height units="m" is_input="True">0.99<!--maximum height of the fuselage--></maximum_height>
+        <wet_area units="m**2" is_input="True">23.873036515818036<!--fuselage wet area--></wet_area>
       </fuselage>
       <wing>
         <area units="m**2" is_input="True">7.105673586278243<!--wing area--></area>
@@ -447,6 +455,48 @@
             </sheath>
           </harness_1>
         </DC_cable_harness>
+        <H2_fuel_system>
+          <h2_fuel_system_1>
+            <fuel_distribution is_input="True">1.0</fuel_distribution>
+            <mass units="kg" is_input="False">0.08357615058936613<!--Weight of the hydrogen fuel system--></mass>
+            <number_source is_input="False">1.0<!--Number of power source connected to this hydrogen fuel system--></number_source>
+            <pipe_pressure units="Pa" is_input="True">1013250.0<!--hydrogen transport pressure--></pipe_pressure>
+            <relative_roughness is_input="False">0.0011250023748046874<!--Inner diameter of the hydrogen fuel system--></relative_roughness>
+            <safety_factor is_input="True">1.0<!--hydrogen fuel system design safety factor--></safety_factor>
+            <total_fuel_flowed units="kg" is_input="False">15.418620602510641<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
+            <CG>
+              <x units="m" is_input="False">1.6080628878066596<!--X position of the hydrogen fuel system center of gravity--></x>
+              <y units="m" is_input="False">0.0<!--Y position of the ICE center of gravity--></y>
+              <y_ratio is_input="True">0.224<!--Y position of the power source center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <connection>
+              <front is_input="True">0.0<!--Number of front connections for the h2 fuel system--></front>
+              <near is_input="True">0.0<!--Number of near connections for the h2 fuel system--></near>
+              <rear is_input="True">1.0<!--Number of rear connections for the h2 fuel system--></rear>
+              <wing is_input="True">0.0<!--Number of wing connections for the h2 fuel system--></wing>
+            </connection>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <dimension>
+              <inner_diameter units="m" is_input="False">0.03999991556267824<!--Inner diameter of the hydrogen fuel system--></inner_diameter>
+              <insulation_thickness units="m" is_input="True">0.005<!--Pipe insulation layer thickness--></insulation_thickness>
+              <length units="m" is_input="False">0.7387085918711065<!--Total length of the h2 fuel system--></length>
+              <overall_diameter units="m" is_input="False">0.05<!--Overall diameter of the hydrogen fuel system--></overall_diameter>
+              <overall_wall_thickness units="m" is_input="False">0.00500004221866088<!--Overall wall thickness of the hydrogen fuel system--></overall_wall_thickness>
+              <pipe_diameter units="m" is_input="True">0.04<!--Pipe diameter of the hydrogen fuel system--></pipe_diameter>
+            </dimension>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+            <material>
+              <density units="kg/m**3" is_input="True">7700.0<!--pipe wall material yield stress. Some reference (in kg/m^3):Steel(306):7700, Aluminum(5083):2660, --></density>
+              <insulation_density units="kg/m**3" is_input="True">160.0</insulation_density>
+              <surface_irregularity units="mm" is_input="True">0.045<!--Pipe inner surface irregularity, the typical value of commercial or welded Steel is considered--></surface_irregularity>
+              <yield_strength units="Pa" is_input="True">240000000000.0<!--pipe wall material yield stress. Some reference (in MPa):Steel(306):240, Aluminum(5083):228, --></yield_strength>
+            </material>
+          </h2_fuel_system_1>
+        </H2_fuel_system>
         <PEMFC_stack>
           <pemfc_stack_1>
             <area_ohmic_resistance units="ohm*cm**2" is_input="True">0.24<!--Area ohmic resistance of the single-layered PEMFC--></area_ohmic_resistance>
@@ -530,30 +580,29 @@
             <diameter_height_ratio is_input="True">0.9<!--Fraction between the tank outer diameter and fuselage height--></diameter_height_ratio>
             <fuel_consumed_mission units="kg" is_input="False">15.418620602510641<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
             <fuel_total_mission units="kg" is_input="False">15.759114229869668<!--Total amount of hydrogen loaded in the tank for the mission--></fuel_total_mission>
-            <gravimetric_index is_input="False">0.2485372613822923<!--Ratio between the maximum capacity and overall system weight--></gravimetric_index>
+            <gravimetric_index is_input="False">0.33151640487047035<!--Ratio between the maximum capacity and overall system weight--></gravimetric_index>
             <inner_volume units="m**3" is_input="False">19.465788829546028<!--Capacity of the tank in terms of volume--></inner_volume>
-            <mass units="kg" is_input="False">47.64833679868854<!--Weight of the gaseous hydrogen tanks--></mass>
+            <mass units="kg" is_input="False">31.777339466975434<!--Weight of the gaseous hydrogen tanks--></mass>
             <number_of_tank is_input="True">1.0<!--Number of gaseous hydrogen tank in a stack in fuselage. Default set 1.0 for single tank in fuselage and outside fuselage uses.--></number_of_tank>
             <safety_factor is_input="True">1.0<!--gaseous hydrogen tank design safety factor--></safety_factor>
             <tank_pressure units="Pa" is_input="True">1013250.0<!--gaseous hydrogen tank static pressure--></tank_pressure>
             <trapped_ratio is_input="True">0.03<!--Ratio between the hydrogen reactant pressure for fuel cell or the injection pressure for hydrogen engines and filling pressure of hydrogen tank--></trapped_ratio>
             <unusable_fuel_mission units="kg" is_input="False">0.45900332708358255<!--Amount of trapped hydrogen in the tank--></unusable_fuel_mission>
             <CG>
-              <x units="m" is_input="False">3.6479592981364553<!--X position of the tank center of gravity--></x>
+              <x units="m" is_input="False">1.2387085918711065<!--X position of the tank center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the tank center of gravity--></y>
             </CG>
             <cruise>
-              <CD0 is_input="False">0.0</CD0>
+              <CD0 is_input="False">0.1882052521834035</CD0>
             </cruise>
             <dimension>
-              <inner_diameter units="m" is_input="False">3.3357455770852695<!--Inner diameter of the gaseous hydrogen tanks--></inner_diameter>
-              <length units="m" is_input="False">3.341084228788484<!--Value of the cylindrical length of the tank in the x-direction, computed differently based on the location of the tank.--></length>
-              <outer_diameter units="m" is_input="False">3.3375244950884175<!--Outer diameter of the gaseous hydrogen tank--></outer_diameter>
-              <rear_length_ratio is_input="True">0.5<!--The ratio between the usable length of the rear fuselage and the the whole rear fuselage length.--></rear_length_ratio>
-              <wall_thickness units="m" is_input="False">0.000889459001574<!--Inner diameter of the gaseous hydrogen tanks--></wall_thickness>
+              <inner_diameter units="m" is_input="False">0.19789446496493382<!--Inner diameter of the gaseous hydrogen tanks--></inner_diameter>
+              <length units="m" is_input="False">632.9365402429271<!--Value of the cylindrical length of the tank in the x-direction, computed differently based on the location of the tank.--></length>
+              <outer_diameter units="m" is_input="False">0.198<!--Outer diameter of the gaseous hydrogen tank--></outer_diameter>
+              <wall_thickness units="m" is_input="False">5.276751753309494e-05<!--Inner diameter of the gaseous hydrogen tanks--></wall_thickness>
             </dimension>
             <low_speed>
-              <CD0 is_input="False">0.0</CD0>
+              <CD0 is_input="False">0.19082239916778945</CD0>
             </low_speed>
             <material>
               <density units="kg/m**3" is_input="True">1530.0<!--Choice of the tank material,Some reference (in kg/m**3): Steel(ASTM-A514):7860, Aluminum(2014-T6):2800, Titanium(6%Al,4%V):4460, Carbon Composite:1530--></density>
@@ -561,48 +610,6 @@
             </material>
           </gaseous_hydrogen_tank_1>
         </gaseous_hydrogen_tank>
-        <h2_fuel_system>
-          <h2_fuel_system_1>
-            <fuel_distribution is_input="True">1.0</fuel_distribution>
-            <mass units="kg" is_input="False">0.08357615058936613<!--Weight of the hydrogen fuel system--></mass>
-            <number_source is_input="False">1.0<!--Number of power source connected to this hydrogen fuel system--></number_source>
-            <pipe_pressure units="Pa" is_input="True">1013250.0<!--hydrogen transport pressure--></pipe_pressure>
-            <relative_roughness is_input="False">0.0011250023748046874<!--Inner diameter of the hydrogen fuel system--></relative_roughness>
-            <safety_factor is_input="True">1.0<!--hydrogen fuel system design safety factor--></safety_factor>
-            <total_fuel_flowed units="kg" is_input="False">15.418620602510641<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
-            <CG>
-              <x units="m" is_input="False">1.6080628878066596<!--X position of the hydrogen fuel system center of gravity--></x>
-              <y units="m" is_input="False">0.0<!--Y position of the ICE center of gravity--></y>
-              <y_ratio is_input="True">0.224<!--Y position of the power source center of gravity as a ratio of the wing half-span--></y_ratio>
-            </CG>
-            <connection>
-              <front is_input="True">0.0<!--Number of front connections for the h2 fuel system--></front>
-              <near is_input="True">0.0<!--Number of near connections for the h2 fuel system--></near>
-              <rear is_input="True">1.0<!--Number of rear connections for the h2 fuel system--></rear>
-              <wing is_input="True">0.0<!--Number of wing connections for the h2 fuel system--></wing>
-            </connection>
-            <cruise>
-              <CD0 is_input="False">0.0</CD0>
-            </cruise>
-            <dimension>
-              <inner_diameter units="m" is_input="False">0.03999991556267824<!--Inner diameter of the hydrogen fuel system--></inner_diameter>
-              <insulation_thickness units="m" is_input="True">0.005<!--Pipe insulation layer thickness--></insulation_thickness>
-              <length units="m" is_input="False">0.7387085918711065<!--Total length of the h2 fuel system--></length>
-              <overall_diameter units="m" is_input="False">0.05<!--Overall diameter of the hydrogen fuel system--></overall_diameter>
-              <overall_wall_thickness units="m" is_input="False">0.00500004221866088<!--Overall wall thickness of the hydrogen fuel system--></overall_wall_thickness>
-              <pipe_diameter units="m" is_input="True">0.04<!--Pipe diameter of the hydrogen fuel system--></pipe_diameter>
-            </dimension>
-            <low_speed>
-              <CD0 is_input="False">0.0</CD0>
-            </low_speed>
-            <material>
-              <density units="kg/m**3" is_input="True">7700.0<!--pipe wall material yield stress. Some reference (in kg/m^3):Steel(306):7700, Aluminum(5083):2660, --></density>
-              <insulation_density units="kg/m**3" is_input="True">160.0</insulation_density>
-              <surface_irregularity units="mm" is_input="True">0.045<!--Pipe inner surface irregularity, the typical value of commercial or welded Steel is considered--></surface_irregularity>
-              <yield_strength units="Pa" is_input="True">240000000000.0<!--pipe wall material yield stress. Some reference (in MPa):Steel(306):240, Aluminum(5083):228, --></yield_strength>
-            </material>
-          </h2_fuel_system_1>
-        </h2_fuel_system>
         <inverter>
           <inverter_1>
             <current_ac_max units="A" is_input="False">741.0665236737296<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
@@ -822,13 +829,6 @@
             </inductor>
           </dc_dc_converter_1>
         </DC_DC_converter>
-        <gaseous_hydrogen_tank>
-          <gaseous_hydrogen_tank_1>
-            <dimension>
-              <length units="m" is_input="False">0.5166034937742379<!--Constraints on the tank length w.r.t the cabin/rear_fuselage length,  respected if <0--></length>
-            </dimension>
-          </gaseous_hydrogen_tank_1>
-        </gaseous_hydrogen_tank>
         <inverter>
           <inverter_1>
             <inductor>

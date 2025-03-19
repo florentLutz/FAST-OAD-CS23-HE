@@ -100,6 +100,13 @@
             </properties>
           </harness_1>
         </DC_cable_harness>
+        <H2_fuel_system>
+          <h2_fuel_system_1>
+            <fuel_distribution is_input="True">1.0</fuel_distribution>
+            <number_source is_input="False">1.0<!--Number of power source connected to this hydrogen fuel system--></number_source>
+            <total_fuel_flowed units="kg" is_input="False">13.55674326875067<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
+          </h2_fuel_system_1>
+        </H2_fuel_system>
         <PEMFC_stack>
           <pemfc_stack_1>
             <area_ohmic_resistance units="ohm*cm**2" is_input="True">0.24<!--Area ohmic resistance of the single-layered PEMFC--></area_ohmic_resistance>
@@ -131,13 +138,6 @@
             <fuel_consumed_mission units="kg" is_input="False">13.556743268750669<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
           </gaseous_hydrogen_tank_1>
         </gaseous_hydrogen_tank>
-        <h2_fuel_system>
-          <h2_fuel_system_1>
-            <fuel_distribution is_input="True">1.0</fuel_distribution>
-            <number_source is_input="False">1.0<!--Number of power source connected to this hydrogen fuel system--></number_source>
-            <total_fuel_flowed units="kg" is_input="False">13.55674326875067<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
-          </h2_fuel_system_1>
-        </h2_fuel_system>
         <inverter>
           <inverter_1>
             <current_ac_max units="A" is_input="False">186.98174220313672<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
