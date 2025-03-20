@@ -23,57 +23,21 @@ pipe lengths based on installation positions with the amount that are considered
 With
 
 .. math::
-    L_{\text{front}} = L_{\text{rear}} = 0.5*L{\text{cabin}} \\
+    L_{\text{front}} = L_{\text{rear}} = 0.5 \cdot L_{\text{cabin}} \\
     L_{\text{near}} = MAC_{\text{wing}} \\
-    L_{\text{wing}} = 0.5 * span_{\text{wing}} *\lambda{wing}
+    L_{\text{wing}} = 0.5 \cdot S_{\text{wing}} \cdot \lambda{\text{wing}}
 
-Where :math:`L{\text{cabin}}` is the cabin length and :math:`\lambda{wing}` is the position in portion of half wing span
-that the source is fixed with respect to the wing root.
+Where :math:`L_{\text{cabin}}` is the cabin length, :math:`S_{\text{wing}}` is the wing span,  and :math:`\lambda{wing}`
+is the position in portion of half wing span that the source is fixed with respect to the wing root.
 
 
 Pipe diameter calculation
 =========================
-
-The inner pipe diameter calculation is based on the hoop stress of a cylindrical tank calculation provided by :cite:`colozza:2002`
-
-.. math::
-
-   t_{wall} = \frac {R_{in} * SF*P}{\sigma_{wall}}
-
-With the pipe outer diameter provided by user, the pipe inner diameter (:math:`D_{inner}`) is derived
-with the following equation:
-
-.. math::
-
-    D_{inner} = \frac{\sigma_{wall} * D_{outer}}{\sigma_{wall}+ SF*P}
-
-Where :math:`SF` represent the safety factor of the pipes,  :math:`P` is the pipe pressure, and :math:`\sigma_{wall}` is
-the tank wall material yield stress.
+The pipe inner diameter is computed based on the hoop stress calculation similar as :ref:`gaseous hydrogen tank inner diameter <models-gaseous_hydrogen_tank-inner-diameter>`.
+But different from the one performed in gaseous hydrogen tank model, the pipe diameter :math:`D_{\text{pipe}}` ,served
+as the outer diameter of the pipe line without insulation, is directly defined by user.
 
 
-*************************
-Pressure Loss calculation
-*************************
-
-
-
-Tank length calculation
-=======================
-With the assumption that the shape of the tank is cylindrical with hemispherical cap at both end,
-the length of the tank can be expressed as:
-
-.. math::
-
-    L = \frac {V_{inner} - V_{cap}} {A_{cross}} + D_{outer}
-
-Where :math:`V_{inner}` denotes the inner volume, as calculated in the tank capacity section,
-:math:`V_{cap}` represents the inner volume of the two hemispherical caps,
-while :math:`A_{cross}` refers to the tank's inner cross-sectional area.
-
-.. math::
-
-    V_{cap} = \frac{\pi D_{inner}^3}{6} \\
-    A_{cross} = \frac{\pi D_{inner}^2}{4}
 
 *******************************
 Component Computation Structure
@@ -83,5 +47,5 @@ in hydrogen fuel system component.
 
 .. raw:: html
 
-   <a href="../../../../../../../n2/n2_performance_gh2_tank.html" target="_blank">Gaseous hydrogen tank performance N2 diagram</a><br>
-   <a href="../../../../../../../n2/n2_sizing_gh2_tank.html" target="_blank">Gaseous hydrogen tank sizing N2 diagram</a>
+   <a href="../../../../../../../n2/n2_performance_h2_fuel_system.html" target="_blank">Hydrogen fuel system performance N2 diagram</a><br>
+   <a href="../../../../../../../n2/n2_sizing_h2_fuel_system.html" target="_blank">Hydrogen fuel system sizing N2 diagram</a>
