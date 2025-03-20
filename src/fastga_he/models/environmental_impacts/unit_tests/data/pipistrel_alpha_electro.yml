@@ -55,7 +55,7 @@ model:
                 - attribute: "component"
                   value: landing_gear_production
         
-            name: 'market for steel, unalloyed'
+            name: 'market for glass fibre reinforced plastic, polyamide, injection moulded'
             amount: data__weight__airframe__landing_gear__mass_per_fu
         
         assembly:  # Airframe assembly, assumed to be the same as aircraft assembly given the absence of this data in :cite:`thonemann:2024`
@@ -73,66 +73,7 @@ model:
                 electricity:
                   name: 'market group for electricity, high voltage'
                   loc: 'RER'
-                  amount: 219520.67 / 5485.0 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
-        
-                gas:
-                  name: 'natural gas, burned in gas turbine'  # Not sure about this one
-                  loc: 'RoE'
-                  amount: 220738.34 / 5485.0 * 3.6 # kWh to MJ
-        
-                heat_and_steam:
-                  name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
-                  loc: 'RoW'
-                  amount: 27551.155 / 5485.0 * 3.6 # kWh to MJ
-        
-                diesel:
-                  name: 'market for diesel'
-                  loc: 'Europe without Switzerland'
-                  amount: 58409.765 / 5485.0 * 3.6 / 45.6 # kWh to MJ to kg
-        
-                kerosene:
-                  name: 'market for kerosene'
-                  loc: 'RoW'
-                  amount: 118914.8 / 5485.0 * 3.6 / 43.0 # kWh to MJ to kg
-        
-                water_in:
-                  name: 'market for water, decarbonised'
-                  loc: 'RoW'
-                  amount: 537530 / 5485.0 # In kg
-        
-                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In kg in the source but needs to be in m**3 here
-                  amount: 499.135 / 5485.0
-                  name: 'water'
-                  categories:
-                    - 'water'
-                    - 'ground-'
-        
-                CO2:
-                  amount: 89954.38395 / 5485.0 # In kg
-                  name: 'carbon dioxide, fossil'  # this is a biosphere process
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                SOx:
-                  amount: 2.24067735 / 5485.0
-                  name: 'sulfur dioxide'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                NOx:
-                  amount: 35.53361811 / 5485.0
-                  name: 'nitrogen oxides'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                VOC:
-                  amount: 168.2270343 / 5485.0
-                  name: 'VOC, volatile organic compounds'
-                  categories:
-                    - 'air'
+                  amount: 900.0 / 370.0 # kWh for the assembly of the aircraft according to the paper, so 900 kWh for 370kg of OWE
 
         propeller_1:
             custom_attributes:
@@ -146,11 +87,7 @@ model:
               production:
                 composite:
                   name: 'market for carbon fibre reinforced plastic, injection moulded'
-                  amount: data__propulsion__he_power_train__propeller__propeller_1__material
-        
-                aluminium:
-                  name: 'market for aluminium, cast alloy'
-                  amount: 1.0 - data__propulsion__he_power_train__propeller__propeller_1__material
+                  amount: 1.0
         
                 # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
                 # with the mass
@@ -520,7 +457,7 @@ model:
             loc: 'RER'
             # This variable should always exist since we will only add this part to the conf file if
             # there are batteries and if there are batteries the component that computes this value will be added
-            amount: data__LCA__operation__he_power_train__electricity__energy_per_fu / 1000
+            amount: data__LCA__operation__he_power_train__electricity__energy_per_fu / 1000 # This should be given in W*h
 
 
 methods:

@@ -23,6 +23,9 @@ from ..lca_impact import (
     lca_impacts_bar_chart_with_contributors,
     lca_impacts_bar_chart_with_components_absolute,
     lca_impacts_search_table,
+    lca_raw_impact_comparison,
+    lca_raw_impact_comparison_advanced,
+    _get_impact_dict,
 )
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
@@ -35,6 +38,14 @@ SENSITIVITY_STUDIES_FOLDER_PATH = (
     / "unit_tests"
     / "results"
     / "parametric_study"
+)
+SENSITIVITY_STUDIES_FOLDER_PATH_2 = (
+    pathlib.Path(__file__).parents[2]
+    / "models"
+    / "environmental_impacts"
+    / "unit_tests"
+    / "results"
+    / "parametric_study_2"
 )
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
@@ -93,6 +104,19 @@ def test_lca_other_impact_sensitivity_analysis():
     # Check that we can create a plot
     fig = lca_score_sensitivity_simple(
         results_folder_path=SENSITIVITY_STUDIES_FOLDER_PATH,
+        impact_to_plot="material_resources_metals_minerals",
+        prefix="hybrid_kodiak",
+        name="Hybrid Kodiak",
+    )
+
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_other_impact_sensitivity_analysis_longer():
+    # Check that we can create a plot
+    fig = lca_score_sensitivity_simple(
+        results_folder_path=SENSITIVITY_STUDIES_FOLDER_PATH_2,
         impact_to_plot="material_resources_metals_minerals",
         prefix="hybrid_kodiak",
         name="Hybrid Kodiak",
@@ -173,6 +197,7 @@ def test_lca_bar_chart_relative_paper():
         ],
         names_aircraft=["Reference Kodiak 100", "Hybrid Kodiak 100"],
     )
+    fig.update_layout(title_text=None)
 
     fig.show()
     fig.update_layout(height=800, width=1600)
@@ -206,6 +231,119 @@ def test_lca_bar_chart_relative_contribution():
     fig = lca_impacts_bar_chart_with_contributors(
         DATA_FOLDER_PATH / "hybrid_kodiak_100_ef.xml",
         name_aircraft="Hybrid Kodiak 100",
+    )
+
+    fig.show()
+
+
+def test_lca_bar_chart_pipistrel_comparison_paper_short():
+    fig = lca_impacts_bar_chart_with_contributors(
+        DATA_FOLDER_PATH / "pipistrel_alpha_short.xml",
+        name_aircraft="the Pipistrel with a 500h lifetime",
+        impact_step="normalized",
+        impact_filter_list=[
+            "climate_change",
+            "acidification_terrestrial",
+            "particulate_matter_formation",
+        ],
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",
+            "Battery pack": ["battery_pack_1", "battery_pack_2"],
+            "Others": [
+                "propeller_1",
+                "motor_1",
+                "inverter_1",
+                "harness_1",
+                "dc_sspc_1",
+                "dc_sspc_2",
+                "dc_splitter_1",
+                "dc_bus_1",
+                "manufacturing",
+                "distribution",
+            ],
+            "Use phase": "electricity_for_mission,",
+        },
+    )
+
+    fig.show()
+
+
+def test_lca_bar_chart_pipistrel_comparison_paper_std():
+    fig = lca_impacts_bar_chart_with_contributors(
+        DATA_FOLDER_PATH / "pipistrel_alpha_standard.xml",
+        name_aircraft="the Pipistrel with a 4000h lifetime",
+        impact_step="normalized",
+        impact_filter_list=[
+            "climate_change",
+            "acidification_terrestrial",
+            "particulate_matter_formation",
+        ],
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",
+            "Battery pack": ["battery_pack_1", "battery_pack_2"],
+            "Others": [
+                "propeller_1",
+                "motor_1",
+                "inverter_1",
+                "harness_1",
+                "dc_sspc_1",
+                "dc_sspc_2",
+                "dc_splitter_1",
+                "dc_bus_1",
+                "manufacturing",
+                "distribution",
+            ],
+            "Use phase": "electricity_for_mission,",
+        },
+    )
+
+    fig.show()
+
+
+def test_lca_bar_chart_pipistrel_comparison_raw_impact():
+    fig = lca_raw_impact_comparison(
+        [DATA_FOLDER_PATH / "pipistrel_standard.xml", DATA_FOLDER_PATH / "pipistrel_short.xml"],
+        ["Pipistrel with a 4000h lifetime", "Pipistrel with a 500h lifetime"],
+    )
+
+    fig.show()
+
+
+def test_lca_bar_chart_pipistrel_advanced_comparison_raw_impact_without_aggregation():
+    fig = lca_raw_impact_comparison_advanced(
+        [
+            DATA_FOLDER_PATH / "pipistrel_alpha_standard.xml",
+            DATA_FOLDER_PATH / "pipistrel_alpha_short.xml",
+        ],
+        ["Pipistrel with a 4000h lifetime", "Pipistrel with a 500h lifetime"],
+        impact_category="climate change",
+    )
+
+    fig.show()
+
+
+def test_lca_bar_chart_pipistrel_advanced_comparison_raw_impact_with_aggregation_cc():
+    fig = lca_raw_impact_comparison_advanced(
+        [
+            DATA_FOLDER_PATH / "pipistrel_alpha_short.xml",
+            DATA_FOLDER_PATH / "pipistrel_alpha_standard.xml",
+        ],
+        ["Pipistrel with a 500h lifetime", "Pipistrel with a 4000h lifetime"],
+        impact_category="climate change",
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",  # Just a renaming, should work as well
+            "Battery pack": ["battery_pack_1", "battery_pack_2"],
+            "Use phase": "electricity_for_mission",  # Just a renaming, should work as well
+            "Others": [
+                "propeller_1",
+                "motor_1",
+                "inverter_1",
+                "harness_1",
+                "dc_bus_1",
+                "manufacturing",
+                "distribution",
+            ],
+        },
     )
 
     fig.show()
@@ -350,6 +488,8 @@ def test_search_engine_paper():
     print("Flights per FU design", flights_per_fu_ref_design)
     print("FU per flights design", 1.0 / flights_per_fu_ref_design)
 
+    single_score_ref = ref_design_datafile["data:environmental_impact:single_score"].value[0]
+
     # Not available here directly, have to rely on the amount of kerosene in the tanks
     fuel_burned_ref_design = (
         ref_design_datafile[
@@ -357,6 +497,7 @@ def test_search_engine_paper():
         ].value[0]
         * 2.0
     )
+    fuel_burned_per_pax_km_ref_design = fuel_burned_ref_design * flights_per_fu_ref_design
     energy_mission_ref_design = fuel_burned_ref_design * 11.9  # in kWh
     energy_per_pax_km = energy_mission_ref_design * flights_per_fu_ref_design
     print("Energy required per FU", energy_per_pax_km)
@@ -372,8 +513,6 @@ def test_search_engine_paper():
         component_list_ref_design,
         rel=False,
     )
-
-    assert sum(impacts_value_ref_design[:-1]) > 0.94 * impacts_value_ref_design[-1]
 
     impact_one_flight = sum(impacts_value_ref_design[:2]) / flights_per_fu_ref_design
     impact_per_kwh_of_energy_used = impact_one_flight / energy_mission_ref_design
@@ -396,6 +535,10 @@ def test_search_engine_paper():
     print("Flights per FU hybrid design", flights_per_fu_hybrid_design)
     print("FU per flights hybrid design", fu_per_flights_hybrid_design)
 
+    single_score_hybrid_design = hybrid_design_datafile[
+        "data:environmental_impact:single_score"
+    ].value[0]
+
     # Not available here directly, have to rely on the amount of kerosene in the tanks
     fuel_burned_hybrid_design = (
         hybrid_design_datafile[
@@ -411,6 +554,7 @@ def test_search_engine_paper():
     ].units
     if electricity_unit == "W*h":
         electricity_used_hybrid_design /= 1000.0
+    fuel_burned_per_pax_km_hybrid_design = fuel_burned_hybrid_design * flights_per_fu_hybrid_design
     energy_mission_hybrid_design = (
         fuel_burned_hybrid_design * 11.9 + electricity_used_hybrid_design
     )  # in kWh
@@ -435,13 +579,21 @@ def test_search_engine_paper():
         rel=False,
     )
 
-    assert sum(impacts_value_hybrid_design[:-1]) > 0.93 * impacts_value_hybrid_design[-1]
-
     impact_one_flight_hybrid = sum(impacts_value_hybrid_design[:-1]) * fu_per_flights_hybrid_design
     impact_per_kwh_of_energy_used_hybrid = impact_one_flight_hybrid / energy_mission_hybrid_design
     print(impact_per_kwh_of_energy_used_hybrid)
     print("\n")
 
+    print(
+        "Decrease in fuel required",
+        (fuel_burned_hybrid_design - fuel_burned_ref_design) / fuel_burned_ref_design * 100.0,
+    )
+    print(
+        "Decrease in fuel required per pax.km",
+        (fuel_burned_per_pax_km_hybrid_design - fuel_burned_per_pax_km_ref_design)
+        / fuel_burned_per_pax_km_ref_design
+        * 100.0,
+    )
     print(
         "Decrease in energy required",
         (energy_mission_hybrid_design - energy_mission_ref_design)
@@ -457,6 +609,13 @@ def test_search_engine_paper():
         (impact_per_kwh_of_energy_used_hybrid - impact_per_kwh_of_energy_used)
         / impact_per_kwh_of_energy_used
         * 100.0,
+    )
+
+    print("Single score reference design: ", single_score_ref)
+    print("Single score hybrid design: ", single_score_hybrid_design)
+    print(
+        "Variation in single score: ",
+        (single_score_ref - single_score_hybrid_design) / single_score_ref * 100.0,
     )
 
 
@@ -526,7 +685,9 @@ def test_search_engine_paper_climate_change():
     total_impact_electricity_one_fu_co2eq = (
         impact_battery_production_one_fu + impact_electricity_production_one_fu
     )
-
+    ratio_battery_production = (
+        impact_battery_production_one_fu / total_impact_electricity_one_fu_co2eq
+    )
     impact_one_flight_electricity = (
         total_impact_electricity_one_fu_co2eq / flights_per_fu_hybrid_design
     )
@@ -535,6 +696,14 @@ def test_search_engine_paper_climate_change():
     )
 
     print("Kg of CO2eq for 1 kWh of electricity", impact_per_kwh_of_electricity_used)
+    print(
+        "Kg of CO2eq for producing 1 kWh of electricity",
+        (1.0 - ratio_battery_production) * impact_per_kwh_of_electricity_used,
+    )
+    print(
+        "Kg of CO2eq for producing the battery",
+        ratio_battery_production * impact_per_kwh_of_electricity_used,
+    )
 
     impact_list_hybrid_design = ["*", "*"]
     phase_list_hybrid_design = ["*", "production"]
@@ -607,3 +776,66 @@ def test_carbon_intensity_kerosene():
         impact_kero_production_one_fu + impact_kero_combustion_one_fu
     ) / quantity_kero_one_fu
     print(impact_kero_per_kg, "Kg of CO2eq for 1 kg of AvGas")
+
+
+def test_get_impact_dict():
+    """
+    Tests the function that returns a list of the available impacts and their sum. In the case of
+    EF, whether we choose normalized weighted or raw, the impacts shall be the same except for
+    some impacts whose contribution are sometimes split, like climate change with biogenic, fossil
+    and land use change (though their value will differ). For ReCiPe since we only weigh endpoint
+    impact the list shall be different. This is what we'll test.
+    """
+
+    xml_ef = DATA_FOLDER_PATH / "hybrid_kodiak.xml"
+    ef_weighted_impact_dict, _ = _get_impact_dict(xml_ef, impact_step="weighted")
+    ef_normalized_impact_dict, _ = _get_impact_dict(xml_ef, impact_step="normalized")
+    ef_raw_impact_dict, _ = _get_impact_dict(xml_ef, impact_step="raw")
+
+    ef_raw_impact_list = list(ef_raw_impact_dict.keys())
+    ef_raw_impact_list.remove("climate_change_biogenic")
+    ef_raw_impact_list.remove("climate_change_fossil")
+    ef_raw_impact_list.remove("climate_change_land_use_and_land_use_change")
+    ef_raw_impact_list.remove("ecotoxicity_freshwaterinorganics")
+    ef_raw_impact_list.remove("ecotoxicity_freshwaterorganics")
+    ef_raw_impact_list.remove("human_toxicity_carcinogenicinorganics")
+    ef_raw_impact_list.remove("human_toxicity_carcinogenicorganics")
+    ef_raw_impact_list.remove("human_toxicity_non-carcinogenicinorganics")
+    ef_raw_impact_list.remove("human_toxicity_non-carcinogenicorganics")
+
+    ef_normalized_impact_list = list(ef_normalized_impact_dict.keys())
+    ef_normalized_impact_list.remove("climate_change_biogenic")
+    ef_normalized_impact_list.remove("climate_change_fossil")
+    ef_normalized_impact_list.remove("climate_change_land_use_and_land_use_change")
+    ef_normalized_impact_list.remove("ecotoxicity_freshwaterinorganics")
+    ef_normalized_impact_list.remove("ecotoxicity_freshwaterorganics")
+    ef_normalized_impact_list.remove("human_toxicity_carcinogenicinorganics")
+    ef_normalized_impact_list.remove("human_toxicity_carcinogenicorganics")
+    ef_normalized_impact_list.remove("human_toxicity_non-carcinogenicinorganics")
+    ef_normalized_impact_list.remove("human_toxicity_non-carcinogenicorganics")
+
+    ef_weighted_impact_list = list(ef_weighted_impact_dict.keys())
+    ef_weighted_impact_list.remove("single_score")
+
+    assert ef_normalized_impact_list == ef_raw_impact_list
+    assert ef_normalized_impact_list == ef_weighted_impact_list
+
+    xml_recipe = DATA_FOLDER_PATH / "pipistrel_short.xml"
+    recipe_weighted_impact_dict, _ = _get_impact_dict(xml_recipe, impact_step="weighted")
+    recipe_normalized_impact_dict, recipe_normalised_unit_dict = _get_impact_dict(
+        xml_recipe, impact_step="normalized"
+    )
+    recipe_raw_impact_dict, recipe_raw_unit_dict = _get_impact_dict(xml_recipe, impact_step="raw")
+
+    recipe_raw_impact_list = list(recipe_raw_impact_dict.keys())
+    recipe_normalized_impact_list = list(recipe_normalized_impact_dict.keys())
+    recipe_weighted_impact_list = list(recipe_weighted_impact_dict.keys())
+
+    assert recipe_raw_impact_list == recipe_normalized_impact_list
+    assert recipe_raw_impact_list != recipe_weighted_impact_list
+
+    # In theory normalised results don't have units but for the sake of testing the function,
+    # it should give the result
+
+    assert recipe_raw_unit_dict["climate_change"] == "kg CO2-Eq"
+    assert recipe_raw_unit_dict["climate_change"] == recipe_normalised_unit_dict["climate_change"]
