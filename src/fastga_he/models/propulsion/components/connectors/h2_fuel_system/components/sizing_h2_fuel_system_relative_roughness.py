@@ -8,8 +8,8 @@ import openmdao.api as om
 
 class SizingH2FuelSystemRelativeRoughness(om.ExplicitComponent):
     """
-    Computation of the inner relative roughness of the H2 fuel system, which will be part of the
-    pressure loss computation. The pipe inner surface irregularity is obtained from:
+    Computation of the inner relative roughness of the hydrogen fuel system, which will be part
+    of the pressure loss computation. The pipe inner surface irregularity is obtained from:
     https://www.pipeflow.com/pipe-pressure-drop-calculations/pipe-roughness.
     """
 

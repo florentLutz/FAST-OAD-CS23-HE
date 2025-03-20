@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
     """
-    Computation of the inner diameter of the H2 fuel system. Using the relation of the pipe
+    Computation of the inner diameter of the hydrogen fuel system. Using the relation of the pipe
     pressure and the yield strength of the wall material :cite:`colozza:2002`.
     """
 

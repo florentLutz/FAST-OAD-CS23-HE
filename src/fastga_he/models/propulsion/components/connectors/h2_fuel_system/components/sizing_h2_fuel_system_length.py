@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingH2FuelSystemLength(om.ExplicitComponent):
     """
-    The length of the hydrogen fuel system. The pipe inside the length
+    Computation the hydrogen fuel system overall length.
     """
 
     def initialize(self):

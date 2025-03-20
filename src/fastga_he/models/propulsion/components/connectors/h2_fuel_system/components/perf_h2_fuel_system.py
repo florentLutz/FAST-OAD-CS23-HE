@@ -11,7 +11,8 @@ from .perf_h2_total_fuel_flowed import PerformancesTotalH2FuelFlowed
 
 class PerformancesH2FuelSystem(om.Group):
     """
-    Group that gathers all the components necessary to assess the performances of the hydrogen fuel system.
+    Group that gathers all the components necessary to assess the performances of the
+    hydrogen fuel system.
     """
 
     def initialize(self):
@@ -71,7 +72,3 @@ class PerformancesH2FuelSystem(om.Group):
             ),
             promotes=["*"],
         )
-
-        # Because I don't want to have to give the option on the number of engine to the sizing
-        # group, I'll make it an output of one of those component. It was initially an ivc but since
-        # ivc output appear as input of the problem (???) I have to do it someway else

@@ -3,14 +3,12 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-
-import numpy as np
 import pytest
-
-import fastoad.api as oad
+import numpy as np
 import openmdao.api as om
-from stdatm import Atmosphere
+import fastoad.api as oad
 
+from stdatm import Atmosphere
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
 from utils.filter_residuals import filter_residuals

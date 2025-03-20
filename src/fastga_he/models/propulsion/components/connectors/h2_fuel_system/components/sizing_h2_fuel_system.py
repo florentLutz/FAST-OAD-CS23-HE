@@ -20,7 +20,7 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingH2FuelSystem(om.Group):
     """
-    Class that regroups all subcomponents for the sizing of the hydrogen fuel system.
+    Group that collects all subcomponents for the sizing of the hydrogen fuel system.
     """
 
     def initialize(self):

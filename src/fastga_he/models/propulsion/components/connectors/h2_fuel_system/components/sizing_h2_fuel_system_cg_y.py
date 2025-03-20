@@ -10,8 +10,9 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingH2FuelSystemCGY(om.ExplicitComponent):
     """
-    Class that computes the Y-CG of the hydrogen fuel system based on its position. Will be based on simple
-    geometric ratios, no consideration of volume will be implemented for now.
+    Computation of the hydrogen fuel system Y-CG based on the positions of the storage and the
+    source components connected to the hydrogen fuel system. The value is 0.0 except having
+    hydrogen power sources for tanks on the wing.
     """
 
     def initialize(self):

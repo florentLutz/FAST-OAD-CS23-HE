@@ -8,10 +8,10 @@ import openmdao.api as om
 
 class PerformancesH2FuelSystemInput(om.ExplicitComponent):
     """
-    Compute the amount of hydrogen that the system will draw from the tanks at each point of the
-    flight. This is simply the hydrogen from the outputs distributed among the input with a
-    distributing parameter. Exceptionally, we will set a default value for the splitting assuming it is
-    equally distributed
+    Computation of the amount of hydrogen that the system will draw from the tanks at each point
+    of the flight. This is simply the hydrogen from the outputs distributed among the input with a
+    distributing parameter. Exceptionally, a default value is set for the splitting with equal
+    distribution assumption.
     """
 
     def __init__(self, **kwargs):

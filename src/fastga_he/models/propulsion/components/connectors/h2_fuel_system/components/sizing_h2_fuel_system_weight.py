@@ -8,8 +8,7 @@ import openmdao.api as om
 
 class SizingH2FuelSystemWeight(om.ExplicitComponent):
     """
-    Computation of the hydrogen fuel system weight, based on a formula from :cite:`gudmundsson:2013` for
-    Torenbeek approach. Include the weight of fuel tanks, pipes, pumps, vents, ...
+    Computation of the hydrogen fuel system weight.
     """
 
     def initialize(self):

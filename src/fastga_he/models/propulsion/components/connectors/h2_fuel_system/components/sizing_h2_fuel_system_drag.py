@@ -7,9 +7,8 @@ import openmdao.api as om
 
 class SizingH2FuelSystemDrag(om.ExplicitComponent):
     """
-    Class that computes the drag coefficient of the hydrogen fuel system based on its position. Will be 0.0
-    all the time as we wil make the assumption that the system is "inside" the fuselage or in
-    inside the wing.
+    Computation of the drag coefficient of the hydrogen fuel system based on its position. Remains
+    0.0 as the system is assumed inside the fuselage or inside the wing.
     """
 
     def initialize(self):

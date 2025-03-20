@@ -8,9 +8,9 @@ import openmdao.api as om
 
 class SlipstreamH2FuelSystem(om.Group):
     """
-    Component that computes the variation of aerodynamic coefficient during the mission. This
-    component is required as all components are required to provide one component that computes
-    the delta's but all expect the propeller will be 0.0 at the beginning.
+    Computation of the variation of aerodynamic coefficient during the mission. This component is
+    required as all components are required to provide one component that computes the delta's
+    but all expect the propeller will be 0.0 at the beginning.
     """
 
     def initialize(self):
