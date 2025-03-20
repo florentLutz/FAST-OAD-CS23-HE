@@ -2,10 +2,10 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
 import pytest
-import os.path as pth
 import numpy as np
+import os.path as pth
+import openmdao.api as om
 
 from ..components.sizing_h2_fuel_system_cg_x import SizingH2FuelSystemCGX
 from ..components.sizing_h2_fuel_system_cg_y import SizingH2FuelSystemCGY
