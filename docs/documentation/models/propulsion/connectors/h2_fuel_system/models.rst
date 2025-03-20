@@ -1,62 +1,60 @@
-.. _models-gaseous_hydrogen_tank:
+.. _models-hydrogen-fuel-system:
 
-=================================
-Gaseous hydrogen tank computation
-=================================
+================================
+Hydrogen fuel system computation
+================================
 
 .. contents::
 
-***********************
-Tank volume calculation
-***********************
-The tank inner volume is calculated based on the hydrogen  mass specified by user (:math:`m_{H2}`)
-and the ideal gas assumption. Thus, the ideal gas constant (:math:`R`), the storage temperature (:math:`T`),
-and the storage pressure (:math:`P`) are applied in this calculation.
-
-.. math::
-
-    V_{inner} = \frac{Z*m_{H2}*R*T}{P}
-
-
-The hydrogen gas compressibility factor (:math:`Z`) is expressed as:
-
-.. math::
-    Z = 0.99704 + 6.4149*10^{-9}*P
-
-
 *************************
-Tank geometry calculation
+Pipe geometry calculation
 *************************
 
-Tank diameter calculation
+System length calculation
 =========================
-The gaseous hydrogen tank's outer diameter (:math:`D_{outer}`)  is defined based on its installation location. For an internal installation,
-it is set as a fraction of the maximum fuselage height to ensure proper fit. For an external installation,
-the outer diameter is fixed at 20% of the maximum fuselage height to minimize drag.
+
+The overall length of the hydrogen fuel system is calculated with summing the multiplications of four different
+pipe lengths based on installation positions with the amount that are considered for each type of length respectively.
 
 .. math::
 
-    D_{outer} =
-    \begin{cases}
-        0.9 \cdot \max(H_{fuselage}) & \text{if inside fuselage} \\
-        0.2 \cdot \max(H_{fuselage}) & \text{if outside fuselage}
-    \end{cases}
+    L_{system} = \sum_{i=\text{front, rear, wing, near}} L_{i} \cdot N_{i}
+
+With
+
+.. math::
+    L_{\text{front}} = L_{\text{rear}} = 0.5*L{\text{cabin}} \\
+    L_{\text{near}} = MAC_{\text{wing}} \\
+    L_{\text{wing}} = 0.5 * span_{\text{wing}} *\lambda{wing}
+
+Where :math:`L{\text{cabin}}` is the cabin length and :math:`\lambda{wing}` is the position in portion of half wing span
+that the source is fixed with respect to the wing root.
 
 
-Then the inner diameter calculation is based on the hoop stress of a cylindrical tank calculation provided by :cite:`colozza:2002`
+Pipe diameter calculation
+=========================
+
+The inner pipe diameter calculation is based on the hoop stress of a cylindrical tank calculation provided by :cite:`colozza:2002`
 
 .. math::
 
    t_{wall} = \frac {R_{in} * SF*P}{\sigma_{wall}}
 
-With the tank outer diameter calculated in advance, the tank inner diameter (:math:`D_{inner}`) is derived
+With the pipe outer diameter provided by user, the pipe inner diameter (:math:`D_{inner}`) is derived
 with the following equation:
 
 .. math::
 
     D_{inner} = \frac{\sigma_{wall} * D_{outer}}{\sigma_{wall}+ SF*P}
 
-Where :math:`SF` represent the safety factor of the tank,  :math:`P` is the tank storage pressure, and :math:`\sigma_{wall}` is the tank wall material yield stress.
+Where :math:`SF` represent the safety factor of the pipes,  :math:`P` is the pipe pressure, and :math:`\sigma_{wall}` is
+the tank wall material yield stress.
+
+
+*************************
+Pressure Loss calculation
+*************************
+
 
 
 Tank length calculation
@@ -81,7 +79,7 @@ while :math:`A_{cross}` refers to the tank's inner cross-sectional area.
 Component Computation Structure
 *******************************
 The following two links are the N2 diagrams representing the performance and sizing computation
-in gaseous hydrogen tank component.
+in hydrogen fuel system component.
 
 .. raw:: html
 

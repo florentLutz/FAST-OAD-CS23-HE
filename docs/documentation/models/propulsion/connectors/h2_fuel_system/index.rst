@@ -4,7 +4,8 @@ Hydrogen fuel system model
 
 The hydrogen fuel system is a connector option in FAST-OAD-CS23-HE, designed to hydrogen storage device and
 hydrogen_powered sources. This component can be activated through the powertrain configuration file (PT file). The
-registered installation positions can be found in :ref:`options <options-h2-fuel-system>`.
+registered installation positions can be found in :ref:`options <options-h2-fuel-system>`. This model is extremely
+simplified for temporary usage, the complete model and documentation will be updated in future version.
 
 .. code-block:: yaml
 
@@ -22,4 +23,3 @@ A brief description of the hydrogen fuel system component is presented here:
 
     Hydrogen fuel system computation logic <models>
     Hydrogen fuel system customization options <options>
-    Hydrogen fuel system model assumption <assumptions>
