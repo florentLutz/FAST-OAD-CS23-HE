@@ -223,4 +223,4 @@ As explained in :ref:`LCA configuration file <models-lca>`, the LCA module relie
 .. note::
     While the option `lca_conf_file_path` allows to specify where to find the LCA configuration in the case where an existing one is used, it can't be used to specify where to write it when it's automatically generated.
 
-    If option `write_lca_conf` is set to `False` but no path is provided in option `lca_conf_file_path`, the code will assumed it is located in the same where it would have been if automatically generated.
+    If option `write_lca_conf` is set to `False` but no path is provided in option `lca_conf_file_path`, the code will assumed it is located in the same folder where it would have been if automatically generated.
