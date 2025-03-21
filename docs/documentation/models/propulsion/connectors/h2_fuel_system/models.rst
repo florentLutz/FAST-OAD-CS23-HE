@@ -34,8 +34,7 @@ is the position in portion of half wing span that the source is fixed with respe
 Pipe diameter calculation
 =========================
 The pipe inner diameter is computed based on the hoop stress calculation similarly to what is done in :ref:`gaseous hydrogen tank inner diameter <models-gaseous_hydrogen_tank-inner-diameter>`.
-But different from the one performed in gaseous hydrogen tank model, the pipe diameter :math:`D_{\text{pipe}}`, served
-as the outer diameter of the pipe line without insulation, is directly defined by user.
+However, unlike for the  gaseous hydrogen tank model, the pipe diameter :math:`D_{\text{pipe}}`, is directly defined by user.
 
 
 
