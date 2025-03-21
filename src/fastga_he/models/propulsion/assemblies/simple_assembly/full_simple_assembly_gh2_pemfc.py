@@ -9,10 +9,6 @@ from .performances_simple_assembly_gh2_pemfc import PerformancesAssembly
 from ...assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
 from ...assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 
-from fastga_he.powertrain_builder.powertrain import (
-    FASTGAHEPowerTrainConfigurator,
-)
-
 
 class FullSimpleAssembly(om.Group):
     def __init__(self, **kwargs):
@@ -44,8 +40,6 @@ class FullSimpleAssembly(om.Group):
 class FullSimpleAssemblyPT(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.configurator = FASTGAHEPowerTrainConfigurator()
 
         # Solvers setup
         self.nonlinear_solver = om.NonlinearBlockGS()

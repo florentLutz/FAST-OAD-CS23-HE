@@ -226,7 +226,7 @@ def test_fuel_output():
         PerformancesH2FuelSystemOutput(
             h2_fuel_system_id="h2_fuel_system_1",
             number_of_points=NB_POINTS_TEST,
-            number_of_sources=2,
+            number_of_power_sources=2,
         ),
         ivc,
     )
@@ -248,7 +248,7 @@ def test_fuel_input():
         PerformancesH2FuelSystemInput(
             h2_fuel_system_id="h2_fuel_system_1",
             number_of_points=NB_POINTS_TEST,
-            number_of_tank_stacks=2,
+            number_of_tanks=2,
         ),
         ivc,
     )
@@ -271,7 +271,7 @@ def test_fuel_input():
         PerformancesH2FuelSystemInput(
             h2_fuel_system_id="h2_fuel_system_1",
             number_of_points=NB_POINTS_TEST,
-            number_of_tank_stacks=2,
+            number_of_tanks=2,
         ),
         ivc,
     )
@@ -309,8 +309,8 @@ def test_fuel_system_performances():
     problem = run_system(
         PerformancesH2FuelSystem(
             number_of_points=NB_POINTS_TEST,
-            number_of_sources=2,
-            number_of_tank_stacks=5,
+            number_of_power_sources=2,
+            number_of_tanks=5,
             h2_fuel_system_id="h2_fuel_system_1",
         ),
         ivc,

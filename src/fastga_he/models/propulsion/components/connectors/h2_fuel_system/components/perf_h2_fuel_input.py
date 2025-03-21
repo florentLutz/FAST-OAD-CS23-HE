@@ -31,7 +31,7 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            name="number_of_tank_stacks",
+            name="number_of_tanks",
             default=1,
             types=int,
             desc="Number of connections at the input of the hydrogen fuel system, should always be tanks",
@@ -41,7 +41,7 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
-        number_of_tank_stacks = self.options["number_of_tank_stacks"]
+        number_of_tanks = self.options["number_of_tanks"]
 
         self.add_input(
             name="fuel_flowing_t",
@@ -55,10 +55,10 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
             "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":fuel_distribution",
-            val=np.ones(number_of_tank_stacks),
+            val=np.ones(number_of_tanks),
         )
 
-        for i in range(number_of_tank_stacks):
+        for i in range(number_of_tanks):
             self.add_output(
                 name="fuel_consumed_in_t_" + str(i + 1),
                 units="kg",
@@ -84,7 +84,7 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
-        number_of_tank_stacks = self.options["number_of_tank_stacks"]
+        number_of_tanks = self.options["number_of_tanks"]
 
         #  First we rescale the distribution so that at all point it is between 0 and 1
         self.hydrogen_distribution = inputs[
@@ -101,12 +101,12 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
 
         fuel_flow = inputs["fuel_flowing_t"]
 
-        for i in range(number_of_tank_stacks):
+        for i in range(number_of_tanks):
             outputs["fuel_consumed_in_t_" + str(i + 1)] = fuel_flow * self.hydrogen_distribution[i]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
-        number_of_tank_stacks = self.options["number_of_tank_stacks"]
+        number_of_tanks = self.options["number_of_tanks"]
         number_of_points = self.options["number_of_points"]
 
         fuel_flow = inputs["fuel_flowing_t"]
@@ -118,13 +118,13 @@ class PerformancesH2FuelSystemInput(om.ExplicitComponent):
             ]
         )
 
-        for i in range(number_of_tank_stacks):
+        for i in range(number_of_tanks):
             partials["fuel_consumed_in_t_" + str(i + 1), "fuel_flowing_t"] = (
                 self.hydrogen_distribution[i] * np.ones(number_of_points)
             )
 
             base_partials = (
-                (-np.tile(fuel_flow, (number_of_tank_stacks, 1)))
+                (-np.tile(fuel_flow, (number_of_tanks, 1)))
                 * self.hydrogen_distribution[i]
                 / scale_factor
             )

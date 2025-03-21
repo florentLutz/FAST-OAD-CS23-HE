@@ -27,14 +27,14 @@ class PerformancesH2FuelSystem(om.Group):
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            name="number_of_tank_stacks",
+            name="number_of_tanks",
             default=1,
             types=int,
             desc="Number of connections at the input of the hydrogen fuel system, should always be tanks",
             allow_none=False,
         )
         self.options.declare(
-            name="number_of_sources",
+            name="number_of_power_sources",
             default=1,
             types=int,
             desc="Number of connections at the output of the hydrogen fuel system",
@@ -44,14 +44,14 @@ class PerformancesH2FuelSystem(om.Group):
     def setup(self):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
         number_of_points = self.options["number_of_points"]
-        number_of_tank_stacks = self.options["number_of_tank_stacks"]
-        number_of_sources = self.options["number_of_sources"]
+        number_of_tanks = self.options["number_of_tanks"]
+        number_of_power_sources = self.options["number_of_power_sources"]
 
         self.add_subsystem(
             name="h2_fuel_flow_out",
             subsys=PerformancesH2FuelSystemOutput(
                 number_of_points=number_of_points,
-                number_of_sources=number_of_sources,
+                number_of_power_sources=number_of_power_sources,
                 h2_fuel_system_id=h2_fuel_system_id,
             ),
             promotes=["*"],
@@ -60,7 +60,7 @@ class PerformancesH2FuelSystem(om.Group):
             name="h2_fuel_flow_in",
             subsys=PerformancesH2FuelSystemInput(
                 number_of_points=number_of_points,
-                number_of_tank_stacks=number_of_tank_stacks,
+                number_of_tanks=number_of_tanks,
                 h2_fuel_system_id=h2_fuel_system_id,
             ),
             promotes=["*"],

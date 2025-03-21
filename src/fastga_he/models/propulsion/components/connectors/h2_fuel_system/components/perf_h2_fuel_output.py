@@ -25,7 +25,7 @@ class PerformancesH2FuelSystemOutput(om.ExplicitComponent):
             "number_of_points", default=1, types=int, desc="number of equilibrium to be treated"
         )
         self.options.declare(
-            name="number_of_sources",
+            name="number_of_power_sources",
             default=1,
             types=int,
             desc="Number of connections at the output of the hydrogen fuel system, should always be "
@@ -49,11 +49,11 @@ class PerformancesH2FuelSystemOutput(om.ExplicitComponent):
             name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":number_source",
-            val=self.options["number_of_sources"],
+            val=self.options["number_of_power_sources"],
             desc="Number of power source connected to this hydrogen fuel system",
         )
 
-        for i in range(self.options["number_of_sources"]):
+        for i in range(self.options["number_of_power_sources"]):
             # Choice was made to start current numbering at 1 to be consistent with what is done
             # on electrical node (which coincidentally should irritate programmer)
             self.add_input(
@@ -78,7 +78,7 @@ class PerformancesH2FuelSystemOutput(om.ExplicitComponent):
 
         fuel_output = np.zeros(number_of_points)
 
-        for i in range(self.options["number_of_sources"]):
+        for i in range(self.options["number_of_power_sources"]):
             fuel_output += inputs["fuel_consumed_out_t_" + str(i + 1)]
 
         outputs["fuel_flowing_t"] = fuel_output
