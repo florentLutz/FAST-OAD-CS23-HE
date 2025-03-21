@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesH2FuelSystemOutput(om.ExplicitComponent):
     """
-    Computation of the fuel that the system has to output towards power source at each point of
+    Computation of the fuel that the system has to output towards power sources at each point of
     the flight. This is simply the sum of the fuel consumed by each power source connected at
     the output.
     """
