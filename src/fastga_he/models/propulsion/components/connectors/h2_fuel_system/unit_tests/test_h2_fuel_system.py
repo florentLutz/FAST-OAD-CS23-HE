@@ -18,12 +18,11 @@ from ..components.sizing_h2_fuel_system_relative_roughness import (
 from ..components.sizing_h2_fuel_system_cross_section import (
     SizingH2FuelSystemCrossSectionDimension,
 )
+from ..components.sizing_h2_fuel_system import SizingH2FuelSystem
 
 from ..components.perf_h2_fuel_output import PerformancesH2FuelSystemOutput
 from ..components.perf_h2_fuel_input import PerformancesH2FuelSystemInput
 from ..components.perf_h2_total_fuel_flowed import PerformancesTotalH2FuelFlowed
-
-from ..components.sizing_h2_fuel_system import SizingH2FuelSystem
 from ..components.perf_h2_fuel_system import PerformancesH2FuelSystem
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs

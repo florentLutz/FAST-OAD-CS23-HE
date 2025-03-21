@@ -13,8 +13,8 @@ Pipe geometry calculation
 System length calculation
 =========================
 
-The overall length of the hydrogen fuel system is calculated with summing the multiplications of four different
-pipe lengths based on installation positions with the amount that are considered for each type of length respectively.
+The overall length of the hydrogen fuel system is calculated by summing the pipe lengths in each configuration and
+weighting each configuration with their respective quantities.
 
 .. math::
 
@@ -34,7 +34,7 @@ is the position in portion of half wing span that the source is fixed with respe
 Pipe diameter calculation
 =========================
 The pipe inner diameter is computed based on the hoop stress calculation similar as :ref:`gaseous hydrogen tank inner diameter <models-gaseous_hydrogen_tank-inner-diameter>`.
-But different from the one performed in gaseous hydrogen tank model, the pipe diameter :math:`D_{\text{pipe}}` ,served
+But different from the one performed in gaseous hydrogen tank model, the pipe diameter :math:`D_{\text{pipe}}`, served
 as the outer diameter of the pipe line without insulation, is directly defined by user.
 
 

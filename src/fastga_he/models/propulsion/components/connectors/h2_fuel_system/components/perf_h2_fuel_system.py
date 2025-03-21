@@ -11,8 +11,8 @@ from .perf_h2_total_fuel_flowed import PerformancesTotalH2FuelFlowed
 
 class PerformancesH2FuelSystem(om.Group):
     """
-    Group that gathers all the components necessary to assess the performances of the
-    hydrogen fuel system.
+    Group that gathers all the components necessary to assess the performances of the hydrogen
+    fuel system.
     """
 
     def initialize(self):

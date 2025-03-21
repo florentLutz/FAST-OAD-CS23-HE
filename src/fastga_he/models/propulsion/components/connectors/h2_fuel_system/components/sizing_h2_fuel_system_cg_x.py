@@ -10,8 +10,8 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingH2FuelSystemCGX(om.ExplicitComponent):
     """
-    Computation of the hydrogen fuel system X-CG based on the positions of the
-    storage and the source components connected to the hydrogen fuel system.
+    Computation of the hydrogen fuel system X-CG based on the positions of the storage and the
+    source components connected to the hydrogen fuel system.
     """
 
     def initialize(self):
