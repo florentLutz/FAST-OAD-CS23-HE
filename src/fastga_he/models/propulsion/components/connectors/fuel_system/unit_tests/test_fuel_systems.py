@@ -24,7 +24,7 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 from ..constants import POSSIBLE_POSITION
 
-XML_FILE = "sample_hydrogen_pipeline.xml"
+XML_FILE = "sample_fuel_system.xml"
 NB_POINTS_TEST = 10
 
 
