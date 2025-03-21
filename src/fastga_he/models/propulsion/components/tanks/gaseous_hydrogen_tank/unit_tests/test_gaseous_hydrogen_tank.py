@@ -667,7 +667,7 @@ def test_hydrogen_gas_remaining_mission():
         units="kg",
         val=140.0,
     )
-    ivc.add_output("fuel_consumed_t", val=np.full(NB_POINTS_TEST, 14.0))
+    ivc.add_output("fuel_consumed_t", val=np.full(NB_POINTS_TEST, 14.0),units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -686,7 +686,7 @@ def test_hydrogen_gas_remaining_mission():
 def test_performances_gaseous_hydrogen_tank():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST))
+    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST),units="kg")
 
     problem = run_system(
         PerformancesGaseousHydrogenTank(
