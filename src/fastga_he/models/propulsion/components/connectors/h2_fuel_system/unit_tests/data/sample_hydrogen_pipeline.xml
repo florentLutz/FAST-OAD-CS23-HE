@@ -50,9 +50,7 @@
                         </material>
                         <pipe_pressure units="MPa">3.5</pipe_pressure>
                         <connection>
-                            <front>0.0<!--number of connection at the front of the fuselage--></front>
                             <rear>3.0<!--number of connection at the rear of the fuselage--></rear>
-                            <near>0.0<!--number of near connection between source and tank--></near>
                             <wing>2.0<!--number of connection in the wing--></wing>
                         </connection>
                     </h2_fuel_system_1>
