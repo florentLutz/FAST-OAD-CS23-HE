@@ -23,6 +23,7 @@ The hydrogen gas compressibility factor (:math:`Z`) is expressed as:
 .. math::
     Z = 0.99704 + 6.4149*10^{-9}*P
 
+.. _models-gaseous_hydrogen_tank-inner-diameter:
 
 *************************
 Tank geometry calculation
