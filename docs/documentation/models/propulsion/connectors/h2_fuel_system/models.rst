@@ -41,7 +41,7 @@ However, unlike for the  gaseous hydrogen tank model, the pipe diameter :math:`D
 *******************************
 Component Computation Structure
 *******************************
-The following two links are the N2 diagrams representing the performance and sizing computation
+The following two links directs to the N2 diagrams representing the performance and sizing computation
 in hydrogen fuel system component.
 
 .. raw:: html
