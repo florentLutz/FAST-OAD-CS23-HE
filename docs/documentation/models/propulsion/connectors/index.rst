@@ -1,7 +1,7 @@
 .. _connector-index:
 
 =====================
-Connectors components
+Connector components
 =====================
 
 Here you will find the documentation of the connector components available in FAST-OAD-CS23-HE.
