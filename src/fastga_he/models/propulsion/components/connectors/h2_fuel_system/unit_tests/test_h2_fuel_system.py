@@ -112,7 +112,7 @@ def test_h2_fuel_inner_diameter():
         units="m",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:material" ":yield_strength",
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:material:yield_strength",
         val=240,
         units="MPa",
     )
