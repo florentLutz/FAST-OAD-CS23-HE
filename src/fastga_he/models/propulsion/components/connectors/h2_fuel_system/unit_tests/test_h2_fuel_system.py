@@ -102,7 +102,7 @@ def test_h2_fuel_inner_diameter():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:pipe_pressure" "",
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:pipe_pressure",
         val=70.0,
         units="MPa",
     )
