@@ -130,7 +130,7 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
         position = self.options["position"]
         compact = self.options["compact"]
 
-        if not compact and not position == "in_thw_middle" and wing_related:
+        if not compact and not position == "in_the_middle" and wing_related:
             partials[
                 "data:propulsion:he_power_train:H2_fuel_system:"
                 + h2_fuel_system_id

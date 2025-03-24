@@ -106,18 +106,67 @@ def test_fuel_system_cg_y():
 def test_h2_fuel_pipe_length():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
-        list_inputs(SizingH2FuelSystemLength(h2_fuel_system_id="h2_fuel_system_1")),
+        list_inputs(SizingH2FuelSystemLength(h2_fuel_system_id="h2_fuel_system_1", compact=True)),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(SizingH2FuelSystemLength(h2_fuel_system_id="h2_fuel_system_1"), ivc)
+    problem = run_system(
+        SizingH2FuelSystemLength(h2_fuel_system_id="h2_fuel_system_1", compact=True), ivc
+    )
 
     assert problem.get_val(
         "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:length", units="m"
-    ) == pytest.approx(4.9, rel=1e-2)
+    ) == pytest.approx(2.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+    expected_length = [0.7387, 1.4774, 0.7387]
+    expected_length_wing = [2.083, 1.4774, 2.083]
+
+    for position, expected_value, expected_value_wing in zip(
+        POSSIBLE_POSITION, expected_length, expected_length_wing
+    ):
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingH2FuelSystemLength(h2_fuel_system_id="h2_fuel_system_1", position=position)
+            ),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(
+            SizingH2FuelSystemLength(h2_fuel_system_id="h2_fuel_system_1", position=position), ivc
+        )
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:length",
+            units="m",
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingH2FuelSystemLength(
+                    h2_fuel_system_id="h2_fuel_system_1", position=position, wing_related=True
+                )
+            ),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(
+            SizingH2FuelSystemLength(
+                h2_fuel_system_id="h2_fuel_system_1", position=position, wing_related=True
+            ),
+            ivc,
+        )
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:length",
+            units="m",
+        ) == pytest.approx(expected_value_wing, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
 
 
 def test_h2_fuel_inner_diameter():

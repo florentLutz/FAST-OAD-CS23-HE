@@ -49,10 +49,6 @@
                             <insulation_density units="kg/m**3">160</insulation_density>
                         </material>
                         <pipe_pressure units="MPa">3.5</pipe_pressure>
-                        <connection>
-                            <rear>3.0<!--number of connection at the rear of the fuselage--></rear>
-                            <wing>2.0<!--number of connection in the wing--></wing>
-                        </connection>
                     </h2_fuel_system_1>
                 </H2_fuel_system>
             </he_power_train>
