@@ -33,7 +33,7 @@ class SizingH2FuelSystemCGX(om.ExplicitComponent):
         self.options.declare(
             name="wing_related",
             default=False,
-            Types=bool,
+            types=bool,
             desc="Option identifies weather the system reaches inside the wing or not",
         )
 

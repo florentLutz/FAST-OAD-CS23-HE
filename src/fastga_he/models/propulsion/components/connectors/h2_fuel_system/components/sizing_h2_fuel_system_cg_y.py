@@ -25,14 +25,14 @@ class SizingH2FuelSystemCGY(om.ExplicitComponent):
         self.options.declare(
             name="wing_related",
             default=False,
-            Types=bool,
+            types=bool,
             desc="Option identifies weather the system reaches inside the wing or not",
         )
 
         self.options.declare(
             name="compact",
             default=False,
-            Types=bool,
+            types=bool,
             desc="Option identifies weather the system is installed compactly in one position",
         )
 

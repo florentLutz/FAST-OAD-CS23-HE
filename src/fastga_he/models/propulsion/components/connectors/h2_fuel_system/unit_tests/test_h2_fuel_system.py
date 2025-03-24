@@ -58,25 +58,47 @@ def test_fuel_system_cg_x():
 
 
 def test_fuel_system_cg_y():
-    expected_cg = [0.0, 0.0, 0.672, 0.672, 0.0, 0.672, 0.0, 0.0, 1.344]
+    expected_cg = [0.672, 0.672, 0.672]
+    expected_cg_compact = [1.344, 1.344, 1.344]
 
-    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+    for option, expected_value, expected_value_compact in zip(
+        POSSIBLE_POSITION, expected_cg, expected_cg_compact
+    ):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
             list_inputs(
-                SizingH2FuelSystemCGY(h2_fuel_system_id="h2_fuel_system_1", position=option)
+                SizingH2FuelSystemCGY(h2_fuel_system_id="h2_fuel_system_1", wing_related=True)
             ),
             __file__,
             XML_FILE,
         )
 
+        problem = run_system(SizingH2FuelSystemCGY(h2_fuel_system_id="h2_fuel_system_1"), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:CG:y", units="m"
+        ) == pytest.approx(0.0, rel=1e-2)
+
         problem = run_system(
-            SizingH2FuelSystemCGY(h2_fuel_system_id="h2_fuel_system_1", position=option), ivc
+            SizingH2FuelSystemCGY(h2_fuel_system_id="h2_fuel_system_1", wing_related=True), ivc
         )
 
         assert problem.get_val(
             "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:CG:y", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+        problem = run_system(
+            SizingH2FuelSystemCGY(
+                h2_fuel_system_id="h2_fuel_system_1", wing_related=True, compact=True
+            ),
+            ivc,
+        )
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:CG:y", units="m"
+        ) == pytest.approx(expected_value_compact, rel=1e-2)
 
         problem.check_partials(compact_print=True)
 
