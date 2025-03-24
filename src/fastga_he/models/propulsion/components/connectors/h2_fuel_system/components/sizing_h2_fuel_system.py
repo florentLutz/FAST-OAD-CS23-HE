@@ -33,20 +33,39 @@ class SizingH2FuelSystem(om.Group):
         )
         self.options.declare(
             name="position",
-            default="from_rear_to_center",
+            default="in_the_middle",
             values=POSSIBLE_POSITION,
-            desc="Option to give the position of the hydrogen fuel system, possible position include "
-            + ", ".join(POSSIBLE_POSITION),
+            desc="Option to give the position of the hydrogen fuel system, possible position "
+            "include " + ", ".join(POSSIBLE_POSITION),
             allow_none=False,
+        )
+        self.options.declare(
+            name="wing_related",
+            default=False,
+            Types=bool,
+            desc="Option identifies weather the system reaches inside the wing or not",
+        )
+        self.options.declare(
+            name="compact",
+            default=False,
+            Types=bool,
+            desc="Option identifies weather the system is installed compactly in one position",
         )
 
     def setup(self):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
         position = self.options["position"]
+        wing_related = self.options["wing_related"]
+        compact = self.options["compact"]
 
         self.add_subsystem(
             name="h2_fuel_system_length",
-            subsys=SizingH2FuelSystemLength(h2_fuel_system_id=h2_fuel_system_id),
+            subsys=SizingH2FuelSystemLength(
+                h2_fuel_system_id=h2_fuel_system_id,
+                position=position,
+                wing_related=wing_related,
+                compact=compact,
+            ),
             promotes=["*"],
         )
 
@@ -64,13 +83,17 @@ class SizingH2FuelSystem(om.Group):
 
         self.add_subsystem(
             name="h2_fuel_system_cg_x",
-            subsys=SizingH2FuelSystemCGX(h2_fuel_system_id=h2_fuel_system_id, position=position),
+            subsys=SizingH2FuelSystemCGX(
+                h2_fuel_system_id=h2_fuel_system_id, position=position, wing_related=wing_related
+            ),
             promotes=["*"],
         )
 
         self.add_subsystem(
             name="h2_fuel_system_cg_y",
-            subsys=SizingH2FuelSystemCGY(h2_fuel_system_id=h2_fuel_system_id, position=position),
+            subsys=SizingH2FuelSystemCGY(
+                h2_fuel_system_id=h2_fuel_system_id, wing_related=wing_related, compact=compact
+            ),
             promotes=["*"],
         )
 

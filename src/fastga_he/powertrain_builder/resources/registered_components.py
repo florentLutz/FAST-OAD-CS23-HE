@@ -704,7 +704,7 @@ H2_FUEL_SYSTEM = {
     CN: "H2FuelSystem",
     CN_ID: "h2_fuel_system_id",
     CT: "H2_fuel_system",
-    ATT: ["number_of_sources", "number_of_tank_stacks"],
+    ATT: ["number_of_sources", "number_of_tanks", "compact", "wing_related"],
     PT: [],
     SPT: [],
     PTS: [],
@@ -731,7 +731,7 @@ H2_FUEL_SYSTEM = {
     PCT_W: [],
     DST_W_F: [],
     PCT_W_F: [],
-    VARIES_MASS: False,  # Seems weird but the ICE already does the job so we won't double up
+    VARIES_MASS: False,
     VARIESN_T_MASS: True,
     ETA: 1.0,
     CTRL_PARAM: [],
