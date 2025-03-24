@@ -130,12 +130,6 @@
                             <insulation_density units="kg/m**3">160</insulation_density>
                         </material>
                         <pipe_pressure units="Pa">1013250</pipe_pressure>
-                        <connection>
-                            <front>0.0<!--number of connection at the front of the fuselage--></front>
-                            <rear>1.0<!--number of connection at the rear of the fuselage--></rear>
-                            <near>0.0<!--number of near connection between source and tank--></near>
-                            <wing>0.0<!--number of connection in the wing--></wing>
-                        </connection>
                     </h2_fuel_system_1>
                 </H2_fuel_system>
                 <gaseous_hydrogen_tank>

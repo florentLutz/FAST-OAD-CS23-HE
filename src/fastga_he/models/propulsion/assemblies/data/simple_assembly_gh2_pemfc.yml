@@ -42,8 +42,11 @@ power_train_components:
   h2_fuel_system_1:
     id: fastga_he.pt_component.h2_fuel_system
     options:
-      number_of_tank_stacks: 1
-      number_of_sources: 1
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: False
+      compact: False
+    position: in_the_rear
   gaseous_hydrogen_tank_1:
     id: fastga_he.pt_component.gaseous_hydrogen_tank
     position: in_the_cabin

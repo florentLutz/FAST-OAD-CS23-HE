@@ -70,9 +70,7 @@ class SizingAssembly(om.Group):
         )
         self.add_subsystem(
             "h2_fuel_system_1",
-            SizingH2FuelSystem(
-                h2_fuel_system_id="h2_fuel_system_1",
-            ),
+            SizingH2FuelSystem(h2_fuel_system_id="h2_fuel_system_1", position="in_the_rear"),
             promotes=["*"],
         )
         self.add_subsystem(

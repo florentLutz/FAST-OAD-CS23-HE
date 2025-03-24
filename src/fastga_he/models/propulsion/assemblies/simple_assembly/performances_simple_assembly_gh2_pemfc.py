@@ -138,8 +138,8 @@ class PerformancesAssembly(om.Group):
             PerformancesH2FuelSystem(
                 h2_fuel_system_id="h2_fuel_system_1",
                 number_of_points=number_of_points,
-                number_of_sources=1,
-                number_of_tank_stacks=1,
+                number_of_power_sources=1,
+                number_of_tanks=1,
             ),
             promotes=["data:*"],
         )

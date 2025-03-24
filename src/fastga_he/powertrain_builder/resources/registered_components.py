@@ -704,7 +704,7 @@ H2_FUEL_SYSTEM = {
     CN: "H2FuelSystem",
     CN_ID: "h2_fuel_system_id",
     CT: "H2_fuel_system",
-    ATT: ["number_of_sources", "number_of_tanks", "compact", "wing_related"],
+    ATT: ["number_of_power_sources", "number_of_tanks", "compact", "wing_related"],
     PT: [],
     SPT: [],
     PTS: [],

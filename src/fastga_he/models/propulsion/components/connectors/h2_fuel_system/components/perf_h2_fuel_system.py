@@ -40,6 +40,18 @@ class PerformancesH2FuelSystem(om.Group):
             desc="Number of connections at the output of the hydrogen fuel system",
             allow_none=False,
         )
+        self.options.declare(
+            name="wing_related",
+            default=False,
+            types=bool,
+            desc="Option identifies weather the system reaches inside the wing or not",
+        )
+        self.options.declare(
+            name="compact",
+            default=False,
+            types=bool,
+            desc="Option identifies weather the system is installed compactly in one position",
+        )
 
     def setup(self):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]

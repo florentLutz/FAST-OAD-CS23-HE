@@ -453,15 +453,8 @@
             <safety_factor is_input="True">1.0<!--hydrogen fuel system design safety factor--></safety_factor>
             <CG>
               <x units="m" is_input="False">1.6080628878066596<!--X position of the hydrogen fuel system center of gravity--></x>
-              <y units="m" is_input="False">0.0<!--Y position of the ICE center of gravity--></y>
-              <y_ratio is_input="True">0.224<!--Y position of the power source center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y units="m" is_input="False">0.0<!--Y position of the hydrogen fuel system center of gravity--></y>
             </CG>
-            <connection>
-              <front is_input="True">0.0<!--Number of front connections for the h2 fuel system--></front>
-              <near is_input="True">0.0<!--Number of near connections for the h2 fuel system--></near>
-              <rear is_input="True">1.0<!--Number of rear connections for the h2 fuel system--></rear>
-              <wing is_input="True">0.0<!--Number of wing connections for the h2 fuel system--></wing>
-            </connection>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
