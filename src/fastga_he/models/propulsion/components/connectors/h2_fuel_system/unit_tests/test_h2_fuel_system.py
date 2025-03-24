@@ -34,9 +34,12 @@ NB_POINTS_TEST = 10
 
 
 def test_fuel_system_cg_x():
-    expected_cg = [2.239, 2.608, 2.663, 2.693, 1.869, 2.4, 3.977, 2.239, 2.693]
+    expected_cg = [1.869, 2.239, 2.608]
+    expected_cg_wing = [2.054, 2.239, 2.793]
 
-    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+    for option, expected_value, expected_value_wing in zip(
+        POSSIBLE_POSITION, expected_cg, expected_cg_wing
+    ):
         # Research independent input value in .xml file
         ivc = get_indep_var_comp(
             list_inputs(
@@ -53,6 +56,27 @@ def test_fuel_system_cg_x():
         assert problem.get_val(
             "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:CG:x", units="m"
         ) == pytest.approx(expected_value, rel=1e-2)
+
+        ivc = get_indep_var_comp(
+            list_inputs(
+                SizingH2FuelSystemCGX(
+                    h2_fuel_system_id="h2_fuel_system_1", position=option, wing_related=True
+                )
+            ),
+            __file__,
+            XML_FILE,
+        )
+
+        problem = run_system(
+            SizingH2FuelSystemCGX(
+                h2_fuel_system_id="h2_fuel_system_1", position=option, wing_related=True
+            ),
+            ivc,
+        )
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:CG:x", units="m"
+        ) == pytest.approx(expected_value_wing, rel=1e-2)
 
         problem.check_partials(compact_print=True)
 
@@ -413,7 +437,7 @@ def test_sizing_h2_fuel_system():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass", units="kg"
-    ) == pytest.approx(7.4, rel=1e-2)
+    ) == pytest.approx(2.23, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:cruise:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
