@@ -7,22 +7,37 @@ Hydrogen fuel system model
 **********************
 System position option
 **********************
-The hydrogen fuel system model has nine possible installation options:
+The hydrogen fuel system is typically placed inside the fuselage, with the power source and storage tank in separate
+locations. However, components could also be installed together or integrated along the wing. To support these
+configurations, the ``compat`` and ``wing_related`` options are also introduced.
 
-Longitudinal Paths
--------------------
-- "from_rear_to_front" : Extends from the rear to the front of the fuselage.
-- "from_rear_to_center" : Extends from the rear to the center of the fuselage.
-- "from_center_to_front" : Extends from the center to the front of the fuselage.
+Compact option
+**************
+The compact configuration option sets the hydrogen fuel system length as the wing MAC, ensuring accurate weight
+estimation when the power source and tank are installed at the same position.
 
-Wing Connections
------------------
-- "from_rear_to_wing" : Extends from the rear of the fuselage to the source position on the wing.
-- "from_center_to_wing" : Extends from the center of the fuselage to the source position on the wing.
-- "from_front_to_wing" : Extends from the front of the fuselage to the source position on the wing.
+Wing-related option
+*******************
+The wing-related configuration option adjusts the center of gravity and system length when the pipe network extends into
+the wing to connect the power source or storage tank.
 
-Localized Configurations
--------------------------
-- "in_the_back" : Located only in the rear of the fuselage.
-- "at_center" : Located only in the center of the fuselage.
-- "in_the_wing" : Located only at the source position on the wing.
+Fuselage position option
+*******************************
+The fuselage part of hydrogen fuel system model has three possible installation options:
+
+| "in_the_rear" : Located in the rear of the cabin.
+| "in_the_middle" : Located in the middle of the cabin.
+| "in_the_front" : Located in the front of the cabin.
+
+All the position related options can be activated with the PT file shown as:
+
+.. code-block:: yaml
+
+    power_train_components:
+      ⋮
+      h2_fuel_system_1:
+        id: fastga_he.pt_component.h2_fuel_system_1
+        position: ...
+        options:
+          compact:... #True, False
+          wing_related:... #True, False

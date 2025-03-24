@@ -13,8 +13,10 @@ Pipe geometry calculation
 System length calculation
 =========================
 
-The overall length of the hydrogen fuel system is calculated by summing the pipe lengths in each configuration and
-weighting each configuration with their respective quantities.
+The hydrogen fuel system length depends on three three installation types for the power source and storage tank. In the
+compact configuration,the components are installed in the same position. The wing-related configuration places one
+component along the wing. The ordinary configuration installs the components separately within the fuselage. With these
+three configurations, the following equations calculate the system length for each setup.
 
 .. math::
 
