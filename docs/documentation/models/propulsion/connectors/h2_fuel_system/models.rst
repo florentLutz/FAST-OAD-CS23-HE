@@ -20,17 +20,33 @@ three configurations, the following equations calculate the system length for ea
 
 .. math::
 
-    L_{system} = \sum_{i=\text{front, rear, wing, near}} L_{i} \cdot N_{i}
+    L_{system} =
+    \begin{cases}
+        MAC_{\text{wing}} & \text{if compact} \\
+        L_{fus} + L_{\text{wing}} & \text{else}
+    \end{cases}
 
 With
 
 .. math::
-    L_{\text{front}} = L_{\text{rear}} = 0.5 \cdot L_{\text{cabin}} \\
-    L_{\text{near}} = MAC_{\text{wing}} \\
-    L_{\text{wing}} = 0.5 \cdot S_{\text{wing}} \cdot \lambda{\text{wing}}
 
-Where :math:`L_{\text{cabin}}` is the cabin length, :math:`S_{\text{wing}}` is the wing span,  and :math:`\lambda{wing}`
-is the position in portion of half wing span that the source is fixed with respect to the wing root.
+    L_{\text{wing}} =
+    \begin{cases}
+        0.5 * S_{\text{wing}} * \lambda_{\text{wing}} & \text{if wing-related} \\
+        0.0 & \text{else}
+    \end{cases}
+
+.. math::
+
+    L_{fus} =
+    \begin{cases}
+        L_{\text{cabin}} & \text{if in the middle} \\
+        0.5 * L_{\text{cabin}} & \text{else}
+    \end{cases}
+
+Where :math:`L_{\text{cabin}}` is the cabin length, :math:`S_{\text{wing}}` is the wing span,  and :math:`\lambda{\text{wing}}`
+is the position in portion of half wing span that the source is fixed with respect to the wing root. The position options
+of pipe network length along fuselage :math:`L_{fus}` and length along wing :math:`L_{\text{wing}}` can be found in :ref:`options <options-h2-fuel-system>`.
 
 
 Pipe diameter calculation

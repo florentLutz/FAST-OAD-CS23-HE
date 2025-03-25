@@ -8,7 +8,7 @@ Hydrogen fuel system model
 System position option
 **********************
 The hydrogen fuel system is typically placed inside the fuselage, with the power source and storage tank in separate
-locations. However, components could also be installed together or integrated along the wing. To support these
+positions. However, components could also be installed together or integrated along the wing. To support these
 configurations, the ``compat`` and ``wing_related`` options are also introduced.
 
 Compact option
