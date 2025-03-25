@@ -54,7 +54,6 @@ class PerformancesH2FuelSystemOutput(om.ExplicitComponent):
         )
 
         for i in range(self.options["number_of_power_sources"]):
-
             self.add_input(
                 name="fuel_consumed_out_t_" + str(i + 1),
                 units="kg",
