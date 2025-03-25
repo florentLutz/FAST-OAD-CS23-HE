@@ -551,3 +551,71 @@ def test_plot_power_profile_results():
     # fig.show()
     # fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_performances comparison.pdf"))
     fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_performances comparison.svg"))
+
+
+def test_pipistrel_velis_club():
+    """
+    This is the thermal version of the Pipistrel Velis Electro (rather, the Pipistrel Velis Electro
+    is the electric version of this aircraft.
+
+    The design mission will be assumed to be a mission of 642 nm at 2000ft of altitude with 75% of
+    the power which should give fuel consumption of 18.4 l/h as per Pipistrel website.
+
+    RPM:
+    - Climb: 5500.
+    - Cruise: 5300.
+    - Descent: ? (4500.)
+    - Reserve: 5100. (Equivalent to a cruise at 4000ft at 65% power for 30 min) which is 116 kts
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "pipistrel_club_source.xml"
+    process_file_name = "pipistrel_club_configuration.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # Removing previous case and adding a recorder
+    recorder_path = pth.join(RESULTS_FOLDER_PATH, "pipistrel_cases.sql")
+
+    if pth.exists(recorder_path):
+        os.remove(recorder_path)
+
+    recorder = om.SqliteRecorder(recorder_path)
+    solver = problem.model.nonlinear_solver
+    solver.add_recorder(recorder)
+    solver.recording_options["record_solver_residuals"] = True
+
+    # Give good initial guess on a few key value to reduce the time it takes to converge
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:OWE", units="kg", val=400.0)
+    problem.set_val("data:weight:aircraft:MZFW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:ZFW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:MLW", units="kg", val=600.0)
+
+    # Run the problem
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        600.00, rel=1e-2
+    )
+    sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
+    assert sizing_fuel == pytest.approx(25.01, abs=1e-2)
