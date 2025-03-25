@@ -1,0 +1,74 @@
+<FASTOAD_model>
+    <data>
+        <environmental_impact>
+            <aircraft_per_fu>1e-6</aircraft_per_fu>
+            <flight_per_fu>1e-3</flight_per_fu>
+            <line_test>
+                <mission_ratio>7.5</mission_ratio>
+            </line_test>
+            <delivery>
+                <mission_ratio>4.0</mission_ratio>
+            </delivery>
+        </environmental_impact>
+        <aerodynamics>
+            <cruise>
+                  <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
+                  <unit_reynolds units="1/m" is_input="False">2948053.940803294<!--unitary reynolds number representative of high speed aerodynamics--></unit_reynolds>
+            </cruise>
+            <low_speed>
+                <mach is_input="False">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
+                <unit_reynolds units="1/m" is_input="False">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
+            </low_speed>
+        </aerodynamics>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
+                <span units="m" is_input="False">10.0<!--wing area--></span>
+                <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <environmental_impact>
+            <operation>
+                <sizing>
+                    <he_power_train>
+                        <ICE>
+                            <ice_1>
+                                <CO units="g" is_input="False">186307.80232367662</CO>
+                                <CO2 units="g" is_input="False">723752.1142899718</CO2>
+                                <H2O units="g" is_input="False">288800.4404440951</H2O>
+                                <HC units="g" is_input="False">4404.848754938354</HC>
+                                <NOx units="g" is_input="False">733.0908512485522</NOx>
+                                <SOx units="g" is_input="False">98.05673806509293</SOx>
+                                <lead units="g" is_input="False">57.27916</lead>
+                            </ice_1>
+                        </ICE>
+                    </he_power_train>
+                </sizing>
+            </operation>
+        </environmental_impact>
+        <propulsion>
+            <he_power_train>
+                <ICE>
+                    <ice_1>
+                        <power_rating_SL units="kW">250.0</power_rating_SL>
+                        <power_max_SL units="kW">245.0</power_max_SL>
+                    </ice_1>
+                </ICE>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>
