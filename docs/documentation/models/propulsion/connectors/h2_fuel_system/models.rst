@@ -54,7 +54,11 @@ Pipe diameter calculation
 The pipe inner diameter is computed based on the hoop stress calculation similarly to what is done in :ref:`gaseous hydrogen tank inner diameter <models-gaseous_hydrogen_tank-inner-diameter>`.
 However, unlike for the  gaseous hydrogen tank model, the pipe diameter :math:`D_{\text{pipe}}`, is directly defined by user.
 
+.. image:: ../../../../../img/h2_pipe.svg
+    :width: 600
+    :align: center
 
+This figure demonstrates the essential geometry parameters of the pipe cross section.
 
 *******************************
 Component Computation Structure
