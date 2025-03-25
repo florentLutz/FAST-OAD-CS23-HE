@@ -194,7 +194,6 @@ def test_h2_fuel_pipe_length():
 
 
 def test_h2_fuel_inner_diameter():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:pipe_pressure",
@@ -217,13 +216,12 @@ def test_h2_fuel_inner_diameter():
     assert problem.get_val(
         "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:inner_diameter",
         units="m",
-    ) == pytest.approx(0.0349, rel=1e-2)
+    ) == pytest.approx(0.0231, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_h2_fuel_inner_diameter_clipped():
-    # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:pipe_pressure" "",
@@ -252,11 +250,12 @@ def test_h2_fuel_inner_diameter_clipped():
 
 
 def test_h2_fuel_relative_roughness():
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingH2FuelSystemRelativeRoughness(h2_fuel_system_id="h2_fuel_system_1")),
-        __file__,
-        XML_FILE,
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:inner_diameter",
+        units="m",
+        val=0.0373,
     )
 
     problem = run_system(
@@ -271,11 +270,24 @@ def test_h2_fuel_relative_roughness():
 
 
 def test_h2_fuel_overall_cross_section():
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingH2FuelSystemCrossSectionDimension(h2_fuel_system_id="h2_fuel_system_1")),
-        __file__,
-        XML_FILE,
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:inner_diameter",
+        units="m",
+        val=0.0373,
+    )
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:pipe_diameter",
+        units="m",
+        val=0.04,
+    )
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:insulation_thickness",
+        units="m",
+        val=0.005,
     )
 
     problem = run_system(

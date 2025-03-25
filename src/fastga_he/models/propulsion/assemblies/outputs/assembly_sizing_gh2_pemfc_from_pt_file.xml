@@ -450,7 +450,7 @@
             <mass units="kg" is_input="False">1.1155127999782695<!--Weight of the hydrogen fuel system--></mass>
             <pipe_pressure units="Pa" is_input="True">1013250.0<!--hydrogen transport pressure--></pipe_pressure>
             <relative_roughness is_input="False">0.0012162162162162162<!--Inner diameter of the hydrogen fuel system--></relative_roughness>
-            <safety_factor is_input="True">1.0<!--hydrogen fuel system design safety factor--></safety_factor>
+            <safety_factor is_input="True">5.0<!--hydrogen fuel system design safety factor--></safety_factor>
             <CG>
               <x units="m" is_input="False">1.6080628878066596<!--X position of the hydrogen fuel system center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the hydrogen fuel system center of gravity--></y>

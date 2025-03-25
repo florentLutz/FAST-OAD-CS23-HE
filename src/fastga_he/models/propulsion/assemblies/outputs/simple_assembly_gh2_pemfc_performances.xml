@@ -104,7 +104,7 @@
           <h2_fuel_system_1>
             <fuel_distribution is_input="True">1.0</fuel_distribution>
             <number_source is_input="False">1.0<!--Number of power source connected to this hydrogen fuel system--></number_source>
-            <total_fuel_flowed units="kg" is_input="False">13.55674326875067<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
+            <total_fuel_flowed units="kg" is_input="False">13.556743268750669<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
           </h2_fuel_system_1>
         </H2_fuel_system>
         <PEMFC_stack>

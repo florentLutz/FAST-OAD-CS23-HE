@@ -9,7 +9,9 @@ import openmdao.api as om
 class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
     """
     Computation of the inner diameter of the hydrogen fuel system. Using the relation of the pipe
-    pressure and the yield strength of the wall material :cite:`colozza:2002`.
+    pressure and the yield strength of the wall material :cite:`colozza:2002`. The safety factor of
+    the pipe is set to minimum 5.0 based on the European Industrial Gases Association (EIGA)
+    guidelines from: https://www.eiga.eu/uploads/documents/DOC121.pdf.
     """
 
     def initialize(self):
@@ -44,7 +46,7 @@ class SizingH2FuelSystemInnerDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":safety_factor",
-            val=1.0,
+            val=5.0,
             desc="hydrogen fuel system design safety factor",
         )
 
