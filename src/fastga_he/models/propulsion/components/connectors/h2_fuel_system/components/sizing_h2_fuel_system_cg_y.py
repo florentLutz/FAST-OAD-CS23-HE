@@ -9,8 +9,8 @@ import openmdao.api as om
 class SizingH2FuelSystemCGY(om.ExplicitComponent):
     """
     Computation of the hydrogen fuel system Y-CG based on the positions of the storage and the
-    source components connected to the hydrogen fuel system. The value is 0.0 except having
-    hydrogen power sources for tanks on the wing.
+    source components connected to the hydrogen fuel system. The value is 0.0 except when 
+    power sources and tanks are in the wing.
     """
 
     def initialize(self):
