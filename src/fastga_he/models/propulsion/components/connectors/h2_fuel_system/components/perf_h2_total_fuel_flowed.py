@@ -58,4 +58,4 @@ class PerformancesTotalH2FuelFlowed(om.ExplicitComponent):
             "data:propulsion:he_power_train:H2_fuel_system:"
             + h2_fuel_system_id
             + ":total_fuel_flowed"
-        ] = sum(inputs["fuel_flowing_t"])
+        ] = np.sum(inputs["fuel_flowing_t"])
