@@ -231,7 +231,7 @@ def test_h2_fuel_inner_diameter_clipped():
         units="Pa",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension" ":pipe_diameter",
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:dimension:pipe_diameter",
         val=0.04,
         units="m",
     )
