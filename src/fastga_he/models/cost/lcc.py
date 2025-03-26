@@ -19,7 +19,7 @@ from .lca_core import LCACore
 from .lca_core_normalization import LCACoreNormalisation
 from .lca_core_weighting import LCACoreWeighting
 from .lca_core_aggregation import LCACoreAggregation
-from .lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
+from .lcc_engineering_cost import LCARatioDeliveryFlightMission
 from .lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
 from .lca_electricty_per_fu import LCAElectricityPerFU
 from .lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
@@ -65,25 +65,6 @@ class LCC(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="component_level_breakdown",
-            default=False,
-            types=bool,
-            desc="If true in addition to a breakdown, phase by phase, adds a breakdown component "
-            "by component",
-        )
-        self.options.declare(
-            name="impact_assessment_method",
-            default="ReCiPe 2016 v1.03",
-            desc="Impact assessment method to be used",
-            values=list(METHODS_TO_FILE.keys()),
-        )
-        self.options.declare(
-            name="ecoinvent_version",
-            default="3.9.1",
-            desc="EcoInvent version to use",
-            values=["3.9.1"],
-        )
-        self.options.declare(
             name="airframe_material",
             default="aluminium",
             desc="Material used for the airframe which include wing, fuselage, HTP and VTP. LG will"
@@ -100,21 +81,6 @@ class LCC(om.Group):
             values=["flight", "train"],
         )
         self.options.declare(
-            name="electric_mix",
-            default="default",
-            desc="By default to construct the aircraft, a European electric mix is used. This "
-            "forces all higher level process to use a different mix. This will not affect "
-            "subprocesses of proxies directly taken from EcoInvent",
-            allow_none=False,
-            values=["default", "french", "slovenia"],
-        )
-        self.options.declare(
-            name="normalization",
-            default=False,
-            types=bool,
-            desc="If available, the normalization step will be added to the LCA process",
-        )
-        self.options.declare(
             name="weighting",
             default=False,
             types=bool,
@@ -127,35 +93,11 @@ class LCC(om.Group):
             desc="The characteristics and consumption of the operational mission will be used",
         )
         self.options.declare(
-            name="recipe_midpoint_weighting",
-            default=False,
-            types=bool,
-            desc="Use equivalent midpoint weighting factor for the weighting of ReCiPe 2016. Is "
-            "only used ReCiPe is used as LCIA method and if weighting is enabled",
-        )
-        self.options.declare(
             name="aircraft_lifespan_in_hours",
             default=False,
             types=bool,
             desc="The inputs for the computation of the functional units are requested in "
             "hours instead of years and number of flights per year",
-        )
-        self.options.declare(
-            name="write_lca_conf",
-            default=True,
-            types=bool,
-            desc="By default the code will write a new configuration file for the LCA in the same "
-            "folder as the powertrain file at each setup of the LCA module. This can be "
-            "turned off if an LCA file is already available",
-        )
-        self.options.declare(
-            name="lca_conf_file_path",
-            default="",
-            types=(str, pathlib.Path),
-            desc="If an existing LCA configuration file is to be used, its path can be provided "
-            "here. If nothing is put for this option, the code will assume it is located in "
-            "the same folder as the powertrain file and will have the same name except for a "
-            "_lca suffix",
         )
 
     def setup(self):

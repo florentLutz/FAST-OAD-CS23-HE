@@ -16,7 +16,7 @@ from ..lcc import LCC
 from ..lca_equivalent_year_of_life import LCAEquivalentYearOfLife
 from ..lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
 from ..lca_aircraft_per_fu import LCAAircraftPerFU, LCAAircraftPerFUFlightHours
-from ..lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
+from ..lcc_engineering_cost import LCARatioDeliveryFlightMission
 from ..lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
 from ..lca_electricty_per_fu import LCAElectricityPerFU
 from ..lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
