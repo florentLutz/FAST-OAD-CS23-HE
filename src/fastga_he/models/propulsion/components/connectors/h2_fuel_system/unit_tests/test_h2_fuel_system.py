@@ -35,7 +35,7 @@ NB_POINTS_TEST = 10
 
 def test_fuel_system_cg_x():
     expected_cg = [1.869, 2.239, 2.608]
-    expected_cg_wing = [2.054, 2.239, 2.793]
+    expected_cg_wing = [2.054, 2.239, 2.423]
 
     for option, expected_value, expected_value_wing in zip(
         POSSIBLE_POSITION, expected_cg, expected_cg_wing

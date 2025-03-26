@@ -59,7 +59,7 @@ class SizingH2FuelSystemCGX(om.ExplicitComponent):
             if position == "in_the_front":
                 self.declare_partials("*", "data:geometry:cabin:length", val=0.375)
             if position == "in_the_rear":
-                self.declare_partials("*", "data:geometry:cabin:length", val=0.875)
+                self.declare_partials("*", "data:geometry:cabin:length", val=0.625)
         else:
             if position == "in_the_front":
                 self.declare_partials("*", "data:geometry:cabin:length", val=0.25)
@@ -86,7 +86,7 @@ class SizingH2FuelSystemCGX(om.ExplicitComponent):
             if position == "in_the_rear":
                 outputs[
                     "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:x"
-                ] = front_length + 0.875 * cabin_length
+                ] = front_length + 0.625 * cabin_length
         else:
             if position == "in_the_front":
                 outputs[
