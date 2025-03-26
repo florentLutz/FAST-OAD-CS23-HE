@@ -45,8 +45,8 @@ Where,
     \end{cases}
 
 Where :math:`L_{\text{cabin}}` is the cabin length, :math:`S_{\text{wing}}` is the wing span,  and :math:`\lambda{\text{wing}}`
-is the position in portion of half wing span that the source is fixed with respect to the wing root. The position options
-of pipe network length along fuselage :math:`L_{fus}` and length along wing :math:`L_{\text{wing}}` can be found in :ref:`options <options-h2-fuel-system>`.
+is the position as a ratio of half wing span where the source is located. The position options of pipe network length
+along fuselage :math:`L_{fus}` and length along wing :math:`L_{\text{wing}}` can be found in :ref:`options <options-h2-fuel-system>`.
 
 
 Pipe diameter calculation
