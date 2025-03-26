@@ -13,8 +13,8 @@ Pipe geometry calculation
 System length calculation
 =========================
 
-The hydrogen fuel system length depends on three three installation types for the power source and storage tank. In the
-compact configuration,the components are installed in the same position. The wing-related configuration places one
+The hydrogen fuel system length depends on three installation types for the power source and storage tank. In the
+compact configuration, the components are installed in the same location. The wing-related configuration places at least one
 component along the wing. The ordinary configuration installs the components separately within the fuselage. With these
 three configurations, the following equations calculate the system length for each setup.
 
