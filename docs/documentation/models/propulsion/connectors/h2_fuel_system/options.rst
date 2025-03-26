@@ -29,7 +29,7 @@ The fuselage part of hydrogen fuel system model has three possible installation 
 | "in_the_middle" : Located in the middle of the cabin.
 | "in_the_front" : Located in the front of the cabin.
 
-All the position related options can be activated with the PT file shown as:
+All the position-related options can be activated in the PT file:
 
 .. code-block:: yaml
 
