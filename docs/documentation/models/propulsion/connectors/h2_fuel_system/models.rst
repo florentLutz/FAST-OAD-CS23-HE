@@ -64,7 +64,7 @@ This figure illustrates the main geometrical parameters of the pipe cross sectio
 Component Computation Structure
 *******************************
 The following two links directs to the N2 diagrams representing the performance and sizing computation
-in hydrogen fuel system component.
+for the hydrogen fuel system component.
 
 .. raw:: html
 
