@@ -58,7 +58,7 @@ However, unlike for the  gaseous hydrogen tank model, the pipe diameter :math:`D
     :width: 600
     :align: center
 
-This figure demonstrates the essential geometry parameters of the pipe cross section.
+This figure illustrates the main geometrical parameters of the pipe cross section.
 
 *******************************
 Component Computation Structure
