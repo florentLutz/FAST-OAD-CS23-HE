@@ -103,26 +103,20 @@ class SizingH2FuelSystemLength(om.ExplicitComponent):
         else:
             l_in_fus = 0.5 * inputs["data:geometry:cabin:length"]
             if wing_related:
-                outputs[
-                    "data:propulsion:he_power_train:H2_fuel_system:"
-                    + h2_fuel_system_id
-                    + ":dimension:length"
-                ] = (
-                    l_in_fus
-                    + 0.5
+                l_in_wing = 0.5
                     * inputs["data:geometry:wing:span"]
                     * inputs[
                         "data:propulsion:he_power_train:H2_fuel_system:"
                         + h2_fuel_system_id
                         + ":CG:y_ratio"
                     ]
-                )
             else:
-                outputs[
-                    "data:propulsion:he_power_train:H2_fuel_system:"
-                    + h2_fuel_system_id
-                    + ":dimension:length"
-                ] = l_in_fus
+                 l_in_wing = 0.
+            outputs[
+                "data:propulsion:he_power_train:H2_fuel_system:"
+                + h2_fuel_system_id
+                + ":dimension:length"
+            ] = l_in_fus + l_in_wing
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
