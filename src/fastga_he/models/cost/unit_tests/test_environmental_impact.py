@@ -12,7 +12,7 @@ import fastoad.api as oad
 from lca_modeller.gui.plots import process_tree
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
-from ..lca import LCA
+from ..lcc import LCC
 from ..lca_equivalent_year_of_life import LCAEquivalentYearOfLife
 from ..lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
 from ..lca_aircraft_per_fu import LCAAircraftPerFU, LCAAircraftPerFUFlightHours
@@ -673,7 +673,7 @@ def test_electricity_per_fu_velis():
 def test_lca_pipistrel():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCA(
+            LCC(
                 power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
                 component_level_breakdown=True,
                 airframe_material="composite",
@@ -688,7 +688,7 @@ def test_lca_pipistrel():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCA(
+        LCC(
             power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
             component_level_breakdown=True,
             airframe_material="composite",
@@ -782,7 +782,7 @@ def test_pipistrel_lca_comparison_paper():
     # by adjusting the content of the LCA conf file. We'll make the assumption of a similar
     # powertrain (but different values).
 
-    component = LCA(
+    component = LCC(
         power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
         component_level_breakdown=True,
         airframe_material="composite",
@@ -971,7 +971,7 @@ def test_kerosene_per_fu_tbm900():
 def test_lca_tbm900():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCA(
+            LCC(
                 power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
                 component_level_breakdown=True,
                 airframe_material="aluminium",
@@ -984,7 +984,7 @@ def test_lca_tbm900():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCA(
+        LCC(
             power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
             component_level_breakdown=True,
             airframe_material="aluminium",
@@ -1055,7 +1055,7 @@ def test_lca_tbm900():
 def test_lca_tbm900_ef():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCA(
+            LCC(
                 power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
                 component_level_breakdown=True,
                 airframe_material="aluminium",
@@ -1071,7 +1071,7 @@ def test_lca_tbm900_ef():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCA(
+        LCC(
             power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
             component_level_breakdown=True,
             airframe_material="aluminium",
@@ -1111,7 +1111,7 @@ def test_lca_tbm900_ef():
 def test_lca_tbm900_ef_inputs_as_hours():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCA(
+            LCC(
                 power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
                 component_level_breakdown=True,
                 airframe_material="aluminium",
@@ -1128,7 +1128,7 @@ def test_lca_tbm900_ef_inputs_as_hours():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCA(
+        LCC(
             power_train_file_path=DATA_FOLDER_PATH / "tbm900_propulsion.yml",
             component_level_breakdown=True,
             airframe_material="aluminium",
@@ -1184,7 +1184,7 @@ def test_gasoline_per_fu_sr22():
 def test_lca_cirrus_sr22():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCA(
+            LCC(
                 power_train_file_path=DATA_FOLDER_PATH / "sr22_propulsion.yml",
                 component_level_breakdown=True,
                 airframe_material="composite",
@@ -1197,7 +1197,7 @@ def test_lca_cirrus_sr22():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCA(
+        LCC(
             power_train_file_path=DATA_FOLDER_PATH / "sr22_propulsion.yml",
             component_level_breakdown=True,
             airframe_material="composite",
@@ -1257,7 +1257,7 @@ def test_lca_cirrus_sr22():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_kodiak_100_ef_and_hybrid():
-    component = LCA(
+    component = LCC(
         power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion.yml",
         component_level_breakdown=True,
         airframe_material="aluminium",
@@ -1285,7 +1285,7 @@ def test_lca_kodiak_100_ef_and_hybrid():
 
     # Second LCA
 
-    component = LCA(
+    component = LCC(
         power_train_file_path=DATA_FOLDER_PATH / "hybrid_propulsion.yml",
         component_level_breakdown=True,
         airframe_material="aluminium",
@@ -1313,7 +1313,7 @@ def test_lca_kodiak_100_ef_and_hybrid():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_kodiak_100_recipe_end_and_mid():
-    component = LCA(
+    component = LCC(
         power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion.yml",
         component_level_breakdown=True,
         airframe_material="aluminium",
@@ -1364,7 +1364,7 @@ def test_lca_kodiak_100_recipe_end_and_mid():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_hybrid_kodiak_100_recipe_mid_and_end():
-    component = LCA(
+    component = LCC(
         power_train_file_path=DATA_FOLDER_PATH / "hybrid_propulsion.yml",
         component_level_breakdown=True,
         airframe_material="aluminium",

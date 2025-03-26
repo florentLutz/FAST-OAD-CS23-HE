@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2024 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -43,8 +43,8 @@ from .resources.constants import (
 )
 
 
-@oad.RegisterOpenMDAOSystem("fastga_he.lca.legacy", domain=ModelDomain.OTHER)
-class LCA(om.Group):
+@oad.RegisterOpenMDAOSystem("fastga_he.lcc.legacy", domain=ModelDomain.OTHER)
+class LCC(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
