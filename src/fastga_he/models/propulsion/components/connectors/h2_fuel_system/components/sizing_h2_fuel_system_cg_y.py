@@ -82,7 +82,7 @@ class SizingH2FuelSystemCGY(om.ExplicitComponent):
         else:
             outputs[
                 "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y"
-                ] = 0.0
+            ] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
