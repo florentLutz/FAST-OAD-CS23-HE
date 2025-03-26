@@ -26,7 +26,7 @@ three configurations, the following equations calculate the system length for ea
         L_{fus} + L_{\text{wing}} & \text{else}
     \end{cases}
 
-With
+Where,
 
 .. math::
 
