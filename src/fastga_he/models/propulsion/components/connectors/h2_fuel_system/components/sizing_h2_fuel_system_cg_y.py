@@ -51,21 +51,14 @@ class SizingH2FuelSystemCGY(om.ExplicitComponent):
                 "half-span",
             )
 
-            self.add_output(
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y",
-                units="m",
-                val=0.0,
-                desc="Y position of the hydrogen fuel system center of gravity",
-            )
             self.declare_partials(of="*", wrt="*", method="exact")
 
-        else:
-            self.add_output(
-                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y",
-                units="m",
-                val=0.0,
-                desc="Y position of the hydrogen fuel system center of gravity",
-            )
+        self.add_output(
+            "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y",
+            units="m",
+            val=0.0,
+            desc="Y position of the hydrogen fuel system center of gravity",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
@@ -85,6 +78,11 @@ class SizingH2FuelSystemCGY(om.ExplicitComponent):
                 outputs[
                     "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y"
                 ] = 0.5 * half_span * y_ratio
+
+        else:
+            outputs[
+                "data:propulsion:he_power_train:H2_fuel_system:" + h2_fuel_system_id + ":CG:y"
+                ] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
