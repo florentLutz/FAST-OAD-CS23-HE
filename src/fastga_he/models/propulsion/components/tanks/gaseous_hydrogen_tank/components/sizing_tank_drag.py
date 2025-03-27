@@ -51,7 +51,6 @@ class SizingGaseousHydrogenTankDrag(om.ExplicitComponent):
             val=np.nan,
             desc="Outer diameter of the gaseous hydrogen tank",
         )
-
         if position == "underbelly":
             self.add_input(
                 "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
@@ -79,7 +78,7 @@ class SizingGaseousHydrogenTankDrag(om.ExplicitComponent):
 
         # Should not work but actually does. I expected the value to be zero everywhere but it
         # seems like this value is overwritten by the compute_partials function
-        self.declare_partials(of="*", wrt="*", val=0.0)
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
