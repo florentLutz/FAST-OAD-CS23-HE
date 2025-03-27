@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 ID = "id"
 # CN is used to translate the ID to the prefix used in the OpenMDAO names for the components,
@@ -699,6 +699,43 @@ FUEL_SYSTEM = {
     ETA: 1.0,
     CTRL_PARAM: [],
 }
+H2_FUEL_SYSTEM = {
+    ID: "fastga_he.pt_component.h2_fuel_system",
+    CN: "H2FuelSystem",
+    CN_ID: "h2_fuel_system_id",
+    CT: "H2_fuel_system",
+    ATT: ["number_of_power_sources", "number_of_tanks", "compact", "wing_related"],
+    PT: [],
+    SPT: [],
+    PTS: [],
+    IN: [(None, "fuel_consumed_in_t_")],
+    OUT: [("fuel_consumed_out_t_", None)],
+    CTC: "connector",
+    MP: [
+        {"fuel_flowing_t": "kg"},
+    ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
+    ICON: "fuel_system",
+    ICON_SIZE: 30,
+    RSD: ["fuel_flowing_t"],
+    SETS_V: False,
+    IO_INDEP_V: False,
+    V_TO_SET: [],
+    P_TO_SET: [],
+    I_TO_SET: [],
+    SFR: False,
+    SWL: False,
+    DST_W: [],
+    PCT_W: [],
+    DST_W_F: [],
+    PCT_W_F: [],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: True,
+    ETA: 1.0,
+    CTRL_PARAM: [],
+}
 TURBOSHAFT = {
     ID: "fastga_he.pt_component.turboshaft",
     CN: "Turboshaft",
@@ -970,7 +1007,7 @@ GASEOUS_HYDROGEN_TANK = {
     SPT: [],
     PTS: [],
     IN: None,
-    OUT: [("fuel_consumed_t", None), ("hydrogen_reactant_pressure", None)],
+    OUT: [("fuel_consumed_t", None)],
     CTC: "tank",
     MP: [
         {"fuel_remaining_t": "kg"},
@@ -1001,12 +1038,12 @@ PEMFC_STACK = {
     ID: "fastga_he.pt_component.pemfc_stack",
     CN: "PEMFCStack",
     CN_ID: "pemfc_stack_id",
-    CT: "pemfc_stack",
+    CT: "PEMFC_stack",
     ATT: ["model_fidelity"],
     PT: ["time_step", "altitude"],
     SPT: [],
     PTS: [],
-    IN: [(None, "fuel_consumed_t")],
+    IN: [(None, "fuel_consumed_t"), (None, "fuel_consumption")],
     OUT: [(None, "voltage_out"), ("dc_current_out", None)],
     CTC: "source",
     MP: [
@@ -1054,6 +1091,7 @@ KNOWN_COMPONENTS = [
     ICE,
     FUEL_TANK,
     FUEL_SYSTEM,
+    H2_FUEL_SYSTEM,
     TURBOSHAFT,
     SPEED_REDUCER,
     PLANETARY_GEAR,

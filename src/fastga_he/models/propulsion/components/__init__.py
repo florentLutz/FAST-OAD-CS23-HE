@@ -101,3 +101,8 @@ from .tanks.gaseous_hydrogen_tank import (
     PerformancesGaseousHydrogenTank,
     SlipstreamGaseousHydrogenTank,
 )
+from .connectors.h2_fuel_system import (
+    SizingH2FuelSystem,
+    PerformancesH2FuelSystem,
+    SlipstreamH2FuelSystem,
+)

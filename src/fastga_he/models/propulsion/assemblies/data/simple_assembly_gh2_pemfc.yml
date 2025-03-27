@@ -1,0 +1,94 @@
+title: Sample power train file for testing hydrogen electric power train
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+  dc_sspc_1:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: True
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  dc_sspc_2:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: True
+  harness_1:
+    id: fastga_he.pt_component.dc_line
+  dc_sspc_412:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: True
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  dc_sspc_1337:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: True
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+  pemfc_stack_1:
+    id: fastga_he.pt_component.pemfc_stack
+  h2_fuel_system_1:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: False
+      compact: False
+    position: in_the_rear
+  gaseous_hydrogen_tank_1:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+
+component_connections:
+  - source: propeller_1
+    target: motor_1
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: inverter_1
+    target: dc_sspc_1
+
+  - source: dc_sspc_1
+    target: [dc_bus_1, 1]
+
+  - source: [dc_bus_1, 1]
+    target: dc_sspc_2
+
+  - source: dc_sspc_2
+    target: harness_1
+
+  - source: harness_1
+    target: dc_sspc_412
+
+  - source: dc_sspc_412
+    target: [dc_bus_2, 1]
+
+  - source: [dc_bus_2, 1]
+    target: dc_sspc_1337
+
+  - source: dc_sspc_1337
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: pemfc_stack_1
+
+  - source: pemfc_stack_1
+    target: [h2_fuel_system_1, 1]
+
+  - source: [h2_fuel_system_1, 1]
+    target: gaseous_hydrogen_tank_1
+
+watcher_file_path: ./simple_assembly_performances_gh2_pemfc.csv
