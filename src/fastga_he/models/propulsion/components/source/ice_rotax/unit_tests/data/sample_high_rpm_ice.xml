@@ -46,6 +46,7 @@
                 <high_rpm_ICE>
                     <ice_1>
                         <power_rating_SL units="kW">69.0</power_rating_SL>
+                        <power_max_SL units="kW">68.0</power_max_SL>
                         <pme_max units="bar">22.27</pme_max>
                     </ice_1>
                 </high_rpm_ICE>
