@@ -45,6 +45,7 @@
             <he_power_train>
                 <high_rpm_ICE>
                     <ice_1>
+                        <displacement_volume units="cm**3">1352.0</displacement_volume>
                         <power_rating_SL units="kW">69.0</power_rating_SL>
                         <power_max_SL units="kW">68.0</power_max_SL>
                         <pme_max units="bar">22.27</pme_max>

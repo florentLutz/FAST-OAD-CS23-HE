@@ -15,6 +15,8 @@ from ..components.cstr_high_rpm_ice import ConstraintHighRPMICEPowerRateMission
 
 from ..components.sizing_displacement_volume import SizingHighRPMICEDisplacementVolume
 
+from ..components.perf_mean_effective_pressure import PerformancesMeanEffectivePressure
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "sample_high_rpm_ice.xml"
@@ -85,5 +87,31 @@ def test_displacement_volume():
     assert problem.get_val(
         "data:propulsion:he_power_train:high_rpm_ICE:ice_1:displacement_volume", units="cm**3"
     ) == pytest.approx(1352.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_mean_effective_pressure():
+    ivc = get_indep_var_comp(
+        ["data:propulsion:he_power_train:high_rpm_ICE:ice_1:displacement_volume"],
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "torque_out",
+        val=np.array([30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 110.0, 120.0]),
+        units="N*m",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMeanEffectivePressure(high_rpm_ice_id="ice_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("mean_effective_pressure", units="bar") == pytest.approx(
+        np.array([5.57, 7.43, 9.29, 11.1, 13.0, 14.8, 16.7, 18.5, 20.4, 22.3]),
+        rel=1e-2,
+    )
 
     problem.check_partials(compact_print=True)
