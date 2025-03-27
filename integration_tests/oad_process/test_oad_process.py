@@ -18,13 +18,14 @@ from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
+WORKDIR_FOLDER_PATH = pth.join(pth.dirname(__file__), "workdir")
 
 
 @pytest.fixture(scope="module")
 def cleanup():
     """Empties results folder to avoid any conflicts."""
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
-    rmtree("D:/tmp", ignore_errors=True)
+    rmtree(WORKDIR_FOLDER_PATH, ignore_errors=True)
 
 
 def test_fuel_and_battery(cleanup):

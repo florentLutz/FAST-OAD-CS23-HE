@@ -40,6 +40,15 @@ class SizingBatteryPack(om.Group):
             allow_none=False,
         )
 
+        # Dummy option to prevent error
+        self.options.declare(
+            name="direct_bus_connection",
+            default=False,
+            types=bool,
+            desc="If the battery is directly connected to a bus, a special mode is required to "
+            "interface the two",
+        )
+
     def setup(self):
         battery_pack_id = self.options["battery_pack_id"]
         position = self.options["position"]

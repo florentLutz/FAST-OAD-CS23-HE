@@ -52,6 +52,22 @@ class SizingH2FuelSystem(om.Group):
             desc="Option identifies weather the system is installed compactly in one position",
         )
 
+        # Dummy option to prevent error
+        self.options.declare(
+            name="number_of_tanks",
+            default=1,
+            types=int,
+            desc="Number of connections at the input of the hydrogen fuel system, should always be tanks",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="number_of_power_sources",
+            default=1,
+            types=int,
+            desc="Number of connections at the output of the hydrogen fuel system",
+            allow_none=False,
+        )
+
     def setup(self):
         h2_fuel_system_id = self.options["h2_fuel_system_id"]
         position = self.options["position"]

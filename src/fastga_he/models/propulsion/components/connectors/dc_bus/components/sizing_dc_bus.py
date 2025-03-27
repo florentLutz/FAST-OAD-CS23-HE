@@ -42,6 +42,22 @@ class SizingDCBus(om.Group):
             allow_none=False,
         )
 
+        # Dummy option to prevent error
+        self.options.declare(
+            name="number_of_inputs",
+            default=1,
+            types=int,
+            desc="Number of connections at the input of the bus",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="number_of_outputs",
+            default=1,
+            types=int,
+            desc="Number of connections at the output of the bus",
+            allow_none=False,
+        )
+
     def setup(self):
         dc_bus_id = self.options["dc_bus_id"]
         position = self.options["position"]

@@ -35,6 +35,22 @@ class SizingFuelSystem(om.Group):
             allow_none=False,
         )
 
+        # Dummy option to prevent error
+        self.options.declare(
+            name="number_of_tanks",
+            default=1,
+            types=int,
+            desc="Number of connections at the input of the fuel system, should always be tanks",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="number_of_engines",
+            default=1,
+            types=int,
+            desc="Number of connections at the output of the fuel system, should always be engine",
+            allow_none=False,
+        )
+
     def setup(self):
         fuel_system_id = self.options["fuel_system_id"]
         position = self.options["position"]

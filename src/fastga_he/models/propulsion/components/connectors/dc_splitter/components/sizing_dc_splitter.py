@@ -41,6 +41,14 @@ class SizingDCSplitter(om.Group):
             allow_none=False,
         )
 
+        # Dummy option to prevent error
+        self.options.declare(
+            "splitter_mode",
+            default="percent_split",
+            desc="Mode of the power splitter, should be either percent_split or power_share",
+            values=["percent_split", "power_share"],
+        )
+
     def setup(self):
         position = self.options["position"]
         dc_splitter_id = self.options["dc_splitter_id"]
