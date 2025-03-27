@@ -32,7 +32,7 @@ Where,
 
     L_{\text{wing}} =
     \begin{cases}
-        0.5 * S_{\text{wing}} * \lambda_{\text{wing}} & \text{if wing-related} \\
+        0.5 * b_{\text{wing}} * \lambda_{\text{wing}} & \text{if wing-related} \\
         0.0 & \text{else}
     \end{cases}
 
@@ -44,8 +44,8 @@ Where,
         0.5 * L_{\text{cabin}} & \text{else}
     \end{cases}
 
-Where :math:`L_{\text{cabin}}` is the cabin length, :math:`S_{\text{wing}}` is the wing span,  and :math:`\lambda{\text{wing}}`
-is the position as a ratio of half wing span where the source is located. The position options of pipe network length
+Where :math:`L_{\text{cabin}}` is the cabin length, :math:`b_{\text{wing}}` is the wing span,  and :math:`\lambda{\text{wing}}`
+is the position, as a ratio of half wing span, where the source is located. The position options of pipe network length
 along fuselage :math:`L_{fus}` and length along wing :math:`L_{\text{wing}}` can be found in :ref:`options <options-h2-fuel-system>`.
 
 
