@@ -3,6 +3,13 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import numpy as np
+import plotly.graph_objects as go
+
+
+def mean_effective_pressure(displacement_volume, power, omega):
+    mep = (power * 2.0 * np.pi * 4.0) / (displacement_volume * omega)
+    return mep
+
 
 if __name__ == "__main__":
     """
@@ -17,23 +24,21 @@ if __name__ == "__main__":
 
     # Data for the 912 Series -A, -F, -UL
     data_rpm_power_912_a = np.array(
-        [2499.0, 2996.0, 3494.0, 4001.0, 4492.0, 4993.0, 5490.0, 5794.0]
+        [2499.0, 2996.0, 3494.0, 4001.0, 4492.0, 4993.0, 5490.0, 5794.0]  # In kW
     )
     data_power_power_912_a = np.array([4.91, 8.60, 13.2, 19.9, 27.8, 38.3, 50.7, 59.7])
 
-    data_rpm_fuel_912_a = np.array(
-        [2494.83, 2997.04, 3490.39, 3995.56, 4497.78, 4997.04, 5502.21, 5794.68]
-    )
-    data_fuel_fuel_912_a = np.array([2.99, 4.16, 5.68, 8.14, 11.1, 14.2, 18.7, 22.4])
+    data_rpm_fuel_912_a = np.array([2494.83, 2997.04, 3490.39, 3995.56, 4497.78, 4997.04, 5502.21])
+    data_fuel_fuel_912_a = np.array([2.99, 4.16, 5.68, 8.14, 11.1, 14.2, 18.7])  # In l/h
 
     # Data for the 912 Series -S, -ULS
     data_rpm_power_912_s = np.array(
-        [2498.2, 2999.6, 3495.2, 3992.9, 4486.8, 4980.3, 5478.7, 5772.6]
+        [2498.2, 2999.6, 3495.2, 3992.9, 4486.8, 4980.3, 5478.7, 5772.6]  # In kW
     )
     data_power_power_912_s = np.array([6.4, 11.3, 16.3, 24.3, 35.1, 47.0, 62.5, 73.2])
 
-    data_rpm_fuel_912_s = np.array([2496.2, 2993.9, 3491.3, 3989.4, 4487.5, 4985.4, 5482.0, 5778.1])
-    data_fuel_fuel_912_s = np.array([5.99, 6.90, 8.17, 12.0, 15.9, 20.0, 25.5, 26.9])
+    data_rpm_fuel_912_s = np.array([2496.2, 2993.9, 3491.3, 3989.4, 4487.5, 4985.4, 5482.0])
+    data_fuel_fuel_912_s = np.array([5.99, 6.90, 8.17, 12.0, 15.9, 20.0, 25.5])  # In l/h
 
     # Data for the 914 Series
     data_rpm_power_914 = np.array(
@@ -96,3 +101,283 @@ if __name__ == "__main__":
             26.2,
         ]
     )  # In l/h
+
+    # First establish some regressions between power and rpm ?
+    poly_power_912_a = np.polyfit(data_power_power_912_a, data_rpm_power_912_a, 3)
+    poly_power_912_s = np.polyfit(data_power_power_912_s, data_rpm_power_912_s, 3)
+    poly_power_914 = np.polyfit(data_power_power_914, data_rpm_power_914, 3)
+
+    fig912a = go.Figure()
+
+    fig912a.add_trace(
+        go.Scatter(x=data_power_power_912_a, y=data_rpm_power_912_a, name="Original data")
+    )
+    fig912a.add_trace(
+        go.Scatter(
+            x=data_power_power_912_a,
+            y=np.polyval(poly_power_912_a, data_power_power_912_a),
+            name="Interpolated data",
+        )
+    )
+    fig912a.update_layout(title_text="Power/RPM interpolation 912-A")
+
+    # fig912a.show()
+
+    fig912s = go.Figure()
+
+    fig912s.add_trace(
+        go.Scatter(x=data_power_power_912_s, y=data_rpm_power_912_s, name="Original data")
+    )
+    fig912s.add_trace(
+        go.Scatter(
+            x=data_power_power_912_s,
+            y=np.polyval(poly_power_912_s, data_power_power_912_s),
+            name="Interpolated data",
+        )
+    )
+    fig912s.update_layout(title_text="Power/RPM interpolation 912-S")
+
+    # fig912s.show()
+
+    fig914 = go.Figure()
+
+    fig914.add_trace(
+        go.Scatter(
+            x=data_power_power_914,
+            y=data_rpm_power_914,
+            name="Original data",
+            mode="lines+markers",
+        )
+    )
+    fig914.add_trace(
+        go.Scatter(
+            x=data_power_power_914,
+            y=np.polyval(poly_power_914, data_power_power_914),
+            name="Interpolated data",
+            mode="lines+markers",
+        )
+    )
+    fig914.update_layout(title_text="Power/RPM interpolation 914")
+
+    # fig914.show()
+
+    # We'll focus on max continuous performances, 5500 seems to be a common upper limit for
+    # continuous operation
+    mcp_914 = 73.5  # kW at 5500 rpm
+    mcp_912a = 58.0  # kW at 5500 rpm
+    mcp_912s = 69.0  # kW at 5500 rpm
+
+    displacement_914 = 1211  # cm**3
+    displacement_912a = 1211  # cm**3
+    displacement_912s = 1352  # cm**3
+
+    # Very big difference in the power for the same displacement between 912 and 914 which means
+    # different max pressure which should essentially be linked to the injection system. For this
+    # model we'll consider constant motor architecture so in the end it will be a 912-like ICE.
+
+    print(
+        "MEP max for Rotax 912-A:",
+        mean_effective_pressure(
+            displacement_912a / 1e6, mcp_912a * 1000.0, 5500 * 2.0 * np.pi / 60.0
+        )
+        * 1e-5,
+    )
+    print(
+        "MEP max for Rotax 912-S:",
+        mean_effective_pressure(
+            displacement_912s / 1e6, mcp_912s * 1000.0, 5500 * 2.0 * np.pi / 60.0
+        )
+        * 1e-5,
+    )
+
+    # Around 5% difference in the max MEP...
+
+    print(
+        "MEP for 912-A along propeller power curve",
+        mean_effective_pressure(
+            displacement_912a / 1e6,
+            data_power_power_912_a * 1000.0,
+            data_rpm_power_912_a * 2.0 * np.pi / 60.0,
+        )
+        * 1e-5,
+    )
+
+    print(
+        "MEP for 912-S along propeller power curve",
+        mean_effective_pressure(
+            displacement_912s / 1e6,
+            data_power_power_912_s * 1000.0,
+            data_rpm_power_912_s * 2.0 * np.pi / 60.0,
+        )
+        * 1e-5,
+    )
+
+    # In the previous case, sfc was a function of MEP and RPM but in the case of Rotax both are
+    # linked because RPM gives you power which gives you torque which gives you MEP. What we need
+    # to verify is if there is a either a constant sfc or if the function of SFC based on MEP is
+    # similar for both engine
+
+    density_avgas = 0.72  # In kg/l
+
+    poly_rpm_to_power_912_a = np.polyfit(data_rpm_power_912_a, data_power_power_912_a, 3)
+    poly_rpm_to_power_912_s = np.polyfit(data_rpm_power_912_s, data_power_power_912_s, 3)
+
+    sfc_fuel_curve_912a = data_fuel_fuel_912_a / np.polyval(
+        poly_rpm_to_power_912_a, data_rpm_fuel_912_a
+    )  # In l/h/kW
+    sfc_fuel_curve_912a *= density_avgas  # In kg/h/W
+    sfc_fuel_curve_912a *= 1000  # In g/Wh
+    print(sfc_fuel_curve_912a)
+
+    sfc_fuel_curve_912s = data_fuel_fuel_912_s / np.polyval(
+        poly_rpm_to_power_912_s, data_rpm_fuel_912_s
+    )  # In l/h/kW
+    sfc_fuel_curve_912s *= density_avgas  # In kg/h/W
+    sfc_fuel_curve_912s *= 1000  # In g/Wh
+    print(sfc_fuel_curve_912s)
+
+    fig_fuel = go.Figure()
+    fig_fuel.add_trace(
+        go.Scatter(
+            x=np.polyval(poly_rpm_to_power_912_a, data_rpm_fuel_912_a),
+            y=sfc_fuel_curve_912a,
+            name="Original data",
+            mode="lines+markers",
+        )
+    )
+
+    # fig_fuel.show()
+
+    mep_for_sfc_912a = (
+        mean_effective_pressure(
+            displacement_912a / 1e6,
+            np.polyval(poly_rpm_to_power_912_a, data_rpm_fuel_912_a) * 1000.0,
+            data_rpm_fuel_912_a * 2.0 * np.pi / 60.0,
+        )
+        * 1e-5
+    )
+    fig_fuel_mep = go.Figure()
+    fig_fuel_mep.add_trace(
+        go.Scatter(
+            x=mean_effective_pressure(
+                displacement_912a / 1e6,
+                np.polyval(poly_rpm_to_power_912_a, data_rpm_fuel_912_a) * 1000.0,
+                data_rpm_fuel_912_a * 2.0 * np.pi / 60.0,
+            )
+            * 1e-5,
+            # x=np.polyval(poly_rpm_to_power_912_a, data_rpm_fuel_912_a),
+            y=sfc_fuel_curve_912a,
+            name="Data Rotax 912-A",
+            mode="lines+markers",
+        )
+    )
+    mep_for_sfc_912s = (
+        mean_effective_pressure(
+            displacement_912s / 1e6,
+            np.polyval(poly_rpm_to_power_912_s, data_rpm_fuel_912_s) * 1000.0,
+            data_rpm_fuel_912_s * 2.0 * np.pi / 60.0,
+        )
+        * 1e-5
+    )
+    fig_fuel_mep.add_trace(
+        go.Scatter(
+            x=mep_for_sfc_912s,
+            # x=np.polyval(poly_rpm_to_power_912_s, data_rpm_fuel_912_s),
+            y=sfc_fuel_curve_912s,
+            name="Data Rotax 912-S",
+            mode="lines+markers",
+        )
+    )
+
+    # fig_fuel_mep.show()
+
+    # There seems like there isn't really any constance in the sfc = f(MEP) as what was found for
+    # the original model. The shape is more or less the same though. So what we will do is derive
+    # a regression based on the min and max sfc whose evolution seems consistent with previous
+    # models. We'll take something under the form of a + k * exp(-(x-MEP_MAX) with k chosen so
+    # that the value of the sfc is equal to the max value of the sfc for x = Min MEP (which we'll
+    # take as 5 bar). For the max value of the MEP we'll take 18.
+
+    # Values obtained from reading the curves plotted before
+    sfc_mep_min_912a = np.interp(5, mep_for_sfc_912a, sfc_fuel_curve_912a)
+    sfc_mep_min_912s = np.interp(5, mep_for_sfc_912s, sfc_fuel_curve_912s)
+
+    sfc_mep_max_912a = np.interp(18, mep_for_sfc_912a, sfc_fuel_curve_912a)
+    sfc_mep_max_912s = np.interp(18, mep_for_sfc_912s, sfc_fuel_curve_912s)
+
+    print(sfc_mep_min_912a, sfc_mep_min_912s)
+    print(sfc_mep_max_912a, sfc_mep_max_912s)
+
+    fig_fuel_interp = go.Figure()
+
+    sfc_interp_912a = sfc_mep_max_912a + (sfc_mep_min_912a - sfc_mep_max_912a) / (
+        np.exp(18.0 - 5.0)
+    ) * np.exp(-(mep_for_sfc_912a - 18.0))
+
+    fig_fuel_interp.add_trace(
+        go.Scatter(
+            x=mep_for_sfc_912s,
+            y=sfc_interp_912a,
+            name="Interpolation",
+            mode="lines+markers",
+        )
+    )
+    fig_fuel_interp.add_trace(
+        go.Scatter(
+            x=mep_for_sfc_912s,
+            y=sfc_fuel_curve_912a,
+            name="Data Rotax 912-S",
+            mode="lines+markers",
+        )
+    )
+
+    # fig_fuel_interp.show()
+
+    fig_fuel_interp_2 = go.Figure()
+
+    k_a = np.log(sfc_mep_min_912a - sfc_mep_max_912a) / (18.0 - 5.0)
+    sfc_interp_912a_v2 = sfc_mep_max_912a + np.exp(-k_a * (mep_for_sfc_912a - 18.0))
+
+    fig_fuel_interp_2.add_trace(
+        go.Scatter(
+            x=mep_for_sfc_912a,
+            y=sfc_interp_912a_v2,
+            name="Interpolation Rotax 912-A",
+            mode="lines+markers",
+        )
+    )
+    fig_fuel_interp_2.add_trace(
+        go.Scatter(
+            x=mep_for_sfc_912a,
+            y=sfc_fuel_curve_912a,
+            name="Data Rotax 912-A",
+            mode="lines+markers",
+        )
+    )
+
+    k_s = np.log(sfc_mep_min_912s - sfc_mep_max_912s) / (18.0 - 5.0)
+    sfc_interp_912s_v2 = sfc_mep_max_912s + np.exp(-k_s * (mep_for_sfc_912s - 18.0))
+
+    fig_fuel_interp_2.add_trace(
+        go.Scatter(
+            x=mep_for_sfc_912s,
+            y=sfc_interp_912s_v2,
+            name="Interpolation Rotax 912-S",
+            mode="lines+markers",
+        )
+    )
+    fig_fuel_interp_2.add_trace(
+        go.Scatter(
+            x=mep_for_sfc_912s,
+            y=sfc_fuel_curve_912s,
+            name="Data Rotax 912-S",
+            mode="lines+markers",
+        )
+    )
+
+    fig_fuel_interp_2.show()
+
+    r2 = 1.0 - np.sum((sfc_fuel_curve_912a - sfc_interp_912a_v2) ** 2) / np.sum(
+        (sfc_fuel_curve_912a - np.mean(sfc_fuel_curve_912a)) ** 2
+    )
+    print("R2: ", r2)
