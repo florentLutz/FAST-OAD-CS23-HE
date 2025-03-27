@@ -12,6 +12,16 @@
          <mission_ratio>50.</mission_ratio>
       </delivery>
     </environmental_impact>
+    <cost>
+      <cpi_2012>1.4</cpi_2012>
+      <airframe>
+        <num_aircraft_5years>75.0</num_aircraft_5years>
+        <engineering_man_hours unit="h">72.679</engineering_man_hours>
+        <engineering_cost_per_hour unit="USD/h">126.54</engineering_cost_per_hour>
+        <prototype_number>2.0</prototype_number>
+      </airframe>
+
+    </cost>
     <TLAR>
       <max_airframe_hours units="h">3524.9</max_airframe_hours>
       <flight_hours_per_year units="h">283.2</flight_hours_per_year>

@@ -34,13 +34,13 @@ class LCCDevSupportCost(om.ExplicitComponent):
 
         self.add_input(
             "data:cost:airframe:composite_fraction",
-            val=np.nan,
+            val=0.0,
             desc="Fraction of airframe made by composite, range from 0.0 to 1.0",
         )
 
         self.add_input(
             "data:cost:airframe:pressurization_factor",
-            val=np.nan,
+            val=1.0,
             desc="Set to 1.03 for pressurized aircraft, 1.0 for unpressurized",
         )
 
@@ -50,6 +50,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             units="USD",
             desc="Development support adjusted cost per aircraft",
         )
+        self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:airframe:dev_support_cost_per_unit"] = (

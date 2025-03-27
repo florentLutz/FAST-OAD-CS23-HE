@@ -17,15 +17,14 @@ class LCCEngineeringCost(om.ExplicitComponent):
             "data:cost:airframe:engineering_man_hours",
             val=np.nan,
             units="h",
-            desc="Number of man-hours required for a certain amount of aircraft been produced in "
-            "a 5-year or 60 month period",
+            desc="Number of engineering man-hours required for a certain amount of aircraft been "
+            "produced in a 5-year or 60 month period",
         )
         self.add_input(
             "data:cost:airframe:engineering_cost_per_hour",
             val=np.nan,
             units="USD/h",
-            desc="Number of man-hours required for a certain amount of aircraft been produced in "
-            "a 5-year or 60 month period",
+            desc="Engineering cost per hour",
         )
         self.add_input(
             "data:cost:cpi_2012",
@@ -39,6 +38,7 @@ class LCCEngineeringCost(om.ExplicitComponent):
             units="USD",
             desc="Engineering adjusted cost per aircraft",
         )
+        self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:airframe:engineering_cost_per_unit"] = (
