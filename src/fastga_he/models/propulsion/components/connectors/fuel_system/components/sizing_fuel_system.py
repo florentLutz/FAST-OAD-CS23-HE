@@ -35,7 +35,7 @@ class SizingFuelSystem(om.Group):
             allow_none=False,
         )
 
-        # Dummy option to prevent error
+        # The followong option(s) is/are dummy option(s) to prevent error
         self.options.declare(
             name="number_of_tanks",
             default=1,

@@ -52,7 +52,7 @@ class SizingH2FuelSystem(om.Group):
             desc="Option identifies weather the system is installed compactly in one position",
         )
 
-        # Dummy option to prevent error
+        # The followong option(s) is/are dummy option(s) to prevent error
         self.options.declare(
             name="number_of_tanks",
             default=1,

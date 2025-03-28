@@ -41,7 +41,7 @@ class PerformancesH2FuelSystem(om.Group):
             allow_none=False,
         )
 
-        # Dummy option to prevent error
+        # The followong option(s) is/are dummy option(s) to prevent error
         self.options.declare(
             name="wing_related",
             default=False,
