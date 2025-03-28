@@ -41,7 +41,6 @@ class LCCQualityControlCost(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-
         partials[
             "data:cost:airframe:quality_control_cost_per_unit",
             "data:cost:airframe:manufacturing_man_hours",
@@ -50,5 +49,4 @@ class LCCQualityControlCost(om.ExplicitComponent):
         partials[
             "data:cost:airframe:quality_control_cost_per_unit",
             "data:cost:airframe:manufacturing_cost_per_hour",
-        ] = 0.065* inputs["data:cost:airframe:manufacturing_cost_per_unit"]
-
+        ] = 0.065 * inputs["data:cost:airframe:manufacturing_cost_per_unit"]
