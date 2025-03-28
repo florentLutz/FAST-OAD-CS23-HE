@@ -77,6 +77,12 @@ from .source.generator import (
     PreLCAGenerator,
 )
 from .source.ice import SizingICE, PerformancesICE, SlipstreamICE, PreLCAICE
+from .source.high_rpm_ice import (
+    SizingHighRPMICE,
+    PerformancesHighRPMICE,
+    SlipstreamHighRPMICE,
+    PreLCAHighRPMICE,
+)
 from .source.turboshaft import (
     SizingTurboshaft,
     PerformancesTurboshaft,
