@@ -689,7 +689,18 @@ def test_performances_sizing_from_pt_with_sizing_options():
     )
 
     problem.setup()
+    problem.run_model()
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass",
+        units="kg",
+    ) == pytest.approx(1.158, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area", units="cm**2"
+    ) == pytest.approx(500.0, rel=1e-2)
     assert problem.model.full.sizing.pemfc_stack_1.options["model_fidelity"] == "analytical"
+    assert problem.model.full.sizing.h2_fuel_system_1.options["wing_related"]
+    assert problem.model.full.sizing.h2_fuel_system_1.options["compact"]
 
 
 def test_cg_from_pt_file():

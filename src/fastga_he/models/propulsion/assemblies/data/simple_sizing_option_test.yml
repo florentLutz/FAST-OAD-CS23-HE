@@ -46,8 +46,8 @@ power_train_components:
     options:
       number_of_tanks: 1
       number_of_power_sources: 1
-      wing_related: False
-      compact: False
+      wing_related: True
+      compact: True
     position: in_the_rear
   gaseous_hydrogen_tank_1:
     id: fastga_he.pt_component.gaseous_hydrogen_tank
