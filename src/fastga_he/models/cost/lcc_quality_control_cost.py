@@ -14,55 +14,41 @@ class LCCQualityControlCost(om.ExplicitComponent):
 
     def setup(self):
         self.add_input(
-            "data:cost:airframe:manufacturing_man_hours",
+            "data:cost:airframe:manufacturing_cost_per_unit",
             val=np.nan,
-            units="h",
-            desc="Number of tooling man-hours required for a certain amount of aircraft been "
-            "produced in a 5-year or 60 month period",
+            units="USD",
+            desc="Manufacturing adjusted cost per aircraft",
         )
         self.add_input(
-            "data:cost:airframe:manufacturing_cost_per_hour",
-            val=np.nan,
-            units="USD/h",
-            desc="Manufacturing labor cost per hour",
-        )
-        self.add_input(
-            "data:cost:cpi_2012",
-            val=np.nan,
-            desc="Consumer price index relative to the year 2012",
+            "data:cost:airframe:composite_fraction",
+            val=0.0,
+            desc="Fraction of airframe made by composite, range from 0.0 to 1.0",
         )
 
         self.add_output(
-            "data:cost:airframe:manufacturing_cost_per_unit",
+            "data:cost:airframe:quality_control_cost_per_unit",
             val=2.0e5,
             units="USD",
-            desc="Manufacturing adjusted cost per aircraft",
+            desc="Quality control adjusted cost per aircraft",
         )
         self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:airframe:manufacturing_cost_per_unit"] = (
-            2.0969
-            * inputs["data:cost:airframe:manufacturing_man_hours"]
-            * inputs["data:cost:airframe:manufacturing_cost_per_hour"]
-            * inputs["data:cost:cpi_2012"]
+        outputs["data:cost:airframe:quality_control_cost_per_unit"] = (
+            0.13
+            * inputs["data:cost:airframe:manufacturing_cost_per_unit"]
+            * (1.0 + 0.5 * inputs["data:cost:airframe:composite_fraction"])
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        mh_tooling = inputs["data:cost:airframe:manufacturing_man_hours"]
-        cost_rate_tooling = inputs["data:cost:airframe:manufacturing_cost_per_hour"]
-        cpi_2012 = inputs["data:cost:cpi_2012"]
 
         partials[
-            "data:cost:airframe:manufacturing_cost_per_unit",
+            "data:cost:airframe:quality_control_cost_per_unit",
             "data:cost:airframe:manufacturing_man_hours",
-        ] = 2.0969 * cost_rate_tooling * cpi_2012
+        ] = 0.13 * (1.0 + 0.5 * inputs["data:cost:airframe:composite_fraction"])
 
         partials[
-            "data:cost:airframe:manufacturing_cost_per_unit",
+            "data:cost:airframe:quality_control_cost_per_unit",
             "data:cost:airframe:manufacturing_cost_per_hour",
-        ] = 2.0969 * mh_tooling * cpi_2012
+        ] = 0.065* inputs["data:cost:airframe:manufacturing_cost_per_unit"]
 
-        partials["data:cost:airframe:manufacturing_cost_per_unit", "data:cost:cpi_2012"] = (
-            2.0969 * mh_tooling * cost_rate_tooling
-        )
