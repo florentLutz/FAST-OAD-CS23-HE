@@ -8,9 +8,13 @@ import numpy as np
 # These models are exactly the same and doesn't require options so let's import it for consistency
 from ...ice.components.perf_torque import PerformancesTorque
 from ...ice.components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
+from ...ice.components.perf_fuel_consumption import PerformancesICEFuelConsumption
+from ...ice.components.perf_fuel_consumed import PerformancesICEFuelConsumed
 
 from .perf_mean_effective_pressure import PerformancesMeanEffectivePressure
 from .perf_sfc import PerformancesSFC
+from .perf_inflight_emissions import PerformancesHighRPMICEInFlightEmissions
+from .perf_maximum import PerformancesMaximum
 
 
 class PerformancesHighRPMICE(om.Group):
@@ -64,7 +68,7 @@ class PerformancesHighRPMICE(om.Group):
 
         self.add_subsystem(
             name="emissions",
-            subsys=PerformancesICEInFlightEmissions(
+            subsys=PerformancesHighRPMICEInFlightEmissions(
                 number_of_points=number_of_points, high_rpm_ice_id=high_rpm_ice_id
             ),
             promotes=["*"],
