@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCToolManHours(om.ExplicitComponent):
+class LCCToolingManHours(om.ExplicitComponent):
     """
     Compute the number of man-hours required in tooling labor, obtained from
     :cite:`gudmundsson:2013`.
@@ -44,7 +44,7 @@ class LCCToolManHours(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:airframe:toolring_man_hours",
+            "data:cost:airframe:tooling_man_hours",
             val=2.0e5,
             units="h",
             desc="Number of tooling man-hours required per aircraft",

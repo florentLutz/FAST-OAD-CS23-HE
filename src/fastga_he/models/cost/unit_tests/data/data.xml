@@ -18,6 +18,10 @@
         <num_aircraft_5years>75.0</num_aircraft_5years>
         <engineering_man_hours unit="h">72.679</engineering_man_hours>
         <engineering_cost_per_hour unit="USD/h">126.54</engineering_cost_per_hour>
+        <tooling_man_hours unit="h">92.625</tooling_man_hours>
+        <tooling_cost_per_hour unit="USD/h">83.97</tooling_cost_per_hour>
+        <manufacturing_man_hours unit="h">688.025</manufacturing_man_hours>
+        <manufacturing_cost_per_hour unit="USD/h">72.97</manufacturing_cost_per_hour>
         <prototype_number>2.0</prototype_number>
       </airframe>
 
