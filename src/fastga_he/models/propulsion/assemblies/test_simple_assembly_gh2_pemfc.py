@@ -642,11 +642,21 @@ def test_performances_sizing_assembly_pemfc_gh2_ensure_from_pt():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area", units="cm**2"
     ) == pytest.approx(2000.0, rel=1e-2)
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
+        units="cm**2",
+    ) == pytest.approx(-1189.284, rel=1e-2)
 
 
 def test_performances_sizing_from_pt_with_sizing_options():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY] = (
+        "fastga_he.submodel.propulsion.constraints.gaseous_hydrogen_tank.capacity.ensure"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = (
+        "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure"
     )
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_sizing_option_test.yml")
@@ -696,8 +706,9 @@ def test_performances_sizing_from_pt_with_sizing_options():
         units="kg",
     ) == pytest.approx(1.158, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area", units="cm**2"
-    ) == pytest.approx(500.0, rel=1e-2)
+        "constraints:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
+        units="cm**2",
+    ) == pytest.approx(-1727.809, rel=1e-2)
     assert problem.model.full.sizing.pemfc_stack_1.options["model_fidelity"] == "analytical"
     assert problem.model.full.sizing.h2_fuel_system_1.options["wing_related"]
     assert problem.model.full.sizing.h2_fuel_system_1.options["compact"]
