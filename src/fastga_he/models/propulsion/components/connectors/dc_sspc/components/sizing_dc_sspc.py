@@ -38,6 +38,20 @@ class SizingDCSSPC(om.Group):
             allow_none=False,
         )
 
+        # The followong option(s) is/are dummy option(s) to ensure compatibility
+        self.options.declare(
+            "closed",
+            default=True,
+            desc="Boolean to choose whether the breaker is closed or not.",
+            types=bool,
+        )
+        self.options.declare(
+            "at_bus_output",
+            default=True,
+            desc="Boolean to inform whether the breaker is at the input or output of a bus.",
+            types=bool,
+        )
+
     def setup(self):
         dc_sspc_id = self.options["dc_sspc_id"]
         position = self.options["position"]

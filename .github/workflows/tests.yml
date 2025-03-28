@@ -48,6 +48,11 @@ jobs:
           poetry run pytest --no-cov src/fastga_he/models/propulsion/assemblies
         shell: bash
 
+      - name: Assembler unit tests
+        run: |
+          poetry run pytest --no-cov src/fastga_he/models/propulsion/assemblers
+        shell: bash
+
       - name: Mission unit tests
         run: |
           poetry run pytest --no-cov src/fastga_he/models/performances

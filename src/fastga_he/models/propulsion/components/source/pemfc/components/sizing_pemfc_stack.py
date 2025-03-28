@@ -42,6 +42,22 @@ class SizingPEMFCStack(om.Group):
             "Aerostak 200W empirical polarization model is set as default.",
         )
 
+        # The followong option(s) is/are dummy option(s) to ensure compatibility
+        self.options.declare(
+            name="direct_bus_connection",
+            default=False,
+            types=bool,
+            desc="If the PEMFC stack is directly connected to a bus, a special mode is required to "
+            "interface the two",
+        )
+        self.options.declare(
+            name="compressor_connection",
+            default=False,
+            types=bool,
+            desc="The PEMFC stack operation pressure have to adjust based on compressor "
+            "connection for the oxygen/air inlet",
+        )
+
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         position = self.options["position"]
