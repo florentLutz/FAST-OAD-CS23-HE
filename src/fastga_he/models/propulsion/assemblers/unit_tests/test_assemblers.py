@@ -29,6 +29,7 @@ def test_clean_lift_wing():
         XML_FILE,
     )
     ivc.add_output("alpha", val=np.full(NB_POINTS_TEST, 5.0), units="deg")
+    ivc.add_output("altitude", val=np.full(NB_POINTS_TEST, 0.0), units="ft")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(

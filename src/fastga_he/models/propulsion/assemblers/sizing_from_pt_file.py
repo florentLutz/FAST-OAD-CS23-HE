@@ -44,6 +44,7 @@ class PowerTrainSizingFromFile(om.Group):
             components_name_id,
             components_type,
             components_om_type,
+            components_options,
             components_position,
         ) = self.configurator.get_sizing_element_lists()
 
@@ -52,16 +53,23 @@ class PowerTrainSizingFromFile(om.Group):
             component_name_id,
             component_type,
             component_om_type,
+            component_option,
             component_position,
         ) in zip(
             components_name,
             components_name_id,
             components_type,
             components_om_type,
+            components_options,
             components_position,
         ):
             local_sub_sys = he_comp.__dict__["Sizing" + component_om_type]()
             local_sub_sys.options[component_name_id] = component_name
+
+            if component_option:
+                for option_name in component_option:
+                    local_sub_sys.options[option_name] = component_option[option_name]
+
             if component_position:
                 local_sub_sys.options["position"] = component_position
 

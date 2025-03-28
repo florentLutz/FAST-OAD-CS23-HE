@@ -40,6 +40,8 @@ class PerformancesH2FuelSystem(om.Group):
             desc="Number of connections at the output of the hydrogen fuel system",
             allow_none=False,
         )
+
+        # The followong option(s) is/are dummy option(s) to ensure compatibility
         self.options.declare(
             name="wing_related",
             default=False,

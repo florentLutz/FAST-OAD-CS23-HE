@@ -690,6 +690,7 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_name_id,
             self._components_type,
             self._components_om_type,
+            self._components_options,
             self._components_position,
         )
 

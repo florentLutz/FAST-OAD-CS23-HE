@@ -251,6 +251,7 @@ class LCA(om.Group):
             components_type,
             components_om_type,
             _,
+            _,
         ) = self.configurator.get_sizing_element_lists()
 
         for (

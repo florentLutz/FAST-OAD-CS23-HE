@@ -642,6 +642,76 @@ def test_performances_sizing_assembly_pemfc_gh2_ensure_from_pt():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area", units="cm**2"
     ) == pytest.approx(2000.0, rel=1e-2)
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
+        units="cm**2",
+    ) == pytest.approx(-1189.284, rel=1e-2)
+
+
+def test_performances_sizing_from_pt_with_sizing_options():
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY] = (
+        "fastga_he.submodel.propulsion.constraints.gaseous_hydrogen_tank.capacity.ensure"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = (
+        "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure"
+    )
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_sizing_option_test.yml")
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            FullSimpleAssemblyPT(
+                power_train_file_path=pt_file_path,
+                number_of_points=NB_POINTS_TEST,
+                pre_condition_pt=True,
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    problem = oad.FASTOADProblem(reports=False)
+    model = problem.model
+    model.add_subsystem(name="inputs", subsys=ivc, promotes=["*"])
+    model.add_subsystem(
+        name="full",
+        subsys=FullSimpleAssemblyPT(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_pt=True,
+        ),
+        promotes=["*"],
+    )
+
+    problem.setup()
+    problem.run_model()
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass",
+        units="kg",
+    ) == pytest.approx(1.158, rel=1e-2)
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
+        units="cm**2",
+    ) == pytest.approx(-1727.809, rel=1e-2)
+    assert problem.model.full.sizing.pemfc_stack_1.options["model_fidelity"] == "analytical"
+    assert problem.model.full.sizing.h2_fuel_system_1.options["wing_related"]
+    assert problem.model.full.sizing.h2_fuel_system_1.options["compact"]
 
 
 def test_cg_from_pt_file():

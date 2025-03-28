@@ -37,6 +37,14 @@ class SizingPlanetaryGear(om.Group):
             allow_none=False,
         )
 
+        # The followong option(s) is/are dummy option(s) to ensure compatibility
+        self.options.declare(
+            "gear_mode",
+            default="percent_split",
+            desc="Mode of the planetary gear, should be either percent_split or power_share",
+            values=["percent_split", "power_share"],
+        )
+
     def setup(self):
         position = self.options["position"]
         planetary_gear_id = self.options["planetary_gear_id"]
