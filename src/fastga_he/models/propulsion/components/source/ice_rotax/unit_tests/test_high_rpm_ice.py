@@ -16,13 +16,22 @@ from ..components.cstr_ensure import ConstraintsSeaLevelPowerEnsure
 from ..components.cstr_high_rpm_ice import ConstraintHighRPMICEPowerRateMission
 
 from ..components.sizing_displacement_volume import SizingHighRPMICEDisplacementVolume
-from ..components.sizing_sfc_min_mep import SizingHighRPMICESFCMinMEP
-from ..components.sizing_sfc_max_mep import SizingHighRPMICESFCMaxMEP
-from ..components.sizing_sfc_k_coefficient import SizingHighRPMICESFCKCoefficient
+from ..components.sizing_high_rpm_ice_sfc_min_mep import SizingHighRPMICESFCMinMEP
+from ..components.sizing_high_rpm_ice_sfc_max_mep import SizingHighRPMICESFCMaxMEP
+from ..components.sizing_high_rpm_ice_sfc_k_coefficient import SizingHighRPMICESFCKCoefficient
 
 from ..components.perf_mean_effective_pressure import PerformancesMeanEffectivePressure
-from ..components.perf_sfc import PerformancesSFC
+from ..components.sizing_high_rpm_ice_uninstalled_weight import SizingHighRPMICEUninstalledWeight
+from ..components.sizing_high_rpm_ice_weight import SizingHighRPMICEWeight
+from ..components.sizing_high_rpm_ice_dimensions_scaling import SizingHighRPMICEDimensionsScaling
+from ..components.sizing_high_rpm_ice_dimensions import SizingHighRPMICEDimensions
+from ..components.sizing_high_rpm_ice_nacelle_dimensions import SizingHighRPMICENacelleDimensions
+from ..components.sizing_high_rpm_ice_nacelle_wet_area import SizingHighRPMICENacelleWetArea
+from ..components.sizing_high_rpm_ice_cg_x import SizingHighRPMICECGX
+from ..components.sizing_high_rpm_ice_cg_y import SizingHighRPMICECGY
+from ..components.sizing_high_rpm_ice_drag import SizingHighRPMICEDrag
 
+from ..components.perf_sfc import PerformancesSFC
 from ..components.perf_inflight_co2_emissions import PerformancesHighRPMICEInFlightCO2Emissions
 from ..components.perf_inflight_co_emissions import PerformancesHighRPMICEInFlightCOEmissions
 from ..components.perf_inflight_nox_emissions import PerformancesHighRPMICEInFlightNOxEmissions
@@ -42,6 +51,9 @@ from ...ice.components.perf_fuel_consumed import PerformancesICEFuelConsumed
 from ...ice.components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
 
 from ..components.perf_high_rpm_ice import PerformancesHighRPMICE
+from ..components.sizing_high_rpm_ice import SizingHighRPMICE
+
+from ..constants import POSSIBLE_POSITION
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -113,6 +125,232 @@ def test_displacement_volume():
     assert problem.get_val(
         "data:propulsion:he_power_train:high_rpm_ICE:ice_1:displacement_volume", units="cm**3"
     ) == pytest.approx(1352.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_uninstalled_weight():
+    inputs_list = [
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingHighRPMICEUninstalledWeight(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:uninstalled_mass", units="kg"
+    ) == pytest.approx(56.6, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_installed_weight():
+    ivc = get_indep_var_comp(
+        ["data:propulsion:he_power_train:high_rpm_ICE:ice_1:uninstalled_mass"], __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingHighRPMICEWeight(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:mass", units="kg"
+    ) == pytest.approx(67.92, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_installed_dimensions_scaling():
+    ivc = get_indep_var_comp(
+        [
+            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL",
+        ],
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingHighRPMICEDimensionsScaling(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:scaling:length"
+    ) == pytest.approx(1.076, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:scaling:width"
+    ) == pytest.approx(1.076, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:scaling:height"
+    ) == pytest.approx(1.076, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_ice_dimensions():
+    inputs_list = [
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:scaling:length",
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:scaling:width",
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:scaling:height",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingHighRPMICEDimensions(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:engine:length", units="m"
+    ) == pytest.approx(0.603636, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:engine:width", units="m"
+    ) == pytest.approx(0.620, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:engine:height", units="m"
+    ) == pytest.approx(0.620, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_nacelle_dimensions():
+    inputs_list = [
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:engine:length",
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:engine:width",
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:engine:height",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingHighRPMICENacelleDimensions(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:nacelle:length", units="m"
+    ) == pytest.approx(1.24, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:nacelle:width", units="m"
+    ) == pytest.approx(0.664, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:nacelle:height", units="m"
+    ) == pytest.approx(0.682, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_nacelle_wet_area():
+    inputs_list = [
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:nacelle:length",
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:nacelle:width",
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:nacelle:height",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingHighRPMICENacelleWetArea(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:nacelle:wet_area", units="m**2"
+    ) == pytest.approx(3.34, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_motor_cg_x():
+    expected_cg = [2.62, 0.62, 2.60]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        ivc = get_indep_var_comp(
+            list_inputs(SizingHighRPMICECGX(high_rpm_ice_id="ice_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(SizingHighRPMICECGX(high_rpm_ice_id="ice_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:CG:x", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_motor_cg_y():
+    expected_cg = [2.0, 0.0, 0.0]
+
+    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+        ivc = get_indep_var_comp(
+            list_inputs(SizingHighRPMICECGY(high_rpm_ice_id="ice_1", position=option)),
+            __file__,
+            XML_FILE,
+        )
+        # Run problem and check obtained value(s) is/(are) correct
+        problem = run_system(SizingHighRPMICECGY(high_rpm_ice_id="ice_1", position=option), ivc)
+
+        assert problem.get_val(
+            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:CG:y", units="m"
+        ) == pytest.approx(expected_value, rel=1e-2)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_nacelle_drag():
+    expected_drag_ls = [2.56, 0.0, 0.0]
+    expected_drag_cruise = [2.53, 0.0, 0.0]
+
+    for option, ls_drag, cruise_drag in zip(
+        POSSIBLE_POSITION, expected_drag_ls, expected_drag_cruise
+    ):
+        for ls_option in [True, False]:
+            ivc = get_indep_var_comp(
+                list_inputs(
+                    SizingHighRPMICEDrag(
+                        high_rpm_ice_id="ice_1", position=option, low_speed_aero=ls_option
+                    )
+                ),
+                __file__,
+                XML_FILE,
+            )
+            # Run problem and check obtained value(s) is/(are) correct
+            problem = run_system(
+                SizingHighRPMICEDrag(
+                    high_rpm_ice_id="ice_1", position=option, low_speed_aero=ls_option
+                ),
+                ivc,
+            )
+
+            if ls_option:
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:high_rpm_ICE:ice_1:low_speed:CD0",
+                ) * 1e3 == pytest.approx(ls_drag, rel=1e-2)
+            else:
+                assert problem.get_val(
+                    "data:propulsion:he_power_train:high_rpm_ICE:ice_1:cruise:CD0",
+                ) * 1e3 == pytest.approx(cruise_drag, rel=1e-2)
+
+            # Slight error on reynolds is due to step
+            problem.check_partials(compact_print=True)
+
+
+def test_high_rpm_ice_sizing():
+    ivc = get_indep_var_comp(
+        list_inputs(SizingHighRPMICE(high_rpm_ice_id="ice_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingHighRPMICE(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:mass", units="kg"
+    ) == pytest.approx(67.92, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:CG:x", units="m"
+    ) == pytest.approx(2.60, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:CG:y", units="m"
+    ) == pytest.approx(2.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:low_speed:CD0",
+    ) * 1e3 == pytest.approx(2.53, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

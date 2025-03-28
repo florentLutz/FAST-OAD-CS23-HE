@@ -259,13 +259,13 @@ if __name__ == "__main__":
     fig_fuel_mep = go.Figure()
     fig_fuel_mep.add_trace(
         go.Scatter(
-            x=mean_effective_pressure(
-                displacement_912a / 1e6,
-                np.polyval(poly_rpm_to_power_912_a, data_rpm_fuel_912_a) * 1000.0,
-                data_rpm_fuel_912_a * 2.0 * np.pi / 60.0,
-            )
-            * 1e-5,
-            # x=np.polyval(poly_rpm_to_power_912_a, data_rpm_fuel_912_a),
+            # x=mean_effective_pressure(
+            #     displacement_912a / 1e6,
+            #     np.polyval(poly_rpm_to_power_912_a, data_rpm_fuel_912_a) * 1000.0,
+            #     data_rpm_fuel_912_a * 2.0 * np.pi / 60.0,
+            # )
+            # * 1e-5,
+            x=np.polyval(poly_rpm_to_power_912_a, data_rpm_fuel_912_a),
             y=sfc_fuel_curve_912a,
             name="Data Rotax 912-A",
             mode="lines+markers",
@@ -281,15 +281,15 @@ if __name__ == "__main__":
     )
     fig_fuel_mep.add_trace(
         go.Scatter(
-            x=mep_for_sfc_912s,
-            # x=np.polyval(poly_rpm_to_power_912_s, data_rpm_fuel_912_s),
+            # x=mep_for_sfc_912s,
+            x=np.polyval(poly_rpm_to_power_912_s, data_rpm_fuel_912_s),
             y=sfc_fuel_curve_912s,
             name="Data Rotax 912-S",
             mode="lines+markers",
         )
     )
 
-    # fig_fuel_mep.show()
+    fig_fuel_mep.show()
 
     # There seems like there isn't really any constance in the sfc = f(MEP) as what was found for
     # the original model. The shape is more or less the same though. So what we will do is derive
