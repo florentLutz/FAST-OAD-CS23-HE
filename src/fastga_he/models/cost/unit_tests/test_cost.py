@@ -10,10 +10,10 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lcc_engineering_man_hours import LCCEngineeringManHours
 from ..lcc_tooling_man_hours import LCCToolingManHours
 from ..lcc_manufacturing_man_hours import LCCManufacturingManHours
-from ..lcc_tooling_cost import LCCToolingCost
-from ..lcc_engineering_cost import LCCEngineeringCost
+from ..lcc_tooling_cost_per_unit import LCCToolingCost
+from ..lcc_engineering_cost_per_unit import LCCEngineeringCost
 from ..lcc_dev_suppoet_cost import LCCDevSupportCost
-from ..lcc_manufacturing_cost import LCCManufacturingCost
+from ..lcc_manufacturing_cost_per_unit import LCCManufacturingCost
 
 
 XML_FILE = "data.xml"
@@ -160,7 +160,7 @@ def test_development_support_cost():
     )
 
     assert problem.get_val(
-        "data:cost:airframe:dev_support_cost_per_unit", units="USD"
+        "data:cost:airframe:dev_support_cost", units="USD"
     ) == pytest.approx(57318.152, rel=1e-3)
 
     problem.check_partials(compact_print=True)
