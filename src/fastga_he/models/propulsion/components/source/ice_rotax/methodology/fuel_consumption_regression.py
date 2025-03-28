@@ -356,6 +356,7 @@ if __name__ == "__main__":
     )
 
     k_s = np.log(sfc_mep_min_912s - sfc_mep_max_912s) / (18.0 - 5.0)
+    print("k coefficient for Rotax 912-S", k_s)
     sfc_interp_912s_v2 = sfc_mep_max_912s + np.exp(-k_s * (mep_for_sfc_912s - 18.0))
 
     fig_fuel_interp_2.add_trace(

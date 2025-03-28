@@ -10,6 +10,7 @@ from ...ice.components.perf_torque import PerformancesTorque
 from ...ice.components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
 
 from .perf_mean_effective_pressure import PerformancesMeanEffectivePressure
+from .perf_sfc import PerformancesSFC
 
 
 class PerformancesHighRPMICE(om.Group):

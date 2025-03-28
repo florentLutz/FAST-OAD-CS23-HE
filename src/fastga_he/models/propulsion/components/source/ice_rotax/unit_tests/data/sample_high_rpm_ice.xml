@@ -49,6 +49,11 @@
                         <power_rating_SL units="kW">69.0</power_rating_SL>
                         <power_max_SL units="kW">68.0</power_max_SL>
                         <pme_max units="bar">22.27</pme_max>
+                        <sfc_coefficient>
+                            <min_mep units="g/kW/h">620.0</min_mep>
+                            <max_mep units="g/kW/h">300.6</max_mep>
+                            <k_coefficient>0.443</k_coefficient>
+                        </sfc_coefficient>
                     </ice_1>
                 </high_rpm_ICE>
             </he_power_train>
