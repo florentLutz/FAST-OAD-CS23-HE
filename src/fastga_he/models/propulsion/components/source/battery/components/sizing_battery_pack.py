@@ -40,7 +40,7 @@ class SizingBatteryPack(om.Group):
             allow_none=False,
         )
 
-        # The followong option(s) is/are dummy option(s) to prevent error
+        # The followong option(s) is/are dummy option(s) to ensure compatibility
         self.options.declare(
             name="direct_bus_connection",
             default=False,

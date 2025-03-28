@@ -42,7 +42,7 @@ class SizingPEMFCStack(om.Group):
             "Aerostak 200W empirical polarization model is set as default.",
         )
 
-        # The followong option(s) is/are dummy option(s) to prevent error
+        # The followong option(s) is/are dummy option(s) to ensure compatibility
         self.options.declare(
             name="direct_bus_connection",
             default=False,

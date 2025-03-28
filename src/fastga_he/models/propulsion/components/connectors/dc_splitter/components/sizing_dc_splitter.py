@@ -41,7 +41,7 @@ class SizingDCSplitter(om.Group):
             allow_none=False,
         )
 
-        # The followong option(s) is/are dummy option(s) to prevent error
+        # The followong option(s) is/are dummy option(s) to ensure compatibility
         self.options.declare(
             "splitter_mode",
             default="percent_split",
