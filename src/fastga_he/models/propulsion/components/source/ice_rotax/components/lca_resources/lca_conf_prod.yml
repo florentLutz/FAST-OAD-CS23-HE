@@ -1,0 +1,8 @@
+ANCHOR_COMPONENT_NAME:
+    custom_attributes:
+        - attribute: "component"
+          value: ANCHOR_COMPONENT_NAME
+
+    name: 'internal combustion engine production, passenger car'
+    loc: 'GLO'
+    amount: ANCHOR_COMPONENT_MASS
