@@ -12,6 +12,14 @@ class LCCManufacturingManHours(om.ExplicitComponent):
     :cite:`gudmundsson:2013`.
     """
 
+    def initialize(self):
+        self.options.declare(
+            name="complex_flap",
+            default=False,
+            types=bool,
+            desc="True if complex flap system is selected in design",
+        )
+
     def setup(self):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:TLAR:v_cruise", units="kn", val=np.nan)
@@ -19,11 +27,6 @@ class LCCManufacturingManHours(om.ExplicitComponent):
             "data:cost:airframe:num_aircraft_5years",
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
-        )
-        self.add_input(
-            "data:cost:airframe:flap_factor",
-            val=1.0,
-            desc="Set to 1.01 for complex flap, 1.0 for simple flap",
         )
 
         self.add_input(
@@ -42,12 +45,17 @@ class LCCManufacturingManHours(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        if self.options["complex_flap"]:
+            f_flap = 1.01
+        else:
+            f_flap = 1.0
+
         outputs["data:cost:airframe:manufacturing_man_hours"] = (
             9.6613
             * inputs["data:weight:airframe:mass"] ** 0.74
             * inputs["data:TLAR:v_cruise"] ** 0.543
             * inputs["data:cost:airframe:num_aircraft_5years"] ** -0.476
-            * inputs["data:cost:airframe:flap_factor"]
+            * f_flap
             * (1.0 + 0.25 * inputs["data:cost:airframe:composite_fraction"])
         )
 
@@ -55,8 +63,12 @@ class LCCManufacturingManHours(om.ExplicitComponent):
         m_airframe = inputs["data:weight:airframe:mass"]
         v_cruise = inputs["data:TLAR:v_cruise"]
         num_5years = inputs["data:cost:airframe:num_aircraft_5years"]
-        f_flap = inputs["data:cost:airframe:flap_factor"]
         f_composite = inputs["data:cost:airframe:composite_fraction"]
+
+        if self.options["complex_flap"]:
+            f_flap = 1.01
+        else:
+            f_flap = 1.0
 
         partials[
             "data:cost:airframe:manufacturing_man_hours",
@@ -83,17 +95,6 @@ class LCCManufacturingManHours(om.ExplicitComponent):
         ] = (
             -4.5987788 * m_airframe**0.74 * v_cruise**0.543 * f_flap * (1.0 + 0.25 * f_composite)
         ) / num_5years**1.476
-
-        partials[
-            "data:cost:airframe:manufacturing_man_hours",
-            "data:cost:airframe:flap_factor",
-        ] = (
-            9.6613
-            * m_airframe**0.74
-            * v_cruise**0.543
-            * num_5years**-0.476
-            * (1.0 + 0.25 * f_composite)
-        )
 
         partials[
             "data:cost:airframe:manufacturing_man_hours",

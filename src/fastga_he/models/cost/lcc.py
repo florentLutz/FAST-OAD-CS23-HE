@@ -19,7 +19,7 @@ from .lca_core import LCACore
 from .lca_core_normalization import LCACoreNormalisation
 from .lca_core_weighting import LCACoreWeighting
 from .lca_core_aggregation import LCACoreAggregation
-from .lcc_engineering_cost_per_unit import LCARatioDeliveryFlightMission
+from .lcc_engineering_cost import LCARatioDeliveryFlightMission
 from .lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
 from .lca_electricty_per_fu import LCAElectricityPerFU
 from .lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU

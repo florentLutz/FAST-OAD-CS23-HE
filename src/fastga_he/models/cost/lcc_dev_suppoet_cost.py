@@ -11,6 +11,20 @@ class LCCDevSupportCost(om.ExplicitComponent):
     Computation of the airframe cost of development support obtained from :cite:`gudmundsson:2013`.
     """
 
+    def initialize(self):
+        self.options.declare(
+            name="complex_flap",
+            default=False,
+            types=bool,
+            desc="True if complex flap system is selected in design",
+        )
+        self.options.declare(
+            name="pressurized",
+            default=False,
+            types=bool,
+            desc="True if the aircraft is pressurized",
+        )
+
     def setup(self):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:TLAR:v_cruise", units="kn", val=np.nan)
@@ -24,11 +38,10 @@ class LCCDevSupportCost(om.ExplicitComponent):
             val=np.nan,
             desc="Consumer price index relative to the year 2012",
         )
-
         self.add_input(
-            "data:cost:airframe:flap_factor",
-            val=1.0,
-            desc="Set to 1.01 for complex flap, 1.0 for simple flap",
+            "data:cost:airframe:num_aircraft_5years",
+            val=np.nan,
+            desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
         )
 
         self.add_input(
@@ -37,30 +50,35 @@ class LCCDevSupportCost(om.ExplicitComponent):
             desc="Fraction of airframe made by composite, range from 0.0 to 1.0",
         )
 
-        self.add_input(
-            "data:cost:airframe:pressurization_factor",
-            val=1.0,
-            desc="Set to 1.03 for pressurized aircraft, 1.0 for unpressurized",
-        )
-
         self.add_output(
-            "data:cost:airframe:dev_support_cost",
+            "data:cost:airframe:dev_support_cost_per_unit",
             val=2.0e5,
             units="USD",
-            desc="Development support adjusted cost",
+            desc="Development support adjusted cost per aircraft",
         )
         self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:airframe:dev_support_cost"] = (
+        if self.options["complex_flap"]:
+            f_flap = 1.01
+        else:
+            f_flap = 1.0
+
+        if self.options["pressurized"]:
+            f_pressurized = 1.03
+        else:
+            f_pressurized = 1.0
+
+        outputs["data:cost:airframe:dev_support_cost_per_unit"] = (
             0.06458
             * inputs["data:weight:airframe:mass"] ** 0.873
             * inputs["data:TLAR:v_cruise"] ** 1.89
             * inputs["data:cost:airframe:prototype_number"] ** 0.346
             * inputs["data:cost:cpi_2012"]
-            * inputs["data:cost:airframe:flap_factor"]
+            * f_flap
             * (1.0 + 0.5 * inputs["data:cost:airframe:composite_fraction"])
-            * inputs["data:cost:airframe:pressurization_factor"]
+            * f_pressurized
+            / inputs["data:cost:airframe:num_aircraft_5years"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -68,88 +86,92 @@ class LCCDevSupportCost(om.ExplicitComponent):
         v_cruise = inputs["data:TLAR:v_cruise"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
         num_prototype = inputs["data:cost:airframe:prototype_number"]
-        f_flap = inputs["data:cost:airframe:flap_factor"]
+        num_5years = inputs["data:cost:airframe:num_aircraft_5years"]
         f_composite = inputs["data:cost:airframe:composite_fraction"]
-        f_pressurized = inputs["data:cost:airframe:pressurization_factor"]
 
-        partials["data:cost:airframe:dev_support_cost", "data:weight:airframe:mass"] = (
+        if self.options["complex_flap"]:
+            f_flap = 1.01
+        else:
+            f_flap = 1.0
+
+        if self.options["pressurized"]:
+            f_pressurized = 1.03
+        else:
+            f_pressurized = 1.0
+
+        partials["data:cost:airframe:dev_support_cost_per_unit", "data:weight:airframe:mass"] = (
             0.05637834
+            * m_airframe**-0.127
             * v_cruise**1.89
             * num_prototype**0.346
             * cpi_2012
             * f_flap
             * (1.0 + 0.5 * f_composite)
             * f_pressurized
-            / m_airframe**0.127
+            / num_5years
         )
 
-        partials["data:cost:airframe:dev_support_cost", "data:TLAR:v_cruise"] = (
+        partials["data:cost:airframe:dev_support_cost_per_unit", "data:TLAR:v_cruise"] = (
             0.1220562
-            * v_cruise**0.873
+            * m_airframe**0.873
             * v_cruise**0.89
             * num_prototype**0.346
             * cpi_2012
             * f_flap
             * (1.0 + 0.5 * f_composite)
             * f_pressurized
+            / num_5years
         )
 
         partials[
-            "data:cost:airframe:dev_support_cost", "data:cost:airframe:prototype_number"
+            "data:cost:airframe:dev_support_cost_per_unit", "data:cost:airframe:prototype_number"
         ] = (
             0.02234468
-            * v_cruise**0.873
+            * m_airframe**0.873
             * v_cruise**1.89
+            * num_prototype**-0.654
             * cpi_2012
             * f_flap
             * (1.0 + 0.5 * f_composite)
             * f_pressurized
-            / num_prototype**0.654
+            / num_5years
         )
 
-        partials["data:cost:airframe:dev_support_cost", "data:cost:cpi_2012"] = (
+        partials["data:cost:airframe:dev_support_cost_per_unit", "data:cost:cpi_2012"] = (
             0.06458
-            * v_cruise**0.873
+            * m_airframe**0.873
             * v_cruise**1.89
             * num_prototype**0.346
             * f_flap
             * (1.0 + 0.5 * f_composite)
             * f_pressurized
+            / num_5years
         )
 
         partials[
-            "data:cost:airframe:dev_support_cost", "data:cost:airframe:flap_factor"
-        ] = (
-            0.06458
-            * v_cruise**0.873
-            * v_cruise**1.89
-            * num_prototype**0.346
-            * cpi_2012
-            * (1.0 + 0.5 * f_composite)
-            * f_pressurized
-        )
-
-        partials[
-            "data:cost:airframe:dev_support_cost", "data:cost:airframe:composite_fraction"
+            "data:cost:airframe:dev_support_cost_per_unit", "data:cost:airframe:composite_fraction"
         ] = (
             0.03229
-            * v_cruise**0.873
+            * m_airframe**0.873
             * v_cruise**1.89
             * num_prototype**0.346
             * cpi_2012
             * f_flap
             * f_pressurized
+            / num_5years
         )
 
         partials[
-            "data:cost:airframe:dev_support_cost",
-            "data:cost:airframe:pressurization_factor",
+            "data:cost:airframe:dev_support_cost_per_unit",
+            "data:cost:airframe:num_aircraft_5years",
         ] = (
-            0.06458
-            * v_cruise**0.873
+            -0.06458
+            * m_airframe**0.873
             * v_cruise**1.89
             * num_prototype**0.346
             * cpi_2012
             * f_flap
             * (1.0 + 0.5 * f_composite)
+            * f_pressurized
+            / num_5years**2.0
         )

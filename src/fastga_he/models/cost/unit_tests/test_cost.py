@@ -10,10 +10,10 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lcc_engineering_man_hours import LCCEngineeringManHours
 from ..lcc_tooling_man_hours import LCCToolingManHours
 from ..lcc_manufacturing_man_hours import LCCManufacturingManHours
-from ..lcc_tooling_cost_per_unit import LCCToolingCost
-from ..lcc_engineering_cost_per_unit import LCCEngineeringCost
+from ..lcc_tooling_cost import LCCToolingCost
+from ..lcc_engineering_cost import LCCEngineeringCost
 from ..lcc_dev_suppoet_cost import LCCDevSupportCost
-from ..lcc_manufacturing_cost_per_unit import LCCManufacturingCost
+from ..lcc_manufacturing_cost import LCCManufacturingCost
 
 
 XML_FILE = "data.xml"
@@ -27,9 +27,7 @@ def test_engineering_human_hours():
         "data:weight:airframe:mass",
         "data:TLAR:v_cruise",
         "data:cost:airframe:num_aircraft_5years",
-        "data:cost:airframe:flap_factor",
         "data:cost:airframe:composite_fraction",
-        "data:cost:airframe:pressurization_factor",
     ]
 
     ivc = get_indep_var_comp(
@@ -57,9 +55,7 @@ def test_tooling_human_hours():
         "data:TLAR:v_cruise",
         "data:cost:airframe:num_aircraft_5years",
         "data:cost:airframe:taper_factor",
-        "data:cost:airframe:flap_factor",
         "data:cost:airframe:composite_fraction",
-        "data:cost:airframe:pressurization_factor",
     ]
 
     ivc = get_indep_var_comp(
@@ -75,7 +71,7 @@ def test_tooling_human_hours():
     )
 
     assert problem.get_val("data:cost:airframe:tooling_man_hours", units="h") == pytest.approx(
-        92.625, rel=1e-3
+        87.993, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -86,7 +82,6 @@ def test_manufacturing_human_hours():
         "data:weight:airframe:mass",
         "data:TLAR:v_cruise",
         "data:cost:airframe:num_aircraft_5years",
-        "data:cost:airframe:flap_factor",
         "data:cost:airframe:composite_fraction",
     ]
 
@@ -141,9 +136,7 @@ def test_development_support_cost():
         "data:TLAR:v_cruise",
         "data:cost:airframe:prototype_number",
         "data:cost:airframe:num_aircraft_5years",
-        "data:cost:airframe:flap_factor",
         "data:cost:airframe:composite_fraction",
-        "data:cost:airframe:pressurization_factor",
         "data:cost:cpi_2012",
     ]
 
@@ -160,8 +153,8 @@ def test_development_support_cost():
     )
 
     assert problem.get_val(
-        "data:cost:airframe:dev_support_cost", units="USD"
-    ) == pytest.approx(57318.152, rel=1e-3)
+        "data:cost:airframe:dev_support_cost_per_unit", units="USD"
+    ) == pytest.approx(764.242, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

@@ -12,6 +12,26 @@ class LCCToolingManHours(om.ExplicitComponent):
     :cite:`gudmundsson:2013`.
     """
 
+    def initialize(self):
+        self.options.declare(
+            name="complex_flap",
+            default=False,
+            types=bool,
+            desc="True if complex flap system is selected in design",
+        )
+        self.options.declare(
+            name="pressurized",
+            default=False,
+            types=bool,
+            desc="True if the aircraft is pressurized",
+        )
+        self.options.declare(
+            name="tapered_wing",
+            default=False,
+            types=bool,
+            desc="True if the aircraft has tapered wing",
+        )
+
     def setup(self):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:TLAR:v_cruise", units="kn", val=np.nan)
@@ -20,27 +40,11 @@ class LCCToolingManHours(om.ExplicitComponent):
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
         )
-        self.add_input(
-            "data:cost:airframe:taper_factor",
-            val=1.0,
-            desc="Set to 0.95 for non-tapered wing , 1.0 for tapered wing",
-        )
-        self.add_input(
-            "data:cost:airframe:flap_factor",
-            val=1.0,
-            desc="Set to 1.01 for complex flap, 1.0 for simple flap",
-        )
 
         self.add_input(
             "data:cost:airframe:composite_fraction",
             val=0.0,
             desc="Fraction of airframe made by composite, range from 0.0 to 1.0",
-        )
-
-        self.add_input(
-            "data:cost:airframe:pressurization_factor",
-            val=1.0,
-            desc="Set to 1.03 for pressurized aircraft, 1.0 for unpressurized",
         )
 
         self.add_output(
@@ -53,25 +57,52 @@ class LCCToolingManHours(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        if self.options["complex_flap"]:
+            f_flap = 1.02
+        else:
+            f_flap = 1.0
+
+        if self.options["pressurized"]:
+            f_pressurized = 1.01
+        else:
+            f_pressurized = 1.0
+
+        if self.options["tapered_wing"]:
+            f_tapered = 1.0
+        else:
+            f_tapered = 0.95
+
         outputs["data:cost:airframe:tooling_man_hours"] = (
             0.76565
             * inputs["data:weight:airframe:mass"] ** 0.764
             * inputs["data:TLAR:v_cruise"] ** 0.899
             * inputs["data:cost:airframe:num_aircraft_5years"] ** -0.756
-            * inputs["data:cost:airframe:taper_factor"]
-            * inputs["data:cost:airframe:flap_factor"]
+            * f_tapered
+            * f_flap
             * (1.0 + inputs["data:cost:airframe:composite_fraction"])
-            * inputs["data:cost:airframe:pressurization_factor"]
+            * f_pressurized
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         m_airframe = inputs["data:weight:airframe:mass"]
         v_cruise = inputs["data:TLAR:v_cruise"]
         num_5years = inputs["data:cost:airframe:num_aircraft_5years"]
-        f_taper = inputs["data:cost:airframe:taper_factor"]
-        f_flap = inputs["data:cost:airframe:flap_factor"]
         f_composite = inputs["data:cost:airframe:composite_fraction"]
-        f_pressurized = inputs["data:cost:airframe:pressurization_factor"]
+
+        if self.options["complex_flap"]:
+            f_flap = 1.02
+        else:
+            f_flap = 1.0
+
+        if self.options["pressurized"]:
+            f_pressurized = 1.01
+        else:
+            f_pressurized = 1.0
+
+        if self.options["tapered_wing"]:
+            f_tapered = 1.0
+        else:
+            f_tapered = 0.95
 
         partials[
             "data:cost:airframe:tooling_man_hours",
@@ -80,7 +111,7 @@ class LCCToolingManHours(om.ExplicitComponent):
             0.5849566
             * v_cruise**0.899
             * num_5years**-0.756
-            * f_taper
+            * f_tapered
             * f_flap
             * (1.0 + f_composite)
             * f_pressurized
@@ -93,7 +124,7 @@ class LCCToolingManHours(om.ExplicitComponent):
             0.68831935
             * m_airframe**0.764
             * num_5years**-0.756
-            * f_taper
+            * f_tapered
             * f_flap
             * (1.0 + f_composite)
             * f_pressurized
@@ -107,37 +138,11 @@ class LCCToolingManHours(om.ExplicitComponent):
             -0.5788314
             * m_airframe**0.764
             * v_cruise**0.899
-            * f_taper
+            * f_tapered
             * f_flap
             * (1.0 + f_composite)
             * f_pressurized
         ) / num_5years**1.756
-
-        partials[
-            "data:cost:airframe:tooling_man_hours",
-            "data:cost:airframe:taper_factor",
-        ] = (
-            0.76565
-            * m_airframe**0.764
-            * v_cruise**0.899
-            * num_5years**-0.756
-            * f_flap
-            * (1.0 + f_composite)
-            * f_pressurized
-        )
-
-        partials[
-            "data:cost:airframe:tooling_man_hours",
-            "data:cost:airframe:flap_factor",
-        ] = (
-            0.76565
-            * m_airframe**0.764
-            * v_cruise**0.899
-            * num_5years**-0.756
-            * f_taper
-            * (1.0 + f_composite)
-            * f_pressurized
-        )
 
         partials[
             "data:cost:airframe:tooling_man_hours",
@@ -147,20 +152,7 @@ class LCCToolingManHours(om.ExplicitComponent):
             * m_airframe**0.764
             * v_cruise**0.899
             * num_5years**-0.756
-            * f_taper
+            * f_tapered
             * f_flap
             * f_pressurized
-        )
-
-        partials[
-            "data:cost:airframe:tooling_man_hours",
-            "data:cost:airframe:pressurization_factor",
-        ] = (
-            0.76565
-            * m_airframe**0.764
-            * v_cruise**0.899
-            * num_5years**-0.756
-            * f_taper
-            * f_flap
-            * (1.0 + f_composite)
         )
