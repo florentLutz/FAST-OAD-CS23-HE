@@ -27,6 +27,8 @@ class PerformancesMaximum(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
+        self.add_input("shaft_power_out", units="kW", val=np.nan, shape=number_of_points)
+
         self.add_input("power_required", units="kW", val=np.nan, shape=number_of_points)
         self.add_input(
             "equivalent_rated_power_opr_limit",
@@ -50,12 +52,29 @@ class PerformancesMaximum(om.ExplicitComponent):
             desc="Maximum power the turboshaft has to provide",
         )
 
+        self.add_output(
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power",
+            units="kW",
+            val=600.0,
+            desc="Maximum shaft power the turboshaft has to provide",
+        )
+
         self.declare_partials(
-            of="*",
-            wrt="*",
+            of="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_max",
+            wrt=[
+                "power_required",
+                "equivalent_rated_power_opr_limit",
+                "equivalent_rated_power_itt_limit",
+            ],
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
+        )
+
+        self.declare_partials(
+            of="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power",
+            wrt="shaft_power_out",
+            method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -73,6 +92,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_max"] = (
             self.max_power
         )
+        outputs[
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power"
+        ] = np.max(inputs["shaft_power_out"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         turboshaft_id = self.options["turboshaft_id"]
@@ -135,3 +157,8 @@ class PerformancesMaximum(om.ExplicitComponent):
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_max",
                 "power_required",
             ] = partial
+
+        partials[
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power",
+            "shaft_power_out",
+        ] = np.where(inputs["shaft_power_out"] == np.max(inputs["shaft_power_out"]), 1.0, 0.0)
