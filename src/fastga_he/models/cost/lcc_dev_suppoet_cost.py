@@ -29,7 +29,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:TLAR:v_cruise", units="kn", val=np.nan)
         self.add_input(
-            "data:cost:airframe:prototype_number",
+            "data:cost:prototype_number",
             val=np.nan,
             desc="number of prototypes",
         )
@@ -39,19 +39,19 @@ class LCCDevSupportCost(om.ExplicitComponent):
             desc="Consumer price index relative to the year 2012",
         )
         self.add_input(
-            "data:cost:airframe:num_aircraft_5years",
+            "data:cost:num_aircraft_5years",
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
         )
 
         self.add_input(
-            "data:cost:airframe:composite_fraction",
+            "data:cost:composite_fraction",
             val=0.0,
             desc="Fraction of airframe made by composite, range from 0.0 to 1.0",
         )
 
         self.add_output(
-            "data:cost:airframe:dev_support_cost_per_unit",
+            "data:cost:dev_support_cost_per_unit",
             val=2.0e5,
             units="USD",
             desc="Development support adjusted cost per aircraft",
@@ -69,25 +69,25 @@ class LCCDevSupportCost(om.ExplicitComponent):
         else:
             f_pressurized = 1.0
 
-        outputs["data:cost:airframe:dev_support_cost_per_unit"] = (
+        outputs["data:cost:dev_support_cost_per_unit"] = (
             0.06458
             * inputs["data:weight:airframe:mass"] ** 0.873
             * inputs["data:TLAR:v_cruise"] ** 1.89
-            * inputs["data:cost:airframe:prototype_number"] ** 0.346
+            * inputs["data:cost:prototype_number"] ** 0.346
             * inputs["data:cost:cpi_2012"]
             * f_flap
-            * (1.0 + 0.5 * inputs["data:cost:airframe:composite_fraction"])
+            * (1.0 + 0.5 * inputs["data:cost:composite_fraction"])
             * f_pressurized
-            / inputs["data:cost:airframe:num_aircraft_5years"]
+            / inputs["data:cost:num_aircraft_5years"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         m_airframe = inputs["data:weight:airframe:mass"]
         v_cruise = inputs["data:TLAR:v_cruise"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
-        num_prototype = inputs["data:cost:airframe:prototype_number"]
-        num_5years = inputs["data:cost:airframe:num_aircraft_5years"]
-        f_composite = inputs["data:cost:airframe:composite_fraction"]
+        num_prototype = inputs["data:cost:prototype_number"]
+        num_5years = inputs["data:cost:num_aircraft_5years"]
+        f_composite = inputs["data:cost:composite_fraction"]
 
         if self.options["complex_flap"]:
             f_flap = 1.01
@@ -99,7 +99,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
         else:
             f_pressurized = 1.0
 
-        partials["data:cost:airframe:dev_support_cost_per_unit", "data:weight:airframe:mass"] = (
+        partials["data:cost:dev_support_cost_per_unit", "data:weight:airframe:mass"] = (
             0.05637834
             * m_airframe**-0.127
             * v_cruise**1.89
@@ -111,7 +111,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             / num_5years
         )
 
-        partials["data:cost:airframe:dev_support_cost_per_unit", "data:TLAR:v_cruise"] = (
+        partials["data:cost:dev_support_cost_per_unit", "data:TLAR:v_cruise"] = (
             0.1220562
             * m_airframe**0.873
             * v_cruise**0.89
@@ -123,9 +123,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             / num_5years
         )
 
-        partials[
-            "data:cost:airframe:dev_support_cost_per_unit", "data:cost:airframe:prototype_number"
-        ] = (
+        partials["data:cost:dev_support_cost_per_unit", "data:cost:prototype_number"] = (
             0.02234468
             * m_airframe**0.873
             * v_cruise**1.89
@@ -137,7 +135,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             / num_5years
         )
 
-        partials["data:cost:airframe:dev_support_cost_per_unit", "data:cost:cpi_2012"] = (
+        partials["data:cost:dev_support_cost_per_unit", "data:cost:cpi_2012"] = (
             0.06458
             * m_airframe**0.873
             * v_cruise**1.89
@@ -148,9 +146,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             / num_5years
         )
 
-        partials[
-            "data:cost:airframe:dev_support_cost_per_unit", "data:cost:airframe:composite_fraction"
-        ] = (
+        partials["data:cost:dev_support_cost_per_unit", "data:cost:composite_fraction"] = (
             0.03229
             * m_airframe**0.873
             * v_cruise**1.89
@@ -162,8 +158,8 @@ class LCCDevSupportCost(om.ExplicitComponent):
         )
 
         partials[
-            "data:cost:airframe:dev_support_cost_per_unit",
-            "data:cost:airframe:num_aircraft_5years",
+            "data:cost:dev_support_cost_per_unit",
+            "data:cost:num_aircraft_5years",
         ] = (
             -0.06458
             * m_airframe**0.873
