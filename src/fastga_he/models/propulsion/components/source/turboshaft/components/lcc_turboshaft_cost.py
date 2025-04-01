@@ -19,22 +19,22 @@ class LCCTurboshaftCost(om.ExplicitComponent):
         turboshaft_id = self.options["turboshaft_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":mass",
-            units="kg",
+            "data:cost:cpi_2012",
             val=np.nan,
-            desc="Installed weight of the turboshaft engine",
+            desc="Consumer price index relative to the year 2012",
         )
         self.add_input(
-            name="data:environmental_impact:aircraft_per_fu",
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power",
+            units="hp",
             val=np.nan,
-            desc="Number of aircraft required for a functional unit",
+            desc="Maximum shaft power the turboshaft has to provide",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":mass_per_fu",
-            units="kg",
-            val=1e-6,
-            desc="Weight of the turboshaft required for a functional unit",
+            name="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_engine",
+            units="USD",
+            val=1e4,
+            desc="Cost of the turboshaft per unit",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -42,19 +42,28 @@ class LCCTurboshaftCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         turboshaft_id = self.options["turboshaft_id"]
 
-        outputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":mass_per_fu"] = (
-            inputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":mass"]
-            * inputs["data:environmental_impact:aircraft_per_fu"]
+        outputs[
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_engine"
+        ] = 377.4 * (
+            inputs[
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power"
+            ]
+            * inputs["data:cost:cpi_2012"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         turboshaft_id = self.options["turboshaft_id"]
 
         partials[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":mass_per_fu",
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":mass",
-        ] = inputs["data:environmental_impact:aircraft_per_fu"]
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_engine",
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power",
+        ] = 377.4 * inputs["data:cost:cpi_2012"]
         partials[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":mass_per_fu",
-            "data:environmental_impact:aircraft_per_fu",
-        ] = inputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":mass"]
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_engine",
+            "data:cost:cpi_2012",
+        ] = (
+            377.4
+            * inputs[
+                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power"
+            ]
+        )
