@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import pytest
@@ -32,6 +32,7 @@ from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
+from ..components.lcc_pmsm_cost import LCCPMSMCost
 
 from ..components.cstr_enforce import (
     ConstraintsTorqueEnforce,
@@ -737,5 +738,23 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:mass_per_fu", units="kg"
     ) == pytest.approx(3.238e-5, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PMSM:motor_1:shaft_power_max",
+        70.0,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCPMSMCost(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:cost_per_motor", units="USD"
+    ) == pytest.approx(2895.608, rel=1e-2)
 
     problem.check_partials(compact_print=True)
