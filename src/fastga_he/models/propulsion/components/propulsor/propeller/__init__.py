@@ -9,3 +9,4 @@ from .components.sizing_propeller import SizingPropeller
 from .components.perf_propeller import PerformancesPropeller
 from .components.slipstream_propeller import SlipstreamPropeller
 from .components.pre_lca_propeller import PreLCAPropeller
+from .components.lcc_propeller_cost import LCCPropellerCost

@@ -7,6 +7,10 @@ import openmdao.api as om
 
 
 class LCCTurboshaftCost(om.ExplicitComponent):
+    """
+    Computation of the turboshaft engine purchasing cost from :cite:`gudmundsson:2013`.
+    """
+
     def initialize(self):
         self.options.declare(
             name="turboshaft_id",

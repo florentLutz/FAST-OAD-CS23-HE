@@ -7,6 +7,10 @@ import openmdao.api as om
 
 
 class LCCICECost(om.ExplicitComponent):
+    """
+    Computation of ICE engine purchasing cost from :cite:`gudmundsson:2013`.
+    """
+
     def initialize(self):
         self.options.declare(
             name="ice_id",

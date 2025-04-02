@@ -26,6 +26,12 @@ class LCCPMSMCost(om.ExplicitComponent):
             val=np.nan,
         )
 
+        self.add_input(
+            "data:cost:cpi_2025",
+            val=1.0,
+            desc="Consumer price index relative to the year 2025",
+        )
+
         self.add_output(
             name="data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_motor",
             units="USD",
@@ -40,6 +46,7 @@ class LCCPMSMCost(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_motor"] = (
             1876.1
+            * inputs["data:cost:cpi_2025"]
             * np.exp(
                 0.0062
                 * inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max"]
@@ -48,10 +55,15 @@ class LCCPMSMCost(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
+        cpi_2025 = inputs["data:cost:cpi_2025"]
+        power_max = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max"]
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_motor",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max",
-        ] = 11.632 * np.exp(
-            0.0062 * inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max"]
-        )
+        ] = 11.632 * cpi_2025 * np.exp(0.0062 * power_max)
+
+        partials[
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_motor",
+            "data:cost:cpi_2025",
+        ] = 1876.1 * cpi_2025 * np.exp(0.0062 * power_max)
