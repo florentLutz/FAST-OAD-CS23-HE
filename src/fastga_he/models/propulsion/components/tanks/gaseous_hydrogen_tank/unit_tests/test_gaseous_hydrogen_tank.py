@@ -32,6 +32,8 @@ from ..components.cstr_ensure import ConstraintsGaseousHydrogenTankCapacityEnsur
 from ..components.perf_fuel_mission_consumed import PerformancesGaseousHydrogenConsumedMission
 from ..components.perf_fuel_remaining import PerformancesGaseousHydrogenRemainingMission
 
+from ..components.lcc_gaseous_hydrogen_tank_cost import LCCGaseousHydrogenTankCost
+
 from ..components.sizing_tank import SizingGaseousHydrogenTank
 from ..components.perf_gaseous_hydrogen_tank import PerformancesGaseousHydrogenTank
 
@@ -704,3 +706,25 @@ def test_performances_gaseous_hydrogen_tank():
         units="kg",
     ) == pytest.approx(279.62, rel=1e-2)
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
+        units="kg",
+        val=140.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCGaseousHydrogenTankCost(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:cost_per_tank",
+        units="USD",
+    ) == pytest.approx(893.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
