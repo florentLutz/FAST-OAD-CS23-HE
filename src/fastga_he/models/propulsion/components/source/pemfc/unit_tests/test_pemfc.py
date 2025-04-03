@@ -7,6 +7,7 @@ import pytest
 import numpy as np
 import openmdao.api as om
 
+from ..components.lcc_pemfc_cost import LCCPEMFCStackCost
 from ..components.perf_ambient_pressure import PerformancesPEMFCStackAmbientPressure
 from ..components.sizing_pemfc_weight import SizingPEMFCStackWeight
 from ..components.sizing_pemfc_cg_x import SizingPEMFCStackCGX
@@ -929,5 +930,29 @@ def test_performances_pemfc_stack_analytical():
     )
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max",
+        units="kW",
+        val=0.2,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCPEMFCStackCost(pemfc_stack_id="pemfc_stack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_stack",
+        units="USD",
+    ) == pytest.approx(
+        13.14,
+        rel=1e-2,
+    )
 
     problem.check_partials(compact_print=True)
