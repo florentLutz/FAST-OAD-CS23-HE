@@ -1,0 +1,46 @@
+# This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
+# Electric Aircraft.
+# Copyright (C) 2025 ISAE-SUPAERO
+
+import numpy as np
+import openmdao.api as om
+
+
+class LCCPTElectronicCost(om.ExplicitComponent):
+    """
+    Computation of the cost of the electronic consist with a branch of  electric or hybrid
+    powertrain. Reference value obtained from :cite:`marciello:2024`.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="aux_load_id",
+            default=None,
+            desc="Identifier of the auxiliary load",
+            allow_none=False,
+        )
+
+    def setup(self):
+        aux_load_id = self.options["aux_load_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max",
+            units="kW",
+            val=np.nan,
+        )
+
+        self.add_output(
+            name="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":electronic_cost_per_branch",
+            units="USD",
+            val=1e4,
+            desc="Cost of the electronic cost per branch",
+        )
+
+        self.declare_partials(of="*", wrt="*", val=265.0)
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        aux_load_id = self.options["aux_load_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":electronic_cost_per_branch"
+        ] = 265.0 * inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max"]
