@@ -30,7 +30,7 @@ class LCCPMSMCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_motor",
             units="USD",
             val=1e4,
-            desc="Cosy of the PMSM per unit",
+            desc="Cost of the PMSM per unit",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

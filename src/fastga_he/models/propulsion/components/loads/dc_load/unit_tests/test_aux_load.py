@@ -23,6 +23,8 @@ from ..components.sizing_aux_load_cg_x import SizingDCAuxLoadCGX
 
 from ..components.sizing_aux_load import SizingDCAuxLoad
 
+from ..components.lcc_dc_load_cost import LCCDCLoadCost
+
 from ..constants import POSSIBLE_POSITION
 
 from tests.testing_utilities import run_system, get_indep_var_comp
@@ -254,5 +256,23 @@ def test_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:aux_load:aux_load_1:cruise:CD0"
     ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:aux_load:aux_load_1:power_max",
+        10.0,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCDCLoadCost(aux_load_id="aux_load_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:aux_load:aux_load_1:cost_per_load", units="USD"
+    ) == pytest.approx(1996.1, rel=1e-2)
 
     problem.check_partials(compact_print=True)

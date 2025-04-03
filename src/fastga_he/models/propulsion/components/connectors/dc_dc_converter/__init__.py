@@ -9,4 +9,3 @@ from .components.sizing_dc_dc_converter import SizingDCDCConverter
 from .components.perf_dc_dc_converter import PerformancesDCDCConverter
 from .components.slipstream_dc_dc_converter import SlipstreamDCDCConverter
 from .components.pre_lca_dc_dc_converter import PreLCADCDCConverter
-from .components.lcc_dc_dc_converter_cost import LCCDCDCConverterCost

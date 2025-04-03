@@ -8,3 +8,4 @@
 from .components.sizing_aux_load import SizingDCAuxLoad
 from .components.perf_aux_load import PerformancesDCAuxLoad
 from .components.slipstream_aux_load import SlipstreamDCAuxLoad
+from .components.lcc_dc_load_cost import LCCDCLoadCost
