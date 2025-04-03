@@ -27,6 +27,7 @@
       <manufacturing_cost_per_hour unit="USD/h">72.97</manufacturing_cost_per_hour>
       <manufacturing_cost_per_unit unit="USD">147385.351</manufacturing_cost_per_unit>
       <prototype_number>2.0</prototype_number>
+      <fixed_landing_gear>0.0</fixed_landing_gear>
     </cost>
     <TLAR>
       <max_airframe_hours units="h">3524.9</max_airframe_hours>

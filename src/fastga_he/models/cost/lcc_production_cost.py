@@ -4,6 +4,7 @@
 
 import openmdao.api as om
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
+# import fastga_he.models.propulsion.components as he_comp
 
 from .lcc_engineering_man_hours import LCCEngineeringManHours
 from .lcc_tooling_man_hours import LCCToolingManHours
@@ -16,7 +17,9 @@ from .lcc_quality_control_cost import LCCQualityControlCost
 from .lcc_material_cost import LCCMaterialCost
 from .lcc_flight_test_cost import LCCFlightTestCost
 from .lcc_avionics_cost import LCCAvionicsCost
+from .lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 from .lcc_certification_cost import LCCCertificationCost
+# from .lcc_cost_sum import LCCSCost
 
 
 class LCCProductionCost(om.Group):
@@ -44,18 +47,11 @@ class LCCProductionCost(om.Group):
             types=bool,
             desc="True if the aircraft has tapered wing",
         )
-        # self.options.declare(
-        #     name="retractable_landing_gear",
-        #     default=False,
-        #     types=bool,
-        #     desc="True if retractable design is selected",
-        # )
 
     def setup(self):
         complex_flap = self.options["complex_flap"]
         pressurized = self.options["pressurized"]
         tapered_wing = self.options["tapered_wing"]
-        # retractable_landing_gear = self.options["retractable_landing_gear"]
 
         # Calculate first the labor resources required for R&D and manufacturing of airframe
         self.add_subsystem(
@@ -116,8 +112,14 @@ class LCCProductionCost(om.Group):
             promotes=["*"],
         )
 
-        # # For the most part we can reuse what is done for the sizing, no need to write a new
-        # # function
+        self.add_subsystem(
+            name="landing_gear_cost_reduction",
+            subsys=LCCLandingGearCostReduction(),
+            promotes=["*"],
+        )
+
+        # For the most part we can reuse what is done for the sizing, no need to write a new
+        # function
         # (
         #     components_name,
         #     components_name_id,
@@ -140,14 +142,5 @@ class LCCProductionCost(om.Group):
         # ):
         #     local_sub_sys = he_comp.__dict__["LCC" + component_om_type]()
         #     local_sub_sys.options[component_name_id] = component_name
-        #     # Fastest way to implement it even though not very elegant
-        #     try:
-        #         local_sub_sys.options["use_operational_mission"] = self.options[
-        #             "use_operational_mission"
-        #         ]
-        #     except KeyError:
-        #         pass
         #
         #     self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
-
-        # Add landing_gear_reduction at the sum

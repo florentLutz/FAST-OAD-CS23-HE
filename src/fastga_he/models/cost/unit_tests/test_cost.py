@@ -22,6 +22,7 @@ from ..lcc_avionics_cost import LCCAvionicsCost
 from ..lcc_manufacturing_cost import LCCManufacturingCost
 from ..lcc_certification_cost import LCCCertificationCost
 from ..lcc_production_cost import LCCProductionCost
+from ..lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 
 
 XML_FILE = "data.xml"
@@ -345,6 +346,29 @@ def test_certification_cost():
 
     assert problem.get_val("data:cost:certification_cost_per_unit", units="USD") == pytest.approx(
         49547.05, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+def test_landing_gear_cost_reduction():
+    input_list = [
+        "data:cost:fixed_landing_gear",
+    ]
+
+    ivc = get_indep_var_comp(
+        input_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCLandingGearCostReduction(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:landing_gear_cost_reduction", units="USD") == pytest.approx(
+        0.0, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
