@@ -30,7 +30,9 @@ class LCCPTElectronicCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":electronic_cost_per_branch",
+            name="data:propulsion:he_power_train:aux_load:"
+            + aux_load_id
+            + ":electronic_cost_per_branch",
             units="USD",
             val=1e4,
             desc="Cost of the electronic cost per branch",

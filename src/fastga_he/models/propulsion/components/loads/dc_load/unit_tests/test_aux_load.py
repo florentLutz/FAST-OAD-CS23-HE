@@ -278,6 +278,7 @@ def test_cost():
 
     problem.check_partials(compact_print=True)
 
+
 def test_electronic_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
