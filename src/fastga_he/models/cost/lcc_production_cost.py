@@ -1,7 +1,7 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
-
+import numpy as np
 import openmdao.api as om
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 # import fastga_he.models.propulsion.components as he_comp
@@ -120,6 +120,9 @@ class LCCProductionCost(om.Group):
 
         # For the most part we can reuse what is done for the sizing, no need to write a new
         # function
+
+        # cost_components_type = []
+        # cost_components_name = []
         # (
         #     components_name,
         #     components_name_id,
@@ -142,5 +145,9 @@ class LCCProductionCost(om.Group):
         # ):
         #     local_sub_sys = he_comp.__dict__["LCC" + component_om_type]()
         #     local_sub_sys.options[component_name_id] = component_name
+        #     cost_components_type.append(component_type)
+        #     cost_components_name.append(component_name)
         #
         #     self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
+
+        # Change list into numpy array
