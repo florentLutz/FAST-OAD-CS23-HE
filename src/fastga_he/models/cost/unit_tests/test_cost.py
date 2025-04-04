@@ -10,6 +10,7 @@ import openmdao.api as om
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lcc_engineering_man_hours import LCCEngineeringManHours
+from ..lcc_sale_price import LCCSalePrice
 from ..lcc_tooling_man_hours import LCCToolingManHours
 from ..lcc_manufacturing_man_hours import LCCManufacturingManHours
 from ..lcc_flight_test_cost import LCCFlightTestCost
@@ -415,6 +416,30 @@ def test_cost_sum():
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
         600777.59, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_sale_price():
+    input_list = [
+        "data:cost:production_cost_per_unit",
+    ]
+
+    ivc = get_indep_var_comp(
+        input_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCSalePrice(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:sale_price_per_unit", units="USD") == pytest.approx(
+        412758.77, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)

@@ -19,6 +19,7 @@ from .lcc_flight_test_cost import LCCFlightTestCost
 from .lcc_avionics_cost import LCCAvionicsCost
 from .lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 from .lcc_certification_cost import LCCCertificationCost
+from .lcc_sale_price import LCCSalePrice
 from .lcc_production_cost_sum import LCCSumProductionCost
 
 
@@ -163,5 +164,11 @@ class LCCProductionCost(om.Group):
             subsys=LCCSumProductionCost(
                 cost_components_type=cost_components_type, cost_components_name=cost_components_name
             ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="sale_price",
+            subsys=LCCSalePrice(),
             promotes=["*"],
         )
