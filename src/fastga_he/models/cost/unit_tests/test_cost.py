@@ -10,7 +10,7 @@ import openmdao.api as om
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lcc_engineering_man_hours import LCCEngineeringManHours
-from ..lcc_sale_price import LCCSalePrice
+from ..lcc_msrp import LCCMSP
 from ..lcc_tooling_man_hours import LCCToolingManHours
 from ..lcc_manufacturing_man_hours import LCCManufacturingManHours
 from ..lcc_flight_test_cost import LCCFlightTestCost
@@ -24,6 +24,8 @@ from ..lcc_manufacturing_cost import LCCManufacturingCost
 from ..lcc_certification_cost import LCCCertificationCost
 from ..lcc_production_cost import LCCProductionCost
 from ..lcc_production_cost_sum import LCCSumProductionCost
+from ..lcc_annual_insurance_cost import LCCAnnualInsuranceCost
+from ..lcc_annual_storage_cost import LCCAnnualStorageCost
 from ..lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 
 
@@ -421,7 +423,7 @@ def test_cost_sum():
     problem.check_partials(compact_print=True)
 
 
-def test_sale_price():
+def test_aircraft_MSP():
     input_list = [
         "data:cost:production_cost_per_unit",
     ]
@@ -434,12 +436,48 @@ def test_sale_price():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCSalePrice(),
+        LCCMSP(),
         ivc,
     )
 
-    assert problem.get_val("data:cost:sale_price_per_unit", units="USD") == pytest.approx(
+    assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
         412758.77, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_annual_insurance_cost():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:msp_per_unit", units="USD", val=412758.77)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCAnnualInsuranceCost(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:annual_insurance_cost", units="USD/yr") == pytest.approx(
+        6691.38, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_annual_storage_cost():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:storage_fee_per_month", units="USD", val=600.0)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCAnnualStorageCost(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:annual_storage_cost", units="USD/yr") == pytest.approx(
+        7200.0, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)

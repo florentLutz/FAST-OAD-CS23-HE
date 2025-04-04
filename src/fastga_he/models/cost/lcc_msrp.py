@@ -6,9 +6,11 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCSalePrice(om.ExplicitComponent):
+class LCCMSP(om.ExplicitComponent):
     """
-    Computation of the aircraft sales price. The profit margin is set to 10% based on
+    Computation of the aircraft manufacturer suggested price (MSP) . The profit margin is
+    set to 10%
+    based on
     :cite:`marciello:2024`.
     """
 
@@ -20,14 +22,12 @@ class LCCSalePrice(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:sale_price_per_unit",
+            "data:cost:msp_per_unit",
             val=1.0e5,
             units="USD",
-            desc="Sale price per aircraft",
+            desc="MSP of the aircraft",
         )
         self.declare_partials("*", "*", val=1.11)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:sale_price_per_unit"] = (
-            1.11 * inputs["data:cost:production_cost_per_unit"]
-        )
+        outputs["data:cost:msp_per_unit"] = 1.11 * inputs["data:cost:production_cost_per_unit"]
