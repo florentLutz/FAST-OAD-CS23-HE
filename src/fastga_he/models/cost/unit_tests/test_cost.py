@@ -439,20 +439,12 @@ def test_production_cost():
         26998.679, rel=1e-3
     )
 
-    assert problem.get_val("data:cost:dev_support_cost_per_unit", units="USD") == pytest.approx(
-        764.242, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:cost_per_unit", units="USD"
+    ) == pytest.approx(70956.47, rel=1e-3)
 
-    assert problem.get_val("data:cost:flight_test_cost_per_unit", units="USD") == pytest.approx(
-        93.105, rel=1e-3
-    )
-
-    assert problem.get_val("data:cost:tooling_cost_per_unit", units="USD") == pytest.approx(
-        21690.978, rel=1e-3
-    )
-
-    assert problem.get_val("data:cost:certification_cost_per_unit", units="USD") == pytest.approx(
-        49547.05, rel=1e-3
+    assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
+        371854.75, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
