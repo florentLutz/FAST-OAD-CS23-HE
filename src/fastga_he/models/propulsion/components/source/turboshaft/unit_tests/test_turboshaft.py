@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import pytest
 import numpy as np
@@ -1394,7 +1394,7 @@ def test_cost():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1" ":cost_per_engine", units="USD"
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
     ) == pytest.approx(
         407535.115,
         rel=1e-2,

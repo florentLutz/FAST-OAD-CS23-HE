@@ -991,7 +991,7 @@ def test_cost():
     problem = run_system(LCCICECost(ice_id="ice_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:ICE:ice_1:cost_per_engine", units="USD"
+        "data:propulsion:he_power_train:ICE:ice_1:cost_per_unit", units="USD"
     ) == pytest.approx(
         81668.231,
         rel=1e-2,

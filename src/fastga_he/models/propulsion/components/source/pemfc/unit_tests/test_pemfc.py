@@ -948,7 +948,7 @@ def test_cost():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_stack",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_unit",
         units="USD",
     ) == pytest.approx(
         13.14,

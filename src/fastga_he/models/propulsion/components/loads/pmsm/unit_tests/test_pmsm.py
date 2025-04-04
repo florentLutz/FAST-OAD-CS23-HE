@@ -33,7 +33,6 @@ from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 from ..components.lcc_pmsm_cost import LCCPMSMCost
-from ..components.lcc_powertrain_electronics_cost import LCCPTElectronicCost
 
 from ..components.cstr_enforce import (
     ConstraintsTorqueEnforce,
@@ -755,25 +754,7 @@ def test_cost():
     problem = run_system(LCCPMSMCost(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PMSM:motor_1:cost_per_motor", units="USD"
-    ) == pytest.approx(2895.608, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_electronic_cost():
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "data:propulsion:he_power_train:PMSM:motor_1:shaft_power_max",
-        70.0,
-        units="kW",
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(LCCPTElectronicCost(motor_id="motor_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:PMSM:motor_1:electronic_cost_per_branch", units="USD"
-    ) == pytest.approx(18550.0, rel=1e-2)
+        "data:propulsion:he_power_train:PMSM:motor_1:cost_per_unit", units="USD"
+    ) == pytest.approx(20815.61, rel=1e-2)
 
     problem.check_partials(compact_print=True)

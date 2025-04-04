@@ -469,7 +469,7 @@ def test_cost():
 
     problem = run_system(LCCFuelTankCost(fuel_tank_id="fuel_tank_1"), ivc)
     assert problem.get_val(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:cost_per_tank", units="USD"
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:cost_per_unit", units="USD"
     ) == pytest.approx(4194.31, rel=1e-2)
 
     problem.check_partials(compact_print=True)

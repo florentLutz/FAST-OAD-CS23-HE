@@ -35,7 +35,7 @@ class LCCICECost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:ICE:" + ice_id + ":cost_per_engine",
+            name="data:propulsion:he_power_train:ICE:" + ice_id + ":cost_per_unit",
             units="USD",
             val=1e4,
             desc="Cost of the ICE per unit",
@@ -46,7 +46,7 @@ class LCCICECost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         ice_id = self.options["ice_id"]
 
-        outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":cost_per_engine"] = (
+        outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":cost_per_unit"] = (
             174.0
             * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL"]
             * inputs["data:cost:cpi_2012"]
@@ -56,10 +56,10 @@ class LCCICECost(om.ExplicitComponent):
         ice_id = self.options["ice_id"]
 
         partials[
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":cost_per_engine",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":cost_per_unit",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL",
         ] = 174.0 * inputs["data:cost:cpi_2012"]
         partials[
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":cost_per_engine",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":cost_per_unit",
             "data:cost:cpi_2012",
         ] = 174.0 * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL"]

@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import pytest
@@ -1582,7 +1582,7 @@ def test_cost():
     problem = run_system(LCCPropellerCost(propeller_id="propeller_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:propeller:propeller_1:cost_per_propeller", units="USD"
+        "data:propulsion:he_power_train:propeller:propeller_1:cost_per_unit", units="USD"
     ) == pytest.approx(2059.097, rel=1e-3)
 
     problem.check_partials(compact_print=True)

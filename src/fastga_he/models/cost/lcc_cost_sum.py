@@ -12,11 +12,10 @@ class LCCSCost(om.ExplicitComponent):
     """
 
     def initialize(self):
-        self.options.declare('input_costs', types=list, default=[])
+        self.options.declare("input_costs", types=list, default=[])
 
     def setup(self):
-
-        for cost in self.options['input_costs']:
+        for cost in self.options["input_costs"]:
             self.add_input(cost, units="USD", val=0.0)
 
         self.add_output("data:cost:production_cost_per_unit", units="USD", val=0.0)
@@ -24,4 +23,4 @@ class LCCSCost(om.ExplicitComponent):
         self.declare_partials("*", "*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs['sum'] = np.sum(inputs.values())
+        outputs["sum"] = np.sum(inputs.values())

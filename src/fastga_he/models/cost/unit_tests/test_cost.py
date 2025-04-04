@@ -350,6 +350,7 @@ def test_certification_cost():
 
     problem.check_partials(compact_print=True)
 
+
 def test_landing_gear_cost_reduction():
     input_list = [
         "data:cost:fixed_landing_gear",

@@ -43,7 +43,7 @@ class LCCPropellerCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_propeller",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
             units="USD",
             val=1000.0,
         )
@@ -64,9 +64,9 @@ class LCCPropellerCost(om.ExplicitComponent):
         fixed_pitch_cost = 3145.0 * cpi_2012
         constant_speed_cost = 209.69 * cpi_2012 * d_prop**2.0 * (shaft_power_max / d_prop) ** 0.12
 
-        outputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_propeller"
-        ] = (1.0 - f_constant_speed) * fixed_pitch_cost + f_constant_speed * constant_speed_cost
+        outputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit"] = (
+            1.0 - f_constant_speed
+        ) * fixed_pitch_cost + f_constant_speed * constant_speed_cost
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]
@@ -83,23 +83,23 @@ class LCCPropellerCost(om.ExplicitComponent):
         constant_speed_cost = 209.69 * cpi_2012 * d_prop**2.0 * (shaft_power_max / d_prop) ** 0.12
 
         partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_propeller",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
             "data:cost:cpi_2012",
         ] = (1.0 - f_constant_speed) * 3145.0 + f_constant_speed * 209.69 * d_prop**2.0 * (
             shaft_power_max / d_prop
         ) ** 0.12
 
         partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_propeller",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":constant_speed_prop",
         ] = constant_speed_cost - fixed_pitch_cost
 
         partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_propeller",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":shaft_power_in_max",
         ] = 25.1628 * f_constant_speed * cpi_2012 * d_prop**1.88 / shaft_power_max**0.88
 
         partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_propeller",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
         ] = 394.2172 * f_constant_speed * cpi_2012 * d_prop**0.88 * shaft_power_max**0.12

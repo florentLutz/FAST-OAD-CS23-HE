@@ -35,7 +35,7 @@ class LCCTurboshaftCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_engine",
+            name="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_unit",
             units="USD",
             val=1e4,
             desc="Cost of the turboshaft per unit",
@@ -46,24 +46,27 @@ class LCCTurboshaftCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         turboshaft_id = self.options["turboshaft_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_engine"
-        ] = 377.4 * (
-            inputs[
-                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power"
-            ]
-            * inputs["data:cost:cpi_2012"]
+        outputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_unit"] = (
+            377.4
+            * (
+                inputs[
+                    "data:propulsion:he_power_train:turboshaft:"
+                    + turboshaft_id
+                    + ":max_shaft_power"
+                ]
+                * inputs["data:cost:cpi_2012"]
+            )
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         turboshaft_id = self.options["turboshaft_id"]
 
         partials[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_engine",
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_unit",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power",
         ] = 377.4 * inputs["data:cost:cpi_2012"]
         partials[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_engine",
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_unit",
             "data:cost:cpi_2012",
         ] = (
             377.4

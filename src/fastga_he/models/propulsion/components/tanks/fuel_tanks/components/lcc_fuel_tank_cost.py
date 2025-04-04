@@ -31,7 +31,7 @@ class LCCFuelTankCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":cost_per_tank",
+            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":cost_per_unit",
             units="USD",
             val=4.0e3,
             desc="Purchase cost per fuel tank",
@@ -42,6 +42,6 @@ class LCCFuelTankCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         fuel_tank_id = self.options["fuel_tank_id"]
 
-        outputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":cost_per_tank"] = (
+        outputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":cost_per_unit"] = (
             40.4 * inputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":volume"]
         )
