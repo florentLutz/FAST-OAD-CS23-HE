@@ -19,6 +19,10 @@
       <engineering_cost_per_hour unit="USD/h">126.54</engineering_cost_per_hour>
       <engineering_cost_per_unit unit="USD">26998.679</engineering_cost_per_unit>
       <dev_support_cost_per_unit unit="USD">764.242</dev_support_cost_per_unit>
+      <quality_control_cost_per_unit unit="USD">19160.096</quality_control_cost_per_unit>
+      <material_cost_per_unit unit="USD">8735.09</material_cost_per_unit>
+      <avionics_cost_per_unit unit="USD">21000.0</avionics_cost_per_unit>
+      <certification_cost_per_unit unit="USD">49547.05</certification_cost_per_unit>
       <flight_test_cost_per_unit unit="USD">93.105</flight_test_cost_per_unit>
       <tooling_man_hours unit="h">87.993</tooling_man_hours>
       <tooling_cost_per_hour unit="USD/h">83.97</tooling_cost_per_hour>
@@ -28,6 +32,7 @@
       <manufacturing_cost_per_unit unit="USD">147385.351</manufacturing_cost_per_unit>
       <prototype_number>2.0</prototype_number>
       <fixed_landing_gear>0.0</fixed_landing_gear>
+      <landing_gear_cost_reduction unit="USD">0.0</landing_gear_cost_reduction>
     </cost>
     <TLAR>
       <max_airframe_hours units="h">3524.9</max_airframe_hours>

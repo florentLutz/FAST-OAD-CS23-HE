@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 # pylint: disable=unused-import
 # flake8: noqa
@@ -56,13 +56,19 @@ from .connectors.planetary_gear import (
     PreLCAPlanetaryGear,
 )
 from .connectors.gearbox import SizingGearbox, PerformancesGearbox, SlipstreamGearbox, PreLCAGearbox
-from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM, PreLCAPMSM
-from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
+from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM, PreLCAPMSM, LCCPMSMCost
+from .loads.dc_load import (
+    SizingDCAuxLoad,
+    PerformancesDCAuxLoad,
+    SlipstreamDCAuxLoad,
+    LCCDCLoadCost,
+)
 from .propulsor.propeller import (
     SizingPropeller,
     PerformancesPropeller,
     SlipstreamPropeller,
     PreLCAPropeller,
+    LCCPropellerCost,
 )
 from .source.battery import (
     SizingBatteryPack,
@@ -76,12 +82,13 @@ from .source.generator import (
     SlipstreamGenerator,
     PreLCAGenerator,
 )
-from .source.ice import SizingICE, PerformancesICE, SlipstreamICE, PreLCAICE
+from .source.ice import SizingICE, PerformancesICE, SlipstreamICE, PreLCAICE, LCCICECost
 from .source.turboshaft import (
     SizingTurboshaft,
     PerformancesTurboshaft,
     SlipstreamTurboshaft,
     PreLCATurboshaft,
+    LCCTurboshaftCost,
 )
 from .source.simple_turbo_generator import (
     SizingTurboGenerator,
@@ -89,17 +96,24 @@ from .source.simple_turbo_generator import (
     SlipstreamTurboGenerator,
     PreLCATurboGenerator,
 )
-from .source.pemfc import SizingPEMFCStack, PerformancesPEMFCStack, SlipstreamPEMFCStack
+from .source.pemfc import (
+    SizingPEMFCStack,
+    PerformancesPEMFCStack,
+    SlipstreamPEMFCStack,
+    LCCPEMFCStackCost,
+)
 from .tanks.fuel_tanks import (
     SizingFuelTank,
     PerformancesFuelTank,
     SlipstreamFuelTank,
     PreLCAFuelTank,
+    LCCFuelTankCost,
 )
 from .tanks.gaseous_hydrogen_tank import (
     SizingGaseousHydrogenTank,
     PerformancesGaseousHydrogenTank,
     SlipstreamGaseousHydrogenTank,
+    LCCGaseousHydrogenTankCost,
 )
 from .connectors.h2_fuel_system import (
     SizingH2FuelSystem,

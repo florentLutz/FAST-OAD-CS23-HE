@@ -1,10 +1,10 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
-# import numpy as np
+
 import openmdao.api as om
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
-# import fastga_he.models.propulsion.components as he_comp
+import fastga_he.models.propulsion.components as he_comp
 
 from .lcc_engineering_man_hours import LCCEngineeringManHours
 from .lcc_tooling_man_hours import LCCToolingManHours
@@ -19,7 +19,7 @@ from .lcc_flight_test_cost import LCCFlightTestCost
 from .lcc_avionics_cost import LCCAvionicsCost
 from .lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 from .lcc_certification_cost import LCCCertificationCost
-# from .lcc_cost_sum import LCCSCost
+from .lcc_production_cost_sum import LCCSumProductionCost
 
 
 class LCCProductionCost(om.Group):
@@ -29,6 +29,12 @@ class LCCProductionCost(om.Group):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
+        self.options.declare(
+            name="power_train_file_path",
+            default=None,
+            desc="Path to the file containing the description of the power",
+            allow_none=False,
+        )
         self.options.declare(
             name="complex_flap",
             default=False,
@@ -49,6 +55,7 @@ class LCCProductionCost(om.Group):
         )
 
     def setup(self):
+        self.configurator.load(self.options["power_train_file_path"])
         complex_flap = self.options["complex_flap"]
         pressurized = self.options["pressurized"]
         tapered_wing = self.options["tapered_wing"]
@@ -121,33 +128,40 @@ class LCCProductionCost(om.Group):
         # For the most part we can reuse what is done for the sizing, no need to write a new
         # function
 
-        # cost_components_type = []
-        # cost_components_name = []
-        # (
-        #     components_name,
-        #     components_name_id,
-        #     components_type,
-        #     components_om_type,
-        #     _,
-        #     _,
-        # ) = self.configurator.get_sizing_element_lists()
-        #
-        # for (
-        #     component_name,
-        #     component_name_id,
-        #     component_type,
-        #     component_om_type,
-        # ) in zip(
-        #     components_name,
-        #     components_name_id,
-        #     components_type,
-        #     components_om_type,
-        # ):
-        #     local_sub_sys = he_comp.__dict__["LCC" + component_om_type]()
-        #     local_sub_sys.options[component_name_id] = component_name
-        #     cost_components_type.append(component_type)
-        #     cost_components_name.append(component_name)
-        #
-        #     self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
+        cost_components_type = []
+        cost_components_name = []
+        (
+            components_name,
+            components_name_id,
+            components_type,
+            components_om_type,
+            _,
+            _,
+        ) = self.configurator.get_sizing_element_lists()
 
-        # Change list into numpy array
+        for (
+            component_name,
+            component_name_id,
+            component_type,
+            component_om_type,
+        ) in zip(
+            components_name,
+            components_name_id,
+            components_type,
+            components_om_type,
+        ):
+            if hasattr(he_comp, "LCC" + component_om_type + "Cost"):
+                local_sub_sys = he_comp.__dict__["LCC" + component_om_type + "Cost"]()
+                local_sub_sys.options[component_name_id] = component_name
+                cost_components_type.append(component_type)
+                cost_components_name.append(component_name)
+
+                self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
+
+        self.add_subsystem(
+            name="cost_sum",
+            subsys=LCCSumProductionCost(
+                cost_components_type=cost_components_type, cost_components_name=cost_components_name
+            ),
+            promotes=["*"],
+        )

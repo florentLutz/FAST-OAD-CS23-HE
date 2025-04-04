@@ -22,6 +22,7 @@ from ..lcc_avionics_cost import LCCAvionicsCost
 from ..lcc_manufacturing_cost import LCCManufacturingCost
 from ..lcc_certification_cost import LCCCertificationCost
 from ..lcc_production_cost import LCCProductionCost
+from ..lcc_production_cost_sum import LCCSumProductionCost
 from ..lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 
 
@@ -375,16 +376,62 @@ def test_landing_gear_cost_reduction():
     problem.check_partials(compact_print=True)
 
 
+def test_cost_sum():
+    components_type = ["propeller", "turboshaft", "fuel_tank"]
+    components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1"]
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCSumProductionCost(
+                cost_components_type=components_type, cost_components_name=components_name
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:propeller:propeller_1:cost_per_unit",
+        units="USD",
+        val=4403.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit",
+        units="USD",
+        val=3.0e5,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:cost_per_unit",
+        units="USD",
+        val=1000.0,
+    )
+
+    problem = run_system(
+        LCCSumProductionCost(
+            cost_components_type=components_type, cost_components_name=components_name
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
+        600777.59, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_production_cost():
     ivc = get_indep_var_comp(
-        list_inputs(LCCProductionCost()),
+        list_inputs(
+            LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml")
+        ),
         __file__,
         XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCProductionCost(),
+        LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml"),
         ivc,
     )
 

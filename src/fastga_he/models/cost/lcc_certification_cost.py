@@ -46,9 +46,4 @@ class LCCCertificationCost(om.ExplicitComponent):
         self.declare_partials("*", "*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:certification_cost_per_unit"] = (
-            inputs["data:cost:engineering_cost_per_unit"]
-            + inputs["data:cost:dev_support_cost_per_unit"]
-            + inputs["data:cost:flight_test_cost_per_unit"]
-            + inputs["data:cost:tooling_cost_per_unit"]
-        )
+        outputs["data:cost:certification_cost_per_unit"] = np.sum(inputs.values())
