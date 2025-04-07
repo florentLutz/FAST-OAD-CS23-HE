@@ -34,6 +34,7 @@ from ..components.sizing_generator_cg_x import SizingGeneratorCGX
 from ..components.sizing_generator_cg_y import SizingGeneratorCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAGeneratorProdWeightPerFU
+from ..components.lcc_generator_cost import LCCGeneratorCost
 
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
@@ -697,5 +698,23 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:generator:generator_1:mass_per_fu", units="kg"
     ) == pytest.approx(6.1752e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:generator:generator_1:shaft_power_max",
+        70.0,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCGeneratorCost(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:cost_per_unit", units="USD"
+    ) == pytest.approx(2895.61, rel=1e-2)
 
     problem.check_partials(compact_print=True)
