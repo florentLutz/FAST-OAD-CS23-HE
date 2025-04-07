@@ -10,7 +10,7 @@ import openmdao.api as om
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lcc_engineering_man_hours import LCCEngineeringManHours
-from ..lcc_msrp import LCCMSP
+from ..lcc_msp import LCCMSP
 from ..lcc_tooling_man_hours import LCCToolingManHours
 from ..lcc_manufacturing_man_hours import LCCManufacturingManHours
 from ..lcc_flight_test_cost import LCCFlightTestCost

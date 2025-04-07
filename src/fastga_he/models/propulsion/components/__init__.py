@@ -75,6 +75,7 @@ from .source.battery import (
     PerformancesBatteryPack,
     SlipstreamBatteryPack,
     PreLCABatteryPack,
+    LCCBatteryPackCost,
 )
 from .source.generator import (
     SizingGenerator,
