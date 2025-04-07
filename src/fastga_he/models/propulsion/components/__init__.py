@@ -90,6 +90,7 @@ from .source.generator import (
     PerformancesGenerator,
     SlipstreamGenerator,
     PreLCAGenerator,
+    LCCGeneratorCost,
 )
 from .source.ice import SizingICE, PerformancesICE, SlipstreamICE, PreLCAICE, LCCICECost
 from .source.turboshaft import (
