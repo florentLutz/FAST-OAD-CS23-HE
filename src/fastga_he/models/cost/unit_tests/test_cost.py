@@ -513,3 +513,68 @@ def test_production_cost():
     problem.check_partials(compact_print=True)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_production_cost_hydrogen():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml")
+        ),
+        __file__,
+        "data_pemfc.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:cost_per_unit",
+        units="USD",
+    ) == pytest.approx(104.25, rel=1e-3)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_unit", units="USD"
+    ) == pytest.approx(13639.32, rel=1e-3)
+
+    assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
+        354297.8, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_production_cost_hybrid_tbm_900():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCProductionCost(
+                power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml"
+            )
+        ),
+        __file__,
+        "input_ecopulse.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gearbox:gearbox_1:cost_per_unit", units="USD"
+    ) == pytest.approx(1959.02, rel=1e-3)
+
+    assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
+        3245311.51, rel=1e-3
+    )
+
+    assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
+        3602295.781, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
