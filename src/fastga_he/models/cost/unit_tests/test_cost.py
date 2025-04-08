@@ -28,6 +28,7 @@ from ..lcc_annual_insurance_cost import LCCAnnualInsuranceCost
 from ..lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 from ..lcc_landing_cost import LCCLandingCost
 from ..lcc_daily_parking_cost import LCCDailyParkingCost
+from ..lcc_annual_crew_cost import LCCAnnualCrewCost
 
 
 XML_FILE = "data.xml"
@@ -634,3 +635,22 @@ def test_daily_parking_cost():
         ) == pytest.approx(cost, rel=1e-3)
 
         problem.check_partials(compact_print=True)
+
+
+def test_annual_crew_cost():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:operation:number_of_pilot", val=1.0)
+    ivc.add_output("data:cost:operation:number_of_cabin_crew", val=1.0)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCAnnualCrewCost(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:annual_crew_cost", units="USD/yr") == pytest.approx(
+        138756.7, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
