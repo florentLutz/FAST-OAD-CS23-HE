@@ -25,8 +25,9 @@ from ..lcc_certification_cost import LCCCertificationCost
 from ..lcc_production_cost import LCCProductionCost
 from ..lcc_production_cost_sum import LCCSumProductionCost
 from ..lcc_annual_insurance_cost import LCCAnnualInsuranceCost
-from ..lcc_annual_storage_cost import LCCAnnualStorageCost
 from ..lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
+from ..lcc_landing_cost import LCCLandingCost
+from ..lcc_daily_parking_cost import LCCDailyParkingCost
 
 
 XML_FILE = "data.xml"
@@ -447,42 +448,6 @@ def test_aircraft_MSP():
     problem.check_partials(compact_print=True)
 
 
-def test_annual_insurance_cost():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output("data:cost:msp_per_unit", units="USD", val=412758.77)
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        LCCAnnualInsuranceCost(),
-        ivc,
-    )
-
-    assert problem.get_val("data:cost:annual_insurance_cost", units="USD/yr") == pytest.approx(
-        6691.38, rel=1e-3
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_annual_storage_cost():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output("data:cost:storage_fee_per_month", units="USD", val=600.0)
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        LCCAnnualStorageCost(),
-        ivc,
-    )
-
-    assert problem.get_val("data:cost:annual_storage_cost", units="USD/yr") == pytest.approx(
-        7200.0, rel=1e-3
-    )
-
-    problem.check_partials(compact_print=True)
-
-
 def test_production_cost():
     ivc = get_indep_var_comp(
         list_inputs(
@@ -578,3 +543,94 @@ def test_production_cost_hybrid_tbm_900():
     problem.check_partials(compact_print=True)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_production_cost_tbm_900():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCProductionCost(
+                power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"
+            )
+        ),
+        __file__,
+        "tbm_900_inputs.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCProductionCost(
+            power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"
+        ),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
+    ) == pytest.approx(425906.45, rel=1e-3)
+
+    assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
+        3775204.15, rel=1e-3
+    )
+
+    assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
+        4190476.61, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_annual_insurance_cost():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:msp_per_unit", units="USD", val=412758.77)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCAnnualInsuranceCost(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:annual_insurance_cost", units="USD/yr") == pytest.approx(
+        6691.38, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_landing_cost():
+    expect_mtow = [1.0, 2.0, 3.0, 7.0]
+    expect_cost = [41.59, 53.8, 72.3, 66.53]
+    for mtow, cost in zip(expect_mtow, expect_cost):
+        ivc = om.IndepVarComp()
+        ivc.add_output("data:weight:aircraft:MTOW", units="t", val=mtow)
+
+        problem = run_system(
+            LCCLandingCost(),
+            ivc,
+        )
+
+        assert problem.get_val("data:cost:operation:landing_cost", units="USD") == pytest.approx(
+            cost, rel=1e-3
+        )
+
+        problem.check_partials(compact_print=True)
+
+
+def test_daily_parking_cost():
+    expect_mtow = [1.0, 2.0, 3.0, 7.0]
+    expect_cost = [2.132, 4.186, 7.2, 82.6]
+    for mtow, cost in zip(expect_mtow, expect_cost):
+        ivc = om.IndepVarComp()
+        ivc.add_output("data:weight:aircraft:MTOW", units="t", val=mtow)
+
+        problem = run_system(
+            LCCDailyParkingCost(),
+            ivc,
+        )
+
+        assert problem.get_val(
+            "data:cost:operation:daily_parking_cost", units="USD"
+        ) == pytest.approx(cost, rel=1e-3)
+
+        problem.check_partials(compact_print=True)
