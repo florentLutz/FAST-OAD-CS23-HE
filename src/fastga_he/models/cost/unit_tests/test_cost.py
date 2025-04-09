@@ -30,6 +30,7 @@ from ..lcc_landing_cost import LCCLandingCost
 from ..lcc_daily_parking_cost import LCCDailyParkingCost
 from ..lcc_annual_crew_cost import LCCAnnualCrewCost
 from ..lcc_annual_airport_cost import LCCAnnualAirportCost
+from ..lcc_annual_loan_cost import LCCAnnualLoanCost
 
 
 XML_FILE = "data.xml"
@@ -676,5 +677,23 @@ def test_annual_airport_cost():
     assert problem.get_val(
         "data:cost:operation:annual_airport_cost", units="USD/yr"
     ) == pytest.approx(4650.0, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_annual_loan_cost():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:operation:loan_principal", units="USD", val=1.0e6)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCAnnualLoanCost(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:annual_loan_cost", units="USD/yr") == pytest.approx(
+        109794.62, rel=1e-3
+    )
 
     problem.check_partials(compact_print=True)
