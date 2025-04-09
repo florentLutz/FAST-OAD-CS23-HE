@@ -31,7 +31,7 @@ class LCCDailyParkingCost(om.ExplicitComponent):
         self.add_output(
             "data:cost:operation:daily_parking_cost",
             val=15.0,
-            units="USD",
+            units="USD/d",
             desc="Daily parking cost of the aircraft",
         )
         self.declare_partials("*", "*", method="exact")
