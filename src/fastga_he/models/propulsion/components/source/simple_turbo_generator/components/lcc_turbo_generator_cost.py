@@ -10,8 +10,8 @@ import openmdao.api as om
 class LCCTurboGeneratorCost(om.ExplicitComponent):
     """
     Cost computation of the turbo  generator based on the price of single starter generator from
-    https://www.zauba.com/import-starter+generator+apu-hs-code.html and the performance
-    specification from https://www.startergenerator.com/inventory/1152400-3.
+    https://www.zauba.com/import-1152400-3-hs-code.html and the performance specification from
+    https://www.startergenerator.com/inventory/1152400-3.
     """
 
     def initialize(self):
@@ -40,7 +40,7 @@ class LCCTurboGeneratorCost(om.ExplicitComponent):
             units="USD",
             val=5.0e3,
         )
-        self.declare_partials(of="*", wrt="*", val=1123.93)
+        self.declare_partials(of="*", wrt="*", val=328.4)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         turbo_generator_id = self.options["turbo_generator_id"]
@@ -50,7 +50,7 @@ class LCCTurboGeneratorCost(om.ExplicitComponent):
             + turbo_generator_id
             + ":cost_per_unit"
         ] = (
-            1123.93
+            328.4
             * inputs[
                 "data:propulsion:he_power_train:turbo_generator:"
                 + turbo_generator_id

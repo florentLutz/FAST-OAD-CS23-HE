@@ -105,6 +105,7 @@ from .source.simple_turbo_generator import (
     PerformancesTurboGenerator,
     SlipstreamTurboGenerator,
     PreLCATurboGenerator,
+    LCCTurboGeneratorCost,
 )
 from .source.pemfc import (
     SizingPEMFCStack,

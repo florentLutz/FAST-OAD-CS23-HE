@@ -430,6 +430,6 @@ def test_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:cost_per_unit",
         units="USD",
-    ) == pytest.approx(7867.51, rel=1e-2)
+    ) == pytest.approx(2298.8, rel=1e-2)
 
     problem.check_partials(compact_print=True)
