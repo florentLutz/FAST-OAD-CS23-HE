@@ -1,0 +1,59 @@
+# This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
+# Electric Aircraft.
+# Copyright (C) 2025 ISAE-SUPAERO
+
+
+import numpy as np
+import openmdao.api as om
+
+
+class LCCTurboGeneratorCost(om.ExplicitComponent):
+    """
+    Cost computation of the turbo  generator based on the price of single starter generator from
+    https://www.zauba.com/import-starter+generator+apu-hs-code.html and the performance
+    specification from https://www.startergenerator.com/inventory/1152400-3.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="turbo_generator_id",
+            default=None,
+            desc="Identifier of the turbo generator",
+            allow_none=False,
+        )
+
+    def setup(self):
+        turbo_generator_id = self.options["turbo_generator_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":shaft_power_max",
+            units="kW",
+            val=np.nan,
+        )
+
+        self.add_output(
+            "data:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":cost_per_unit",
+            units="USD",
+            val=5.0e3,
+        )
+        self.declare_partials(of="*", wrt="*", val=1123.93)
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        turbo_generator_id = self.options["turbo_generator_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":cost_per_unit"
+        ] = (
+            1123.93
+            * inputs[
+                "data:propulsion:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":shaft_power_max"
+            ]
+        )

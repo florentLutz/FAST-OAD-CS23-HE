@@ -12,6 +12,7 @@ from ..components.sizing_turbo_generator_cg_x import SizingTurboGeneratorCGX
 from ..components.sizing_turbo_generator_cg_y import SizingTurboGeneratorCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCATurboGeneratorProdWeightPerFU
+from ..components.lcc_turbo_generator_cost import LCCTurboGeneratorCost
 
 from ..components.sizing_turbo_generator import SizingTurboGenerator
 
@@ -411,5 +412,24 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:mass_per_fu", units="kg"
     ) == pytest.approx(0.00032, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:shaft_power_max",
+        7.0,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCTurboGeneratorCost(turbo_generator_id="turbo_generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:cost_per_unit",
+        units="USD",
+    ) == pytest.approx(7867.51, rel=1e-2)
 
     problem.check_partials(compact_print=True)
