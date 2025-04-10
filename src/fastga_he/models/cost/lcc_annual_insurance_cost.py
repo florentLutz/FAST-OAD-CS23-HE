@@ -19,7 +19,7 @@ class LCCAnnualInsuranceCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:annual_insurance_cost",
+            "data:cost:operation:annual_insurance_cost",
             val=1500.0,
             units="USD/yr",
             desc="Annual insurance cost of the aircraft",
@@ -27,4 +27,6 @@ class LCCAnnualInsuranceCost(om.ExplicitComponent):
         self.declare_partials("*", "*", val=0.015)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:annual_insurance_cost"] = 500 + 0.015 * inputs["data:cost:msp_per_unit"]
+        outputs["data:cost:operation:annual_insurance_cost"] = (
+            500 + 0.015 * inputs["data:cost:msp_per_unit"]
+        )
