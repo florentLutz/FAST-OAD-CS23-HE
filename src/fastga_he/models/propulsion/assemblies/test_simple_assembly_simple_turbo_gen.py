@@ -7,12 +7,14 @@ import os.path as pth
 import numpy as np
 import pytest
 
+import openmdao.api as om
+
 import fastoad.api as oad
 from stdatm import Atmosphere
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.write_outputs import write_outputs
-
+from utils.filter_residuals import filter_residuals
 
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 from ..assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
@@ -222,3 +224,57 @@ def test_assembly_sizing_from_pt_file():
         pth.join(outputs.__path__[0], "assembly_sizing_from_pt_file.xml"),
         problem,
     )
+
+
+def test_full_high_rpm_ice():
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    )
+
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_high_rpm_ice.yml")
+
+    model = om.Group()
+    model.add_subsystem(
+        "sizing", PowerTrainSizingFromFile(power_train_file_path=pt_file_path), promotes=["*"]
+    )
+    model.add_subsystem(
+        "performances",
+        PowerTrainPerformancesFromFile(
+            power_train_file_path=pt_file_path,
+            number_of_points=NB_POINTS_TEST,
+            pre_condition_pt=True,
+        ),
+        promotes=["*"],
+    )
+
+    model.nonlinear_solver = om.NonlinearBlockGS()
+    model.nonlinear_solver.options["iprint"] = 2
+    model.nonlinear_solver.options["maxiter"] = 200
+    model.nonlinear_solver.options["rtol"] = 1e-5
+    model.linear_solver = om.LinearBlockGS()
+
+    ivc = get_indep_var_comp(
+        list_inputs(model),
+        __file__,
+        XML_FILE,
+    )
+
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
+    ivc.add_output("true_airspeed", val=np.linspace(60.0, 65.0, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(1000, 90, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 60))
+
+    problem = run_system(model, ivc)
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    assert problem.get_val("data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL", units="kW") == pytest.approx(93.0, rel=1e-2)
+    assert problem.get_val("data:propulsion:he_power_train:high_rpm_ICE:ice_1:mass", units="kg") == pytest.approx(71.08, rel=1e-2)

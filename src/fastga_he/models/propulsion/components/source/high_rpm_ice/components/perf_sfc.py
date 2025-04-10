@@ -41,6 +41,11 @@ class PerformancesSFC(om.ExplicitComponent):
             val=np.nan,
         )
         self.add_input("mean_effective_pressure", units="bar", val=np.nan, shape=number_of_points)
+        self.add_input(
+            "settings:propulsion:he_power_train:high_RPM_ICE:" + high_rpm_ice_id + ":k_sfc",
+            val=1.0,
+            desc="K-factor to adjust the sfc of the ICE",
+        )
 
         self.add_output(
             "specific_fuel_consumption", units="g/kW/h", val=300.0, shape=number_of_points
@@ -55,9 +60,12 @@ class PerformancesSFC(om.ExplicitComponent):
         )
         self.declare_partials(
             of="specific_fuel_consumption",
-            wrt="data:propulsion:he_power_train:high_rpm_ICE:"
-            + high_rpm_ice_id
-            + ":sfc_coefficient:k_coefficient",
+            wrt=[
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":sfc_coefficient:k_coefficient",
+                "settings:propulsion:he_power_train:high_RPM_ICE:" + high_rpm_ice_id + ":k_sfc",
+            ],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -92,7 +100,12 @@ class PerformancesSFC(om.ExplicitComponent):
 
         sfc = sfc_max_mep + np.exp(-k_coefficient * (clipped_mep - 18.0))
 
-        outputs["specific_fuel_consumption"] = sfc
+        outputs["specific_fuel_consumption"] = (
+            sfc
+            * inputs[
+                "settings:propulsion:he_power_train:high_RPM_ICE:" + high_rpm_ice_id + ":k_sfc"
+            ]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         high_rpm_ice_id = self.options["high_rpm_ice_id"]
@@ -104,13 +117,35 @@ class PerformancesSFC(om.ExplicitComponent):
             + high_rpm_ice_id
             + ":sfc_coefficient:k_coefficient"
         ]
+        sfc_max_mep = inputs[
+            "data:propulsion:he_power_train:high_rpm_ICE:"
+            + high_rpm_ice_id
+            + ":sfc_coefficient:max_mep"
+        ]
 
         partials[
             "specific_fuel_consumption",
             "data:propulsion:he_power_train:high_rpm_ICE:"
             + high_rpm_ice_id
             + ":sfc_coefficient:k_coefficient",
-        ] = -(clipped_mep - 18.0) * np.exp(-k_coefficient * (clipped_mep - 18.0))
-        partials["specific_fuel_consumption", "mean_effective_pressure"] = np.where(
-            mep == clipped_mep, -k_coefficient * np.exp(-k_coefficient * (clipped_mep - 18.0)), 1e-6
+        ] = (
+            -(clipped_mep - 18.0)
+            * np.exp(-k_coefficient * (clipped_mep - 18.0))
+            * inputs[
+                "settings:propulsion:he_power_train:high_RPM_ICE:" + high_rpm_ice_id + ":k_sfc"
+            ]
         )
+        partials["specific_fuel_consumption", "mean_effective_pressure"] = (
+            np.where(
+                mep == clipped_mep,
+                -k_coefficient * np.exp(-k_coefficient * (clipped_mep - 18.0)),
+                1e-6,
+            )
+            * inputs[
+                "settings:propulsion:he_power_train:high_RPM_ICE:" + high_rpm_ice_id + ":k_sfc"
+            ]
+        )
+        partials[
+            "specific_fuel_consumption",
+            "settings:propulsion:he_power_train:high_RPM_ICE:" + high_rpm_ice_id + ":k_sfc",
+        ] = sfc_max_mep + np.exp(-k_coefficient * (clipped_mep - 18.0))

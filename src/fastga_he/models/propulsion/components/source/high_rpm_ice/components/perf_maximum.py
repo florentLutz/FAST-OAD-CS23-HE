@@ -32,7 +32,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_max_SL",
             units="W",
-            val=250e3,
+            val=75e3,
             desc="Maximum power the motor has to provide at Sea Level",
         )
         self.declare_partials(

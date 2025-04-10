@@ -30,6 +30,13 @@ class SizingHighRPMICESFCMinMEP(om.ExplicitComponent):
             val=np.nan,
             desc="Maximum power the motor can provide at Sea Level",
         )
+        self.add_input(
+            "data:propulsion:he_power_train:high_rpm_ICE:"
+            + high_rpm_ice_id
+            + ":sfc_coefficient:max_mep",
+            units="g/kW/h",
+            val=np.nan,
+        )
 
         self.add_output(
             "data:propulsion:he_power_train:high_rpm_ICE:"
@@ -39,15 +46,7 @@ class SizingHighRPMICESFCMinMEP(om.ExplicitComponent):
             val=619.0,
         )
 
-        self.declare_partials(
-            of="data:propulsion:he_power_train:high_rpm_ICE:"
-            + high_rpm_ice_id
-            + ":sfc_coefficient:min_mep",
-            wrt="data:propulsion:he_power_train:high_rpm_ICE:"
-            + high_rpm_ice_id
-            + ":power_rating_SL",
-            val=21.47,
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         high_rpm_ice_id = self.options["high_rpm_ice_id"]
@@ -55,11 +54,67 @@ class SizingHighRPMICESFCMinMEP(om.ExplicitComponent):
         max_power = inputs[
             "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_rating_SL"
         ]
+        sfc_max_mep = inputs[
+            "data:propulsion:he_power_train:high_rpm_ICE:"
+            + high_rpm_ice_id
+            + ":sfc_coefficient:max_mep"
+        ]
 
-        sfc_min_mep = 383.28 + 21.47 * (max_power - 58.0)
+        # If the design power is so low that the regression give us a sfc at min MEP smaller than at
+        # max MEP, this will cause a convergence issue. This is a fail-safe to prevent it.
+        sfc_min_mep = np.maximum(383.28 + 21.47 * (max_power - 58.0), 1.1 * sfc_max_mep)
 
         outputs[
             "data:propulsion:he_power_train:high_rpm_ICE:"
             + high_rpm_ice_id
             + ":sfc_coefficient:min_mep"
         ] = sfc_min_mep
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        high_rpm_ice_id = self.options["high_rpm_ice_id"]
+
+        max_power = inputs[
+            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_rating_SL"
+        ]
+        sfc_max_mep = inputs[
+            "data:propulsion:he_power_train:high_rpm_ICE:"
+            + high_rpm_ice_id
+            + ":sfc_coefficient:max_mep"
+        ]
+
+        sfc_min_mep = 383.28 + 21.47 * (max_power - 58.0)
+
+        if sfc_min_mep > 1.1 * sfc_max_mep:
+            partials[
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":sfc_coefficient:min_mep",
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":power_rating_SL",
+            ] = 21.47
+            partials[
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":sfc_coefficient:min_mep",
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":sfc_coefficient:max_mep",
+            ] = 0.0
+        else:
+            partials[
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":sfc_coefficient:min_mep",
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":power_rating_SL",
+            ] = 0.0
+            partials[
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":sfc_coefficient:min_mep",
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":sfc_coefficient:max_mep",
+            ] = 1.1

@@ -16,8 +16,8 @@ from ..components.cstr_ensure import ConstraintsSeaLevelPowerEnsure
 from ..components.cstr_high_rpm_ice import ConstraintHighRPMICEPowerRateMission
 
 from ..components.sizing_displacement_volume import SizingHighRPMICEDisplacementVolume
-from ..components.sizing_high_rpm_ice_sfc_min_mep import SizingHighRPMICESFCMinMEP
 from ..components.sizing_high_rpm_ice_sfc_max_mep import SizingHighRPMICESFCMaxMEP
+from ..components.sizing_high_rpm_ice_sfc_min_mep import SizingHighRPMICESFCMinMEP
 from ..components.sizing_high_rpm_ice_sfc_k_coefficient import SizingHighRPMICESFCKCoefficient
 
 from ..components.perf_mean_effective_pressure import PerformancesMeanEffectivePressure
@@ -355,21 +355,6 @@ def test_high_rpm_ice_sizing():
     problem.check_partials(compact_print=True)
 
 
-def test_sfc_min_mep():
-    ivc = get_indep_var_comp(
-        ["data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL"], __file__, XML_FILE
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(SizingHighRPMICESFCMinMEP(high_rpm_ice_id="ice_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:sfc_coefficient:min_mep", units="g/kW/h"
-    ) == pytest.approx(620.0, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
 def test_sfc_max_mep():
     ivc = get_indep_var_comp(
         ["data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL"], __file__, XML_FILE
@@ -381,6 +366,26 @@ def test_sfc_max_mep():
     assert problem.get_val(
         "data:propulsion:he_power_train:high_rpm_ICE:ice_1:sfc_coefficient:max_mep", units="g/kW/h"
     ) == pytest.approx(300.6, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_sfc_min_mep():
+    ivc = get_indep_var_comp(
+        [
+            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL",
+            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:sfc_coefficient:max_mep",
+        ],
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingHighRPMICESFCMinMEP(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:sfc_coefficient:min_mep", units="g/kW/h"
+    ) == pytest.approx(620.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

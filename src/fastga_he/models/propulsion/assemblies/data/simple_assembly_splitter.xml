@@ -113,6 +113,14 @@
                         </CG>
                     </ice_1>
                 </ICE>
+                <high_rpm_ICE>
+                    <ice_1>
+                        <from_LE units="m">0.5</from_LE>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                    </ice_1>
+                </high_rpm_ICE>
                 <rectifier>
                     <rectifier_1>
                         <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum value of the switching frequency of the rectifier--></switching_frequency_max>
