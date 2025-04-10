@@ -33,6 +33,7 @@ from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 from ..components.lcc_pmsm_cost import LCCPMSMCost
+from ..components.lcc_pmsm_maintenance import LCCPMSMMaintenance
 
 from ..components.cstr_enforce import (
     ConstraintsTorqueEnforce,
@@ -756,5 +757,23 @@ def test_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:cost_per_unit", units="USD"
     ) == pytest.approx(20815.61, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maintenance():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PMSM:motor_1:cost_per_unit",
+        20815.61,
+        units="USD",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCPMSMMaintenance(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:maintenance_per_unit", units="USD/yr"
+    ) == pytest.approx(1387.7, rel=1e-2)
 
     problem.check_partials(compact_print=True)

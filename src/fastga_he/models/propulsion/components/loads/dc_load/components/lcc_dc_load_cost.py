@@ -30,28 +30,35 @@ class LCCDCLoadCost(om.ExplicitComponent):
             val=np.nan,
         )
 
+        self.add_input(
+            name="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":purchase_price",
+            units="USD",
+            val=0.0,
+            desc="Cost of the DC load per unit",
+        )
+
         self.add_output(
             name="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cost_per_unit",
             units="USD",
             val=1e4,
-            desc="Cost of the DC load per unit",
+            desc="Cost of the DC load per unit including electronics",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max",
+            val=256.0,
+        )
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":purchase_price",
+            val=1.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         aux_load_id = self.options["aux_load_id"]
-        power_max = inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max"]
 
         outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cost_per_unit"] = (
-            1876.1 * np.exp(0.0062 * power_max) + 256.0 * power_max
+            256.0 * inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max"]
+            + inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":purchase_price"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        aux_load_id = self.options["aux_load_id"]
-        power_max = inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max"]
-
-        partials[
-            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cost_per_unit",
-            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max",
-        ] = 11.632 * np.exp(0.0062 * power_max) + 256.0

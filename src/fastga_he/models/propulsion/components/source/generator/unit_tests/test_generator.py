@@ -35,6 +35,7 @@ from ..components.sizing_generator_cg_y import SizingGeneratorCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAGeneratorProdWeightPerFU
 from ..components.lcc_generator_cost import LCCGeneratorCost
+from ..components.lcc_generator_maintenance import LCCGeneratorMaintenance
 
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
@@ -716,5 +717,23 @@ def test_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:generator:generator_1:cost_per_unit", units="USD"
     ) == pytest.approx(2895.61, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maintenance():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:generator:generator_1:cost_per_unit",
+        2895.61,
+        units="USD",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCGeneratorMaintenance(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:maintenance_per_unit", units="USD/yr"
+    ) == pytest.approx(193.04, rel=1e-2)
 
     problem.check_partials(compact_print=True)

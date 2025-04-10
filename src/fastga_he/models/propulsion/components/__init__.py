@@ -64,12 +64,20 @@ from .connectors.gearbox import (
     PreLCAGearbox,
     LCCGearboxCost,
 )
-from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM, PreLCAPMSM, LCCPMSMCost
+from .loads.pmsm import (
+    SizingPMSM,
+    PerformancesPMSM,
+    SlipstreamPMSM,
+    PreLCAPMSM,
+    LCCPMSMCost,
+    LCCPMSMMaintenance,
+)
 from .loads.dc_load import (
     SizingDCAuxLoad,
     PerformancesDCAuxLoad,
     SlipstreamDCAuxLoad,
     LCCDCLoadCost,
+    LCCDCLoadMaintenance,
 )
 from .propulsor.propeller import (
     SizingPropeller,

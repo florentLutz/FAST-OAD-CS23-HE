@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import pytest
@@ -24,6 +24,7 @@ from ..components.sizing_aux_load_cg_x import SizingDCAuxLoadCGX
 from ..components.sizing_aux_load import SizingDCAuxLoad
 
 from ..components.lcc_dc_load_cost import LCCDCLoadCost
+from ..components.lcc_dc_load_maintenance import LCCDCLoadMaintenance
 
 from ..constants import POSSIBLE_POSITION
 
@@ -273,6 +274,24 @@ def test_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:aux_load:aux_load_1:cost_per_unit", units="USD"
-    ) == pytest.approx(4556.1, rel=1e-2)
+    ) == pytest.approx(2560.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maintenance():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:aux_load:aux_load_1:cost_per_unit",
+        2560.0,
+        units="USD",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCDCLoadMaintenance(aux_load_id="aux_load_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:aux_load:aux_load_1:maintenance_per_unit", units="USD/yr"
+    ) == pytest.approx(170.66, rel=1e-2)
 
     problem.check_partials(compact_print=True)
