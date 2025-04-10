@@ -77,6 +77,7 @@ from .propulsor.propeller import (
     SlipstreamPropeller,
     PreLCAPropeller,
     LCCPropellerCost,
+    LCCPropellerMaintenance,
 )
 from .source.battery import (
     SizingBatteryPack,

@@ -1,0 +1,93 @@
+# This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
+# Electric Aircraft.
+# Copyright (C) 2025 ISAE-SUPAERO
+
+import openmdao.api as om
+from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
+import fastga_he.models.propulsion.components as he_comp
+
+from .lcc_landing_cost import LCCLandingCost
+from .lcc_annual_insurance_cost import LCCAnnualInsuranceCost
+from .lcc_daily_parking_cost import LCCDailyParkingCost
+from .lcc_annual_airport_cost import LCCAnnualAirportCost
+from .lcc_annual_loan_cost import LCCAnnualLoanCost
+from .lcc_annual_depreciation_cost import LCCAnnualDepreciationCost
+
+
+class LCCOperationCost(om.Group):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.configurator = FASTGAHEPowerTrainConfigurator()
+
+    def initialize(self):
+        self.options.declare(
+            name="power_train_file_path",
+            default=None,
+            desc="Path to the file containing the description of the power",
+            allow_none=False,
+        )
+
+    def setup(self):
+        self.configurator.load(self.options["power_train_file_path"])
+
+        self.add_subsystem(
+            name="landing_cost_per_operation",
+            subsys=LCCLandingCost(),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="daily_parking_cost",
+            subsys=LCCDailyParkingCost(),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="annual_airport_cost",
+            subsys=LCCAnnualAirportCost(),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="annual_insurance_cost", subsys=LCCAnnualInsuranceCost(), promotes=["*"]
+        )
+
+        self.add_subsystem(name="annual_loan_cost", subsys=LCCAnnualLoanCost(), promotes=["*"])
+
+        self.add_subsystem(
+            name="annual_depreciation_cost", subsys=LCCAnnualDepreciationCost(), promotes=["*"]
+        )
+
+        # For the most part we can reuse what is done for the sizing, no need to write a new
+        # function
+
+        cost_components_type = []
+        cost_components_name = []
+        (
+            components_name,
+            components_name_id,
+            components_type,
+            components_om_type,
+            _,
+            _,
+        ) = self.configurator.get_sizing_element_lists()
+
+        for (
+            component_name,
+            component_name_id,
+            component_type,
+            component_om_type,
+        ) in zip(
+            components_name,
+            components_name_id,
+            components_type,
+            components_om_type,
+        ):
+            if hasattr(he_comp, "LCC" + component_om_type + "Maintenance"):
+                local_sub_sys = he_comp.__dict__["LCC" + component_om_type + "Maintenance"]()
+                local_sub_sys.options[component_name_id] = component_name
+                cost_components_type.append(component_type)
+                cost_components_name.append(component_name)
+
+                self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
