@@ -31,7 +31,7 @@ from ..lcc_daily_parking_cost import LCCDailyParkingCost
 from ..lcc_annual_crew_cost import LCCAnnualCrewCost
 from ..lcc_annual_airport_cost import LCCAnnualAirportCost
 from ..lcc_annual_loan_cost import LCCAnnualLoanCost
-from ..lcc_annual_depreciation_cost import LCCAnnualDepreciationCost
+from ..lcc_annual_depreciation import LCCAnnualDepreciation
 
 
 XML_FILE = "data.xml"
@@ -699,6 +699,18 @@ def test_annual_loan_cost():
 
     problem.check_partials(compact_print=True)
 
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCAnnualLoanCost(loan=False),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:annual_loan_cost", units="USD/yr") == pytest.approx(
+        0.0, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_annual_depreciation_cost():
     ivc = om.IndepVarComp()
@@ -707,7 +719,7 @@ def test_annual_depreciation_cost():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCAnnualDepreciationCost(),
+        LCCAnnualDepreciation(),
         ivc,
     )
 

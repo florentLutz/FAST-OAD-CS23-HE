@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCAnnualDepreciationCost(om.ExplicitComponent):
+class LCCAnnualDepreciation(om.ExplicitComponent):
     """
     Computation of the aircraft value depreciates per year.
     """

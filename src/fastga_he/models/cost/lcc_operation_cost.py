@@ -11,7 +11,7 @@ from .lcc_annual_insurance_cost import LCCAnnualInsuranceCost
 from .lcc_daily_parking_cost import LCCDailyParkingCost
 from .lcc_annual_airport_cost import LCCAnnualAirportCost
 from .lcc_annual_loan_cost import LCCAnnualLoanCost
-from .lcc_annual_depreciation_cost import LCCAnnualDepreciationCost
+from .lcc_annual_depreciation import LCCAnnualDepreciation
 
 
 class LCCOperationCost(om.Group):
@@ -28,8 +28,16 @@ class LCCOperationCost(om.Group):
             allow_none=False,
         )
 
+        self.options.declare(
+            name="loan",
+            default=True,
+            types=bool,
+            desc="True if loan is taken for financing the aircraft",
+        )
+
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
+        loan = self.options["loan"]
 
         self.add_subsystem(
             name="landing_cost_per_operation",
@@ -53,10 +61,12 @@ class LCCOperationCost(om.Group):
             name="annual_insurance_cost", subsys=LCCAnnualInsuranceCost(), promotes=["*"]
         )
 
-        self.add_subsystem(name="annual_loan_cost", subsys=LCCAnnualLoanCost(), promotes=["*"])
+        self.add_subsystem(
+            name="annual_loan_cost", subsys=LCCAnnualLoanCost(loan=loan), promotes=["*"]
+        )
 
         self.add_subsystem(
-            name="annual_depreciation_cost", subsys=LCCAnnualDepreciationCost(), promotes=["*"]
+            name="annual_depreciation", subsys=LCCAnnualDepreciation(), promotes=["*"]
         )
 
         # For the most part we can reuse what is done for the sizing, no need to write a new
