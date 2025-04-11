@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCGeneratorMaintenance(om.ExplicitComponent):
+class LCCGeneratorOperation(om.ExplicitComponent):
     """
     Computation of the maintenance cost of the generator.
     """

@@ -24,7 +24,7 @@ from ..components.sizing_aux_load_cg_x import SizingDCAuxLoadCGX
 from ..components.sizing_aux_load import SizingDCAuxLoad
 
 from ..components.lcc_dc_load_cost import LCCDCLoadCost
-from ..components.lcc_dc_load_maintenance import LCCDCLoadMaintenance
+from ..components.lcc_dc_load_operation import LCCDCLoadOperation
 
 from ..constants import POSSIBLE_POSITION
 
@@ -288,7 +288,7 @@ def test_maintenance():
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(LCCDCLoadMaintenance(aux_load_id="aux_load_1"), ivc)
+    problem = run_system(LCCDCLoadOperation(aux_load_id="aux_load_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:aux_load:aux_load_1:maintenance_per_unit", units="USD/yr"

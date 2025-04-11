@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCDCLoadMaintenance(om.ExplicitComponent):
+class LCCDCLoadOperation(om.ExplicitComponent):
     """
     Computation of the maintenance cost of the DC loads including the electronics of the powertrain.
     """

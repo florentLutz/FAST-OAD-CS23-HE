@@ -5,7 +5,7 @@
 import openmdao.api as om
 
 
-class LCCPropellerMaintenance(om.ExplicitComponent):
+class LCCPropellerOperation(om.ExplicitComponent):
     """
     Computation of the propeller maintenance cost based on the mean service price from
     https://aircraftaccessoriesofok.com/aircraft-propeller-overhaul-cost/.

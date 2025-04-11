@@ -10,4 +10,4 @@ from .components.perf_propeller import PerformancesPropeller
 from .components.slipstream_propeller import SlipstreamPropeller
 from .components.pre_lca_propeller import PreLCAPropeller
 from .components.lcc_propeller_cost import LCCPropellerCost
-from .components.lcc_propeller_maintenace import LCCPropellerMaintenance
+from .components.lcc_propeller_operation import LCCPropellerOperation

@@ -70,14 +70,14 @@ from .loads.pmsm import (
     SlipstreamPMSM,
     PreLCAPMSM,
     LCCPMSMCost,
-    LCCPMSMMaintenance,
+    LCCPMSMOperation,
 )
 from .loads.dc_load import (
     SizingDCAuxLoad,
     PerformancesDCAuxLoad,
     SlipstreamDCAuxLoad,
     LCCDCLoadCost,
-    LCCDCLoadMaintenance,
+    LCCDCLoadOperation,
 )
 from .propulsor.propeller import (
     SizingPropeller,
@@ -85,7 +85,7 @@ from .propulsor.propeller import (
     SlipstreamPropeller,
     PreLCAPropeller,
     LCCPropellerCost,
-    LCCPropellerMaintenance,
+    LCCPropellerOperation,
 )
 from .source.battery import (
     SizingBatteryPack,
@@ -100,6 +100,7 @@ from .source.generator import (
     SlipstreamGenerator,
     PreLCAGenerator,
     LCCGeneratorCost,
+    LCCGeneratorOperation,
 )
 from .source.ice import SizingICE, PerformancesICE, SlipstreamICE, PreLCAICE, LCCICECost
 from .source.turboshaft import (

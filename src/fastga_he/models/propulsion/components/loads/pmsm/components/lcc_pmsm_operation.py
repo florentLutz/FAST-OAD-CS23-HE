@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCPMSMMaintenance(om.ExplicitComponent):
+class LCCPMSMOperation(om.ExplicitComponent):
     """
     Computation of the maintenance cost of the PMSM. For the default value of the average lifespan
     of the motor, the value is taken from :cite:`thonemann:2024` for short term technologies.

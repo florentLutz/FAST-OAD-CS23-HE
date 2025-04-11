@@ -33,7 +33,7 @@ from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 from ..components.lcc_pmsm_cost import LCCPMSMCost
-from ..components.lcc_pmsm_maintenance import LCCPMSMMaintenance
+from ..components.lcc_pmsm_operation import LCCPMSMOperation
 
 from ..components.cstr_enforce import (
     ConstraintsTorqueEnforce,
@@ -770,7 +770,7 @@ def test_maintenance():
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(LCCPMSMMaintenance(motor_id="motor_1"), ivc)
+    problem = run_system(LCCPMSMOperation(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:maintenance_per_unit", units="USD/yr"
