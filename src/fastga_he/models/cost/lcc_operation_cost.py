@@ -12,6 +12,9 @@ from .lcc_daily_parking_cost import LCCDailyParkingCost
 from .lcc_annual_airport_cost import LCCAnnualAirportCost
 from .lcc_annual_loan_cost import LCCAnnualLoanCost
 from .lcc_annual_depreciation import LCCAnnualDepreciation
+from .lcc_maintenance_labor_cost import LCCMaintenanceLaborCost
+from .lcc_maintenance_material_cost import LCCMaintenanceMaterialCost
+from .lcc_annual_maintenance_cost import LCCAirframeMaintenanceCost
 
 
 class LCCOperationCost(om.Group):
@@ -67,6 +70,24 @@ class LCCOperationCost(om.Group):
 
         self.add_subsystem(
             name="annual_depreciation", subsys=LCCAnnualDepreciation(), promotes=["*"]
+        )
+
+        self.add_subsystem(
+            name="airframe_maintenance_labor",
+            subsys=LCCMaintenanceLaborCost(),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="airframe_maintenance_material",
+            subsys=LCCMaintenanceMaterialCost(),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="airframe_maintenance_cost",
+            subsys=LCCAirframeMaintenanceCost(),
+            promotes=["*"],
         )
 
         # For the most part we can reuse what is done for the sizing, no need to write a new

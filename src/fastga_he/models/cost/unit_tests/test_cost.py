@@ -32,6 +32,9 @@ from ..lcc_annual_crew_cost import LCCAnnualCrewCost
 from ..lcc_annual_airport_cost import LCCAnnualAirportCost
 from ..lcc_annual_loan_cost import LCCAnnualLoanCost
 from ..lcc_annual_depreciation import LCCAnnualDepreciation
+from ..lcc_maintenance_labor_cost import LCCMaintenanceLaborCost
+from ..lcc_maintenance_material_cost import LCCMaintenanceMaterialCost
+from ..lcc_annual_maintenance_cost import LCCAirframeMaintenanceCost
 
 
 XML_FILE = "data.xml"
@@ -726,5 +729,62 @@ def test_annual_depreciation_cost():
     assert problem.get_val(
         "data:cost:operation:annual_depreciation_cost", units="USD/yr"
     ) == pytest.approx(18574.15, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_annual_maintenance_labor_cost():
+    ivc = get_indep_var_comp(
+        list_inputs(LCCMaintenanceLaborCost()),
+        __file__,
+        XML_FILE,
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCMaintenanceLaborCost(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:cost:operation:airframe_labor_cost", units="USD/yr"
+    ) == pytest.approx(10058.76, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_annual_maintenance_material_cost():
+    ivc = get_indep_var_comp(
+        list_inputs(LCCMaintenanceMaterialCost()),
+        __file__,
+        XML_FILE,
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCMaintenanceMaterialCost(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:cost:operation:airframe_material_cost", units="USD/yr"
+    ) == pytest.approx(70.97, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_annual_airframe_maintenance():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:operation:airframe_material_cost", units="USD/yr", val=70.0)
+    ivc.add_output("data:cost:operation:airframe_labor_cost", units="USD/yr", val=10000.0)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCAirframeMaintenanceCost(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:cost:operation:airframe_maintenance_cost", units="USD/yr"
+    ) == pytest.approx(10070.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
