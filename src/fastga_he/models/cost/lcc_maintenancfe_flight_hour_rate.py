@@ -15,6 +15,12 @@ class LCCMaintenanceLaborCost(om.ExplicitComponent):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:TLAR:v_cruise", units="kn", val=np.nan)
         self.add_input(
+            name="data:TLAR:flight_hours_per_year",
+            val=np.nan,
+            units="h",
+            desc="Expected number of hours flown per year",
+        )
+        self.add_input(
             "data:cost:num_aircraft_5years",
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
