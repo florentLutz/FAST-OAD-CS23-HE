@@ -38,9 +38,17 @@ class LCCOperationCost(om.Group):
             desc="True if loan is taken for financing the aircraft",
         )
 
+        self.options.declare(
+            name="use_operational_mission",
+            default=False,
+            types=bool,
+            desc="The characteristics and consumption of the operational mission will be used",
+        )
+
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
         loan = self.options["loan"]
+        use_operational_mission = self.options["use_operational_mission"]
 
         self.add_subsystem(
             name="landing_cost_per_operation",
@@ -115,10 +123,13 @@ class LCCOperationCost(om.Group):
             components_type,
             components_om_type,
         ):
-            if hasattr(he_comp, "LCC" + component_om_type + "Maintenance"):
-                local_sub_sys = he_comp.__dict__["LCC" + component_om_type + "Maintenance"]()
+            if hasattr(he_comp, "LCC" + component_om_type + "Operation"):
+                local_sub_sys = he_comp.__dict__["LCC" + component_om_type + "Operation"]()
                 local_sub_sys.options[component_name_id] = component_name
                 cost_components_type.append(component_type)
                 cost_components_name.append(component_name)
+
+                if component_type == "gaseous_hydrogen_tank" or component_type == "fuel_tank":
+                    local_sub_sys.options["use_operational_mission"] = use_operational_mission
 
                 self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])

@@ -7,7 +7,6 @@ import pytest
 import numpy as np
 import openmdao.api as om
 
-from ..components.lcc_pemfc_cost import LCCPEMFCStackCost
 from ..components.perf_ambient_pressure import PerformancesPEMFCStackAmbientPressure
 from ..components.sizing_pemfc_weight import SizingPEMFCStackWeight
 from ..components.sizing_pemfc_cg_x import SizingPEMFCStackCGX
@@ -45,6 +44,9 @@ from ..components.perf_pemfc_stack import PerformancesPEMFCStack
 
 from ..components.cstr_ensure import ConstraintsPEMFCStackEffectiveAreaEnsure
 from ..components.cstr_enforce import ConstraintsPEMFCStackEffectiveAreaEnforce
+
+from ..components.lcc_pemfc_cost import LCCPEMFCStackCost
+from ..components.lcc_pemfc_operation import LCCPEMFCStackOperation
 
 from ..constants import POSSIBLE_POSITION
 
@@ -952,6 +954,35 @@ def test_cost():
         units="USD",
     ) == pytest.approx(
         13.14,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operation_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_unit",
+        units="USD",
+        val=10000.0,
+    )
+    ivc.add_output(
+        "data:TLAR:flight_hours_per_year",
+        units="h",
+        val=1000.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCPEMFCStackOperation(pemfc_stack_id="pemfc_stack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:maintenance_per_unit",
+        units="USD/yr",
+    ) == pytest.approx(
+        0.0008,
         rel=1e-2,
     )
 

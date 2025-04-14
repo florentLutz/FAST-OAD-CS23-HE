@@ -21,6 +21,7 @@ from .lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 from .lcc_certification_cost import LCCCertificationCost
 from .lcc_msp import LCCMSP
 from .lcc_production_cost_sum import LCCSumProductionCost
+from .lcc_freight_cost import LCCFreightCost
 
 
 class LCCProductionCost(om.Group):
@@ -170,5 +171,11 @@ class LCCProductionCost(om.Group):
         self.add_subsystem(
             name="sale_price",
             subsys=LCCMSP(),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="freight_cost",
+            subsys=LCCFreightCost(),
             promotes=["*"],
         )

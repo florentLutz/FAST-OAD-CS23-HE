@@ -10,3 +10,4 @@ from .components.perf_fuel_tank import PerformancesFuelTank
 from .components.slipstream_fuel_tank import SlipstreamFuelTank
 from .components.pre_lca_tank import PreLCAFuelTank
 from .components.lcc_fuel_tank_cost import LCCFuelTankCost
+from .components.lcc_fuel_tank_operation import LCCFuelTankOperation

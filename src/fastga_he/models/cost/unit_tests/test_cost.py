@@ -26,6 +26,7 @@ from ..lcc_production_cost import LCCProductionCost
 from ..lcc_production_cost_sum import LCCSumProductionCost
 from ..lcc_annual_insurance_cost import LCCAnnualInsuranceCost
 from ..lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
+from ..lcc_freight_cost import LCCFreightCost
 from ..lcc_landing_cost import LCCLandingCost
 from ..lcc_daily_parking_cost import LCCDailyParkingCost
 from ..lcc_annual_crew_cost import LCCAnnualCrewCost
@@ -450,6 +451,27 @@ def test_aircraft_MSP():
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
         412758.77, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_freight_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:weight:aircraft:OWE", val=426.58, units="kg")
+    ivc.add_output("data:cost:airplane_delivery", val=0.25)
+    ivc.add_output("data:cost:train_delivery", val=0.25)
+    ivc.add_output("data:cost:truck_delivery", val=0.25)
+    ivc.add_output("data:cost:ship_delivery", val=0.25)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCFreightCost(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:freight_cost_per_unit", units="USD") == pytest.approx(
+        1075.25, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
