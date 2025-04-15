@@ -19,8 +19,6 @@ from ..components.sizing_displacement_volume import SizingHighRPMICEDisplacement
 from ..components.sizing_high_rpm_ice_sfc_max_mep import SizingHighRPMICESFCMaxMEP
 from ..components.sizing_high_rpm_ice_sfc_min_mep import SizingHighRPMICESFCMinMEP
 from ..components.sizing_high_rpm_ice_sfc_k_coefficient import SizingHighRPMICESFCKCoefficient
-
-from ..components.perf_mean_effective_pressure import PerformancesMeanEffectivePressure
 from ..components.sizing_high_rpm_ice_uninstalled_weight import SizingHighRPMICEUninstalledWeight
 from ..components.sizing_high_rpm_ice_weight import SizingHighRPMICEWeight
 from ..components.sizing_high_rpm_ice_dimensions_scaling import SizingHighRPMICEDimensionsScaling
@@ -31,6 +29,9 @@ from ..components.sizing_high_rpm_ice_cg_x import SizingHighRPMICECGX
 from ..components.sizing_high_rpm_ice_cg_y import SizingHighRPMICECGY
 from ..components.sizing_high_rpm_ice_drag import SizingHighRPMICEDrag
 
+from ..components.perf_engine_rpm import PerformancesEngineRPM
+from ..components.perf_torque import PerformancesTorque
+from ..components.perf_mean_effective_pressure import PerformancesMeanEffectivePressure
 from ..components.perf_sfc import PerformancesSFC
 from ..components.perf_inflight_co2_emissions import PerformancesHighRPMICEInFlightCO2Emissions
 from ..components.perf_inflight_co_emissions import PerformancesHighRPMICEInFlightCOEmissions
@@ -406,6 +407,51 @@ def test_sfc_k_coefficient():
     assert problem.get_val(
         "data:propulsion:he_power_train:high_rpm_ICE:ice_1:sfc_coefficient:k_coefficient"
     ) == pytest.approx(0.443, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_engine_rpm():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "rpm",
+        val=np.linspace(1000.0, 2300.0, NB_POINTS_TEST),
+        units="1/min",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PerformancesEngineRPM(number_of_points=NB_POINTS_TEST), ivc)
+
+    assert problem.get_val("engine_rpm", units="1/min") == pytest.approx(
+        np.array([2430.0, 2781.0, 3132.0, 3483.0, 3834.0, 4185.0, 4536.0, 4887.0, 5238.0, 5589.0]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_torque():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "shaft_power_out",
+        val=np.linspace(5.0, 50.0, NB_POINTS_TEST),
+        units="kW",
+    )
+    ivc.add_output(
+        "engine_rpm",
+        val=np.array(
+            [2430.0, 2781.0, 3132.0, 3483.0, 3834.0, 4185.0, 4536.0, 4887.0, 5238.0, 5589.0]
+        ),
+        units="min**-1",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PerformancesTorque(number_of_points=NB_POINTS_TEST), ivc)
+
+    assert problem.get_val("torque_out", units="N*m") == pytest.approx(
+        np.array([19.64, 34.33, 45.73, 54.83, 62.26, 68.45, 73.68, 78.16, 82.03, 85.42]),
+        rel=1e-2,
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -1058,7 +1104,7 @@ def test_performances_ice():
     )
     ivc.add_output(
         "rpm",
-        val=np.linspace(2500.0, 5000.0, NB_POINTS_TEST),
+        val=np.linspace(2500.0, 5000.0, NB_POINTS_TEST) / 2.43,
         units="min**-1",
     )
     altitude = np.linspace(4000.0, 0.0, NB_POINTS_TEST)

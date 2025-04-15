@@ -276,5 +276,9 @@ def test_full_high_rpm_ice():
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
-    assert problem.get_val("data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL", units="kW") == pytest.approx(93.0, rel=1e-2)
-    assert problem.get_val("data:propulsion:he_power_train:high_rpm_ICE:ice_1:mass", units="kg") == pytest.approx(71.08, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL", units="kW"
+    ) == pytest.approx(93.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:mass", units="kg"
+    ) == pytest.approx(71.08, rel=1e-2)

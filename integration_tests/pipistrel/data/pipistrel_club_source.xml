@@ -3,7 +3,7 @@
     <TLAR>
       <NPAX_design is_input="True">0.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">10.0<!--luggage design mass--></luggage_mass_design>
-      <range units="NM" is_input="True">642.0<!--top-level requirement: design range--></range>
+      <range units="NM" is_input="True">513.8<!--top-level requirement: design range--></range>
       <v_approach units="knot" is_input="True">58.5<!--approach speed--></v_approach>
       <v_cruise units="knot" is_input="True">119.0<!--cruise speed--></v_cruise>
       <v_max_sl units="knot" is_input="True">110.0<!--maximum speed at sea level--></v_max_sl>
@@ -77,7 +77,7 @@
       </wing>
       <cabin>
         <luggage>
-          <mass_max units="kg" is_input="True">10.0<!--maximum luggage weight in the luggage compartment--></mass_max>
+          <mass_max units="kg" is_input="True">25.0<!--maximum luggage weight in the luggage compartment--></mass_max>
         </luggage>
         <seats>
           <passenger>
@@ -154,11 +154,11 @@
             <activity_factor is_input="True">125.0<!--Activity factor of the propeller--></activity_factor>
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
-            <diameter units="cm" is_input="True">164.0<!--Diameter of the propeller--></diameter>
+            <diameter units="cm" is_input="True">170.0<!--Diameter of the propeller--></diameter>
             <installation_angle units="deg" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">2.0<!--Number of blades on the propeller--></number_blades>
-            <rpm_mission units="1/min" is_input="True">[4500, 5500, 5500, 5500, 5500, 5500, 5500, 5500, 5500, 5500, 5500, 5500,5500, 5500, 5500, 5500, 5500, 5500, 5500, 5500, 5500, 5500, 5500,5500, 5500, 5500, 5500, 5500, 5500, 5500, 5500, 5300, 5300, 5300,5300, 5300, 5300, 5300, 5300, 5300, 5300, 5300, 5300, 5300, 5300,5300, 5300, 5300, 5300, 5300, 5300, 5300, 5300, 5300, 5300, 5300,5300, 5300, 5300, 5300, 5300, 4500, 4500, 4500, 4500, 4500, 4500,4500, 4500, 4500, 4500, 4500, 4500, 4500, 4500, 4500, 4500, 4500,4500, 4500, 4500, 5100, 5100, 5100, 5100, 5100, 5100, 5100, 5100,5100, 5100, 4500]</rpm_mission>
+            <rpm_mission units="1/min" is_input="True">[1029., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2263., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 2181., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 1029., 2099., 2099., 2099., 2099., 2099., 2099., 2099., 2099., 2099., 2099., 1029.]</rpm_mission>
             <solidity is_input="True">0.09<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>
@@ -212,8 +212,8 @@
     </handling_qualities>
     <weight>
       <aircraft>
-        <max_payload units="kg" is_input="True">172.0<!--max payload weight--></max_payload>
-        <payload units="kg" is_input="True">172.0<!--design payload weight--></payload>
+        <max_payload units="kg" is_input="True">188.0<!--max payload weight--></max_payload>
+        <payload units="kg" is_input="True">188.0<!--design payload weight--></payload>
       </aircraft>
       <airframe>
         <fuselage>
@@ -285,9 +285,9 @@
         <cs23>
           <safety_factor is_input="True">1.5</safety_factor>
           <characteristic_speed>
-            <va units="knot" is_input="True">86.0</va>
-            <vc units="knot" is_input="True">93.0</vc>
-            <vd units="knot" is_input="True">135.0<!--limit speed--></vd>
+            <va units="knot" is_input="True">100.0</va>
+            <vc units="knot" is_input="True">119.0</vc>
+            <vd units="knot" is_input="True">163.0<!--limit speed--></vd>
           </characteristic_speed>
           <sizing_factor>
             <ultimate_aircraft is_input="True">6.0<!--ultimate load factor that the aircraft will experience (default value is 5.7)--></ultimate_aircraft>
@@ -313,7 +313,7 @@
           <elevator_angle units="deg" is_input="True">-40.0<!--position of the elevator during takeoff--></elevator_angle>
           <energy units="W*h" is_input="True">0.0<!--mass of consumed fuel during initial climb phase in sizing mission--></energy>
           <flap_angle units="deg" is_input="True">9.0<!--flap angle during takeoff phase in sizing mission--></flap_angle>
-          <fuel units="kg" is_input="True">0.0<!--mass of consumed fuel during takeoff phase in sizing mission--></fuel>
+          <fuel units="kg" is_input="True">1.4<!--mass of consumed fuel during takeoff phase in sizing mission--></fuel>
           <thrust_rate is_input="True">1.0<!--thrust rate during takeoff phase--></thrust_rate>
         </takeoff>
         <taxi_in>
@@ -454,7 +454,7 @@
         <main_route>
           <reserve>
             <speed>
-              <k_factor is_input="True">2.5<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+              <k_factor is_input="True">2.38<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
             </speed>
           </reserve>
         </main_route>

@@ -561,11 +561,18 @@ def test_pipistrel_velis_club():
     The design mission will be assumed to be a mission of 642 nm at 2000ft of altitude with 75% of
     the power which should give fuel consumption of 18.4 l/h as per Pipistrel website.
 
-    RPM:
+    Engine RPM:
     - Climb: 5500.
     - Cruise: 5300.
-    - Descent: ? (4500.)
+    - Descent: 2500 (Correspond to min power on the operator manual of Rotax 912).
     - Reserve: 5100. (Equivalent to a cruise at 4000ft at 65% power for 30 min) which is 116 kts
+
+    Because what is given in the POH is most certainly the engine RPM (otherwise we would have very
+    high tip mach number) and FAST-OAD-GA-HE needs propeller RPM a small conversion was made. A
+    reduction ration of 2.43 was considered as per the operator manual for the rotax engine.
+
+    I've called it the "Club" so far, but it is actually the base model we are trying to model, the
+    Velis SW121, the Club is the SW121C
     """
 
     logging.basicConfig(level=logging.WARNING)
@@ -617,5 +624,8 @@ def test_pipistrel_velis_club():
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         600.00, rel=1e-2
     )
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
+        439.00, rel=5e-2
+    )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(25.01, abs=1e-2)
+    assert sizing_fuel == pytest.approx(63, abs=1e-2)

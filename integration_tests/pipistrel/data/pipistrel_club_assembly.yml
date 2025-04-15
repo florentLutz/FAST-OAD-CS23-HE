@@ -6,7 +6,7 @@ power_train_components:
     position: in_the_nose  # "on_the_wing", "in_the_nose"
 
   ice_1:
-    id: fastga_he.pt_component.internal_combustion_engine
+    id: fastga_he.pt_component.internal_combustion_engine_high_rpm
     position: in_the_front  # "on_the_wing", "in_the_front", "in_the_back"
 
   fuel_system_1:

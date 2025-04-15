@@ -6,11 +6,12 @@ import openmdao.api as om
 import numpy as np
 
 # These models are exactly the same and doesn't require options so let's import it for consistency
-from ...ice.components.perf_torque import PerformancesTorque
 from ...ice.components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
 from ...ice.components.perf_fuel_consumption import PerformancesICEFuelConsumption
 from ...ice.components.perf_fuel_consumed import PerformancesICEFuelConsumed
 
+from .perf_engine_rpm import PerformancesEngineRPM
+from .perf_torque import PerformancesTorque
 from .perf_mean_effective_pressure import PerformancesMeanEffectivePressure
 from .perf_sfc import PerformancesSFC
 from .perf_inflight_emissions import PerformancesHighRPMICEInFlightEmissions
@@ -33,6 +34,11 @@ class PerformancesHighRPMICE(om.Group):
         high_rpm_ice_id = self.options["high_rpm_ice_id"]
         number_of_points = self.options["number_of_points"]
 
+        self.add_subsystem(
+            name="engine_rpm",
+            subsys=PerformancesEngineRPM(number_of_points=number_of_points),
+            promotes=["*"],
+        )
         self.add_subsystem(
             name="torque",
             subsys=PerformancesTorque(number_of_points=number_of_points),

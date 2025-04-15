@@ -641,6 +641,7 @@ HIGH_RPM_ICE = {
         {"torque_out": "N*m"},
         {"specific_fuel_consumption": "kg/kW/h"},
         {"mean_effective_pressure": "bar"},
+        {"engine_rpm": "1/min"},
         {"fuel_consumption": "kg/h"},
         {"fuel_consumed_t": "kg"},
         {"CO2_emissions": "kg"},

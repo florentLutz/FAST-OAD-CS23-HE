@@ -31,11 +31,148 @@ if __name__ == "__main__":
     data_rpm_fuel_912_a = np.array([2494.83, 2997.04, 3490.39, 3995.56, 4497.78, 4997.04, 5502.21])
     data_fuel_fuel_912_a = np.array([2.99, 4.16, 5.68, 8.14, 11.1, 14.2, 18.7])  # In l/h
 
+    data_rpm_power_912_a_prop_curve = np.array(
+        [
+            2509.5238095238096,
+            3007.936507936508,
+            3496.8253968253966,
+            3995.2380952380954,
+            4500,
+            4995.238095238095,
+            5490.47619047619,
+            5800.0,
+        ]  # In rpm
+    )
+    data_power_power_912_a_prop_curve = np.array(
+        [
+            4.679144385026737,
+            8.529157117392405,
+            13.420422714540365,
+            19.99770817417876,
+            28.34071810542399,
+            38.687547746371266,
+            51.280366692131395,
+            60.1,
+        ]
+    )
+
+    data_rpm_power_912_a_max_curve = np.array(
+        [
+            2512.6984126984125,
+            3007.9365079365075,
+            3500,
+            4004.7619047619046,
+            4496.825396825396,
+            5001.587301587301,
+            5484.126984126984,
+            5800.0,
+        ]  # In rpm
+    )
+    data_power_power_912_a_max_curve = np.array(
+        [
+            21.28393175451999,
+            28.50241914947797,
+            34.83804430863254,
+            41.57677616501145,
+            47.992615227909326,
+            54.16984975808504,
+            58.73924115100585,
+            60.1,
+        ]
+    )
+
+    mid_curve_912_a_rpm = np.array([2500.0, 3000.0, 3500.0, 4000.0, 4500.0, 5000.0, 5500.0, 5800.0])
+    mid_curve_912_a_power = 0.5 * np.interp(
+        mid_curve_912_a_rpm, data_rpm_power_912_a_prop_curve, data_power_power_912_a_prop_curve
+    ) + 0.5 * np.interp(
+        mid_curve_912_a_rpm, data_rpm_power_912_a_max_curve, data_power_power_912_a_max_curve
+    )
+
     # Data for the 912 Series -S, -ULS
     data_rpm_power_912_s = np.array(
         [2498.2, 2999.6, 3495.2, 3992.9, 4486.8, 4980.3, 5478.7, 5772.6]  # In kW
     )
     data_power_power_912_s = np.array([6.4, 11.3, 16.3, 24.3, 35.1, 47.0, 62.5, 73.2])
+
+    data_rpm_power_912_s_prop_curve = np.array(
+        [
+            2497.5094768070026,
+            2996.493123592213,
+            3501.648140348307,
+            3997.8665738824693,
+            4500.549380116103,
+            5003.305437031882,
+            5512.580804658744,
+            5800,
+        ]  # In rpm
+    )
+    data_power_power_912_s_prop_curve = np.array(
+        [
+            5.810060981192882,
+            10.839635944109723,
+            16.41035032138737,
+            24.313183291519362,
+            35.63151244345957,
+            47.66843078726164,
+            63.65978720676827,
+            74.5,
+        ]
+    )
+
+    data_rpm_power_912_s_max_curve = np.array(
+        [
+            2496.5022799274816,
+            2995.797242111817,
+            3501.208636255425,
+            3994.4054791510243,
+            4502.948339956416,
+            5008.414672111635,
+            5510.419909535407,
+            5800,
+        ]  # In rpm
+    )
+    data_power_power_912_s_max_curve = np.array(
+        [
+            25.929459593092464,
+            34.01303862142214,
+            42.09881517021625,
+            50.359843976046996,
+            59.16530847693516,
+            67.79002691962563,
+            72.4614060468437,
+            74.5,
+        ]
+    )
+
+    # Take the avg
+    mid_curve_912_s_rpm = np.array([2500.0, 3000.0, 3500.0, 4000.0, 4500.0, 5000.0, 5500.0, 5800.0])
+    mid_curve_912_s_power = 0.5 * np.interp(
+        mid_curve_912_s_rpm, data_rpm_power_912_s_prop_curve, data_power_power_912_s_prop_curve
+    ) + 0.5 * np.interp(
+        mid_curve_912_s_rpm, data_rpm_power_912_s_max_curve, data_power_power_912_s_max_curve
+    )
+
+    fig_mid_curve = go.Figure()
+    fig_mid_curve.add_trace(
+        go.Scatter(
+            x=data_rpm_power_912_s_prop_curve,
+            y=data_power_power_912_s_prop_curve,
+            name="Prop curve",
+        )
+    )
+    fig_mid_curve.add_trace(
+        go.Scatter(
+            x=data_rpm_power_912_s_max_curve, y=data_power_power_912_s_max_curve, name="Max curve"
+        )
+    )
+    fig_mid_curve.add_trace(
+        go.Scatter(x=mid_curve_912_s_rpm, y=mid_curve_912_s_power, name="Mid curve")
+    )
+    # fig_mid_curve.show()
+
+    # Here we should take a curve that is somewhere between the max output or power required for
+    # propeller operation This seems to make it possible to match the value in the POH for the fuel
+    # consumption.
 
     data_rpm_fuel_912_s = np.array([2496.2, 2993.9, 3491.3, 3989.4, 4487.5, 4985.4, 5482.0])
     data_fuel_fuel_912_s = np.array([5.99, 6.90, 8.17, 12.0, 15.9, 20.0, 25.5])  # In l/h
@@ -289,7 +426,7 @@ if __name__ == "__main__":
         )
     )
 
-    fig_fuel_mep.show()
+    # fig_fuel_mep.show()
 
     # There seems like there isn't really any constance in the sfc = f(MEP) as what was found for
     # the original model. The shape is more or less the same though. So what we will do is derive
@@ -376,7 +513,7 @@ if __name__ == "__main__":
         )
     )
 
-    fig_fuel_interp_2.show()
+    # fig_fuel_interp_2.show()
 
     r2 = 1.0 - np.sum((sfc_fuel_curve_912a - sfc_interp_912a_v2) ** 2) / np.sum(
         (sfc_fuel_curve_912a - np.mean(sfc_fuel_curve_912a)) ** 2
