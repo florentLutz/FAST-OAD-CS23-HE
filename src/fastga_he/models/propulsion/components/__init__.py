@@ -93,6 +93,7 @@ from .source.battery import (
     SlipstreamBatteryPack,
     PreLCABatteryPack,
     LCCBatteryPackCost,
+    LCCBatteryPackOperation,
 )
 from .source.generator import (
     SizingGenerator,
@@ -122,6 +123,7 @@ from .source.pemfc import (
     PerformancesPEMFCStack,
     SlipstreamPEMFCStack,
     LCCPEMFCStackCost,
+    LCCPEMFCStackOperation,
 )
 from .tanks.fuel_tanks import (
     SizingFuelTank,
@@ -129,12 +131,14 @@ from .tanks.fuel_tanks import (
     SlipstreamFuelTank,
     PreLCAFuelTank,
     LCCFuelTankCost,
+    LCCFuelTankOperation,
 )
 from .tanks.gaseous_hydrogen_tank import (
     SizingGaseousHydrogenTank,
     PerformancesGaseousHydrogenTank,
     SlipstreamGaseousHydrogenTank,
     LCCGaseousHydrogenTankCost,
+    LCCGaseousHydrogenTankOperation,
 )
 from .connectors.h2_fuel_system import (
     SizingH2FuelSystem,

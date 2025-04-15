@@ -485,14 +485,14 @@ def test_fuel_cost():
         val=279.62,
     )
     ivc.add_output(
-        "data:mission:sizing:duration",
-        units="s",
-        val=13977.0,
+        "data:cost:operation:mission_per_year",
+        units="1/yr",
+        val=100.0,
     )
 
     problem = run_system(LCCFuelTankOperation(fuel_tank_id="fuel_tank_1"), ivc)
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:annual_fuel_cost", units="USD/yr"
-    ) == pytest.approx(74650.22, rel=1e-2)
+    ) == pytest.approx(102340.92, rel=1e-2)
 
     problem.check_partials(compact_print=True)

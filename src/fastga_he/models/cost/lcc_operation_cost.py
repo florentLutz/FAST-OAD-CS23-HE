@@ -15,6 +15,7 @@ from .lcc_annual_depreciation import LCCAnnualDepreciation
 from .lcc_maintenance_labor_cost import LCCMaintenanceLaborCost
 from .lcc_maintenance_material_cost import LCCMaintenanceMaterialCost
 from .lcc_annual_maintenance_cost import LCCAirframeMaintenanceCost
+from .lcc_flight_mission import LCCFlightMission
 
 
 class LCCOperationCost(om.Group):
@@ -49,6 +50,12 @@ class LCCOperationCost(om.Group):
         self.configurator.load(self.options["power_train_file_path"])
         loan = self.options["loan"]
         use_operational_mission = self.options["use_operational_mission"]
+
+        self.add_subsystem(
+            name="yearly_flight_mission",
+            subsys=LCCFlightMission(use_operational_mission=use_operational_mission),
+            promotes=["*"],
+        )
 
         self.add_subsystem(
             name="landing_cost_per_operation",
@@ -128,8 +135,5 @@ class LCCOperationCost(om.Group):
                 local_sub_sys.options[component_name_id] = component_name
                 cost_components_type.append(component_type)
                 cost_components_name.append(component_name)
-
-                if component_type == "gaseous_hydrogen_tank" or component_type == "fuel_tank":
-                    local_sub_sys.options["use_operational_mission"] = use_operational_mission
 
                 self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])

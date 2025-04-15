@@ -36,6 +36,7 @@ from ..lcc_annual_depreciation import LCCAnnualDepreciation
 from ..lcc_maintenance_labor_cost import LCCMaintenanceLaborCost
 from ..lcc_maintenance_material_cost import LCCMaintenanceMaterialCost
 from ..lcc_annual_maintenance_cost import LCCAirframeMaintenanceCost
+from ..lcc_flight_mission import LCCFlightMission
 
 
 XML_FILE = "data.xml"
@@ -626,6 +627,24 @@ def test_annual_insurance_cost():
     assert problem.get_val(
         "data:cost:operation:annual_insurance_cost", units="USD/yr"
     ) == pytest.approx(6691.38, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_flight_mission():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:mission:sizing:duration", val=2.832)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCFlightMission(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:mission_per_year", units="1/yr") == pytest.approx(
+        100.0, rel=1e-3
+    )
 
     problem.check_partials(compact_print=True)
 

@@ -29,33 +29,14 @@ class LCCFuelTankOperation(om.ExplicitComponent):
             allow_none=False,
         )
 
-        self.options.declare(
-            name="use_operational_mission",
-            default=False,
-            types=bool,
-            desc="The characteristics and consumption of the operational mission will be used",
-        )
-
     def setup(self):
         fuel_tank_id = self.options["fuel_tank_id"]
 
         self.add_input(
-            name="data:TLAR:flight_hours_per_year",
-            val=283.2,
-            units="h",
-            desc="Expected number of hours flown per year",
-        )
-
-        if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
-
-        else:
-            duration_mission_name = "data:mission:operational:duration"
-
-        self.add_input(
-            name=duration_mission_name,
-            units="h",
+            name="data:cost:operation:mission_per_year",
             val=np.nan,
+            units="1/yr",
+            desc="Flight mission per year",
         )
 
         self.add_input(
@@ -82,8 +63,7 @@ class LCCFuelTankOperation(om.ExplicitComponent):
                 "data:propulsion:he_power_train:fuel_tank:"
                 + fuel_tank_id
                 + ":fuel_consumed_mission",
-                duration_mission_name,
-                "data:TLAR:flight_hours_per_year",
+                "data:cost:operation:mission_per_year",
             ],
             method="exact",
         )
@@ -105,12 +85,6 @@ class LCCFuelTankOperation(om.ExplicitComponent):
             self.price_fuel = 3.66
             _LOGGER.warning("Fuel type %f does not exist, replaced by type 1!", fuel_type)
 
-        if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
-
-        else:
-            duration_mission_name = "data:mission:operational:duration"
-
         outputs[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":annual_fuel_cost"
         ] = (
@@ -120,21 +94,13 @@ class LCCFuelTankOperation(om.ExplicitComponent):
                 + fuel_tank_id
                 + ":fuel_consumed_mission"
             ]
-            * inputs["data:TLAR:flight_hours_per_year"]
-            / inputs[duration_mission_name]
+            * inputs["data:cost:operation:mission_per_year"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         fuel_tank_id = self.options["fuel_tank_id"]
 
-        if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
-
-        else:
-            duration_mission_name = "data:mission:operational:duration"
-
-        year_flight_hour = inputs["data:TLAR:flight_hours_per_year"]
-        mission_time = inputs[duration_mission_name]
+        mission_per_year = inputs["data:cost:operation:mission_per_year"]
         fuel_consumed = inputs[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_consumed_mission"
         ]
@@ -142,14 +108,9 @@ class LCCFuelTankOperation(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":annual_fuel_cost",
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_consumed_mission",
-        ] = self.price_fuel * year_flight_hour / mission_time
+        ] = self.price_fuel * mission_per_year
 
         partials[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":annual_fuel_cost",
-            "data:TLAR:flight_hours_per_year",
-        ] = self.price_fuel * fuel_consumed / mission_time
-
-        partials[
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":annual_fuel_cost",
-            duration_mission_name,
-        ] = -self.price_fuel * fuel_consumed * year_flight_hour / mission_time**2.0
+            "data:cost:operation:mission_per_year",
+        ] = self.price_fuel * fuel_consumed

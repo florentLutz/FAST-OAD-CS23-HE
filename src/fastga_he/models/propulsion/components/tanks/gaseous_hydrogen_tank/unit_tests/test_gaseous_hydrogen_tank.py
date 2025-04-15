@@ -739,9 +739,9 @@ def test_fuel_cost():
         val=40.0,
     )
     ivc.add_output(
-        "data:mission:sizing:duration",
-        units="s",
-        val=13977.0,
+        "data:cost:operation:mission_per_year",
+        units="1/yr",
+        val=100.0,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -753,6 +753,6 @@ def test_fuel_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:annual_fuel_cost",
         units="USD/yr",
-    ) == pytest.approx(19081.81, rel=1e-2)
+    ) == pytest.approx(26160.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

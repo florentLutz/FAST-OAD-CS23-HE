@@ -45,6 +45,7 @@ from ..components.cstr_enforce import ConstraintsSOCEnforce
 from ..components.pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
 from ..components.pre_lca_use_emission_per_fu import PreLCABatteryUseEmissionPerFU
 from ..components.lcc_battery_cost import LCCBatteryPackCost
+from ..components.lcc_battery_operation import LCCBatteryPackOperation
 
 from ..components.sizing_battery_pack import SizingBatteryPack
 from ..components.perf_battery_pack import PerformancesBatteryPack
@@ -1194,5 +1195,31 @@ def test_cost():
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:cost_per_unit",
         units="USD",
     ) == pytest.approx(170524.19, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operation():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cost_per_unit",
+        units="USD",
+        val=170524.19,
+    )
+
+    ivc.add_output(
+        "data:cost:operation:mission_per_year",
+        units="1/yr",
+        val=100.0,
+    )
+
+    problem = run_system(
+        LCCBatteryPackOperation(battery_pack_id="battery_pack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:maintenance_per_unit",
+        units="USD/yr",
+    ) == pytest.approx(34104.84, rel=1e-2)
 
     problem.check_partials(compact_print=True)
