@@ -23,6 +23,7 @@ from ..components.pre_lca_prod_weight_per_fu import PreLCATurboshaftProdWeightPe
 from ..components.pre_lca_use_emission_per_fu import PreLCATurboshaftUseEmissionPerFU
 
 from ..components.lcc_turboshaft_cost import LCCTurboshaftCost
+from ..components.lcc_turboshaft_operation import LCCTurboshaftOperation
 
 from ..components.perf_density_ratio import PerformancesDensityRatio
 from ..components.perf_mach import PerformancesMach
@@ -1397,6 +1398,30 @@ def test_cost():
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
     ) == pytest.approx(
         407535.115,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maintenance():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_rating",
+        val=575.174,
+        units="kW",
+    )
+
+    problem = run_system(
+        LCCTurboshaftOperation(turboshaft_id="turboshaft_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:maintenance_per_unit",
+        units="USD/yr",
+    ) == pytest.approx(
+        30357.83,
         rel=1e-2,
     )
 

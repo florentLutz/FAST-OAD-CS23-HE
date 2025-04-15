@@ -110,6 +110,7 @@ from .source.turboshaft import (
     SlipstreamTurboshaft,
     PreLCATurboshaft,
     LCCTurboshaftCost,
+    LCCTurboshaftOperation,
 )
 from .source.simple_turbo_generator import (
     SizingTurboGenerator,

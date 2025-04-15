@@ -30,6 +30,7 @@ from ..components.pre_lca_prod_weight_per_fu import PreLCAICEProdWeightPerFU
 from ..components.pre_lca_use_emission_per_fu import PreLCAICEUseEmissionPerFU
 
 from ..components.lcc_ice_cost import LCCICECost
+from ..components.lcc_ice_operation import LCCICEOperation
 
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
@@ -994,6 +995,27 @@ def test_cost():
         "data:propulsion:he_power_train:ICE:ice_1:cost_per_unit", units="USD"
     ) == pytest.approx(
         81668.231,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maintenance():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:ICE:ice_1:displacement_volume",
+        val=0.0107,
+        units="m**3",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCICEOperation(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:maintenance_per_unit", units="USD/yr"
+    ) == pytest.approx(
+        9887.5,
         rel=1e-2,
     )
 

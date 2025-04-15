@@ -10,3 +10,4 @@ from .components.perf_turboshaft import PerformancesTurboshaft
 from .components.slipstream_turboshaft import SlipstreamTurboshaft
 from .components.pre_lca_turboshaft import PreLCATurboshaft
 from .components.lcc_turboshaft_cost import LCCTurboshaftCost
+from .components.lcc_turboshaft_operation import LCCTurboshaftOperation
