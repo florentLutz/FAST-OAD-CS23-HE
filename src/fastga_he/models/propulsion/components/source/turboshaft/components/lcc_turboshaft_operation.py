@@ -41,9 +41,7 @@ class LCCTurboshaftOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:turboshaft:"
-            + turboshaft_id
-            + ":maintenance_per_unit",
+            name="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":operation_cost",
             units="USD/yr",
             val=1e4,
             desc="Annual Maintenance cost of the turboshaft",
@@ -60,7 +58,7 @@ class LCCTurboshaftOperation(om.ExplicitComponent):
         ]
 
         outputs[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":maintenance_per_unit"
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":operation_cost"
         ] = flight_hour / 3.5 * (0.202 * power_rating + 259.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -72,10 +70,10 @@ class LCCTurboshaftOperation(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":operation_cost",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
         ] = 0.202 * flight_hour / 3.5
         partials[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":operation_cost",
             "data:TLAR:flight_hours_per_year",
         ] = (0.202 * power_rating + 259.0) / 3.5

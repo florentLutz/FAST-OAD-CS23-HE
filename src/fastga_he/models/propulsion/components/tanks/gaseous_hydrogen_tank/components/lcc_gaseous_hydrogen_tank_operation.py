@@ -41,7 +41,7 @@ class LCCGaseousHydrogenTankOperation(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":annual_fuel_cost",
+            + ":operation_cost",
             units="USD/yr",
             val=200.0,
         )
@@ -54,7 +54,7 @@ class LCCGaseousHydrogenTankOperation(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":annual_fuel_cost"
+            + ":operation_cost"
         ] = (
             6.54
             * inputs[
@@ -78,7 +78,7 @@ class LCCGaseousHydrogenTankOperation(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":annual_fuel_cost",
+            + ":operation_cost",
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":fuel_consumed_mission",
@@ -87,6 +87,6 @@ class LCCGaseousHydrogenTankOperation(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":annual_fuel_cost",
+            + ":operation_cost",
             "data:cost:operation:mission_per_year",
         ] = 6.54 * fuel_consumed

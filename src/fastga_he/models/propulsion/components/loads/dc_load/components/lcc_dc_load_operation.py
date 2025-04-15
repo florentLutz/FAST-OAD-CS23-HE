@@ -37,7 +37,7 @@ class LCCDCLoadOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":maintenance_per_unit",
+            name="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":operation_cost",
             units="USD/yr",
             val=100.0,
             desc="Annual maintenance cost of the electronics",
@@ -48,9 +48,7 @@ class LCCDCLoadOperation(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         aux_load_id = self.options["aux_load_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":maintenance_per_unit"
-        ] = (
+        outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":operation_cost"] = (
             inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cost_per_unit"]
             / inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":lifespan"]
         )
@@ -59,12 +57,12 @@ class LCCDCLoadOperation(om.ExplicitComponent):
         aux_load_id = self.options["aux_load_id"]
 
         partials[
-            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":operation_cost",
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cost_per_unit",
         ] = 1.0 / inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":lifespan"]
 
         partials[
-            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":operation_cost",
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":lifespan",
         ] = (
             -inputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cost_per_unit"]

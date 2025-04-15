@@ -34,6 +34,13 @@
       <fixed_landing_gear>0.0</fixed_landing_gear>
       <landing_gear_cost_reduction unit="USD">0.0</landing_gear_cost_reduction>
       <production_cost_per_unit unit="USD">371854.75</production_cost_per_unit>
+      <operation>
+        <airframe_maintenance_cost unit="USD/yr">10070.0</airframe_maintenance_cost>
+        <annual_loan_cost unit="USD/yr">18574.15</annual_loan_cost>
+        <annual_airport_cost unit="USD/yr">4650.0</annual_airport_cost>
+        <annual_crew_cost unit="USD/yr">138756.7</annual_crew_cost>
+        <annual_insurance_cost unit="USD/yr">6691.38</annual_insurance_cost>
+      </operation>
     </cost>
     <TLAR>
       <max_airframe_hours units="h">3524.9</max_airframe_hours>

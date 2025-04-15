@@ -773,7 +773,7 @@ def test_maintenance():
     problem = run_system(LCCPMSMOperation(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PMSM:motor_1:maintenance_per_unit", units="USD/yr"
+        "data:propulsion:he_power_train:PMSM:motor_1:operation_cost", units="USD/yr"
     ) == pytest.approx(1387.7, rel=1e-2)
 
     problem.check_partials(compact_print=True)

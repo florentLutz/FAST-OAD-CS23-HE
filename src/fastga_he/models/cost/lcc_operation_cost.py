@@ -16,6 +16,8 @@ from .lcc_maintenance_labor_cost import LCCMaintenanceLaborCost
 from .lcc_maintenance_material_cost import LCCMaintenanceMaterialCost
 from .lcc_annual_maintenance_cost import LCCAirframeMaintenanceCost
 from .lcc_flight_mission import LCCFlightMission
+from .lcc_annual_crew_cost import LCCAnnualCrewCost
+from .lcc_operation_cost_sum import LCCSumOperationCost
 
 
 class LCCOperationCost(om.Group):
@@ -60,6 +62,12 @@ class LCCOperationCost(om.Group):
         self.add_subsystem(
             name="landing_cost_per_operation",
             subsys=LCCLandingCost(),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="annual_crew_cost",
+            subsys=LCCAnnualCrewCost(),
             promotes=["*"],
         )
 
@@ -137,3 +145,13 @@ class LCCOperationCost(om.Group):
                 cost_components_name.append(component_name)
 
                 self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
+
+        self.add_subsystem(
+            name="cost_sum",
+            subsys=LCCSumOperationCost(
+                cost_components_type=cost_components_type,
+                cost_components_name=cost_components_name,
+                loan=loan,
+            ),
+            promotes=["*"],
+        )

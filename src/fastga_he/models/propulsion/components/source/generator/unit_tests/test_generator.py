@@ -733,7 +733,7 @@ def test_maintenance():
     problem = run_system(LCCGeneratorOperation(generator_id="generator_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:generator:generator_1:maintenance_per_unit", units="USD/yr"
+        "data:propulsion:he_power_train:generator:generator_1:operation_cost", units="USD/yr"
     ) == pytest.approx(193.04, rel=1e-2)
 
     problem.check_partials(compact_print=True)

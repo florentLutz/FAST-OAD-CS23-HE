@@ -45,6 +45,7 @@ class LCCFuelTankOperation(om.ExplicitComponent):
             val=np.nan,
             desc="Amount of fuel from that tank which will be consumed during mission",
         )
+
         self.add_input(
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_type",
             val=1.0,
@@ -52,7 +53,7 @@ class LCCFuelTankOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":annual_fuel_cost",
+            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operation_cost",
             units="USD/yr",
             val=1.0e4,
         )
@@ -85,9 +86,7 @@ class LCCFuelTankOperation(om.ExplicitComponent):
             self.price_fuel = 3.66
             _LOGGER.warning("Fuel type %f does not exist, replaced by type 1!", fuel_type)
 
-        outputs[
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":annual_fuel_cost"
-        ] = (
+        outputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operation_cost"] = (
             self.price_fuel
             * inputs[
                 "data:propulsion:he_power_train:fuel_tank:"
@@ -106,11 +105,11 @@ class LCCFuelTankOperation(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":annual_fuel_cost",
+            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operation_cost",
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_consumed_mission",
         ] = self.price_fuel * mission_per_year
 
         partials[
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":annual_fuel_cost",
+            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operation_cost",
             "data:cost:operation:mission_per_year",
         ] = self.price_fuel * fuel_consumed

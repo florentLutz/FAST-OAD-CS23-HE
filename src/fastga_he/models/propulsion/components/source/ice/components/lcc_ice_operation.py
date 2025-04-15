@@ -37,7 +37,7 @@ class LCCICEOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:ICE:" + ice_id + ":maintenance_per_unit",
+            name="data:propulsion:he_power_train:ICE:" + ice_id + ":operation_cost",
             units="USD/yr",
             val=1e4,
             desc="Cost of the ICE per unit",
@@ -50,7 +50,7 @@ class LCCICEOperation(om.ExplicitComponent):
         volume = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume"]
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
-        outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":maintenance_per_unit"] = (
+        outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":operation_cost"] = (
             (0.103 * volume - 4.41) * flight_hour / 1.8
         )
 
@@ -60,10 +60,10 @@ class LCCICEOperation(om.ExplicitComponent):
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
         partials[
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":operation_cost",
             "data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume",
         ] = 0.103 * flight_hour / 1.8
         partials[
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":operation_cost",
             "data:TLAR:flight_hours_per_year",
         ] = (0.103 * volume - 4.41) / 1.8

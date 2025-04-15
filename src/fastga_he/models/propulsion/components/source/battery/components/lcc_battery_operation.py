@@ -54,9 +54,7 @@ class LCCBatteryPackOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost",
             units="USD/yr",
             val=500.0,
             desc="battery pack cost per unit",
@@ -68,9 +66,7 @@ class LCCBatteryPackOperation(om.ExplicitComponent):
         battery_pack_id = self.options["battery_pack_id"]
 
         outputs[
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":maintenance_per_unit"
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost"
         ] = (
             inputs[
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit"
@@ -104,30 +100,22 @@ class LCCBatteryPackOperation(om.ExplicitComponent):
         mission_per_year = inputs["data:cost:operation:mission_per_year"]
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit",
         ] = mission_per_year / lifespan
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost",
             "data:cost:operation:mission_per_year",
         ] = cost / lifespan + 0.655 * energy_consumed
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
         ] = -cost * mission_per_year / lifespan**2.0
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost",
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":energy_consumed_mission",

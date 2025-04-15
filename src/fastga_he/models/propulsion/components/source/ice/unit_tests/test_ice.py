@@ -1013,7 +1013,7 @@ def test_maintenance():
     problem = run_system(LCCICEOperation(ice_id="ice_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:ICE:ice_1:maintenance_per_unit", units="USD/yr"
+        "data:propulsion:he_power_train:ICE:ice_1:operation_cost", units="USD/yr"
     ) == pytest.approx(
         9887.5,
         rel=1e-2,

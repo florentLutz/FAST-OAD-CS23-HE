@@ -11,14 +11,6 @@ class LCCAirframeMaintenanceCost(om.ExplicitComponent):
     Compute the annual cost of the airframe maintenance, obtained from :cite:`salgas:2025`.
     """
 
-    def initialize(self):
-        self.options.declare(
-            name="use_operational_mission",
-            default=False,
-            types=bool,
-            desc="The characteristics and consumption of the operational mission will be used",
-        )
-
     def setup(self):
         self.add_input(
             "data:cost:operation:airframe_labor_cost",

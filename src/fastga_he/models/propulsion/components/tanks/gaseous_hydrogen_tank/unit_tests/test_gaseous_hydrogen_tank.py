@@ -751,7 +751,7 @@ def test_fuel_cost():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:annual_fuel_cost",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:operation_cost",
         units="USD/yr",
     ) == pytest.approx(26160.0, rel=1e-2)
 

@@ -291,7 +291,7 @@ def test_maintenance():
     problem = run_system(LCCDCLoadOperation(aux_load_id="aux_load_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:aux_load:aux_load_1:maintenance_per_unit", units="USD/yr"
+        "data:propulsion:he_power_train:aux_load:aux_load_1:operation_cost", units="USD/yr"
     ) == pytest.approx(170.66, rel=1e-2)
 
     problem.check_partials(compact_print=True)

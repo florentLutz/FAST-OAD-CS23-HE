@@ -1418,7 +1418,7 @@ def test_maintenance():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:maintenance_per_unit",
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:operation_cost",
         units="USD/yr",
     ) == pytest.approx(
         30357.83,

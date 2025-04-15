@@ -1224,7 +1224,7 @@ def test_operation():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:maintenance_per_unit",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:operation_cost",
         units="USD/yr",
     ) == pytest.approx(61737.1265, rel=1e-2)
 

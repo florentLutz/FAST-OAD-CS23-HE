@@ -1599,7 +1599,7 @@ def test_maintenance():
     problem = run_system(LCCPropellerOperation(propeller_id="propeller_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:propeller:propeller_1:maintenance_per_unit", units="USD/yr"
+        "data:propulsion:he_power_train:propeller:propeller_1:operation_cost", units="USD/yr"
     ) == pytest.approx(517.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)

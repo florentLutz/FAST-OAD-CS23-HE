@@ -37,6 +37,7 @@ from ..lcc_maintenance_labor_cost import LCCMaintenanceLaborCost
 from ..lcc_maintenance_material_cost import LCCMaintenanceMaterialCost
 from ..lcc_annual_maintenance_cost import LCCAirframeMaintenanceCost
 from ..lcc_flight_mission import LCCFlightMission
+from ..lcc_operation_cost_sum import LCCSumOperationCost
 
 
 XML_FILE = "data.xml"
@@ -827,5 +828,49 @@ def test_annual_airframe_maintenance():
     assert problem.get_val(
         "data:cost:operation:airframe_maintenance_cost", units="USD/yr"
     ) == pytest.approx(10070.0, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operation_sum():
+    components_type = ["propeller", "turboshaft", "fuel_tank"]
+    components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1"]
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCSumOperationCost(
+                cost_components_type=components_type, cost_components_name=components_name
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:propeller:propeller_1:operation_cost",
+        units="USD/yr",
+        val=4403.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:operation_cost",
+        units="USD/yr",
+        val=3.0e5,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:operation_cost",
+        units="USD/yr",
+        val=1000.0,
+    )
+
+    problem = run_system(
+        LCCSumOperationCost(
+            cost_components_type=components_type, cost_components_name=components_name
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:cost:operation:annual_cost_per_unit", units="USD/yr"
+    ) == pytest.approx(484145.23, rel=1e-3)
 
     problem.check_partials(compact_print=True)
