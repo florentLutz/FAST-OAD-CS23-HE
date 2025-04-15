@@ -8,7 +8,8 @@ import numpy as np
 
 class LCCBatteryPackOperation(om.ExplicitComponent):
     """
-    Computation of the battery pack operation cost.
+    Computation of the battery pack operation cost and electricity cost. The charging cost is
+    estimated from https://eniplenitude.eu/e-mobility/pricing.
     """
 
     def initialize(self):
@@ -27,6 +28,15 @@ class LCCBatteryPackOperation(om.ExplicitComponent):
             val=np.nan,
             units="1/yr",
             desc="Flight mission per year",
+        )
+
+        self.add_input(
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":energy_consumed_mission",
+            units="kW*h",
+            val=np.nan,
+            desc="Energy drawn from the battery for the mission",
         )
 
         self.add_input(
@@ -65,12 +75,23 @@ class LCCBatteryPackOperation(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit"
             ]
-            * inputs["data:cost:operation:mission_per_year"]
             / inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"]
-        )
+            + 0.655
+            * inputs[
+                "data:propulsion:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":energy_consumed_mission"
+            ]
+        ) * inputs["data:cost:operation:mission_per_year"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         battery_pack_id = self.options["battery_pack_id"]
+
+        energy_consumed = inputs[
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":energy_consumed_mission"
+        ]
 
         cost = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit"
@@ -94,7 +115,7 @@ class LCCBatteryPackOperation(om.ExplicitComponent):
             + battery_pack_id
             + ":maintenance_per_unit",
             "data:cost:operation:mission_per_year",
-        ] = cost / lifespan
+        ] = cost / lifespan + 0.655 * energy_consumed
 
         partials[
             "data:propulsion:he_power_train:battery_pack:"
@@ -102,3 +123,12 @@ class LCCBatteryPackOperation(om.ExplicitComponent):
             + ":maintenance_per_unit",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
         ] = -cost * mission_per_year / lifespan**2.0
+
+        partials[
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":maintenance_per_unit",
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":energy_consumed_mission",
+        ] = 0.655 * mission_per_year
