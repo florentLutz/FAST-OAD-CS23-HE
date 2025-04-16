@@ -17,9 +17,16 @@ class LCCMaintenanceMaterialCost(om.ExplicitComponent):
 
         self.add_input(
             name="data:TLAR:flight_hours_per_year",
-            val=np.nan,
+            val=283.2,
             units="h",
             desc="Expected number of hours flown per year",
+        )
+
+        self.add_input(
+            "data:cost:operation:mission_per_year",
+            val=np.nan,
+            units="1/yr",
+            desc="Flight mission per year",
         )
 
         self.add_output(
@@ -34,19 +41,25 @@ class LCCMaintenanceMaterialCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         ft_year = inputs["data:TLAR:flight_hours_per_year"]
         mass = inputs["data:weight:airframe:mass"]
+        mission_per_year = inputs["data:cost:operation:mission_per_year"]
 
         outputs["data:cost:operation:airframe_material_cost"] = (
             mass * (0.21 * ft_year + 13.7) + 57.5
-        )
+        ) * mission_per_year
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         ft_year = inputs["data:TLAR:flight_hours_per_year"]
         mass = inputs["data:weight:airframe:mass"]
+        mission_per_year = inputs["data:cost:operation:mission_per_year"]
 
         partials["data:cost:operation:airframe_material_cost", "data:weight:airframe:mass"] = (
             0.21 * ft_year + 13.7
-        )
+        ) * mission_per_year
 
         partials[
             "data:cost:operation:airframe_material_cost", "data:TLAR:flight_hours_per_year"
-        ] = mass * 0.21
+        ] = mass * 0.21 * mission_per_year
+
+        partials[
+            "data:cost:operation:airframe_material_cost", "data:cost:operation:mission_per_year"
+        ] = mass * (0.21 * ft_year + 13.7) + 57.5

@@ -41,6 +41,7 @@
         <airframe_maintenance_cost unit="USD/yr">10070.0</airframe_maintenance_cost>
         <loan_principal unit="USD">4200.0</loan_principal>
         <annual_loan_cost unit="USD/yr">18574.15</annual_loan_cost>
+        <mission_per_year unit="1/yr">50.0</mission_per_year>
         <annual_airport_cost unit="USD/yr">4650.0</annual_airport_cost>
         <annual_crew_cost unit="USD/yr">138756.7</annual_crew_cost>
         <annual_insurance_cost unit="USD/yr">6691.38</annual_insurance_cost>

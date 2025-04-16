@@ -62,8 +62,8 @@ class LCCPEMFCStackOperation(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit"
             ]
+            * inputs["data:TLAR:flight_hours_per_year"]
             / inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan"]
-            / inputs["data:TLAR:flight_hours_per_year"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -79,14 +79,14 @@ class LCCPEMFCStackOperation(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit",
-        ] = 1.0 / lifespan / yearly_flight_hour
+        ] = yearly_flight_hour / lifespan
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan",
-        ] = -cost / lifespan**2.0 / yearly_flight_hour
+        ] = -cost * yearly_flight_hour / lifespan**2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = -cost / lifespan / yearly_flight_hour**2.0
+        ] = cost / lifespan

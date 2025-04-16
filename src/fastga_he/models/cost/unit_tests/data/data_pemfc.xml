@@ -79,6 +79,7 @@
         </geometry>
         <cost>
             <cpi_2012>1.4</cpi_2012>
+            <msp_per_unit unit="USD">412758.77</msp_per_unit>
             <prototype_number>2.0</prototype_number>
             <production>
                 <num_aircraft_5years>75.0</num_aircraft_5years>
@@ -90,6 +91,9 @@
                   <manufacturing_cost_per_hour unit="USD/h">72.97</manufacturing_cost_per_hour>
                 <fixed_landing_gear>0.0</fixed_landing_gear>
             </production>
+            <operation>
+                <loan_principal unit="USD">4200.0</loan_principal>
+            </operation>
         </cost>
         <propulsion>
             <he_power_train>
@@ -100,6 +104,7 @@
                 </aux_load>
                 <PEMFC_stack>
                     <pemfc_stack_1>
+                        <cost_per_unit unit="USD">13639.32</cost_per_unit>
                         <mass units="kg">327.988</mass>
                         <specific_power units="kW/kg">0.345</specific_power>
                         <power_density units="kW/m**3">124</power_density>
@@ -535,6 +540,7 @@
                 </inverter>
                 <PMSM>
                     <motor_1>
+                        <cost_per_unit unit="USD">43154.99</cost_per_unit>
                         <voltage_ac_max units="V" is_input="True">414.83894592299646<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
                         <CG>
                             <x units="m">2.39</x>
@@ -668,6 +674,14 @@
             <airframe>
                 <mass units="kg">184.141277038</mass>
             </airframe>
+            <aircraft>
+                <MTOW units="kg" is_input="False">598.5836858551203<!--maximum takeoff weight of the aircraft--></MTOW>
+            </aircraft>
         </weight>
+        <mission>
+            <sizing>
+                <duration unit="h">3.0</duration>
+            </sizing>
+        </mission>
     </data>
 </FASTOAD_model>

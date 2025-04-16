@@ -982,7 +982,7 @@ def test_operation_cost():
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:operation_cost",
         units="USD/yr",
     ) == pytest.approx(
-        0.0008,
+        800.0,
         rel=1e-2,
     )
 

@@ -535,6 +535,10 @@ def test_production_cost_hydrogen():
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_unit", units="USD"
     ) == pytest.approx(13639.32, rel=1e-3)
 
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:cost_per_unit", units="USD"
+    ) == pytest.approx(43154.99, rel=1e-3)
+
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
         354297.8, rel=1e-3
     )
@@ -792,7 +796,7 @@ def test_annual_maintenance_labor_cost():
 
     assert problem.get_val(
         "data:cost:operation:airframe_labor_cost", units="USD/yr"
-    ) == pytest.approx(10058.76, rel=1e-3)
+    ) == pytest.approx(502937.989, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -811,7 +815,7 @@ def test_annual_maintenance_material_cost():
 
     assert problem.get_val(
         "data:cost:operation:airframe_material_cost", units="USD/yr"
-    ) == pytest.approx(70.97, rel=1e-3)
+    ) == pytest.approx(3548.7, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -896,7 +900,7 @@ def test_operation_cost():
 
     assert problem.get_val(
         "data:cost:operation:airframe_maintenance_cost", units="USD/yr"
-    ) == pytest.approx(10129.73, rel=1e-3)
+    ) == pytest.approx(2955480.8, rel=1e-3)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:ICE:ice_1:operation_cost", units="USD/yr"
@@ -904,7 +908,79 @@ def test_operation_cost():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(289175.93, rel=1e-3)
+    ) == pytest.approx(3234527.0, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_operation_cost_hydrogen():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCOperationCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml")
+        ),
+        __file__,
+        "data_pemfc.xml",
+    )
+    ivc.add_output("data:weight:aircraft:OWE", val=426.58, units="kg")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCOperationCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:operation_cost",
+        units="USD/yr",
+    ) == pytest.approx(8643.26, rel=1e-3)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:operation_cost", units="USD/yr"
+    ) == pytest.approx(309.0, rel=1e-3)
+
+    assert problem.get_val(
+        "data:cost:operation:annual_cost_per_unit", units="USD/yr"
+    ) == pytest.approx(980450.1, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_operation_cost_tbm_900():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCOperationCost(
+                power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"
+            )
+        ),
+        __file__,
+        "tbm_900_inputs.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCOperationCost(
+            power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"
+        ),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:operation_cost", units="USD/yr"
+    ) == pytest.approx(33177.257, rel=1e-3)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:operation_cost", units="USD/yr"
+    ) == pytest.approx(77346.8, rel=1e-3)
+
+    assert problem.get_val(
+        "data:cost:operation:airframe_maintenance_cost", units="USD/yr"
+    ) == pytest.approx(712370.674, rel=1e-3)
+
+    assert problem.get_val(
+        "data:cost:operation:annual_cost_per_unit", units="USD/yr"
+    ) == pytest.approx(1089620.47, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

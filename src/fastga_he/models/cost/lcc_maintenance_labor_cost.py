@@ -23,8 +23,15 @@ class LCCMaintenanceLaborCost(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:TLAR:flight_hours_per_year",
+            "data:cost:operation:mission_per_year",
             val=np.nan,
+            units="1/yr",
+            desc="Flight mission per year",
+        )
+
+        self.add_input(
+            name="data:TLAR:flight_hours_per_year",
+            val=283.2,
             units="h",
             desc="Expected number of hours flown per year",
         )
@@ -42,24 +49,30 @@ class LCCMaintenanceLaborCost(om.ExplicitComponent):
         ft_year = inputs["data:TLAR:flight_hours_per_year"]
         labor_rate = inputs["data:cost:operation:maintenance_labor_rate"]
         mass = inputs["data:weight:airframe:mass"]
+        mission_per_year = inputs["data:cost:operation:mission_per_year"]
 
-        outputs["data:cost:operation:airframe_labor_cost"] = labor_rate * (
-            (0.655 + 0.01 * mass) * ft_year + 0.254 + 0.01 * mass
+        outputs["data:cost:operation:airframe_labor_cost"] = (
+            labor_rate * ((0.655 + 0.01 * mass) * ft_year + 0.254 + 0.01 * mass) * mission_per_year
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         ft_year = inputs["data:TLAR:flight_hours_per_year"]
         labor_rate = inputs["data:cost:operation:maintenance_labor_rate"]
         mass = inputs["data:weight:airframe:mass"]
+        mission_per_year = inputs["data:cost:operation:mission_per_year"]
 
         partials[
             "data:cost:operation:airframe_labor_cost", "data:cost:operation:maintenance_labor_rate"
-        ] = (0.655 + 0.01 * mass) * ft_year + 0.254 + 0.01 * mass
+        ] = ((0.655 + 0.01 * mass) * ft_year + 0.254 + 0.01 * mass) * mission_per_year
 
         partials["data:cost:operation:airframe_labor_cost", "data:weight:airframe:mass"] = (
-            labor_rate * (0.01 * ft_year + 0.01)
+            labor_rate * (0.01 * ft_year + 0.01) * mission_per_year
         )
 
         partials["data:cost:operation:airframe_labor_cost", "data:TLAR:flight_hours_per_year"] = (
-            labor_rate * (0.655 + 0.01 * mass)
+            labor_rate * (0.655 + 0.01 * mass) * mission_per_year
         )
+
+        partials[
+            "data:cost:operation:airframe_labor_cost", "data:cost:operation:mission_per_year"
+        ] = labor_rate * ((0.655 + 0.01 * mass) * ft_year + 0.254 + 0.01 * mass)

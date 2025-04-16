@@ -56,14 +56,6 @@ class LCCSumOperationCost(om.ExplicitComponent):
                 desc="Annual loan cost of the aircraft",
             )
 
-        else:
-            self.add_input(
-                "data:cost:operation:annual_depreciation_cost",
-                val=np.nan,
-                units="USD/yr",
-                desc="Annual depreciation cost of the aircraft",
-            )
-
         self.add_input(
             "data:cost:operation:airframe_maintenance_cost",
             val=np.nan,
