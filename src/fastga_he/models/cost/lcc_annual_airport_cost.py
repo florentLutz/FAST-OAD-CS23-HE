@@ -27,10 +27,10 @@ class LCCAnnualAirportCost(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:cost:operation:landing_per_year",
+            "data:cost:operation:mission_per_year",
             val=np.nan,
             units="1/yr",
-            desc="Landing operation per year",
+            desc="Flight mission per year",
         )
 
         self.add_output(
@@ -45,15 +45,15 @@ class LCCAnnualAirportCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:operation:annual_airport_cost"] = (
             365.0 * inputs["data:cost:operation:daily_parking_cost"]
-            + inputs["data:cost:operation:landing_per_year"]
+            + inputs["data:cost:operation:mission_per_year"]
             * inputs["data:cost:operation:landing_cost"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         partials[
-            "data:cost:operation:annual_airport_cost", "data:cost:operation:landing_per_year"
+            "data:cost:operation:annual_airport_cost", "data:cost:operation:mission_per_year"
         ] = inputs["data:cost:operation:landing_cost"]
 
         partials["data:cost:operation:annual_airport_cost", "data:cost:operation:landing_cost"] = (
-            inputs["data:cost:operation:landing_per_year"]
+            inputs["data:cost:operation:mission_per_year"]
         )

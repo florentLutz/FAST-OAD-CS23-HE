@@ -45,8 +45,8 @@ class LCCMaintenanceMaterialCost(om.ExplicitComponent):
 
         partials["data:cost:operation:airframe_material_cost", "data:weight:airframe:mass"] = (
             0.21 * ft_year + 13.7
-        ) + 57.5
+        )
 
         partials[
             "data:cost:operation:airframe_material_cost", "data:TLAR:flight_hours_per_year"
-        ] = mass * 0.21 * ft_year
+        ] = mass * 0.21

@@ -14,6 +14,7 @@
     </environmental_impact>
     <cost>
       <cpi_2012>1.4</cpi_2012>
+      <msp_per_unit unit="USD">412758.77</msp_per_unit>
       <production>
         <num_aircraft_5years>75.0</num_aircraft_5years>
         <engineering_man_hours unit="h">72.679</engineering_man_hours>
@@ -38,6 +39,7 @@
       <production_cost_per_unit unit="USD">371854.75</production_cost_per_unit>
       <operation>
         <airframe_maintenance_cost unit="USD/yr">10070.0</airframe_maintenance_cost>
+        <loan_principal unit="USD">4200.0</loan_principal>
         <annual_loan_cost unit="USD/yr">18574.15</annual_loan_cost>
         <annual_airport_cost unit="USD/yr">4650.0</annual_airport_cost>
         <annual_crew_cost unit="USD/yr">138756.7</annual_crew_cost>

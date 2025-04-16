@@ -16,11 +16,11 @@ class LCCAnnualCrewCost(om.ExplicitComponent):
     def setup(self):
         self.add_input(
             "data:cost:operation:number_of_pilot",
-            val=np.nan,
+            val=0.0,
         )
         self.add_input(
             "data:cost:operation:number_of_cabin_crew",
-            val=np.nan,
+            val=0.0,
         )
 
         self.add_output(

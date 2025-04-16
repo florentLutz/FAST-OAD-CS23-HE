@@ -61,5 +61,5 @@ class LCCMaintenanceLaborCost(om.ExplicitComponent):
         )
 
         partials["data:cost:operation:airframe_labor_cost", "data:TLAR:flight_hours_per_year"] = (
-            labor_rate * 2.0 * (0.655 + 0.01 * mass)
+            labor_rate * (0.655 + 0.01 * mass)
         )
