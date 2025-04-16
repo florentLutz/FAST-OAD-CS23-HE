@@ -13,32 +13,32 @@ class LCCCertificationCost(om.ExplicitComponent):
 
     def setup(self):
         self.add_input(
-            "data:cost:engineering_cost_per_unit",
+            "data:cost:production:engineering_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Engineering adjusted cost per aircraft",
         )
         self.add_input(
-            "data:cost:dev_support_cost_per_unit",
+            "data:cost:production:dev_support_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Development support adjusted cost per aircraft",
         )
         self.add_input(
-            "data:cost:flight_test_cost_per_unit",
+            "data:cost:production:flight_test_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Development flight test adjusted cost per aircraft",
         )
         self.add_input(
-            "data:cost:tooling_cost_per_unit",
+            "data:cost:production:tooling_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Tooling adjusted cost per aircraft",
         )
 
         self.add_output(
-            "data:cost:certification_cost_per_unit",
+            "data:cost:production:certification_cost_per_unit",
             val=2.0e5,
             units="USD",
             desc="Certification adjusted cost per aircraft",
@@ -46,4 +46,4 @@ class LCCCertificationCost(om.ExplicitComponent):
         self.declare_partials("*", "*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:certification_cost_per_unit"] = np.sum(inputs.values())
+        outputs["data:cost:production:certification_cost_per_unit"] = np.sum(inputs.values())

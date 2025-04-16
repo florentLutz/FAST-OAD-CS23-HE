@@ -14,14 +14,14 @@ class LCCToolingCost(om.ExplicitComponent):
 
     def setup(self):
         self.add_input(
-            "data:cost:tooling_man_hours",
+            "data:cost:production:tooling_man_hours",
             val=np.nan,
             units="h",
             desc="Number of tooling man-hours required for a certain amount of aircraft been "
             "produced in a 5-year or 60 month period",
         )
         self.add_input(
-            "data:cost:tooling_cost_per_hour",
+            "data:cost:production:tooling_cost_per_hour",
             val=np.nan,
             units="USD/h",
             desc="Tooling labor cost per hour",
@@ -33,7 +33,7 @@ class LCCToolingCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:tooling_cost_per_unit",
+            "data:cost:production:tooling_cost_per_unit",
             val=2.0e5,
             units="USD",
             desc="Tooling adjusted cost per aircraft",
@@ -41,28 +41,28 @@ class LCCToolingCost(om.ExplicitComponent):
         self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:tooling_cost_per_unit"] = (
+        outputs["data:cost:production:tooling_cost_per_unit"] = (
             2.0969
-            * inputs["data:cost:tooling_man_hours"]
-            * inputs["data:cost:tooling_cost_per_hour"]
+            * inputs["data:cost:production:tooling_man_hours"]
+            * inputs["data:cost:production:tooling_cost_per_hour"]
             * inputs["data:cost:cpi_2012"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        mh_tooling = inputs["data:cost:tooling_man_hours"]
-        cost_rate_tooling = inputs["data:cost:tooling_cost_per_hour"]
+        mh_tooling = inputs["data:cost:production:tooling_man_hours"]
+        cost_rate_tooling = inputs["data:cost:production:tooling_cost_per_hour"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
 
         partials[
-            "data:cost:tooling_cost_per_unit",
-            "data:cost:tooling_man_hours",
+            "data:cost:production:tooling_cost_per_unit",
+            "data:cost:production:tooling_man_hours",
         ] = 2.0969 * cost_rate_tooling * cpi_2012
 
         partials[
-            "data:cost:tooling_cost_per_unit",
-            "data:cost:tooling_cost_per_hour",
+            "data:cost:production:tooling_cost_per_unit",
+            "data:cost:production:tooling_cost_per_hour",
         ] = 2.0969 * mh_tooling * cpi_2012
 
-        partials["data:cost:tooling_cost_per_unit", "data:cost:cpi_2012"] = (
+        partials["data:cost:production:tooling_cost_per_unit", "data:cost:cpi_2012"] = (
             2.0969 * mh_tooling * cost_rate_tooling
         )

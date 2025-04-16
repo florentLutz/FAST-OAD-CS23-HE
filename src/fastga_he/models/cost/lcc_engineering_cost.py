@@ -14,14 +14,14 @@ class LCCEngineeringCost(om.ExplicitComponent):
 
     def setup(self):
         self.add_input(
-            "data:cost:engineering_man_hours",
+            "data:cost:production:engineering_man_hours",
             val=np.nan,
             units="h",
             desc="Number of engineering man-hours required for a certain amount of aircraft been "
             "produced in a 5-year or 60 month period",
         )
         self.add_input(
-            "data:cost:engineering_cost_per_hour",
+            "data:cost:production:engineering_cost_per_hour",
             val=np.nan,
             units="USD/h",
             desc="Engineering cost per hour",
@@ -33,7 +33,7 @@ class LCCEngineeringCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:engineering_cost_per_unit",
+            "data:cost:production:engineering_cost_per_unit",
             val=2.0e5,
             units="USD",
             desc="Engineering adjusted cost per aircraft",
@@ -41,28 +41,28 @@ class LCCEngineeringCost(om.ExplicitComponent):
         self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:engineering_cost_per_unit"] = (
+        outputs["data:cost:production:engineering_cost_per_unit"] = (
             2.0969
-            * inputs["data:cost:engineering_man_hours"]
-            * inputs["data:cost:engineering_cost_per_hour"]
+            * inputs["data:cost:production:engineering_man_hours"]
+            * inputs["data:cost:production:engineering_cost_per_hour"]
             * inputs["data:cost:cpi_2012"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        mh_engineering = inputs["data:cost:engineering_man_hours"]
-        cost_rate_engineering = inputs["data:cost:engineering_cost_per_hour"]
+        mh_engineering = inputs["data:cost:production:engineering_man_hours"]
+        cost_rate_engineering = inputs["data:cost:production:engineering_cost_per_hour"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
 
         partials[
-            "data:cost:engineering_cost_per_unit",
-            "data:cost:engineering_man_hours",
+            "data:cost:production:engineering_cost_per_unit",
+            "data:cost:production:engineering_man_hours",
         ] = 2.0969 * cost_rate_engineering * cpi_2012
 
         partials[
-            "data:cost:engineering_cost_per_unit",
-            "data:cost:engineering_cost_per_hour",
+            "data:cost:production:engineering_cost_per_unit",
+            "data:cost:production:engineering_cost_per_hour",
         ] = 2.0969 * mh_engineering * cpi_2012
 
-        partials["data:cost:engineering_cost_per_unit", "data:cost:cpi_2012"] = (
+        partials["data:cost:production:engineering_cost_per_unit", "data:cost:cpi_2012"] = (
             2.0969 * mh_engineering * cost_rate_engineering
         )

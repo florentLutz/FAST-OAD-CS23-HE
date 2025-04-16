@@ -19,7 +19,7 @@ class LCCAvionicsCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:avionics_cost_per_unit",
+            "data:cost:production:avionics_cost_per_unit",
             val=2.0e5,
             units="USD",
             desc="Avionics adjusted cost per aircraft",
@@ -27,4 +27,6 @@ class LCCAvionicsCost(om.ExplicitComponent):
         self.declare_partials("*", "*", val=15000.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:avionics_cost_per_unit"] = 15000.0 * inputs["data:cost:cpi_2012"]
+        outputs["data:cost:production:avionics_cost_per_unit"] = (
+            15000.0 * inputs["data:cost:cpi_2012"]
+        )

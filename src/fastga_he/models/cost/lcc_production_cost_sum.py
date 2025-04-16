@@ -20,70 +20,70 @@ class LCCSumProductionCost(om.ExplicitComponent):
         cost_components_name = self.options["cost_components_name"]
 
         self.add_input(
-            "data:cost:engineering_cost_per_unit",
+            "data:cost:production:engineering_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Engineering adjusted cost per aircraft",
         )
 
         self.add_input(
-            "data:cost:tooling_cost_per_unit",
+            "data:cost:production:tooling_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Tooling adjusted cost per aircraft",
         )
 
         self.add_input(
-            "data:cost:manufacturing_cost_per_unit",
+            "data:cost:production:manufacturing_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Manufacturing adjusted cost per aircraft",
         )
 
         self.add_input(
-            "data:cost:flight_test_cost_per_unit",
+            "data:cost:production:flight_test_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Development flight test adjusted cost per aircraft",
         )
 
         self.add_input(
-            "data:cost:quality_control_cost_per_unit",
+            "data:cost:production:quality_control_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Quality control adjusted cost per aircraft",
         )
 
         self.add_input(
-            "data:cost:material_cost_per_unit",
+            "data:cost:production:material_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Development flight test adjusted cost per aircraft",
         )
 
         self.add_input(
-            "data:cost:dev_support_cost_per_unit",
+            "data:cost:production:dev_support_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Development support adjusted cost per aircraft",
         )
 
         self.add_input(
-            "data:cost:avionics_cost_per_unit",
+            "data:cost:production:avionics_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Avionics adjusted cost per aircraft",
         )
 
         self.add_input(
-            "data:cost:certification_cost_per_unit",
+            "data:cost:production:certification_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Certification adjusted cost per aircraft",
         )
 
         self.add_input(
-            "data:cost:landing_gear_cost_reduction",
+            "data:cost:production:landing_gear_cost_reduction",
             val=np.nan,
             units="USD",
             desc="Cost reduction if fixed landing gear design is selected",

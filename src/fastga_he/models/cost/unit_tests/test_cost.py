@@ -50,8 +50,8 @@ def test_engineering_human_hours():
     input_list = [
         "data:weight:airframe:mass",
         "data:TLAR:v_cruise",
-        "data:cost:num_aircraft_5years",
-        "data:cost:composite_fraction",
+        "data:cost:production:num_aircraft_5years",
+        "data:cost:production:composite_fraction",
     ]
 
     ivc = get_indep_var_comp(
@@ -66,9 +66,9 @@ def test_engineering_human_hours():
         ivc,
     )
 
-    assert problem.get_val("data:cost:engineering_man_hours", units="h") == pytest.approx(
-        72.679, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:engineering_man_hours", units="h"
+    ) == pytest.approx(72.679, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -77,9 +77,8 @@ def test_tooling_human_hours():
     input_list = [
         "data:weight:airframe:mass",
         "data:TLAR:v_cruise",
-        "data:cost:num_aircraft_5years",
-        "data:cost:taper_factor",
-        "data:cost:composite_fraction",
+        "data:cost:production:num_aircraft_5years",
+        "data:cost:production:composite_fraction",
     ]
 
     ivc = get_indep_var_comp(
@@ -94,7 +93,7 @@ def test_tooling_human_hours():
         ivc,
     )
 
-    assert problem.get_val("data:cost:tooling_man_hours", units="h") == pytest.approx(
+    assert problem.get_val("data:cost:production:tooling_man_hours", units="h") == pytest.approx(
         87.993, rel=1e-3
     )
 
@@ -105,8 +104,8 @@ def test_manufacturing_human_hours():
     input_list = [
         "data:weight:airframe:mass",
         "data:TLAR:v_cruise",
-        "data:cost:num_aircraft_5years",
-        "data:cost:composite_fraction",
+        "data:cost:production:num_aircraft_5years",
+        "data:cost:production:composite_fraction",
     ]
 
     ivc = get_indep_var_comp(
@@ -121,17 +120,17 @@ def test_manufacturing_human_hours():
         ivc,
     )
 
-    assert problem.get_val("data:cost:manufacturing_man_hours", units="h") == pytest.approx(
-        688.025, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:manufacturing_man_hours", units="h"
+    ) == pytest.approx(688.025, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_engineering_cost():
     input_list = [
-        "data:cost:engineering_man_hours",
-        "data:cost:engineering_cost_per_hour",
+        "data:cost:production:engineering_man_hours",
+        "data:cost:production:engineering_cost_per_hour",
         "data:cost:cpi_2012",
     ]
 
@@ -147,9 +146,9 @@ def test_engineering_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:engineering_cost_per_unit", units="USD") == pytest.approx(
-        26998.679, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:engineering_cost_per_unit", units="USD"
+    ) == pytest.approx(26998.679, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -159,8 +158,8 @@ def test_development_support_cost():
         "data:weight:airframe:mass",
         "data:TLAR:v_cruise",
         "data:cost:prototype_number",
-        "data:cost:num_aircraft_5years",
-        "data:cost:composite_fraction",
+        "data:cost:production:num_aircraft_5years",
+        "data:cost:production:composite_fraction",
         "data:cost:cpi_2012",
     ]
 
@@ -176,17 +175,17 @@ def test_development_support_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:dev_support_cost_per_unit", units="USD") == pytest.approx(
-        764.242, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:dev_support_cost_per_unit", units="USD"
+    ) == pytest.approx(764.242, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_tooling_cost():
     input_list = [
-        "data:cost:tooling_man_hours",
-        "data:cost:tooling_cost_per_hour",
+        "data:cost:production:tooling_man_hours",
+        "data:cost:production:tooling_cost_per_hour",
         "data:cost:cpi_2012",
     ]
 
@@ -202,17 +201,17 @@ def test_tooling_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:tooling_cost_per_unit", units="USD") == pytest.approx(
-        21690.978, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:tooling_cost_per_unit", units="USD"
+    ) == pytest.approx(21690.978, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_manufacturing_cost():
     input_list = [
-        "data:cost:manufacturing_man_hours",
-        "data:cost:manufacturing_cost_per_hour",
+        "data:cost:production:manufacturing_man_hours",
+        "data:cost:production:manufacturing_cost_per_hour",
         "data:cost:cpi_2012",
     ]
 
@@ -228,17 +227,17 @@ def test_manufacturing_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:manufacturing_cost_per_unit", units="USD") == pytest.approx(
-        147385.351, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:manufacturing_cost_per_unit", units="USD"
+    ) == pytest.approx(147385.351, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_quality_control_cost():
     input_list = [
-        "data:cost:manufacturing_cost_per_unit",
-        "data:cost:composite_fraction",
+        "data:cost:production:manufacturing_cost_per_unit",
+        "data:cost:production:composite_fraction",
     ]
 
     ivc = get_indep_var_comp(
@@ -253,9 +252,9 @@ def test_quality_control_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:quality_control_cost_per_unit", units="USD") == pytest.approx(
-        19160.096, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:quality_control_cost_per_unit", units="USD"
+    ) == pytest.approx(19160.096, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -265,7 +264,7 @@ def test_flight_test_cost():
         "data:weight:airframe:mass",
         "data:TLAR:v_cruise",
         "data:cost:prototype_number",
-        "data:cost:num_aircraft_5years",
+        "data:cost:production:num_aircraft_5years",
         "data:cost:cpi_2012",
     ]
 
@@ -281,9 +280,9 @@ def test_flight_test_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:flight_test_cost_per_unit", units="USD") == pytest.approx(
-        93.105, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:flight_test_cost_per_unit", units="USD"
+    ) == pytest.approx(93.105, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -292,7 +291,7 @@ def test_material_cost():
     input_list = [
         "data:weight:airframe:mass",
         "data:TLAR:v_cruise",
-        "data:cost:num_aircraft_5years",
+        "data:cost:production:num_aircraft_5years",
         "data:cost:cpi_2012",
     ]
 
@@ -308,9 +307,9 @@ def test_material_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:material_cost_per_unit", units="USD") == pytest.approx(
-        8735.09, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:material_cost_per_unit", units="USD"
+    ) == pytest.approx(8735.09, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -332,19 +331,19 @@ def test_avionics_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:avionics_cost_per_unit", units="USD") == pytest.approx(
-        21000.0, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:avionics_cost_per_unit", units="USD"
+    ) == pytest.approx(21000.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_certification_cost():
     input_list = [
-        "data:cost:engineering_cost_per_unit",
-        "data:cost:dev_support_cost_per_unit",
-        "data:cost:flight_test_cost_per_unit",
-        "data:cost:tooling_cost_per_unit",
+        "data:cost:production:engineering_cost_per_unit",
+        "data:cost:production:dev_support_cost_per_unit",
+        "data:cost:production:flight_test_cost_per_unit",
+        "data:cost:production:tooling_cost_per_unit",
     ]
 
     ivc = get_indep_var_comp(
@@ -359,16 +358,16 @@ def test_certification_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:certification_cost_per_unit", units="USD") == pytest.approx(
-        49547.05, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:certification_cost_per_unit", units="USD"
+    ) == pytest.approx(49547.05, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_landing_gear_cost_reduction():
     input_list = [
-        "data:cost:fixed_landing_gear",
+        "data:cost:production:fixed_landing_gear",
     ]
 
     ivc = get_indep_var_comp(
@@ -383,9 +382,9 @@ def test_landing_gear_cost_reduction():
         ivc,
     )
 
-    assert problem.get_val("data:cost:landing_gear_cost_reduction", units="USD") == pytest.approx(
-        0.0, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:landing_gear_cost_reduction", units="USD"
+    ) == pytest.approx(0.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -494,9 +493,9 @@ def test_production_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:engineering_cost_per_unit", units="USD") == pytest.approx(
-        26998.679, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:engineering_cost_per_unit", units="USD"
+    ) == pytest.approx(26998.679, rel=1e-3)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:ICE:ice_1:cost_per_unit", units="USD"
@@ -519,6 +518,7 @@ def test_production_cost_hydrogen():
         __file__,
         "data_pemfc.xml",
     )
+    ivc.add_output("data:weight:aircraft:OWE", val=426.58, units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -553,6 +553,8 @@ def test_production_cost_hybrid_tbm_900():
         __file__,
         "input_ecopulse.xml",
     )
+
+    ivc.add_output("data:weight:aircraft:OWE", val=2570.055, units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
