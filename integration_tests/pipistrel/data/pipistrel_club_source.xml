@@ -113,22 +113,12 @@
       </IC_engine>
       <he_power_train>
         <thrust_distribution is_input="True">1.0</thrust_distribution>
-        <ICE>
+        <high_rpm_ICE>
           <ice_1>
-            <pme_max units="bar" is_input="True">20.62<!--Maximum Mean Effective Pressure in the ICE cylinders--></pme_max>
-            <rpm_max units="1/min" is_input="True">2700.0<!--Maximum RPM on the shaft of the engine--></rpm_max>
-            <strokes_number is_input="True">4.0</strokes_number>
-            <emission_index>
-              <CO units="g/kg" is_input="True">798.0</CO>
-              <CO2 units="g/kg" is_input="True">3100.0</CO2>
-              <H2O units="g/kg" is_input="True">1237.0</H2O>
-              <HC units="g/kg" is_input="True">18.867</HC>
-              <NOx units="g/kg" is_input="True">3.14</NOx>
-              <SOx units="g/kg" is_input="True">0.42</SOx>
-              <lead units="g/kg" is_input="True">0.794</lead>
-            </emission_index>
+            <power_rating_SL units="kW" is_input="False">69.0<!--Maximum power the motor can provide at Sea Level--></power_rating_SL>
+            <pme_max units="bar" is_input="True">22.6<!--Maximum Mean Effective Pressure in the ICE cylinders--></pme_max>
           </ice_1>
-        </ICE>
+        </high_rpm_ICE>
         <fuel_system>
           <fuel_system_1>
             <fuel_distribution is_input="True">[1.0, 1.0]</fuel_distribution>
@@ -326,7 +316,7 @@
         </taxi_out>
         <main_route>
           <climb>
-            <v_eas units="m/s" is_input="True">38.0<!--75 KIAS--></v_eas>
+            <v_eas units="m/s" is_input="True">38.0<!--78 KIAS--></v_eas>
             <climb_rate>
               <cruise_level units="ft/min" is_input="True">997.0<!--target climb rate at the end of climb--></cruise_level>
               <sea_level units="ft/min" is_input="True">1050.0<!--target climb rate at sea level--></sea_level>

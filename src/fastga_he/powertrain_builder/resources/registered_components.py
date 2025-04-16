@@ -650,6 +650,7 @@ HIGH_RPM_ICE = {
         {"SOx_emissions": "g"},
         {"H2O_emissions": "kg"},
         {"HC_emissions": "g"},
+        {"equivalent_SL_power": "kW"},
     ],
     SMP: [
         {"delta_Cd": None},

@@ -254,7 +254,7 @@ if __name__ == "__main__":
             21.0,
             19.7,
             20.3,
-            18.,
+            18.0,
         ]
     )  # In l/h
     vol_ff_validation_points = np.array(
@@ -356,7 +356,9 @@ if __name__ == "__main__":
 
     # Altitude effect
     f_alt_sigma_interp_v2 = np.linspace(1.0, 0.3)
-    k_sfc_validation_points = vol_ff_validation_points * 0.72 / power_validation_points * 1000.0 / 285.0
+    k_sfc_validation_points = (
+        vol_ff_validation_points * 0.72 / power_validation_points * 1000.0 / 285.0
+    )
     poly_sfc_f_alt_v2 = np.polyfit(sigma_validation_points, k_sfc_validation_points, 2)
 
     fig_alt_effect_v2 = go.Figure()

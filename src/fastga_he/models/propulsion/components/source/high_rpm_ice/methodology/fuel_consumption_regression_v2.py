@@ -2,9 +2,6 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import numpy as np
-import plotly.graph_objects as go
-
 if __name__ == "__main__":
     # We'll focus on max continuous performances, 5500 seems to be a common upper limit for
     # continuous operation
