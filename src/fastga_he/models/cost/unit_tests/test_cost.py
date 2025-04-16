@@ -878,6 +878,7 @@ def test_operation_sum():
 
     problem.check_partials(compact_print=True)
 
+
 def test_operation_cost():
     ivc = get_indep_var_comp(
         list_inputs(
@@ -901,10 +902,9 @@ def test_operation_cost():
         "data:propulsion:he_power_train:ICE:ice_1:operation_cost", units="USD/yr"
     ) == pytest.approx(9153.7, rel=1e-3)
 
-    assert (problem.get_val("data:cost:operation:annual_cost_per_unit", units="USD/yr") ==
-            pytest.approx(
-        289175.93, rel=1e-3
-    ))
+    assert problem.get_val(
+        "data:cost:operation:annual_cost_per_unit", units="USD/yr"
+    ) == pytest.approx(289175.93, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

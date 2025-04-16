@@ -2,7 +2,6 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
 
 
