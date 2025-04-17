@@ -34,7 +34,6 @@ if __name__ == "__main__":
             exponential_func, x, y, p0=initial_guess, bounds=([0, -0.001], [1000, 0.001])
         )
 
-
         # Calculate fitted y values and R-squared
         y_exponential = exponential_func(x, *exponential_params)
         r2_exponential = 1 - np.sum((y - y_exponential) ** 2) / np.sum((y - np.mean(y)) ** 2)

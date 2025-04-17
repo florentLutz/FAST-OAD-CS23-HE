@@ -9,7 +9,7 @@ import openmdao.api as om
 class LCCDailyParkingCost(om.ExplicitComponent):
     """
     Computation of the aircraft daily parking cost. The parking cost for aircraft with MTOW lower
-    than 6 tons includes all other types of charges
+    than 6 tons includes all other types of charges.
     Prices provide from
     https://www.toulouse.aeroport.fr/sites/default/files/2023-03/2023_03_23_Redevances_A_EN_v1.pdf.
     """
