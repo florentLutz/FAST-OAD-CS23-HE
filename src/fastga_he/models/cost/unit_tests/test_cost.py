@@ -593,7 +593,9 @@ def test_production_cost_tbm_900():
     ivc = get_indep_var_comp(
         list_inputs(
             LCCProductionCost(
-                power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"
+                power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+                pressurized=True,
+                tapered_wing=True,
             )
         ),
         __file__,
@@ -603,7 +605,9 @@ def test_production_cost_tbm_900():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         LCCProductionCost(
-            power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"
+            power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+            pressurized=True,
+            tapered_wing=True,
         ),
         ivc,
     )
@@ -612,11 +616,11 @@ def test_production_cost_tbm_900():
     ) == pytest.approx(425906.45, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        3775204.15, rel=1e-3
+        3853743.71, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4190476.61, rel=1e-3
+        4277655.52, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1007,7 +1011,11 @@ def test_operation_cost_hybrid_tbm_900():
 def test_cost_tbm_900():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCC(power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml")
+            LCC(
+                power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+                pressurized=True,
+                tapered_wing=True,
+            )
         ),
         __file__,
         "tbm_900_inputs.xml",
@@ -1015,7 +1023,11 @@ def test_cost_tbm_900():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCC(power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"),
+        LCC(
+            power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+            pressurized=True,
+            tapered_wing=True,
+        ),
         ivc,
     )
     assert problem.get_val(
@@ -1023,16 +1035,16 @@ def test_cost_tbm_900():
     ) == pytest.approx(425906.45, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        3775204.15, rel=1e-3
+        3853743.72, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4190476.61, rel=1e-3
+        4277655.53, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(475280.3, rel=1e-3)
+    ) == pytest.approx(476152.08, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
