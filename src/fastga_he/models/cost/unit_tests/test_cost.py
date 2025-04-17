@@ -8,6 +8,7 @@ import pytest
 import os.path as pth
 import openmdao.api as om
 
+from ..lcc import LCC
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lcc_engineering_man_hours import LCCEngineeringManHours
 from ..lcc_msp import LCCMSP
@@ -997,6 +998,41 @@ def test_operation_cost_hybrid_tbm_900():
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
         100248.33, rel=1e-3
     )
+
+    problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_cost_tbm_900():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCC(power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml")
+        ),
+        __file__,
+        "tbm_900_inputs.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCC(power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
+    ) == pytest.approx(425906.45, rel=1e-3)
+
+    assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
+        3775204.15, rel=1e-3
+    )
+
+    assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
+        4190476.61, rel=1e-3
+    )
+
+    assert problem.get_val(
+        "data:cost:operation:annual_cost_per_unit", units="USD/yr"
+    ) == pytest.approx(475280.3, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

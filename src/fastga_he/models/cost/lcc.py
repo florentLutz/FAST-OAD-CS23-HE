@@ -52,6 +52,7 @@ class LCC(om.Group):
         )
 
     def setup(self):
+        power_train_file_path = self.options["power_train_file_path"]
         complex_flap = self.options["complex_flap"]
         pressurized = self.options["pressurized"]
         tapered_wing = self.options["tapered_wing"]
@@ -61,13 +62,20 @@ class LCC(om.Group):
         self.add_subsystem(
             name="production_cost",
             subsys=LCCProductionCost(
-                complex_flap=complex_flap, pressurized=pressurized, tapered_wing=tapered_wing
+                power_train_file_path=power_train_file_path,
+                complex_flap=complex_flap,
+                pressurized=pressurized,
+                tapered_wing=tapered_wing,
             ),
             promotes=["*"],
         )
 
         self.add_subsystem(
             name="operation_cost",
-            subsys=LCCOperationCost(loan=loan, use_operational_mission=use_operational_mission),
+            subsys=LCCOperationCost(
+                power_train_file_path=power_train_file_path,
+                loan=loan,
+                use_operational_mission=use_operational_mission,
+            ),
             promotes=["*"],
         )
