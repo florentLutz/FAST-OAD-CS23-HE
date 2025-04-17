@@ -14,9 +14,6 @@ from ..components.sizing_high_rpm_ice_nacelle_wet_area import SizingHighRPMICENa
 from ..components.sizing_high_rpm_ice_cg_x import SizingHighRPMICECGX
 from ..components.sizing_high_rpm_ice_cg_y import SizingHighRPMICECGY
 from ..components.sizing_high_rpm_ice_drag import SizingHighRPMICEDrag
-from ..components.sizing_high_rpm_ice_sfc_max_mep import SizingHighRPMICESFCMaxMEP
-from ..components.sizing_high_rpm_ice_sfc_min_mep import SizingHighRPMICESFCMinMEP
-from ..components.sizing_high_rpm_ice_sfc_k_coefficient import SizingHighRPMICESFCKCoefficient
 
 from ..components.cstr_high_rpm_ice import ConstraintsHighRPMICE
 
@@ -85,21 +82,6 @@ class SizingHighRPMICE(om.Group):
         self.add_subsystem(
             name="nacelle_wet_area",
             subsys=SizingHighRPMICENacelleWetArea(high_rpm_ice_id=high_rpm_ice_id),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="coeff_sfc_max_mep",
-            subsys=SizingHighRPMICESFCMaxMEP(high_rpm_ice_id=high_rpm_ice_id),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="coeff_sfc_min_mep",
-            subsys=SizingHighRPMICESFCMinMEP(high_rpm_ice_id=high_rpm_ice_id),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="coeff_sfc_k_coeff",
-            subsys=SizingHighRPMICESFCKCoefficient(high_rpm_ice_id=high_rpm_ice_id),
             promotes=["*"],
         )
         self.add_subsystem(

@@ -115,6 +115,7 @@
                 </ICE>
                 <high_rpm_ICE>
                     <ice_1>
+                        <sfc units="g/kW/h">280.0</sfc>
                         <from_LE units="m">0.5</from_LE>
                         <CG>
                             <y_ratio>0.34</y_ratio>

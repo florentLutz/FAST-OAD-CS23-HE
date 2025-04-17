@@ -631,7 +631,7 @@ HIGH_RPM_ICE = {
     CN_ID: "high_rpm_ice_id",
     CT: "high_rpm_ICE",
     ATT: None,
-    PT: ["time_step", "density", "settings:*"],
+    PT: ["time_step", "density"],
     SPT: [],
     PTS: [],
     IN: [(None, "fuel_consumed_t")],

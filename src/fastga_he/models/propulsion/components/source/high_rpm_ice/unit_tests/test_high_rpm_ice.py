@@ -16,9 +16,9 @@ from ..components.cstr_ensure import ConstraintsSeaLevelPowerEnsure
 from ..components.cstr_high_rpm_ice import ConstraintHighRPMICEPowerRateMission
 
 from ..components.sizing_displacement_volume import SizingHighRPMICEDisplacementVolume
-from ..components.sizing_high_rpm_ice_sfc_max_mep import SizingHighRPMICESFCMaxMEP
-from ..components.sizing_high_rpm_ice_sfc_min_mep import SizingHighRPMICESFCMinMEP
-from ..components.sizing_high_rpm_ice_sfc_k_coefficient import SizingHighRPMICESFCKCoefficient
+from ..components.stale.sizing_high_rpm_ice_sfc_max_mep import SizingHighRPMICESFCMaxMEP
+from ..components.stale.sizing_high_rpm_ice_sfc_min_mep import SizingHighRPMICESFCMinMEP
+from ..components.stale.sizing_high_rpm_ice_sfc_k_coefficient import SizingHighRPMICESFCKCoefficient
 from ..components.sizing_high_rpm_ice_uninstalled_weight import SizingHighRPMICEUninstalledWeight
 from ..components.sizing_high_rpm_ice_weight import SizingHighRPMICEWeight
 from ..components.sizing_high_rpm_ice_dimensions_scaling import SizingHighRPMICEDimensionsScaling
@@ -509,17 +509,9 @@ def test_mean_effective_pressure():
 
 def test_sfc():
     ivc = get_indep_var_comp(
-        [
-            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:sfc_coefficient:k_coefficient",
-            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:sfc_coefficient:max_mep",
-        ],
+        ["data:propulsion:he_power_train:high_rpm_ICE:ice_1:sfc"],
         __file__,
         XML_FILE,
-    )
-    ivc.add_output(
-        "mean_effective_pressure",
-        val=np.array([4.5, 5.57, 7.43, 9.29, 11.1, 13.0, 14.8, 16.7, 18.5, 20.4]),
-        units="bar",
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -529,7 +521,7 @@ def test_sfc():
     )
 
     assert problem.get_val("specific_fuel_consumption", units="g/kW/h") == pytest.approx(
-        np.array([617.0, 546.0, 408.0, 347.0, 321.0, 309.0, 304.0, 302.0, 301.0, 300.0]),
+        np.full(NB_POINTS_TEST, 256.0),
         rel=1e-2,
     )
 
@@ -1123,16 +1115,16 @@ def test_performances_ice():
     assert problem.get_val("fuel_consumed_t", units="kg") == pytest.approx(
         np.array(
             [
-                0.42891051,
-                0.65531621,
-                0.75367227,
-                0.90704623,
-                1.08732801,
-                1.28056926,
-                1.48034806,
-                1.68361652,
-                1.88885209,
-                2.09525266,
+                0.17777778,
+                0.35555556,
+                0.53333333,
+                0.71111111,
+                0.88888889,
+                1.06666667,
+                1.24444444,
+                1.42222222,
+                1.6,
+                1.77777778,
             ]
         ),
         rel=1e-2,

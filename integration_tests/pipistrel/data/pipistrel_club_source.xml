@@ -6,7 +6,7 @@
       <range units="NM" is_input="True">513.8<!--top-level requirement: design range--></range>
       <v_approach units="knot" is_input="True">58.5<!--approach speed--></v_approach>
       <v_cruise units="knot" is_input="True">119.0<!--cruise speed--></v_cruise>
-      <v_max_sl units="knot" is_input="True">110.0<!--maximum speed at sea level--></v_max_sl>
+      <v_max_sl units="knot" is_input="True">129.0<!--maximum speed at sea level, can't find the value for 0ft, took 2000ft instead--></v_max_sl>
     </TLAR>
     <geometry>
       <flap_type is_input="True">1.0<!--flap type (0.0 - plain flap, 2.0 - single slotted flap, 3.0 - split flap)--></flap_type>
@@ -115,6 +115,7 @@
         <thrust_distribution is_input="True">1.0</thrust_distribution>
         <high_rpm_ICE>
           <ice_1>
+            <sfc units="g/kW/h">256.0</sfc>
             <power_rating_SL units="kW" is_input="False">69.0<!--Maximum power the motor can provide at Sea Level--></power_rating_SL>
             <pme_max units="bar" is_input="True">22.6<!--Maximum Mean Effective Pressure in the ICE cylinders--></pme_max>
           </ice_1>

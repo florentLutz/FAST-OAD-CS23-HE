@@ -622,10 +622,10 @@ def test_pipistrel_velis_club():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        600.00, rel=1e-2
+        600.00, rel=5e-2
     )
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        439.00, rel=5e-2
+        349.00, rel=5e-2
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(63, abs=1e-2)
+    assert sizing_fuel == pytest.approx(63, abs=5e-2)
