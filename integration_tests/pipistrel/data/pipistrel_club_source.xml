@@ -11,7 +11,7 @@
     <geometry>
       <flap_type is_input="True">1.0<!--flap type (0.0 - plain flap, 2.0 - single slotted flap, 3.0 - split flap)--></flap_type>
       <has_T_tail is_input="True">1.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>
-      <wing_configuration is_input="True">1.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></wing_configuration>
+      <wing_configuration is_input="True">3.0<!--3.0 is for high wing aircraft--></wing_configuration>
       <flap>
         <chord_ratio is_input="True">0.2<!--mean value of (flap chord)/(section chord)--></chord_ratio>
         <span_ratio is_input="True">0.88<!--ratio (width of flaps)/(total span)--></span_ratio>
@@ -47,7 +47,7 @@
       </propeller>
       <vertical_tail>
         <area units="m**2" is_input="True">0.86<!--vertical tail area--></area>
-        <aspect_ratio is_input="True">1.43<!--aspect ratio of vertical tail--></aspect_ratio>
+        <aspect_ratio is_input="True">1.14<!--aspect ratio of vertical tail--></aspect_ratio>
         <sweep_25 units="deg" is_input="True">30.0<!--sweep angle at 25% chord of vertical tail--></sweep_25>
         <taper_ratio is_input="True">0.62<!--taper ratio of vertical tail--></taper_ratio>
         <thickness_ratio is_input="True">0.125<!--thickness ratio of vertical tail--></thickness_ratio>
@@ -142,8 +142,8 @@
         </fuel_tank>
         <propeller>
           <propeller_1>
-            <activity_factor is_input="True">125.0<!--Activity factor of the propeller--></activity_factor>
-            <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
+            <activity_factor is_input="True">80.0<!--Activity factor of the propeller taken from a hamilton standard blade --></activity_factor>
+            <blade_twist units="deg" is_input="True">22.0<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="cm" is_input="True">170.0<!--Diameter of the propeller--></diameter>
             <installation_angle units="deg" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
@@ -297,14 +297,14 @@
           <fuel units="kg" is_input="True">0.0<!--mass of consumed fuel during initial climb phase in sizing mission--></fuel>
         </initial_climb>
         <landing>
-          <elevator_angle units="deg" is_input="True">-40.0<!--position of the elevator during landing--></elevator_angle>
+          <elevator_angle units="deg" is_input="True">-25.0<!--position of the elevator during landing--></elevator_angle>
           <flap_angle units="deg" is_input="True">19.0<!--flap angle during landing phase in sizing mission--></flap_angle>
         </landing>
         <takeoff>
-          <elevator_angle units="deg" is_input="True">-40.0<!--position of the elevator during takeoff--></elevator_angle>
+          <elevator_angle units="deg" is_input="True">-25.0<!--position of the elevator during takeoff--></elevator_angle>
           <energy units="W*h" is_input="True">0.0<!--mass of consumed fuel during initial climb phase in sizing mission--></energy>
           <flap_angle units="deg" is_input="True">9.0<!--flap angle during takeoff phase in sizing mission--></flap_angle>
-          <fuel units="kg" is_input="True">1.4<!--mass of consumed fuel during takeoff phase in sizing mission--></fuel>
+          <fuel units="kg" is_input="True">0.8<!--mass of consumed fuel during takeoff phase in sizing mission, assumption is that taxi out + t/o + taxi in is 1.0 of fuel--></fuel>
           <thrust_rate is_input="True">1.0<!--thrust rate during takeoff phase--></thrust_rate>
         </takeoff>
         <taxi_in>
@@ -360,15 +360,9 @@
         <k_factor_sfc is_input="True">1.0<!--k_factor that can be used to adjust the consumption on engine level to the aircraft level--></k_factor_sfc>
       </IC_engine>
       <he_power_train>
-        <ICE>
-          <ice_1>
-            <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
-            <k_sfc is_input="True">0.99<!--K-factor to adjust the sfc of the ICE--></k_sfc>
-          </ice_1>
-        </ICE>
         <propeller>
           <propeller_1>
-            <effective_advance_ratio is_input="True">1.0<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
+            <effective_advance_ratio is_input="True">0.97<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
             <installation_effect is_input="True">0.95<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
           </propeller_1>
         </propeller>
@@ -378,10 +372,10 @@
       <aircraft>
         <MLW_MZFW_ratio is_input="True">1.06</MLW_MZFW_ratio>
         <CG>
-          <range is_input="True">0.074<!--distance between front position and aft position of CG, as ratio of mean aerodynamic chord (allows to have front position of CG, as currently, FAST-OAD estimates only the aft position of CG)--></range>
+          <range is_input="True">0.1<!--distance between front position and aft position of CG, as ratio of mean aerodynamic chord (allows to have front position of CG, as currently, FAST-OAD estimates only the aft position of CG)--></range>
           <aft>
             <MAC_position>
-              <margin is_input="True">0.05<!--safety margin aft of the most aft X-position of center of gravity as ratio of mean aerodynamic chord--></margin>
+              <margin is_input="True">0.03<!--safety margin aft of the most aft X-position of center of gravity as ratio of mean aerodynamic chord--></margin>
             </MAC_position>
           </aft>
           <fwd>
@@ -398,7 +392,7 @@
         <landing_gear>
           <front>
             <front_fuselage_ratio is_input="True">0.75<!--Position of front landing gear expressed as fuselage front length ratio--></front_fuselage_ratio>
-            <weight_ratio is_input="True">0.25<!--part of aircraft weight that is supported by front landing gear--></weight_ratio>
+            <weight_ratio is_input="True">0.15<!--part of aircraft weight that is supported by front landing gear--></weight_ratio>
           </front>
         </landing_gear>
       </airframe>

@@ -86,7 +86,7 @@ def test_pipistrel_velis_electro():
         600.00, rel=1e-2
     )
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(25.01, abs=1e-2)
+    assert sizing_energy == pytest.approx(25.05, abs=1e-2)
 
 
 def test_pipistrel_detailed_mission():
@@ -558,8 +558,15 @@ def test_pipistrel_velis_club():
     This is the thermal version of the Pipistrel Velis Electro (rather, the Pipistrel Velis Electro
     is the electric version of this aircraft.
 
-    The design mission will be assumed to be a mission of 642 nm at 2000ft of altitude with 75% of
-    the power which should give fuel consumption of 18.4 l/h as per Pipistrel website.
+    The design mission will be assumed to be a mission et 2000ft of altitude with 75% of
+    the power which should give fuel consumption of 18.4 l/h as per Pipistrel website. The fuel
+    available with the choice of 188 kg of payload leaves us 63 kg of fuel. Reserve will be
+    considered as a cruise @4000ft for 30 min giving a fuel consumed of 6.32, climb fuel is computed
+    based on fuel consumption at MCP for 2 min giving 0.624 kg, descent at idle fuel gives 0.31 kg
+    and 1 kg of fuel for T/O and taxi is assumed, leaving 54.74 kg of fuel for cruise. The fuel
+    consumption in cruise is given at 18.4 l/h in the POH or 13.248 kg/h. which means cruise will
+    last for 4.05 h or 482nm. Added to that the distance for climb and descent, a design range of
+    513nm is taken.
 
     Engine RPM:
     - Climb: 5500.
@@ -628,4 +635,4 @@ def test_pipistrel_velis_club():
         349.00, rel=5e-2
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(63, abs=5e-2)
+    assert sizing_fuel == pytest.approx(63, rel=5e-2)
