@@ -38,7 +38,8 @@
       <prototype_number>2.0</prototype_number>
       <production_cost_per_unit unit="USD">371854.75</production_cost_per_unit>
       <operation>
-        <airframe_maintenance_cost unit="USD/yr">10070.0</airframe_maintenance_cost>
+        <maintenance_cost unit="USD/yr">10000.0</maintenance_cost>
+        <miscellaneous_cost unit="USD/yr">70.0</miscellaneous_cost>
         <loan_principal unit="USD">4200.0</loan_principal>
         <annual_loan_cost unit="USD/yr">18574.15</annual_loan_cost>
         <mission_per_year unit="1/yr">50.0</mission_per_year>

@@ -12,9 +12,8 @@ from .lcc_daily_parking_cost import LCCDailyParkingCost
 from .lcc_annual_airport_cost import LCCAnnualAirportCost
 from .lcc_annual_loan_cost import LCCAnnualLoanCost
 from .lcc_annual_depreciation import LCCAnnualDepreciation
-from .lcc_maintenance_labor_cost import LCCMaintenanceLaborCost
-from .lcc_maintenance_material_cost import LCCMaintenanceMaterialCost
-from .lcc_annual_maintenance_cost import LCCAirframeMaintenanceCost
+from .lcc_maintenance_cost import LCCMaintenanceCost
+from .lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
 from .lcc_flight_mission import LCCFlightMission
 from .lcc_annual_crew_cost import LCCAnnualCrewCost
 from .lcc_operation_cost_sum import LCCSumOperationCost
@@ -96,20 +95,14 @@ class LCCOperationCost(om.Group):
         )
 
         self.add_subsystem(
-            name="airframe_maintenance_labor",
-            subsys=LCCMaintenanceLaborCost(),
+            name="airframe_maintenance",
+            subsys=LCCMaintenanceCost(),
             promotes=["*"],
         )
 
         self.add_subsystem(
-            name="airframe_maintenance_material",
-            subsys=LCCMaintenanceMaterialCost(),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            name="airframe_maintenance_cost",
-            subsys=LCCAirframeMaintenanceCost(),
+            name="airframe_maintenance_miscellaneous",
+            subsys=LCCMaintenanceMiscellaneousCost(),
             promotes=["*"],
         )
 

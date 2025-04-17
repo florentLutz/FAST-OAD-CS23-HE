@@ -9,7 +9,7 @@ import openmdao.api as om
 
 class LCCTurboGeneratorCost(om.ExplicitComponent):
     """
-    Cost computation of the turbo  generator based on the price of single starter generator from
+    Cost computation of the turbo generator based on the price of single starter generator from
     https://www.zauba.com/import-1152400-3-hs-code.html and the performance specification from
     https://www.startergenerator.com/inventory/1152400-3.
     """

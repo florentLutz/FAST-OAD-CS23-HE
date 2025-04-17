@@ -244,6 +244,7 @@
     <cost>
       <cpi_2012>1.4</cpi_2012>
       <prototype_number>2.0</prototype_number>
+      <msp_per_unit unit="USD">3847836.34</msp_per_unit>
       <production>
         <num_aircraft_5years>75.0</num_aircraft_5years>
         <engineering_man_hours unit="h">72.679</engineering_man_hours>
@@ -254,6 +255,10 @@
         <manufacturing_cost_per_hour unit="USD/h">72.97</manufacturing_cost_per_hour>
         <fixed_landing_gear>0.0</fixed_landing_gear>
       </production>
+      <operation>
+        <number_of_pilot>1.0</number_of_pilot>
+        <loan_principal unit="USD">38000.0</loan_principal>
+      </operation>
     </cost>
     <propulsion>
       <he_power_train>
@@ -850,6 +855,7 @@
             <length units="m" is_input="False">0.14793674162006307</length>
             <losses_max units="W" is_input="False">2525.5929659195585</losses_max>
             <mass units="kg" is_input="False">29.124800185860668</mass>
+            <cost_per_unit unit="USD">29683.17</cost_per_unit>
             <phase_resistance units="ohm" is_input="False">0.006410983838220755</phase_resistance>
             <rpm_max units="1/min" is_input="False">3000.0<!--Maximum value of the motor rpm--></rpm_max>
             <rpm_rating units="1/min" is_input="True">4500.0<!--Max continuous rpm of the motor--></rpm_rating>
@@ -892,6 +898,7 @@
           <motor_2>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
+            <cost_per_unit unit="USD">29683.17</cost_per_unit>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
             <length units="m" is_input="False">0.14793674162006307</length>
             <losses_max units="W" is_input="False">2525.5929659195585</losses_max>
@@ -938,6 +945,7 @@
           <motor_3>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
+            <cost_per_unit unit="USD">29683.17</cost_per_unit>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
             <length units="m" is_input="False">0.14793674162006307</length>
             <losses_max units="W" is_input="False">2525.5929659195585</losses_max>
@@ -984,6 +992,7 @@
           <motor_4>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
+            <cost_per_unit unit="USD">29683.17</cost_per_unit>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
             <length units="m" is_input="False">0.14793674162006307</length>
             <losses_max units="W" is_input="False">2525.5929659195585</losses_max>
@@ -1030,6 +1039,7 @@
           <motor_5>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
+            <cost_per_unit unit="USD">29683.17</cost_per_unit>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
             <length units="m" is_input="False">0.14793674162006307</length>
             <losses_max units="W" is_input="False">2525.5929659195585</losses_max>
@@ -1076,6 +1086,7 @@
           <motor_6>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
+            <cost_per_unit unit="USD">29683.17</cost_per_unit>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
             <length units="m" is_input="False">0.14793674162006307</length>
             <losses_max units="W" is_input="False">2525.5929659195585</losses_max>
@@ -2629,6 +2640,7 @@
           <turbo_generator>
             <efficiency is_input="True">0.96</efficiency>
             <mass units="kg" is_input="False">134.7184594440759</mass>
+            <cost_per_unit unit="USD">221207.71</cost_per_unit>
             <power_density units="kW/kg" is_input="True">5.0<!--Power density of the turbo generator--></power_density>
             <power_rating units="kW" is_input="False">673.5922972203795<!--Max continuous power of the turbo generator--></power_rating>
             <rear_length_ratio is_input="True">0.1<!--Location of the turbo generator CG as a ratio of the aircraft rear length--></rear_length_ratio>
@@ -2760,6 +2772,7 @@
     </weight>
     <mission>
       <sizing>
+        <duration units="s" is_input="False">16588.350196741827</duration>
         <cs23>
           <safety_factor is_input="True">1.5</safety_factor>
           <characteristic_speed>

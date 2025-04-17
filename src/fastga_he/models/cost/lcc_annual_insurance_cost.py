@@ -8,7 +8,8 @@ import openmdao.api as om
 
 class LCCAnnualInsuranceCost(om.ExplicitComponent):
     """
-    Computation of the annual insurance cost in operation :cite:`gudmundsson:2013`.
+    Computation of the annual insurance cost in operation :cite:`gudmundsson:2013`. Percentage
+    adjusted with cost provides from https://sunsetais.com/aircraft-hull-liability/.
     """
 
     def setup(self):
@@ -24,9 +25,9 @@ class LCCAnnualInsuranceCost(om.ExplicitComponent):
             units="USD/yr",
             desc="Annual insurance cost of the aircraft",
         )
-        self.declare_partials("*", "*", val=0.015)
+        self.declare_partials("*", "*", val=0.01)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:operation:annual_insurance_cost"] = (
-            500 + 0.015 * inputs["data:cost:msp_per_unit"]
+            500 + 0.01 * inputs["data:cost:msp_per_unit"]
         )

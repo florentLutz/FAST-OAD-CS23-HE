@@ -57,10 +57,24 @@ class LCCSumOperationCost(om.ExplicitComponent):
             )
 
         self.add_input(
-            "data:cost:operation:airframe_maintenance_cost",
+            "data:cost:operation:miscellaneous_cost",
             val=np.nan,
             units="USD/yr",
-            desc="Annual airframe maintenance cost per aircraft",
+            desc="Annual airframe maintenance material cost per aircraft",
+        )
+
+        self.add_input(
+            "data:cost:operation:maintenance_cost",
+            val=np.nan,
+            units="USD/yr",
+            desc="Annual maintenance cost per aircraft",
+        )
+
+        self.add_input(
+            "data:cost:operation:additional_cost",
+            val=0.0,
+            units="USD/yr",
+            desc="Yearly additional cost does not considered in the model",
         )
 
         for component_type, component_name in zip(cost_components_type, cost_components_name):
