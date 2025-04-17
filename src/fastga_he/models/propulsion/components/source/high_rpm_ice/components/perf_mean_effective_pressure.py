@@ -11,12 +11,7 @@ class PerformancesMeanEffectivePressure(om.ExplicitComponent):
     Computation of the ICE mean effective pressure for the required torque, formula is based on
     :cite:`lutz:2022`.
 
-    Here is as good of a point as any other to mention that in reality, these engines are mostly
-    associated with fixed pitch propeller which means that the engine RPM dictates the power on the
-    shaft. But that would change the efficiency of the propeller which would change the power
-    required meaning we should an algebraic loop. For simplification, we won't include that since
-    it would require some changes on the structure of the propeller but that means that the user
-    has to be especially vigilant when choosing the input value for the rpm of the propeller.
+    The MEP is computed only for indicative purpose, it is currently not used.
     """
 
     def initialize(self):
