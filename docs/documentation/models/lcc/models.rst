@@ -1,13 +1,24 @@
 .. _models-lca:
 
-============================
-Life Cycle Assessment models
-============================
+======================
+Life Cycle Cost models
+======================
+.. image:: ../../../img/cost_computation_structure.svg
+    :width: 800
+    :align: center
 
-This is a Work-In-Progress, future version of the documentation will include a description of:
+The Life Cycle Cost (LCC) of the aircraft consists with two main categories the production cost and the operation cost.
+The elements of the both groups are detailed in the following descriptions.
 
-* How the `EcoInvent <https://ecoinvent.org/>`_ database is used
-* How the `LCAv package <https://github.com/felixpollet/LCAv>`_ is used
-* How the LCA module works in terms of creating an LCA configuration file
-* What the functional unit is
-* How we compute the impacts per functional unit
+.. contents::
+
+*********************
+Production cost model
+*********************
+
+dfsuifhsudi
+
+
+********************
+Operation cost model
+********************

@@ -1,28 +1,14 @@
-.. _assumptions-lca:
+.. _assumptions-lcc:
 
-=======================================
+=================================
 Life Cycle Cost model assumptions
-=======================================
+=================================
 
-Scope of the LCA analysis
-=========================
+The following assumptions have been made in the calculation of the Life Cycle Cost (LCC).
 
-The LCA covers the production of the components, the assembly of the airframe, the testing of the aircraft before acceptance, its distribution to the end user and the use phase. The use phase includes the generation of electricity, the production of fuel and its combustion during flight. Ground infrastructure (e.g. airfields) and end-of-life treatment of the aircraft and its components are excluded from the study, although future work could investigate the potential impact of these omissions.
-
-A nomenclature similar to that used in early drafts of the aircraft PEFCR has been adopted in the data structures and post-processing graphs. The following categories and their sub-processes are listed here:
-
-* Production: production of airframe components, airframe assembly and powertrain components
-* Manufacturing: acceptance tests.
-* Distribution: distribution according to one of two selected modes, see the section on the :ref:`options-lca`.
-* Operation: combustion and production of fuels and generation of electricity.
-
-Because of their relative simplicity and small contribution to the final impact, manufacturing and distribution have been assumed to be proportionate to the operation phase. Therefore, all their sub-processes have been aggregated, unlike the other phases for which a breakdown of contribution is available.
-
-Other assumptions
-=================
-
-This is a Work-In-Progress, future version of the documentation will include a description of:
-
-* The assumptions made on the materials of the landing gear
-* The assumptions made on the electric mix
-* The proxies used
+* The maintenance cost of the engines and propeller are the annual split of their overhaul cost.
+* The maintenance cost of the electric source and loads are the annual split of their replacement cost.
+* The purchase cost of the powertrain electronics are estimated the number of electric loads.
+* The storage tank maintenance costs are combined in the aircraft annual maintenance cost.
+* The operation cost of the storage tanks are the annual fuel cost.
+* The loan financing in :ref:`options-lca` is considered as default for most financing cases.
