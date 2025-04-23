@@ -110,7 +110,14 @@ from .source.ice import (
     LCCICECost,
     LCCICEOperation,
 )
-from .source.high_rpm_ice import SizingHighRPMICE, PerformancesHighRPMICE, SlipstreamHighRPMICE
+from .source.high_rpm_ice import (
+    SizingHighRPMICE,
+    PerformancesHighRPMICE,
+    SlipstreamHighRPMICE,
+    PreLCAHighRPMICE,
+    LCCHighRPMICECost,
+    LCCHighRPMICEOperation,
+)
 from .source.turboshaft import (
     SizingTurboshaft,
     PerformancesTurboshaft,
