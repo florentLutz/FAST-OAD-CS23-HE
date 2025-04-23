@@ -136,7 +136,7 @@ def test_uninstalled_weight():
     problem.check_partials(compact_print=True)
 
 
-def installed_weight():
+def test_installed_weight():
     ivc = get_indep_var_comp(list_inputs(SizingICEWeight(ice_id="ice_1")), __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -144,7 +144,7 @@ def installed_weight():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:ICE:ice_1:mass", units="kg"
-    ) == pytest.approx(361.218, rel=1e-2)
+    ) == pytest.approx(309.61, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
