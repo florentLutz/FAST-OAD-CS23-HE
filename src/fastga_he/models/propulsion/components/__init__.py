@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 # pylint: disable=unused-import
 # flake8: noqa
@@ -54,52 +54,100 @@ from .connectors.planetary_gear import (
     PerformancesPlanetaryGear,
     SlipstreamPlanetaryGear,
     PreLCAPlanetaryGear,
+    LCCPlanetaryGearCost,
 )
-from .connectors.gearbox import SizingGearbox, PerformancesGearbox, SlipstreamGearbox, PreLCAGearbox
-from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM, PreLCAPMSM
-from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
+from .connectors.gearbox import (
+    SizingGearbox,
+    PerformancesGearbox,
+    SlipstreamGearbox,
+    PreLCAGearbox,
+    LCCGearboxCost,
+)
+from .loads.pmsm import (
+    SizingPMSM,
+    PerformancesPMSM,
+    SlipstreamPMSM,
+    PreLCAPMSM,
+    LCCPMSMCost,
+    LCCPMSMOperation,
+)
+from .loads.dc_load import (
+    SizingDCAuxLoad,
+    PerformancesDCAuxLoad,
+    SlipstreamDCAuxLoad,
+    LCCDCLoadCost,
+    LCCDCLoadOperation,
+)
 from .propulsor.propeller import (
     SizingPropeller,
     PerformancesPropeller,
     SlipstreamPropeller,
     PreLCAPropeller,
+    LCCPropellerCost,
+    LCCPropellerOperation,
 )
 from .source.battery import (
     SizingBatteryPack,
     PerformancesBatteryPack,
     SlipstreamBatteryPack,
     PreLCABatteryPack,
+    LCCBatteryPackCost,
+    LCCBatteryPackOperation,
 )
 from .source.generator import (
     SizingGenerator,
     PerformancesGenerator,
     SlipstreamGenerator,
     PreLCAGenerator,
+    LCCGeneratorCost,
+    LCCGeneratorOperation,
 )
-from .source.ice import SizingICE, PerformancesICE, SlipstreamICE, PreLCAICE
+from .source.ice import (
+    SizingICE,
+    PerformancesICE,
+    SlipstreamICE,
+    PreLCAICE,
+    LCCICECost,
+    LCCICEOperation,
+)
+from .source.high_rpm_ice import SizingHighRPMICE, PerformancesHighRPMICE, SlipstreamHighRPMICE
 from .source.turboshaft import (
     SizingTurboshaft,
     PerformancesTurboshaft,
     SlipstreamTurboshaft,
     PreLCATurboshaft,
+    LCCTurboshaftCost,
+    LCCTurboshaftOperation,
 )
 from .source.simple_turbo_generator import (
     SizingTurboGenerator,
     PerformancesTurboGenerator,
     SlipstreamTurboGenerator,
     PreLCATurboGenerator,
+    LCCTurboGeneratorCost,
+    LCCTurboGeneratorOperation,
 )
-from .source.pemfc import SizingPEMFCStack, PerformancesPEMFCStack, SlipstreamPEMFCStack
+from .source.pemfc import (
+    SizingPEMFCStack,
+    PerformancesPEMFCStack,
+    SlipstreamPEMFCStack,
+    LCCPEMFCStackCost,
+    LCCPEMFCStackOperation,
+)
 from .tanks.fuel_tanks import (
     SizingFuelTank,
     PerformancesFuelTank,
     SlipstreamFuelTank,
     PreLCAFuelTank,
+    LCCFuelTankCost,
+    LCCFuelTankOperation,
 )
 from .tanks.gaseous_hydrogen_tank import (
     SizingGaseousHydrogenTank,
     PerformancesGaseousHydrogenTank,
     SlipstreamGaseousHydrogenTank,
+    LCCGaseousHydrogenTankCost,
+    LCCGaseousHydrogenTankOperation,
 )
 from .connectors.h2_fuel_system import (
     SizingH2FuelSystem,
