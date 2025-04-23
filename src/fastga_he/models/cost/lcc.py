@@ -12,6 +12,10 @@ from .lcc_operation_cost import LCCOperationCost
 
 @oad.RegisterOpenMDAOSystem("fastga_he.lcc.legacy", domain=ModelDomain.OTHER)
 class LCC(om.Group):
+    """
+    Group that collects all the LCC computations.
+    """
+
     def initialize(self):
         self.options.declare(
             name="power_train_file_path",

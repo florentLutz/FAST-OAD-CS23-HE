@@ -537,10 +537,10 @@ def test_production_cost_hydrogen():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:cost_per_unit", units="USD"
-    ) == pytest.approx(43154.99, rel=1e-3)
+    ) == pytest.approx(98885.41, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        354297.8, rel=1e-3
+        410028.21, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -571,17 +571,17 @@ def test_production_cost_hybrid_tbm_900():
     ) == pytest.approx(1959.02, rel=1e-3)
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:cost_per_unit", units="USD"
-    ) == pytest.approx(29683.17, rel=1e-3)
+    ) == pytest.approx(41911.87, rel=1e-3)
     assert problem.get_val(
         "data:propulsion:he_power_train:turbo_generator:turbo_generator:cost_per_unit", units="USD"
     ) == pytest.approx(221207.71, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        3466519.22, rel=1e-3
+        3539891.41, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        3847836.34, rel=1e-3
+        3929279.46, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
