@@ -129,9 +129,9 @@ Unit purchase cost of the propeller from :cite:`gudmundsson:2013`.
 
 :math:`D_p` is the diameter of the propeller and :math:`P_{\text{SHP}}` is the shaft horse power applied to the propeller.
 
-Synchronous Motor / Generator purchase cost
+Synchronous motor / Generator purchase cost
 *******************************************
-Unit purchase cost obtained from https://emrax.com/e-motors/.
+Unit purchase cost obtained from `Emrax <https://emrax.com/e-motors/>`_.
 
 .. math::
 
@@ -161,6 +161,14 @@ regression model derived with the data from https://www.guardianjet.com/jet-airc
 Aircraft level cost
 ===================
 
+Annual maintenance & miscellaneous cost
+***************************************
+
+.. math::
+
+    C_{\text{maintenance}} = 195 \cdot FH_{\text{year}} \cdot e^{0.000232 OWE} \\
+    C_{\text{miscellaneous}} = 80 \cdot FH_{\text{year}}
+
 Annual loan cost
 ****************
 If the aircraft is fully or partially financed by loaning, the annual payback amount is estimated with the formula based
@@ -171,7 +179,87 @@ on regular house mortgage from :cite:`gudmundsson:2013`.
    C_{\text{loan}} = \frac{P \cdot R_{\text{interest}}}{1-\frac{1}{(1 + R_{\text{interest}})^n}}
 
 :math:`P` is the principal of the loan, :math:`R_{\text{interest}}` is the annual interest rate, and :math:`n` is the
-payback perios.
+payback periods.
+
+Annual insurance cost
+*********************
+
+Yearly insurance cost estimation provided by :cite:`gudmundsson:2013`, slight value adjustments applied
+from https://sunsetais.com/aircraft-hull-liability/.
+
+.. math::
+
+   C_{\text{ins}} = 500 + 0.01 \cdot Price
+
+:math:`Price` is the purchase price of the aircraft
+
+Landing / Parking cost
+**********************
+The landing and parking cost obtained from
+`Toulouse Blagnac airport <https://www.toulouse.aeroport.fr/sites/default/files/2023-03/2023_03_23_Redevances_A_EN_v1.pdf>`_.
+
+All the costs do not include VAT.
+
+.. raw:: html
+
+   <div style="display: flex; justify-content: center;">
+
+========================  =======================  =============================================
+MTOW (Tons)                Daily parking cost (€)            Landing cost per operation (€)
+========================  =======================  =============================================
+:math:`w \leq 1.5`               :math:`1.63`                       :math:`31.8`
+:math:`1.5 < w \leq 2.5`          :math:`3.2`                       :math:`41.13`
+:math:`2.5 < w \leq 6`           :math:`5.49`                         :math:`55.29`
+:math:`6 < w \leq 7`            :math:`5.68  w`                 :math:`55.29`
+:math:`w > 7`               :math:`5.68  w`                :math:`50.35 + 0.55(w-6)`
+========================  =======================  =============================================
+
+.. raw:: html
+
+   </div>
+
+:math:`w` is the MTOW of the aircraft.
+
 
 Powertrain level cost
 =====================
+Since the aircraft-level maintenance cost already includes all connector and tank components, their individual costs are
+not calculated. For electronic components such as the motor and generator, operational costs are estimated as an annual
+fraction of the purchase price.
+
+Fuel cost
+*********
+Fuel cost estimation obtained from :cite:`sens:2024` and `Orleans loire-valley airport <https://orleans.aeroport.fr>`_.
+
+.. raw:: html
+
+   <div style="display: flex; justify-content: center;">
+
+========================  =======================
+Fuel Type                     Unit cost (€/kg)
+========================  =======================
+    Avgas 100LL                     3.36
+    Jet-A1                          2.72
+    Diesel                          1.81
+Pressurized Hydrogen                6
+========================  =======================
+
+.. raw:: html
+
+   </div>
+
+Propeller / Engine maintenance cost
+***********************************
+The maintenance cost of propeller, turboshaft, and ICE are calculated as the annual split of the overhaul cost, which is
+required in a specific operation hours.
+
+.. math::
+
+    C_{\text{prop,overhaul}} =
+    \begin{cases}
+        880 & \text{else}
+        3145 \cdot CPI_{\text{2012}} & \text{if connect to turboshaft} \\
+        209.69 \cdot CPI_{\text{2012}} \cdot D_p^2 (\frac {P_{\text{SHP}}}{D_p}) ^{0.12} & \text{else}
+    \end{cases} \\
+    C_{\text{ICE,overhaul}} =  \frac{0.103 V_{\text{disp}} - 4.41}{1.8} \\
+
