@@ -36,7 +36,7 @@ adjustment.
 .. math::
 
     H_{\text{labor}} = f(W_{\text{airframe}},N,V_H,Q_m,F) \\
-    C_{\text{labor}} = 2.0969 \cdot H_{\text{labor}} \cdot R_{\text{labor}} \cdot CPI_{\text{2012}}
+    C_{\text{labor (\$)}} = 2.0969 \cdot H_{\text{labor}} \cdot R_{\text{labor}} \cdot CPI_{\text{2012}}
 
 :math:`W_{\text{airframe}}` is the weight of airframe, :math:`N` is the number of aircraft predicted for a
 five-year-period, :math:`V_H` maximum cruise true airspeed in knots, :math:`Q_m` is the estimated aircraft production
@@ -50,7 +50,7 @@ the aircraft development. As numerous types of labor are included, this cost can
 
 .. math::
 
-    C_{\text{dev}} = 0.06458 \cdot W_{\text{airframe}}^{0.873} \cdot V_H^{1.89} \cdot N_p^{0.346} \cdot CPI_{\text{2012}}
+    C_{\text{dev (\$)}} = 0.06458 \cdot W_{\text{airframe}}^{0.873} \cdot V_H^{1.89} \cdot N_p^{0.346} \cdot CPI_{\text{2012}}
                     \cdot F
 
 :math:`N_p` is the number of prototype produced during the development period.
@@ -61,7 +61,7 @@ Cost of development and certification flight test.
 
 .. math::
 
-    C_{\text{ft}} = 0.009646 \cdot W_{\text{airframe}}^{1.16} \cdot V_H^{1.3718} \cdot N_p^{1.281} \cdot CPI_{\text{2012}}
+    C_{\text{ft (\$)}} = 0.009646 \cdot W_{\text{airframe}}^{1.16} \cdot V_H^{1.3718} \cdot N_p^{1.281} \cdot CPI_{\text{2012}}
 
 
 Cost of quality control
@@ -70,7 +70,7 @@ Cost of manufacturing quality control, which consist with the cost of technician
 
 .. math::
 
-    C_{\text{QC}} = 0.13 * C_{\text{MFG}} * (1 + 0.5f_{\text{comp}})
+    C_{\text{QC (\$)}} = 0.13 * C_{\text{MFG}} * (1 + 0.5f_{\text{comp}})
 
 :math:`C_{\text{MFG}}` is the manufacturing cost of a five-year period, :math:`f_{\text{comp}}` represents the
 proportion of the airframe made of composite material.
@@ -80,7 +80,7 @@ Cost of material
 
 .. math::
 
-    C_{\text{material}} = 24.896 \cdot  W_{\text{airframe}}^{0.689} \cdot V_H^{0.624} \cdot N^{0.792}
+    C_{\text{material (\$)}} = 24.896 \cdot  W_{\text{airframe}}^{0.689} \cdot V_H^{0.624} \cdot N^{0.792}
                             \cdot CPI_{\text{2012}} \cdot F_{CF} \cdot F_{\text{press}}
 
 :math:`F_{CF}` is the complex flap system factor = 1.02 if comp[lex flap system applied, :math:`F_{\text{press}}`
@@ -94,7 +94,7 @@ tooling labor cost.
 
 .. math::
 
-    C_{\text{certify}} =  C_{\text{eng}} + C_{\text{dev}} + C_{\text{ft}} + C_{\text{tool}}
+    C_{\text{certify (\$)}} =  C_{\text{eng}} + C_{\text{dev}} + C_{\text{ft}} + C_{\text{tool}}
 
 
 Powertrain level cost
@@ -106,7 +106,7 @@ Unit purchase cost of the engine from :cite:`gudmundsson:2013`.
 
 .. math::
 
-    C_{\text{engine}} =
+    C_{\text{engine (\$)}} =
     \begin{cases}
         174 \cdot CPI_{\text{2012}} \cdot P_{\text{BHP}} & \text{if ICE} \\
         377.4 \cdot CPI_{\text{2012}} \cdot P_{\text{SHP}} & \text{if turboshaft}
@@ -121,7 +121,7 @@ Unit purchase cost of the propeller from :cite:`gudmundsson:2013`.
 
 .. math::
 
-    C_{\text{propeller}} =
+    C_{\text{propeller (\$)}} =
     \begin{cases}
         3145 \cdot CPI_{\text{2012}} & \text{if fixed-pitch} \\
         209.69 \cdot CPI_{\text{2012}} \cdot D_p^2 (\frac {P_{\text{SHP}}}{D_p}) ^{0.12} & \text{if constant-speed}
@@ -135,7 +135,7 @@ Unit purchase cost obtained from `Emrax <https://emrax.com/e-motors/>`_.
 
 .. math::
 
-    C_{\text{motor}} = 893.51 \cdot e^{0.0281 P_{\text{max, cont.}} }
+    C_{\text{motor (\$)}} = 893.51 \cdot e^{0.0281 P_{\text{max, cont.}} }
 
 :math:`P_{\text{max, cont.}}` is the maximum continuous power of the motor / generator.
 
@@ -145,7 +145,7 @@ Unit purchase cost obtained with logarithmic regression from :cite:`Wesley:2023`
 
 .. math::
 
-    C_{\text{bat}} = C_{2022}  E_{\text{bat}} (1.01 - 0.156 \ln{Y_{2022}})
+    C_{\text{bat (\$)}} = C_{2022}  E_{\text{bat}} (1.01 - 0.156 \ln{Y_{2022}})
 
 :math:`C_{2022}` is the energy per dollar of battery in 2022, :math:`E_{bat}` is the maximum energy supply from battery,
 and :math:`Y_{2022}` is the amount of year from 2022.
@@ -156,7 +156,7 @@ Operation cost model
 ********************
 Similar as the production cost model, the operation cost is also built with the cost from aircraft level and powertrain
 level. However, to better estimate the regular maintenance cost, the calculation of maintenance is achieved with a
-regression model derived with the data from https://www.guardianjet.com/jet-aircraft-online-tools.
+regression model derived with the data from `Guardianjet <https://www.guardianjet.com/jet-aircraft-online-tools>`_.
 
 Aircraft level cost
 ===================
@@ -166,8 +166,8 @@ Annual maintenance & miscellaneous cost
 
 .. math::
 
-    C_{\text{maintenance}} = 195 \cdot FH_{\text{year}} \cdot e^{0.000232 OWE} \\
-    C_{\text{miscellaneous}} = 80 \cdot FH_{\text{year}}
+    C_{\text{maintenance (\$)}} = 195 \cdot FH_{\text{year}} \cdot e^{0.000232 OWE} \\
+    C_{\text{miscellaneous (\$)}} = 80 \cdot FH_{\text{year}}
 
 Annual loan cost
 ****************
@@ -176,7 +176,7 @@ on regular house mortgage from :cite:`gudmundsson:2013`.
 
 .. math::
 
-   C_{\text{loan}} = \frac{P \cdot R_{\text{interest}}}{1-\frac{1}{(1 + R_{\text{interest}})^n}}
+   C_{\text{loan (\$)}} = \frac{P \cdot R_{\text{interest}}}{1-\frac{1}{(1 + R_{\text{interest}})^n}}
 
 :math:`P` is the principal of the loan, :math:`R_{\text{interest}}` is the annual interest rate, and :math:`n` is the
 payback periods.
@@ -185,11 +185,11 @@ Annual insurance cost
 *********************
 
 Yearly insurance cost estimation provided by :cite:`gudmundsson:2013`, slight value adjustments applied
-from https://sunsetais.com/aircraft-hull-liability/.
+from `Sunset aviation insurance <https://sunsetais.com/aircraft-hull-liability/>`_.
 
 .. math::
 
-   C_{\text{ins}} = 500 + 0.01 \cdot Price
+   C_{\text{ins (\$)}} = 500 + 0.01 \cdot Price
 
 :math:`Price` is the purchase price of the aircraft
 
@@ -218,7 +218,7 @@ MTOW (Tons)                Daily parking cost (€)            Landing cost per 
 
    </div>
 
-:math:`w` is the MTOW of the aircraft.
+:math:`w` is the MTOW of the aircraft in tons.
 
 
 Powertrain level cost
@@ -253,13 +253,36 @@ Propeller / Engine maintenance cost
 The maintenance cost of propeller, turboshaft, and ICE are calculated as the annual split of the overhaul cost, which is
 required in a specific operation hours.
 
+.. raw:: html
+
+   <div style="display: flex; justify-content: center;">
+
+==============================  ========================
+Propeller Type                  Overhaul cost range (\$)
+==============================  ========================
+    Fixed-pitch                         840 - 920
+    Constant-speed                      2800 - 3400
+Constant-speed with turboshaft          4000 - 6800
+==============================  ========================
+
+.. raw:: html
+
+   </div>
+
 .. math::
 
-    C_{\text{prop,overhaul}} =
-    \begin{cases}
-        880 & \text{else}
-        3145 \cdot CPI_{\text{2012}} & \text{if connect to turboshaft} \\
-        209.69 \cdot CPI_{\text{2012}} \cdot D_p^2 (\frac {P_{\text{SHP}}}{D_p}) ^{0.12} & \text{else}
-    \end{cases} \\
-    C_{\text{ICE,overhaul}} =  \frac{0.103 V_{\text{disp}} - 4.41}{1.8} \\
+    C_{\text{ICE,overhaul (\$)}} =  \frac{0.103 V_{\text{disp}} - 4.41}{1.8} \\
+    C_{\text{turboshaft,overhaul (\$)}} = \frac{0.202 P_{\text{cont}} + 259}{3.5}
 
+:math:`V_{\text{disp}}` is the ICE piston displacement volume and :math:`P_{\text{cont}}` is the maximum continuous
+power of the turboshaft engine at sea level.
+
+*********************
+Computation Structure
+*********************
+
+This is a reference model structure of the LCC model using TBM-900 as the base aircraft.
+
+.. raw:: html
+
+   <a href="../../../../../n2/n2_tbm_900_lcc.html" target="_blank">LCC N2 diagram with TBM 900</a><br>

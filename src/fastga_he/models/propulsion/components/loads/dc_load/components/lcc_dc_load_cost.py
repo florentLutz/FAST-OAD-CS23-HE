@@ -9,8 +9,7 @@ import openmdao.api as om
 class LCCDCLoadCost(om.ExplicitComponent):
     """
     Computation of the cost of the DC loads including the electronics of the powertrain.
-    Load regression model obtained based on the price of the products
-    from: https://emrax.com/e-motors/ and the reference electronic cost from :cite:`marciello:2024`.
+    The reference electronic cost from :cite:`marciello:2024`.
     """
 
     def initialize(self):

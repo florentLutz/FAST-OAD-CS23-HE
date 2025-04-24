@@ -74,17 +74,17 @@ class LCCPEMFCStackOperation(om.ExplicitComponent):
         lifespan = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan"
         ]
-        yearly_flight_hour = inputs["data:TLAR:flight_hours_per_year"]
+        flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit",
-        ] = yearly_flight_hour / lifespan
+        ] = flight_hour / lifespan
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan",
-        ] = -cost * yearly_flight_hour / lifespan**2.0
+        ] = -cost * flight_hour / lifespan**2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost",

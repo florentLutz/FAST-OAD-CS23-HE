@@ -58,7 +58,7 @@ class LCCSumProductionCost(om.ExplicitComponent):
             "data:cost:production:material_cost_per_unit",
             val=np.nan,
             units="USD",
-            desc="Development flight test adjusted cost per aircraft",
+            desc="Material adjusted cost per aircraft",
         )
 
         self.add_input(

@@ -9,9 +9,7 @@ import openmdao.api as om
 class LCCMSP(om.ExplicitComponent):
     """
     Computation of the aircraft manufacturer suggested price (MSP) . The profit margin is
-    set to 10%
-    based on
-    :cite:`marciello:2024`.
+    set to 10% based on :cite:`marciello:2024`.
     """
 
     def setup(self):
@@ -25,7 +23,7 @@ class LCCMSP(om.ExplicitComponent):
             "data:cost:msp_per_unit",
             val=1.0e5,
             units="USD",
-            desc="MSP of the aircraft",
+            desc="Manufacturer suggested price of the aircraft",
         )
         self.declare_partials("*", "*", val=1.11)
 

@@ -9,7 +9,7 @@ import openmdao.api as om
 class LCCAnnualLoanCost(om.ExplicitComponent):
     """
     Computation of the yearly loan payment of standard mortgage formula from
-    :cite:`gudmundsson:2013`. The 7% interest rate is  applied typically with down payment of
+    :cite:`gudmundsson:2013`. The 7% interest rate is applied typically with down payment of
     10-20% and a good credit record.
     """
 

@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCGeneratorOperation(om.ExplicitComponent):
     """
-    Computation of the maintenance cost of the generator.
+    Computation of the operation cost of the generator.
     """
 
     def initialize(self):
