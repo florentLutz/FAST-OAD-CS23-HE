@@ -13,7 +13,7 @@ the form of group options. A description of those options is available here.
 Powertrain file path options
 ****************************
 
-The LCC module computes the purchase cost, annual maintenance cost, and the annual fuel / electricity cost of the
+The LCC module computes the purchase cost, annual operation cost, and the annual fuel / electricity cost of the
 aircraft powertrain based on the components specified in the powertrain architecture. The path to that file is given in
 the :code:`power_train_file_path` option.
 
@@ -47,9 +47,9 @@ Production cost options
 
 These are the production cost options based on different aircraft configurations:
 
-| "complex_flap" : Activated if the complex flap system is configured for the wing.
-| "pressurized" : Activated if the cabin is pressurized.
-| "tapered_wing" : Activated if the taper-wing design is applied.
+| ``complex_flap`` : Activate if the complex flap system is configured for the wing.
+| ``pressurized`` : Activate if the cabin is pressurized.
+| ``tapered_wing`` : Activate if the taper-wing design is applied.
 
 
 Operation cost options
@@ -57,6 +57,6 @@ Operation cost options
 
 These are the operation cost options based on purchase financing and variable naming consistency:
 
-| "loan" : Activated if loan is one of the financial source during purchase.
-| "use_operational_mission" : LCA model inheritance ensures consistent variable naming.
+| ``loan`` : Activate if loan is one of the financial source during purchase.
+| ``use_operational_mission`` : LCA model inheritance ensures consistent variable naming.
 

@@ -7,7 +7,7 @@ Life Cycle Cost model assumptions
 The following assumptions have been made in the calculation of the Life Cycle Cost (LCC).
 
 * The operation cost of the engines and propeller are the annual split of their overhaul cost.
-* The operation cost of the electric source and loads are the annual split of their replacement cost.
+* The operation cost of electric sources and loads are the annual split of their replacement cost.
 * The purchase cost of the electronics are estimated based on the amount of electric loads.
 * The storage tank maintenance costs are combined in the aircraft annual maintenance cost.
 * The operation cost of the storage tank is the estimated annual fuel cost.

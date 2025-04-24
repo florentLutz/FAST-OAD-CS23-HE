@@ -1,8 +1,8 @@
-============================
+======================
 Life Cycle Cost models
-============================
+======================
 
-FAST-OAD-CS23-HE allows to perform a Life Cycle Cost of hybrid-electric aircraft via a LCC module. That module can be integrated to the analysis by adding the corresponding `id` to the `configuration file <https://fast-oad.readthedocs.io/en/v1.8.2/documentation/usage.html#problem-definition>`_. The id for the LCC module is:
+FAST-OAD-CS23-HE allows to perform a Life Cycle Cost of hybrid-electric aircraft via a LCC module. This module can be integrated to the analysis by adding the corresponding `id` to the `configuration file <https://fast-oad.readthedocs.io/en/v1.8.2/documentation/usage.html#problem-definition>`_. The id for the LCC module is:
 
 .. code:: yaml
 

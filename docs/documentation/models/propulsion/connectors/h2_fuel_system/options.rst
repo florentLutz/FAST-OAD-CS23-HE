@@ -25,9 +25,9 @@ Fuselage position option
 ************************
 The fuselage part of hydrogen fuel system model has three possible installation options:
 
-| "in_the_rear" : Located in the rear of the cabin.
-| "in_the_middle" : Located in the middle of the cabin.
-| "in_the_front" : Located in the front of the cabin.
+| ``in_the_rear`` : Located in the rear of the cabin.
+| ``in_the_middle`` : Located in the middle of the cabin.
+| ``in_the_front`` : Located in the front of the cabin.
 
 All the position-related options can be activated in the PT file:
 
