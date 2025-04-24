@@ -61,7 +61,7 @@ assembly:  # Airframe assembly, assumed to be the same as aircraft assembly give
         electricity:
           name: 'market group for electricity, high voltage'
           loc: 'RER'
-          amount: 219520.67 / 5485.0 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
+          amount: 219520.67 / 5485.0 # We are giving here the amount for 1 kg of OWE since we are defining a custom process
 
         gas:
           name: 'natural gas, burned in gas turbine'  # Not sure about this one
