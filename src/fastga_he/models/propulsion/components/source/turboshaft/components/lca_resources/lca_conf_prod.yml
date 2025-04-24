@@ -32,68 +32,7 @@ ANCHOR_COMPONENT_NAME:
           name: 'market for aluminium alloy, metal matrix composite'
           amount: 0.483
 
-        # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
-        # with the mass
-        electricity:
-          name: 'market group for electricity, high voltage'
-          loc: 'RER'
-          amount: 9484 / 237 # We are giving here the amount for 1 kg of turboshaft since we are defining a custom process
-
-        gas:
-          name: 'natural gas, burned in gas turbine'  # Not sure about this one
-          loc: 'RoE'
-          amount: 9537 / 237 * 3.6 # kWh to MJ
-
-        heat_and_steam:
-          name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
-          loc: 'RoW'
-          amount: 1190 / 237 * 3.6 # kWh to MJ
-
-        diesel:
-          name: 'market for diesel'
-          loc: 'Europe without Switzerland'
-          amount: 2524 / 237 * 3.6 / 45.6 # kWh to MJ to kg
-
-        kerosene: # SAF aggregated in here because the process does not exist
-          name: 'market for kerosene'
-          loc: 'RoW'
-          amount: 5168 / 237 * 3.6 / 43.0 # kWh to MJ to kg
-
-        water_in:
-          name: 'market for water, decarbonised'
-          loc: 'RoW'
-          amount: 23000 / 237 # In m**3 in the source, in kg here (1m**3 = 1000kg)
-
-        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In m**3
-          amount: 22 / 237
-          name: 'water'
-          categories:
-            - 'water'
-            - 'ground-'
-
-        CO2:
-          amount: 9858 / 237 # In kg
-          name: 'carbon dioxide, fossil'  # this is a biosphere process
-          categories:
-            - 'air'
-            - 'lower stratosphere + upper troposphere'
-
-        SOx:
-          amount: 0.105 / 237
-          name: 'sulfur dioxide'
-          categories:
-            - 'air'
-            - 'lower stratosphere + upper troposphere'
-
-        NOx:
-          amount: 3.030 / 237
-          name: 'nitrogen oxides'
-          categories:
-            - 'air'
-            - 'lower stratosphere + upper troposphere'
-
-        VOC:
-          amount: 14.347 / 237
-          name: 'VOC, volatile organic compounds'
-          categories:
-            - 'air'
+        # Originally, values from :cite:`thonemann:2024` were used for the assembly of the
+        # turboshaft, but it seems like the value they give also include materials production which
+        # we don't want to count twice. This means that we don't consider the assembly of the
+        # turboshaft, resulting in an underestimation.

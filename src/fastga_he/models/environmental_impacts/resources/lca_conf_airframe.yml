@@ -56,68 +56,17 @@ assembly:  # Airframe assembly, assumed to be the same as aircraft assembly give
       unit: kilogram
 
       assembly:
-        # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
-        # with the mass
+        # For all of those we use the value from :cite:`arvidsson:2024` then we do a cross product
+        # with the mass. Originally, data from :cite:`thonemann:2024` were used, but it seemed like
+        # the production of materials was already included and as per :cite:`arvidsson:2024`, most
+        # of the things except electricity can be discarded.
         electricity:
           name: 'market group for electricity, high voltage'
           loc: 'RER'
-          amount: 219520.67 / 5485.0 # We are giving here the amount for 1 kg of OWE since we are defining a custom process
-
-        gas:
-          name: 'natural gas, burned in gas turbine'  # Not sure about this one
-          loc: 'RoE'
-          amount: 220738.34 / 5485.0 * 3.6 # kWh to MJ
-
-        heat_and_steam:
-          name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
-          loc: 'RoW'
-          amount: 27551.155 / 5485.0 * 3.6 # kWh to MJ
-
-        diesel:
-          name: 'market for diesel'
-          loc: 'Europe without Switzerland'
-          amount: 58409.765 / 5485.0 * 3.6 / 45.6 # kWh to MJ to kg
-
-        kerosene:
-          name: 'market for kerosene'
-          loc: 'RoW'
-          amount: 118914.8 / 5485.0 * 3.6 / 43.0 # kWh to MJ to kg
-
-        water_in:
-          name: 'market for water, decarbonised'
-          loc: 'RoW'
-          amount: 537530 / 5485.0 # In kg
-
-        water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In kg in the source but needs to be in m**3 here
-          amount: 499.135 / 5485.0
-          name: 'water'
-          categories:
-            - 'water'
-            - 'ground-'
-
-        CO2:
-          amount: 89954.38395 / 5485.0 # In kg
-          name: 'carbon dioxide, fossil'  # this is a biosphere process
-          categories:
-            - 'air'
-            - 'lower stratosphere + upper troposphere'
-
-        SOx:
-          amount: 2.24067735 / 5485.0
-          name: 'sulfur dioxide'
-          categories:
-            - 'air'
-            - 'lower stratosphere + upper troposphere'
-
-        NOx:
-          amount: 35.53361811 / 5485.0
-          name: 'nitrogen oxides'
-          categories:
-            - 'air'
-            - 'lower stratosphere + upper troposphere'
+          amount: 2.43 # We are giving here the amount for 1 kg of OWE since we are defining a custom process
 
         VOC:
-          amount: 168.2270343 / 5485.0
+          amount: 0.0049
           name: 'VOC, volatile organic compounds'
           categories:
             - 'air'
