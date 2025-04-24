@@ -381,6 +381,14 @@ def test_wing_weight_per_fu():
 
     problem.check_partials(compact_print=True)
 
+    # Check it still works with the option enabled
+    problem = run_system(
+        LCAWingWeightPerFU(airframe_material="composite"),
+        ivc,
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_fuselage_weight_per_fu():
     inputs_list = [
@@ -403,6 +411,14 @@ def test_fuselage_weight_per_fu():
     assert problem.get_val(
         "data:weight:airframe:fuselage:mass_per_fu", units="kg"
     ) == pytest.approx(5.99973828e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    # Check that it still works with the option enabled
+    problem = run_system(
+        LCAFuselageWeightPerFU(airframe_material="composite"),
+        ivc,
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -431,6 +447,14 @@ def test_htp_weight_per_fu():
 
     problem.check_partials(compact_print=True)
 
+    # Check that it still works with the option enabled
+    problem = run_system(
+        LCAHTPWeightPerFU(airframe_material="composite"),
+        ivc,
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_vtp_weight_per_fu():
     inputs_list = [
@@ -453,6 +477,14 @@ def test_vtp_weight_per_fu():
     assert problem.get_val(
         "data:weight:airframe:vertical_tail:mass_per_fu", units="kg"
     ) == pytest.approx(3.45032812e-06, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    # Check that it still works with the option enabled
+    problem = run_system(
+        LCAVTPWeightPerFU(airframe_material="composite"),
+        ivc,
+    )
 
     problem.check_partials(compact_print=True)
 
