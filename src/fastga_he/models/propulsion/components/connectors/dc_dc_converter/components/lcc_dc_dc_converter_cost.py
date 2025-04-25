@@ -1,0 +1,77 @@
+# This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
+# Electric Aircraft.
+# Copyright (C) 2022 ISAE-SUPAERO
+
+import numpy as np
+import openmdao.api as om
+
+
+class LCCDCDCConverterCost(om.ExplicitComponent):
+    """
+    Computation of convertor purchase cost. Reference prices obtained from
+    https://www.mcico.com/truebluepower/converters?purchase_type=New+Outright%2CNew+Exchange.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="dc_dc_converter_id",
+            default=None,
+            desc="Identifier of the DC/DC converter",
+            allow_none=False,
+        )
+
+    def setup(self):
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":power_rating_max",
+            val=np.nan,
+            units="kW",
+            desc="Maximum power rating of the converter",
+        )
+
+        self.add_output(
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":cost_per_unit",
+            units="USD",
+            val=750.0,
+        )
+
+        self.declare_partials(of="*", wrt="*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        power = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":power_rating_max"
+        ]
+
+        outputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":cost_per_unit"
+        ] = 733.0 * np.log(power) + 2295.0
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        partials[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":cost_per_unit",
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":power_rating_max",
+        ] = (
+            733.0
+            / inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":power_rating_max"
+            ]
+        )

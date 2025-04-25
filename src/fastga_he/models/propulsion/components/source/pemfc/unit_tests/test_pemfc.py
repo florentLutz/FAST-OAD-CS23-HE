@@ -45,6 +45,9 @@ from ..components.perf_pemfc_stack import PerformancesPEMFCStack
 from ..components.cstr_ensure import ConstraintsPEMFCStackEffectiveAreaEnsure
 from ..components.cstr_enforce import ConstraintsPEMFCStackEffectiveAreaEnforce
 
+from ..components.lcc_pemfc_cost import LCCPEMFCStackCost
+from ..components.lcc_pemfc_operation import LCCPEMFCStackOperation
+
 from ..constants import POSSIBLE_POSITION
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -929,5 +932,58 @@ def test_performances_pemfc_stack_analytical():
     )
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max",
+        units="kW",
+        val=0.2,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCPEMFCStackCost(pemfc_stack_id="pemfc_stack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_unit",
+        units="USD",
+    ) == pytest.approx(
+        13.14,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operation_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_unit",
+        units="USD",
+        val=10000.0,
+    )
+    ivc.add_output(
+        "data:TLAR:flight_hours_per_year",
+        units="h",
+        val=1000.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCPEMFCStackOperation(pemfc_stack_id="pemfc_stack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:operation_cost",
+        units="USD/yr",
+    ) == pytest.approx(
+        800.0,
+        rel=1e-2,
+    )
 
     problem.check_partials(compact_print=True)

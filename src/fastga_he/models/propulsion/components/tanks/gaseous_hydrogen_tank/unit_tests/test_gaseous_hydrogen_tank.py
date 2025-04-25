@@ -32,6 +32,9 @@ from ..components.cstr_ensure import ConstraintsGaseousHydrogenTankCapacityEnsur
 from ..components.perf_fuel_mission_consumed import PerformancesGaseousHydrogenConsumedMission
 from ..components.perf_fuel_remaining import PerformancesGaseousHydrogenRemainingMission
 
+from ..components.lcc_gaseous_hydrogen_tank_cost import LCCGaseousHydrogenTankCost
+from ..components.lcc_gaseous_hydrogen_tank_operation import LCCGaseousHydrogenTankOperation
+
 from ..components.sizing_tank import SizingGaseousHydrogenTank
 from ..components.perf_gaseous_hydrogen_tank import PerformancesGaseousHydrogenTank
 
@@ -704,3 +707,52 @@ def test_performances_gaseous_hydrogen_tank():
         units="kg",
     ) == pytest.approx(279.62, rel=1e-2)
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
+        units="kg",
+        val=140.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCGaseousHydrogenTankCost(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:cost_per_unit",
+        units="USD",
+    ) == pytest.approx(893.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_fuel_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:fuel_consumed_mission",
+        units="kg",
+        val=40.0,
+    )
+    ivc.add_output(
+        "data:cost:operation:mission_per_year",
+        units="1/yr",
+        val=100.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCGaseousHydrogenTankOperation(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:operation_cost",
+        units="USD/yr",
+    ) == pytest.approx(26160.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)

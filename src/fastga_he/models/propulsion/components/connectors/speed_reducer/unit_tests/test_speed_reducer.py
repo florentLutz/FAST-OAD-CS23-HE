@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import pytest
@@ -23,6 +23,7 @@ from ..components.sizing_cg_x import SizingSpeedReducerCGX
 from ..components.sizing_cg_y import SizingSpeedReducerCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCASpeedReducerProdWeightPerFU
+from ..components.lcc_speed_reducer_cost import LCCSpeedReducerCost
 
 from ..components.perf_speed_reducer import PerformancesSpeedReducer
 from ..components.sizing_speed_reducer import SizingSpeedReducer
@@ -369,5 +370,21 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:mass_per_fu", units="kg"
     ) == pytest.approx(3.11e-06, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:mass", val=32.86, units="kg"
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCSpeedReducerCost(speed_reducer_id="speed_reducer_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:speed_reducer:speed_reducer_1:cost_per_unit", units="USD"
+    ) == pytest.approx(7590.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

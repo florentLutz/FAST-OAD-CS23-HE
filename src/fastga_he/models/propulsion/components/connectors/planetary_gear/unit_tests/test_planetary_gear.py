@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import pytest
@@ -28,6 +28,7 @@ from ..components.sizing_cg_x import SizingPlanetaryGearCGX
 from ..components.sizing_cg_y import SizingPlanetaryGearCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAPlanetaryGearProdWeightPerFU
+from ..components.lcc_planatary_gear_cost import LCCPlanetaryGearCost
 
 from ..components.perf_planetary_gear import PerformancesPlanetaryGear
 from ..components.sizing_planetary_gear import SizingPlanetaryGear
@@ -600,5 +601,21 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:mass_per_fu", units="kg"
     ) == pytest.approx(1.622e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:mass", val=32.86, units="kg"
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCPlanetaryGearCost(planetary_gear_id="planetary_gear_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:cost_per_unit", units="USD"
+    ) == pytest.approx(7590.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

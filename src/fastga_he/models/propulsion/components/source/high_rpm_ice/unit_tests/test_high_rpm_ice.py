@@ -47,6 +47,9 @@ from ..components.perf_maximum import PerformancesMaximum
 from ..components.pre_lca_prod_weight_per_fu import PreLCAHighRPMICEProdWeightPerFU
 from ..components.pre_lca_use_emission_per_fu import PreLCAHighRPMICEUseEmissionPerFU
 
+from ..components.lcc_high_rpm_ice_cost import LCCHighRPMICECost
+from ..components.lcc_high_rpm_ice_operation import LCCHighRPMICEOperation
+
 from ...ice.components.perf_fuel_consumption import PerformancesICEFuelConsumption
 from ...ice.components.perf_fuel_consumed import PerformancesICEFuelConsumed
 from ...ice.components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
@@ -1140,3 +1143,46 @@ def test_performances_ice():
     problem.check_partials(compact_print=True)
 
     om.n2(problem, show_browser=False, outfile=pathlib.Path(__file__).parent / "n2.html")
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:cpi_2012", val=1.4)
+    ivc.add_output(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_max_SL",
+        val=250.0,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHighRPMICECost(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:cost_per_unit", units="USD"
+    ) == pytest.approx(
+        81668.231,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_maintenance():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:displacement_volume",
+        val=0.0107,
+        units="m**3",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHighRPMICEOperation(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:operation_cost", units="USD/yr"
+    ) == pytest.approx(
+        9887.5,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
