@@ -24,7 +24,7 @@ class PerformancesPowerOutput(om.ExplicitComponent):
         self.add_input("ac_voltage_rms_out", units="V", val=np.full(number_of_points, np.nan))
 
         self.add_output(
-            "power_output",
+            "power_out",
             units="W",
             val=np.full(number_of_points, 250.0),
         )
@@ -44,11 +44,11 @@ class PerformancesPowerOutput(om.ExplicitComponent):
         current = inputs["ac_current_rms_out_one_phase"]
         ac_voltage_rms_out = inputs["ac_voltage_rms_out"]
 
-        outputs["power_output"] = 3.0 * current * ac_voltage_rms_out
+        outputs["power_out"] = 3.0 * current * ac_voltage_rms_out
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         current = inputs["ac_current_rms_out_one_phase"]
         ac_voltage_rms_out = inputs["ac_voltage_rms_out"]
 
-        partials["power_output", "ac_voltage_rms_out"] = 3.0 * current
-        partials["power_output", "ac_current_rms_out_one_phase"] = 3.0 * ac_voltage_rms_out
+        partials["power_out", "ac_voltage_rms_out"] = 3.0 * current
+        partials["power_out", "ac_current_rms_out_one_phase"] = 3.0 * ac_voltage_rms_out

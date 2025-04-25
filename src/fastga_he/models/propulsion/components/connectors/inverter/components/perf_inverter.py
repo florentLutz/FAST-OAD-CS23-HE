@@ -90,7 +90,7 @@ class PerformancesInverter(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "power_output",
+            "power_out",
             PerformancesPowerOutput(number_of_points=number_of_points),
             promotes=["*"],
         )
