@@ -1365,18 +1365,24 @@ def test_weight_per_fu():
 
     problem.check_partials(compact_print=True)
 
+
 def test_cost():
     ivc = om.IndepVarComp()
 
-    ivc.add_output("data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1"
-                   ":power_rating_max",364.0, units="kW")
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1" ":power_rating_max",
+        364.0,
+        units="kW",
+    )
 
     problem = run_system(
         LCCDCDCConverterCost(dc_dc_converter_id="dc_dc_converter_1"),
         ivc,
     )
 
-    assert problem.get_val("data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1"
-                           ":cost_per_unit", units="USD") == pytest.approx(6617.61, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1" ":cost_per_unit",
+        units="USD",
+    ) == pytest.approx(6617.61, rel=1e-2)
 
     problem.check_partials(compact_print=True)
