@@ -102,12 +102,12 @@ class LCCHarnessCost(om.ExplicitComponent):
         ]
         length = inputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length"]
 
-        cost_ins = 40.0  # USD/kg
+        cost_ins = 86000.0  # USD/m^3
 
         if rho_c < 8960.0:
-            self.price_metal = 2.5  # USD/kg
+            self.price_metal = 6775.0  # USD/m^3
         else:
-            self.price_metal = 10.33  # USD/kg
+            self.price_metal = 92556.8  # USD/m^3
 
         c_conductor = np.pi * self.price_metal * (r_c**2.0)
         c_i = np.pi * cost_ins * ((2.0 * r_c + t_in) * t_in)
@@ -144,7 +144,7 @@ class LCCHarnessCost(om.ExplicitComponent):
 
         length = inputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length"]
 
-        cost_ins = 40.0  # USD/kg
+        cost_ins = 86000.0  # USD/m^3
 
         c_conductor = np.pi * self.price_metal * (r_c**2.0)
         c_i = np.pi * cost_ins * ((2.0 * r_c + t_in) * t_in)

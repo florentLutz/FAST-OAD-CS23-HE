@@ -954,6 +954,6 @@ def test_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_unit",
         units="USD",
-    ) == pytest.approx(0.04824, rel=1e-2)
+    ) == pytest.approx(148.07, rel=1e-2)
 
     problem.check_partials(compact_print=True)
