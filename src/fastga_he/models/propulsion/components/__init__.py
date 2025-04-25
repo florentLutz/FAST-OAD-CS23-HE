@@ -11,6 +11,7 @@ from .connectors.dc_cable import (
     PerformancesHarness,
     SlipstreamHarness,
     PreLCAHarness,
+    LCCHarnessCost,
 )
 from .connectors.dc_dc_converter import (
     SizingDCDCConverter,
