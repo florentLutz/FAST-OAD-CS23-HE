@@ -25,15 +25,15 @@ class LCAHTPWeightPerFU(om.ExplicitComponent):
             self.add_input(
                 "data:environmental_impact:buy_to_fly:metallic",
                 val=1.0,
-                desc="Ratio of the amount of material purchased to the one that actually flies. "
-                "Typical value for metallic material is between 5 and 10",
+                desc="Ratio of the amount of material purchased to to what is really put into the "
+                "manufactured parts. Typical value for metallic material is between 5 and 10",
             )
         else:
             self.add_input(
                 "data:environmental_impact:buy_to_fly:composite",
                 val=1.0,
-                desc="Ratio of the amount of material purchased to the one that actually flies. "
-                "Typical value for composite material is between 1 and 2",
+                desc="Ratio of the amount of material purchased to to what is really put into the "
+                "manufactured parts. Typical value for composite material is between 1 and 2",
             )
 
         self.add_output("data:weight:airframe:horizontal_tail:mass_per_fu", val=1e-6, units="kg")
