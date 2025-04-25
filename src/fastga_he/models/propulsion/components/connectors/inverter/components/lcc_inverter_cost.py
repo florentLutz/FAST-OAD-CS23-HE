@@ -24,10 +24,10 @@ class LCCInverterCost(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":usable_power_max",
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":power_rating_max",
             units="kW",
             val=np.nan,
-            desc="Maximum value of the usable power",
+            desc="Power rating of the inverter",
         )
 
         self.add_output(
@@ -41,12 +41,12 @@ class LCCInverterCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         inverter_id = self.options["inverter_id"]
 
-        power = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":usable_power_max"
+        power_rating = inputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_rating_max"
         ]
 
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":cost_per_unit"] = (
-            2167.0 * np.log(power) + 6910.0
+            2167.0 * np.log(power_rating) + 6910.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -54,8 +54,8 @@ class LCCInverterCost(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":cost_per_unit",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":usable_power_max",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_rating_max",
         ] = (
             2167.0
-            / inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":usable_power_max"]
+            / inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_rating_max"]
         )

@@ -32,7 +32,7 @@ from ..components.perf_modulation_index import PerformancesModulationIndex
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_gate_voltage import PerformancesGateVoltage
-from ..components.perf_power_output import PerformancesPowerOutput
+from ..components.perf_power_rating import PerformancesPowerRating
 from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_total_loss import PerformancesLosses
 from fastga_he.models.propulsion.components.connectors.inverter.components.stale.perf_temperature_derivative import (
@@ -1263,7 +1263,7 @@ def test_efficiency_mission():
     problem3.check_partials(compact_print=True)
 
 
-def test_power_output():
+def test_power_rating():
     ivc = om.IndepVarComp()
     ivc.add_output(
         name="ac_voltage_rms_out",
@@ -1280,14 +1280,14 @@ def test_power_output():
     # is not equal to the modulation index computed based on bus voltage
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPowerOutput(number_of_points=NB_POINTS_TEST),
+        PerformancesPowerRating(number_of_points=NB_POINTS_TEST),
         ivc,
     )
 
-    power_out = np.array(
+    power_rating = np.array(
         [348.0, 416.36, 488.32, 563.76, 642.7, 725.23, 811.2, 900.77, 994.0, 1090.65]
     )
-    assert problem.get_val("power_output", units="kW") == pytest.approx(power_out, rel=1e-2)
+    assert problem.get_val("power_rating", units="kW") == pytest.approx(power_rating, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1362,7 +1362,7 @@ def test_maximum():
         val=np.array([710.4, 728.5, 747.6, 767.2, 787.1, 807.5, 827.9, 848.6, 869.6, 890.5]),
     )
     ivc.add_output(
-        "power_output",
+        "power_rating",
         units="kW",
         val=np.array([348.0, 416.36, 488.32, 563.76, 642.7, 725.23, 811.2, 900.77, 994.0, 1090.65]),
     )
@@ -1411,7 +1411,7 @@ def test_maximum():
         "data:propulsion:he_power_train:inverter:inverter_1:voltage_dc_max", units="V"
     ) == pytest.approx(1000.5, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:inverter:inverter_1:usable_power_max", units="kW"
+        "data:propulsion:he_power_train:inverter:inverter_1:power_rating_max", units="kW"
     ) == pytest.approx(1090.65, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:igbt:temperature_max", units="degK"
@@ -1513,7 +1513,7 @@ def test_weight_per_fu():
 def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        name="data:propulsion:he_power_train:inverter:inverter_1:usable_power_max",
+        name="data:propulsion:he_power_train:inverter:inverter_1:power_rating_max",
         val=200.0,
         units="kW",
     )

@@ -16,7 +16,7 @@ from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_total_loss import PerformancesLosses
 from .perf_casing_temperature import PerformancesCasingTemperature
 from .perf_dc_current import PerformancesDCCurrent
-from .perf_power_output import PerformancesPowerOutput
+from .perf_power_rating import PerformancesPowerRating
 from .perf_maximum import PerformancesMaximum
 
 from .perf_junction_temperature_fixed import SUBMODEL_INVERTER_JUNCTION_TEMPERATURE_FIXED
@@ -90,8 +90,8 @@ class PerformancesInverter(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "power_out",
-            PerformancesPowerOutput(number_of_points=number_of_points),
+            "power_rating",
+            PerformancesPowerRating(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(
