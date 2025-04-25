@@ -24,6 +24,7 @@ from .connectors.inverter import (
     PerformancesInverter,
     SlipstreamInverter,
     PreLCAInverter,
+    LCCInverterCost,
 )
 from .connectors.dc_sspc import SizingDCSSPC, PerformancesDCSSPC, SlipstreamDCSSPC, PreLCADCSSPC
 from .connectors.dc_splitter import (

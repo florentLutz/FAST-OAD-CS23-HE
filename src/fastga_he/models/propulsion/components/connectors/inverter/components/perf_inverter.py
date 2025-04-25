@@ -16,6 +16,7 @@ from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_total_loss import PerformancesLosses
 from .perf_casing_temperature import PerformancesCasingTemperature
 from .perf_dc_current import PerformancesDCCurrent
+from .perf_power_output import PerformancesPowerOutput
 from .perf_maximum import PerformancesMaximum
 
 from .perf_junction_temperature_fixed import SUBMODEL_INVERTER_JUNCTION_TEMPERATURE_FIXED
@@ -86,6 +87,11 @@ class PerformancesInverter(om.Group):
         self.add_subsystem(
             "dc_side_current",
             PerformancesDCCurrent(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "power_output",
+            PerformancesPowerOutput(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(

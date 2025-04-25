@@ -32,6 +32,7 @@ from ..components.perf_modulation_index import PerformancesModulationIndex
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_gate_voltage import PerformancesGateVoltage
+from ..components.perf_power_output import PerformancesPowerOutput
 from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_total_loss import PerformancesLosses
 from fastga_he.models.propulsion.components.connectors.inverter.components.stale.perf_temperature_derivative import (
@@ -49,6 +50,7 @@ from ..components.perf_dc_current import PerformancesDCCurrent
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_inverter import PerformancesInverter
 from ..components.pre_lca_prod_weight_per_fu import PreLCAInverterProdWeightPerFU
+from ..components.lcc_inverter_cost import LCCInverterCost
 
 from ..components.cstr_enforce import (
     ConstraintsCurrentEnforce,
@@ -1261,6 +1263,35 @@ def test_efficiency_mission():
     problem3.check_partials(compact_print=True)
 
 
+def test_power_output():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        name="ac_voltage_rms_out",
+        val=np.array([580.0, 594.8, 610.4, 626.4, 642.7, 659.3, 676.0, 692.9, 710.0, 727.1]),
+        units="V",
+    )
+    ivc.add_output(
+        name="ac_current_rms_out_one_phase",
+        val=np.linspace(200.0, 500.0, NB_POINTS_TEST),
+        units="A",
+    )
+
+    # Won't be representative since the modulation index used for the computation of the losses
+    # is not equal to the modulation index computed based on bus voltage
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPowerOutput(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    power_out = np.array(
+        [348.0, 416.36, 488.32, 563.76, 642.7, 725.23, 811.2, 900.77, 994.0, 1090.65]
+    )
+    assert problem.get_val("power_output", units="kW") == pytest.approx(power_out, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_dc_current():
     ivc = om.IndepVarComp()
     ivc.add_output("dc_voltage_in", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
@@ -1331,6 +1362,11 @@ def test_maximum():
         val=np.array([710.4, 728.5, 747.6, 767.2, 787.1, 807.5, 827.9, 848.6, 869.6, 890.5]),
     )
     ivc.add_output(
+        "power_output",
+        units="kW",
+        val=np.array([348.0, 416.36, 488.32, 563.76, 642.7, 725.23, 811.2, 900.77, 994.0, 1090.65]),
+    )
+    ivc.add_output(
         "diode_temperature",
         units="degK",
         val=np.array(
@@ -1374,6 +1410,9 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:voltage_dc_max", units="V"
     ) == pytest.approx(1000.5, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:usable_power_max", units="kW"
+    ) == pytest.approx(1090.65, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:igbt:temperature_max", units="degK"
     ) == pytest.approx(473.05, rel=1e-2)
@@ -1467,5 +1506,25 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:mass_per_fu", units="kg"
     ) == pytest.approx(8.564e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        name="data:propulsion:he_power_train:inverter:inverter_1:usable_power_max",
+        val=200.0,
+        units="kW",
+    )
+
+    problem = run_system(
+        LCCInverterCost(inverter_id="inverter_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:cost_per_unit", units="USD"
+    ) == pytest.approx(18391.45, rel=1e-3)
 
     problem.check_partials(compact_print=True)
