@@ -68,68 +68,17 @@ model:
               unit: kilogram
         
               assembly:
-                # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
-                # with the mass
+                # For all of those we use the value from :cite:`arvidsson:2024` then we do a cross product
+                # with the mass. Originally, data from :cite:`thonemann:2024` were used, but it seemed like
+                # the production of materials was already included and as per :cite:`arvidsson:2024`, most
+                # of the things except electricity can be discarded.
                 electricity:
                   name: 'market group for electricity, high voltage'
                   loc: 'RER'
-                  amount: 219520.67 / 5485.0 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
-        
-                gas:
-                  name: 'natural gas, burned in gas turbine'  # Not sure about this one
-                  loc: 'RoE'
-                  amount: 220738.34 / 5485.0 * 3.6 # kWh to MJ
-        
-                heat_and_steam:
-                  name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
-                  loc: 'RoW'
-                  amount: 27551.155 / 5485.0 * 3.6 # kWh to MJ
-        
-                diesel:
-                  name: 'market for diesel'
-                  loc: 'Europe without Switzerland'
-                  amount: 58409.765 / 5485.0 * 3.6 / 45.6 # kWh to MJ to kg
-        
-                kerosene:
-                  name: 'market for kerosene'
-                  loc: 'RoW'
-                  amount: 118914.8 / 5485.0 * 3.6 / 43.0 # kWh to MJ to kg
-        
-                water_in:
-                  name: 'market for water, decarbonised'
-                  loc: 'RoW'
-                  amount: 537530 / 5485.0 # In kg
-        
-                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In kg in the source but needs to be in m**3 here
-                  amount: 499.135 / 5485.0
-                  name: 'water'
-                  categories:
-                    - 'water'
-                    - 'ground-'
-        
-                CO2:
-                  amount: 89954.38395 / 5485.0 # In kg
-                  name: 'carbon dioxide, fossil'  # this is a biosphere process
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                SOx:
-                  amount: 2.24067735 / 5485.0
-                  name: 'sulfur dioxide'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                NOx:
-                  amount: 35.53361811 / 5485.0
-                  name: 'nitrogen oxides'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
+                  amount: 2.43 # We are giving here the amount for 1 kg of OWE since we are defining a custom process
         
                 VOC:
-                  amount: 168.2270343 / 5485.0
+                  amount: 0.0049
                   name: 'VOC, volatile organic compounds'
                   categories:
                     - 'air'
@@ -152,72 +101,10 @@ model:
                   name: 'market for aluminium, cast alloy'
                   amount: 1.0 - data__propulsion__he_power_train__propeller__propeller_1__material
         
-                # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
-                # with the mass
-                electricity:
-                  name: 'market group for electricity, high voltage'
-                  loc: 'RER'
-                  amount: 13361 / 333.9 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
-        
-                gas:
-                  name: 'natural gas, burned in gas turbine'  # Not sure about this one
-                  loc: 'RoE'
-                  amount: 13436 / 333.9 * 3.6 # kWh to MJ
-        
-                heat_and_steam:
-                  name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
-                  loc: 'RoW'
-                  amount: 1677 / 333.9 * 3.6 # kWh to MJ
-        
-                diesel:
-                  name: 'market for diesel'
-                  loc: 'Europe without Switzerland'
-                  amount: 3555 / 333.9 * 3.6 / 45.6 # kWh to MJ to kg
-        
-                kerosene: # SAF aggregated in here because the process does not exist
-                  name: 'market for kerosene'
-                  loc: 'RoW'
-                  amount: 7280 / 333.9 * 3.6 / 43.0 # kWh to MJ to kg
-        
-                water_in:
-                  name: 'market for water, decarbonised'
-                  loc: 'RoW'
-                  amount: 33000 / 333.9 # In m**3 in the source, in kg here (1m**3 = 1000kg)
-        
-                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In m**3
-                  amount: 30 / 333.9
-                  name: 'water'
-                  categories:
-                    - 'water'
-                    - 'ground-'
-        
-                CO2:
-                  amount: 13889 / 333.9 # In kg
-                  name: 'carbon dioxide, fossil'  # this is a biosphere process
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                SOx:
-                  amount: 0.149 / 333.9
-                  name: 'sulfur dioxide'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                NOx:
-                  amount: 2.356 / 333.9
-                  name: 'nitrogen oxides'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                VOC:
-                  amount: 11.154 / 333.9
-                  name: 'VOC, volatile organic compounds'
-                  categories:
-                    - 'air'
-
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the
+                # propeller, but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # propeller, resulting in an underestimation.
         turboshaft_1:
             custom_attributes:
                 - attribute: "component"
@@ -252,71 +139,10 @@ model:
                   name: 'market for aluminium alloy, metal matrix composite'
                   amount: 0.483
         
-                # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
-                # with the mass
-                electricity:
-                  name: 'market group for electricity, high voltage'
-                  loc: 'RER'
-                  amount: 9484 / 237 # We are giving here the amount for 1 kg of turboshaft since we are defining a custom process
-        
-                gas:
-                  name: 'natural gas, burned in gas turbine'  # Not sure about this one
-                  loc: 'RoE'
-                  amount: 9537 / 237 * 3.6 # kWh to MJ
-        
-                heat_and_steam:
-                  name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
-                  loc: 'RoW'
-                  amount: 1190 / 237 * 3.6 # kWh to MJ
-        
-                diesel:
-                  name: 'market for diesel'
-                  loc: 'Europe without Switzerland'
-                  amount: 2524 / 237 * 3.6 / 45.6 # kWh to MJ to kg
-        
-                kerosene: # SAF aggregated in here because the process does not exist
-                  name: 'market for kerosene'
-                  loc: 'RoW'
-                  amount: 5168 / 237 * 3.6 / 43.0 # kWh to MJ to kg
-        
-                water_in:
-                  name: 'market for water, decarbonised'
-                  loc: 'RoW'
-                  amount: 23000 / 237 # In m**3 in the source, in kg here (1m**3 = 1000kg)
-        
-                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In m**3
-                  amount: 22 / 237
-                  name: 'water'
-                  categories:
-                    - 'water'
-                    - 'ground-'
-        
-                CO2:
-                  amount: 9858 / 237 # In kg
-                  name: 'carbon dioxide, fossil'  # this is a biosphere process
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                SOx:
-                  amount: 0.105 / 237
-                  name: 'sulfur dioxide'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                NOx:
-                  amount: 3.030 / 237
-                  name: 'nitrogen oxides'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                VOC:
-                  amount: 14.347 / 237
-                  name: 'VOC, volatile organic compounds'
-                  categories:
-                    - 'air'
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the
+                # turboshaft, but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # turboshaft, resulting in an underestimation.
 
         fuel_system_1:
             custom_attributes:
@@ -337,71 +163,10 @@ model:
                   loc: 'GLO'
                   amount: 0.333
         
-                # For all of those we use the value from :cite:`thonemann:2024` then we do a cross product
-                # with the mass
-                electricity:
-                  name: 'market group for electricity, high voltage'
-                  loc: 'RER'
-                  amount: 918 / 22.9 # We are giving here the amount for 1 kg of propeller since we are defining a custom process
-        
-                gas:
-                  name: 'natural gas, burned in gas turbine'  # Not sure about this one
-                  loc: 'RoE'
-                  amount: 923 / 22.9 * 3.6 # kWh to MJ
-        
-                heat_and_steam:
-                  name: 'heat production, natural gas, at boiler modulating >100kW'  # Not sure about this one
-                  loc: 'RoW'
-                  amount: 115 / 22.9 * 3.6 # kWh to MJ
-        
-                diesel:
-                  name: 'market for diesel'
-                  loc: 'Europe without Switzerland'
-                  amount: 244 / 22.9 * 3.6 / 45.6 # kWh to MJ to kg
-        
-                kerosene: # SAF aggregated in here because the process does not exist
-                  name: 'market for kerosene'
-                  loc: 'RoW'
-                  amount: 500 / 22.9 * 3.6 / 43.0 # kWh to MJ to kg
-        
-                water_in:
-                  name: 'market for water, decarbonised'
-                  loc: 'RoW'
-                  amount: 2000 / 22.9  # In m**3 in the source, in kg here (1m**3 = 1000kg)
-        
-                water_out: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!? In m**3
-                  amount: 2 / 22.9
-                  name: 'water'
-                  categories:
-                    - 'water'
-                    - 'ground-'
-        
-                CO2:
-                  amount: 954 / 22.9 # In kg
-                  name: 'carbon dioxide, fossil'  # this is a biosphere process
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                SOx:
-                  amount: 0.01 / 22.9
-                  name: 'sulfur dioxide'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                NOx:
-                  amount: 0.162 / 22.9
-                  name: 'nitrogen oxides'
-                  categories:
-                    - 'air'
-                    - 'lower stratosphere + upper troposphere'
-        
-                VOC:
-                  amount: 0.766 / 22.9
-                  name: 'VOC, volatile organic compounds'
-                  categories:
-                    - 'air'
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the fuel
+                # system, but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't count the assembly of the fuel
+                # system, resulting in an underestimation.
 
 
     manufacturing:
@@ -588,24 +353,28 @@ model:
 
 
 methods:
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'acidification: terrestrial', 'terrestrial acidification potential (TAP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'climate change',  'global warming potential (GWP100)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: freshwater', 'freshwater ecotoxicity potential (FETP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: marine', 'marine ecotoxicity potential (METP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: terrestrial', 'terrestrial ecotoxicity potential (TETP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'energy resources: non-renewable, fossil', 'fossil fuel potential (FFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: freshwater', 'freshwater eutrophication potential (FEP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: marine', 'marine eutrophication potential (MEP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: carcinogenic', 'human toxicity potential (HTPc)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: non-carcinogenic', 'human toxicity potential (HTPnc)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ionising radiation', 'ionising radiation potential (IRP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'land use', 'agricultural land occupation (LOP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'material resources: metals/minerals', 'surplus ore potential (SOP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ozone depletion', 'ozone depletion potential (ODPinfinite)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'particulate matter formation', 'particulate matter formation potential (PMFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: human health', 'photochemical oxidant formation potential: humans (HOFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: terrestrial ecosystems', 'photochemical oxidant formation potential: ecosystems (EOFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'water use', 'water consumption potential (WCP)')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: ecosystem quality', 'ecosystem quality')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: human health', 'human health')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: natural resources', 'natural resources')"
+    - "('EF v3.1', 'acidification', 'accumulated exceedance (AE)')"
+    - "('EF v3.1', 'climate change', 'global warming potential (GWP100)')"
+    - "('EF v3.1', 'climate change: biogenic', 'global warming potential (GWP100)')"
+    - "('EF v3.1', 'climate change: fossil', 'global warming potential (GWP100)')"
+    - "('EF v3.1', 'climate change: land use and land use change', 'global warming potential (GWP100)')"
+    - "('EF v3.1', 'ecotoxicity: freshwater', 'comparative toxic unit for ecosystems (CTUe)')"
+    - "('EF v3.1', 'ecotoxicity: freshwater, inorganics', 'comparative toxic unit for ecosystems (CTUe)')"
+    - "('EF v3.1', 'ecotoxicity: freshwater, organics', 'comparative toxic unit for ecosystems (CTUe)')"
+    - "('EF v3.1', 'energy resources: non-renewable', 'abiotic depletion potential (ADP): fossil fuels')"
+    - "('EF v3.1', 'eutrophication: freshwater', 'fraction of nutrients reaching freshwater end compartment (P)')"
+    - "('EF v3.1', 'eutrophication: marine', 'fraction of nutrients reaching marine end compartment (N)')"
+    - "('EF v3.1', 'eutrophication: terrestrial', 'accumulated exceedance (AE)')"
+    - "('EF v3.1', 'human toxicity: carcinogenic', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'human toxicity: carcinogenic, inorganics', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'human toxicity: carcinogenic, organics', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'human toxicity: non-carcinogenic', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'human toxicity: non-carcinogenic, inorganics', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'human toxicity: non-carcinogenic, organics', 'comparative toxic unit for human (CTUh)')"
+    - "('EF v3.1', 'ionising radiation: human health', 'human exposure efficiency relative to u235')"
+    - "('EF v3.1', 'land use', 'soil quality index')"
+    - "('EF v3.1', 'material resources: metals/minerals', 'abiotic depletion potential (ADP): elements (ultimate reserves)')"
+    - "('EF v3.1', 'ozone depletion', 'ozone depletion potential (ODP)')"
+    - "('EF v3.1', 'particulate matter formation', 'impact on human health')"
+    - "('EF v3.1', 'photochemical oxidant formation: human health', 'tropospheric ozone concentration increase')"
+    - "('EF v3.1', 'water use', 'user deprivation potential (deprivation-weighted water consumption)')"

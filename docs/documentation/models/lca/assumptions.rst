@@ -18,6 +18,11 @@ A nomenclature similar to that used in early drafts of the aircraft PEFCR has be
 
 Because of their relative simplicity and small contribution to the final impact, manufacturing and distribution have been assumed to be proportionate to the operation phase. Therefore, all their sub-processes have been aggregated, unlike the other phases for which a breakdown of contribution is available.
 
+Assumptions regarding assembly of components
+============================================
+
+While the impacts of most components is computed using proxies from the EcoInvent database, for the others, inventories were reconstructed from literature. Data for those reconstructed inventories should include the production of materials and other inputs required for the assembly of the components. For the former, data from :cite:`thonemann:2024` are used, and while data from the latter is also available it seems like the values given might already include the production of the materials. Consequently, and to avoid counting effect twice, for components with no proxies in the EcoInvent database, assembly will be discarded and only impacts from the production of materials will be considered.
+
 Other assumptions
 =================
 
