@@ -56,6 +56,7 @@
             <losses_max units="W" is_input="False">4728.962426915104</losses_max>
             <mass units="kg" is_input="False">917.048414813573<!--Mass of the converter--></mass>
             <power_density units="kW/kg" is_input="False">0.22385764149752968<!--Power density of the DC/DC converter--></power_density>
+            <power_rating_max units="kW" is_input="False">195.00448489406918</power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT module in the converter--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
@@ -72,21 +73,21 @@
             </CG>
             <capacitor>
               <aspect_ratio units="A" is_input="True">2.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
-              <capacity units="F" is_input="False">0.00047791752173502894<!--Capacity of the capacitor--></capacity>
-              <current_caliber units="A" is_input="False">389.9806977357836<!--Current caliber of the DC/DC converter--></current_caliber>
+              <capacity units="F" is_input="False">0.0004779175217350289<!--Capacity of the capacitor--></capacity>
+              <current_caliber units="A" is_input="False">389.98069773578356<!--Current caliber of the DC/DC converter--></current_caliber>
               <current_max units="A" is_input="False">390.992397426788</current_max>
-              <diameter units="mm" is_input="False">98.50561413267262<!--Diameter of the capacitor--></diameter>
-              <height units="mm" is_input="False">197.01122826534524<!--Diameter of the capacitor--></height>
-              <mass units="kg" is_input="False">1.8500033099420479<!--Capacitor's mass--></mass>
-              <resistance units="ohm" is_input="False">0.003297828086321118<!--Capacitor's resistance--></resistance>
+              <diameter units="mm" is_input="False">98.5056141326726<!--Diameter of the capacitor--></diameter>
+              <height units="mm" is_input="False">197.0112282653452<!--Diameter of the capacitor--></height>
+              <mass units="kg" is_input="False">1.8500033099420472<!--Capacitor's mass--></mass>
+              <resistance units="ohm" is_input="False">0.0032978280863211183<!--Capacitor's resistance--></resistance>
               <thermal_resistance units="degK/W" is_input="False">2.797440378687355<!--Capacitor's thermal resistance--></thermal_resistance>
               <scaling>
-                <capacity is_input="False">0.477917521735029<!--Scaling factor for the capacitor capacity--></capacity>
-                <diameter is_input="False">0.9850561413267261<!--Scaling factor for the capacitor diameter--></diameter>
-                <height is_input="False">1.271040182357066<!--Scaling factor for the capacitor height--></height>
-                <mass is_input="False">1.2333355399613652<!--Scaling factor for the capacitor mass--></mass>
-                <resistance is_input="False">1.0305712769753492<!--Scaling factor for the capacitor resistance--></resistance>
-                <thermal_resistance is_input="False">0.9324801262291184<!--Scaling factor for the capacitor thermal resistance--></thermal_resistance>
+                <capacity is_input="False">0.47791752173502894<!--Scaling factor for the capacitor capacity--></capacity>
+                <diameter is_input="False">0.985056141326726<!--Scaling factor for the capacitor diameter--></diameter>
+                <height is_input="False">1.2710401823570658<!--Scaling factor for the capacitor height--></height>
+                <mass is_input="False">1.2333355399613648<!--Scaling factor for the capacitor mass--></mass>
+                <resistance is_input="False">1.0305712769753494<!--Scaling factor for the capacitor resistance--></resistance>
+                <thermal_resistance is_input="False">0.9324801262291185<!--Scaling factor for the capacitor thermal resistance--></thermal_resistance>
               </scaling>
             </capacitor>
             <contactor>
@@ -150,18 +151,18 @@
             </igbt>
             <inductor>
               <air_gap units="mm" is_input="True">10.0<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">10.886402502297164<!--Mass of the copper in the inductor--></copper_mass>
+              <copper_mass units="kg" is_input="False">10.886402502297166<!--Mass of the copper in the inductor--></copper_mass>
               <core_mass units="kg" is_input="False">450.2029972121426<!--Mass of the E-core in the inductor--></core_mass>
-              <current_caliber units="A" is_input="False">892.3364463019116<!--Current caliber of the DC/DC converter--></current_caliber>
+              <current_caliber units="A" is_input="False">892.3364463019115<!--Current caliber of the DC/DC converter--></current_caliber>
               <current_max units="A" is_input="False">895.7801592606585</current_max>
-              <inductance units="H" is_input="False">0.000396898129774292<!--Inductance of the inductor--></inductance>
+              <inductance units="H" is_input="False">0.0003968981297742921<!--Inductance of the inductor--></inductance>
               <iron_surface units="m**2" is_input="False">0.06946467427607755<!--Iron surface of the E-core inductor--></iron_surface>
               <magnetic_energy_rating units="J" is_input="False">158.0179123659635<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
               <mass units="kg" is_input="False">911.2923969265823<!--Mass of the inductor--></mass>
               <reluctance units="1/H" is_input="False">65495.02440290697<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.0007756142805932173<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">5.098514753831295<!--Number of turns in the inductor--></turn_number>
+              <resistance units="ohm" is_input="False">0.0007756142805932174<!--Resistance of the inductor--></resistance>
+              <turn_number is_input="False">5.098514753831296<!--Number of turns in the inductor--></turn_number>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
               <wire_section_area units="m**2" is_input="False">0.0001784672892603823<!--Section area of the copper wire inside the inductor--></wire_section_area>
               <core_dimension>
@@ -195,10 +196,10 @@
         </DC_DC_converter>
         <DC_SSPC>
           <dc_sspc_1337>
-            <current_caliber units="A" is_input="False">229.41689387431109<!--Current caliber of the SSPC--></current_caliber>
+            <current_caliber units="A" is_input="False">229.41689387431106<!--Current caliber of the SSPC--></current_caliber>
             <current_max units="A" is_input="False">229.4170410518461<!--Maximum current flowing through the SSPC--></current_max>
             <efficiency is_input="False">0.9956576470588234<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
-            <mass units="kg" is_input="False">6.500145326438814<!--Mass of the SSPC--></mass>
+            <mass units="kg" is_input="False">6.500145326438813<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
             <voltage_caliber units="V" is_input="False">850.0<!--Voltage caliber of the SSPC--></voltage_caliber>
             <voltage_max units="V" is_input="False">850.0<!--Maximum voltage at the terminals SSPC--></voltage_max>
@@ -226,7 +227,7 @@
             </scaling>
           </dc_sspc_1337>
           <dc_sspc_1>
-            <current_caliber units="A" is_input="False">229.41689387431109<!--Current caliber of the SSPC--></current_caliber>
+            <current_caliber units="A" is_input="False">229.41689387431106<!--Current caliber of the SSPC--></current_caliber>
             <current_max units="A" is_input="False">229.4170410518461<!--Maximum current flowing through the SSPC--></current_max>
             <efficiency is_input="False">0.9956192135497908<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
             <mass units="kg" is_input="False">6.443118261331438<!--Mass of the SSPC--></mass>
@@ -288,10 +289,10 @@
             </scaling>
           </dc_sspc_2>
           <dc_sspc_412>
-            <current_caliber units="A" is_input="False">229.41689387431109<!--Current caliber of the SSPC--></current_caliber>
+            <current_caliber units="A" is_input="False">229.41689387431106<!--Current caliber of the SSPC--></current_caliber>
             <current_max units="A" is_input="False">229.4170410518461<!--Maximum current flowing through the SSPC--></current_max>
             <efficiency is_input="False">0.9955999377243392<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
-            <mass units="kg" is_input="False">6.414892201064872<!--Mass of the SSPC--></mass>
+            <mass units="kg" is_input="False">6.4148922010648715<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
             <voltage_caliber units="V" is_input="False">838.8517636254832<!--Voltage caliber of the SSPC--></voltage_caliber>
             <voltage_max units="V" is_input="False">838.8512252859493<!--Maximum voltage at the terminals SSPC--></voltage_max>
@@ -321,7 +322,7 @@
         </DC_SSPC>
         <DC_bus>
           <dc_bus_1>
-            <current_caliber units="A" is_input="False">229.41689387431109</current_caliber>
+            <current_caliber units="A" is_input="False">229.41689387431106</current_caliber>
             <current_max units="A" is_input="False">229.4170410518461</current_max>
             <height units="m" is_input="False">0.0065698311880694246</height>
             <length units="m" is_input="False">0.3023473647269126</length>
@@ -357,7 +358,7 @@
             </low_speed>
           </dc_bus_1>
           <dc_bus_2>
-            <current_caliber units="A" is_input="False">229.41689387431109</current_caliber>
+            <current_caliber units="A" is_input="False">229.41689387431106</current_caliber>
             <current_max units="A" is_input="False">229.4170410518461</current_max>
             <height units="m" is_input="False">0.006574719932520785</height>
             <length units="m" is_input="False">0.30235062388988015</length>
@@ -560,18 +561,18 @@
         </PMSM>
         <gaseous_hydrogen_tank>
           <gaseous_hydrogen_tank_1>
-            <capacity units="kg" is_input="False">15.759114229869668<!--Capacity of the tank in terms of weight--></capacity>
+            <capacity units="kg" is_input="False">15.759114229869667<!--Capacity of the tank in terms of weight--></capacity>
             <diameter_height_ratio is_input="True">0.9<!--Fraction between the tank outer diameter and fuselage height--></diameter_height_ratio>
             <fuel_consumed_mission units="kg" is_input="False">15.418620602510641<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
-            <fuel_total_mission units="kg" is_input="False">15.759114229869668<!--Total amount of hydrogen loaded in the tank for the mission--></fuel_total_mission>
-            <gravimetric_index is_input="False">0.32944616794298537<!--Ratio between the maximum capacity and overall system weight--></gravimetric_index>
-            <inner_volume units="m**3" is_input="False">19.465788829546028<!--Capacity of the tank in terms of volume--></inner_volume>
+            <fuel_total_mission units="kg" is_input="False">15.759114229869667<!--Total amount of hydrogen loaded in the tank for the mission--></fuel_total_mission>
+            <gravimetric_index is_input="False">0.3294461679429853<!--Ratio between the maximum capacity and overall system weight--></gravimetric_index>
+            <inner_volume units="m**3" is_input="False">19.465788829546025<!--Capacity of the tank in terms of volume--></inner_volume>
             <mass units="kg" is_input="False">32.07605813916203<!--Weight of the gaseous hydrogen tanks--></mass>
             <number_of_tank is_input="True">1.0<!--Number of gaseous hydrogen tank in a stack in fuselage. Default set 1.0 for single tank in fuselage and outside fuselage uses.--></number_of_tank>
             <safety_factor is_input="True">1.0<!--gaseous hydrogen tank design safety factor--></safety_factor>
             <tank_pressure units="Pa" is_input="True">1013250.0<!--gaseous hydrogen tank static pressure--></tank_pressure>
             <trapped_ratio is_input="True">0.03<!--Ratio between the hydrogen reactant pressure for fuel cell or the injection pressure for hydrogen engines and filling pressure of hydrogen tank--></trapped_ratio>
-            <unusable_fuel_mission units="kg" is_input="False">0.45900332708358255<!--Amount of trapped hydrogen in the tank--></unusable_fuel_mission>
+            <unusable_fuel_mission units="kg" is_input="False">0.4590033270835825<!--Amount of trapped hydrogen in the tank--></unusable_fuel_mission>
             <CG>
               <x units="m" is_input="False">1.2387085918711065<!--X position of the tank center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the tank center of gravity--></y>
@@ -581,7 +582,7 @@
             </cruise>
             <dimension>
               <inner_diameter units="m" is_input="False">0.8905250923422022<!--Inner diameter of the gaseous hydrogen tanks--></inner_diameter>
-              <length units="m" is_input="False">31.55017931553666<!--Value of the cylindrical length of the tank in the x-direction, computed differently based on the location of the tank.--></length>
+              <length units="m" is_input="False">31.550179315536653<!--Value of the cylindrical length of the tank in the x-direction, computed differently based on the location of the tank.--></length>
               <outer_diameter units="m" is_input="False">0.891<!--Outer diameter of the gaseous hydrogen tank--></outer_diameter>
               <wall_thickness units="m" is_input="False">0.00023745382889889255<!--Inner diameter of the gaseous hydrogen tanks--></wall_thickness>
             </dimension>
@@ -606,6 +607,7 @@
             <modulation_idx_max is_input="False">0.11520098355536577<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_density units="kW/kg" is_input="False">1.951201350549745<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
+            <power_rating_max units="kW" is_input="False">174.64540011830852<!--Maximum value of the usable power--></power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -776,6 +778,7 @@
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <shaft_power_in_max units="W" is_input="False">171526.7765569521<!--Maximum value of the propeller input shaft power--></shaft_power_in_max>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
             <tip_mach_max is_input="False">0.44243515198268096<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
             <torque_max units="N*m" is_input="False">818.9800308497388<!--Maximum value of the propeller torque--></torque_max>
@@ -816,7 +819,7 @@
         <gaseous_hydrogen_tank>
           <gaseous_hydrogen_tank_1>
             <dimension>
-              <length units="m" is_input="False">30.07276213179445<!--Constraints on the tank length w.r.t the cabin/rear_fuselage length,  respected if <0--></length>
+              <length units="m" is_input="False">30.07276213179444<!--Constraints on the tank length w.r.t the cabin/rear_fuselage length,  respected if <0--></length>
             </dimension>
           </gaseous_hydrogen_tank_1>
         </gaseous_hydrogen_tank>

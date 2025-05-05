@@ -1244,18 +1244,19 @@
             </scaling>
           </gearbox_1>
         </gearbox>
-        <inverter>
+         <inverter>
           <inverter_1>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
-            <current_dc_max units="A" is_input="False">133.45740622569895<!--Maximum value of the current at the input of the inverter--></current_dc_max>
-            <dissipable_heat units="W" is_input="False">1965.8404834327835<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
+            <current_dc_max units="A" is_input="False">133.45740622569897<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <dissipable_heat units="W" is_input="False">1965.840483432783<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
-            <losses_max units="W" is_input="False">1965.8404834327835</losses_max>
-            <mass units="kg" is_input="False">4.13255823559498<!--Mass of the inverter--></mass>
+            <losses_max units="W" is_input="False">1965.840483432783</losses_max>
+            <mass units="kg" is_input="False">4.132558235594981<!--Mass of the inverter--></mass>
             <modulation_idx_max is_input="False">0.7999673345424712<!--Maximum modulation index during the mission--></modulation_idx_max>
-            <power_density units="kW/kg" is_input="False">39.27884405292406<!--Power density of the inverter--></power_density>
+            <power_density units="kW/kg" is_input="False">39.27884405292405<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
+            <power_rating_max units="kW" is_input="False">104.66998432187594<!--Maximum value of the usable power--></power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -1324,16 +1325,16 @@
             </energy_rr>
             <heat_sink>
               <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
-              <height units="m" is_input="False">0.006940293321015798<!--Height of the heat sink--></height>
+              <height units="m" is_input="False">0.006940293321015799<!--Height of the heat sink--></height>
               <length units="m" is_input="False">0.21450000000000002<!--Length of the heat sink--></length>
-              <mass units="kg" is_input="False">0.4960833215599117<!--Mass of the heat sink, includes tubes and core--></mass>
+              <mass units="kg" is_input="False">0.4960833215599118<!--Mass of the heat sink, includes tubes and core--></mass>
               <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
               <width units="m" is_input="False">0.10519039329776518<!--Width of the heat sink--></width>
               <coolant>
                 <Prandtl_number is_input="False">39.493034825870645<!--Prandtl number of the coolant--></Prandtl_number>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <max_mass_flow units="m**3/s" is_input="False">1.8577281367844742e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
+                <max_mass_flow units="m**3/s" is_input="False">1.857728136784474e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
                 <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
                 <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
@@ -1341,41 +1342,41 @@
               </coolant>
               <tube>
                 <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
-                <inner_diameter units="m" is_input="False">0.002126862214010532<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
+                <inner_diameter units="m" is_input="False">0.002126862214010533<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
                 <length units="m" is_input="False">0.8580000000000001<!--Length of the tube which is useful for the cooling of the inverter--></length>
-                <mass units="kg" is_input="False">0.11222419151067527<!--Wieght of the tube for the cooling of the inverter--></mass>
-                <outer_diameter units="m" is_input="False">0.004626862214010532<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
+                <mass units="kg" is_input="False">0.1122241915106753<!--Wieght of the tube for the cooling of the inverter--></mass>
+                <outer_diameter units="m" is_input="False">0.004626862214010533<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
                 <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
               </tube>
             </heat_sink>
             <igbt>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="False">0.008036400826694523</resistance>
-              <temperature_max units="degK" is_input="False">398.89983498780543</temperature_max>
+              <temperature_max units="degK" is_input="False">398.8998349878054</temperature_max>
               <thermal_resistance units="degK/W" is_input="False">0.44173593948055984<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
-              <air_gap units="m" is_input="False">0.0006027672664791111<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">0.014831439199696702<!--Mass of the copper in the inductor--></copper_mass>
-              <core_mass units="kg" is_input="False">0.005198237617364882<!--Mass of the E-core in the inductor--></core_mass>
+              <air_gap units="m" is_input="False">0.0006027672664791112<!--Air gap in the inductor--></air_gap>
+              <copper_mass units="kg" is_input="False">0.014831439199696704<!--Mass of the copper in the inductor--></copper_mass>
+              <core_mass units="kg" is_input="False">0.005198237617364881<!--Mass of the E-core in the inductor--></core_mass>
               <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one of the inductor of the inverter--></current_caliber>
               <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
-              <iron_surface units="m**2" is_input="False">3.5486445529752074e-05<!--Iron surface of the E-core inductor--></iron_surface>
+              <iron_surface units="m**2" is_input="False">3.548644552975207e-05<!--Iron surface of the E-core inductor--></iron_surface>
               <magnetic_energy_rating units="J" is_input="False">0.00486580249522942<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
               <mass units="kg" is_input="False">0.025227914434426464<!--Mass of the inductor--></mass>
-              <reluctance units="1/H" is_input="False">7727864.007112578<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.00011769180547164122<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">3.243352113291249<!--Number of turns in the inductor--></turn_number>
+              <reluctance units="1/H" is_input="False">7727864.007112579<!--Reluctance of the inductor--></reluctance>
+              <resistance units="ohm" is_input="False">0.00011769180547164123<!--Resistance of the inductor--></resistance>
+              <turn_number is_input="False">3.2433521132912495<!--Number of turns in the inductor--></turn_number>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
               <wire_section_area units="m**2" is_input="False">1.69105552262377e-05<!--Section area of the copper wire inside the inductor--></wire_section_area>
               <core_dimension>
                 <B units="m" is_input="False">0.016040481471587605<!--B dimension of the E-core in the inductor--></B>
-                <C units="m" is_input="False">0.006030256192326167<!--C dimension of the E-core in the inductor--></C>
+                <C units="m" is_input="False">0.006030256192326166<!--C dimension of the E-core in the inductor--></C>
               </core_dimension>
               <scaling>
-                <core_dimension is_input="False">0.21928204335731516<!--Scaling factor for the dimensions of the E-core--></core_dimension>
-                <core_mass is_input="False">0.01054409253015189<!--Scaling factor for the mass of the E-core--></core_mass>
+                <core_dimension is_input="False">0.21928204335731513<!--Scaling factor for the dimensions of the E-core--></core_dimension>
+                <core_mass is_input="False">0.010544092530151889<!--Scaling factor for the mass of the E-core--></core_mass>
               </scaling>
             </inductor>
             <low_speed>
@@ -1408,14 +1409,15 @@
           <inverter_2>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
-            <current_dc_max units="A" is_input="False">133.41054587225562<!--Maximum value of the current at the input of the inverter--></current_dc_max>
-            <dissipable_heat units="W" is_input="False">1965.8402374197606<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
+            <current_dc_max units="A" is_input="False">133.41054587225565<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <dissipable_heat units="W" is_input="False">1965.8402374197603<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
-            <losses_max units="W" is_input="False">1965.8402374197606</losses_max>
+            <losses_max units="W" is_input="False">1965.8402374197603</losses_max>
             <mass units="kg" is_input="False">4.132558242841155<!--Mass of the inverter--></mass>
             <modulation_idx_max is_input="False">0.7999494848931576<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_density units="kW/kg" is_input="False">39.278843984051136<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
+            <power_rating_max units="kW" is_input="False">104.66998432187594<!--Maximum value of the usable power--></power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -1493,7 +1495,7 @@
                 <Prandtl_number is_input="False">39.493034825870645<!--Prandtl number of the coolant--></Prandtl_number>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <max_mass_flow units="m**3/s" is_input="False">1.8577279043010563e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
+                <max_mass_flow units="m**3/s" is_input="False">1.857727904301056e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
                 <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
                 <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
@@ -1515,27 +1517,27 @@
               <thermal_resistance units="degK/W" is_input="False">0.44173593948055984<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
-              <air_gap units="m" is_input="False">0.0006027672664791111<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">0.014831439199696702<!--Mass of the copper in the inductor--></copper_mass>
-              <core_mass units="kg" is_input="False">0.005198237617364882<!--Mass of the E-core in the inductor--></core_mass>
+              <air_gap units="m" is_input="False">0.0006027672664791112<!--Air gap in the inductor--></air_gap>
+              <copper_mass units="kg" is_input="False">0.014831439199696704<!--Mass of the copper in the inductor--></copper_mass>
+              <core_mass units="kg" is_input="False">0.005198237617364881<!--Mass of the E-core in the inductor--></core_mass>
               <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one of the inductor of the inverter--></current_caliber>
               <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
-              <iron_surface units="m**2" is_input="False">3.5486445529752074e-05<!--Iron surface of the E-core inductor--></iron_surface>
+              <iron_surface units="m**2" is_input="False">3.548644552975207e-05<!--Iron surface of the E-core inductor--></iron_surface>
               <magnetic_energy_rating units="J" is_input="False">0.00486580249522942<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
               <mass units="kg" is_input="False">0.025227914434426464<!--Mass of the inductor--></mass>
-              <reluctance units="1/H" is_input="False">7727864.007112578<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.00011769180547164122<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">3.243352113291249<!--Number of turns in the inductor--></turn_number>
+              <reluctance units="1/H" is_input="False">7727864.007112579<!--Reluctance of the inductor--></reluctance>
+              <resistance units="ohm" is_input="False">0.00011769180547164123<!--Resistance of the inductor--></resistance>
+              <turn_number is_input="False">3.2433521132912495<!--Number of turns in the inductor--></turn_number>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
               <wire_section_area units="m**2" is_input="False">1.69105552262377e-05<!--Section area of the copper wire inside the inductor--></wire_section_area>
               <core_dimension>
                 <B units="m" is_input="False">0.016040481471587605<!--B dimension of the E-core in the inductor--></B>
-                <C units="m" is_input="False">0.006030256192326167<!--C dimension of the E-core in the inductor--></C>
+                <C units="m" is_input="False">0.006030256192326166<!--C dimension of the E-core in the inductor--></C>
               </core_dimension>
               <scaling>
-                <core_dimension is_input="False">0.21928204335731516<!--Scaling factor for the dimensions of the E-core--></core_dimension>
-                <core_mass is_input="False">0.01054409253015189<!--Scaling factor for the mass of the E-core--></core_mass>
+                <core_dimension is_input="False">0.21928204335731513<!--Scaling factor for the dimensions of the E-core--></core_dimension>
+                <core_mass is_input="False">0.010544092530151889<!--Scaling factor for the mass of the E-core--></core_mass>
               </scaling>
             </inductor>
             <low_speed>
@@ -1569,13 +1571,14 @@
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
             <current_dc_max units="A" is_input="False">133.3682264972979<!--Maximum value of the current at the input of the inverter--></current_dc_max>
-            <dissipable_heat units="W" is_input="False">1965.840015264952<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
+            <dissipable_heat units="W" is_input="False">1965.8400152649515<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
-            <losses_max units="W" is_input="False">1965.840015264952</losses_max>
+            <losses_max units="W" is_input="False">1965.8400152649515</losses_max>
             <mass units="kg" is_input="False">4.1325582493846<!--Mass of the inverter--></mass>
             <modulation_idx_max is_input="False">0.799933344755761<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_density units="kW/kg" is_input="False">39.27884392185747<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
+            <power_rating_max units="kW" is_input="False">104.66998432187594<!--Maximum value of the usable power--></power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -1644,16 +1647,16 @@
             </energy_rr>
             <heat_sink>
               <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
-              <height units="m" is_input="False">0.0069402935109591<!--Height of the heat sink--></height>
+              <height units="m" is_input="False">0.006940293510959102<!--Height of the heat sink--></height>
               <length units="m" is_input="False">0.21450000000000002<!--Length of the heat sink--></length>
-              <mass units="kg" is_input="False">0.4960833353495307<!--Mass of the heat sink, includes tubes and core--></mass>
+              <mass units="kg" is_input="False">0.49608333534953086<!--Mass of the heat sink, includes tubes and core--></mass>
               <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
               <width units="m" is_input="False">0.10519039329776518<!--Width of the heat sink--></width>
               <coolant>
                 <Prandtl_number is_input="False">39.493034825870645<!--Prandtl number of the coolant--></Prandtl_number>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <max_mass_flow units="m**3/s" is_input="False">1.8577276943637587e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
+                <max_mass_flow units="m**3/s" is_input="False">1.8577276943637584e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
                 <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
                 <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
@@ -1661,41 +1664,41 @@
               </coolant>
               <tube>
                 <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
-                <inner_diameter units="m" is_input="False">0.0021268623406394<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
+                <inner_diameter units="m" is_input="False">0.0021268623406394006<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
                 <length units="m" is_input="False">0.8580000000000001<!--Length of the tube which is useful for the cooling of the inverter--></length>
-                <mass units="kg" is_input="False">0.11222419586077019<!--Wieght of the tube for the cooling of the inverter--></mass>
-                <outer_diameter units="m" is_input="False">0.0046268623406394<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
+                <mass units="kg" is_input="False">0.11222419586077025<!--Wieght of the tube for the cooling of the inverter--></mass>
+                <outer_diameter units="m" is_input="False">0.004626862340639401<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
                 <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
               </tube>
             </heat_sink>
             <igbt>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="False">0.008036400826694523</resistance>
-              <temperature_max units="degK" is_input="False">398.8958905366498</temperature_max>
+              <temperature_max units="degK" is_input="False">398.89589053664974</temperature_max>
               <thermal_resistance units="degK/W" is_input="False">0.44173593948055984<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
-              <air_gap units="m" is_input="False">0.0006027672664791111<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">0.014831439199696702<!--Mass of the copper in the inductor--></copper_mass>
-              <core_mass units="kg" is_input="False">0.005198237617364882<!--Mass of the E-core in the inductor--></core_mass>
+              <air_gap units="m" is_input="False">0.0006027672664791112<!--Air gap in the inductor--></air_gap>
+              <copper_mass units="kg" is_input="False">0.014831439199696704<!--Mass of the copper in the inductor--></copper_mass>
+              <core_mass units="kg" is_input="False">0.005198237617364881<!--Mass of the E-core in the inductor--></core_mass>
               <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one of the inductor of the inverter--></current_caliber>
               <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
-              <iron_surface units="m**2" is_input="False">3.5486445529752074e-05<!--Iron surface of the E-core inductor--></iron_surface>
+              <iron_surface units="m**2" is_input="False">3.548644552975207e-05<!--Iron surface of the E-core inductor--></iron_surface>
               <magnetic_energy_rating units="J" is_input="False">0.00486580249522942<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
               <mass units="kg" is_input="False">0.025227914434426464<!--Mass of the inductor--></mass>
-              <reluctance units="1/H" is_input="False">7727864.007112578<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.00011769180547164122<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">3.243352113291249<!--Number of turns in the inductor--></turn_number>
+              <reluctance units="1/H" is_input="False">7727864.007112579<!--Reluctance of the inductor--></reluctance>
+              <resistance units="ohm" is_input="False">0.00011769180547164123<!--Resistance of the inductor--></resistance>
+              <turn_number is_input="False">3.2433521132912495<!--Number of turns in the inductor--></turn_number>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
               <wire_section_area units="m**2" is_input="False">1.69105552262377e-05<!--Section area of the copper wire inside the inductor--></wire_section_area>
               <core_dimension>
                 <B units="m" is_input="False">0.016040481471587605<!--B dimension of the E-core in the inductor--></B>
-                <C units="m" is_input="False">0.006030256192326167<!--C dimension of the E-core in the inductor--></C>
+                <C units="m" is_input="False">0.006030256192326166<!--C dimension of the E-core in the inductor--></C>
               </core_dimension>
               <scaling>
-                <core_dimension is_input="False">0.21928204335731516<!--Scaling factor for the dimensions of the E-core--></core_dimension>
-                <core_mass is_input="False">0.01054409253015189<!--Scaling factor for the mass of the E-core--></core_mass>
+                <core_dimension is_input="False">0.21928204335731513<!--Scaling factor for the dimensions of the E-core--></core_dimension>
+                <core_mass is_input="False">0.010544092530151889<!--Scaling factor for the mass of the E-core--></core_mass>
               </scaling>
             </inductor>
             <low_speed>
@@ -1729,13 +1732,14 @@
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
             <current_dc_max units="A" is_input="False">133.3682264972979<!--Maximum value of the current at the input of the inverter--></current_dc_max>
-            <dissipable_heat units="W" is_input="False">1965.840015264952<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
+            <dissipable_heat units="W" is_input="False">1965.8400152649515<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
-            <losses_max units="W" is_input="False">1965.840015264952</losses_max>
+            <losses_max units="W" is_input="False">1965.8400152649515</losses_max>
             <mass units="kg" is_input="False">4.1325582493846<!--Mass of the inverter--></mass>
             <modulation_idx_max is_input="False">0.799933344755761<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_density units="kW/kg" is_input="False">39.27884392185747<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
+            <power_rating_max units="kW" is_input="False">104.66998432187594<!--Maximum value of the usable power--></power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -1804,16 +1808,16 @@
             </energy_rr>
             <heat_sink>
               <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
-              <height units="m" is_input="False">0.0069402935109591<!--Height of the heat sink--></height>
+              <height units="m" is_input="False">0.006940293510959102<!--Height of the heat sink--></height>
               <length units="m" is_input="False">0.21450000000000002<!--Length of the heat sink--></length>
-              <mass units="kg" is_input="False">0.4960833353495307<!--Mass of the heat sink, includes tubes and core--></mass>
+              <mass units="kg" is_input="False">0.49608333534953086<!--Mass of the heat sink, includes tubes and core--></mass>
               <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
               <width units="m" is_input="False">0.10519039329776518<!--Width of the heat sink--></width>
               <coolant>
                 <Prandtl_number is_input="False">39.493034825870645<!--Prandtl number of the coolant--></Prandtl_number>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <max_mass_flow units="m**3/s" is_input="False">1.8577276943637587e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
+                <max_mass_flow units="m**3/s" is_input="False">1.8577276943637584e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
                 <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
                 <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
@@ -1821,41 +1825,41 @@
               </coolant>
               <tube>
                 <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
-                <inner_diameter units="m" is_input="False">0.0021268623406394<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
+                <inner_diameter units="m" is_input="False">0.0021268623406394006<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
                 <length units="m" is_input="False">0.8580000000000001<!--Length of the tube which is useful for the cooling of the inverter--></length>
-                <mass units="kg" is_input="False">0.11222419586077019<!--Wieght of the tube for the cooling of the inverter--></mass>
-                <outer_diameter units="m" is_input="False">0.0046268623406394<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
+                <mass units="kg" is_input="False">0.11222419586077025<!--Wieght of the tube for the cooling of the inverter--></mass>
+                <outer_diameter units="m" is_input="False">0.004626862340639401<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
                 <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
               </tube>
             </heat_sink>
             <igbt>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="False">0.008036400826694523</resistance>
-              <temperature_max units="degK" is_input="False">398.8958905366498</temperature_max>
+              <temperature_max units="degK" is_input="False">398.89589053664974</temperature_max>
               <thermal_resistance units="degK/W" is_input="False">0.44173593948055984<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
-              <air_gap units="m" is_input="False">0.0006027672664791111<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">0.014831439199696702<!--Mass of the copper in the inductor--></copper_mass>
-              <core_mass units="kg" is_input="False">0.005198237617364882<!--Mass of the E-core in the inductor--></core_mass>
+              <air_gap units="m" is_input="False">0.0006027672664791112<!--Air gap in the inductor--></air_gap>
+              <copper_mass units="kg" is_input="False">0.014831439199696704<!--Mass of the copper in the inductor--></copper_mass>
+              <core_mass units="kg" is_input="False">0.005198237617364881<!--Mass of the E-core in the inductor--></core_mass>
               <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one of the inductor of the inverter--></current_caliber>
               <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
-              <iron_surface units="m**2" is_input="False">3.5486445529752074e-05<!--Iron surface of the E-core inductor--></iron_surface>
+              <iron_surface units="m**2" is_input="False">3.548644552975207e-05<!--Iron surface of the E-core inductor--></iron_surface>
               <magnetic_energy_rating units="J" is_input="False">0.00486580249522942<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
               <mass units="kg" is_input="False">0.025227914434426464<!--Mass of the inductor--></mass>
-              <reluctance units="1/H" is_input="False">7727864.007112578<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.00011769180547164122<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">3.243352113291249<!--Number of turns in the inductor--></turn_number>
+              <reluctance units="1/H" is_input="False">7727864.007112579<!--Reluctance of the inductor--></reluctance>
+              <resistance units="ohm" is_input="False">0.00011769180547164123<!--Resistance of the inductor--></resistance>
+              <turn_number is_input="False">3.2433521132912495<!--Number of turns in the inductor--></turn_number>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
               <wire_section_area units="m**2" is_input="False">1.69105552262377e-05<!--Section area of the copper wire inside the inductor--></wire_section_area>
               <core_dimension>
                 <B units="m" is_input="False">0.016040481471587605<!--B dimension of the E-core in the inductor--></B>
-                <C units="m" is_input="False">0.006030256192326167<!--C dimension of the E-core in the inductor--></C>
+                <C units="m" is_input="False">0.006030256192326166<!--C dimension of the E-core in the inductor--></C>
               </core_dimension>
               <scaling>
-                <core_dimension is_input="False">0.21928204335731516<!--Scaling factor for the dimensions of the E-core--></core_dimension>
-                <core_mass is_input="False">0.01054409253015189<!--Scaling factor for the mass of the E-core--></core_mass>
+                <core_dimension is_input="False">0.21928204335731513<!--Scaling factor for the dimensions of the E-core--></core_dimension>
+                <core_mass is_input="False">0.010544092530151889<!--Scaling factor for the mass of the E-core--></core_mass>
               </scaling>
             </inductor>
             <low_speed>
@@ -1888,14 +1892,15 @@
           <inverter_5>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
-            <current_dc_max units="A" is_input="False">133.41054587225562<!--Maximum value of the current at the input of the inverter--></current_dc_max>
-            <dissipable_heat units="W" is_input="False">1965.8402374197606<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
+            <current_dc_max units="A" is_input="False">133.41054587225565<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <dissipable_heat units="W" is_input="False">1965.8402374197603<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
-            <losses_max units="W" is_input="False">1965.8402374197606</losses_max>
+            <losses_max units="W" is_input="False">1965.8402374197603</losses_max>
             <mass units="kg" is_input="False">4.132558242841155<!--Mass of the inverter--></mass>
             <modulation_idx_max is_input="False">0.7999494848931576<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_density units="kW/kg" is_input="False">39.278843984051136<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
+            <power_rating_max units="kW" is_input="False">104.66998432187594<!--Maximum value of the usable power--></power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -1973,7 +1978,7 @@
                 <Prandtl_number is_input="False">39.493034825870645<!--Prandtl number of the coolant--></Prandtl_number>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <max_mass_flow units="m**3/s" is_input="False">1.8577279043010563e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
+                <max_mass_flow units="m**3/s" is_input="False">1.857727904301056e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
                 <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
                 <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
@@ -1995,27 +2000,27 @@
               <thermal_resistance units="degK/W" is_input="False">0.44173593948055984<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
-              <air_gap units="m" is_input="False">0.0006027672664791111<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">0.014831439199696702<!--Mass of the copper in the inductor--></copper_mass>
-              <core_mass units="kg" is_input="False">0.005198237617364882<!--Mass of the E-core in the inductor--></core_mass>
+              <air_gap units="m" is_input="False">0.0006027672664791112<!--Air gap in the inductor--></air_gap>
+              <copper_mass units="kg" is_input="False">0.014831439199696704<!--Mass of the copper in the inductor--></copper_mass>
+              <core_mass units="kg" is_input="False">0.005198237617364881<!--Mass of the E-core in the inductor--></core_mass>
               <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one of the inductor of the inverter--></current_caliber>
               <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
-              <iron_surface units="m**2" is_input="False">3.5486445529752074e-05<!--Iron surface of the E-core inductor--></iron_surface>
+              <iron_surface units="m**2" is_input="False">3.548644552975207e-05<!--Iron surface of the E-core inductor--></iron_surface>
               <magnetic_energy_rating units="J" is_input="False">0.00486580249522942<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
               <mass units="kg" is_input="False">0.025227914434426464<!--Mass of the inductor--></mass>
-              <reluctance units="1/H" is_input="False">7727864.007112578<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.00011769180547164122<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">3.243352113291249<!--Number of turns in the inductor--></turn_number>
+              <reluctance units="1/H" is_input="False">7727864.007112579<!--Reluctance of the inductor--></reluctance>
+              <resistance units="ohm" is_input="False">0.00011769180547164123<!--Resistance of the inductor--></resistance>
+              <turn_number is_input="False">3.2433521132912495<!--Number of turns in the inductor--></turn_number>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
               <wire_section_area units="m**2" is_input="False">1.69105552262377e-05<!--Section area of the copper wire inside the inductor--></wire_section_area>
               <core_dimension>
                 <B units="m" is_input="False">0.016040481471587605<!--B dimension of the E-core in the inductor--></B>
-                <C units="m" is_input="False">0.006030256192326167<!--C dimension of the E-core in the inductor--></C>
+                <C units="m" is_input="False">0.006030256192326166<!--C dimension of the E-core in the inductor--></C>
               </core_dimension>
               <scaling>
-                <core_dimension is_input="False">0.21928204335731516<!--Scaling factor for the dimensions of the E-core--></core_dimension>
-                <core_mass is_input="False">0.01054409253015189<!--Scaling factor for the mass of the E-core--></core_mass>
+                <core_dimension is_input="False">0.21928204335731513<!--Scaling factor for the dimensions of the E-core--></core_dimension>
+                <core_mass is_input="False">0.010544092530151889<!--Scaling factor for the mass of the E-core--></core_mass>
               </scaling>
             </inductor>
             <low_speed>
@@ -2048,14 +2053,15 @@
           <inverter_6>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
-            <current_dc_max units="A" is_input="False">133.45740622569895<!--Maximum value of the current at the input of the inverter--></current_dc_max>
-            <dissipable_heat units="W" is_input="False">1965.8404834327835<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
+            <current_dc_max units="A" is_input="False">133.45740622569897<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <dissipable_heat units="W" is_input="False">1965.840483432783<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
-            <losses_max units="W" is_input="False">1965.8404834327835</losses_max>
-            <mass units="kg" is_input="False">4.13255823559498<!--Mass of the inverter--></mass>
+            <losses_max units="W" is_input="False">1965.840483432783</losses_max>
+            <mass units="kg" is_input="False">4.132558235594981<!--Mass of the inverter--></mass>
             <modulation_idx_max is_input="False">0.7999673345424712<!--Maximum modulation index during the mission--></modulation_idx_max>
-            <power_density units="kW/kg" is_input="False">39.27884405292406<!--Power density of the inverter--></power_density>
+            <power_density units="kW/kg" is_input="False">39.27884405292405<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
+            <power_rating_max units="kW" is_input="False">104.66998432187594<!--Maximum value of the usable power--></power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -2124,16 +2130,16 @@
             </energy_rr>
             <heat_sink>
               <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
-              <height units="m" is_input="False">0.006940293321015798<!--Height of the heat sink--></height>
+              <height units="m" is_input="False">0.006940293321015799<!--Height of the heat sink--></height>
               <length units="m" is_input="False">0.21450000000000002<!--Length of the heat sink--></length>
-              <mass units="kg" is_input="False">0.4960833215599117<!--Mass of the heat sink, includes tubes and core--></mass>
+              <mass units="kg" is_input="False">0.4960833215599118<!--Mass of the heat sink, includes tubes and core--></mass>
               <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
               <width units="m" is_input="False">0.10519039329776518<!--Width of the heat sink--></width>
               <coolant>
                 <Prandtl_number is_input="False">39.493034825870645<!--Prandtl number of the coolant--></Prandtl_number>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <max_mass_flow units="m**3/s" is_input="False">1.8577281367844742e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
+                <max_mass_flow units="m**3/s" is_input="False">1.857728136784474e-05<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
                 <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
                 <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
@@ -2141,41 +2147,41 @@
               </coolant>
               <tube>
                 <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
-                <inner_diameter units="m" is_input="False">0.002126862214010532<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
+                <inner_diameter units="m" is_input="False">0.002126862214010533<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
                 <length units="m" is_input="False">0.8580000000000001<!--Length of the tube which is useful for the cooling of the inverter--></length>
-                <mass units="kg" is_input="False">0.11222419151067527<!--Wieght of the tube for the cooling of the inverter--></mass>
-                <outer_diameter units="m" is_input="False">0.004626862214010532<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
+                <mass units="kg" is_input="False">0.1122241915106753<!--Wieght of the tube for the cooling of the inverter--></mass>
+                <outer_diameter units="m" is_input="False">0.004626862214010533<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
                 <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
               </tube>
             </heat_sink>
             <igbt>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="False">0.008036400826694523</resistance>
-              <temperature_max units="degK" is_input="False">398.89983498780543</temperature_max>
+              <temperature_max units="degK" is_input="False">398.8998349878054</temperature_max>
               <thermal_resistance units="degK/W" is_input="False">0.44173593948055984<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
-              <air_gap units="m" is_input="False">0.0006027672664791111<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">0.014831439199696702<!--Mass of the copper in the inductor--></copper_mass>
-              <core_mass units="kg" is_input="False">0.005198237617364882<!--Mass of the E-core in the inductor--></core_mass>
+              <air_gap units="m" is_input="False">0.0006027672664791112<!--Air gap in the inductor--></air_gap>
+              <copper_mass units="kg" is_input="False">0.014831439199696704<!--Mass of the copper in the inductor--></copper_mass>
+              <core_mass units="kg" is_input="False">0.005198237617364881<!--Mass of the E-core in the inductor--></core_mass>
               <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one of the inductor of the inverter--></current_caliber>
               <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
-              <iron_surface units="m**2" is_input="False">3.5486445529752074e-05<!--Iron surface of the E-core inductor--></iron_surface>
+              <iron_surface units="m**2" is_input="False">3.548644552975207e-05<!--Iron surface of the E-core inductor--></iron_surface>
               <magnetic_energy_rating units="J" is_input="False">0.00486580249522942<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
               <mass units="kg" is_input="False">0.025227914434426464<!--Mass of the inductor--></mass>
-              <reluctance units="1/H" is_input="False">7727864.007112578<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.00011769180547164122<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">3.243352113291249<!--Number of turns in the inductor--></turn_number>
+              <reluctance units="1/H" is_input="False">7727864.007112579<!--Reluctance of the inductor--></reluctance>
+              <resistance units="ohm" is_input="False">0.00011769180547164123<!--Resistance of the inductor--></resistance>
+              <turn_number is_input="False">3.2433521132912495<!--Number of turns in the inductor--></turn_number>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
               <wire_section_area units="m**2" is_input="False">1.69105552262377e-05<!--Section area of the copper wire inside the inductor--></wire_section_area>
               <core_dimension>
                 <B units="m" is_input="False">0.016040481471587605<!--B dimension of the E-core in the inductor--></B>
-                <C units="m" is_input="False">0.006030256192326167<!--C dimension of the E-core in the inductor--></C>
+                <C units="m" is_input="False">0.006030256192326166<!--C dimension of the E-core in the inductor--></C>
               </core_dimension>
               <scaling>
-                <core_dimension is_input="False">0.21928204335731516<!--Scaling factor for the dimensions of the E-core--></core_dimension>
-                <core_mass is_input="False">0.01054409253015189<!--Scaling factor for the mass of the E-core--></core_mass>
+                <core_dimension is_input="False">0.21928204335731513<!--Scaling factor for the dimensions of the E-core--></core_dimension>
+                <core_mass is_input="False">0.010544092530151889<!--Scaling factor for the mass of the E-core--></core_mass>
               </scaling>
             </inductor>
             <low_speed>

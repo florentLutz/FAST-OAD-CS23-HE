@@ -34,6 +34,7 @@ from ..components.perf_total_losses import PerformancesLosses
 from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.lcc_dc_dc_converter_cost import LCCDCDCConverterCost
+from ..components.lcc_dc_dc_converter_operation import LCCDCDCConverterOperation
 
 from ..components.cstr_enforce import (
     ConstraintsCurrentCapacitorEnforce,
@@ -1370,7 +1371,7 @@ def test_cost():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1" ":power_rating_max",
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:power_rating_max",
         364.0,
         units="kW",
     )
@@ -1381,8 +1382,30 @@ def test_cost():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1" ":cost_per_unit",
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:cost_per_unit",
         units="USD",
     ) == pytest.approx(6617.61, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:cost_per_unit",
+        6617.61,
+        units="USD",
+    )
+
+    problem = run_system(
+        LCCDCDCConverterOperation(dc_dc_converter_id="dc_dc_converter_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:operation_cost",
+        units="USD/yr",
+    ) == pytest.approx(441.17, rel=1e-2)
 
     problem.check_partials(compact_print=True)

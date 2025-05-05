@@ -9,8 +9,7 @@ import openmdao.api as om
 class LCCPMSMCost(om.ExplicitComponent):
     """
     Computation of the cost of the motor including the electronics of the powertrain. PMSM
-    regression model obtained based on the price of the products
-    from: https://emrax.com/e-motors/ and the reference electronic cost from :cite:`marciello:2024`.
+    regression model obtained based on the price of the products from: https://emrax.com/e-motors/.
     """
 
     def initialize(self):
@@ -41,7 +40,7 @@ class LCCPMSMCost(om.ExplicitComponent):
         power_max = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max"]
 
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_unit"] = (
-            893.51 * np.exp(0.0281 * power_max) + 256.0 * power_max
+            893.51 * np.exp(0.0281 * power_max)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -51,4 +50,4 @@ class LCCPMSMCost(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_unit",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max",
-        ] = 25.108 * np.exp(0.0281 * power_max) + 256.0
+        ] = 25.108 * np.exp(0.0281 * power_max)

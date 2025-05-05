@@ -6,10 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCDCDCConverterCost(om.ExplicitComponent):
+class LCCDCDCConverterOperation(om.ExplicitComponent):
     """
-    Computation of convertor purchase cost. Reference prices obtained from
-    https://www.mcico.com/truebluepower/converters?purchase_type=New+Outright%2CNew+Exchange.
+    Computation of convertor annual operational cost.
     """
 
     def initialize(self):
@@ -26,52 +25,72 @@ class LCCDCDCConverterCost(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":power_rating_max",
+            + ":cost_per_unit",
             val=np.nan,
-            units="kW",
-            desc="Maximum power rating of the converter",
+            units="USD",
+        )
+
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":lifespan",
+            units="yr",
+            val=15.0,
+            desc="Expected lifetime of the DC_DC_converter, typically around 15 year",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":cost_per_unit",
-            units="USD",
-            val=750.0,
+            + ":operation_cost",
+            units="USD/yr",
+            val=75.0,
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        power = inputs[
+        cost = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":power_rating_max"
+            + ":cost_per_unit"
+        ]
+
+        lifespan = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
         ]
 
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":cost_per_unit"
-        ] = 733.0 * np.log(power) + 2295.0
+            + ":operation_cost"
+        ] = cost / lifespan
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
+        cost = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":cost_per_unit"
+        ]
+
+        lifespan = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
+        ]
 
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":cost_per_unit",
+            + ":operation_cost",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":power_rating_max",
-        ] = (
-            733.0
-            / inputs[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":power_rating_max"
-            ]
-        )
+            + ":cost_per_unit",
+        ] = 1.0 / lifespan
+
+        partials[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":operation_cost",
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan",
+        ] = -cost / lifespan**2.0

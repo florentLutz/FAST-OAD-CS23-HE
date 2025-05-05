@@ -10,3 +10,4 @@ from .components.perf_inverter import PerformancesInverter
 from .components.slipstream_inverter import SlipstreamInverter
 from .components.pre_lca_inverter import PreLCAInverter
 from .components.lcc_inverter_cost import LCCInverterCost
+from .components.lcc_inverter_operation import LCCInverterOperation

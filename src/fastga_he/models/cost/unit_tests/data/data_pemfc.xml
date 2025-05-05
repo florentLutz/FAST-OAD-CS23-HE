@@ -201,6 +201,7 @@
                 <DC_DC_converter>
                     <dc_dc_converter_1>
                         <losses_max units="W" is_input="True">1958.0316619368884</losses_max>
+                        <power_rating_max units="kW">344.0</power_rating_max>
                         <CG>
                             <x units="m">2.69</x>
                             <y_ratio>0.34</y_ratio>
@@ -489,6 +490,7 @@
                         <current_ac_max units="A">400.0</current_ac_max>
                         <voltage_caliber units="V">500.0</voltage_caliber>
                         <voltage_ac_max units="V">500.0</voltage_ac_max>
+                        <power_rating_max units="kW">200.0</power_rating_max>
                         <switching_frequency units="Hz">15.0e3</switching_frequency>
                         <switching_frequency_max units="Hz" is_input="True">12000.0</switching_frequency_max>
                         <power_factor>1.0</power_factor>

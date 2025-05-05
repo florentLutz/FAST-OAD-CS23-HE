@@ -56,6 +56,7 @@
             <losses_max units="W" is_input="False">4040.066217949916</losses_max>
             <mass units="kg" is_input="False">759.0236028099076<!--Mass of the converter--></mass>
             <power_density units="kW/kg" is_input="False">0.2634644058509324<!--Power density of the DC/DC converter--></power_density>
+            <power_rating_max units="kW" is_input="False">195.0044848941573</power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT module in the converter--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
@@ -606,6 +607,7 @@
             <modulation_idx_max is_input="False">0.1152009835554178<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_density units="kW/kg" is_input="False">1.951201350549745<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
+            <power_rating_max units="kW" is_input="False">174.64540011830852<!--Maximum value of the usable power--></power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>

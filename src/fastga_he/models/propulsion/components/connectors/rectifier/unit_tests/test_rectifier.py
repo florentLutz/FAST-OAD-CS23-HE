@@ -40,6 +40,7 @@ from ..components.sizing_rectifier_cg_y import SizingRectifierCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCARectifierProdWeightPerFU
 from ..components.lcc_rectifier_cost import LCCRectifierCost
+from ..components.lcc_rectifier_operation import LCCRectifierOperation
 
 from ..components.sizing_rectifier import SizingRectifier
 from ..components.perf_rectifier import PerformancesRectifier
@@ -1289,5 +1290,25 @@ def test_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:cost_per_unit", units="USD"
     ) == pytest.approx(2262.76, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operation():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:cost_per_unit",
+        units="USD",
+        val=2262.76,
+    )
+
+    problem = run_system(
+        LCCRectifierOperation(rectifier_id="rectifier_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:operation_cost", units="USD/yr"
+    ) == pytest.approx(150.85, rel=1e-2)
 
     problem.check_partials(compact_print=True)

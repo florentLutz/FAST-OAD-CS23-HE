@@ -19,6 +19,7 @@ from .connectors.dc_dc_converter import (
     SlipstreamDCDCConverter,
     PreLCADCDCConverter,
     LCCDCDCConverterCost,
+    LCCDCDCConverterOperation,
 )
 from .connectors.inverter import (
     SizingInverter,
@@ -26,6 +27,7 @@ from .connectors.inverter import (
     SlipstreamInverter,
     PreLCAInverter,
     LCCInverterCost,
+    LCCInverterOperation,
 )
 from .connectors.dc_sspc import (
     SizingDCSSPC,
@@ -33,6 +35,7 @@ from .connectors.dc_sspc import (
     SlipstreamDCSSPC,
     PreLCADCSSPC,
     LCCDCSSPCCost,
+    LCCDCSSPCOperation,
 )
 from .connectors.dc_splitter import (
     SizingDCSplitter,
@@ -46,6 +49,7 @@ from .connectors.rectifier import (
     SlipstreamRectifier,
     PreLCARectifier,
     LCCRectifierCost,
+    LCCRectifierOperation,
 )
 from .connectors.fuel_system import (
     SizingFuelSystem,
@@ -81,13 +85,7 @@ from .loads.pmsm import (
     LCCPMSMCost,
     LCCPMSMOperation,
 )
-from .loads.dc_load import (
-    SizingDCAuxLoad,
-    PerformancesDCAuxLoad,
-    SlipstreamDCAuxLoad,
-    LCCDCLoadCost,
-    LCCDCLoadOperation,
-)
+from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
 from .propulsor.propeller import (
     SizingPropeller,
     PerformancesPropeller,
