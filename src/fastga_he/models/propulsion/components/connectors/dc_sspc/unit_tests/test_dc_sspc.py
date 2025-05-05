@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import pytest
@@ -26,6 +26,7 @@ from ..components.sizing_dc_sspc import SizingDCSSPC
 from ..components.perf_dc_sspc import PerformancesDCSSPC
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCADCSSPCProdWeightPerFU
+from ..components.lcc_dc_sspc_cost import LCCDCSSPCCost
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -410,5 +411,20 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:mass_per_fu", units="kg"
     ) == pytest.approx(8e-6, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:current_max", units="A", val=400
+    )
+
+    problem = run_system(LCCDCSSPCCost(dc_sspc_id="dc_sspc_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:cost_per_unit", units="USD"
+    ) == pytest.approx(1135.6, rel=1e-2)
 
     problem.check_partials(compact_print=True)
