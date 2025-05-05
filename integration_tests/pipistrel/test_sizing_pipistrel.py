@@ -388,7 +388,11 @@ def test_mass_bar_plot():
     fig.update_layout(
         title_text="Comparison of computed aircraft mass with reference value for the Pipistrel",
         title_x=0.5,
+        height=800,
+        width=1600,
+        font_size=18,
     )
+    fig.update_annotations(font_size=20)
 
     fig.show()
 
