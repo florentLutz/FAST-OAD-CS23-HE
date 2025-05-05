@@ -39,6 +39,7 @@ from .connectors.rectifier import (
     PerformancesRectifier,
     SlipstreamRectifier,
     PreLCARectifier,
+    LCCRectifierCost,
 )
 from .connectors.fuel_system import (
     SizingFuelSystem,
