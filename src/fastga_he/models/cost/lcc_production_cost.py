@@ -12,7 +12,7 @@ from .lcc_manufacturing_man_hours import LCCManufacturingManHours
 from .lcc_engineering_cost import LCCEngineeringCost
 from .lcc_tooling_cost import LCCToolingCost
 from .lcc_manufacturing_cost import LCCManufacturingCost
-from .lcc_dev_suppoet_cost import LCCDevSupportCost
+from .lcc_dev_support_cost import LCCDevSupportCost
 from .lcc_quality_control_cost import LCCQualityControlCost
 from .lcc_material_cost import LCCMaterialCost
 from .lcc_flight_test_cost import LCCFlightTestCost
