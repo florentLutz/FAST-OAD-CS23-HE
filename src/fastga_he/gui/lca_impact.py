@@ -1624,6 +1624,7 @@ def lca_impacts_bar_chart_with_components_absolute(
     detailed_component_contributions: bool = False,
     legend_rename: dict = None,
     aggregate_phase: list = None,
+    cutoff_criteria: float = None,
 ) -> go.FigureWidget:
     """
     Provide a bar chart of the weighted impacts of an aircraft, showing the absolute value of each
@@ -1631,12 +1632,13 @@ def lca_impacts_bar_chart_with_components_absolute(
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft
-    :param detailed_component_contributions: by default, all contribution of one component, regardless of the phase
-    is aggregated, this segregates them.
+    :param detailed_component_contributions: by default, all contribution of one component,
+    regardless of the phase is aggregated, this segregates them.
     :param legend_rename: legend names are set by the code by default, if any renaming is to be
     done, pass here the legend to be renamed as key and how to rename it as item.
     :param aggregate_phase: by default only the manufacturing and distribution are aggregated.
     Additional phase specified here can be aggregated.
+    :param cutoff_criteria: value of the cutoff criteria, in percent of the single score.
     """
 
     component_and_contribution = _get_component_and_contribution(
@@ -1646,6 +1648,7 @@ def lca_impacts_bar_chart_with_components_absolute(
     fig = go.Figure()
 
     impact_score_dict, _ = _get_impact_dict(aircraft_file_path)
+    single_score = impact_score_dict["single_score"]
     impact_score_dict.pop("single_score")
 
     component_counter = 0
@@ -1669,6 +1672,28 @@ def lca_impacts_bar_chart_with_components_absolute(
                 components_type[component_type] = [beautified_component_name]
         else:
             components_type[beautified_component_name] = [beautified_component_name]
+
+    # Here we filter to only show the impact whose contribution to the single score is greater than
+    # the set value in inputs
+    if cutoff_criteria:
+
+        component_and_contribution_with_cutoff = {}
+        contribution_others = {}
+
+        for component, impacts in component_and_contribution.items():
+            if np.sum(np.array(list(impacts.values()))) < single_score * cutoff_criteria / 100.:
+                if not contribution_others:
+                    contribution_others = impacts
+                else:
+                    for impact, contribution in impacts.items():
+                        contribution_others[impact] = contribution
+            else:
+                component_and_contribution_with_cutoff[component] = impacts
+
+        if contribution_others:
+            component_and_contribution_with_cutoff["Others"] = contribution_others
+
+        component_and_contribution = component_and_contribution_with_cutoff
 
     for component, impacts in component_and_contribution.items():
         impact_contributions = []
