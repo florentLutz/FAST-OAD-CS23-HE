@@ -7,23 +7,23 @@ Life Cycle Cost models
     :width: 800
     :align: center
 
-The Life Cycle Cost (LCC) of the aircraft consists with two main categories the production cost and the operation cost.
-The elements of the both groups are detailed in the following descriptions.
+The Direct Operating Cost (DOC) of an aircraft can be broken in two main cost categories: the production cost and the operational cost.
+The contents of those two categories are detailed in the following descriptions.
 
 .. contents::
 
 *********************
 Production cost model
 *********************
-The aircraft level and powertrain level are the two main cost groups under the production cost. Each
-aircraft level production cost is calculated the Eastlake model (1986) from :cite:`gudmundsson:2013`. The component
-purchase cost of the powertrain components are either based on the Eastlake model (1986) from :cite:`gudmundsson:2013`
-or estimated from the retailers or the company websites. The cost calculations from Gudmundsson are based on the USD in 2012.
-Considering currency depreciation, the cost adjust factor :math:`CPI_{\text{2012}}` is introduced. This factor represent
-the cost price index difference between 2012 and current time.
+The aircraft and the powertrain are the two main contributors to production costs. Aircraft production costs are
+calculated using the Eastlake model (1986) from :cite:`gudmundsson:2013`. Powertrain component purchase costs are either
+based on the Eastlake model (1986) from :cite:`gudmundsson:2013` or estimated from dealers or company websites. The cost
+calculations from :cite:`gudmundsson:2013` are based on the USD in 2012. To account for currency depreciation, a cost
+adjustment factor :math:`CPI_{\text{2012}}` is introduced. This factor represents the cost price index difference
+between 2012 and today.
 
-Aircraft level cost
-===================
+Aircraft production cost
+========================
 
 Cost of engineering, toolong, and manufacturing
 ***********************************************
@@ -96,8 +96,8 @@ tooling labor cost.
     C_{\text{certify (\$)}} =  C_{\text{eng}} + C_{\text{dev}} + C_{\text{ft}} + C_{\text{tool}}
 
 
-Powertrain level cost
-=====================
+Powertrain production cost
+==========================
 
 Engine purchase cost
 ********************
