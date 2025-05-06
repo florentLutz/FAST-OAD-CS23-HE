@@ -17,7 +17,7 @@ class LCCEngineeringCost(om.ExplicitComponent):
             "data:cost:production:engineering_man_hours",
             val=np.nan,
             units="h",
-            desc="Number of engineering man-hours required for a certain amount of aircraft been "
+            desc="Number of engineering man-hours required for a certain number of aircraft to be"
             "produced in a 5-year or 60 month period",
         )
         self.add_input(
