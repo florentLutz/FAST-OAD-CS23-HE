@@ -10,4 +10,4 @@ from .components.perf_generator import PerformancesGenerator
 from .components.slipstream_generator import SlipstreamGenerator
 from .components.pre_lca_generator import PreLCAGenerator
 from .components.lcc_generator_cost import LCCGeneratorCost
-from .components.lcc_generator_operation import LCCGeneratorOperation
+from .components.lcc_generator_operation import LCCGeneratorOperationalCost

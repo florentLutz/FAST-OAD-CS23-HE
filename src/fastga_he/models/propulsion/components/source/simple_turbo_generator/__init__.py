@@ -10,4 +10,4 @@ from .components.perf_turbo_generator import PerformancesTurboGenerator
 from .components.slipstream_turbo_generator import SlipstreamTurboGenerator
 from .components.pre_lca_turbo_generator import PreLCATurboGenerator
 from .components.lcc_turbo_generator_cost import LCCTurboGeneratorCost
-from .components.lcc_turbo_generator_operation import LCCTurboGeneratorOperation
+from .components.lcc_turbo_generator_operational_cost import LCCTurboGeneratorOperationalCost

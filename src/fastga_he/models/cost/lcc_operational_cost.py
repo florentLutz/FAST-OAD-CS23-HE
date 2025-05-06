@@ -16,10 +16,10 @@ from .lcc_maintenance_cost import LCCMaintenanceCost
 from .lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
 from .lcc_flight_mission import LCCFlightMission
 from .lcc_annual_crew_cost import LCCAnnualCrewCost
-from .lcc_operation_cost_sum import LCCSumOperationCost
+from .lcc_operational_cost_sum import LCCSumOperationalCost
 
 
-class LCCOperationCost(om.Group):
+class LCCOperationalCost(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -131,8 +131,8 @@ class LCCOperationCost(om.Group):
             components_type,
             components_om_type,
         ):
-            if hasattr(he_comp, "LCC" + component_om_type + "Operation"):
-                local_sub_sys = he_comp.__dict__["LCC" + component_om_type + "Operation"]()
+            if hasattr(he_comp, "LCC" + component_om_type + "OperationalCost"):
+                local_sub_sys = he_comp.__dict__["LCC" + component_om_type + "OperationalCost"]()
                 local_sub_sys.options[component_name_id] = component_name
                 cost_components_type.append(component_type)
                 cost_components_name.append(component_name)
@@ -141,7 +141,7 @@ class LCCOperationCost(om.Group):
 
         self.add_subsystem(
             name="cost_sum",
-            subsys=LCCSumOperationCost(
+            subsys=LCCSumOperationalCost(
                 cost_components_type=cost_components_type,
                 cost_components_name=cost_components_name,
                 loan=loan,

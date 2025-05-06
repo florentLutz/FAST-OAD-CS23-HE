@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCHighRPMICEOperation(om.ExplicitComponent):
+class LCCHighRPMICEOperationalCost(om.ExplicitComponent):
     """
-    Computation of ICE engine operation cost from
+    Computation of ICE engine operational cost from
     http://blog.overhaulbids.com/lycoming-overhaul-cost/.
     """
 
@@ -41,7 +41,7 @@ class LCCHighRPMICEOperation(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:high_rpm_ICE:"
             + high_rpm_ice_id
-            + ":operation_cost",
+            + ":operational_cost",
             units="USD/yr",
             val=1e4,
             desc="Cost of the ICE per unit",
@@ -59,7 +59,7 @@ class LCCHighRPMICEOperation(om.ExplicitComponent):
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
         outputs[
-            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":operation_cost"
+            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":operational_cost"
         ] = (0.103 * volume - 4.41) * flight_hour / 1.8
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -72,12 +72,12 @@ class LCCHighRPMICEOperation(om.ExplicitComponent):
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
         partials[
-            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":operation_cost",
+            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":operational_cost",
             "data:propulsion:he_power_train:high_rpm_ICE:"
             + high_rpm_ice_id
             + ":displacement_volume",
         ] = 0.103 * flight_hour / 1.8
         partials[
-            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":operation_cost",
+            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
         ] = (0.103 * volume - 4.41) / 1.8

@@ -7,7 +7,7 @@ import fastoad.api as oad
 from fastoad.module_management.constants import ModelDomain
 
 from .lcc_production_cost import LCCProductionCost
-from .lcc_operation_cost import LCCOperationCost
+from .lcc_operational_cost import LCCOperationalCost
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.lcc.legacy", domain=ModelDomain.OTHER)
@@ -75,8 +75,8 @@ class LCC(om.Group):
         )
 
         self.add_subsystem(
-            name="operation_cost",
-            subsys=LCCOperationCost(
+            name="operational_cost",
+            subsys=LCCOperationalCost(
                 power_train_file_path=power_train_file_path,
                 loan=loan,
                 use_operational_mission=use_operational_mission,

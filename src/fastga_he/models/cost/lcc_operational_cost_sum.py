@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCSumOperationCost(om.ExplicitComponent):
+class LCCSumOperationalCost(om.ExplicitComponent):
     """
-    Computation of summing all the operation cost.
+    Computation of summing all the operational cost.
     """
 
     def initialize(self):
@@ -83,7 +83,7 @@ class LCCSumOperationCost(om.ExplicitComponent):
                 + component_type
                 + ":"
                 + component_name
-                + ":operation_cost",
+                + ":operational_cost",
                 units="USD/yr",
                 val=np.nan,
             )

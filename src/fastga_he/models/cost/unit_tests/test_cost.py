@@ -37,8 +37,8 @@ from ..lcc_annual_depreciation import LCCAnnualDepreciation
 from ..lcc_maintenance_cost import LCCMaintenanceCost
 from ..lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
 from ..lcc_flight_mission import LCCFlightMission
-from ..lcc_operation_cost_sum import LCCSumOperationCost
-from ..lcc_operation_cost import LCCOperationCost
+from ..lcc_operational_cost_sum import LCCSumOperationalCost
+from ..lcc_operational_cost import LCCOperationalCost
 
 
 XML_FILE = "data.xml"
@@ -828,13 +828,13 @@ def test_annual_maintenance_miscellaneous_cost():
     problem.check_partials(compact_print=True)
 
 
-def test_operation_sum():
+def test_operational_sum():
     components_type = ["propeller", "turboshaft", "fuel_tank"]
     components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1"]
 
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCSumOperationCost(
+            LCCSumOperationalCost(
                 cost_components_type=components_type, cost_components_name=components_name
             )
         ),
@@ -843,23 +843,23 @@ def test_operation_sum():
     )
 
     ivc.add_output(
-        "data:propulsion:he_power_train:propeller:propeller_1:operation_cost",
+        "data:propulsion:he_power_train:propeller:propeller_1:operational_cost",
         units="USD/yr",
         val=4403.0,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:operation_cost",
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:operational_cost",
         units="USD/yr",
         val=3.0e5,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:operation_cost",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:operational_cost",
         units="USD/yr",
         val=1000.0,
     )
 
     problem = run_system(
-        LCCSumOperationCost(
+        LCCSumOperationalCost(
             cost_components_type=components_type, cost_components_name=components_name
         ),
         ivc,
@@ -875,7 +875,7 @@ def test_operation_sum():
 def test_operational_cost():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCOperationCost(power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml")
+            LCCOperationalCost(power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml")
         ),
         __file__,
         XML_FILE,
@@ -883,7 +883,7 @@ def test_operational_cost():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCOperationCost(power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml"),
+        LCCOperationalCost(power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml"),
         ivc,
     )
 
@@ -892,7 +892,7 @@ def test_operational_cost():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:ICE:ice_1:operation_cost", units="USD/yr"
+        "data:propulsion:he_power_train:ICE:ice_1:operational_cost", units="USD/yr"
     ) == pytest.approx(9153.7, rel=1e-3)
 
     assert problem.get_val(
@@ -907,7 +907,7 @@ def test_operational_cost():
 def test_operational_cost_hydrogen():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCOperationCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml")
+            LCCOperationalCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml")
         ),
         __file__,
         "data_pemfc.xml",
@@ -916,16 +916,16 @@ def test_operational_cost_hydrogen():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCOperationCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml"),
+        LCCOperationalCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml"),
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:operation_cost",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:operational_cost",
         units="USD/yr",
     ) == pytest.approx(8643.26, rel=1e-3)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:operation_cost", units="USD/yr"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:operational_cost", units="USD/yr"
     ) == pytest.approx(309.0, rel=1e-3)
 
     assert problem.get_val(
@@ -940,7 +940,7 @@ def test_operational_cost_hydrogen():
 def test_operational_cost_tbm_900():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCOperationCost(
+            LCCOperationalCost(
                 power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"
             )
         ),
@@ -950,17 +950,17 @@ def test_operational_cost_tbm_900():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCOperationCost(
+        LCCOperationalCost(
             power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"
         ),
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:operation_cost", units="USD/yr"
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:operational_cost", units="USD/yr"
     ) == pytest.approx(33177.257, rel=1e-3)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:operation_cost", units="USD/yr"
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:operational_cost", units="USD/yr"
     ) == pytest.approx(77346.8, rel=1e-3)
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
@@ -979,7 +979,7 @@ def test_operational_cost_tbm_900():
 def test_operational_cost_hybrid_tbm_900():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCOperationCost(
+            LCCOperationalCost(
                 power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml"
             )
         ),
@@ -989,12 +989,14 @@ def test_operational_cost_hybrid_tbm_900():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCOperationCost(power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml"),
+        LCCOperationalCost(
+            power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml"
+        ),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:turbo_generator:turbo_generator:operation_cost",
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator:operational_cost",
         units="USD/yr",
     ) == pytest.approx(50116.82, rel=1e-3)
 
@@ -1003,7 +1005,7 @@ def test_operational_cost_hybrid_tbm_900():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:rectifier:rectifier:operation_cost",
+        "data:propulsion:he_power_train:rectifier:rectifier:operational_cost",
         units="USD/yr",
     ) == pytest.approx(166.5, rel=1e-3)
 

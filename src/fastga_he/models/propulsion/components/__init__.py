@@ -19,7 +19,7 @@ from .connectors.dc_dc_converter import (
     SlipstreamDCDCConverter,
     PreLCADCDCConverter,
     LCCDCDCConverterCost,
-    LCCDCDCConverterOperation,
+    LCCDCDCConverterOperationalCost,
 )
 from .connectors.inverter import (
     SizingInverter,
@@ -27,7 +27,7 @@ from .connectors.inverter import (
     SlipstreamInverter,
     PreLCAInverter,
     LCCInverterCost,
-    LCCInverterOperation,
+    LCCInverterOperationalCost,
 )
 from .connectors.dc_sspc import (
     SizingDCSSPC,
@@ -35,7 +35,7 @@ from .connectors.dc_sspc import (
     SlipstreamDCSSPC,
     PreLCADCSSPC,
     LCCDCSSPCCost,
-    LCCDCSSPCOperation,
+    LCCDCSSPCOperationalCost,
 )
 from .connectors.dc_splitter import (
     SizingDCSplitter,
@@ -49,7 +49,7 @@ from .connectors.rectifier import (
     SlipstreamRectifier,
     PreLCARectifier,
     LCCRectifierCost,
-    LCCRectifierOperation,
+    LCCRectifierOperationalCost,
 )
 from .connectors.fuel_system import (
     SizingFuelSystem,
@@ -83,7 +83,7 @@ from .loads.pmsm import (
     SlipstreamPMSM,
     PreLCAPMSM,
     LCCPMSMCost,
-    LCCPMSMOperation,
+    LCCPMSMOperationalCost,
 )
 from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
 from .propulsor.propeller import (
@@ -92,7 +92,7 @@ from .propulsor.propeller import (
     SlipstreamPropeller,
     PreLCAPropeller,
     LCCPropellerCost,
-    LCCPropellerOperation,
+    LCCPropellerOperationalCost,
 )
 from .source.battery import (
     SizingBatteryPack,
@@ -100,7 +100,7 @@ from .source.battery import (
     SlipstreamBatteryPack,
     PreLCABatteryPack,
     LCCBatteryPackCost,
-    LCCBatteryPackOperation,
+    LCCBatteryPackOperationalCost,
 )
 from .source.generator import (
     SizingGenerator,
@@ -108,7 +108,7 @@ from .source.generator import (
     SlipstreamGenerator,
     PreLCAGenerator,
     LCCGeneratorCost,
-    LCCGeneratorOperation,
+    LCCGeneratorOperationalCost,
 )
 from .source.ice import (
     SizingICE,
@@ -116,7 +116,7 @@ from .source.ice import (
     SlipstreamICE,
     PreLCAICE,
     LCCICECost,
-    LCCICEOperation,
+    LCCICEOperationalCost,
 )
 from .source.high_rpm_ice import (
     SizingHighRPMICE,
@@ -124,7 +124,7 @@ from .source.high_rpm_ice import (
     SlipstreamHighRPMICE,
     PreLCAHighRPMICE,
     LCCHighRPMICECost,
-    LCCHighRPMICEOperation,
+    LCCHighRPMICEOperationalCost,
 )
 from .source.turboshaft import (
     SizingTurboshaft,
@@ -132,7 +132,7 @@ from .source.turboshaft import (
     SlipstreamTurboshaft,
     PreLCATurboshaft,
     LCCTurboshaftCost,
-    LCCTurboshaftOperation,
+    LCCTurboshaftOperationalCost,
 )
 from .source.simple_turbo_generator import (
     SizingTurboGenerator,
@@ -140,14 +140,14 @@ from .source.simple_turbo_generator import (
     SlipstreamTurboGenerator,
     PreLCATurboGenerator,
     LCCTurboGeneratorCost,
-    LCCTurboGeneratorOperation,
+    LCCTurboGeneratorOperationalCost,
 )
 from .source.pemfc import (
     SizingPEMFCStack,
     PerformancesPEMFCStack,
     SlipstreamPEMFCStack,
     LCCPEMFCStackCost,
-    LCCPEMFCStackOperation,
+    LCCPEMFCStackOperationalCost,
 )
 from .tanks.fuel_tanks import (
     SizingFuelTank,
@@ -155,14 +155,14 @@ from .tanks.fuel_tanks import (
     SlipstreamFuelTank,
     PreLCAFuelTank,
     LCCFuelTankCost,
-    LCCFuelTankOperation,
+    LCCFuelTankOperationalCost,
 )
 from .tanks.gaseous_hydrogen_tank import (
     SizingGaseousHydrogenTank,
     PerformancesGaseousHydrogenTank,
     SlipstreamGaseousHydrogenTank,
     LCCGaseousHydrogenTankCost,
-    LCCGaseousHydrogenTankOperation,
+    LCCGaseousHydrogenTankOperationalCost,
 )
 from .connectors.h2_fuel_system import (
     SizingH2FuelSystem,

@@ -51,7 +51,7 @@ from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_inverter import PerformancesInverter
 from ..components.pre_lca_prod_weight_per_fu import PreLCAInverterProdWeightPerFU
 from ..components.lcc_inverter_cost import LCCInverterCost
-from ..components.lcc_inverter_operation import LCCInverterOperation
+from ..components.lcc_inverter_operational_cost import LCCInverterOperationalCost
 
 from ..components.cstr_enforce import (
     ConstraintsCurrentEnforce,
@@ -1531,7 +1531,7 @@ def test_cost():
     problem.check_partials(compact_print=True)
 
 
-def test_operation():
+def test_operational_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
         name="data:propulsion:he_power_train:inverter:inverter_1:cost_per_unit",
@@ -1540,12 +1540,12 @@ def test_operation():
     )
 
     problem = run_system(
-        LCCInverterOperation(inverter_id="inverter_1"),
+        LCCInverterOperationalCost(inverter_id="inverter_1"),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:inverter:inverter_1:operation_cost", units="USD/yr"
+        "data:propulsion:he_power_train:inverter:inverter_1:operational_cost", units="USD/yr"
     ) == pytest.approx(1839.15, rel=1e-3)
 
     problem.check_partials(compact_print=True)

@@ -10,4 +10,4 @@ from .components.perf_battery_pack import PerformancesBatteryPack
 from .components.slipstream_battery_pack import SlipstreamBatteryPack
 from .components.pre_lca_battery_pack import PreLCABatteryPack
 from .components.lcc_battery_cost import LCCBatteryPackCost
-from .components.lcc_battery_operation import LCCBatteryPackOperation
+from .components.lcc_battery_operational_cost import LCCBatteryPackOperationalCost

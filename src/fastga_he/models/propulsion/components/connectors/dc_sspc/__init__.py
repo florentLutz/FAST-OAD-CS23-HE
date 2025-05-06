@@ -10,4 +10,4 @@ from .components.sizing_dc_sspc import SizingDCSSPC
 from .components.slipstream_dc_sspc import SlipstreamDCSSPC
 from .components.pre_lca_dc_sspc import PreLCADCSSPC
 from .components.lcc_dc_sspc_cost import LCCDCSSPCCost
-from .components.lcc_dc_sspc_operation import LCCDCSSPCOperation
+from .components.lcc_dc_sspc_operational_cost import LCCDCSSPCOperationalCost

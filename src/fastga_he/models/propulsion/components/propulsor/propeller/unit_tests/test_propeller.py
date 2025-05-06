@@ -60,7 +60,7 @@ from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 from ..components.pre_lca_prod_weight_per_fu import PreLCAPropellerProdWeightPerFU
 from ..components.lcc_propeller_cost import LCCPropellerCost
-from ..components.lcc_propeller_operation import LCCPropellerOperation
+from ..components.lcc_propeller_operational_cost import LCCPropellerOperationalCost
 
 from ..components.perf_propeller import PerformancesPropeller
 from ..components.sizing_propeller import SizingPropeller
@@ -1589,17 +1589,17 @@ def test_cost():
     problem.check_partials(compact_print=True)
 
 
-def test_maintenance():
+def test_operational_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:propeller:propeller_1:constant_speed_prop", val=1.0
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(LCCPropellerOperation(propeller_id="propeller_1"), ivc)
+    problem = run_system(LCCPropellerOperationalCost(propeller_id="propeller_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:propeller:propeller_1:operation_cost", units="USD/yr"
+        "data:propulsion:he_power_train:propeller:propeller_1:operational_cost", units="USD/yr"
     ) == pytest.approx(517.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)

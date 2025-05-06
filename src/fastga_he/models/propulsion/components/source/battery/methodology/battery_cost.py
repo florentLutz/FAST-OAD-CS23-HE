@@ -7,9 +7,11 @@ import plotly.graph_objects as go
 from scipy import optimize
 
 
-# Logarithmic fit function
-def logarithmic_func(x, a, b):
-    return a + b * np.log(x + 1)  # Added +1 to handle x=0
+# Inverse power function y = a * x^(-b)
+def power_func(x, a, b):
+    # Handle x=0 by adding a small epsilon to avoid division by zero
+    x_safe = x + 1e-10
+    return a * x_safe ** (-b)
 
 
 if __name__ == "__main__":
@@ -81,17 +83,30 @@ if __name__ == "__main__":
         ]
     )
 
-    # Fit logarithmic regression
-    # Modified function to handle x=0 by adding 1 to all x values before taking log
-    logarithmic_params, pcov = optimize.curve_fit(logarithmic_func, x, y)
+    # For the power function, we need to exclude x=0 for curve fitting
+    # Let's create a version of the data without the x=0 point
+    mask = x > 0
+    x_filtered = x[mask]
+    y_filtered = y[mask]
 
-    # Calculate fitted y values and R-squared
-    y_logarithmic = logarithmic_func(x, *logarithmic_params)
-    r2_logarithmic = 1 - np.sum((y - y_logarithmic) ** 2) / np.sum((y - np.mean(y)) ** 2)
+    # Initial parameter guesses
+    initial_params = [1.0, 0.1]  # Initial guesses for a and b
+
+    # Fit inverse power regression to the filtered data
+    power_params, pcov = optimize.curve_fit(power_func, x_filtered, y_filtered, p0=initial_params)
+
+    # Extract parameters
+    a, b = power_params
+
+    # Calculate fitted y values for all points (including x=0)
+    y_power = power_func(x, a, b)
+
+    # Calculate R-squared for the power function
+    r2_power = 1 - np.sum((y - y_power) ** 2) / np.sum((y - np.mean(y)) ** 2)
 
     # Generate points for smooth curve
-    x_smooth = np.linspace(min(x), max(x), 100)
-    y_smooth = logarithmic_func(x_smooth, *logarithmic_params)
+    x_smooth = np.linspace(0.01, max(x), 100)  # Start slightly above 0 to avoid division by zero
+    y_smooth = power_func(x_smooth, a, b)
 
     # Create interactive plot
     fig = go.Figure()
@@ -103,13 +118,13 @@ if __name__ == "__main__":
             x=x_smooth,
             y=y_smooth,
             mode="lines",
-            name=f"Logarithmic (R² = {r2_logarithmic:.3f})",
+            name=f"Power Law (R² = {r2_power:.3f})",
             line=dict(color="red", width=2),
         )
     )
 
     # Add function text to the plot
-    function_text = f"y = {logarithmic_params[0]:.4f} + {logarithmic_params[1]:.4f} * ln(x+1)"
+    function_text = f"y = {a:.4f} * x^(-{b:.4f})"
     fig.add_annotation(
         x=max(x) * 0.7,
         y=max(y) * 0.7,
@@ -122,7 +137,7 @@ if __name__ == "__main__":
     )
 
     fig.update_layout(
-        title="Logarithmic Regression",
+        title="Inverse Power Law Regression",
         xaxis_title="Year from 2022",
         yaxis_title="USD",
         template="plotly_white",
@@ -131,17 +146,17 @@ if __name__ == "__main__":
 
     fig.show()
 
-    print(f"Logarithmic fit: {function_text}")
-    print(f"R² value: {r2_logarithmic:.4f}")
+    print(f"Inverse Power Law fit: {function_text}")
+    print(f"R² value: {r2_power:.4f}")
 
     # Print residuals for model evaluation
     print("\nResiduals (first 5 and last 5 points):")
     for i in range(5):
         print(
-            f"Point {i} (x={x[i]}): Actual={y[i]}, Fitted={y_logarithmic[i]:.2f}, Residual={y[i] - y_logarithmic[i]:.2f}"
+            f"Point {i} (x={x[i]}): Actual={y[i]}, Fitted={y_power[i]:.2f}, Residual={y[i] - y_power[i]:.2f}"
         )
     print("...")
     for i in range(len(x) - 5, len(x)):
         print(
-            f"Point {i} (x={x[i]}): Actual={y[i]}, Fitted={y_logarithmic[i]:.2f}, Residual={y[i] - y_logarithmic[i]:.2f}"
+            f"Point {i} (x={x[i]}): Actual={y[i]}, Fitted={y_power[i]:.2f}, Residual={y[i] - y_power[i]:.2f}"
         )

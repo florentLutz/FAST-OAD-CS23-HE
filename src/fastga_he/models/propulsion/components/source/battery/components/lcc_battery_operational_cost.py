@@ -6,9 +6,9 @@ import openmdao.api as om
 import numpy as np
 
 
-class LCCBatteryPackOperation(om.ExplicitComponent):
+class LCCBatteryPackOperationalCost(om.ExplicitComponent):
     """
-    Computation of the battery pack operation cost and electricity cost. The charging cost is
+    Computation of the battery pack operational cost and electricity cost. The charging cost is
     estimated from https://eniplenitude.eu/e-mobility/pricing.
     """
 
@@ -54,7 +54,7 @@ class LCCBatteryPackOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
             units="USD/yr",
             val=500.0,
             desc="battery pack cost per unit",
@@ -66,7 +66,7 @@ class LCCBatteryPackOperation(om.ExplicitComponent):
         battery_pack_id = self.options["battery_pack_id"]
 
         outputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost"
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost"
         ] = (
             inputs[
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit"
@@ -100,22 +100,22 @@ class LCCBatteryPackOperation(om.ExplicitComponent):
         mission_per_year = inputs["data:cost:operation:mission_per_year"]
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit",
         ] = mission_per_year / lifespan
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
             "data:cost:operation:mission_per_year",
         ] = cost / lifespan + 0.655 * energy_consumed
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
         ] = -cost * mission_per_year / lifespan**2.0
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operation_cost",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":energy_consumed_mission",

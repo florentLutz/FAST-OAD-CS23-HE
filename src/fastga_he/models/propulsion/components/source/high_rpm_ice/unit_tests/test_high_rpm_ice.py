@@ -48,7 +48,7 @@ from ..components.pre_lca_prod_weight_per_fu import PreLCAHighRPMICEProdWeightPe
 from ..components.pre_lca_use_emission_per_fu import PreLCAHighRPMICEUseEmissionPerFU
 
 from ..components.lcc_high_rpm_ice_cost import LCCHighRPMICECost
-from ..components.lcc_high_rpm_ice_operation import LCCHighRPMICEOperation
+from ..components.lcc_high_rpm_ice_operational_cost import LCCHighRPMICEOperationalCost
 
 from ...ice.components.perf_fuel_consumption import PerformancesICEFuelConsumption
 from ...ice.components.perf_fuel_consumed import PerformancesICEFuelConsumed
@@ -1167,7 +1167,7 @@ def test_cost():
     problem.check_partials(compact_print=True)
 
 
-def test_maintenance():
+def test_operational_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:high_rpm_ICE:ice_1:displacement_volume",
@@ -1176,10 +1176,10 @@ def test_maintenance():
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(LCCHighRPMICEOperation(high_rpm_ice_id="ice_1"), ivc)
+    problem = run_system(LCCHighRPMICEOperationalCost(high_rpm_ice_id="ice_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:operation_cost", units="USD/yr"
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:operational_cost", units="USD/yr"
     ) == pytest.approx(
         9887.5,
         rel=1e-2,

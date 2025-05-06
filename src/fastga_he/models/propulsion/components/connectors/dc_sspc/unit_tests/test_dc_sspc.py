@@ -27,7 +27,7 @@ from ..components.perf_dc_sspc import PerformancesDCSSPC
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCADCSSPCProdWeightPerFU
 from ..components.lcc_dc_sspc_cost import LCCDCSSPCCost
-from ..components.lcc_dc_sspc_operation import LCCDCSSPCOperation
+from ..components.lcc_dc_sspc_operational_cost import LCCDCSSPCOperationalCost
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -437,10 +437,10 @@ def test_operational_cost():
         "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:cost_per_unit", units="USD", val=400
     )
 
-    problem = run_system(LCCDCSSPCOperation(dc_sspc_id="dc_sspc_1"), ivc)
+    problem = run_system(LCCDCSSPCOperationalCost(dc_sspc_id="dc_sspc_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:operation_cost", units="USD/yr"
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:operational_cost", units="USD/yr"
     ) == pytest.approx(40.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

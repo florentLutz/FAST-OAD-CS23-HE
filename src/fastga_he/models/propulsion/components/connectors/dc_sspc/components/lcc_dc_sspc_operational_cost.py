@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCDCSSPCOperation(om.ExplicitComponent):
+class LCCDCSSPCOperationalCost(om.ExplicitComponent):
     """
-    Computation of the SSPC annual operation cost. The lifespan expectancy is obtained from
+    Computation of the SSPC annual operational cost. The lifespan expectancy is obtained from
     :cite:`cao:2023`.
     """
 
@@ -31,10 +31,10 @@ class LCCDCSSPCOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operation_cost",
+            name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operational_cost",
             val=100.0,
             units="USD/yr",
-            desc="Annual operation cost of SSPC",
+            desc="Annual operational cost of SSPC",
         )
 
         self.declare_partials(of="*", wrt="*", val=0.1)
@@ -42,6 +42,6 @@ class LCCDCSSPCOperation(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_sspc_id = self.options["dc_sspc_id"]
 
-        outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operation_cost"] = (
+        outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operational_cost"] = (
             0.1 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":cost_per_unit"]
         )

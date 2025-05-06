@@ -46,7 +46,7 @@ from ..components.cstr_ensure import ConstraintsPEMFCStackEffectiveAreaEnsure
 from ..components.cstr_enforce import ConstraintsPEMFCStackEffectiveAreaEnforce
 
 from ..components.lcc_pemfc_cost import LCCPEMFCStackCost
-from ..components.lcc_pemfc_operation import LCCPEMFCStackOperation
+from ..components.lcc_pemfc_operational_cost import LCCPEMFCStackOperationalCost
 
 from ..constants import POSSIBLE_POSITION
 
@@ -960,7 +960,7 @@ def test_cost():
     problem.check_partials(compact_print=True)
 
 
-def test_operation_cost():
+def test_operational_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_unit",
@@ -975,11 +975,11 @@ def test_operation_cost():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCPEMFCStackOperation(pemfc_stack_id="pemfc_stack_1"),
+        LCCPEMFCStackOperationalCost(pemfc_stack_id="pemfc_stack_1"),
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:operation_cost",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:operational_cost",
         units="USD/yr",
     ) == pytest.approx(
         800.0,

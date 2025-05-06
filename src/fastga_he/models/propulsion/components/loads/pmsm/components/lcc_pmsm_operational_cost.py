@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCPMSMOperation(om.ExplicitComponent):
+class LCCPMSMOperationalCost(om.ExplicitComponent):
     """
     Computation of the maintenance cost of the PMSM. For the default value of the average lifespan
     of the motor, the value is taken from :cite:`thonemann:2024` for short term technologies.
@@ -33,7 +33,7 @@ class LCCPMSMOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":operation_cost",
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
             units="USD/yr",
             val=1.0e3,
             desc="Annual maintenance cost per unit",
@@ -44,7 +44,7 @@ class LCCPMSMOperation(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":operation_cost"] = (
+        outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost"] = (
             inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_unit"]
             / inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan"]
         )
@@ -53,11 +53,11 @@ class LCCPMSMOperation(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         partials[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":operation_cost",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_unit",
         ] = 1 / inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan"]
         partials[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":operation_cost",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan",
         ] = (
             -inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_unit"]

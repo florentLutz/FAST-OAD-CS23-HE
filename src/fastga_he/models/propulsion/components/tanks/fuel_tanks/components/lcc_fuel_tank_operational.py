@@ -10,7 +10,7 @@ import numpy as np
 _LOGGER = logging.getLogger(__name__)
 
 
-class LCCFuelTankOperation(om.ExplicitComponent):
+class LCCFuelTankOperationalCost(om.ExplicitComponent):
     """
     Computation of the annual fuel cost. The unit price of avgas 100LL and Jet-A1 are obtained from
     https://orleans.aeroport.fr.
@@ -53,7 +53,7 @@ class LCCFuelTankOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operation_cost",
+            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operational_cost",
             units="USD/yr",
             val=1.0e4,
         )
@@ -86,7 +86,9 @@ class LCCFuelTankOperation(om.ExplicitComponent):
             self.price_fuel = 3.66
             _LOGGER.warning("Fuel type %f does not exist, replaced by type 1!", fuel_type)
 
-        outputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operation_cost"] = (
+        outputs[
+            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operational_cost"
+        ] = (
             self.price_fuel
             * inputs[
                 "data:propulsion:he_power_train:fuel_tank:"
@@ -105,11 +107,11 @@ class LCCFuelTankOperation(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operation_cost",
+            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operational_cost",
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_consumed_mission",
         ] = self.price_fuel * mission_per_year
 
         partials[
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operation_cost",
+            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operational_cost",
             "data:cost:operation:mission_per_year",
         ] = self.price_fuel * fuel_consumed

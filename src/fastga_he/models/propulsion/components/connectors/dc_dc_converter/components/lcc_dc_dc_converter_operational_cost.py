@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCDCDCConverterOperation(om.ExplicitComponent):
+class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
     """
     Computation of convertor annual operational cost.
     """
@@ -42,7 +42,7 @@ class LCCDCDCConverterOperation(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":operation_cost",
+            + ":operational_cost",
             units="USD/yr",
             val=75.0,
         )
@@ -64,7 +64,7 @@ class LCCDCDCConverterOperation(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":operation_cost"
+            + ":operational_cost"
         ] = cost / lifespan
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -82,7 +82,7 @@ class LCCDCDCConverterOperation(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":operation_cost",
+            + ":operational_cost",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":cost_per_unit",
@@ -91,6 +91,6 @@ class LCCDCDCConverterOperation(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":operation_cost",
+            + ":operational_cost",
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan",
         ] = -cost / lifespan**2.0

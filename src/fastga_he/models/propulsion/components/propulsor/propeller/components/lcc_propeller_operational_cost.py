@@ -5,7 +5,7 @@
 import openmdao.api as om
 
 
-class LCCPropellerOperation(om.ExplicitComponent):
+class LCCPropellerOperationalCost(om.ExplicitComponent):
     """
     Computation of the propeller maintenance cost based on the mean service price from
     https://aircraftaccessoriesofok.com/aircraft-propeller-overhaul-cost/.
@@ -31,7 +31,7 @@ class LCCPropellerOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":operation_cost",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":operational_cost",
             units="USD/yr",
             val=500.0,
         )
@@ -48,9 +48,11 @@ class LCCPropellerOperation(om.ExplicitComponent):
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":turboprop_connection"
         ]
 
-        outputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":operation_cost"] = (
-            1.0 - f_constant_speed
-        ) * 147.0 + f_constant_speed * (517.0 + turboprop_connection * 383.0)
+        outputs[
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":operational_cost"
+        ] = (1.0 - f_constant_speed) * 147.0 + f_constant_speed * (
+            517.0 + turboprop_connection * 383.0
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]
@@ -62,11 +64,11 @@ class LCCPropellerOperation(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":operation_cost",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":operational_cost",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":constant_speed_prop",
         ] = -147.0 + (517.0 + turboprop_connection * 383.0)
 
         partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":operation_cost",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":operational_cost",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":turboprop_connection",
         ] = 383.0 * f_constant_speed

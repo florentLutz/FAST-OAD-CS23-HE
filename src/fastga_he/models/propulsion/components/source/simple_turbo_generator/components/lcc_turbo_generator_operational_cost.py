@@ -7,9 +7,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCTurboGeneratorOperation(om.ExplicitComponent):
+class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
     """
-    Cost computation of the turbo generator operation cost is based on its purchase price and the
+    Cost computation of the turbo generator operational cost is based on its purchase price and the
     expected lifespan from https://naasco.com/starter-generators/.
     """
 
@@ -42,7 +42,7 @@ class LCCTurboGeneratorOperation(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":operation_cost",
+            + ":operational_cost",
             units="USD/yr",
             val=5.0e2,
         )
@@ -60,7 +60,7 @@ class LCCTurboGeneratorOperation(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":operation_cost"
+            + ":operational_cost"
         ] = cost * flight_hour / 1250.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -75,7 +75,7 @@ class LCCTurboGeneratorOperation(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":operation_cost",
+            + ":operational_cost",
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
             + ":cost_per_unit",
@@ -84,6 +84,6 @@ class LCCTurboGeneratorOperation(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":operation_cost",
+            + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
         ] = cost / 1250.0

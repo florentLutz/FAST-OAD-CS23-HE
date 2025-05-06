@@ -33,7 +33,9 @@ from ..components.perf_fuel_mission_consumed import PerformancesGaseousHydrogenC
 from ..components.perf_fuel_remaining import PerformancesGaseousHydrogenRemainingMission
 
 from ..components.lcc_gaseous_hydrogen_tank_cost import LCCGaseousHydrogenTankCost
-from ..components.lcc_gaseous_hydrogen_tank_operation import LCCGaseousHydrogenTankOperation
+from ..components.lcc_gaseous_hydrogen_tank_operational_cost import (
+    LCCGaseousHydrogenTankOperationalCost,
+)
 
 from ..components.sizing_tank import SizingGaseousHydrogenTank
 from ..components.perf_gaseous_hydrogen_tank import PerformancesGaseousHydrogenTank
@@ -746,12 +748,12 @@ def test_fuel_cost():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCGaseousHydrogenTankOperation(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+        LCCGaseousHydrogenTankOperationalCost(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:operation_cost",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:operational_cost",
         units="USD/yr",
     ) == pytest.approx(26160.0, rel=1e-2)
 

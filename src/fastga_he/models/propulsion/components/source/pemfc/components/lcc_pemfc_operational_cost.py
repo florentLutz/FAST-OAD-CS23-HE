@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCPEMFCStackOperation(om.ExplicitComponent):
+class LCCPEMFCStackOperationalCost(om.ExplicitComponent):
     """
-    Computation of the PEMFC stack operation cost based on the PEMFC lifespan from
+    Computation of the PEMFC stack operational cost based on the PEMFC lifespan from
     :cite:`fuhren:2022`.
     """
 
@@ -45,7 +45,7 @@ class LCCPEMFCStackOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost",
             units="USD/yr",
             val=1.0e3,
             desc="Annual maintenance cost of PEMFC stack",
@@ -57,7 +57,7 @@ class LCCPEMFCStackOperation(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost"
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost"
         ] = (
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit"
@@ -77,16 +77,16 @@ class LCCPEMFCStackOperation(om.ExplicitComponent):
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
         partials[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit",
         ] = flight_hour / lifespan
 
         partials[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan",
         ] = -cost * flight_hour / lifespan**2.0
 
         partials[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operation_cost",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
         ] = cost / lifespan

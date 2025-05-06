@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCRectifierOperation(om.ExplicitComponent):
+class LCCRectifierOperationalCost(om.ExplicitComponent):
     """
     Computation of the annual operational cost of rectifier.
     """
@@ -35,7 +35,7 @@ class LCCRectifierOperation(om.ExplicitComponent):
             desc="Expected lifetime of the rectifier, typically around 15 year",
         )
         self.add_output(
-            name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operation_cost",
+            name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operational_cost",
             units="USD/yr",
             val=350.0,
         )
@@ -46,9 +46,9 @@ class LCCRectifierOperation(om.ExplicitComponent):
         cost = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":cost_per_unit"]
         lifespan = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
 
-        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operation_cost"] = (
-            cost / lifespan
-        )
+        outputs[
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operational_cost"
+        ] = cost / lifespan
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         rectifier_id = self.options["rectifier_id"]
@@ -56,11 +56,11 @@ class LCCRectifierOperation(om.ExplicitComponent):
         lifespan = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
 
         partials[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operation_cost",
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operational_cost",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":cost_per_unit",
         ] = 1.0 / lifespan
 
         partials[
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operation_cost",
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operational_cost",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan",
         ] = -cost / lifespan**2.0

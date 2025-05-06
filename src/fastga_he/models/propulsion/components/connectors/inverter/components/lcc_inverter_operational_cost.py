@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCInverterOperation(om.ExplicitComponent):
+class LCCInverterOperationalCost(om.ExplicitComponent):
     """
-    Computation of the inverter annual operation cost. The lifespan expectancy is obtained from
+    Computation of the inverter annual operational cost. The lifespan expectancy is obtained from
     :cite:`cao:2023`.
     """
 
@@ -30,7 +30,7 @@ class LCCInverterOperation(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":operation_cost",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
             units="USD/yr",
             val=350.0,
         )
@@ -40,7 +40,7 @@ class LCCInverterOperation(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         inverter_id = self.options["inverter_id"]
 
-        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":operation_cost"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost"] = (
             0.1
             * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":cost_per_unit"]
         )

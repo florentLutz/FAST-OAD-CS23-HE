@@ -10,4 +10,4 @@ from .components.perf_ice import PerformancesICE
 from .components.slipstream_ice import SlipstreamICE
 from .components.pre_lca_ice import PreLCAICE
 from .components.lcc_ice_cost import LCCICECost
-from .components.lcc_ice_operation import LCCICEOperation
+from .components.lcc_ice_operational_cost import LCCICEOperationalCost
