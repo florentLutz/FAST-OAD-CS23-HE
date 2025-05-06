@@ -26,7 +26,7 @@ class LCCMaterialCost(om.ExplicitComponent):
         )
 
     def setup(self):
-        self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
+        self.add_input("data:cost:production:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:TLAR:v_cruise", units="kn", val=np.nan)
         self.add_input(
             "data:cost:production:num_aircraft_5years",
@@ -60,7 +60,7 @@ class LCCMaterialCost(om.ExplicitComponent):
 
         outputs["data:cost:production:material_cost_per_unit"] = (
             24.896
-            * inputs["data:weight:airframe:mass"] ** 0.689
+            * inputs["data:cost:production:airframe:mass"] ** 0.689
             * inputs["data:TLAR:v_cruise"] ** 0.624
             * inputs["data:cost:production:num_aircraft_5years"] ** -0.208
             * inputs["data:cost:cpi_2012"]
@@ -69,7 +69,7 @@ class LCCMaterialCost(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        m_airframe = inputs["data:weight:airframe:mass"]
+        m_airframe = inputs["data:cost:production:airframe:mass"]
         v_cruise = inputs["data:TLAR:v_cruise"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
         num_5years = inputs["data:cost:production:num_aircraft_5years"]
@@ -84,7 +84,9 @@ class LCCMaterialCost(om.ExplicitComponent):
         else:
             f_pressurized = 1.0
 
-        partials["data:cost:production:material_cost_per_unit", "data:weight:airframe:mass"] = (
+        partials[
+            "data:cost:production:material_cost_per_unit", "data:cost:production:airframe:mass"
+        ] = (
             17.153344
             * v_cruise**0.624
             * num_5years**-0.208

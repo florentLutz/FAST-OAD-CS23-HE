@@ -27,7 +27,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         )
 
     def setup(self):
-        self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
+        self.add_input("data:cost:production:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:TLAR:v_cruise", units="kn", val=np.nan)
         self.add_input(
             "data:cost:production:num_aircraft_5years",
@@ -63,7 +63,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
 
         outputs["data:cost:production:engineering_man_hours"] = (
             0.0396
-            * inputs["data:weight:airframe:mass"] ** 0.791
+            * inputs["data:cost:production:airframe:mass"] ** 0.791
             * inputs["data:TLAR:v_cruise"] ** 1.526
             * inputs["data:cost:production:num_aircraft_5years"] ** -0.817
             * f_flap
@@ -72,7 +72,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        m_airframe = inputs["data:weight:airframe:mass"]
+        m_airframe = inputs["data:cost:production:airframe:mass"]
         v_cruise = inputs["data:TLAR:v_cruise"]
         num_5years = inputs["data:cost:production:num_aircraft_5years"]
         f_composite = inputs["data:cost:production:composite_fraction"]
@@ -89,7 +89,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
 
         partials[
             "data:cost:production:engineering_man_hours",
-            "data:weight:airframe:mass",
+            "data:cost:production:airframe:mass",
         ] = (
             0.0313236
             * v_cruise**1.526

@@ -248,6 +248,9 @@
         <tooling_cost_per_hour unit="USD/h">83.97</tooling_cost_per_hour>
         <manufacturing_cost_per_hour unit="USD/h">72.97</manufacturing_cost_per_hour>
         <fixed_landing_gear>0.0</fixed_landing_gear>
+        <airframe>
+          <mass units="kg">1731.6968603612413</mass>
+        </airframe>
       </production>
       <operation>
         <number_of_pilot>1.0</number_of_pilot>

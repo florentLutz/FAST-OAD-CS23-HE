@@ -39,6 +39,7 @@ from ..lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
 from ..lcc_flight_mission import LCCFlightMission
 from ..lcc_operation_cost_sum import LCCSumOperationCost
 from ..lcc_operation_cost import LCCOperationCost
+from ..lcc_airframe_weight import LCCAirframeWeight
 
 
 XML_FILE = "data.xml"
@@ -47,9 +48,27 @@ DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
+def test_airframe_weight():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:propulsion:he_power_train:mass", units="kg", val=357.4)
+    ivc.add_output("data:weight:aircraft:OWE", units="kg", val=2089.1)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCAirframeWeight(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:production:airframe:mass", units="kg") == pytest.approx(
+        1731.7, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_engineering_human_hours():
     input_list = [
-        "data:weight:airframe:mass",
+        "data:cost:production:airframe:mass",
         "data:TLAR:v_cruise",
         "data:cost:production:num_aircraft_5years",
         "data:cost:production:composite_fraction",
@@ -69,14 +88,14 @@ def test_engineering_human_hours():
 
     assert problem.get_val(
         "data:cost:production:engineering_man_hours", units="h"
-    ) == pytest.approx(72.679, rel=1e-3)
+    ) == pytest.approx(86.06, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_tooling_human_hours():
     input_list = [
-        "data:weight:airframe:mass",
+        "data:cost:production:airframe:mass",
         "data:TLAR:v_cruise",
         "data:cost:production:num_aircraft_5years",
         "data:cost:production:composite_fraction",
@@ -95,7 +114,7 @@ def test_tooling_human_hours():
     )
 
     assert problem.get_val("data:cost:production:tooling_man_hours", units="h") == pytest.approx(
-        87.993, rel=1e-3
+        103.6, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -103,7 +122,7 @@ def test_tooling_human_hours():
 
 def test_manufacturing_human_hours():
     input_list = [
-        "data:weight:airframe:mass",
+        "data:cost:production:airframe:mass",
         "data:TLAR:v_cruise",
         "data:cost:production:num_aircraft_5years",
         "data:cost:production:composite_fraction",
@@ -123,7 +142,7 @@ def test_manufacturing_human_hours():
 
     assert problem.get_val(
         "data:cost:production:manufacturing_man_hours", units="h"
-    ) == pytest.approx(688.025, rel=1e-3)
+    ) == pytest.approx(805.9, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -156,7 +175,7 @@ def test_engineering_cost():
 
 def test_development_support_cost():
     input_list = [
-        "data:weight:airframe:mass",
+        "data:cost:production:airframe:mass",
         "data:TLAR:v_cruise",
         "data:cost:prototype_number",
         "data:cost:production:num_aircraft_5years",
@@ -178,7 +197,7 @@ def test_development_support_cost():
 
     assert problem.get_val(
         "data:cost:production:dev_support_cost_per_unit", units="USD"
-    ) == pytest.approx(764.242, rel=1e-3)
+    ) == pytest.approx(921.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -262,7 +281,7 @@ def test_quality_control_cost():
 
 def test_flight_test_cost():
     input_list = [
-        "data:weight:airframe:mass",
+        "data:cost:production:airframe:mass",
         "data:TLAR:v_cruise",
         "data:cost:prototype_number",
         "data:cost:production:num_aircraft_5years",
@@ -283,14 +302,14 @@ def test_flight_test_cost():
 
     assert problem.get_val(
         "data:cost:production:flight_test_cost_per_unit", units="USD"
-    ) == pytest.approx(93.105, rel=1e-3)
+    ) == pytest.approx(119.3, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_material_cost():
     input_list = [
-        "data:weight:airframe:mass",
+        "data:cost:production:airframe:mass",
         "data:TLAR:v_cruise",
         "data:cost:production:num_aircraft_5years",
         "data:cost:cpi_2012",
@@ -310,7 +329,7 @@ def test_material_cost():
 
     assert problem.get_val(
         "data:cost:production:material_cost_per_unit", units="USD"
-    ) == pytest.approx(8735.09, rel=1e-3)
+    ) == pytest.approx(10120.76, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -503,7 +522,7 @@ def test_production_cost():
     ) == pytest.approx(70956.47, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        371854.75, rel=1e-3
+        31970.95, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -559,13 +578,14 @@ def test_production_cost_hybrid_tbm_900():
         "input_ecopulse.xml",
     )
 
-    ivc.add_output("data:weight:aircraft:OWE", val=2570.055, units="kg")
-
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml"),
         ivc,
     )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
+    ) == pytest.approx(487008.82, rel=1e-3)
     assert problem.get_val(
         "data:propulsion:he_power_train:gearbox:gearbox_1:cost_per_unit", units="USD"
     ) == pytest.approx(1959.02, rel=1e-3)
@@ -577,11 +597,11 @@ def test_production_cost_hybrid_tbm_900():
     ) == pytest.approx(221207.71, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        3488491.93, rel=1e-3
+        4561824.7, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        3872226.05, rel=1e-3
+        5063625.41, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -616,11 +636,11 @@ def test_production_cost_tbm_900():
     ) == pytest.approx(425906.45, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        3853743.71, rel=1e-3
+        5324009.64, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4277655.52, rel=1e-3
+        5909650.71, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -936,7 +956,7 @@ def test_operation_cost_hydrogen():
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
-def test_operation_cost_tbm_900():
+def test_operational_cost_tbm_900():
     ivc = get_indep_var_comp(
         list_inputs(
             LCCOperationCost(
@@ -975,7 +995,7 @@ def test_operation_cost_tbm_900():
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
-def test_operation_cost_hybrid_tbm_900():
+def test_operational_cost_hybrid_tbm_900():
     ivc = get_indep_var_comp(
         list_inputs(
             LCCOperationCost(
@@ -985,8 +1005,6 @@ def test_operation_cost_hybrid_tbm_900():
         __file__,
         "input_ecopulse.xml",
     )
-
-    ivc.add_output("data:weight:aircraft:OWE", val=2570.055, units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -1035,16 +1053,16 @@ def test_cost_tbm_900():
     ) == pytest.approx(425906.45, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        3853743.72, rel=1e-3
+        5324009.65, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4277655.53, rel=1e-3
+        5909650.71, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(476152.08, rel=1e-3)
+    ) == pytest.approx(492472.04, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
