@@ -2,7 +2,7 @@
 Life Cycle Assessment models
 ============================
 
-FAST-OAD-CS23-HE allows to perform a Life Cycle Assessment of hybrid-electric aircraft via a LCA module. This module can be integrated to the analysis by adding the corresponding `id` to the `configuration file <https://fast-oad.readthedocs.io/en/v1.8.2/documentation/usage.html#problem-definition>`_. The id for the LCA module is:
+FAST-OAD-CS23-HE allows to perform a Life Cycle Assessment of hybrid-electric aircraft via a LCA module. That module can be integrated to the analysis by adding the corresponding `id` to the `configuration file <https://fast-oad.readthedocs.io/en/v1.8.2/documentation/usage.html#problem-definition>`_. The id for the LCA module is:
 
 .. code:: yaml
 

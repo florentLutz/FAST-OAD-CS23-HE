@@ -9,7 +9,7 @@ import numpy as np
 class LCCBatteryPackCost(om.ExplicitComponent):
     """
     Computation of the battery pack cost with considering cost reduction with production
-    maturity. The reduction curve and estimated price are obtained from :cite:`Wesley:2023`.
+    maturity. The reduction curve and estimated price are obtained from :cite:`wesley:2023`.
     """
 
     def initialize(self):
