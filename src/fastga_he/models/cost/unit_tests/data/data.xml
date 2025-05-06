@@ -13,6 +13,7 @@
       </delivery>
     </environmental_impact>
     <cost>
+      <v_cruise_design units="knot" is_input="True">93.0<!--design cruise speed--></v_cruise_design>
       <cpi_2012>1.4</cpi_2012>
       <msp_per_unit unit="USD">412758.77</msp_per_unit>
       <production>
@@ -34,9 +35,6 @@
         <manufacturing_cost_per_unit unit="USD">147385.351</manufacturing_cost_per_unit>
         <fixed_landing_gear>0.0</fixed_landing_gear>
         <landing_gear_cost_reduction unit="USD">0.0</landing_gear_cost_reduction>
-        <airframe>
-          <mass unit="kg">228.01352987620194</mass>
-        </airframe>
       </production>
       <prototype_number>2.0</prototype_number>
       <production_cost_per_unit unit="USD">371854.75</production_cost_per_unit>

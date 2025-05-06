@@ -13,8 +13,8 @@ class LCCFlightTestCost(om.ExplicitComponent):
     """
 
     def setup(self):
-        self.add_input("data:cost:production:airframe:mass", units="kg", val=np.nan)
-        self.add_input("data:TLAR:v_cruise", units="kn", val=np.nan)
+        self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
+        self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
         self.add_input(
             "data:cost:prototype_number",
             val=np.nan,
@@ -42,23 +42,21 @@ class LCCFlightTestCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:production:flight_test_cost_per_unit"] = (
             0.009646
-            * inputs["data:cost:production:airframe:mass"] ** 1.16
-            * inputs["data:TLAR:v_cruise"] ** 1.3718
+            * inputs["data:weight:airframe:mass"] ** 1.16
+            * inputs["data:cost:v_cruise_design"] ** 1.3718
             * inputs["data:cost:prototype_number"] ** 1.281
             * inputs["data:cost:cpi_2012"]
             / inputs["data:cost:production:num_aircraft_5years"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        m_airframe = inputs["data:cost:production:airframe:mass"]
-        v_cruise = inputs["data:TLAR:v_cruise"]
+        m_airframe = inputs["data:weight:airframe:mass"]
+        v_cruise = inputs["data:cost:v_cruise_design"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
         num_prototype = inputs["data:cost:prototype_number"]
         num_5years = inputs["data:cost:production:num_aircraft_5years"]
 
-        partials[
-            "data:cost:production:flight_test_cost_per_unit", "data:cost:production:airframe:mass"
-        ] = (
+        partials["data:cost:production:flight_test_cost_per_unit", "data:weight:airframe:mass"] = (
             0.01118936
             * m_airframe**0.16
             * v_cruise**1.3718
@@ -67,7 +65,7 @@ class LCCFlightTestCost(om.ExplicitComponent):
             / num_5years
         )
 
-        partials["data:cost:production:flight_test_cost_per_unit", "data:TLAR:v_cruise"] = (
+        partials["data:cost:production:flight_test_cost_per_unit", "data:cost:v_cruise_design"] = (
             0.0132323828
             * m_airframe**1.16
             * v_cruise**0.3718

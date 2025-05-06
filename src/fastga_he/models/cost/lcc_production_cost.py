@@ -22,7 +22,6 @@ from .lcc_certification_cost import LCCCertificationCost
 from .lcc_msp import LCCMSP
 from .lcc_production_cost_sum import LCCSumProductionCost
 from .lcc_freight_cost import LCCFreightCost
-from .lcc_airframe_weight import LCCAirframeWeight
 
 
 class LCCProductionCost(om.Group):
@@ -64,12 +63,6 @@ class LCCProductionCost(om.Group):
         tapered_wing = self.options["tapered_wing"]
 
         # Calculate first the labor resources required for R&D and manufacturing of airframe
-        self.add_subsystem(
-            name="airframe_weight",
-            subsys=LCCAirframeWeight(),
-            promotes=["*"],
-        )
-
         self.add_subsystem(
             name="engineering_man_hours",
             subsys=LCCEngineeringManHours(complex_flap=complex_flap, pressurized=pressurized),

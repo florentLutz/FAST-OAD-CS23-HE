@@ -79,6 +79,7 @@
         </geometry>
         <cost>
             <cpi_2012>1.4</cpi_2012>
+            <v_cruise_design units="knot" is_input="True">93.0<!--design cruise speed--></v_cruise_design>
             <msp_per_unit unit="USD">412758.77</msp_per_unit>
             <prototype_number>2.0</prototype_number>
             <production>
@@ -90,9 +91,6 @@
                   <manufacturing_man_hours unit="h">688.025</manufacturing_man_hours>
                   <manufacturing_cost_per_hour unit="USD/h">72.97</manufacturing_cost_per_hour>
                 <fixed_landing_gear>0.0</fixed_landing_gear>
-                <airframe>
-                    <mass unit="kg">228.01352987620194</mass>
-                </airframe>
             </production>
             <operation>
                 <loan_principal unit="USD">4200.0</loan_principal>
@@ -100,6 +98,7 @@
         </cost>
         <propulsion>
             <he_power_train>
+                <mass units="kg" is_input="False">1280.22446860875</mass>
                 <aux_load>
                     <dc_aux_load_1>
                         <power_in_mission units="kW">5.0</power_in_mission>
@@ -203,6 +202,7 @@
                 </gaseous_hydrogen_tank>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
+                        <cost_per_unit unit="USD">6576.2</cost_per_unit>
                         <losses_max units="W" is_input="True">1958.0316619368884</losses_max>
                         <power_rating_max units="kW">344.0</power_rating_max>
                         <CG>
@@ -284,6 +284,7 @@
                 </DC_DC_converter>
                 <DC_SSPC>
                     <dc_sspc_412>
+                        <cost_per_unit unit="USD">718.4</cost_per_unit>
                         <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -312,6 +313,7 @@
                     </dc_sspc_412>
                     <dc_sspc_1>
                         <efficiency>0.99</efficiency>
+                        <cost_per_unit unit="USD">717.0</cost_per_unit>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -339,6 +341,7 @@
                     </dc_sspc_1>
                     <dc_sspc_2>
                         <efficiency>0.99</efficiency>
+                        <cost_per_unit unit="USD">717.0</cost_per_unit>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -366,6 +369,7 @@
                     </dc_sspc_2>
                     <dc_sspc_1337>
                         <efficiency>0.99</efficiency>
+                        <cost_per_unit unit="USD">717.0</cost_per_unit>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -445,6 +449,7 @@
                 </DC_cable_harness>
                 <inverter>
                     <inverter_1>
+                        <cost_per_unit unit="USD">18391.45</cost_per_unit>
                         <CG>
                             <x units="m">2.69</x>
                             <y_ratio>0.34</y_ratio>

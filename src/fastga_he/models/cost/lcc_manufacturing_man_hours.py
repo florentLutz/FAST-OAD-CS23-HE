@@ -21,8 +21,8 @@ class LCCManufacturingManHours(om.ExplicitComponent):
         )
 
     def setup(self):
-        self.add_input("data:cost:production:airframe:mass", units="kg", val=np.nan)
-        self.add_input("data:TLAR:v_cruise", units="kn", val=np.nan)
+        self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
+        self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
         self.add_input(
             "data:cost:production:num_aircraft_5years",
             val=np.nan,
@@ -52,16 +52,16 @@ class LCCManufacturingManHours(om.ExplicitComponent):
 
         outputs["data:cost:production:manufacturing_man_hours"] = (
             9.6613
-            * inputs["data:cost:production:airframe:mass"] ** 0.74
-            * inputs["data:TLAR:v_cruise"] ** 0.543
+            * inputs["data:weight:airframe:mass"] ** 0.74
+            * inputs["data:cost:v_cruise_design"] ** 0.543
             * inputs["data:cost:production:num_aircraft_5years"] ** -0.476
             * f_flap
             * (1.0 + 0.25 * inputs["data:cost:production:composite_fraction"])
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        m_airframe = inputs["data:cost:production:airframe:mass"]
-        v_cruise = inputs["data:TLAR:v_cruise"]
+        m_airframe = inputs["data:weight:airframe:mass"]
+        v_cruise = inputs["data:cost:v_cruise_design"]
         num_5years = inputs["data:cost:production:num_aircraft_5years"]
         f_composite = inputs["data:cost:production:composite_fraction"]
 
@@ -72,14 +72,14 @@ class LCCManufacturingManHours(om.ExplicitComponent):
 
         partials[
             "data:cost:production:manufacturing_man_hours",
-            "data:cost:production:airframe:mass",
+            "data:weight:airframe:mass",
         ] = (
             7.149362 * v_cruise**0.543 * num_5years**-0.476 * f_flap * (1.0 + 0.25 * f_composite)
         ) / m_airframe**0.26
 
         partials[
             "data:cost:production:manufacturing_man_hours",
-            "data:TLAR:v_cruise",
+            "data:cost:v_cruise_design",
         ] = (
             5.2460859
             * m_airframe**0.74
