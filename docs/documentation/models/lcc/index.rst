@@ -10,7 +10,7 @@ can be integrated to the analysis by adding the corresponding `id` to the `confi
     id: fastga_he.lcc.legacy
 
 
-A description of this LCC module is available here. It includes a description of the models, a description of the option
+A description of the LCC module is available here. It includes a description of the models, a description of the options
 available as well as the value they can take and a description of some of the key assumptions that were made.
 
 .. toctree::
