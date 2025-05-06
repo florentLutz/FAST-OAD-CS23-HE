@@ -34,7 +34,7 @@ class LCCPEMFCStackOperation(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan",
             units="h",
             val=12.5e3,
-            desc="Purchase cost of PEMFC stack",
+            desc="The PEMFC stack lifespan in hours",
         )
 
         self.add_input(
