@@ -89,6 +89,47 @@ def test_pipistrel_velis_electro():
     assert sizing_energy == pytest.approx(25.05, abs=1e-2)
 
 
+def test_pipistrel_heavy_velis_electro():
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "pipistrel_heavy_source.xml"
+    process_file_name = "pipistrel_heavy_configuration.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # Give good initial guess on a few key value to reduce the time it takes to converge
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:OWE", units="kg", val=400.0)
+    problem.set_val("data:weight:aircraft:MZFW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:ZFW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:MLW", units="kg", val=600.0)
+
+    # Run the problem
+    problem.run_model()
+
+    problem.write_outputs()
+
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        642.00, rel=1e-2
+    )
+    assert problem.get_val("data:mission:sizing:energy", units="kW*h") == pytest.approx(
+        25.77, abs=1e-2
+    )
+
+
 def test_pipistrel_detailed_mission():
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)

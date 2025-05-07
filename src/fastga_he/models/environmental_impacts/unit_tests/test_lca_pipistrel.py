@@ -645,3 +645,108 @@ def test_lca_pipistrel_iw():
     problem.run_model()
     problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_iw.xml"
     problem.write_outputs()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_pipistrel_heavy_recipe():
+    input_file_name = "pipistrel_heavy_out.xml"
+
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
+        functional_unit="Flight hours",
+        aircraft_lifespan_in_hours=True,
+        component_level_breakdown=True,
+        airframe_material="aluminium",
+        delivery_method="train",
+        electric_mix="french",
+        normalization=True,
+        weighting=True,
+        ecoinvent_version="3.9.1",
+    )
+
+    ivc = local_get_indep_var_comp(list_inputs(component), input_file_name)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    # The energy stored in the battery does not consider the fuel necessary for takeoff,
+    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
+    # not include the energy necessary for the reserve as it does not contribute to the
+    # functional unit
+    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
+
+    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
+    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
+    energy_for_fu = total_energy_mission - energy_reserves
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
+        units="W*h",
+        val=energy_for_fu / 2.0,
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
+        units="W*h",
+        val=energy_for_fu / 2.0,
+    )
+
+    problem.run_model()
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe.xml"
+    problem.write_outputs()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_pipistrel_heavy_recipe_btf():
+    input_file_name = "pipistrel_heavy_out.xml"
+
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
+        functional_unit="Flight hours",
+        aircraft_lifespan_in_hours=True,
+        component_level_breakdown=True,
+        airframe_material="aluminium",
+        delivery_method="train",
+        electric_mix="french",
+        normalization=True,
+        weighting=True,
+        ecoinvent_version="3.9.1",
+    )
+
+    ivc = local_get_indep_var_comp(list_inputs(component), input_file_name)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    # The energy stored in the battery does not consider the fuel necessary for takeoff,
+    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
+    # not include the energy necessary for the reserve as it does not contribute to the
+    # functional unit
+    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
+
+    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
+    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
+    energy_for_fu = total_energy_mission - energy_reserves
+
+    problem.set_val("data:environmental_impact:buy_to_fly:metallic", val=10.0)
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
+        units="W*h",
+        val=energy_for_fu / 2.0,
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
+        units="W*h",
+        val=energy_for_fu / 2.0,
+    )
+
+    problem.run_model()
+    problem.output_file_path = (
+        RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_btf.xml"
+    )
+    problem.write_outputs()

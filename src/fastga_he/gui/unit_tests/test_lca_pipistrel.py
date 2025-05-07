@@ -130,7 +130,27 @@ def test_lca_bar_chart_absolute_phase_hybrid():
             ],
             "Use phase": "electricity_for_mission",
             "Propeller": "propeller_1",
-        }
+        },
     )
     fig.update_layout(title_text=None, height=800, width=1000)
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_normalized_comparison_with_heavy():
+    fig = lca_impacts_bar_chart_simple(
+        [
+            DATA_FOLDER_PATH / "pipistrel_electro_lca_out_recipe.xml",
+            DATA_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe.xml",
+            DATA_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_btf.xml",
+        ],
+        names_aircraft=[
+            "Pipistrel Velis Electro (composite version, buy-to-fly=1)",
+            "Pipistrel Velis Electro (metallic version, buy-to-fly=1)",
+            "Pipistrel Velis Electro (metallic version, buy-to-fly=10)",
+        ],
+        impact_step="normalized",
+        graph_title="Comparison of Pipistrel version with different materials for the airframe"
+    )
+
     fig.show()

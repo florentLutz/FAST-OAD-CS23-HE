@@ -933,6 +933,8 @@ def _get_component_from_variable_name(variable_name: str) -> str:
 def lca_impacts_bar_chart_simple(
     aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
     names_aircraft: Union[str, List[str]] = None,
+    impact_step: str = "weighted",
+    graph_title: str = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that compares multiples aircraft designs across all categories. This comparison
@@ -941,16 +943,23 @@ def lca_impacts_bar_chart_simple(
 
     :param aircraft_file_paths: paths to the output file that contains the impacts.
     :param names_aircraft: names of the aircraft.
+    :param impact_step: step of the LCIA to consider, by default weighted impacts are considered,
+    can also be "normalized" or "raw" results.
+    :param graph_title: title of the graph, if None are specified one is created based on the
+    aircraft names
     """
 
     fig = go.Figure()
 
-    reference_value, _ = _get_impact_dict(aircraft_file_paths[0])
-    reference_value.pop("single_score")
+    reference_value, _ = _get_impact_dict(aircraft_file_paths[0], impact_step=impact_step)
+    if impact_step == "weighted":
+        reference_value.pop("single_score")
 
     for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
-        impact_score_dict, _ = _get_impact_dict(aircraft_file_path)
-        impact_score_dict.pop("single_score")
+        impact_score_dict, _ = _get_impact_dict(aircraft_file_path, impact_step=impact_step)
+        if impact_step == "weighted":
+            impact_score_dict.pop("single_score")
+
         impact_scores = []
         beautified_impact_names = []
 
@@ -963,16 +972,23 @@ def lca_impacts_bar_chart_simple(
         bar_chart = go.Bar(name=name_aircraft, x=beautified_impact_names, y=impact_scores)
         fig.add_trace(bar_chart)
 
+    if graph_title:
+        title = graph_title
+    else:
+        title = (
+            "Relative score of "
+            + ", ".join(names_aircraft[1:])
+            + " with respect to "
+            + names_aircraft[0]
+        )
+
     fig.update_layout(
         barmode="group",
         plot_bgcolor="white",
         title_font=dict(size=20),
         legend_font=dict(size=20),
         title_x=0.5,
-        title_text="Relative score of "
-        + ", ".join(names_aircraft[1:])
-        + " with respect to "
-        + names_aircraft[0],
+        title_text=title,
     )
     fig.update_xaxes(
         ticks="outside",
