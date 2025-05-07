@@ -82,3 +82,19 @@ def test_lca_bar_chart_normalized_ef():
     )
 
     fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_normalized_arvidsson():
+    fig = lca_impacts_bar_chart_normalised(
+        [
+            DATA_FOLDER_PATH / "pipistrel_club_lca_out_arvidsson.xml",
+            DATA_FOLDER_PATH / "pipistrel_electro_lca_out_arvidsson.xml",
+        ],
+        names_aircraft=[
+            "Pipistrel Alpha Trainer",
+            "Pipistrel Alpha Electro",
+        ],
+    )
+
+    fig.show()
