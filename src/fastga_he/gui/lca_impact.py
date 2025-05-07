@@ -998,6 +998,74 @@ def lca_impacts_bar_chart_simple(
     return go.FigureWidget(fig)
 
 
+def lca_impacts_bar_chart_normalised(
+    aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
+    names_aircraft: Union[str, List[str]] = None,
+) -> go.FigureWidget:
+    """
+    Give a bar chart that compares multiples aircraft designs across all categories. This comparison
+    is done in terms of normalized results. Can be used with only one design.
+
+    :param aircraft_file_paths: paths to the output file that contains the impacts.
+    :param names_aircraft: names of the aircraft.
+    """
+
+    fig = go.Figure()
+
+    for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
+        impact_score_dict, _ = _get_impact_dict(aircraft_file_path, impact_step="normalized")
+        impact_scores = []
+        beautified_impact_names = []
+
+        for impact_name, impact_score in impact_score_dict.items():
+            beautified_impact_name = impact_name.replace("_", " ")
+
+            # There has to be a smarter way of doing it ^^'
+            impact_scores.append(impact_score)
+            beautified_impact_names.append(beautified_impact_name)
+
+        bar_chart = go.Bar(name=name_aircraft, x=beautified_impact_names, y=impact_scores)
+        fig.add_trace(bar_chart)
+
+    if len(names_aircraft) == 1:
+        title = "Normalized score for " + names_aircraft[0]
+    else:
+        title = (
+            "Normalized score for " + ", ".join(names_aircraft[:-1]) + " and " + names_aircraft[-1]
+        )
+
+    fig.update_layout(
+        barmode="group",
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+        title_x=0.5,
+        title_text=title,
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=20),
+        title="Normalized results [eq-person]",
+    )
+    fig.update_yaxes(
+        title_font=dict(size=20),
+    )
+
+    return go.FigureWidget(fig)
+
+
 def lca_raw_impact_comparison(
     aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
     names_aircraft: Union[str, List[str]] = None,
@@ -1676,12 +1744,11 @@ def lca_impacts_bar_chart_with_components_absolute(
     # Here we filter to only show the impact whose contribution to the single score is greater than
     # the set value in inputs
     if cutoff_criteria:
-
         component_and_contribution_with_cutoff = {}
         contribution_others = {}
 
         for component, impacts in component_and_contribution.items():
-            if np.sum(np.array(list(impacts.values()))) < single_score * cutoff_criteria / 100.:
+            if np.sum(np.array(list(impacts.values()))) < single_score * cutoff_criteria / 100.0:
                 if not contribution_others:
                     contribution_others = impacts
                 else:

@@ -853,7 +853,7 @@ def test_lca_bar_chart_presentation():
             "airframe: production": "Airframe production",
             "turboshaft: operation": "Kerosene combustion",
             "kerosene for mission: operation": "Kerosene production",
-        }
+        },
     )
     fig.update_layout(title_text=None)
     fig.update_layout(height=800, width=1600, font=dict(size=20))
