@@ -20,7 +20,7 @@ class LCC(om.Group):
         self.options.declare(
             name="power_train_file_path",
             default=None,
-            desc="Path to the file containing the description of the power",
+            desc="Path to the file containing the description of the powertrain",
             allow_none=False,
         )
         self.options.declare(
