@@ -66,7 +66,7 @@ class LCC(om.Group):
         self.add_subsystem(
             name="production_cost",
             subsys=LCCProductionCost(
-                power_train_file_path=power_train_file_path,
+                power_train_file_path=self.options["power_train_file_path"],
                 complex_flap=complex_flap,
                 pressurized=pressurized,
                 tapered_wing=tapered_wing,
