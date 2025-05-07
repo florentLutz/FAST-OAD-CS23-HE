@@ -37,16 +37,9 @@ class LCCProductionCost(om.Group):
             desc="Path to the file containing the description of the power",
             allow_none=False,
         )
-        self.options.declare(
-            name="tapered_wing",
-            default=False,
-            types=bool,
-            desc="True if the aircraft has tapered wing",
-        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
-        tapered_wing = self.options["tapered_wing"]
 
         # Calculate first the labor resources required for R&D and manufacturing of airframe
         self.add_subsystem(
@@ -57,7 +50,7 @@ class LCCProductionCost(om.Group):
 
         self.add_subsystem(
             name="tooling_man_hours",
-            subsys=LCCToolingManHours(tapered_wing=tapered_wing),
+            subsys=LCCToolingManHours(),
             promotes=["*"],
         )
         self.add_subsystem(

@@ -24,6 +24,7 @@ class LCCToolingManHours(om.ExplicitComponent):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
         self.add_input("data:geometry:flap_type", val=np.nan)
+        self.add_input("data:geometry:wing:taper_ratio", val=1.0)
         self.add_input(
             "data:cost:production:num_aircraft_5years",
             val=np.nan,
@@ -48,7 +49,9 @@ class LCCToolingManHours(om.ExplicitComponent):
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
-        self.declare_partials("*", "data:geometry:flap_type", method="fd")
+        self.declare_partials(
+            "*", ["data:geometry:flap_type", "data:geometry:wing:taper_ratio"], method="fd"
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         if inputs["data:geometry:flap_type"] != 0.0:
@@ -56,7 +59,7 @@ class LCCToolingManHours(om.ExplicitComponent):
         else:
             f_flap = 1.0
 
-        if self.options["tapered_wing"]:
+        if inputs["data:geometry:wing:taper_ratio"] != 1.0:
             f_tapered = 1.0
         else:
             f_tapered = 0.95
@@ -84,7 +87,7 @@ class LCCToolingManHours(om.ExplicitComponent):
         else:
             f_flap = 1.0
 
-        if self.options["tapered_wing"]:
+        if inputs["data:geometry:wing:taper_ratio"] != 1.0:
             f_tapered = 1.0
         else:
             f_tapered = 0.95

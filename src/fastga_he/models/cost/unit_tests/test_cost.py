@@ -82,6 +82,7 @@ def test_tooling_man_hours():
         "data:cost:production:num_aircraft_5years",
         "data:cost:production:composite_fraction",
         "data:geometry:flap_type",
+        "data:geometry:wing:taper_ratio",
     ]
 
     ivc = get_indep_var_comp(
@@ -583,11 +584,11 @@ def test_production_cost_hybrid_tbm_900():
     ) == pytest.approx(221207.71, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        4535819.89, rel=1e-3
+        4564473.08, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        5034760.08, rel=1e-3
+        5066565.11, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -600,7 +601,6 @@ def test_production_cost_tbm_900():
         list_inputs(
             LCCProductionCost(
                 power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
-                tapered_wing=True,
             )
         ),
         __file__,
@@ -611,7 +611,6 @@ def test_production_cost_tbm_900():
     problem = run_system(
         LCCProductionCost(
             power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
-            tapered_wing=True,
         ),
         ivc,
     )
@@ -1022,7 +1021,6 @@ def test_cost_tbm_900():
         list_inputs(
             LCC(
                 power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
-                tapered_wing=True,
             )
         ),
         __file__,
@@ -1033,7 +1031,6 @@ def test_cost_tbm_900():
     problem = run_system(
         LCC(
             power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
-            tapered_wing=True,
         ),
         ivc,
     )

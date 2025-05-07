@@ -24,12 +24,6 @@ class LCC(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="tapered_wing",
-            default=False,
-            types=bool,
-            desc="True if the aircraft has tapered wing",
-        )
-        self.options.declare(
             name="loan",
             default=True,
             types=bool,
@@ -43,7 +37,6 @@ class LCC(om.Group):
         )
 
     def setup(self):
-        tapered_wing = self.options["tapered_wing"]
         loan = self.options["loan"]
         use_operational_mission = self.options["use_operational_mission"]
 
@@ -51,7 +44,6 @@ class LCC(om.Group):
             name="production_cost",
             subsys=LCCProductionCost(
                 power_train_file_path=self.options["power_train_file_path"],
-                tapered_wing=tapered_wing,
             ),
             promotes=["*"],
         )
