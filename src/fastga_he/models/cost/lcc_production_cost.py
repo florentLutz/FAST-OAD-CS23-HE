@@ -38,18 +38,6 @@ class LCCProductionCost(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="complex_flap",
-            default=False,
-            types=bool,
-            desc="True if complex flap system is selected in design",
-        )
-        self.options.declare(
-            name="pressurized",
-            default=False,
-            types=bool,
-            desc="True if the aircraft is pressurized",
-        )
-        self.options.declare(
             name="tapered_wing",
             default=False,
             types=bool,
@@ -58,27 +46,23 @@ class LCCProductionCost(om.Group):
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
-        complex_flap = self.options["complex_flap"]
-        pressurized = self.options["pressurized"]
         tapered_wing = self.options["tapered_wing"]
 
         # Calculate first the labor resources required for R&D and manufacturing of airframe
         self.add_subsystem(
             name="engineering_man_hours",
-            subsys=LCCEngineeringManHours(complex_flap=complex_flap, pressurized=pressurized),
+            subsys=LCCEngineeringManHours(),
             promotes=["*"],
         )
 
         self.add_subsystem(
             name="tooling_man_hours",
-            subsys=LCCToolingManHours(
-                complex_flap=complex_flap, pressurized=pressurized, tapered_wing=tapered_wing
-            ),
+            subsys=LCCToolingManHours(tapered_wing=tapered_wing),
             promotes=["*"],
         )
         self.add_subsystem(
             name="manufacturing_man_hours",
-            subsys=LCCManufacturingManHours(complex_flap=complex_flap),
+            subsys=LCCManufacturingManHours(),
             promotes=["*"],
         )
 
@@ -99,13 +83,13 @@ class LCCProductionCost(om.Group):
 
         self.add_subsystem(
             name="material_cost_per_unit",
-            subsys=LCCMaterialCost(complex_flap=complex_flap, pressurized=pressurized),
+            subsys=LCCMaterialCost(),
             promotes=["*"],
         )
 
         self.add_subsystem(
             name="dev_support_cost_per_unit",
-            subsys=LCCDevSupportCost(complex_flap=complex_flap, pressurized=pressurized),
+            subsys=LCCDevSupportCost(),
             promotes=["*"],
         )
 

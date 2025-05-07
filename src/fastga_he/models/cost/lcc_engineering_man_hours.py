@@ -12,23 +12,15 @@ class LCCEngineeringManHours(om.ExplicitComponent):
     :cite:`gudmundsson:2013`.
     """
 
-    def initialize(self):
-        self.options.declare(
-            name="complex_flap",
-            default=False,
-            types=bool,
-            desc="True if complex flap system is selected in design",
-        )
-        self.options.declare(
-            name="pressurized",
-            default=False,
-            types=bool,
-            desc="True if the aircraft is pressurized",
-        )
-
     def setup(self):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
+        self.add_input("data:geometry:flap_type", val=np.nan)
+        self.add_input(
+            "data:geometry:cabin:pressurized",
+            val=0.0,
+            desc="Cabin pressurization; 0.0 for no pressurization, 1.0 for pressurization",
+        )
         self.add_input(
             "data:cost:production:num_aircraft_5years",
             val=np.nan,
@@ -49,17 +41,13 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials("*", "data:geometry:flap_type", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        if self.options["complex_flap"]:
+        if inputs["data:geometry:flap_type"] != 0.0:
             f_flap = 1.03
         else:
             f_flap = 1.0
-
-        if self.options["pressurized"]:
-            f_pressurized = 1.03
-        else:
-            f_pressurized = 1.0
 
         outputs["data:cost:production:engineering_man_hours"] = (
             0.0396
@@ -68,7 +56,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
             * inputs["data:cost:production:num_aircraft_5years"] ** -0.817
             * f_flap
             * (1.0 + inputs["data:cost:production:composite_fraction"])
-            * f_pressurized
+            * (1.0 + 0.03 * inputs["data:geometry:cabin:pressurized"])
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -76,16 +64,12 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         v_cruise = inputs["data:cost:v_cruise_design"]
         num_5years = inputs["data:cost:production:num_aircraft_5years"]
         f_composite = inputs["data:cost:production:composite_fraction"]
+        pressurized = inputs["data:geometry:cabin:pressurized"]
 
-        if self.options["complex_flap"]:
+        if inputs["data:geometry:flap_type"] != 0.0:
             f_flap = 1.03
         else:
             f_flap = 1.0
-
-        if self.options["pressurized"]:
-            f_pressurized = 1.03
-        else:
-            f_pressurized = 1.0
 
         partials[
             "data:cost:production:engineering_man_hours",
@@ -96,7 +80,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
             * num_5years**-0.817
             * f_flap
             * (1.0 + f_composite)
-            * f_pressurized
+            * (1.0 + 0.03 * pressurized)
         ) / m_airframe**0.209
 
         partials[
@@ -109,7 +93,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
             * num_5years**-0.817
             * f_flap
             * (1.0 + f_composite)
-            * f_pressurized
+            * (1.0 + 0.03 * pressurized)
         )
 
         partials[
@@ -121,7 +105,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
             * v_cruise**1.526
             * f_flap
             * (1.0 + f_composite)
-            * f_pressurized
+            * (1.0 + 0.03 * pressurized)
         ) / num_5years**1.817
 
         partials[
@@ -133,5 +117,17 @@ class LCCEngineeringManHours(om.ExplicitComponent):
             * v_cruise**1.526
             * num_5years**-0.817
             * f_flap
-            * f_pressurized
+            * (1.0 + 0.03 * pressurized)
+        )
+
+        partials[
+            "data:cost:production:engineering_man_hours",
+            "data:geometry:cabin:pressurized",
+        ] = (
+            0.001188
+            * m_airframe**0.791
+            * v_cruise**1.526
+            * num_5years**-0.817
+            * f_flap
+            * (1.0 + f_composite)
         )

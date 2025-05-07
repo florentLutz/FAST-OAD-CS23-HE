@@ -11,23 +11,10 @@ class LCCDevSupportCost(om.ExplicitComponent):
     Computation of the airframe cost of development support obtained from :cite:`gudmundsson:2013`.
     """
 
-    def initialize(self):
-        self.options.declare(
-            name="complex_flap",
-            default=False,
-            types=bool,
-            desc="True if complex flap system is selected in design",
-        )
-        self.options.declare(
-            name="pressurized",
-            default=False,
-            types=bool,
-            desc="True if the aircraft is pressurized",
-        )
-
     def setup(self):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
+        self.add_input("data:geometry:flap_type", val=np.nan)
         self.add_input(
             "data:cost:prototype_number",
             val=np.nan,
@@ -43,7 +30,11 @@ class LCCDevSupportCost(om.ExplicitComponent):
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
         )
-
+        self.add_input(
+            "data:geometry:cabin:pressurized",
+            val=0.0,
+            desc="Cabin pressurization; 0.0 for no pressurization, 1.0 for pressurization",
+        )
         self.add_input(
             "data:cost:production:composite_fraction",
             val=0.0,
@@ -57,17 +48,13 @@ class LCCDevSupportCost(om.ExplicitComponent):
             desc="Development support adjusted cost per aircraft",
         )
         self.declare_partials("*", "*", method="exact")
+        self.declare_partials("*", "data:geometry:flap_type", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        if self.options["complex_flap"]:
+        if inputs["data:geometry:flap_type"] != 0.0:
             f_flap = 1.01
         else:
             f_flap = 1.0
-
-        if self.options["pressurized"]:
-            f_pressurized = 1.03
-        else:
-            f_pressurized = 1.0
 
         outputs["data:cost:production:dev_support_cost_per_unit"] = (
             0.06458
@@ -77,7 +64,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             * inputs["data:cost:cpi_2012"]
             * f_flap
             * (1.0 + 0.5 * inputs["data:cost:production:composite_fraction"])
-            * f_pressurized
+            * (1.0 + 0.03 * inputs["data:geometry:cabin:pressurized"])
             / inputs["data:cost:production:num_aircraft_5years"]
         )
 
@@ -88,16 +75,12 @@ class LCCDevSupportCost(om.ExplicitComponent):
         num_prototype = inputs["data:cost:prototype_number"]
         num_5years = inputs["data:cost:production:num_aircraft_5years"]
         f_composite = inputs["data:cost:production:composite_fraction"]
+        pressurized = inputs["data:geometry:cabin:pressurized"]
 
-        if self.options["complex_flap"]:
+        if inputs["data:geometry:flap_type"] != 0.0:
             f_flap = 1.01
         else:
             f_flap = 1.0
-
-        if self.options["pressurized"]:
-            f_pressurized = 1.03
-        else:
-            f_pressurized = 1.0
 
         partials["data:cost:production:dev_support_cost_per_unit", "data:weight:airframe:mass"] = (
             0.05637834
@@ -105,9 +88,9 @@ class LCCDevSupportCost(om.ExplicitComponent):
             * v_cruise**1.89
             * num_prototype**0.346
             * cpi_2012
-            * f_flap
+            * (1.0 + 0.01 * inputs["data:geometry:flap_type"])
             * (1.0 + 0.5 * f_composite)
-            * f_pressurized
+            * (1.0 + 0.03 * pressurized)
             / num_5years
         )
 
@@ -119,7 +102,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             * cpi_2012
             * f_flap
             * (1.0 + 0.5 * f_composite)
-            * f_pressurized
+            * (1.0 + 0.03 * pressurized)
             / num_5years
         )
 
@@ -131,7 +114,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             * cpi_2012
             * f_flap
             * (1.0 + 0.5 * f_composite)
-            * f_pressurized
+            * (1.0 + 0.03 * pressurized)
             / num_5years
         )
 
@@ -142,7 +125,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             * num_prototype**0.346
             * f_flap
             * (1.0 + 0.5 * f_composite)
-            * f_pressurized
+            * (1.0 + 0.03 * pressurized)
             / num_5years
         )
 
@@ -156,7 +139,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             * num_prototype**0.346
             * cpi_2012
             * f_flap
-            * f_pressurized
+            * (1.0 + 0.03 * pressurized)
             / num_5years
         )
 
@@ -171,6 +154,20 @@ class LCCDevSupportCost(om.ExplicitComponent):
             * cpi_2012
             * f_flap
             * (1.0 + 0.5 * f_composite)
-            * f_pressurized
+            * (1.0 + 0.03 * pressurized)
             / num_5years**2.0
+        )
+
+        partials[
+            "data:cost:production:dev_support_cost_per_unit",
+            "data:geometry:cabin:pressurized",
+        ] = (
+            0.0019374
+            * m_airframe**0.873
+            * v_cruise**1.89
+            * num_prototype**0.346
+            * cpi_2012
+            * f_flap
+            * (1.0 + 0.5 * f_composite)
+            / num_5years
         )

@@ -47,12 +47,13 @@ DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
-def test_engineering_human_hours():
+def test_engineering_man_hours():
     input_list = [
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
         "data:cost:production:num_aircraft_5years",
         "data:cost:production:composite_fraction",
+        "data:geometry:flap_type",
     ]
 
     ivc = get_indep_var_comp(
@@ -69,17 +70,18 @@ def test_engineering_human_hours():
 
     assert problem.get_val(
         "data:cost:production:engineering_man_hours", units="h"
-    ) == pytest.approx(72.68, rel=1e-3)
+    ) == pytest.approx(74.86, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
-def test_tooling_human_hours():
+def test_tooling_man_hours():
     input_list = [
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
         "data:cost:production:num_aircraft_5years",
         "data:cost:production:composite_fraction",
+        "data:geometry:flap_type",
     ]
 
     ivc = get_indep_var_comp(
@@ -95,18 +97,19 @@ def test_tooling_human_hours():
     )
 
     assert problem.get_val("data:cost:production:tooling_man_hours", units="h") == pytest.approx(
-        88.0, rel=1e-3
+        89.75, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
 
 
-def test_manufacturing_human_hours():
+def test_manufacturing_man_hours():
     input_list = [
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
         "data:cost:production:num_aircraft_5years",
         "data:cost:production:composite_fraction",
+        "data:geometry:flap_type",
     ]
 
     ivc = get_indep_var_comp(
@@ -123,7 +126,7 @@ def test_manufacturing_human_hours():
 
     assert problem.get_val(
         "data:cost:production:manufacturing_man_hours", units="h"
-    ) == pytest.approx(688.03, rel=1e-3)
+    ) == pytest.approx(694.9, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -162,6 +165,7 @@ def test_development_support_cost():
         "data:cost:production:num_aircraft_5years",
         "data:cost:production:composite_fraction",
         "data:cost:cpi_2012",
+        "data:geometry:flap_type",
     ]
 
     ivc = get_indep_var_comp(
@@ -178,7 +182,7 @@ def test_development_support_cost():
 
     assert problem.get_val(
         "data:cost:production:dev_support_cost_per_unit", units="USD"
-    ) == pytest.approx(764.24, rel=1e-3)
+    ) == pytest.approx(771.88, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -294,6 +298,7 @@ def test_material_cost():
         "data:cost:v_cruise_design",
         "data:cost:production:num_aircraft_5years",
         "data:cost:cpi_2012",
+        "data:geometry:flap_type",
     ]
 
     ivc = get_indep_var_comp(
@@ -310,7 +315,7 @@ def test_material_cost():
 
     assert problem.get_val(
         "data:cost:production:material_cost_per_unit", units="USD"
-    ) == pytest.approx(8735.1, rel=1e-3)
+    ) == pytest.approx(8909.8, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -496,14 +501,14 @@ def test_production_cost():
 
     assert problem.get_val(
         "data:cost:production:engineering_cost_per_unit", units="USD"
-    ) == pytest.approx(26998.679, rel=1e-3)
+    ) == pytest.approx(27808.7, rel=1e-3)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:ICE:ice_1:cost_per_unit", units="USD"
     ) == pytest.approx(70956.47, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        371854.75, rel=1e-3
+        376197.76, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -540,7 +545,7 @@ def test_production_cost_hydrogen():
     ) == pytest.approx(60485.41, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        399613.09, rel=1e-3
+        403956.1, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -578,11 +583,11 @@ def test_production_cost_hybrid_tbm_900():
     ) == pytest.approx(221207.71, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        4409303.02, rel=1e-3
+        4535819.89, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4894326.36, rel=1e-3
+        5034760.08, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -595,7 +600,6 @@ def test_production_cost_tbm_900():
         list_inputs(
             LCCProductionCost(
                 power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
-                pressurized=True,
                 tapered_wing=True,
             )
         ),
@@ -607,7 +611,6 @@ def test_production_cost_tbm_900():
     problem = run_system(
         LCCProductionCost(
             power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
-            pressurized=True,
             tapered_wing=True,
         ),
         ivc,
@@ -617,11 +620,11 @@ def test_production_cost_tbm_900():
     ) == pytest.approx(425906.45, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        3967207.33, rel=1e-3
+        4039675.1, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4403600.14, rel=1e-3
+        4484039.36, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1019,7 +1022,6 @@ def test_cost_tbm_900():
         list_inputs(
             LCC(
                 power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
-                pressurized=True,
                 tapered_wing=True,
             )
         ),
@@ -1031,7 +1033,6 @@ def test_cost_tbm_900():
     problem = run_system(
         LCC(
             power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
-            pressurized=True,
             tapered_wing=True,
         ),
         ivc,
@@ -1041,16 +1042,16 @@ def test_cost_tbm_900():
     ) == pytest.approx(425906.45, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        3967207.33, rel=1e-3
+        4039675.1, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4403600.14, rel=1e-3
+        4484039.36, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(477411.53, rel=1e-3)
+    ) == pytest.approx(478215.93, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

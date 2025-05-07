@@ -12,17 +12,10 @@ class LCCManufacturingManHours(om.ExplicitComponent):
     :cite:`gudmundsson:2013`.
     """
 
-    def initialize(self):
-        self.options.declare(
-            name="complex_flap",
-            default=False,
-            types=bool,
-            desc="True if complex flap system is selected in design",
-        )
-
     def setup(self):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
+        self.add_input("data:geometry:flap_type", val=np.nan)
         self.add_input(
             "data:cost:production:num_aircraft_5years",
             val=np.nan,
@@ -43,9 +36,10 @@ class LCCManufacturingManHours(om.ExplicitComponent):
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials("*", "data:geometry:flap_type", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        if self.options["complex_flap"]:
+        if inputs["data:geometry:flap_type"] != 0.0:
             f_flap = 1.01
         else:
             f_flap = 1.0
@@ -65,7 +59,7 @@ class LCCManufacturingManHours(om.ExplicitComponent):
         num_5years = inputs["data:cost:production:num_aircraft_5years"]
         f_composite = inputs["data:cost:production:composite_fraction"]
 
-        if self.options["complex_flap"]:
+        if inputs["data:geometry:flap_type"] != 0.0:
             f_flap = 1.01
         else:
             f_flap = 1.0

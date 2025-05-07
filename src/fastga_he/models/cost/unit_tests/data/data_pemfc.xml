@@ -52,6 +52,7 @@
             <flap>
                 <span_ratio>0.45</span_ratio>
             </flap>
+            <flap_type is_input="True">1.0<!--flap type (0.0 - plain flap, 2.0 - single slotted flap, 3.0 - split flap)--></flap_type>
             <fuselage>
                 <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
                 <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>

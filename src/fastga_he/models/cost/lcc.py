@@ -24,18 +24,6 @@ class LCC(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="complex_flap",
-            default=False,
-            types=bool,
-            desc="True if complex flap system is selected in design",
-        )
-        self.options.declare(
-            name="pressurized",
-            default=False,
-            types=bool,
-            desc="True if the aircraft is pressurized",
-        )
-        self.options.declare(
             name="tapered_wing",
             default=False,
             types=bool,
@@ -47,7 +35,6 @@ class LCC(om.Group):
             types=bool,
             desc="True if loan is taken for financing the aircraft",
         )
-
         self.options.declare(
             name="use_operational_mission",
             default=False,
@@ -56,9 +43,6 @@ class LCC(om.Group):
         )
 
     def setup(self):
-        power_train_file_path = self.options["power_train_file_path"]
-        complex_flap = self.options["complex_flap"]
-        pressurized = self.options["pressurized"]
         tapered_wing = self.options["tapered_wing"]
         loan = self.options["loan"]
         use_operational_mission = self.options["use_operational_mission"]
@@ -67,8 +51,6 @@ class LCC(om.Group):
             name="production_cost",
             subsys=LCCProductionCost(
                 power_train_file_path=self.options["power_train_file_path"],
-                complex_flap=complex_flap,
-                pressurized=pressurized,
                 tapered_wing=tapered_wing,
             ),
             promotes=["*"],
@@ -77,7 +59,7 @@ class LCC(om.Group):
         self.add_subsystem(
             name="operational_cost",
             subsys=LCCOperationalCost(
-                power_train_file_path=power_train_file_path,
+                power_train_file_path=self.options["power_train_file_path"],
                 loan=loan,
                 use_operational_mission=use_operational_mission,
             ),

@@ -5,6 +5,7 @@
     </TLAR>
     <geometry>
       <has_T_tail is_input="True">0.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>
+      <flap_type>1.0</flap_type>
       <wing_configuration is_input="True">1.0<!--1=low wing configuration / 2=mid wing configuration / 3=high wing configuration--></wing_configuration>
       <aircraft>
         <wet_area units="m**2" is_input="True">97.35356428843188<!--aircraft total wet area--></wet_area>

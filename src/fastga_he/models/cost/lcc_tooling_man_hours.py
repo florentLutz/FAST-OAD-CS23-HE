@@ -14,18 +14,6 @@ class LCCToolingManHours(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="complex_flap",
-            default=False,
-            types=bool,
-            desc="True if complex flap system is selected in design",
-        )
-        self.options.declare(
-            name="pressurized",
-            default=False,
-            types=bool,
-            desc="True if the aircraft is pressurized",
-        )
-        self.options.declare(
             name="tapered_wing",
             default=False,
             types=bool,
@@ -35,12 +23,17 @@ class LCCToolingManHours(om.ExplicitComponent):
     def setup(self):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
+        self.add_input("data:geometry:flap_type", val=np.nan)
         self.add_input(
             "data:cost:production:num_aircraft_5years",
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
         )
-
+        self.add_input(
+            "data:geometry:cabin:pressurized",
+            val=0.0,
+            desc="Cabin pressurization; 0.0 for no pressurization, 1.0 for pressurization",
+        )
         self.add_input(
             "data:cost:production:composite_fraction",
             val=0.0,
@@ -55,17 +48,13 @@ class LCCToolingManHours(om.ExplicitComponent):
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials("*", "data:geometry:flap_type", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        if self.options["complex_flap"]:
+        if inputs["data:geometry:flap_type"] != 0.0:
             f_flap = 1.02
         else:
             f_flap = 1.0
-
-        if self.options["pressurized"]:
-            f_pressurized = 1.01
-        else:
-            f_pressurized = 1.0
 
         if self.options["tapered_wing"]:
             f_tapered = 1.0
@@ -80,7 +69,7 @@ class LCCToolingManHours(om.ExplicitComponent):
             * f_tapered
             * f_flap
             * (1.0 + inputs["data:cost:production:composite_fraction"])
-            * f_pressurized
+            * (1.0 + 0.01 * inputs["data:geometry:cabin:pressurized"])
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -88,16 +77,12 @@ class LCCToolingManHours(om.ExplicitComponent):
         v_cruise = inputs["data:cost:v_cruise_design"]
         num_5years = inputs["data:cost:production:num_aircraft_5years"]
         f_composite = inputs["data:cost:production:composite_fraction"]
+        pressurized = inputs["data:geometry:cabin:pressurized"]
 
-        if self.options["complex_flap"]:
+        if inputs["data:geometry:flap_type"] != 0.0:
             f_flap = 1.02
         else:
             f_flap = 1.0
-
-        if self.options["pressurized"]:
-            f_pressurized = 1.01
-        else:
-            f_pressurized = 1.0
 
         if self.options["tapered_wing"]:
             f_tapered = 1.0
@@ -114,7 +99,7 @@ class LCCToolingManHours(om.ExplicitComponent):
             * f_tapered
             * f_flap
             * (1.0 + f_composite)
-            * f_pressurized
+            * (1.0 + 0.01 * pressurized)
         ) / m_airframe**0.236
 
         partials[
@@ -127,7 +112,7 @@ class LCCToolingManHours(om.ExplicitComponent):
             * f_tapered
             * f_flap
             * (1.0 + f_composite)
-            * f_pressurized
+            * (1.0 + 0.01 * pressurized)
             / v_cruise**0.101
         )
 
@@ -141,7 +126,7 @@ class LCCToolingManHours(om.ExplicitComponent):
             * f_tapered
             * f_flap
             * (1.0 + f_composite)
-            * f_pressurized
+            * (1.0 + 0.01 * pressurized)
         ) / num_5years**1.756
 
         partials[
@@ -154,5 +139,18 @@ class LCCToolingManHours(om.ExplicitComponent):
             * num_5years**-0.756
             * f_tapered
             * f_flap
-            * f_pressurized
+            * (1.0 + 0.01 * pressurized)
+        )
+
+        partials[
+            "data:cost:production:tooling_man_hours",
+            "data:geometry:cabin:pressurized",
+        ] = (
+            0.0076565
+            * m_airframe**0.764
+            * v_cruise**0.899
+            * num_5years**-0.756
+            * f_tapered
+            * f_flap
+            * (1.0 + f_composite)
         )

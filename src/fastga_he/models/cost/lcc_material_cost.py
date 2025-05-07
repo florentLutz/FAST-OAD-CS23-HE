@@ -11,27 +11,19 @@ class LCCMaterialCost(om.ExplicitComponent):
     Computation of the raw material cost per aircraft obtained from :cite:`gudmundsson:2013`.
     """
 
-    def initialize(self):
-        self.options.declare(
-            name="complex_flap",
-            default=False,
-            types=bool,
-            desc="True if complex flap system is selected in design",
-        )
-        self.options.declare(
-            name="pressurized",
-            default=False,
-            types=bool,
-            desc="True if the aircraft is pressurized",
-        )
-
     def setup(self):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
+        self.add_input("data:geometry:flap_type", val=np.nan)
         self.add_input(
             "data:cost:production:num_aircraft_5years",
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
+        )
+        self.add_input(
+            "data:geometry:cabin:pressurized",
+            val=0.0,
+            desc="Cabin pressurization; 0.0 for no pressurization, 1.0 for pressurization",
         )
         self.add_input(
             "data:cost:cpi_2012",
@@ -46,17 +38,13 @@ class LCCMaterialCost(om.ExplicitComponent):
             desc="Development flight test adjusted cost per aircraft",
         )
         self.declare_partials("*", "*", method="exact")
+        self.declare_partials("*", "data:geometry:flap_type", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        if self.options["complex_flap"]:
+        if inputs["data:geometry:flap_type"] != 0.0:
             f_flap = 1.02
         else:
             f_flap = 1.0
-
-        if self.options["pressurized"]:
-            f_pressurized = 1.01
-        else:
-            f_pressurized = 1.0
 
         outputs["data:cost:production:material_cost_per_unit"] = (
             24.896
@@ -65,7 +53,7 @@ class LCCMaterialCost(om.ExplicitComponent):
             * inputs["data:cost:production:num_aircraft_5years"] ** -0.208
             * inputs["data:cost:cpi_2012"]
             * f_flap
-            * f_pressurized
+            * (1.0 + 0.01 * inputs["data:geometry:cabin:pressurized"])
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -73,16 +61,12 @@ class LCCMaterialCost(om.ExplicitComponent):
         v_cruise = inputs["data:cost:v_cruise_design"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
         num_5years = inputs["data:cost:production:num_aircraft_5years"]
+        pressurized = inputs["data:geometry:cabin:pressurized"]
 
-        if self.options["complex_flap"]:
+        if inputs["data:geometry:flap_type"] != 0.0:
             f_flap = 1.02
         else:
             f_flap = 1.0
-
-        if self.options["pressurized"]:
-            f_pressurized = 1.01
-        else:
-            f_pressurized = 1.0
 
         partials["data:cost:production:material_cost_per_unit", "data:weight:airframe:mass"] = (
             17.153344
@@ -90,7 +74,7 @@ class LCCMaterialCost(om.ExplicitComponent):
             * num_5years**-0.208
             * cpi_2012
             * f_flap
-            * f_pressurized
+            * (1.0 + 0.01 * pressurized)
             / m_airframe**0.311
         )
 
@@ -100,7 +84,7 @@ class LCCMaterialCost(om.ExplicitComponent):
             * num_5years**-0.208
             * cpi_2012
             * f_flap
-            * f_pressurized
+            * (1.0 + 0.01 * pressurized)
             / v_cruise**0.376
         )
 
@@ -113,7 +97,7 @@ class LCCMaterialCost(om.ExplicitComponent):
             * v_cruise**0.624
             * cpi_2012
             * f_flap
-            * f_pressurized
+            * (1.0 + 0.01 * pressurized)
             / num_5years**1.208
         )
 
@@ -123,5 +107,9 @@ class LCCMaterialCost(om.ExplicitComponent):
             * v_cruise**0.624
             * num_5years**-0.208
             * f_flap
-            * f_pressurized
+            * (1.0 + 0.01 * pressurized)
         )
+
+        partials[
+            "data:cost:production:material_cost_per_unit", "data:geometry:cabin:pressurized"
+        ] = 0.24896 * m_airframe**0.689 * v_cruise**0.624 * num_5years**-0.208 * cpi_2012 * f_flap
