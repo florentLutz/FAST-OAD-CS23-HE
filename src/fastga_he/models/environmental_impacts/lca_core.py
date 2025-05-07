@@ -78,7 +78,7 @@ class LCACore(om.ExplicitComponent):
             name="ecoinvent_version",
             default="3.9.1",
             desc="EcoInvent version to use",
-            values=["3.9.1"],
+            values=["3.9.1", "3.10.1"],
         )
         self.options.declare(
             name="airframe_material",

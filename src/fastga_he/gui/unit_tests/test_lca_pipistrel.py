@@ -11,6 +11,7 @@ from ..lca_impact import (
     lca_impacts_bar_chart_simple,
     lca_impacts_sun_breakdown,
     lca_impacts_bar_chart_normalised,
+    lca_impacts_bar_chart_with_contributors,
 )
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data_lca_pipistrel"
@@ -97,4 +98,39 @@ def test_lca_bar_chart_normalized_arvidsson():
         ],
     )
 
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_absolute_phase_hybrid():
+    fig = lca_impacts_bar_chart_with_contributors(
+        DATA_FOLDER_PATH / "pipistrel_electro_lca_out_recipe.xml",
+        name_aircraft="pipistrel Velis Electro",
+        impact_step="normalized",
+        impact_filter_list=[
+            "ecotoxicity_freshwater",
+            "ecotoxicity_marine",
+            "human_toxicity_carcinogenic",
+            "energy_resources_non-renewablefossil",
+            "climate_change",
+        ],
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",
+            "Battery pack": ["battery_pack_1", "battery_pack_2"],
+            "Others": [
+                "motor_1",
+                "inverter_1",
+                "harness_1",
+                "dc_sspc_1",
+                "dc_sspc_2",
+                "dc_splitter_1",
+                "dc_bus_1",
+                "manufacturing",
+                "distribution",
+            ],
+            "Use phase": "electricity_for_mission",
+            "Propeller": "propeller_1",
+        }
+    )
+    fig.update_layout(title_text=None, height=800, width=1000)
     fig.show()
