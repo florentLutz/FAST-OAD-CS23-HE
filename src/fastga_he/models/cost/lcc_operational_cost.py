@@ -29,7 +29,7 @@ class LCCOperationalCost(om.Group):
         self.options.declare(
             name="power_train_file_path",
             default=None,
-            desc="Path to the file containing the description of the power",
+            desc="Path to the file containing the description of the powertrain",
             allow_none=False,
         )
 
@@ -40,21 +40,13 @@ class LCCOperationalCost(om.Group):
             desc="True if loan is taken for financing the aircraft",
         )
 
-        self.options.declare(
-            name="use_operational_mission",
-            default=False,
-            types=bool,
-            desc="The characteristics and consumption of the operational mission will be used",
-        )
-
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
         loan = self.options["loan"]
-        use_operational_mission = self.options["use_operational_mission"]
 
         self.add_subsystem(
             name="yearly_flight_mission",
-            subsys=LCCFlightMission(use_operational_mission=use_operational_mission),
+            subsys=LCCFlightMission(),
             promotes=["*"],
         )
 

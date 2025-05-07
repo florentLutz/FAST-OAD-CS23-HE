@@ -11,14 +11,6 @@ class LCCFlightMission(om.ExplicitComponent):
     Computation of the aircraft flight mission per year.
     """
 
-    def initialize(self):
-        self.options.declare(
-            name="use_operational_mission",
-            default=False,
-            types=bool,
-            desc="The characteristics and consumption of the operational mission will be used",
-        )
-
     def setup(self):
         self.add_input(
             name="data:TLAR:flight_hours_per_year",
@@ -27,14 +19,8 @@ class LCCFlightMission(om.ExplicitComponent):
             desc="Expected number of hours flown per year",
         )
 
-        if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
-
-        else:
-            duration_mission_name = "data:mission:operational:duration"
-
         self.add_input(
-            name=duration_mission_name,
+            name="data:mission:sizing:duration",
             units="h",
             val=np.nan,
         )
@@ -48,27 +34,16 @@ class LCCFlightMission(om.ExplicitComponent):
         self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
-
-        else:
-            duration_mission_name = "data:mission:operational:duration"
-
         outputs["data:cost:operation:mission_per_year"] = (
-            inputs["data:TLAR:flight_hours_per_year"] / inputs[duration_mission_name]
+            inputs["data:TLAR:flight_hours_per_year"] / inputs["data:mission:sizing:duration"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
-
-        else:
-            duration_mission_name = "data:mission:operational:duration"
-
         partials["data:cost:operation:mission_per_year", "data:TLAR:flight_hours_per_year"] = (
-            1.0 / inputs[duration_mission_name]
+            1.0 / inputs["data:mission:sizing:duration"]
         )
 
-        partials["data:cost:operation:mission_per_year", duration_mission_name] = (
-            -inputs["data:TLAR:flight_hours_per_year"] / inputs[duration_mission_name] ** 2.0
+        partials["data:cost:operation:mission_per_year", "data:mission:sizing:duration"] = (
+            -inputs["data:TLAR:flight_hours_per_year"]
+            / inputs["data:mission:sizing:duration"] ** 2.0
         )

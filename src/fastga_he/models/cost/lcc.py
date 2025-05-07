@@ -29,16 +29,9 @@ class LCC(om.Group):
             types=bool,
             desc="True if loan is taken for financing the aircraft",
         )
-        self.options.declare(
-            name="use_operational_mission",
-            default=False,
-            types=bool,
-            desc="The characteristics and consumption of the operational mission will be used",
-        )
 
     def setup(self):
         loan = self.options["loan"]
-        use_operational_mission = self.options["use_operational_mission"]
 
         self.add_subsystem(
             name="production_cost",
@@ -53,7 +46,6 @@ class LCC(om.Group):
             subsys=LCCOperationalCost(
                 power_train_file_path=self.options["power_train_file_path"],
                 loan=loan,
-                use_operational_mission=use_operational_mission,
             ),
             promotes=["*"],
         )
