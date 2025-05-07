@@ -36,6 +36,7 @@ from ..lcc_annual_loan_cost import LCCAnnualLoanCost
 from ..lcc_annual_depreciation import LCCAnnualDepreciation
 from ..lcc_maintenance_cost import LCCMaintenanceCost
 from ..lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
+from ..lcc_annual_fuel_cost import LCCAnnualFuelCost
 from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
 
@@ -807,6 +808,34 @@ def test_annual_maintenance_miscellaneous_cost():
     assert problem.get_val(
         "data:cost:operation:miscellaneous_cost", units="USD/yr"
     ) == pytest.approx(22656.0, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_annual_fuel_cost():
+    components_type = ["propeller", "turboshaft", "fuel_tank"]
+    components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1"]
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCAnnualFuelCost(
+                cost_components_type=components_type, cost_components_name=components_name
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        LCCAnnualFuelCost(
+            cost_components_type=components_type, cost_components_name=components_name
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
+        124756.18, rel=1e-3
+    )
 
     problem.check_partials(compact_print=True)
 
