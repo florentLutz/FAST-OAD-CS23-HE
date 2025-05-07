@@ -36,7 +36,6 @@ from ..lcc_annual_loan_cost import LCCAnnualLoanCost
 from ..lcc_annual_depreciation import LCCAnnualDepreciation
 from ..lcc_maintenance_cost import LCCMaintenanceCost
 from ..lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
-from ..lcc_flight_mission import LCCFlightMission
 from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
 
@@ -649,24 +648,6 @@ def test_annual_insurance_cost():
     problem.check_partials(compact_print=True)
 
 
-def test_flight_mission():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output("data:mission:sizing:duration", val=2.832)
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        LCCFlightMission(),
-        ivc,
-    )
-
-    assert problem.get_val("data:cost:operation:mission_per_year", units="1/yr") == pytest.approx(
-        100.0, rel=1e-3
-    )
-
-    problem.check_partials(compact_print=True)
-
-
 def test_landing_cost():
     expect_mtow = [1.0, 2.0, 3.0, 7.0]
     expect_cost = [41.59, 53.8, 72.3, 66.53]
@@ -729,7 +710,7 @@ def test_annual_airport_cost():
 
     ivc.add_output("data:cost:operation:daily_parking_cost", units="USD/d", val=10.0)
     ivc.add_output("data:cost:operation:landing_cost", units="USD", val=50.0)
-    ivc.add_output("data:cost:operation:mission_per_year", units="1/yr", val=20.0)
+    ivc.add_output("data:TLAR:flight_per_year", units="1/yr", val=20.0)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -963,7 +944,7 @@ def test_operational_cost_tbm_900():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(77346.8, rel=1e-3)
+    ) == pytest.approx(78408.96, rel=1e-3)
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
         94982.88, rel=1e-3
@@ -971,7 +952,7 @@ def test_operational_cost_tbm_900():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(475280.3, rel=1e-3)
+    ) == pytest.approx(477469.3, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1048,7 +1029,7 @@ def test_cost_tbm_900():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(478215.93, rel=1e-3)
+    ) == pytest.approx(480404.9, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

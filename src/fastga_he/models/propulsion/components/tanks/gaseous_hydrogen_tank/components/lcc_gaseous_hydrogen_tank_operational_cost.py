@@ -23,10 +23,9 @@ class LCCGaseousHydrogenTankOperationalCost(om.ExplicitComponent):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
         self.add_input(
-            name="data:cost:operation:mission_per_year",
+            name="data:TLAR:flight_per_year",
             val=np.nan,
-            units="1/yr",
-            desc="Flight mission per year",
+            desc="Average number of flight per year",
         )
 
         self.add_input(
@@ -62,13 +61,13 @@ class LCCGaseousHydrogenTankOperationalCost(om.ExplicitComponent):
                 + gaseous_hydrogen_tank_id
                 + ":fuel_consumed_mission"
             ]
-            * inputs["data:cost:operation:mission_per_year"]
+            * inputs["data:TLAR:flight_per_year"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
 
-        mission_per_year = inputs["data:cost:operation:mission_per_year"]
+        flight_per_year = inputs["data:TLAR:flight_per_year"]
         fuel_consumed = inputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
@@ -82,11 +81,11 @@ class LCCGaseousHydrogenTankOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":fuel_consumed_mission",
-        ] = 6.54 * mission_per_year
+        ] = 6.54 * flight_per_year
 
         partials[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
             + ":operational_cost",
-            "data:cost:operation:mission_per_year",
+            "data:TLAR:flight_per_year",
         ] = 6.54 * fuel_consumed

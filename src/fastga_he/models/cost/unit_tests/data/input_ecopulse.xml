@@ -2,6 +2,7 @@
   <data>
     <TLAR>
       <v_cruise units="knot" is_input="True">320.0<!--cruise speed--></v_cruise>
+      <flight_per_year>66.0</flight_per_year>
     </TLAR>
     <geometry>
       <has_T_tail is_input="True">0.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>

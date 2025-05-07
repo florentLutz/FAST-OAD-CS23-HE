@@ -43,7 +43,6 @@
         <miscellaneous_cost unit="USD/yr">70.0</miscellaneous_cost>
         <loan_principal unit="USD">4200.0</loan_principal>
         <annual_loan_cost unit="USD/yr">18574.15</annual_loan_cost>
-        <mission_per_year unit="1/yr">50.0</mission_per_year>
         <annual_airport_cost unit="USD/yr">4650.0</annual_airport_cost>
         <annual_crew_cost unit="USD/yr">138756.7</annual_crew_cost>
         <annual_insurance_cost unit="USD/yr">6691.38</annual_insurance_cost>
@@ -59,7 +58,7 @@
       <v_cruise units="knot" is_input="True">93.0<!--cruise speed--></v_cruise>
       <v_max_sl units="knot" is_input="True">110.0<!--maximum speed at sea level--></v_max_sl>
       <aircraft_lifespan is_input="year">15.0<!--maximum speed at sea level--></aircraft_lifespan>
-      <flight_per_year>365.0</flight_per_year>
+      <flight_per_year>292.0</flight_per_year>
     </TLAR>
     <geometry>
       <flap_type is_input="True">1.0<!--flap type (0.0 - plain flap, 2.0 - single slotted flap, 3.0 - split flap)--></flap_type>

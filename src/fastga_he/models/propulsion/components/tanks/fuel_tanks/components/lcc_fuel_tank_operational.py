@@ -33,10 +33,9 @@ class LCCFuelTankOperationalCost(om.ExplicitComponent):
         fuel_tank_id = self.options["fuel_tank_id"]
 
         self.add_input(
-            name="data:cost:operation:mission_per_year",
+            name="data:TLAR:flight_per_year",
             val=np.nan,
-            units="1/yr",
-            desc="Flight mission per year",
+            desc="Average number of flight per year",
         )
 
         self.add_input(
@@ -64,7 +63,7 @@ class LCCFuelTankOperationalCost(om.ExplicitComponent):
                 "data:propulsion:he_power_train:fuel_tank:"
                 + fuel_tank_id
                 + ":fuel_consumed_mission",
-                "data:cost:operation:mission_per_year",
+                "data:TLAR:flight_per_year",
             ],
             method="exact",
         )
@@ -95,13 +94,13 @@ class LCCFuelTankOperationalCost(om.ExplicitComponent):
                 + fuel_tank_id
                 + ":fuel_consumed_mission"
             ]
-            * inputs["data:cost:operation:mission_per_year"]
+            * inputs["data:TLAR:flight_per_year"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         fuel_tank_id = self.options["fuel_tank_id"]
 
-        mission_per_year = inputs["data:cost:operation:mission_per_year"]
+        flight_per_year = inputs["data:TLAR:flight_per_year"]
         fuel_consumed = inputs[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_consumed_mission"
         ]
@@ -109,9 +108,9 @@ class LCCFuelTankOperationalCost(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operational_cost",
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_consumed_mission",
-        ] = self.price_fuel * mission_per_year
+        ] = self.price_fuel * flight_per_year
 
         partials[
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":operational_cost",
-            "data:cost:operation:mission_per_year",
+            "data:TLAR:flight_per_year",
         ] = self.price_fuel * fuel_consumed

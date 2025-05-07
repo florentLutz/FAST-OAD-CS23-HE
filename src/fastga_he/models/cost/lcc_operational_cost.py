@@ -14,7 +14,6 @@ from .lcc_annual_loan_cost import LCCAnnualLoanCost
 from .lcc_annual_depreciation import LCCAnnualDepreciation
 from .lcc_maintenance_cost import LCCMaintenanceCost
 from .lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
-from .lcc_flight_mission import LCCFlightMission
 from .lcc_annual_crew_cost import LCCAnnualCrewCost
 from .lcc_operational_cost_sum import LCCSumOperationalCost
 
@@ -43,12 +42,6 @@ class LCCOperationalCost(om.Group):
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
         loan = self.options["loan"]
-
-        self.add_subsystem(
-            name="yearly_flight_mission",
-            subsys=LCCFlightMission(),
-            promotes=["*"],
-        )
 
         self.add_subsystem(
             name="landing_cost_per_operation",
