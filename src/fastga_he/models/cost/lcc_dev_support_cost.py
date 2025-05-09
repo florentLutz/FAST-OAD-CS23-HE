@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCDevSupportCost(om.ExplicitComponent):
     """
-    Computation of the airframe cost of development support obtained from :cite:`gudmundsson:2013`.
+    Computation of the airframe development support cost as obtained from :cite:`gudmundsson:2013`.
     """
 
     def setup(self):
@@ -26,7 +26,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             desc="Consumer price index relative to the year 2012",
         )
         self.add_input(
-            "data:cost:production:num_aircraft_5years",
+            "data:cost:production:number_aircraft_5_years",
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
         )
@@ -65,7 +65,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
             * f_flap
             * (1.0 + 0.5 * inputs["data:cost:production:composite_fraction"])
             * (1.0 + 0.03 * inputs["data:geometry:cabin:pressurized"])
-            / inputs["data:cost:production:num_aircraft_5years"]
+            / inputs["data:cost:production:number_aircraft_5_years"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -73,7 +73,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
         v_cruise = inputs["data:cost:v_cruise_design"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
         num_prototype = inputs["data:cost:prototype_number"]
-        num_5years = inputs["data:cost:production:num_aircraft_5years"]
+        num_5years = inputs["data:cost:production:number_aircraft_5_years"]
         f_composite = inputs["data:cost:production:composite_fraction"]
         pressurized = inputs["data:geometry:cabin:pressurized"]
 
@@ -145,7 +145,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
 
         partials[
             "data:cost:production:dev_support_cost_per_unit",
-            "data:cost:production:num_aircraft_5years",
+            "data:cost:production:number_aircraft_5_years",
         ] = (
             -0.06458
             * m_airframe**0.873

@@ -17,7 +17,7 @@
       <cpi_2012>1.4</cpi_2012>
       <msp_per_unit unit="USD">412758.77</msp_per_unit>
       <production>
-        <num_aircraft_5years>75.0</num_aircraft_5years>
+        <number_aircraft_5_years>75.0</number_aircraft_5_years>
         <engineering_man_hours unit="h">72.679</engineering_man_hours>
         <engineering_cost_per_hour unit="USD/h">126.54</engineering_cost_per_hour>
         <engineering_cost_per_unit unit="USD">26998.679</engineering_cost_per_unit>

@@ -16,7 +16,7 @@ class LCCMaterialCost(om.ExplicitComponent):
         self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
         self.add_input("data:geometry:flap_type", val=np.nan)
         self.add_input(
-            "data:cost:production:num_aircraft_5years",
+            "data:cost:production:number_aircraft_5_years",
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
         )
@@ -50,7 +50,7 @@ class LCCMaterialCost(om.ExplicitComponent):
             24.896
             * inputs["data:weight:airframe:mass"] ** 0.689
             * inputs["data:cost:v_cruise_design"] ** 0.624
-            * inputs["data:cost:production:num_aircraft_5years"] ** -0.208
+            * inputs["data:cost:production:number_aircraft_5_years"] ** -0.208
             * inputs["data:cost:cpi_2012"]
             * f_flap
             * (1.0 + 0.01 * inputs["data:geometry:cabin:pressurized"])
@@ -60,7 +60,7 @@ class LCCMaterialCost(om.ExplicitComponent):
         m_airframe = inputs["data:weight:airframe:mass"]
         v_cruise = inputs["data:cost:v_cruise_design"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
-        num_5years = inputs["data:cost:production:num_aircraft_5years"]
+        num_5years = inputs["data:cost:production:number_aircraft_5_years"]
         pressurized = inputs["data:geometry:cabin:pressurized"]
 
         if inputs["data:geometry:flap_type"] != 0.0:
@@ -90,7 +90,7 @@ class LCCMaterialCost(om.ExplicitComponent):
 
         partials[
             "data:cost:production:material_cost_per_unit",
-            "data:cost:production:num_aircraft_5years",
+            "data:cost:production:number_aircraft_5_years",
         ] = (
             -5.178368
             * m_airframe**0.689

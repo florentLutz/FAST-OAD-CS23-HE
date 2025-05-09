@@ -53,7 +53,7 @@ def test_engineering_man_hours():
     input_list = [
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
-        "data:cost:production:num_aircraft_5years",
+        "data:cost:production:number_aircraft_5_years",
         "data:cost:production:composite_fraction",
         "data:geometry:flap_type",
     ]
@@ -81,7 +81,7 @@ def test_tooling_man_hours():
     input_list = [
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
-        "data:cost:production:num_aircraft_5years",
+        "data:cost:production:number_aircraft_5_years",
         "data:cost:production:composite_fraction",
         "data:geometry:flap_type",
         "data:geometry:wing:taper_ratio",
@@ -110,7 +110,7 @@ def test_manufacturing_man_hours():
     input_list = [
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
-        "data:cost:production:num_aircraft_5years",
+        "data:cost:production:number_aircraft_5_years",
         "data:cost:production:composite_fraction",
         "data:geometry:flap_type",
     ]
@@ -165,7 +165,7 @@ def test_development_support_cost():
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
         "data:cost:prototype_number",
-        "data:cost:production:num_aircraft_5years",
+        "data:cost:production:number_aircraft_5_years",
         "data:cost:production:composite_fraction",
         "data:cost:cpi_2012",
         "data:geometry:flap_type",
@@ -272,7 +272,7 @@ def test_flight_test_cost():
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
         "data:cost:prototype_number",
-        "data:cost:production:num_aircraft_5years",
+        "data:cost:production:number_aircraft_5_years",
         "data:cost:cpi_2012",
     ]
 
@@ -299,7 +299,7 @@ def test_material_cost():
     input_list = [
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
-        "data:cost:production:num_aircraft_5years",
+        "data:cost:production:number_aircraft_5_years",
         "data:cost:cpi_2012",
         "data:geometry:flap_type",
     ]

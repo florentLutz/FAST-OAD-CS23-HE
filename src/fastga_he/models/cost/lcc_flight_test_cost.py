@@ -21,7 +21,7 @@ class LCCFlightTestCost(om.ExplicitComponent):
             desc="number of prototypes",
         )
         self.add_input(
-            "data:cost:production:num_aircraft_5years",
+            "data:cost:production:number_aircraft_5_years",
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
         )
@@ -46,7 +46,7 @@ class LCCFlightTestCost(om.ExplicitComponent):
             * inputs["data:cost:v_cruise_design"] ** 1.3718
             * inputs["data:cost:prototype_number"] ** 1.281
             * inputs["data:cost:cpi_2012"]
-            / inputs["data:cost:production:num_aircraft_5years"]
+            / inputs["data:cost:production:number_aircraft_5_years"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -54,7 +54,7 @@ class LCCFlightTestCost(om.ExplicitComponent):
         v_cruise = inputs["data:cost:v_cruise_design"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
         num_prototype = inputs["data:cost:prototype_number"]
-        num_5years = inputs["data:cost:production:num_aircraft_5years"]
+        num_5years = inputs["data:cost:production:number_aircraft_5_years"]
 
         partials["data:cost:production:flight_test_cost_per_unit", "data:weight:airframe:mass"] = (
             0.01118936
@@ -92,7 +92,7 @@ class LCCFlightTestCost(om.ExplicitComponent):
 
         partials[
             "data:cost:production:flight_test_cost_per_unit",
-            "data:cost:production:num_aircraft_5years",
+            "data:cost:production:number_aircraft_5_years",
         ] = (
             -0.009646
             * m_airframe**1.16

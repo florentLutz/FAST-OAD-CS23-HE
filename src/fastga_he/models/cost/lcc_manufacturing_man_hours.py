@@ -17,7 +17,7 @@ class LCCManufacturingManHours(om.ExplicitComponent):
         self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
         self.add_input("data:geometry:flap_type", val=np.nan)
         self.add_input(
-            "data:cost:production:num_aircraft_5years",
+            "data:cost:production:number_aircraft_5_years",
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
         )
@@ -48,7 +48,7 @@ class LCCManufacturingManHours(om.ExplicitComponent):
             9.6613
             * inputs["data:weight:airframe:mass"] ** 0.74
             * inputs["data:cost:v_cruise_design"] ** 0.543
-            * inputs["data:cost:production:num_aircraft_5years"] ** -0.476
+            * inputs["data:cost:production:number_aircraft_5_years"] ** -0.476
             * f_flap
             * (1.0 + 0.25 * inputs["data:cost:production:composite_fraction"])
         )
@@ -56,7 +56,7 @@ class LCCManufacturingManHours(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         m_airframe = inputs["data:weight:airframe:mass"]
         v_cruise = inputs["data:cost:v_cruise_design"]
-        num_5years = inputs["data:cost:production:num_aircraft_5years"]
+        num_5years = inputs["data:cost:production:number_aircraft_5_years"]
         f_composite = inputs["data:cost:production:composite_fraction"]
 
         if inputs["data:geometry:flap_type"] != 0.0:
@@ -85,7 +85,7 @@ class LCCManufacturingManHours(om.ExplicitComponent):
 
         partials[
             "data:cost:production:manufacturing_man_hours",
-            "data:cost:production:num_aircraft_5years",
+            "data:cost:production:number_aircraft_5_years",
         ] = (
             -4.5987788 * m_airframe**0.74 * v_cruise**0.543 * f_flap * (1.0 + 0.25 * f_composite)
         ) / num_5years**1.476

@@ -84,13 +84,13 @@
             <msp_per_unit unit="USD">412758.77</msp_per_unit>
             <prototype_number>2.0</prototype_number>
             <production>
-                <num_aircraft_5years>75.0</num_aircraft_5years>
-                  <engineering_man_hours unit="h">72.679</engineering_man_hours>
-                  <engineering_cost_per_hour unit="USD/h">126.54</engineering_cost_per_hour>
-                  <tooling_man_hours unit="h">87.993</tooling_man_hours>
-                  <tooling_cost_per_hour unit="USD/h">83.97</tooling_cost_per_hour>
-                  <manufacturing_man_hours unit="h">688.025</manufacturing_man_hours>
-                  <manufacturing_cost_per_hour unit="USD/h">72.97</manufacturing_cost_per_hour>
+                <number_aircraft_5_years>75.0</number_aircraft_5_years>
+                <engineering_man_hours unit="h">72.679</engineering_man_hours>
+                <engineering_cost_per_hour unit="USD/h">126.54</engineering_cost_per_hour>
+                <tooling_man_hours unit="h">87.993</tooling_man_hours>
+                <tooling_cost_per_hour unit="USD/h">83.97</tooling_cost_per_hour>
+                <manufacturing_man_hours unit="h">688.025</manufacturing_man_hours>
+                <manufacturing_cost_per_hour unit="USD/h">72.97</manufacturing_cost_per_hour>
                 <fixed_landing_gear>0.0</fixed_landing_gear>
             </production>
             <operation>
