@@ -36,7 +36,7 @@ class LCCAnnualAirportCost(om.ExplicitComponent):
             "data:cost:operation:annual_airport_cost",
             val=6.0e3,
             units="USD/yr",
-            desc="Annual airport cost of the aircraft",
+            desc="Annual airport related cost for the aircraft",
         )
         self.declare_partials("*", "*", method="exact")
         self.declare_partials("*", "data:cost:operation:daily_parking_cost", val=365.0)
