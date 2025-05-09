@@ -22,7 +22,6 @@ from ..components.sizing_tank_prep_for_loads import SizingFuelTankPreparationFor
 from ..components.pre_lca_prod_weight_per_fu import PreLCAFuelTankProdWeightPerFU
 
 from ..components.lcc_fuel_tank_cost import LCCFuelTankCost
-from ..components.lcc_fuel_tank_operational import LCCFuelTankOperationalCost
 
 from ..components.cstr_enforce import ConstraintsFuelTankCapacityEnforce
 from ..components.cstr_ensure import ConstraintsFuelTankCapacityEnsure
@@ -472,27 +471,5 @@ def test_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:cost_per_unit", units="USD"
     ) == pytest.approx(4194.31, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_fuel_cost():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
-        units="kg",
-        val=279.62,
-    )
-    ivc.add_output(
-        "data:cost:operation:mission_per_year",
-        units="1/yr",
-        val=100.0,
-    )
-
-    problem = run_system(LCCFuelTankOperationalCost(fuel_tank_id="fuel_tank_1"), ivc)
-    assert problem.get_val(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(102340.92, rel=1e-2)
 
     problem.check_partials(compact_print=True)

@@ -11,7 +11,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class LCCAnnualFuelCost(om.ExplicitComponent):
     """
-    Computation of the yearly fuel cost of the aircraft.
+    Computation of the yearly fuel cost of the aircraft. The cost of unit hydrogen is obtained from
+    :cite:`sens:2024`. The unit price of avgas 100LL and Jet-A1 are obtained from
+    https://orleans.aeroport.fr.
     """
 
     def __init__(self, **kwargs):

@@ -839,10 +839,62 @@ def test_annual_fuel_cost():
 
     problem.check_partials(compact_print=True)
 
+    components_type = ["propeller", "PMSM", "gaseous_hydrogen_tank"]
+    components_name = ["propeller_1", "motor_1", "gaseous_hydrogen_tank_1"]
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCAnnualFuelCost(
+                cost_components_type=components_type, cost_components_name=components_name
+            )
+        ),
+        __file__,
+        "data_pemfc.xml",
+    )
+
+    problem = run_system(
+        LCCAnnualFuelCost(
+            cost_components_type=components_type, cost_components_name=components_name
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
+        8643.26, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    components_type = ["propeller", "turboshaft", "fuel_tank", "fuel_tank"]
+    components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1", "fuel_tank_2"]
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCAnnualFuelCost(
+                cost_components_type=components_type, cost_components_name=components_name
+            )
+        ),
+        __file__,
+        "data_fuel_cost.xml",
+    )
+
+    problem = run_system(
+        LCCAnnualFuelCost(
+            cost_components_type=components_type, cost_components_name=components_name
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
+        192144.98, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_operational_sum():
-    components_type = ["propeller", "turboshaft", "fuel_tank"]
-    components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1"]
+    components_type = ["propeller", "turboshaft"]
+    components_name = ["propeller_1", "turboshaft_1"]
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -865,7 +917,7 @@ def test_operational_sum():
         val=3.0e5,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:operational_cost",
+        "data:operation:annual_fuel_cost",
         units="USD/yr",
         val=1000.0,
     )
@@ -932,7 +984,7 @@ def test_operational_cost_hydrogen():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:operational_cost",
+        "data:operation:annual_fuel_cost",
         units="USD/yr",
     ) == pytest.approx(8643.26, rel=1e-3)
 
@@ -971,9 +1023,9 @@ def test_operational_cost_tbm_900():
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:operational_cost", units="USD/yr"
     ) == pytest.approx(33177.257, rel=1e-3)
 
-    assert problem.get_val(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(78408.96, rel=1e-3)
+    assert problem.get_val("data:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
+        156817.93, rel=1e-3
+    )
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
         94982.88, rel=1e-3

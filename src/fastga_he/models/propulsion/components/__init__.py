@@ -155,14 +155,12 @@ from .tanks.fuel_tanks import (
     SlipstreamFuelTank,
     PreLCAFuelTank,
     LCCFuelTankCost,
-    LCCFuelTankOperationalCost,
 )
 from .tanks.gaseous_hydrogen_tank import (
     SizingGaseousHydrogenTank,
     PerformancesGaseousHydrogenTank,
     SlipstreamGaseousHydrogenTank,
     LCCGaseousHydrogenTankCost,
-    LCCGaseousHydrogenTankOperationalCost,
 )
 from .connectors.h2_fuel_system import (
     SizingH2FuelSystem,
