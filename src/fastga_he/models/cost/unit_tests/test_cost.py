@@ -745,18 +745,6 @@ def test_annual_loan_cost():
 
     problem.check_partials(compact_print=True)
 
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        LCCAnnualLoanCost(loan=False),
-        ivc,
-    )
-
-    assert problem.get_val("data:cost:operation:annual_loan_cost", units="USD/yr") == pytest.approx(
-        0.0, rel=1e-3
-    )
-
-    problem.check_partials(compact_print=True)
-
 
 def test_annual_depreciation_cost():
     ivc = om.IndepVarComp()

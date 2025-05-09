@@ -15,17 +15,9 @@ class LCCSumOperationalCost(om.ExplicitComponent):
         self.options.declare("cost_components_type", types=list, default=[])
         self.options.declare("cost_components_name", types=list, default=[])
 
-        self.options.declare(
-            name="loan",
-            default=True,
-            types=bool,
-            desc="True if loan is taken for financing the aircraft",
-        )
-
     def setup(self):
         cost_components_type = self.options["cost_components_type"]
         cost_components_name = self.options["cost_components_name"]
-        loan = self.options["loan"]
 
         self.add_input(
             "data:cost:operation:annual_crew_cost",
@@ -48,13 +40,12 @@ class LCCSumOperationalCost(om.ExplicitComponent):
             desc="Annual insurance cost of the aircraft",
         )
 
-        if loan:
-            self.add_input(
-                "data:cost:operation:annual_loan_cost",
-                val=np.nan,
-                units="USD/yr",
-                desc="Annual loan cost of the aircraft",
-            )
+        self.add_input(
+            "data:cost:operation:annual_loan_cost",
+            val=0.0,
+            units="USD/yr",
+            desc="Annual loan cost of the aircraft",
+        )
 
         self.add_input(
             "data:cost:operation:miscellaneous_cost",

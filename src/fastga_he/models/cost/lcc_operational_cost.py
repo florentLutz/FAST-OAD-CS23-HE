@@ -74,9 +74,8 @@ class LCCOperationalCost(om.Group):
             name="annual_insurance_cost", subsys=LCCAnnualInsuranceCost(), promotes=["*"]
         )
 
-        self.add_subsystem(
-            name="annual_loan_cost", subsys=LCCAnnualLoanCost(loan=loan), promotes=["*"]
-        )
+        if loan:
+            self.add_subsystem(name="annual_loan_cost", subsys=LCCAnnualLoanCost(), promotes=["*"])
 
         self.add_subsystem(
             name="annual_depreciation", subsys=LCCAnnualDepreciation(), promotes=["*"]
@@ -156,7 +155,6 @@ class LCCOperationalCost(om.Group):
             subsys=LCCSumOperationalCost(
                 cost_components_type=cost_components_type,
                 cost_components_name=cost_components_name,
-                loan=loan,
             ),
             promotes=["*"],
         )

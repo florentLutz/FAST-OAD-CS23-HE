@@ -13,16 +13,7 @@ class LCCAnnualLoanCost(om.ExplicitComponent):
     10-20% and a good credit record.
     """
 
-    def initialize(self):
-        self.options.declare(
-            name="loan",
-            default=True,
-            types=bool,
-            desc="True if loan is taken for financing the aircraft",
-        )
-
     def setup(self):
-        loan = self.options["loan"]
         self.add_input(
             "data:cost:operation:loan_principal",
             units="USD",
@@ -48,47 +39,40 @@ class LCCAnnualLoanCost(om.ExplicitComponent):
             units="USD/yr",
             desc="Annual loan cost of the aircraft",
         )
-        if loan:
-            self.declare_partials("*", "*", method="exact")
+
+        self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         principal = inputs["data:cost:operation:loan_principal"]
         r_interest = inputs["data:cost:operation:annual_interest_rate"]
         period = inputs["data:cost:operation:pay_period"]
-        loan = self.options["loan"]
 
-        if loan:
-            outputs["data:cost:operation:annual_loan_cost"] = (
-                principal * r_interest / (1.0 - (1.0 + r_interest) ** -period)
-            )
-
-        else:
-            outputs["data:cost:operation:annual_loan_cost"] = 0.0
+        outputs["data:cost:operation:annual_loan_cost"] = (
+            principal * r_interest / (1.0 - (1.0 + r_interest) ** -period)
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         principal = inputs["data:cost:operation:loan_principal"]
         r_interest = inputs["data:cost:operation:annual_interest_rate"]
         period = inputs["data:cost:operation:pay_period"]
-        loan = self.options["loan"]
 
-        if loan:
-            partials[
-                "data:cost:operation:annual_loan_cost", "data:cost:operation:loan_principal"
-            ] = r_interest / (1.0 - (1.0 + r_interest) ** -period)
+        partials["data:cost:operation:annual_loan_cost", "data:cost:operation:loan_principal"] = (
+            r_interest / (1.0 - (1.0 + r_interest) ** -period)
+        )
 
-            partials[
-                "data:cost:operation:annual_loan_cost", "data:cost:operation:annual_interest_rate"
-            ] = (
-                principal
-                * (r_interest + 1.0) ** (period - 1.0)
-                * ((r_interest + 1.0) ** (period + 1.0) - (period + 1.0) * r_interest - 1.0)
-                / ((r_interest + 1.0) ** period - 1.0) ** 2.0
-            )
+        partials[
+            "data:cost:operation:annual_loan_cost", "data:cost:operation:annual_interest_rate"
+        ] = (
+            principal
+            * (r_interest + 1.0) ** (period - 1.0)
+            * ((r_interest + 1.0) ** (period + 1.0) - (period + 1.0) * r_interest - 1.0)
+            / ((r_interest + 1.0) ** period - 1.0) ** 2.0
+        )
 
-            partials["data:cost:operation:annual_loan_cost", "data:cost:operation:pay_period"] = (
-                -principal
-                * r_interest
-                * (r_interest + 1.0) ** period
-                * np.log(r_interest + 1.0)
-                / ((r_interest + 1.0) ** period - 1.0) ** 2.0
-            )
+        partials["data:cost:operation:annual_loan_cost", "data:cost:operation:pay_period"] = (
+            -principal
+            * r_interest
+            * (r_interest + 1.0) ** period
+            * np.log(r_interest + 1.0)
+            / ((r_interest + 1.0) ** period - 1.0) ** 2.0
+        )
