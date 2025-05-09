@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCAvionicsCost(om.ExplicitComponent):
     """
-    Computation of the avionics cost per aircraft obtained from :cite:`gudmundsson:2013`.
+    Computation of the avionics cost as obtained from :cite:`gudmundsson:2013`.
     """
 
     def setup(self):
