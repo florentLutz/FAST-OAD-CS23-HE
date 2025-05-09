@@ -25,9 +25,10 @@ class LCCAnnualDepreciation(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:cost:operation:service_life",
-            units="yr",
+            name="data:TLAR:aircraft_lifespan",
             val=20.0,
+            units="yr",
+            desc="Expected lifetime of the aircraft",
         )
 
         self.add_output(
@@ -42,22 +43,20 @@ class LCCAnnualDepreciation(om.ExplicitComponent):
         outputs["data:cost:operation:annual_depreciation_cost"] = (
             inputs["data:cost:msp_per_unit"]
             * inputs["data:cost:operation:depreciation_rate"]
-            / inputs["data:cost:operation:service_life"]
+            / inputs["data:TLAR:aircraft_lifespan"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        value = inputs["data:cost:msp_per_unit"]
-        rate = inputs["data:cost:operation:depreciation_rate"]
-        life = inputs["data:cost:operation:service_life"]
-
         partials["data:cost:operation:annual_depreciation_cost", "data:cost:msp_per_unit"] = (
-            rate / life
+            inputs["data:cost:operation:depreciation_rate"] / inputs["data:TLAR:aircraft_lifespan"]
         )
 
         partials[
             "data:cost:operation:annual_depreciation_cost", "data:cost:operation:depreciation_rate"
-        ] = value / life
+        ] = inputs["data:cost:msp_per_unit"] / inputs["data:TLAR:aircraft_lifespan"]
 
-        partials[
-            "data:cost:operation:annual_depreciation_cost", "data:cost:operation:service_life"
-        ] = -value * rate / life**2.0
+        partials["data:cost:operation:annual_depreciation_cost", "data:TLAR:aircraft_lifespan"] = (
+            -inputs["data:cost:msp_per_unit"]
+            * inputs["data:cost:operation:depreciation_rate"]
+            / inputs["data:TLAR:aircraft_lifespan"] ** 2.0
+        )
