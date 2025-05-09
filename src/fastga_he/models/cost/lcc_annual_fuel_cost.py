@@ -149,7 +149,7 @@ class LCCAnnualFuelCost(om.ExplicitComponent):
                     + ":fuel_consumed_mission",
                 ] = self.price_fuel * flight_per_year
 
-                partials["data:operation:annual_fuel_cost", "data:TLAR:flight_per_year"] = (
+                partials["data:operation:annual_fuel_cost", "data:TLAR:flight_per_year"] += (
                     self.price_fuel * fuel_consumed
                 )
 
@@ -161,6 +161,6 @@ class LCCAnnualFuelCost(om.ExplicitComponent):
                     + ":fuel_consumed_mission",
                 ] = 6.54 * flight_per_year
 
-                partials["data:operation:annual_fuel_cost", "data:TLAR:flight_per_year"] = (
+                partials["data:operation:annual_fuel_cost", "data:TLAR:flight_per_year"] += (
                     6.54 * fuel_consumed
                 )

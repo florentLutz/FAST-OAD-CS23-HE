@@ -103,7 +103,7 @@ class LCCAnnualElectricEnergyCost(om.ExplicitComponent):
                 + battery_id
                 + ":energy_consumed_mission"
             ]
-            partials["data:operation:annual_electric_energy_cost", "data:TLAR:flight_per_year"] = (
+            partials["data:operation:annual_electric_energy_cost", "data:TLAR:flight_per_year"] += (
                 0.655 * energy_consumed
             )
             partials[

@@ -789,7 +789,7 @@ def test_annual_maintenance_cost():
     )
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
-        60968.97, rel=1e-3
+        86458.2, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1039,7 +1039,7 @@ def test_operational_cost():
     )
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
-        60968.97, rel=1e-3
+        86458.2, rel=1e-3
     )
 
     assert problem.get_val(
@@ -1048,7 +1048,7 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(360607.37, rel=1e-3)
+    ) == pytest.approx(386309.03, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1085,7 +1085,7 @@ def test_operational_cost_hydrogen():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(108328.88, rel=1e-3)
+    ) == pytest.approx(133818.21, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1119,12 +1119,12 @@ def test_operational_cost_tbm_900():
     )
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
-        94982.88, rel=1e-3
+        90181.17, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(477469.3, rel=1e-3)
+    ) == pytest.approx(472667.57, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1156,7 +1156,7 @@ def test_operational_cost_hybrid_tbm_900():
     ) == pytest.approx(50116.82, rel=1e-3)
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
-        100248.34, rel=1e-3
+        92775.92, rel=1e-3
     )
 
     assert problem.get_val(
@@ -1201,7 +1201,7 @@ def test_cost_tbm_900():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(480404.9, rel=1e-3)
+    ) == pytest.approx(475603.2, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
