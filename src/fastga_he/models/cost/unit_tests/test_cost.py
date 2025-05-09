@@ -10,6 +10,7 @@ import openmdao.api as om
 
 from ..lcc import LCC
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
+
 from ..lcc_engineering_man_hours import LCCEngineeringManHours
 from ..lcc_msp import LCCMSP
 from ..lcc_tooling_man_hours import LCCToolingManHours
@@ -37,6 +38,7 @@ from ..lcc_annual_depreciation import LCCAnnualDepreciation
 from ..lcc_maintenance_cost import LCCMaintenanceCost
 from ..lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
 from ..lcc_annual_fuel_cost import LCCAnnualFuelCost
+from ..lcc_annual_electric_energy_cost import LCCAnnualElectricEnergyCost
 from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
 
@@ -891,6 +893,86 @@ def test_annual_fuel_cost():
 
     problem.check_partials(compact_print=True)
 
+    components_type = ["propeller", "PMSM", "battery_pack"]
+    components_name = ["propeller_1", "motor_1", "battery_pack_1"]
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCAnnualFuelCost(
+                cost_components_type=components_type, cost_components_name=components_name
+            )
+        ),
+        __file__,
+        "pipistrel.xml",
+    )
+
+    problem = run_system(
+        LCCAnnualFuelCost(
+            cost_components_type=components_type, cost_components_name=components_name
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
+        0.0, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_annual_electric_energy_cost():
+    components_type = ["propeller", "PMSM", "battery_pack"]
+    components_name = ["propeller_1", "motor_1", "battery_pack_1"]
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCAnnualElectricEnergyCost(
+                cost_components_type=components_type, cost_components_name=components_name
+            )
+        ),
+        __file__,
+        "pipistrel.xml",
+    )
+
+    problem = run_system(
+        LCCAnnualElectricEnergyCost(
+            cost_components_type=components_type, cost_components_name=components_name
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:operation:annual_electric_energy_cost", units="USD/yr"
+    ) == pytest.approx(2395.55, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    components_type = ["propeller", "turboshaft", "fuel_tank"]
+    components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1"]
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCAnnualElectricEnergyCost(
+                cost_components_type=components_type, cost_components_name=components_name
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        LCCAnnualElectricEnergyCost(
+            cost_components_type=components_type, cost_components_name=components_name
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:operation:annual_electric_energy_cost", units="USD/yr"
+    ) == pytest.approx(0.0, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
 
 def test_operational_sum():
     components_type = ["propeller", "turboshaft"]
@@ -920,6 +1002,11 @@ def test_operational_sum():
         "data:operation:annual_fuel_cost",
         units="USD/yr",
         val=1000.0,
+    )
+    ivc.add_output(
+        "data:operation:annual_electricity_cost",
+        units="USD/yr",
+        val=0.0,
     )
 
     problem = run_system(
@@ -987,6 +1074,10 @@ def test_operational_cost_hydrogen():
         "data:operation:annual_fuel_cost",
         units="USD/yr",
     ) == pytest.approx(8643.26, rel=1e-3)
+    assert problem.get_val(
+        "data:operation:annual_electric_energy_cost",
+        units="USD/yr",
+    ) == pytest.approx(0.0, rel=1e-3)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:operational_cost", units="USD/yr"

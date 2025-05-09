@@ -9,9 +9,9 @@ import openmdao.api as om
 _LOGGER = logging.getLogger(__name__)
 
 
-class LCCAnnualElectricityCost(om.ExplicitComponent):
+class LCCAnnualElectricEnergyCost(om.ExplicitComponent):
     """
-    Computation of the yearly electricity cost of the aircraft.
+    Computation of the yearly electric energy cost of the aircraft.
     """
 
     def initialize(self):
@@ -29,7 +29,7 @@ class LCCAnnualElectricityCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:operation:annual_electricity_cost",
+            name="data:operation:annual_electric_energy_cost",
             val=1000.0,
             units="USD/yr",
         )
@@ -37,17 +37,17 @@ class LCCAnnualElectricityCost(om.ExplicitComponent):
         for battery_type, battery_id in [
             (comp_type, comp_name)
             for comp_type, comp_name in zip(cost_components_type, cost_components_name)
-            if comp_type == "battery"
+            if comp_type == "battery_pack"
         ]:
             self.add_input(
                 "data:propulsion:he_power_train:"
                 + battery_type
                 + ":"
                 + battery_id
-                + ":fuel_consumed_mission",
-                units="kg",
+                + ":energy_consumed_mission",
+                units="kW*h",
                 val=np.nan,
-                desc="Amount of fuel from that tank which will be consumed during mission",
+                desc="Energy drawn from the battery for the mission",
             )
 
             self.declare_partials(
@@ -57,7 +57,7 @@ class LCCAnnualElectricityCost(om.ExplicitComponent):
                     + battery_type
                     + ":"
                     + battery_id
-                    + ":fuel_consumed_mission",
+                    + ":energy_consumed_mission",
                     "data:TLAR:flight_per_year",
                 ],
                 method="exact",
@@ -67,14 +67,14 @@ class LCCAnnualElectricityCost(om.ExplicitComponent):
         cost_components_type = self.options["cost_components_type"]
         cost_components_name = self.options["cost_components_name"]
         flight_per_year = inputs["data:TLAR:flight_per_year"]
-        outputs["data:operation:annual_electricity_cost"] = 0.0
+        outputs["data:operation:annual_electric_energy_cost"] = 0.0
 
         for battery_type, battery_id in [
             (comp_type, comp_name)
             for comp_type, comp_name in zip(cost_components_type, cost_components_name)
-            if comp_type == "battery"
+            if comp_type == "battery_pack"
         ]:
-            outputs["data:operation:annual_electricity_cost"] += (
+            outputs["data:operation:annual_electric_energy_cost"] += (
                 0.655
                 * flight_per_year
                 * inputs[
@@ -94,7 +94,7 @@ class LCCAnnualElectricityCost(om.ExplicitComponent):
         for battery_type, battery_id in [
             (comp_type, comp_name)
             for comp_type, comp_name in zip(cost_components_type, cost_components_name)
-            if comp_type == "battery"
+            if comp_type == "battery_pack"
         ]:
             energy_consumed = inputs[
                 "data:propulsion:he_power_train:"
@@ -103,11 +103,11 @@ class LCCAnnualElectricityCost(om.ExplicitComponent):
                 + battery_id
                 + ":energy_consumed_mission"
             ]
-            partials["data:operation:annual_electricity_cost", "data:TLAR:flight_per_year"] = (
+            partials["data:operation:annual_electric_energy_cost", "data:TLAR:flight_per_year"] = (
                 0.655 * energy_consumed
             )
             partials[
-                "data:operation:annual_electricity_cost",
+                "data:operation:annual_electric_energy_cost",
                 "data:propulsion:he_power_train:"
                 + battery_type
                 + ":"

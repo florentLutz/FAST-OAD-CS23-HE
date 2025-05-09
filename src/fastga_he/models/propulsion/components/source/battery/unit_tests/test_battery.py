@@ -1214,8 +1214,7 @@ def test_operational_cost():
     )
 
     ivc.add_output(
-        "data:cost:operation:mission_per_year",
-        units="1/yr",
+        "data:TLAR:flight_per_year",
         val=100.0,
     )
 
@@ -1226,6 +1225,6 @@ def test_operational_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:operational_cost",
         units="USD/yr",
-    ) == pytest.approx(61737.1265, rel=1e-2)
+    ) == pytest.approx(34104.84, rel=1e-2)
 
     problem.check_partials(compact_print=True)

@@ -30,15 +30,6 @@ class LCCBatteryPackOperationalCost(om.ExplicitComponent):
         )
 
         self.add_input(
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":energy_consumed_mission",
-            units="kW*h",
-            val=np.nan,
-            desc="Energy drawn from the battery for the mission",
-        )
-
-        self.add_input(
             name="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
             val=500.0,
             desc="Expected lifetime of the inverter, expressed in cycles. Default value is the "
@@ -67,26 +58,15 @@ class LCCBatteryPackOperationalCost(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost"
         ] = (
-            inputs[
+            inputs["data:TLAR:flight_per_year"]
+            * inputs[
                 "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit"
             ]
             / inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"]
-            + 0.655
-            * inputs[
-                "data:propulsion:he_power_train:battery_pack:"
-                + battery_pack_id
-                + ":energy_consumed_mission"
-            ]
-        ) * inputs["data:TLAR:flight_per_year"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         battery_pack_id = self.options["battery_pack_id"]
-
-        energy_consumed = inputs[
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":energy_consumed_mission"
-        ]
 
         cost = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit"
@@ -106,16 +86,9 @@ class LCCBatteryPackOperationalCost(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
             "data:TLAR:flight_per_year",
-        ] = cost / lifespan + 0.655 * energy_consumed
+        ] = cost / lifespan
 
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
         ] = -cost * flight_per_year / lifespan**2.0
-
-        partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":energy_consumed_mission",
-        ] = 0.655 * flight_per_year

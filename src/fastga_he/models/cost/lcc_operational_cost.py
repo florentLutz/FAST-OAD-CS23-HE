@@ -16,6 +16,7 @@ from .lcc_maintenance_cost import LCCMaintenanceCost
 from .lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
 from .lcc_annual_crew_cost import LCCAnnualCrewCost
 from .lcc_annual_fuel_cost import LCCAnnualFuelCost
+from .lcc_annual_electric_energy_cost import LCCAnnualElectricEnergyCost
 from .lcc_operational_cost_sum import LCCSumOperationalCost
 
 
@@ -43,7 +44,7 @@ class LCCOperationalCost(om.Group):
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
         loan = self.options["loan"]
-        energy_components = ["battery", "fuel_tank", "gaseous_hydrogen_tank"]
+        energy_components = ["battery_pack", "fuel_tank", "gaseous_hydrogen_tank"]
 
         self.add_subsystem(
             name="landing_cost_per_operation",
@@ -142,7 +143,16 @@ class LCCOperationalCost(om.Group):
         )
 
         self.add_subsystem(
-            name="cost_sum",
+            name="annual_electric_energy_cost",
+            subsys=LCCAnnualElectricEnergyCost(
+                cost_components_type=cost_energy_components_type,
+                cost_components_name=cost_energy_components_name,
+            ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="operational_cost_sum",
             subsys=LCCSumOperationalCost(
                 cost_components_type=cost_components_type,
                 cost_components_name=cost_components_name,
