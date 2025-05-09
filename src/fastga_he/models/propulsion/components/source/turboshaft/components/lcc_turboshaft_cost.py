@@ -28,10 +28,9 @@ class LCCTurboshaftCost(om.ExplicitComponent):
             desc="Consumer price index relative to the year 2012",
         )
         self.add_input(
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power",
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
             units="hp",
             val=np.nan,
-            desc="Maximum shaft power the turboshaft has to provide",
         )
 
         self.add_output(
@@ -50,9 +49,7 @@ class LCCTurboshaftCost(om.ExplicitComponent):
             377.4
             * (
                 inputs[
-                    "data:propulsion:he_power_train:turboshaft:"
-                    + turboshaft_id
-                    + ":max_shaft_power"
+                    "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"
                 ]
                 * inputs["data:cost:cpi_2012"]
             )
@@ -63,14 +60,12 @@ class LCCTurboshaftCost(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_unit",
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power",
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
         ] = 377.4 * inputs["data:cost:cpi_2012"]
         partials[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":cost_per_unit",
             "data:cost:cpi_2012",
         ] = (
             377.4
-            * inputs[
-                "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":max_shaft_power"
-            ]
+            * inputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"]
         )

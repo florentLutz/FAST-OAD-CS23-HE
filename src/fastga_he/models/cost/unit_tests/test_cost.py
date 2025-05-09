@@ -574,7 +574,7 @@ def test_production_cost_hybrid_tbm_900():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
-    ) == pytest.approx(487008.82, rel=1e-3)
+    ) == pytest.approx(449215.82, rel=1e-3)
     assert problem.get_val(
         "data:propulsion:he_power_train:gearbox:gearbox_1:cost_per_unit", units="USD"
     ) == pytest.approx(1959.02, rel=1e-3)
@@ -586,11 +586,11 @@ def test_production_cost_hybrid_tbm_900():
     ) == pytest.approx(221207.71, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        4564473.08, rel=1e-3
+        4507074.58, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        5066565.11, rel=1e-3
+        5002852.79, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -618,14 +618,14 @@ def test_production_cost_tbm_900():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
-    ) == pytest.approx(425906.45, rel=1e-3)
+    ) == pytest.approx(449215.82, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        4039675.1, rel=1e-3
+        4062984.46, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4484039.36, rel=1e-3
+        4509912.75, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1189,14 +1189,14 @@ def test_cost_tbm_900():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
-    ) == pytest.approx(425906.45, rel=1e-3)
+    ) == pytest.approx(449215.82, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        4039675.1, rel=1e-3
+        4062984.46, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4484039.36, rel=1e-3
+        4509912.75, rel=1e-3
     )
 
     assert problem.get_val(

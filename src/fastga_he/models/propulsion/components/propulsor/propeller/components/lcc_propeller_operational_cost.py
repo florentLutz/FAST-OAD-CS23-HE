@@ -20,9 +20,11 @@ class LCCPropellerOperationalCost(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":constant_speed_prop",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":type",
             val=1.0,
-            desc="Value set to 1.0 if constant-speed propeller, 0.0 for fixed-pitch propeller",
+            desc="Value set to 1.0 if constant-speed propeller, 0.0 for fixed-pitch propeller. "
+            "This is only use in cost estimation, does not affect other propeller-related "
+            "models.",
         )
         self.add_input(
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":turboprop_connection",
@@ -41,34 +43,28 @@ class LCCPropellerOperationalCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         propeller_id = self.options["propeller_id"]
 
-        f_constant_speed = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":constant_speed_prop"
-        ]
+        prop_type = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":type"]
         turboprop_connection = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":turboprop_connection"
         ]
 
         outputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":operational_cost"
-        ] = (1.0 - f_constant_speed) * 147.0 + f_constant_speed * (
-            517.0 + turboprop_connection * 383.0
-        )
+        ] = (1.0 - prop_type) * 147.0 + prop_type * (517.0 + turboprop_connection * 383.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]
-        f_constant_speed = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":constant_speed_prop"
-        ]
+        prop_type = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":type"]
         turboprop_connection = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":turboprop_connection"
         ]
 
         partials[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":operational_cost",
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":constant_speed_prop",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":type",
         ] = -147.0 + (517.0 + turboprop_connection * 383.0)
 
         partials[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":operational_cost",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":turboprop_connection",
-        ] = 383.0 * f_constant_speed
+        ] = 383.0 * prop_type

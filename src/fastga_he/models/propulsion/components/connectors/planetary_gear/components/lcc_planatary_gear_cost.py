@@ -8,7 +8,7 @@ import numpy as np
 
 class LCCPlanetaryGearCost(om.ExplicitComponent):
     """
-    Computation of planetary gear purchase price, which is based on the gearbox provided from
+    Computation of planetary gear purchase price, which is based on the gearbox provided by
     https://www.mohawkaero.com/product-page/ak7-gearbox. The gearbox weight is obtained from
     https://www.youtube.com/watch?v=M10O7S89GE8.
     """

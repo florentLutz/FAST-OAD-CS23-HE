@@ -1384,7 +1384,7 @@ def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output("data:cost:cpi_2012", val=1.4)
     ivc.add_output(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:max_shaft_power",
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_rating",
         val=575.174,
         units="kW",
     )

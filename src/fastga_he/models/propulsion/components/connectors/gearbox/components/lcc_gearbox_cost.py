@@ -8,7 +8,7 @@ import numpy as np
 
 class LCCGearboxCost(om.ExplicitComponent):
     """
-    Computation of gearbox purchase price. The MSRP is provided from
+    Computation of gearbox purchase price. The MSRP is provided by
     https://www.mohawkaero.com/product-page/ak7-gearbox. And the source of the gearbox weight is
     obtained from https://www.youtube.com/watch?v=M10O7S89GE8.
     """
