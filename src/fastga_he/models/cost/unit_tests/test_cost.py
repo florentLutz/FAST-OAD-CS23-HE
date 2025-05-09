@@ -1004,7 +1004,7 @@ def test_operational_sum():
         val=1000.0,
     )
     ivc.add_output(
-        "data:operation:annual_electricity_cost",
+        "data:operation:annual_electric_energy_cost",
         units="USD/yr",
         val=0.0,
     )
