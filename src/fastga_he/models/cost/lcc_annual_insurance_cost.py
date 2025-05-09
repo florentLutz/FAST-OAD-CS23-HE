@@ -25,6 +25,7 @@ class LCCAnnualInsuranceCost(om.ExplicitComponent):
             units="USD/yr",
             desc="Annual insurance cost of the aircraft",
         )
+
         self.declare_partials("*", "*", val=0.01)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
