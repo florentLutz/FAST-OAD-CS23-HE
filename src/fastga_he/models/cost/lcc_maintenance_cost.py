@@ -36,19 +36,19 @@ class LCCMaintenanceCost(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        ft_year = inputs["data:TLAR:flight_hours_per_year"]
+        flight_hour = inputs["data:TLAR:flight_hours_per_year"]
         owe = inputs["data:weight:aircraft:OWE"]
 
-        outputs["data:cost:operation:maintenance_cost"] = ft_year * (
+        outputs["data:cost:operation:maintenance_cost"] = flight_hour * (
             331.0 - 0.072 * owe + 2.75e-5 * owe**2.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        ft_year = inputs["data:TLAR:flight_hours_per_year"]
+        flight_hour = inputs["data:TLAR:flight_hours_per_year"]
         owe = inputs["data:weight:aircraft:OWE"]
 
-        partials["data:cost:operation:maintenance_cost", "data:weight:aircraft:OWE"] = ft_year * (
-            5.5e-5 * owe - 0.072
+        partials["data:cost:operation:maintenance_cost", "data:weight:aircraft:OWE"] = (
+            flight_hour * (5.5e-5 * owe - 0.072)
         )
 
         partials["data:cost:operation:maintenance_cost", "data:TLAR:flight_hours_per_year"] = (

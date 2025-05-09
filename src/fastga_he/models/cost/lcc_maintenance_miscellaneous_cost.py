@@ -29,6 +29,6 @@ class LCCMaintenanceMiscellaneousCost(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=80.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        ft_year = inputs["data:TLAR:flight_hours_per_year"]
+        flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
-        outputs["data:cost:operation:miscellaneous_cost"] = 80.0 * ft_year
+        outputs["data:cost:operation:miscellaneous_cost"] = 80.0 * flight_hour

@@ -2,9 +2,10 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-
 import numpy as np
 import openmdao.api as om
+
+EXPECTED_LIFESPAN = 1250.0  # hours
 
 
 class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
