@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCAnnualDepreciation(om.ExplicitComponent):
     """
-    Computation of the aircraft value depreciates per year.
+    Computation of the aircraft depreciation per year.
     """
 
     def setup(self):
