@@ -13,7 +13,7 @@ import openmdao.api as om
 import fastoad.api as oad
 from fastoad.io import VariableIO
 
-from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
+from tests.testing_utilities import run_system, list_inputs
 from ..lca import LCA
 
 XML_FILE = "data.xml"
@@ -700,6 +700,6 @@ def test_lca_pipistrel_heavy_recipe_with_and_without_btf():
     problem.set_val("data:environmental_impact:buy_to_fly:metallic", val=7.5)
     problem.run_model()
     problem.output_file_path = (
-            RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_btf.xml"
+        RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_btf.xml"
     )
     problem.write_outputs()

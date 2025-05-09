@@ -5,6 +5,7 @@
 import pathlib
 import re
 import shutil
+import logging
 from typing import Dict, List
 
 import brightway2 as bw
@@ -31,8 +32,19 @@ NAME_TO_UNIT = {
     "material": None,
 }
 
+_LOGGER = logging.getLogger(__name__)
+
 
 class LCACore(om.ExplicitComponent):
+    # Cache for storing LCA model, methods and lambdas.
+    # This avoids recompiling everything if already done in previous setup of FAST-OAD
+    _cache = {}
+
+    # Cache for storing if a file with identical content has already been written or not. Avoid
+    # rewriting an identical file (which changes time of last modification, which makes it so that
+    # the LCA cache counts a change).
+    _cache_file = {}
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -123,6 +135,68 @@ class LCACore(om.ExplicitComponent):
             "_lca suffix",
         )
 
+    @staticmethod
+    def _check_existing_instance(lca_conf_file_path: pathlib.Path):
+        """
+        Checks the cache to see if an instance of the cache already exists and is usable. Usable
+        means there was no modification to the LCA configuration file.
+        """
+
+        # If cache is empty, no instance is usable
+        if not LCACore._cache:
+            return False
+
+        key = str(lca_conf_file_path)
+
+        # If cache is not empty but there is no instance of that particular configuration file, no
+        # instance is usable.
+        if key not in LCACore._cache:
+            return False
+
+        # Finally, if an instance exists, but it has been modified since, no instance is usable.
+        if LCACore._cache[key]["last_mod_time"] < lca_conf_file_path.lstat().st_mtime:
+            return False
+
+        return True
+
+    @staticmethod
+    def _get_cache_instance(lca_conf_file_path: pathlib.Path):
+        """
+        Access the latest usable instance of the cache that has been registered for this LCA
+        configuration file.
+        """
+
+        key = str(lca_conf_file_path)
+
+        cache_instance = LCACore._cache[key]
+
+        return (
+            cache_instance["model"],
+            cache_instance["methods"],
+            cache_instance["lambdas_dict"],
+            cache_instance["partial_lambdas_dict_dict"],
+        )
+
+    @staticmethod
+    def _add_cache_instance(
+        lca_conf_file_path, model, methods, lambdas_dict, partial_lambdas_dict_dict
+    ):
+        """
+        In the case where no instance were usable and the compilitation needed to be redone, we add
+        said compilation to the cache.
+        """
+
+        key = str(lca_conf_file_path)
+
+        cache_instance = {
+            "last_mod_time": lca_conf_file_path.lstat().st_mtime,
+            "model": model,
+            "methods": methods,
+            "lambdas_dict": lambdas_dict,
+            "partial_lambdas_dict_dict": partial_lambdas_dict_dict,
+        }
+        LCACore._cache[key] = cache_instance
+
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
         lca_conf_file_path = self.write_lca_conf_file()
@@ -131,19 +205,40 @@ class LCACore(om.ExplicitComponent):
         if self.options["component_level_breakdown"]:
             self.axis.append("component")
 
-        _, self.model, self.methods = LCAProblemConfigurator(lca_conf_file_path).generate()
+        # If a usable instance exist, we use it. Otherwise, we create and cache it.
+        if self._check_existing_instance(lca_conf_file_path):
+            self.model, self.methods, self.lambdas_dict, self.partial_lambdas_dict_dict = (
+                self._get_cache_instance(lca_conf_file_path)
+            )
+            _LOGGER.info("Loading cached data for LCA")
 
-        # noinspection PyProtectedMember
-        self.lambdas_dict = {
-            axis: agb.lca._preMultiLCAAlgebric(self.model, self.methods, axis=axis)
-            for axis in self.axis
-        }
+        else:
+            _LOGGER.info(
+                "LCA module: No cache found or configuration file has been modified. "
+                "Compiling LCA model and functions."
+            )
 
-        # Compile expressions for partial derivatives of impacts w.r.t. parameters
-        self.partial_lambdas_dict_dict = {
-            axis: self._preMultiLCAAlgebricPartials(self.model, self.methods, axis=axis)
-            for axis in self.axis
-        }
+            _, self.model, self.methods = LCAProblemConfigurator(lca_conf_file_path).generate()
+
+            # noinspection PyProtectedMember
+            self.lambdas_dict = {
+                axis: agb.lca._preMultiLCAAlgebric(self.model, self.methods, axis=axis)
+                for axis in self.axis
+            }
+
+            # Compile expressions for partial derivatives of impacts w.r.t. parameters
+            self.partial_lambdas_dict_dict = {
+                axis: self._preMultiLCAAlgebricPartials(self.model, self.methods, axis=axis)
+                for axis in self.axis
+            }
+
+            self._add_cache_instance(
+                lca_conf_file_path,
+                self.model,
+                self.methods,
+                self.lambdas_dict,
+                self.partial_lambdas_dict_dict,
+            )
 
         # Get axis keys to ventilate results by e.g. life-cycle phase
         self.axis_keys_dict = {axis: self.lambdas_dict[axis][0].axis_keys for axis in self.axis}
@@ -689,6 +784,68 @@ class LCACore(om.ExplicitComponent):
         pathlib.Path.unlink(lca_conf_file_path)
         shutil.move(tmp_copy_path, lca_conf_file_path)
 
+    def _check_existing_file_instance(
+        self, lca_conf_file_path: pathlib.Path, project_name, component_names
+    ):
+        """
+        Check if a file at the same address and with the same contents already exists to avoid
+        rewriting something strictly similar. Content will be the same if the project name is the
+        same, if the eco_invent version is the same, if the LCIA method is the same, if there are
+        the same components (but their mass will be able to vary), if the materials used for the
+        airframe are the same, if the same delivery method is used, if the same electric mix is
+        used and if a component level breakdown is required or not.
+        """
+
+        # If cache is empty, can't use an existing file
+        if not LCACore._cache_file:
+            return False
+
+        key = str(lca_conf_file_path)
+
+        # If cache is not empty but there is no instance of that particular configuration file,
+        # can't use existing file
+        if key not in LCACore._cache_file:
+            return False
+
+        # Otherwise we check if options and contents are the same
+        cache_instance = LCACore._cache_file[key]
+        existing_file_in_cache = all(
+            (
+                project_name == cache_instance["project_name"],
+                self.options["component_level_breakdown"]
+                == cache_instance["component_level_breakdown"],
+                self.options["impact_assessment_method"]
+                == cache_instance["impact_assessment_method"],
+                self.options["ecoinvent_version"] == cache_instance["ecoinvent_version"],
+                self.options["airframe_material"] == cache_instance["airframe_material"],
+                self.options["delivery_method"] == cache_instance["delivery_method"],
+                self.options["electric_mix"] == cache_instance["electric_mix"],
+                component_names == cache_instance["component_names"],
+            )
+        )
+
+        return existing_file_in_cache
+
+    def _add_cache_file_instance(self, lca_conf_file_path, project_name, component_names):
+        """
+        In the case where no file exists with the exact same constant, we register its
+        instance after rewriting it.
+        """
+
+        key = str(lca_conf_file_path)
+
+        file_cache_instance = {
+            "project_name": project_name,
+            "component_level_breakdown": self.options["component_level_breakdown"],
+            "impact_assessment_method": self.options["impact_assessment_method"],
+            "ecoinvent_version": self.options["ecoinvent_version"],
+            "airframe_material": self.options["airframe_material"],
+            "delivery_method": self.options["delivery_method"],
+            "electric_mix": self.options["electric_mix"],
+            "component_names": component_names,
+        }
+        LCACore._cache_file[key] = file_cache_instance
+
     def write_lca_conf_file(self):
         ecoinvent_version = self.options["ecoinvent_version"]
         methods = self.options["impact_assessment_method"]
@@ -721,34 +878,46 @@ class LCACore(om.ExplicitComponent):
             self.name_to_unit[specie] = "kg"
 
         if self.options["write_lca_conf"]:
-            header = {"project": project_name}
+            # Before writing anything we check if a file with the exact same content at the exact
+            # same address doesn't exist. We'll judge if the same components are there if the same
+            # variables names for their masses are there
+            variables_names_mass = self.configurator.get_mass_element_lists()
 
-            with open(lca_conf_file_path, "w") as new_file:
-                yaml.safe_dump(header, new_file)
+            if not self._check_existing_file_instance(
+                lca_conf_file_path, project_name, variables_names_mass
+            ):
+                header = {"project": project_name}
 
-            self.write_ecoinvent_version(lca_conf_file_path, ecoinvent_version)
+                with open(lca_conf_file_path, "w") as new_file:
+                    yaml.safe_dump(header, new_file)
 
-            dict_with_production = self.configurator.get_lca_production_element_list()
+                self.write_ecoinvent_version(lca_conf_file_path, ecoinvent_version)
 
-            # This function writes the "model: " in the yml so it must be run before anything else
-            # that need to go in the model section in the model section
-            self.write_production(lca_conf_file_path, dict_with_production)
+                dict_with_production = self.configurator.get_lca_production_element_list()
 
-            self.write_manufacturing(lca_conf_file_path, dict_with_manufacturing)
+                # This function writes the "model: " in the yml so it must be run before anything
+                # else that need to go in the model section in the model section
+                self.write_production(lca_conf_file_path, dict_with_production)
 
-            self.write_distribution(lca_conf_file_path, dict_with_distribution)
+                self.write_manufacturing(lca_conf_file_path, dict_with_manufacturing)
 
-            self.write_use(lca_conf_file_path, dict_with_use)
+                self.write_distribution(lca_conf_file_path, dict_with_distribution)
 
-            methods_file = RESOURCE_FOLDER_PATH / METHODS_TO_FILE[methods]
+                self.write_use(lca_conf_file_path, dict_with_use)
 
-            with open(methods_file, "r") as methods_file_stream:
-                methods_dict = yaml.safe_load(methods_file_stream)
+                methods_file = RESOURCE_FOLDER_PATH / METHODS_TO_FILE[methods]
 
-            self.write_methods(lca_conf_file_path, methods_dict)
+                with open(methods_file, "r") as methods_file_stream:
+                    methods_dict = yaml.safe_load(methods_file_stream)
 
-            if self.options["electric_mix"] != "default":
-                self.change_electric_mix(lca_conf_file_path)
+                self.write_methods(lca_conf_file_path, methods_dict)
+
+                if self.options["electric_mix"] != "default":
+                    self.change_electric_mix(lca_conf_file_path)
+
+                self._add_cache_file_instance(
+                    lca_conf_file_path, project_name, variables_names_mass
+                )
 
         elif self.options["lca_conf_file_path"]:
             lca_conf_file_path = self.options["lca_conf_file_path"]

@@ -150,7 +150,7 @@ def test_lca_bar_chart_normalized_comparison_with_heavy():
             "Pipistrel Velis Electro (metallic version, buy-to-fly=7.5)",
         ],
         impact_step="normalized",
-        graph_title="Comparison of Pipistrel version with different materials for the airframe"
+        graph_title="Comparison of Pipistrel version with different materials for the airframe",
     )
 
     fig.show()
