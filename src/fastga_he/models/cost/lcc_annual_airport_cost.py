@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCAnnualAirportCost(om.ExplicitComponent):
     """
-    Computation of the aircraft annual airport cost.
+    Computation of the aircraft annual airport related costs.
     """
 
     def setup(self):
