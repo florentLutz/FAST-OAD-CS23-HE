@@ -140,17 +140,50 @@ def test_lca_bar_chart_absolute_phase_hybrid():
 def test_lca_bar_chart_normalized_comparison_with_heavy():
     fig = lca_impacts_bar_chart_simple(
         [
-            DATA_FOLDER_PATH / "pipistrel_electro_lca_out_recipe.xml",
+            DATA_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_upd.xml",
             DATA_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe.xml",
             DATA_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_btf.xml",
         ],
         names_aircraft=[
             "Pipistrel Velis Electro (composite version, buy-to-fly=1)",
             "Pipistrel Velis Electro (metallic version, buy-to-fly=1)",
-            "Pipistrel Velis Electro (metallic version, buy-to-fly=10)",
+            "Pipistrel Velis Electro (metallic version, buy-to-fly=7.5)",
         ],
         impact_step="normalized",
         graph_title="Comparison of Pipistrel version with different materials for the airframe"
     )
 
+    fig.show()
+
+
+def test_lca_bar_chart_absolute_phase_pipistrel_heavy():
+    fig = lca_impacts_bar_chart_with_contributors(
+        DATA_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_btf.xml",
+        name_aircraft="Pipistrel Velis Electro (metallic version, buy-to-fly=7.5)",
+        impact_step="normalized",
+        impact_filter_list=[
+            "photochemical_oxidant_formation_terrestrial_ecosystems",
+            "human_toxicity_carcinogenic",
+            "energy_resources_non-renewablefossil",
+            "climate_change",
+        ],
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",
+            "Battery pack": ["battery_pack_1", "battery_pack_2"],
+            "Others": [
+                "motor_1",
+                "inverter_1",
+                "harness_1",
+                "dc_sspc_1",
+                "dc_sspc_2",
+                "dc_splitter_1",
+                "dc_bus_1",
+                "manufacturing",
+                "distribution",
+            ],
+            "Use phase": "electricity_for_mission",
+            "Propeller": "propeller_1",
+        },
+    )
+    fig.update_layout(title_text=None, height=800, width=1000)
     fig.show()

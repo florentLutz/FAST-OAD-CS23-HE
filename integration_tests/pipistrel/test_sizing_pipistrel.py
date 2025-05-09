@@ -123,10 +123,10 @@ def test_pipistrel_heavy_velis_electro():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        642.00, rel=1e-2
+        661.00, rel=1e-2
     )
     assert problem.get_val("data:mission:sizing:energy", units="kW*h") == pytest.approx(
-        25.77, abs=1e-2
+        26.13, abs=1e-2
     )
 
 
