@@ -12,14 +12,6 @@ class LCCToolingManHours(om.ExplicitComponent):
     :cite:`gudmundsson:2013`.
     """
 
-    def initialize(self):
-        self.options.declare(
-            name="tapered_wing",
-            default=False,
-            types=bool,
-            desc="True if the aircraft has tapered wing",
-        )
-
     def setup(self):
         self.add_input("data:weight:airframe:mass", units="kg", val=np.nan)
         self.add_input("data:cost:v_cruise_design", units="kn", val=np.nan)
@@ -48,9 +40,11 @@ class LCCToolingManHours(om.ExplicitComponent):
             desc="Number of tooling man-hours required per aircraft",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(of="data:cost:production:tooling_man_hours", wrt="*", method="exact")
         self.declare_partials(
-            "*", ["data:geometry:flap_type", "data:geometry:wing:taper_ratio"], method="fd"
+            "data:cost:production:tooling_man_hours",
+            ["data:geometry:flap_type", "data:geometry:wing:taper_ratio"],
+            method="fd",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

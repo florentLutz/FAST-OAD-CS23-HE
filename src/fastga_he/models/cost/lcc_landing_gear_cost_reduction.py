@@ -26,7 +26,11 @@ class LCCLandingGearCostReduction(om.ExplicitComponent):
             units="USD",
             desc="Cost reduction if fixed landing gear design is selected",
         )
-        self.declare_partials("*", "*", val=-7500.0)
+        self.declare_partials(
+            of="data:cost:production:landing_gear_cost_reduction",
+            wrt="data:cost:production:fixed_landing_gear",
+            val=-7500.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:production:landing_gear_cost_reduction"] = (

@@ -38,8 +38,12 @@ class LCCAnnualAirportCost(om.ExplicitComponent):
             units="USD/yr",
             desc="Annual airport related cost for the aircraft",
         )
-        self.declare_partials("*", "*", method="exact")
-        self.declare_partials("*", "data:cost:operation:daily_parking_cost", val=365.0)
+        self.declare_partials(
+            of="*",
+            wrt=["data:cost:operation:landing_cost", "data:TLAR:flight_per_year"],
+            method="exact",
+        )
+        self.declare_partials(of="*", wrt="data:cost:operation:daily_parking_cost", val=365.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:operation:annual_airport_cost"] = (

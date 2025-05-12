@@ -43,7 +43,9 @@ class LCCCertificationCost(om.ExplicitComponent):
             units="USD",
             desc="Certification adjusted cost per aircraft",
         )
-        self.declare_partials("*", "*", val=1.0)
+        self.declare_partials(
+            of="data:cost:production:certification_cost_per_unit", wrt="*", val=1.0
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:production:certification_cost_per_unit"] = np.sum(inputs.values())

@@ -25,7 +25,9 @@ class LCCMSP(om.ExplicitComponent):
             units="USD",
             desc="Manufacturer suggested price of the aircraft",
         )
-        self.declare_partials("*", "*", val=1.11)
+        self.declare_partials(
+            of="data:cost:msp_per_unit", wrt="data:cost:production_cost_per_unit", val=1.11
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:msp_per_unit"] = 1.11 * inputs["data:cost:production_cost_per_unit"]

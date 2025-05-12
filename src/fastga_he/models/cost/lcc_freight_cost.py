@@ -46,7 +46,7 @@ class LCCFreightCost(om.ExplicitComponent):
             units="USD",
             desc="Freight cost per aircraft",
         )
-        self.declare_partials("*", "*", method="exact")
+        self.declare_partials(of="data:cost:freight_cost_per_unit", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:freight_cost_per_unit"] = inputs["data:weight:aircraft:OWE"] * (
