@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCLandingCost(om.ExplicitComponent):
     """
-    Computation of the aircraft landing cost per operation. Prices provide from
+    Computation of the cost related to aircraft landing. Prices obtained from
     https://www.toulouse.aeroport.fr/sites/default/files/2023-03/2023_03_23_Redevances_A_EN_v1.pdf.
     """
 
