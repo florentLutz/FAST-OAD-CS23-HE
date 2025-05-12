@@ -8,8 +8,7 @@ import numpy as np
 
 class LCCBatteryPackOperationalCost(om.ExplicitComponent):
     """
-    Computation of the battery pack operational cost and electricity cost. The charging cost is
-    estimated from https://eniplenitude.eu/e-mobility/pricing.
+    Computation of the battery pack operational cost and electricity cost.
     """
 
     def initialize(self):

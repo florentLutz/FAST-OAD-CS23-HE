@@ -62,13 +62,13 @@ class LCCSumOperationalCost(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:operation:annual_fuel_cost",
+            name="data:cost:operation:annual_fuel_cost",
             val=np.nan,
             units="USD/yr",
         )
 
         self.add_input(
-            name="data:operation:annual_electric_energy_cost",
+            name="data:cost:operation:annual_electric_energy_cost",
             val=np.nan,
             units="USD/yr",
         )

@@ -28,7 +28,7 @@ from ..lcc_production_cost import LCCProductionCost
 from ..lcc_production_cost_sum import LCCSumProductionCost
 from ..lcc_annual_insurance_cost import LCCAnnualInsuranceCost
 from ..lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
-from ..lcc_freight_cost import LCCFreightCost
+from ..lcc_delivery_cost import LCCDeliveryCost
 from ..lcc_landing_cost import LCCLandingCost
 from ..lcc_daily_parking_cost import LCCDailyParkingCost
 from ..lcc_annual_crew_cost import LCCAnnualCrewCost
@@ -476,7 +476,7 @@ def test_freight_cost():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCFreightCost(),
+        LCCDeliveryCost(),
         ivc,
     )
 
@@ -823,7 +823,7 @@ def test_annual_fuel_cost():
         ivc,
     )
 
-    assert problem.get_val("data:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
+    assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
         124756.18, rel=1e-3
     )
 
@@ -849,7 +849,7 @@ def test_annual_fuel_cost():
         ivc,
     )
 
-    assert problem.get_val("data:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
+    assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
         8643.26, rel=1e-3
     )
 
@@ -875,7 +875,7 @@ def test_annual_fuel_cost():
         ivc,
     )
 
-    assert problem.get_val("data:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
+    assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
         192144.98, rel=1e-3
     )
 
@@ -901,7 +901,7 @@ def test_annual_fuel_cost():
         ivc,
     )
 
-    assert problem.get_val("data:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
+    assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
         0.0, rel=1e-3
     )
 
@@ -930,7 +930,7 @@ def test_annual_electric_energy_cost():
     )
 
     assert problem.get_val(
-        "data:operation:annual_electric_energy_cost", units="USD/yr"
+        "data:cost:operation:annual_electric_energy_cost", units="USD/yr"
     ) == pytest.approx(2395.55, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -956,7 +956,7 @@ def test_annual_electric_energy_cost():
     )
 
     assert problem.get_val(
-        "data:operation:annual_electric_energy_cost", units="USD/yr"
+        "data:cost:operation:annual_electric_energy_cost", units="USD/yr"
     ) == pytest.approx(0.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -987,12 +987,12 @@ def test_operational_sum():
         val=3.0e5,
     )
     ivc.add_output(
-        "data:operation:annual_fuel_cost",
+        "data:cost:operation:annual_fuel_cost",
         units="USD/yr",
         val=1000.0,
     )
     ivc.add_output(
-        "data:operation:annual_electric_energy_cost",
+        "data:cost:operation:annual_electric_energy_cost",
         units="USD/yr",
         val=0.0,
     )
@@ -1059,11 +1059,11 @@ def test_operational_cost_hydrogen():
         ivc,
     )
     assert problem.get_val(
-        "data:operation:annual_fuel_cost",
+        "data:cost:operation:annual_fuel_cost",
         units="USD/yr",
     ) == pytest.approx(8643.26, rel=1e-3)
     assert problem.get_val(
-        "data:operation:annual_electric_energy_cost",
+        "data:cost:operation:annual_electric_energy_cost",
         units="USD/yr",
     ) == pytest.approx(0.0, rel=1e-3)
 
@@ -1102,7 +1102,7 @@ def test_operational_cost_tbm_900():
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:operational_cost", units="USD/yr"
     ) == pytest.approx(33177.257, rel=1e-3)
 
-    assert problem.get_val("data:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
+    assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
         156817.93, rel=1e-3
     )
 

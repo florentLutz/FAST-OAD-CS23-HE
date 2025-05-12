@@ -18,6 +18,14 @@ class LCC(om.Group):
 
     def initialize(self):
         self.options.declare(
+            name="delivery_method",
+            default="flight",
+            desc="Method with which the aircraft will be brought from the assembly plant to the "
+            "end user. Can be either flown or carried by train",
+            allow_none=False,
+            values=["flight", "train"],
+        )
+        self.options.declare(
             name="power_train_file_path",
             default=None,
             desc="Path to the file containing the description of the powertrain",
@@ -32,11 +40,13 @@ class LCC(om.Group):
 
     def setup(self):
         loan = self.options["loan"]
+        delivery_method = self.options["delivery_method"]
 
         self.add_subsystem(
             name="production_cost",
             subsys=LCCProductionCost(
                 power_train_file_path=self.options["power_train_file_path"],
+                delivery_method=delivery_method,
             ),
             promotes=["*"],
         )

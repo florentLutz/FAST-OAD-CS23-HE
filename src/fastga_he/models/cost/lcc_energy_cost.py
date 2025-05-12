@@ -1,6 +1,7 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
+
 import logging
 import numpy as np
 import openmdao.api as om
@@ -8,11 +9,12 @@ import openmdao.api as om
 _LOGGER = logging.getLogger(__name__)
 
 
-class LCCAnnualFuelCost(om.ExplicitComponent):
+class LCCEnergyCost(om.ExplicitComponent):
     """
-    Computation of the yearly fuel cost of the aircraft. The cost of unit hydrogen is obtained from
-    :cite:`sens:2024`. The unit price of avgas 100LL and Jet-A1 are obtained from
-    https://orleans.aeroport.fr.
+    Computation of the single mission energy cost of the aircraft. The cost of unit hydrogen is
+    obtained from :cite:`sens:2024`. The unit price of avgas 100LL and Jet-A1 are obtained from
+    https://orleans.aeroport.fr.  The charging cost is estimated from
+    https://eniplenitude.eu/e-mobility/pricing.
     """
 
     def __init__(self, **kwargs):
@@ -28,14 +30,8 @@ class LCCAnnualFuelCost(om.ExplicitComponent):
         cost_components_type = self.options["cost_components_type"]
         cost_components_name = self.options["cost_components_name"]
 
-        self.add_input(
-            name="data:TLAR:flight_per_year",
-            val=np.nan,
-            desc="Average number of flight per year",
-        )
-
         self.add_output(
-            name="data:cost:operation:annual_fuel_cost",
+            name="data:operation:",
             val=1000.0,
             units="USD/yr",
         )

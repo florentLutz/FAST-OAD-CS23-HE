@@ -21,7 +21,7 @@ from .lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 from .lcc_certification_cost import LCCCertificationCost
 from .lcc_msp import LCCMSP
 from .lcc_production_cost_sum import LCCSumProductionCost
-from .lcc_freight_cost import LCCFreightCost
+from .lcc_delivery_cost import LCCDeliveryCost
 
 
 class LCCProductionCost(om.Group):
@@ -32,6 +32,14 @@ class LCCProductionCost(om.Group):
 
     def initialize(self):
         self.options.declare(
+            name="delivery_method",
+            default="flight",
+            desc="Method with which the aircraft will be brought from the assembly plant to the "
+            "end user. Can be either flown or carried by train",
+            allow_none=False,
+            values=["flight", "train"],
+        )
+        self.options.declare(
             name="power_train_file_path",
             default=None,
             desc="Path to the file containing the description of the power",
@@ -40,7 +48,7 @@ class LCCProductionCost(om.Group):
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
-
+        delivery_method = self.options["delivery_method"]
         # Calculate first the labor resources required for R&D and manufacturing of airframe
         self.add_subsystem(
             name="engineering_man_hours",
@@ -153,6 +161,6 @@ class LCCProductionCost(om.Group):
 
         self.add_subsystem(
             name="freight_cost",
-            subsys=LCCFreightCost(),
+            subsys=LCCDeliveryCost(delivery_method=delivery_method),
             promotes=["*"],
         )

@@ -11,7 +11,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class LCCAnnualElectricEnergyCost(om.ExplicitComponent):
     """
-    Computation of the yearly electric energy cost of the aircraft.
+    Computation of the yearly electric energy cost of the aircraft.  The charging cost is
+    estimated from https://eniplenitude.eu/e-mobility/pricing.
     """
 
     def initialize(self):
@@ -29,7 +30,7 @@ class LCCAnnualElectricEnergyCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:operation:annual_electric_energy_cost",
+            name="data:cost:operation:annual_electric_energy_cost",
             val=1000.0,
             units="USD/yr",
         )
@@ -67,14 +68,14 @@ class LCCAnnualElectricEnergyCost(om.ExplicitComponent):
         cost_components_type = self.options["cost_components_type"]
         cost_components_name = self.options["cost_components_name"]
         flight_per_year = inputs["data:TLAR:flight_per_year"]
-        outputs["data:operation:annual_electric_energy_cost"] = 0.0
+        outputs["data:cost:operation:annual_electric_energy_cost"] = 0.0
 
         for battery_type, battery_id in [
             (comp_type, comp_name)
             for comp_type, comp_name in zip(cost_components_type, cost_components_name)
             if comp_type == "battery_pack"
         ]:
-            outputs["data:operation:annual_electric_energy_cost"] += (
+            outputs["data:cost:operation:annual_electric_energy_cost"] += (
                 0.655
                 * flight_per_year
                 * inputs[
@@ -103,11 +104,11 @@ class LCCAnnualElectricEnergyCost(om.ExplicitComponent):
                 + battery_id
                 + ":energy_consumed_mission"
             ]
-            partials["data:operation:annual_electric_energy_cost", "data:TLAR:flight_per_year"] += (
-                0.655 * energy_consumed
-            )
             partials[
-                "data:operation:annual_electric_energy_cost",
+                "data:cost:operation:annual_electric_energy_cost", "data:TLAR:flight_per_year"
+            ] += 0.655 * energy_consumed
+            partials[
+                "data:cost:operation:annual_electric_energy_cost",
                 "data:propulsion:he_power_train:"
                 + battery_type
                 + ":"
