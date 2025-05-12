@@ -62,7 +62,7 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
             + ":operational_cost"
-        ] = cost * flight_hour / 1250.0
+        ] = cost * flight_hour / EXPECTED_LIFESPAN
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         turbo_generator_id = self.options["turbo_generator_id"]
@@ -80,11 +80,11 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
             + ":cost_per_unit",
-        ] = flight_hour / 1250.0
+        ] = flight_hour / EXPECTED_LIFESPAN
 
         partials[
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
             + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = cost / 1250.0
+        ] = cost / EXPECTED_LIFESPAN
