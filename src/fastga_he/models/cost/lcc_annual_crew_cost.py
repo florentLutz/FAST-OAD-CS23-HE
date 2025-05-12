@@ -28,8 +28,16 @@ class LCCAnnualCrewCost(om.ExplicitComponent):
             units="USD/yr",
             desc="Annual flight crew cost of the aircraft",
         )
-        self.declare_partials("data:cost:operation:annual_crew_cost", "data:cost:operation:number_of_pilot", val=113556.7)
-        self.declare_partials("data:cost:operation:annual_crew_cost", "data:cost:operation:number_of_cabin_crew", val=25200.0)
+        self.declare_partials(
+            "data:cost:operation:annual_crew_cost",
+            "data:cost:operation:number_of_pilot",
+            val=113556.7,
+        )
+        self.declare_partials(
+            "data:cost:operation:annual_crew_cost",
+            "data:cost:operation:number_of_cabin_crew",
+            val=25200.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:operation:annual_crew_cost"] = (
