@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCFlightTestCost(om.ExplicitComponent):
     """
-    Computation of the airframe cost of flight test per aircraft during development obtained from
+    Computation of the cost of flight test operations during development as obtained from
     :cite:`gudmundsson:2013`.
     """
 
