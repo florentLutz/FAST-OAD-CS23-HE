@@ -8,9 +8,7 @@ import openmdao.api as om
 
 class LCCLandingGearCostReduction(om.ExplicitComponent):
     """
-    Computation of the landing gear cost reduction per aircraft from :cite:`gudmundsson:2013`.
-    The cost of retractable landing gear is already include in other cost. Thus, the cost per
-    aircraft needs to be adjusted as the fixed design is considered.
+    Per :cite:`gudmundsson:2013`, the cost of the aircraft assumes a retractable landing. To account for fixed landing gear, a cost reduction is recommenced.
     """
 
     def setup(self):
