@@ -31,7 +31,7 @@ class LCCBatteryPackOperationalCost(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
             val=500.0,
-            desc="Expected lifetime of the inverter, expressed in cycles. Default value is the "
+            desc="Expected lifetime of the battery pack, expressed in cycles. Default value is the "
             "number of cycle required for the reference cell to reach 60% nominal capacity",
         )
 
