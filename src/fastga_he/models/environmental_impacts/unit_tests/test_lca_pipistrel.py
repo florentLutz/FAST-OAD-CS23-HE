@@ -80,7 +80,7 @@ def test_lca_pipistrel():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_ef_fr_mix.xml"
     problem.write_outputs()
 
 
@@ -131,7 +131,7 @@ def test_lca_pipistrel_european_mix():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_eu_mix.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_ef_eu_mix.xml"
     problem.write_outputs()
 
 
@@ -265,7 +265,7 @@ def test_lca_pipistrel_club():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_club_lca_out.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_club_lca_out_ef_fr_mix.xml"
     problem.write_outputs()
 
 
@@ -398,7 +398,7 @@ def test_lca_pipistrel_club_recipe():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_club_lca_out_recipe.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_club_lca_out_recipe_fr_mix.xml"
     problem.write_outputs()
 
 
@@ -449,13 +449,7 @@ def test_lca_pipistrel_recipe():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe.xml"
-    problem.write_outputs()
-
-    # Literature says between 1 and 2
-    problem.set_val("data:environmental_impact:buy_to_fly:composite", val=1.5)
-    problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_btf.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_fr_mix.xml"
     problem.write_outputs()
 
 
@@ -592,7 +586,7 @@ def test_lca_pipistrel_club_iw():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_club_lca_out_iw.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_club_lca_out_iw_fr_mix.xml"
     problem.write_outputs()
 
 
@@ -648,12 +642,12 @@ def test_lca_pipistrel_iw():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_iw.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_iw_fr_mix.xml"
     problem.write_outputs()
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
-def test_lca_pipistrel_heavy_recipe_with_and_without_btf():
+def test_lca_pipistrel_heavy_recipe():
     input_file_name = "pipistrel_heavy_out.xml"
 
     component = LCA(
@@ -699,14 +693,7 @@ def test_lca_pipistrel_heavy_recipe_with_and_without_btf():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe.xml"
-    problem.write_outputs()
-
-    problem.set_val("data:environmental_impact:buy_to_fly:metallic", val=7.5)
-    problem.run_model()
-    problem.output_file_path = (
-        RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_btf.xml"
-    )
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_fr_mix.xml"
     problem.write_outputs()
 
 
@@ -759,7 +746,7 @@ def test_lca_pipistrel_european_mix_btf():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_eu_mix_btf.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_eu_mix_btf.xml"
     problem.write_outputs()
 
 
@@ -813,7 +800,7 @@ def test_lca_pipistrel_heavy_european_mix_btf():
 
     problem.run_model()
     problem.output_file_path = (
-        RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_eu_mix_btf.xml"
+        RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_eu_mix_btf.xml"
     )
     problem.write_outputs()
 
@@ -869,7 +856,7 @@ def test_lca_pipistrel_heavy_french_mix_btf():
 
     problem.run_model()
     problem.output_file_path = (
-        RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_fr_mix_btf.xml"
+        RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_fr_mix_btf.xml"
     )
     problem.write_outputs()
 
@@ -925,5 +912,5 @@ def test_lca_pipistrel_recipe_with_btf():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_btf.xml"
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_fr_mix_btf.xml"
     problem.write_outputs()
