@@ -2393,7 +2393,6 @@
             </low_speed>
           </propeller_1>
           <propeller_elec_1>
-            <constant_speed_prop>0.0</constant_speed_prop>
             <activity_factor is_input="True">120.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">1.7298595496709217<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
@@ -2432,7 +2431,6 @@
             </low_speed>
           </propeller_elec_1>
           <propeller_elec_2>
-            <constant_speed_prop>0.0</constant_speed_prop>
             <activity_factor is_input="True">120.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">1.7298595496709217<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
@@ -2471,7 +2469,6 @@
             </low_speed>
           </propeller_elec_2>
           <propeller_elec_3>
-            <constant_speed_prop>0.0</constant_speed_prop>
             <activity_factor is_input="True">120.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">1.7298595496709217<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
@@ -2510,7 +2507,6 @@
             </low_speed>
           </propeller_elec_3>
           <propeller_elec_4>
-            <constant_speed_prop>0.0</constant_speed_prop>
             <activity_factor is_input="True">120.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">1.7298595496709217<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
@@ -2549,7 +2545,6 @@
             </low_speed>
           </propeller_elec_4>
           <propeller_elec_5>
-            <constant_speed_prop>0.0</constant_speed_prop>
             <activity_factor is_input="True">120.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">1.7298595496709217<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>
@@ -2588,7 +2583,6 @@
             </low_speed>
           </propeller_elec_5>
           <propeller_elec_6>
-            <constant_speed_prop>0.0</constant_speed_prop>
             <activity_factor is_input="True">120.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">1.7298595496709217<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">20.0<!--Twist between the propeller blade root and tip--></blade_twist>

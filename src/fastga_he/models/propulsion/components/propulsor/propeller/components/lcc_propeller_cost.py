@@ -1,9 +1,11 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
-
+import logging
 import numpy as np
 import openmdao.api as om
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class LCCPropellerCost(om.ExplicitComponent):
@@ -34,8 +36,9 @@ class LCCPropellerCost(om.ExplicitComponent):
         )
         self.add_input(
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":type",
-            val=1.0,
-            desc="Value set to 1.0 if constant-speed propeller, 0.0 for fixed-pitch propeller. "
+            val=2.0,
+            desc="Value set to 1.0 if fixed-pitch propeller, "
+            "2.0 for constant-speed propeller. "
             "This is only use in cost estimation, does not affect other propeller-related "
             "models.",
         )
@@ -53,6 +56,11 @@ class LCCPropellerCost(om.ExplicitComponent):
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:propeller:" + propeller_id + ":type",
+            method="fd",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         propeller_id = self.options["propeller_id"]
@@ -63,12 +71,21 @@ class LCCPropellerCost(om.ExplicitComponent):
         d_prop = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
         prop_type = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":type"]
 
-        fixed_pitch_cost = 3145.0 * cpi_2012
-        constant_speed_cost = 209.69 * cpi_2012 * d_prop**2.0 * (shaft_power_max / d_prop) ** 0.12
+        if prop_type == 1.0:
+            outputs[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit"
+            ] = 3145.0 * cpi_2012
 
-        outputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit"] = (
-            1.0 - prop_type
-        ) * fixed_pitch_cost + prop_type * constant_speed_cost
+        elif prop_type == 2.0:
+            outputs[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit"
+            ] = 209.69 * cpi_2012 * d_prop**2.0 * (shaft_power_max / d_prop) ** 0.12
+
+        else:
+            outputs[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit"
+            ] = 3145.0 * cpi_2012
+            _LOGGER.warning("Propeller type %f does not exist, replaced by type 1.0!", prop_type)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]
@@ -79,27 +96,30 @@ class LCCPropellerCost(om.ExplicitComponent):
         d_prop = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
         prop_type = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":type"]
 
-        fixed_pitch_cost = 3145.0 * cpi_2012
-        constant_speed_cost = 209.69 * cpi_2012 * d_prop**2.0 * (shaft_power_max / d_prop) ** 0.12
+        if prop_type == 1.0:
+            partials[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+                "data:cost:cpi_2012",
+            ] = 3145.0
 
-        partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
-            "data:cost:cpi_2012",
-        ] = (1.0 - prop_type) * 3145.0 + prop_type * 209.69 * d_prop**2.0 * (
-            shaft_power_max / d_prop
-        ) ** 0.12
+        elif prop_type == 2.0:
+            partials[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+                "data:cost:cpi_2012",
+            ] = 209.69 * d_prop**2.0 * (shaft_power_max / d_prop) ** 0.12
 
-        partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":type",
-        ] = constant_speed_cost - fixed_pitch_cost
+            partials[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":shaft_power_in_max",
+            ] = 25.1628 * cpi_2012 * d_prop**1.88 / shaft_power_max**0.88
 
-        partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":shaft_power_in_max",
-        ] = 25.1628 * prop_type * cpi_2012 * d_prop**1.88 / shaft_power_max**0.88
+            partials[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
+            ] = 394.2172 * cpi_2012 * d_prop**0.88 * shaft_power_max**0.12
 
-        partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-        ] = 394.2172 * prop_type * cpi_2012 * d_prop**0.88 * shaft_power_max**0.12
+        else:
+            partials[
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+                "data:cost:cpi_2012",
+            ] = 3145.0
