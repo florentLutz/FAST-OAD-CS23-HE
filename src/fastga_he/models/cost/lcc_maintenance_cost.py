@@ -8,8 +8,8 @@ import openmdao.api as om
 
 class LCCMaintenanceCost(om.ExplicitComponent):
     """
-    Compute the annual maintenance cost of the aircraft. The calculation is adjusted based on
-    the cost rate from https://www.guardianjet.com/jet-aircraft-online-tools.
+    Computation of  the annual maintenance cost of the aircraft. The calculation is adjusted
+    based on the cost rate from https://www.guardianjet.com/jet-aircraft-online-tools.
     """
 
     def setup(self):
