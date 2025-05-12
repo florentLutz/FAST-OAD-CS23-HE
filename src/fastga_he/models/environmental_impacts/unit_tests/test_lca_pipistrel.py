@@ -693,7 +693,9 @@ def test_lca_pipistrel_heavy_recipe():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_fr_mix.xml"
+    problem.output_file_path = (
+        RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_fr_mix.xml"
+    )
     problem.write_outputs()
 
 
@@ -746,7 +748,9 @@ def test_lca_pipistrel_european_mix_btf():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_eu_mix_btf.xml"
+    problem.output_file_path = (
+        RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_eu_mix_btf.xml"
+    )
     problem.write_outputs()
 
 
@@ -912,5 +916,7 @@ def test_lca_pipistrel_recipe_with_btf():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_fr_mix_btf.xml"
+    problem.output_file_path = (
+        RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_fr_mix_btf.xml"
+    )
     problem.write_outputs()
