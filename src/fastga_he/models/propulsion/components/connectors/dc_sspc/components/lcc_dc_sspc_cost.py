@@ -39,7 +39,6 @@ class LCCDCSSPCCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":cost_per_unit",
             val=1000.0,
             units="USD",
-            desc="Maximum current flowing through the SSPC",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

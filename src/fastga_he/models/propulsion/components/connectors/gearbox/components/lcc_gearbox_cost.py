@@ -35,7 +35,6 @@ class LCCGearboxCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:gearbox:" + gearbox_id + ":cost_per_unit",
             val=1.0e3,
             units="USD",
-            desc="Purchase cost of a gearbox",
         )
 
         self.declare_partials(of="*", wrt="*", val=230.98)

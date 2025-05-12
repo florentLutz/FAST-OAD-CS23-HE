@@ -36,7 +36,6 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
             units="USD/yr",
             val=1.0e3,
-            desc="Annual maintenance cost per unit",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

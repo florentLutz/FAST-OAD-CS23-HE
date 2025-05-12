@@ -47,7 +47,6 @@ class LCCBatteryPackCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit",
             units="USD",
             val=50e3,
-            desc="battery pack cost per unit",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

@@ -34,11 +34,13 @@ class LCCRectifierOperationalCost(om.ExplicitComponent):
             val=15.0,
             desc="Expected lifetime of the rectifier, typically around 15 year",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operational_cost",
             units="USD/yr",
             val=350.0,
         )
+
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

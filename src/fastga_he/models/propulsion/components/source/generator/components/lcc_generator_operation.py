@@ -36,7 +36,6 @@ class LCCGeneratorOperationalCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:generator:" + generator_id + ":operational_cost",
             units="USD/yr",
             val=1e4,
-            desc="Annual maintenance cost of a generator",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

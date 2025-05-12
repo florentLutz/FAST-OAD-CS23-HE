@@ -34,7 +34,6 @@ class LCCDCSSPCOperationalCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operational_cost",
             val=100.0,
             units="USD/yr",
-            desc="Annual operational cost of SSPC",
         )
 
         self.declare_partials(of="*", wrt="*", val=0.1)

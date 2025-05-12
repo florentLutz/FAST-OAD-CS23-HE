@@ -40,7 +40,6 @@ class LCCICEOperationalCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:ICE:" + ice_id + ":operational_cost",
             units="USD/yr",
             val=1e4,
-            desc="Cost of the ICE per unit",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

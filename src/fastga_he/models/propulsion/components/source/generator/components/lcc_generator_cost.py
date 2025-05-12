@@ -29,7 +29,6 @@ class LCCGeneratorCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:generator:" + generator_id + ":cost_per_unit",
             units="USD",
             val=1e4,
-            desc="Cost of the generator per unit",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

@@ -39,7 +39,6 @@ class LCCGaseousHydrogenTankCost(om.ExplicitComponent):
             + ":cost_per_unit",
             units="USD",
             val=200.0,
-            desc="MSRP of the gaseous hydrogen tanks",
         )
 
         self.declare_partials(of="*", wrt="*", val=6.38)

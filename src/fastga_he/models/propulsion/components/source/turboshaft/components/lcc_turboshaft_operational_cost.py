@@ -44,7 +44,6 @@ class LCCTurboshaftOperationalCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":operational_cost",
             units="USD/yr",
             val=1e4,
-            desc="Annual Maintenance cost of the turboshaft",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

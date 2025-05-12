@@ -48,7 +48,6 @@ class LCCPEMFCStackOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost",
             units="USD/yr",
             val=1.0e3,
-            desc="Annual maintenance cost of PEMFC stack",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

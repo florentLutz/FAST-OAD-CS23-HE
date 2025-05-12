@@ -37,7 +37,6 @@ class LCCPlanetaryGearCost(om.ExplicitComponent):
             + ":cost_per_unit",
             val=1.0e3,
             units="USD",
-            desc="Purchase cost of a planetary gear",
         )
 
         self.declare_partials(of="*", wrt="*", val=230.98)

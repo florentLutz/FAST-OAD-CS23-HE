@@ -29,12 +29,13 @@ class LCCRectifierCost(om.ExplicitComponent):
             val=np.nan,
             desc="Maximum RMS current flowing through one arm of the rectifier",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":cost_per_unit",
             units="USD",
             val=3500.0,
-            desc="Purchase cost of a single rectifier",
         )
+
         self.declare_partials(
             of="*",
             wrt="*",

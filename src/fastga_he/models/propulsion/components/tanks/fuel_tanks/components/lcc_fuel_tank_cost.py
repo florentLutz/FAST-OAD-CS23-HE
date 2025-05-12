@@ -34,7 +34,6 @@ class LCCFuelTankCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":cost_per_unit",
             units="USD",
             val=4.0e3,
-            desc="Purchase cost per fuel tank",
         )
 
         self.declare_partials(of="*", wrt="*", val=40.4)
