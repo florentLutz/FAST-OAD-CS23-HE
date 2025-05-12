@@ -21,6 +21,8 @@ from .lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 from .lcc_certification_cost import LCCCertificationCost
 from .lcc_msp import LCCMSP
 from .lcc_production_cost_sum import LCCSumProductionCost
+from .lcc_fuel_cost import LCCFuelCost
+from .lcc_electric_energy_cost import LCCElectricEnergyCost
 from .lcc_delivery_cost import LCCDeliveryCost
 
 
@@ -49,6 +51,8 @@ class LCCProductionCost(om.Group):
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
         delivery_method = self.options["delivery_method"]
+        energy_components = ["battery_pack", "fuel_tank", "gaseous_hydrogen_tank"]
+
         # Calculate first the labor resources required for R&D and manufacturing of airframe
         self.add_subsystem(
             name="engineering_man_hours",
@@ -117,6 +121,8 @@ class LCCProductionCost(om.Group):
 
         cost_components_type = []
         cost_components_name = []
+        cost_energy_components_type = []
+        cost_energy_components_name = []
         (
             components_name,
             components_name_id,
@@ -145,6 +151,10 @@ class LCCProductionCost(om.Group):
 
                 self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
 
+            if component_type in energy_components:
+                cost_energy_components_type.append(component_type)
+                cost_energy_components_name.append(component_name)
+
         self.add_subsystem(
             name="cost_sum",
             subsys=LCCSumProductionCost(
@@ -159,8 +169,27 @@ class LCCProductionCost(om.Group):
             promotes=["*"],
         )
 
+        if delivery_method == "flight":
+            self.add_subsystem(
+                name="fuel_cost",
+                subsys=LCCFuelCost(
+                    cost_components_type=cost_energy_components_type,
+                    cost_components_name=cost_energy_components_name,
+                ),
+                promotes=["*"],
+            )
+
+            self.add_subsystem(
+                name="electric_energy_cost",
+                subsys=LCCElectricEnergyCost(
+                    cost_components_type=cost_energy_components_type,
+                    cost_components_name=cost_energy_components_name,
+                ),
+                promotes=["*"],
+            )
+
         self.add_subsystem(
-            name="freight_cost",
+            name="delivery_cost",
             subsys=LCCDeliveryCost(delivery_method=delivery_method),
             promotes=["*"],
         )

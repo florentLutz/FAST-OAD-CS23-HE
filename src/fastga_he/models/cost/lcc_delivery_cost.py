@@ -40,15 +40,22 @@ class LCCDeliveryCost(om.ExplicitComponent):
             self.add_input("data:weight:aircraft:OWE", val=np.nan, units="kg")
 
             self.declare_partials(
-                of="data:cost:freight_cost_per_unit", wrt="data:weight:aircraft:OWE", val=1.3625
+                of="data:cost:delivery_cost_per_unit", wrt="data:weight:aircraft:OWE", val=1.3625
             )
 
         elif delivery_method == "flight":
             self.add_input(
-                "data:cost:production:delivery_energy_cost",
-                val=np.nan,
+                name="data:cost:electric_energy_cost",
+                val=0.0,
                 units="USD",
-                desc="Energy cost considering flight delivery",
+                desc="Electric energy cost for single flight mission",
+            )
+
+            self.add_input(
+                name="data:cost:fuel_cost",
+                val=0.0,
+                units="USD",
+                desc="Fuel cost for single flight mission",
             )
 
             self.add_input(
@@ -57,7 +64,7 @@ class LCCDeliveryCost(om.ExplicitComponent):
                 desc="Adjustment factor to consider other flight delivery related costs",
             )
 
-            self.declare_partials(of="data:cost:freight_cost_per_unit", wrt="*", method="exact")
+            self.declare_partials(of="data:cost:delivery_cost_per_unit", wrt="*", method="exact")
 
         else:
             _LOGGER.warning(
@@ -76,18 +83,21 @@ class LCCDeliveryCost(om.ExplicitComponent):
 
         elif delivery_method == "flight":
             outputs["data:cost:delivery_cost_per_unit"] = (
-                inputs["data:cost:production:delivery_energy_cost"]
-                * inputs["data:cost:production:flight_cost_factor"]
-            )
+                inputs["data:cost:fuel_cost"] + inputs["data:cost:electric_energy_cost"]
+            ) * inputs["data:cost:production:flight_cost_factor"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         delivery_method = self.options["delivery_method"]
 
         if delivery_method == "flight":
-            partials[
-                "data:cost:delivery_cost_per_unit", "data:cost:production:delivery_energy_cost"
-            ] = inputs["data:cost:production:flight_cost_factor"]
+            partials["data:cost:delivery_cost_per_unit", "data:cost:fuel_cost"] = inputs[
+                "data:cost:production:flight_cost_factor"
+            ]
+
+            partials["data:cost:delivery_cost_per_unit", "data:cost:electric_energy_cost"] = inputs[
+                "data:cost:production:flight_cost_factor"
+            ]
 
             partials[
                 "data:cost:delivery_cost_per_unit", "data:cost:production:flight_cost_factor"
-            ] = inputs["data:cost:production:delivery_energy_cost"]
+            ] = inputs["data:cost:fuel_cost"] + inputs["data:cost:electric_energy_cost"]

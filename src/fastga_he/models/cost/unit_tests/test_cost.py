@@ -37,8 +37,9 @@ from ..lcc_annual_loan_cost import LCCAnnualLoanCost
 from ..lcc_annual_depreciation import LCCAnnualDepreciation
 from ..lcc_maintenance_cost import LCCMaintenanceCost
 from ..lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
-from ..lcc_annual_fuel_cost import LCCAnnualFuelCost
-from ..lcc_annual_electric_energy_cost import LCCAnnualElectricEnergyCost
+from ..lcc_fuel_cost import LCCFuelCost
+from ..lcc_electric_energy_cost import LCCElectricEnergyCost
+from ..lcc_annual_energy_cost import LCCAnnualEnergyCost
 from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
 
@@ -466,13 +467,25 @@ def test_aircraft_MSP():
     problem.check_partials(compact_print=True)
 
 
-def test_freight_cost():
+def test_delivery_cost():
     ivc = om.IndepVarComp()
     ivc.add_output("data:weight:aircraft:OWE", val=426.58, units="kg")
-    ivc.add_output("data:cost:airplane_delivery", val=0.25)
-    ivc.add_output("data:cost:train_delivery", val=0.25)
-    ivc.add_output("data:cost:truck_delivery", val=0.25)
-    ivc.add_output("data:cost:ship_delivery", val=0.25)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCDeliveryCost(delivery_method="train"),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:delivery_cost_per_unit", units="USD") == pytest.approx(
+        581.21, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:electric_energy_cost", units="USD", val=8.204)
+    ivc.add_output("data:cost:fuel_cost", units="USD", val=91.56)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -480,8 +493,8 @@ def test_freight_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:freight_cost_per_unit", units="USD") == pytest.approx(
-        1075.25, rel=1e-3
+    assert problem.get_val("data:cost:delivery_cost_per_unit", units="USD") == pytest.approx(
+        99.764, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -490,7 +503,10 @@ def test_freight_cost():
 def test_production_cost():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml")
+            LCCProductionCost(
+                power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml",
+                delivery_method="train",
+            )
         ),
         __file__,
         XML_FILE,
@@ -498,7 +514,9 @@ def test_production_cost():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml"),
+        LCCProductionCost(
+            power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml", delivery_method="train"
+        ),
         ivc,
     )
 
@@ -522,7 +540,10 @@ def test_production_cost():
 def test_production_cost_hydrogen():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml")
+            LCCProductionCost(
+                power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml",
+                delivery_method="train",
+            )
         ),
         __file__,
         "data_pemfc.xml",
@@ -531,7 +552,9 @@ def test_production_cost_hydrogen():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml"),
+        LCCProductionCost(
+            power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml", delivery_method="train"
+        ),
         ivc,
     )
     assert problem.get_val(
@@ -560,7 +583,8 @@ def test_production_cost_hybrid_tbm_900():
     ivc = get_indep_var_comp(
         list_inputs(
             LCCProductionCost(
-                power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml"
+                power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml",
+                delivery_method="train",
             )
         ),
         __file__,
@@ -569,7 +593,10 @@ def test_production_cost_hybrid_tbm_900():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCProductionCost(power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml"),
+        LCCProductionCost(
+            power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml",
+            delivery_method="train",
+        ),
         ivc,
     )
     assert problem.get_val(
@@ -603,6 +630,7 @@ def test_production_cost_tbm_900():
         list_inputs(
             LCCProductionCost(
                 power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+                delivery_method="train",
             )
         ),
         __file__,
@@ -613,6 +641,7 @@ def test_production_cost_tbm_900():
     problem = run_system(
         LCCProductionCost(
             power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+            delivery_method="train",
         ),
         ivc,
     )
@@ -802,30 +831,24 @@ def test_annual_maintenance_miscellaneous_cost():
     problem.check_partials(compact_print=True)
 
 
-def test_annual_fuel_cost():
+def test_fuel_cost():
     components_type = ["propeller", "turboshaft", "fuel_tank"]
     components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1"]
 
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCAnnualFuelCost(
-                cost_components_type=components_type, cost_components_name=components_name
-            )
+            LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name)
         ),
         __file__,
         XML_FILE,
     )
 
     problem = run_system(
-        LCCAnnualFuelCost(
-            cost_components_type=components_type, cost_components_name=components_name
-        ),
+        LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name),
         ivc,
     )
 
-    assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
-        124756.18, rel=1e-3
-    )
+    assert problem.get_val("data:cost:fuel_cost", units="USD") == pytest.approx(427.25, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -834,24 +857,18 @@ def test_annual_fuel_cost():
 
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCAnnualFuelCost(
-                cost_components_type=components_type, cost_components_name=components_name
-            )
+            LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name)
         ),
         __file__,
         "data_pemfc.xml",
     )
 
     problem = run_system(
-        LCCAnnualFuelCost(
-            cost_components_type=components_type, cost_components_name=components_name
-        ),
+        LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name),
         ivc,
     )
 
-    assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
-        8643.26, rel=1e-3
-    )
+    assert problem.get_val("data:cost:fuel_cost", units="USD") == pytest.approx(91.56, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -860,33 +877,29 @@ def test_annual_fuel_cost():
 
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCAnnualFuelCost(
-                cost_components_type=components_type, cost_components_name=components_name
-            )
+            LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name)
         ),
         __file__,
         "data_fuel_cost.xml",
     )
 
     problem = run_system(
-        LCCAnnualFuelCost(
-            cost_components_type=components_type, cost_components_name=components_name
-        ),
+        LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name),
         ivc,
     )
 
-    assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
-        192144.98, rel=1e-3
-    )
+    assert problem.get_val("data:cost:fuel_cost", units="USD") == pytest.approx(658.03, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
+
+def test_electric_energy_cost():
     components_type = ["propeller", "PMSM", "battery_pack"]
     components_name = ["propeller_1", "motor_1", "battery_pack_1"]
 
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCAnnualFuelCost(
+            LCCElectricEnergyCost(
                 cost_components_type=components_type, cost_components_name=components_name
             )
         ),
@@ -895,69 +908,37 @@ def test_annual_fuel_cost():
     )
 
     problem = run_system(
-        LCCAnnualFuelCost(
+        LCCElectricEnergyCost(
             cost_components_type=components_type, cost_components_name=components_name
         ),
         ivc,
     )
+
+    assert problem.get_val("data:cost:electric_energy_cost", units="USD") == pytest.approx(
+        8.204, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_energy_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:electric_energy_cost", units="USD", val=8.204)
+    ivc.add_output("data:cost:fuel_cost", units="USD", val=91.56)
+    ivc.add_output("data:TLAR:flight_per_year", val=10.0)
+
+    problem = run_system(
+        LCCAnnualEnergyCost(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:cost:operation:annual_electric_energy_cost", units="USD/yr"
+    ) == pytest.approx(82.04, rel=1e-3)
 
     assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
-        0.0, rel=1e-3
+        915.6, rel=1e-3
     )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_annual_electric_energy_cost():
-    components_type = ["propeller", "PMSM", "battery_pack"]
-    components_name = ["propeller_1", "motor_1", "battery_pack_1"]
-
-    ivc = get_indep_var_comp(
-        list_inputs(
-            LCCAnnualElectricEnergyCost(
-                cost_components_type=components_type, cost_components_name=components_name
-            )
-        ),
-        __file__,
-        "pipistrel.xml",
-    )
-
-    problem = run_system(
-        LCCAnnualElectricEnergyCost(
-            cost_components_type=components_type, cost_components_name=components_name
-        ),
-        ivc,
-    )
-
-    assert problem.get_val(
-        "data:cost:operation:annual_electric_energy_cost", units="USD/yr"
-    ) == pytest.approx(2395.55, rel=1e-3)
-
-    problem.check_partials(compact_print=True)
-
-    components_type = ["propeller", "turboshaft", "fuel_tank"]
-    components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1"]
-
-    ivc = get_indep_var_comp(
-        list_inputs(
-            LCCAnnualElectricEnergyCost(
-                cost_components_type=components_type, cost_components_name=components_name
-            )
-        ),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(
-        LCCAnnualElectricEnergyCost(
-            cost_components_type=components_type, cost_components_name=components_name
-        ),
-        ivc,
-    )
-
-    assert problem.get_val(
-        "data:cost:operation:annual_electric_energy_cost", units="USD/yr"
-    ) == pytest.approx(0.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1162,6 +1143,7 @@ def test_cost_tbm_900():
         list_inputs(
             LCC(
                 power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+                delivery_method="train",
             )
         ),
         __file__,
@@ -1172,6 +1154,7 @@ def test_cost_tbm_900():
     problem = run_system(
         LCC(
             power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+            delivery_method="train",
         ),
         ivc,
     )

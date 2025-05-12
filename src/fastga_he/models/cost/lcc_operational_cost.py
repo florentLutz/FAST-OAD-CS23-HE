@@ -15,8 +15,9 @@ from .lcc_annual_depreciation import LCCAnnualDepreciation
 from .lcc_maintenance_cost import LCCMaintenanceCost
 from .lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
 from .lcc_annual_crew_cost import LCCAnnualCrewCost
-from .lcc_annual_fuel_cost import LCCAnnualFuelCost
-from .lcc_annual_electric_energy_cost import LCCAnnualElectricEnergyCost
+from .lcc_fuel_cost import LCCFuelCost
+from .lcc_electric_energy_cost import LCCElectricEnergyCost
+from .lcc_annual_energy_cost import LCCAnnualEnergyCost
 from .lcc_operational_cost_sum import LCCSumOperationalCost
 
 
@@ -133,8 +134,8 @@ class LCCOperationalCost(om.Group):
                 cost_energy_components_name.append(component_name)
 
         self.add_subsystem(
-            name="annual_fuel_cost",
-            subsys=LCCAnnualFuelCost(
+            name="fuel_cost",
+            subsys=LCCFuelCost(
                 cost_components_type=cost_energy_components_type,
                 cost_components_name=cost_energy_components_name,
             ),
@@ -142,11 +143,17 @@ class LCCOperationalCost(om.Group):
         )
 
         self.add_subsystem(
-            name="annual_electric_energy_cost",
-            subsys=LCCAnnualElectricEnergyCost(
+            name="electric_energy_cost",
+            subsys=LCCElectricEnergyCost(
                 cost_components_type=cost_energy_components_type,
                 cost_components_name=cost_energy_components_name,
             ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="annual_energy_cost",
+            subsys=LCCAnnualEnergyCost(),
             promotes=["*"],
         )
 
