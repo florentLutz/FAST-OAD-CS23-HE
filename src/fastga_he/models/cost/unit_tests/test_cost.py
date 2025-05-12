@@ -377,7 +377,7 @@ def test_certification_cost():
 
 def test_landing_gear_cost_reduction():
     input_list = [
-        "data:cost:production:fixed_landing_gear",
+        "data:geometry:landing_gear:type",
     ]
 
     ivc = get_indep_var_comp(
@@ -394,7 +394,7 @@ def test_landing_gear_cost_reduction():
 
     assert problem.get_val(
         "data:cost:production:landing_gear_cost_reduction", units="USD"
-    ) == pytest.approx(0.0, rel=1e-3)
+    ) == pytest.approx(-7500.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -529,7 +529,7 @@ def test_production_cost():
     ) == pytest.approx(70956.47, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        376197.76, rel=1e-3
+        368697.76, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -571,7 +571,7 @@ def test_production_cost_hydrogen():
     ) == pytest.approx(60485.41, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        403956.1, rel=1e-3
+        396456.1, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)

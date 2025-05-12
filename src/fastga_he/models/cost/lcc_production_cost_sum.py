@@ -84,7 +84,7 @@ class LCCSumProductionCost(om.ExplicitComponent):
 
         self.add_input(
             "data:cost:production:landing_gear_cost_reduction",
-            val=np.nan,
+            val=0.0,
             units="USD",
             desc="Cost reduction if fixed landing gear design is selected",
         )

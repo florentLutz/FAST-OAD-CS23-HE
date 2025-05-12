@@ -15,9 +15,9 @@ class LCCLandingGearCostReduction(om.ExplicitComponent):
 
     def setup(self):
         self.add_input(
-            "data:cost:production:fixed_landing_gear",
+            "data:geometry:landing_gear:type",
             val=np.nan,
-            desc="Set to 1.0 if fixed, 0.0 for retractable landing gear",
+            desc="Set to 0.0 if fixed, 1.0 for retractable landing gear",
         )
 
         self.add_output(
@@ -28,11 +28,11 @@ class LCCLandingGearCostReduction(om.ExplicitComponent):
         )
         self.declare_partials(
             of="data:cost:production:landing_gear_cost_reduction",
-            wrt="data:cost:production:fixed_landing_gear",
-            val=-7500.0,
+            wrt="data:geometry:landing_gear:type",
+            val=7500.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:production:landing_gear_cost_reduction"] = (
-            -7500.0 * inputs["data:cost:production:fixed_landing_gear"]
+        outputs["data:cost:production:landing_gear_cost_reduction"] = 7500.0 * (
+            inputs["data:geometry:landing_gear:type"] - 1.0
         )

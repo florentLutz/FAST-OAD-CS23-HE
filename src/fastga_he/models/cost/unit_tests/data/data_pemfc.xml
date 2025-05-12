@@ -77,6 +77,11 @@
                 </tip>
                 <span units="m" is_input="False">9.237463382822208<!--wing span--></span>
             </wing>
+            <landing_gear>
+                <height units="m" is_input="False">0.49199999999999994<!--height of the landing gear--></height>
+                <type is_input="True">0.0<!--0=non-retractable / 1=retractable--></type>
+                <y units="m" is_input="False">1.1892999999999998<!--landing gear position along the wing--></y>
+            </landing_gear>
         </geometry>
         <cost>
             <cpi_2012>1.4</cpi_2012>
