@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCTurboshaftOperationalCost(om.ExplicitComponent):
     """
-    Computation of the turboshaft engine operational cost. The time between overhaul (TBO) of
+    Computation of the turboshaft engine operational cost. The time between overhaul (TBO) is
     based on the PT6s engines data provided by
     https://www.aopa.org/news-and-media/all-news/2020/february/24/turboprop-engine-repairs-for-less.
     The Overhaul cost rate is obtained from
