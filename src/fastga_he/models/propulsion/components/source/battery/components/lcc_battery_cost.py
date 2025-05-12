@@ -33,9 +33,9 @@ class LCCBatteryPackCost(om.ExplicitComponent):
         )
         self.add_input(
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_median_2022",
-            units="USD",
+            units="USD/kW/h",
             val=482.0,
-            desc="Cost median of the Li-ion battery pack",
+            desc="The Cost median per kW*h of the Li-ion battery pack in 2022",
         )
         self.add_input(
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_from_2022",
