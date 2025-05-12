@@ -187,3 +187,39 @@ def test_lca_bar_chart_absolute_phase_pipistrel_heavy():
     )
     fig.update_layout(title_text=None, height=800, width=1000)
     fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_normalized_comparison_with_heavy_btf_both():
+    fig = lca_impacts_bar_chart_simple(
+        [
+            DATA_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_btf.xml",
+            DATA_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_fr_mix_btf.xml",
+        ],
+        names_aircraft=[
+            "Pipistrel Velis Electro (composite version, buy-to-fly=1.5)",
+            "Pipistrel Velis Electro (metallic version, buy-to-fly=7.5)",
+        ],
+        impact_step="normalized",
+        graph_title="Comparison of Pipistrel version with different materials for the airframe",
+    )
+
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_normalized_comparison_with_heavy_btf_both_eu_mix():
+    fig = lca_impacts_bar_chart_simple(
+        [
+            DATA_FOLDER_PATH / "pipistrel_electro_lca_out_eu_mix_btf.xml",
+            DATA_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_eu_mix_btf.xml",
+        ],
+        names_aircraft=[
+            "Pipistrel Velis Electro (composite version, buy-to-fly=1.5)",
+            "Pipistrel Velis Electro (metallic version, buy-to-fly=7.5)",
+        ],
+        impact_step="normalized",
+        graph_title="Comparison of Pipistrel version with different materials for the airframe, with an EU mix",
+    )
+
+    fig.show()
