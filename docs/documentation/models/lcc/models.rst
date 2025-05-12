@@ -85,7 +85,7 @@ Cost of material
 :math:`F_{CF}` is the complex flap system factor = 1.02 if complex flap system applied and  :math:`F_{\text{press}}`
 is the pressurized factor = 1.01 if having pressurized cabin.
 
-Cost of certify
+Cost of certification
 ***************
 
 The cost of certification is the sum of engineering labor cost, development support cost, flight test cost, and the
