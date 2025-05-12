@@ -8,8 +8,7 @@ import openmdao.api as om
 
 class LCCEngineeringCost(om.ExplicitComponent):
     """
-    Computation of the airframe cost per aircraft of engineering labor obtained from
-    :cite:`gudmundsson:2013`.
+    Computation of the airframe engineering labor cost as obtained from :cite:`gudmundsson:2013`.
     """
 
     def setup(self):
