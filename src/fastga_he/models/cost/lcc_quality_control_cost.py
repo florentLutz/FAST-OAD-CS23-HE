@@ -8,8 +8,7 @@ import openmdao.api as om
 
 class LCCQualityControlCost(om.ExplicitComponent):
     """
-    Computation of the airframe cost per aircraft on quality control obtained from
-    :cite:`gudmundsson:2013`.
+    Computation of the cost of quality control as obtained from :cite:`gudmundsson:2013`.
     """
 
     def setup(self):
@@ -22,7 +21,7 @@ class LCCQualityControlCost(om.ExplicitComponent):
         self.add_input(
             "data:cost:production:composite_fraction",
             val=0.0,
-            desc="Fraction of airframe made by composite, range from 0.0 to 1.0",
+            desc="Fraction of airframe made of composite, range from 0.0 to 1.0",
         )
 
         self.add_output(

@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCManufacturingCost(om.ExplicitComponent):
     """
-    Computation of the airframe cost per aircraft of manufacturing labor obtained from
+    Computation of the manufacturing labor cost for the airframe as obtained from
     :cite:`gudmundsson:2013`. Default manufacturing cost per hour is provided by
     :cite:`stefana:2024`.
     """
@@ -18,7 +18,7 @@ class LCCManufacturingCost(om.ExplicitComponent):
             "data:cost:production:manufacturing_man_hours",
             val=np.nan,
             units="h",
-            desc="Number of tooling man-hours required for a certain amount of aircraft been "
+            desc="Number of tooling man-hours required for a certain number of aircraft to be"
             "produced in a 5-year or 60 month period",
         )
         self.add_input(

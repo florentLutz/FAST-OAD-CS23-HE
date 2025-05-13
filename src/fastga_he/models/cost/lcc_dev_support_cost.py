@@ -38,7 +38,7 @@ class LCCDevSupportCost(om.ExplicitComponent):
         self.add_input(
             "data:cost:production:composite_fraction",
             val=0.0,
-            desc="Fraction of airframe made by composite, range from 0.0 to 1.0",
+            desc="Fraction of airframe made of composite, range from 0.0 to 1.0",
         )
 
         self.add_output(
