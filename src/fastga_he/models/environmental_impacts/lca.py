@@ -81,7 +81,7 @@ class LCA(om.Group):
             name="ecoinvent_version",
             default="3.9.1",
             desc="EcoInvent version to use",
-            values=["3.9.1"],
+            values=["3.9.1", "3.10.1"],
         )
         self.options.declare(
             name="airframe_material",
@@ -231,10 +231,26 @@ class LCA(om.Group):
             )
 
         # Adds all the LCA groups for the airframe which will be here regardless of the powertrain
-        self.add_subsystem(name="pre_lca_wing", subsys=LCAWingWeightPerFU(), promotes=["*"])
-        self.add_subsystem(name="pre_lca_fuselage", subsys=LCAFuselageWeightPerFU(), promotes=["*"])
-        self.add_subsystem(name="pre_lca_htp", subsys=LCAHTPWeightPerFU(), promotes=["*"])
-        self.add_subsystem(name="pre_lca_vtp", subsys=LCAVTPWeightPerFU(), promotes=["*"])
+        self.add_subsystem(
+            name="pre_lca_wing",
+            subsys=LCAWingWeightPerFU(airframe_material=self.options["airframe_material"]),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="pre_lca_fuselage",
+            subsys=LCAFuselageWeightPerFU(airframe_material=self.options["airframe_material"]),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="pre_lca_htp",
+            subsys=LCAHTPWeightPerFU(airframe_material=self.options["airframe_material"]),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="pre_lca_vtp",
+            subsys=LCAVTPWeightPerFU(airframe_material=self.options["airframe_material"]),
+            promotes=["*"],
+        )
         self.add_subsystem(name="pre_lca_lg", subsys=LCALandingGearWeightPerFU(), promotes=["*"])
         self.add_subsystem(
             name="pre_lca_flight_control", subsys=LCAFlightControlsWeightPerFU(), promotes=["*"]

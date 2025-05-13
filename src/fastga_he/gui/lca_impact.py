@@ -933,6 +933,8 @@ def _get_component_from_variable_name(variable_name: str) -> str:
 def lca_impacts_bar_chart_simple(
     aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
     names_aircraft: Union[str, List[str]] = None,
+    impact_step: str = "weighted",
+    graph_title: str = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that compares multiples aircraft designs across all categories. This comparison
@@ -941,16 +943,23 @@ def lca_impacts_bar_chart_simple(
 
     :param aircraft_file_paths: paths to the output file that contains the impacts.
     :param names_aircraft: names of the aircraft.
+    :param impact_step: step of the LCIA to consider, by default weighted impacts are considered,
+    can also be "normalized" or "raw" results.
+    :param graph_title: title of the graph, if None are specified one is created based on the
+    aircraft names
     """
 
     fig = go.Figure()
 
-    reference_value, _ = _get_impact_dict(aircraft_file_paths[0])
-    reference_value.pop("single_score")
+    reference_value, _ = _get_impact_dict(aircraft_file_paths[0], impact_step=impact_step)
+    if impact_step == "weighted":
+        reference_value.pop("single_score")
 
     for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
-        impact_score_dict, _ = _get_impact_dict(aircraft_file_path)
-        impact_score_dict.pop("single_score")
+        impact_score_dict, _ = _get_impact_dict(aircraft_file_path, impact_step=impact_step)
+        if impact_step == "weighted":
+            impact_score_dict.pop("single_score")
+
         impact_scores = []
         beautified_impact_names = []
 
@@ -963,16 +972,23 @@ def lca_impacts_bar_chart_simple(
         bar_chart = go.Bar(name=name_aircraft, x=beautified_impact_names, y=impact_scores)
         fig.add_trace(bar_chart)
 
+    if graph_title:
+        title = graph_title
+    else:
+        title = (
+            "Relative score of "
+            + ", ".join(names_aircraft[1:])
+            + " with respect to "
+            + names_aircraft[0]
+        )
+
     fig.update_layout(
         barmode="group",
         plot_bgcolor="white",
         title_font=dict(size=20),
         legend_font=dict(size=20),
         title_x=0.5,
-        title_text="Relative score of "
-        + ", ".join(names_aircraft[1:])
-        + " with respect to "
-        + names_aircraft[0],
+        title_text=title,
     )
     fig.update_xaxes(
         ticks="outside",
@@ -990,6 +1006,74 @@ def lca_impacts_bar_chart_simple(
         linewidth=3,
         tickfont=dict(size=20),
         title="Relative score [%]",
+    )
+    fig.update_yaxes(
+        title_font=dict(size=20),
+    )
+
+    return go.FigureWidget(fig)
+
+
+def lca_impacts_bar_chart_normalised(
+    aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
+    names_aircraft: Union[str, List[str]] = None,
+) -> go.FigureWidget:
+    """
+    Give a bar chart that compares multiples aircraft designs across all categories. This comparison
+    is done in terms of normalized results. Can be used with only one design.
+
+    :param aircraft_file_paths: paths to the output file that contains the impacts.
+    :param names_aircraft: names of the aircraft.
+    """
+
+    fig = go.Figure()
+
+    for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
+        impact_score_dict, _ = _get_impact_dict(aircraft_file_path, impact_step="normalized")
+        impact_scores = []
+        beautified_impact_names = []
+
+        for impact_name, impact_score in impact_score_dict.items():
+            beautified_impact_name = impact_name.replace("_", " ")
+
+            # There has to be a smarter way of doing it ^^'
+            impact_scores.append(impact_score)
+            beautified_impact_names.append(beautified_impact_name)
+
+        bar_chart = go.Bar(name=name_aircraft, x=beautified_impact_names, y=impact_scores)
+        fig.add_trace(bar_chart)
+
+    if len(names_aircraft) == 1:
+        title = "Normalized score for " + names_aircraft[0]
+    else:
+        title = (
+            "Normalized score for " + ", ".join(names_aircraft[:-1]) + " and " + names_aircraft[-1]
+        )
+
+    fig.update_layout(
+        barmode="group",
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+        title_x=0.5,
+        title_text=title,
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=20),
+        title="Normalized results [eq-person]",
     )
     fig.update_yaxes(
         title_font=dict(size=20),
@@ -1624,6 +1708,7 @@ def lca_impacts_bar_chart_with_components_absolute(
     detailed_component_contributions: bool = False,
     legend_rename: dict = None,
     aggregate_phase: list = None,
+    cutoff_criteria: float = None,
 ) -> go.FigureWidget:
     """
     Provide a bar chart of the weighted impacts of an aircraft, showing the absolute value of each
@@ -1631,12 +1716,13 @@ def lca_impacts_bar_chart_with_components_absolute(
 
     :param aircraft_file_path: path to the output file that contains the results of the LCA
     :param name_aircraft: name of the aircraft
-    :param detailed_component_contributions: by default, all contribution of one component, regardless of the phase
-    is aggregated, this segregates them.
+    :param detailed_component_contributions: by default, all contribution of one component,
+    regardless of the phase is aggregated, this segregates them.
     :param legend_rename: legend names are set by the code by default, if any renaming is to be
     done, pass here the legend to be renamed as key and how to rename it as item.
     :param aggregate_phase: by default only the manufacturing and distribution are aggregated.
     Additional phase specified here can be aggregated.
+    :param cutoff_criteria: value of the cutoff criteria, in percent of the single score.
     """
 
     component_and_contribution = _get_component_and_contribution(
@@ -1646,6 +1732,7 @@ def lca_impacts_bar_chart_with_components_absolute(
     fig = go.Figure()
 
     impact_score_dict, _ = _get_impact_dict(aircraft_file_path)
+    single_score = impact_score_dict["single_score"]
     impact_score_dict.pop("single_score")
 
     component_counter = 0
@@ -1669,6 +1756,27 @@ def lca_impacts_bar_chart_with_components_absolute(
                 components_type[component_type] = [beautified_component_name]
         else:
             components_type[beautified_component_name] = [beautified_component_name]
+
+    # Here we filter to only show the impact whose contribution to the single score is greater than
+    # the set value in inputs
+    if cutoff_criteria:
+        component_and_contribution_with_cutoff = {}
+        contribution_others = {}
+
+        for component, impacts in component_and_contribution.items():
+            if np.sum(np.array(list(impacts.values()))) < single_score * cutoff_criteria / 100.0:
+                if not contribution_others:
+                    contribution_others = impacts
+                else:
+                    for impact, contribution in impacts.items():
+                        contribution_others[impact] = contribution
+            else:
+                component_and_contribution_with_cutoff[component] = impacts
+
+        if contribution_others:
+            component_and_contribution_with_cutoff["Others"] = contribution_others
+
+        component_and_contribution = component_and_contribution_with_cutoff
 
     for component, impacts in component_and_contribution.items():
         impact_contributions = []

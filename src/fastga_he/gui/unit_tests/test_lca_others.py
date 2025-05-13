@@ -839,3 +839,22 @@ def test_get_impact_dict():
 
     assert recipe_raw_unit_dict["climate_change"] == "kg CO2-Eq"
     assert recipe_raw_unit_dict["climate_change"] == recipe_normalised_unit_dict["climate_change"]
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_presentation():
+    fig = lca_impacts_bar_chart_with_components_absolute(
+        SENSITIVITY_STUDIES_FOLDER_PATH / "hybrid_kodiak_7077.xml",
+        name_aircraft="Hybrid Kodiak 100",
+        detailed_component_contributions=True,
+        cutoff_criteria=3.0,
+        legend_rename={
+            "battery pack: production": "Battery pack production",
+            "airframe: production": "Airframe production",
+            "turboshaft: operation": "Kerosene combustion",
+            "kerosene for mission: operation": "Kerosene production",
+        },
+    )
+    fig.update_layout(title_text=None)
+    fig.update_layout(height=800, width=1600, font=dict(size=20))
+    fig.show()

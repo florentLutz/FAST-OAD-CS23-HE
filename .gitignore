@@ -50,6 +50,7 @@ coverage.xml
 
 # test results
 results/
+results*/
 n2.html
 
 # Build and docs folder/files
