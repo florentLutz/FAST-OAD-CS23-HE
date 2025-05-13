@@ -443,7 +443,7 @@
         <main_route>
           <reserve>
             <speed>
-              <k_factor is_input="True">2.38<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+              <k_factor is_input="True">2.28<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
             </speed>
           </reserve>
         </main_route>
