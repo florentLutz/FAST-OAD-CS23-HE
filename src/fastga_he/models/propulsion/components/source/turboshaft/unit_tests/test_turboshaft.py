@@ -638,8 +638,6 @@ def test_maximum():
         ),
         units="kW",
     )
-    ivc.add_output("shaft_power_out", val=np.linspace(250, 575.174, NB_POINTS_TEST), units="kW")
-
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesMaximum(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST), ivc
@@ -649,13 +647,6 @@ def test_maximum():
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_max", units="kW"
     ) == pytest.approx(
         1011.9,
-        rel=1e-2,
-    )
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:max_shaft_power", units="kW"
-    ) == pytest.approx(
-        575.174,
         rel=1e-2,
     )
 

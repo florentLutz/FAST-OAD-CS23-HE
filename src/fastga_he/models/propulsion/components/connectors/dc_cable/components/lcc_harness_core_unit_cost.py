@@ -30,8 +30,9 @@ class LCCHarnessCoreUnitCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id +
-                 ":cost_per_volume",
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cost_per_volume",
             units="USD/m**3",
             val=6775.0,
         )
@@ -47,11 +48,9 @@ class LCCHarnessCoreUnitCost(om.ExplicitComponent):
 
         if rho_c < 8960.0:
             outputs[
-                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id +
-                ":cost_per_volume"
-                ] = 6775.0  # USD/m^3
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume"
+            ] = 6775.0  # USD/m^3
         else:
             outputs[
-                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id +
-                ":cost_per_volume"
-                ] = 92556.8  # USD/m^3
+                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume"
+            ] = 92556.8  # USD/m^3

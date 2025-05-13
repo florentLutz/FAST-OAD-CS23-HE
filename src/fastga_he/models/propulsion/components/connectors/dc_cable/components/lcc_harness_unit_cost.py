@@ -40,8 +40,9 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id +
-                 ":cost_per_volume",
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":cost_per_volume",
             units="USD/m**3",
             val=np.nan,
         )
@@ -92,7 +93,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
         ]
 
         cost_core = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id +":cost_per_volume"
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume"
         ]
         length = inputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length"]
 
@@ -135,7 +136,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
 
         cost_core = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume"
-            ]
+        ]
 
         cost_ins = 86000.0  # USD/m^3
 
@@ -156,12 +157,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             2.0
             * np.pi
             * length
-            * (
-                cost_core * r_c
-                + cost_ins * t_in
-                + cost_core * t_shield
-                + cost_ins * t_sheath
-            )
+            * (cost_core * r_c + cost_ins * t_in + cost_core * t_shield + cost_ins * t_sheath)
         ) / 0.55
         partials[
             output_str,
@@ -193,4 +189,4 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume",
-        ] = length * np.pi *((r_c**2.0) + ((2.0 * (r_c + t_in) + t_shield) * t_shield)) / 0.55
+        ] = length * np.pi * ((r_c**2.0) + ((2.0 * (r_c + t_in) + t_shield) * t_shield)) / 0.55
