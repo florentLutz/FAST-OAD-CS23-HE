@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCMSP(om.ExplicitComponent):
     """
-    Computation of the aircraft manufacturer suggested price (MSP) . The profit margin is
+    Computation of the aircraft manufacturer suggested price (MSP). The profit margin is
     set to 10% based on :cite:`marciello:2024`.
     """
 
