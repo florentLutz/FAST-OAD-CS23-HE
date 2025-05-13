@@ -3,6 +3,7 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
+from .sizing_material_core import RHO_COPPER
 
 
 class LCCHarnessCoreUnitCost(om.ExplicitComponent):
@@ -25,7 +26,7 @@ class LCCHarnessCoreUnitCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":properties:density",
-            val=8960.0,
+            val=RHO_COPPER * 1e3,
             units="kg/m**3",
         )
 
@@ -46,7 +47,7 @@ class LCCHarnessCoreUnitCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":properties:density"
         ]
 
-        if rho_c < 8960.0:
+        if rho_c < RHO_COPPER * 1e3:
             outputs[
                 "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume"
             ] = 6775.0  # USD/m^3
