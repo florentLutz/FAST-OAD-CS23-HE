@@ -118,6 +118,10 @@
             <sfc units="g/kW/h">256.0</sfc>
             <power_rating_SL units="kW" is_input="False">69.0<!--Maximum power the motor can provide at Sea Level--></power_rating_SL>
             <pme_max units="bar" is_input="True">22.6<!--Maximum Mean Effective Pressure in the ICE cylinders--></pme_max>
+            <emission_index>
+              <CO units="g/kg" is_input="True">1000.0<!--value from Hospodka et al.--></CO>
+              <CO2 units="g/kg" is_input="True">2000.0<!--value from Hospodka et al.--></CO2>
+            </emission_index>
           </ice_1>
         </high_rpm_ICE>
         <fuel_system>

@@ -1,4 +1,4 @@
-project: pipistrel_assembly
+project: pipistrel_assembly_eu_mix
 
 ecoinvent:
     version: 3.9.1
@@ -15,7 +15,7 @@ model:
                 - attribute: "component"
                   value: wing_production
         
-            name: market for carbon fibre reinforced plastic, injection moulded
+            name: market for aluminium, cast alloy
             amount: data__weight__airframe__wing__mass_per_fu
         
         fuselage:
@@ -23,7 +23,7 @@ model:
                 - attribute: "component"
                   value: fuselage_production
         
-            name: market for carbon fibre reinforced plastic, injection moulded
+            name: market for aluminium, cast alloy
             amount: data__weight__airframe__fuselage__mass_per_fu
         
         horizontal_tail:
@@ -31,7 +31,7 @@ model:
                 - attribute: "component"
                   value: horizontal_tail_production
         
-            name: market for carbon fibre reinforced plastic, injection moulded
+            name: market for aluminium, cast alloy
             amount: data__weight__airframe__horizontal_tail__mass_per_fu
         
         vertical_tail:
@@ -39,7 +39,7 @@ model:
                 - attribute: "component"
                   value: vertical_tail_production
         
-            name: market for carbon fibre reinforced plastic, injection moulded
+            name: market for aluminium, cast alloy
             amount: data__weight__airframe__vertical_tail__mass_per_fu
         
         flight_controls:

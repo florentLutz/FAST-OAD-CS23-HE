@@ -1,0 +1,1517 @@
+<FASTOAD_model>
+  <data>
+    <TLAR>
+      <aircraft_lifespan units="year" is_input="False">12.446680790960453<!--Expected lifetime of the aircraft--></aircraft_lifespan>
+      <flight_hours_per_year units="h" is_input="True">283.2<!--Expected number of hours flown per year--></flight_hours_per_year>
+      <flight_per_year is_input="False">291.7629291892814<!--Average number of flight per year--></flight_per_year>
+      <max_airframe_hours units="h" is_input="True">3524.9<!--Expected lifetime of the aircraft expressed in airframe hours--></max_airframe_hours>
+      <range units="m" is_input="True">53000.0<!--design range--></range>
+    </TLAR>
+    <environmental_impact>
+      <aircraft_per_fu is_input="False">0.00028369599137564183<!--Number of aircraft required to perform a functional unit, defined here as flying one hour--></aircraft_per_fu>
+      <flight_per_fu is_input="False">1.0302363318830559<!--Number of flight required to perform a functionnal unit, defined here as flying one hour--></flight_per_fu>
+      <single_score is_input="False">0.0007747819123754282</single_score>
+      <acidification_terrestrial>
+        <normalization_factor is_input="True">41.0</normalization_factor>
+        <sum is_input="False">0.07438185117474148<!--kg SO2-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">2.6585293017852522e-05<!--kg SO2-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">3.21912696894434e-06<!--kg SO2-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg SO2-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg SO2-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.0022694201305663813<!--kg SO2-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.0022694201305663813<!--kg SO2-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">5.03137105632562e-05<!--kg SO2-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.02727356979638895<!--kg SO2-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.02727356979638895<!--kg SO2-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">2.258631276279969e-05<!--kg SO2-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">1.228605929955387e-05<!--kg SO2-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">9.735088024486218e-06<!--kg SO2-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">9.735088024486218e-06<!--kg SO2-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">5.9491968151542636e-05<!--kg SO2-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.005577081770911601<!--kg SO2-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">9.151275024997177e-05<!--kg SO2-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.00027932059096819577<!--kg SO2-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.0003228754625011215<!--kg SO2-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">2.6095871999731584e-05<!--kg SO2-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.0005291857080967446<!--kg SO2-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.0017624633832075815<!--kg SO2-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.07208262662418831<!--kg SO2-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.00032079812288209134<!--kg SO2-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.008462005143767258<!--kg SO2-Eq for component wing in production phase--></wing>
+        </production>
+      </acidification_terrestrial>
+      <acidification_terrestrial_normalized>
+        <sum is_input="False">0.0018141914920668655</sum>
+        <distribution>
+          <sum is_input="False">6.484217809232323e-07</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">7.85152919254717e-08</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">5.535171050161906e-05</electricity_for_mission>
+          <sum is_input="False">5.535171050161906e-05</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.2271636722745414e-06</assembly>
+          <battery_pack_1 is_input="False">0.0006652090194241207</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0006652090194241207</battery_pack_2>
+          <dc_bus_1 is_input="False">5.508856771414558e-07</dc_bus_1>
+          <dc_splitter_1 is_input="False">2.9965998291594804e-07</dc_splitter_1>
+          <dc_sspc_1 is_input="False">2.3744117132893214e-07</dc_sspc_1>
+          <dc_sspc_2 is_input="False">2.3744117132893214e-07</dc_sspc_2>
+          <flight_controls is_input="False">1.4510236134522594e-06</flight_controls>
+          <fuselage is_input="False">0.0001360263846563805</fuselage>
+          <harness_1 is_input="False">2.2320182987797994e-06</harness_1>
+          <horizontal_tail is_input="False">6.812697340687702e-06</horizontal_tail>
+          <inverter_1 is_input="False">7.875011280515159e-06</inverter_1>
+          <landing_gear is_input="False">6.364846829202825e-07</landing_gear>
+          <motor_1 is_input="False">1.2906968490164502e-05</motor_1>
+          <propeller_1 is_input="False">4.2986911785550766e-05</propeller_1>
+          <sum is_input="False">0.0017581128444923977</sum>
+          <vertical_tail is_input="False">7.824344460538813e-06</vertical_tail>
+          <wing is_input="False">0.00020639036936017703</wing>
+        </production>
+      </acidification_terrestrial_normalized>
+      <buy_to_fly>
+        <metallic is_input="True">1.0<!--Ratio of the amount of material purchased to to what is really put into the manufactured parts. Typical value for metallic material is between 5 and 10--></metallic>
+      </buy_to_fly>
+      <climate_change>
+        <normalization_factor is_input="True">7990.0</normalization_factor>
+        <sum is_input="False">11.44421556629876<!--kg CO2-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.006230662770989492<!--kg CO2-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">0.0012454164289842377<!--kg CO2-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg CO2-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg CO2-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.8779936741053083<!--kg CO2-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.8779936741053083<!--kg CO2-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.01946537752103204<!--kg CO2-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">3.0621877703618376<!--kg CO2-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">3.0621877703618376<!--kg CO2-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">0.003095288621086644<!--kg CO2-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">0.001683714378140532<!--kg CO2-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">0.0028417944932019696<!--kg CO2-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">0.0028417944932019696<!--kg CO2-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">0.013672994372241645<!--kg CO2-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">1.4529616070042817<!--kg CO2-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">0.002281227207279893<!--kg CO2-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.07276961525636703<!--kg CO2-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.05073485089160038<!--kg CO2-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">0.010552095729452319<!--kg CO2-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.05417872898467242<!--kg CO2-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.4591633644153861<!--kg CO2-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">10.558745812993479<!--kg CO2-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.08357549257710326<!--kg CO2-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">2.204552326324758<!--kg CO2-Eq for component wing in production phase--></wing>
+        </production>
+      </climate_change>
+      <climate_change_normalized>
+        <sum is_input="False">0.001432317342465427</sum>
+        <distribution>
+          <sum is_input="False">7.798076058810378e-07</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.5587189348989208e-07</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">0.00010988656747250417</electricity_for_mission>
+          <sum is_input="False">0.00010988656747250417</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">2.4362174619564503e-06</assembly>
+          <battery_pack_1 is_input="False">0.00038325253696643773</battery_pack_1>
+          <battery_pack_2 is_input="False">0.00038325253696643773</battery_pack_2>
+          <dc_bus_1 is_input="False">3.873953217880656e-07</dc_bus_1>
+          <dc_splitter_1 is_input="False">2.1072770690119297e-07</dc_splitter_1>
+          <dc_sspc_1 is_input="False">3.556688977724618e-07</dc_sspc_1>
+          <dc_sspc_2 is_input="False">3.556688977724618e-07</dc_sspc_2>
+          <flight_controls is_input="False">1.711263375749893e-06</flight_controls>
+          <fuselage is_input="False">0.00018184751026336442</fuselage>
+          <harness_1 is_input="False">2.8551028877095034e-07</harness_1>
+          <horizontal_tail is_input="False">9.107586390033421e-06</horizontal_tail>
+          <inverter_1 is_input="False">6.349793603454366e-06</inverter_1>
+          <landing_gear is_input="False">1.3206627946748835e-06</landing_gear>
+          <motor_1 is_input="False">6.780817144514696e-06</motor_1>
+          <propeller_1 is_input="False">5.7467254620198505e-05</propeller_1>
+          <sum is_input="False">0.0013214950954935519</sum>
+          <vertical_tail is_input="False">1.0460011586621184e-05</vertical_tail>
+          <wing is_input="False">0.00027591393320710363</wing>
+        </production>
+      </climate_change_normalized>
+      <delivery>
+        <cargo_transport_per_fu units="t*km" is_input="False">0.13380076112400258<!--Product of aircraft mass by the distance it needs to be delivered per functional unit--></cargo_transport_per_fu>
+        <distance units="km" is_input="True">1100.0<!--Distance between the site of assembly of the aircraft and the site of delivery. The variable will have the same name regardless of whether the delivery is done by the air or by land.--></distance>
+        <mission_ratio is_input="False">20.754716981132077<!--Ratio of fuel used during the delivery to fuel used during mission. Will only be used if the aircraft is delivered via the air.--></mission_ratio>
+      </delivery>
+      <ecotoxicity_freshwater>
+        <normalization_factor is_input="True">25.2</normalization_factor>
+        <sum is_input="False">2.6616508584588843<!--kg 1,4-DCB-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.00019281598277483814<!--kg 1,4-DCB-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">3.1975849431647076e-05<!--kg 1,4-DCB-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg 1,4-DCB-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg 1,4-DCB-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.022542334332322563<!--kg 1,4-DCB-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.022542334332322563<!--kg 1,4-DCB-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.0004997701702476614<!--kg 1,4-DCB-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">1.2019969570753293<!--kg 1,4-DCB-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">1.2019969570753293<!--kg 1,4-DCB-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">0.002354831337931196<!--kg 1,4-DCB-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">0.00128093495215924<!--kg 1,4-DCB-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">4.206087285372203e-05<!--kg 1,4-DCB-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">4.206087285372203e-05<!--kg 1,4-DCB-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">0.007646696892841639<!--kg 1,4-DCB-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.051143154786056175<!--kg 1,4-DCB-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">0.007944842934940069<!--kg 1,4-DCB-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.0025614356765086685<!--kg 1,4-DCB-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.02914771421010127<!--kg 1,4-DCB-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">0.0006529573752135547<!--kg 1,4-DCB-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.03487077655300268<!--kg 1,4-DCB-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.01616220477208605<!--kg 1,4-DCB-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">2.6388837322943552<!--kg 1,4-DCB-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.0029417944236010945<!--kg 1,4-DCB-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.07759858231330065<!--kg 1,4-DCB-Eq for component wing in production phase--></wing>
+        </production>
+      </ecotoxicity_freshwater>
+      <ecotoxicity_freshwater_normalized>
+        <sum is_input="False">0.1056210658118605</sum>
+        <distribution>
+          <sum is_input="False">7.651427887890403e-06</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.268882913954249e-06</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">0.0008945370766794667</electricity_for_mission>
+          <sum is_input="False">0.0008945370766794667</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.9832149613002437e-05</assembly>
+          <battery_pack_1 is_input="False">0.047698291947433705</battery_pack_1>
+          <battery_pack_2 is_input="False">0.047698291947433705</battery_pack_2>
+          <dc_bus_1 is_input="False">9.34456880131427e-05</dc_bus_1>
+          <dc_splitter_1 is_input="False">5.083075206981111e-05</dc_splitter_1>
+          <dc_sspc_1 is_input="False">1.6690822561000808e-06</dc_sspc_1>
+          <dc_sspc_2 is_input="False">1.6690822561000808e-06</dc_sspc_2>
+          <flight_controls is_input="False">0.00030344035289054126</flight_controls>
+          <fuselage is_input="False">0.0020294902692879436</fuselage>
+          <harness_1 is_input="False">0.0003152715450373043</harness_1>
+          <horizontal_tail is_input="False">0.00010164427287732812</horizontal_tail>
+          <inverter_1 is_input="False">0.0011566553257976696</inverter_1>
+          <landing_gear is_input="False">2.5911006952918838e-05</landing_gear>
+          <motor_1 is_input="False">0.001383760974325503</motor_1>
+          <propeller_1 is_input="False">0.0006413573322256369</propeller_1>
+          <sum is_input="False">0.10471760842437917</sum>
+          <vertical_tail is_input="False">0.00011673787395242439</vertical_tail>
+          <wing is_input="False">0.003079308821956375</wing>
+        </production>
+      </ecotoxicity_freshwater_normalized>
+      <ecotoxicity_marine>
+        <normalization_factor is_input="True">43.4</normalization_factor>
+        <sum is_input="False">3.4698373505920643<!--kg 1,4-DCB-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.00026531721679219774<!--kg 1,4-DCB-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">4.443067111805047e-05<!--kg 1,4-DCB-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg 1,4-DCB-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg 1,4-DCB-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.03132273452480323<!--kg 1,4-DCB-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.03132273452480323<!--kg 1,4-DCB-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.000694434220312193<!--kg 1,4-DCB-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">1.5674336708756318<!--kg 1,4-DCB-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">1.5674336708756318<!--kg 1,4-DCB-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">0.0030852461000147446<!--kg 1,4-DCB-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">0.0016782516445504087<!--kg 1,4-DCB-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">5.7143449924444033e-05<!--kg 1,4-DCB-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">5.7143449924444033e-05<!--kg 1,4-DCB-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">0.009232766778564492<!--kg 1,4-DCB-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.06612527064965362<!--kg 1,4-DCB-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">0.010173990265214119<!--kg 1,4-DCB-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.003311794668697157<!--kg 1,4-DCB-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.03811000584278089<!--kg 1,4-DCB-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">0.0009228522205395332<!--kg 1,4-DCB-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.04485753741433703<!--kg 1,4-DCB-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.02089683691434487<!--kg 1,4-DCB-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">3.438204868179351<!--kg 1,4-DCB-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.003803577492824134<!--kg 1,4-DCB-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.10033067531640467<!--kg 1,4-DCB-Eq for component wing in production phase--></wing>
+        </production>
+      </ecotoxicity_marine>
+      <ecotoxicity_marine_normalized>
+        <sum is_input="False">0.07995016936848075</sum>
+        <distribution>
+          <sum is_input="False">6.113299926087506e-06</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.0237481824435593e-06</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">0.0007217219936590606</electricity_for_mission>
+          <sum is_input="False">0.0007217219936590606</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.600078848645606e-05</assembly>
+          <battery_pack_1 is_input="False">0.03611598319989935</battery_pack_1>
+          <battery_pack_2 is_input="False">0.03611598319989935</battery_pack_2>
+          <dc_bus_1 is_input="False">7.108861981600795e-05</dc_bus_1>
+          <dc_splitter_1 is_input="False">3.8669392731576235e-05</dc_splitter_1>
+          <dc_sspc_1 is_input="False">1.3166693530977888e-06</dc_sspc_1>
+          <dc_sspc_2 is_input="False">1.3166693530977888e-06</dc_sspc_2>
+          <flight_controls is_input="False">0.00021273656171807585</flight_controls>
+          <fuselage is_input="False">0.0015236237476878715</fuselage>
+          <harness_1 is_input="False">0.0002344237388298184</harness_1>
+          <horizontal_tail is_input="False">7.630863291928933e-05</horizontal_tail>
+          <inverter_1 is_input="False">0.0008781107337046288</inverter_1>
+          <landing_gear is_input="False">2.1263876049298e-05</landing_gear>
+          <motor_1 is_input="False">0.0010335838113902543</motor_1>
+          <propeller_1 is_input="False">0.0004814939381185454</propeller_1>
+          <sum is_input="False">0.07922131032671316</sum>
+          <vertical_tail is_input="False">8.764003439686945e-05</vertical_tail>
+          <wing is_input="False">0.002311766712359555</wing>
+        </production>
+      </ecotoxicity_marine_normalized>
+      <ecotoxicity_terrestrial>
+        <normalization_factor is_input="True">15200.0</normalization_factor>
+        <sum is_input="False">270.148697626025<!--kg 1,4-DCB-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.020474662089759163<!--kg 1,4-DCB-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">0.006416391345212657<!--kg 1,4-DCB-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg 1,4-DCB-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg 1,4-DCB-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">4.52342757054802<!--kg 1,4-DCB-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">4.52342757054802<!--kg 1,4-DCB-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.10028571725130786<!--kg 1,4-DCB-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">125.97935526507555<!--kg 1,4-DCB-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">125.97935526507555<!--kg 1,4-DCB-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">0.08507839086461175<!--kg 1,4-DCB-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">0.046279273923579306<!--kg 1,4-DCB-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">0.002405870506935004<!--kg 1,4-DCB-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">0.002405870506935004<!--kg 1,4-DCB-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">0.031093997961751836<!--kg 1,4-DCB-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">2.8242709717322625<!--kg 1,4-DCB-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">0.736919097853871<!--kg 1,4-DCB-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.14144978848851095<!--kg 1,4-DCB-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">1.1845550786338368<!--kg 1,4-DCB-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">0.018307347695173355<!--kg 1,4-DCB-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">3.1264245228187644<!--kg 1,4-DCB-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.8925230750419109<!--kg 1,4-DCB-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">265.598379002042<!--kg 1,4-DCB-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.1624542840608192<!--kg 1,4-DCB-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">4.285215184550638<!--kg 1,4-DCB-Eq for component wing in production phase--></wing>
+        </production>
+      </ecotoxicity_terrestrial>
+      <ecotoxicity_terrestrial_normalized>
+        <sum is_input="False">0.01777294063329112</sum>
+        <distribution>
+          <sum is_input="False">1.3470172427473133e-06</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">4.2213100955346423e-07</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">0.0002975939191150013</electricity_for_mission>
+          <sum is_input="False">0.0002975939191150013</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">6.597744556007096e-06</assembly>
+          <battery_pack_1 is_input="False">0.008288115477965497</battery_pack_1>
+          <battery_pack_2 is_input="False">0.008288115477965497</battery_pack_2>
+          <dc_bus_1 is_input="False">5.5972625568823516e-06</dc_bus_1>
+          <dc_splitter_1 is_input="False">3.0446890739196913e-06</dc_splitter_1>
+          <dc_sspc_1 is_input="False">1.582809544036187e-07</dc_sspc_1>
+          <dc_sspc_2 is_input="False">1.582809544036187e-07</dc_sspc_2>
+          <flight_controls is_input="False">2.045657760641568e-06</flight_controls>
+          <fuselage is_input="False">0.00018580730077185937</fuselage>
+          <harness_1 is_input="False">4.848151959564941e-05</harness_1>
+          <horizontal_tail is_input="False">9.305907137402037e-06</horizontal_tail>
+          <inverter_1 is_input="False">7.793125517327873e-05</inverter_1>
+          <landing_gear is_input="False">1.2044307694192997e-06</landing_gear>
+          <motor_1 is_input="False">0.00020568582386965554</motor_1>
+          <propeller_1 is_input="False">5.871862335802045e-05</propeller_1>
+          <sum is_input="False">0.017473577565923815</sum>
+          <vertical_tail is_input="False">1.0687781846106526e-05</vertical_tail>
+          <wing is_input="False">0.00028192205161517355</wing>
+        </production>
+      </ecotoxicity_terrestrial_normalized>
+      <energy_resources_non-renewablefossil>
+        <normalization_factor is_input="True">569.9</normalization_factor>
+        <sum is_input="False">3.0587021624143658<!--kg oil-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.0016763817976293018<!--kg oil-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">0.0004074934565070826<!--kg oil-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg oil-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg oil-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.2872747369683632<!--kg oil-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.2872747369683632<!--kg oil-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.006368965258255001<!--kg oil-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.8414187913517251<!--kg oil-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.8414187913517251<!--kg oil-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">0.0007518357313584894<!--kg oil-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">0.0004089688510028791<!--kg oil-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">0.0007812255283179026<!--kg oil-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">0.0007812255283179026<!--kg oil-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">0.002909382639184249<!--kg oil-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.35599246583100785<!--kg oil-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">0.000813543353608359<!--kg oil-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.017829400754848363<!--kg oil-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.012055039531383793<!--kg oil-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">0.0023403426615661877<!--kg oil-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.012355329747520875<!--kg oil-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.11250035618939323<!--kg oil-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">2.769343550191866<!--kg oil-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.020476966178691606<!--kg oil-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.5401409197039593<!--kg oil-Eq for component wing in production phase--></wing>
+        </production>
+      </energy_resources_non-renewablefossil>
+      <energy_resources_non-renewablefossil_normalized>
+        <sum is_input="False">0.0053670857385758304</sum>
+        <distribution>
+          <sum is_input="False">2.9415367566753847e-06</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">7.150262440903362e-07</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">0.0005040792015588054</electricity_for_mission>
+          <sum is_input="False">0.0005040792015588054</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.1175583888848923e-05</assembly>
+          <battery_pack_1 is_input="False">0.0014764323413787072</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0014764323413787072</battery_pack_2>
+          <dc_bus_1 is_input="False">1.3192415008922431e-06</dc_bus_1>
+          <dc_splitter_1 is_input="False">7.176151096734149e-07</dc_splitter_1>
+          <dc_sspc_1 is_input="False">1.3708115955744915e-06</dc_sspc_1>
+          <dc_sspc_2 is_input="False">1.3708115955744915e-06</dc_sspc_2>
+          <flight_controls is_input="False">5.105075696059394e-06</flight_controls>
+          <fuselage is_input="False">0.0006246577747517246</fuselage>
+          <harness_1 is_input="False">1.4275194834328111e-06</harness_1>
+          <horizontal_tail is_input="False">3.1285139067991514e-05</horizontal_tail>
+          <inverter_1 is_input="False">2.115290319597086e-05</inverter_1>
+          <landing_gear is_input="False">4.1065847720059445e-06</landing_gear>
+          <motor_1 is_input="False">2.167982057820824e-05</motor_1>
+          <propeller_1 is_input="False">0.00019740367817054437</propeller_1>
+          <sum is_input="False">0.004859349974016259</sum>
+          <vertical_tail is_input="False">3.5930805718005976e-05</vertical_tail>
+          <wing is_input="False">0.0009477819261343381</wing>
+        </production>
+      </energy_resources_non-renewablefossil_normalized>
+      <eutrophication_freshwater>
+        <normalization_factor is_input="True">0.65</normalization_factor>
+        <sum is_input="False">0.006330393108184449<!--kg P-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">2.093498243900889e-06<!--kg P-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.4701730773127475e-07<!--kg P-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg P-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg P-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.0001036442616043941<!--kg P-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.0001036442616043941<!--kg P-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">2.297823708210627e-06<!--kg P-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.0023206097304588444<!--kg P-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0023206097304588444<!--kg P-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">4.479906857722179e-06<!--kg P-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">2.4368918419081606e-06<!--kg P-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">8.322973366978595e-07<!--kg P-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">8.322973366978595e-07<!--kg P-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">4.314565461054915e-06<!--kg P-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.0004895412796569611<!--kg P-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">9.732877999160075e-06<!--kg P-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">2.451801231430726e-05<!--kg P-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">5.820954276437545e-05<!--kg P-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">4.677793661962745e-06<!--kg P-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">5.578035792283008e-05<!--kg P-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.00015470430870568875<!--kg P-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.0062245083310284235<!--kg P-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">2.8158798819544733e-05<!--kg P-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.0007427721157236141<!--kg P-Eq for component wing in production phase--></wing>
+        </production>
+      </eutrophication_freshwater>
+      <eutrophication_freshwater_normalized>
+        <sum is_input="False">0.009739066320283768</sum>
+        <distribution>
+          <sum is_input="False">3.2207665290782906e-06</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">2.261804734327304e-07</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">0.0001594527101606063</electricity_for_mission>
+          <sum is_input="False">0.0001594527101606063</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">3.535113397247118e-06</assembly>
+          <battery_pack_1 is_input="False">0.0035701688160905297</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0035701688160905297</battery_pack_2>
+          <dc_bus_1 is_input="False">6.89216439649566e-06</dc_bus_1>
+          <dc_splitter_1 is_input="False">3.7490643721664006e-06</dc_splitter_1>
+          <dc_sspc_1 is_input="False">1.28045744107363e-06</dc_sspc_1>
+          <dc_sspc_2 is_input="False">1.28045744107363e-06</dc_sspc_2>
+          <flight_controls is_input="False">6.637793017007561e-06</flight_controls>
+          <fuselage is_input="False">0.0007531404302414786</fuselage>
+          <harness_1 is_input="False">1.4973658460246269e-05</harness_1>
+          <horizontal_tail is_input="False">3.772001894508809e-05</horizontal_tail>
+          <inverter_1 is_input="False">8.955314271442376e-05</inverter_1>
+          <landing_gear is_input="False">7.196605633788839e-06</landing_gear>
+          <motor_1 is_input="False">8.581593526589242e-05</motor_1>
+          <propeller_1 is_input="False">0.0002380066287779827</propeller_1>
+          <sum is_input="False">0.009576166663120651</sum>
+          <vertical_tail is_input="False">4.332122895314574e-05</vertical_tail>
+          <wing is_input="False">0.0011427263318824832</wing>
+        </production>
+      </eutrophication_freshwater_normalized>
+      <eutrophication_marine>
+        <normalization_factor is_input="True">4.62</normalization_factor>
+        <sum is_input="False">0.001163169599739703<!--kg N-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">2.409665886420233e-07<!--kg N-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">2.06135103839266e-07<!--kg N-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg N-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg N-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.00014532112550460577<!--kg N-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.00014532112550460577<!--kg N-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">3.221812016596782e-06<!--kg N-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.00041988414968893354<!--kg N-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.00041988414968893354<!--kg N-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">1.6417372650333788e-07<!--kg N-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">8.930400284595742e-08<!--kg N-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">7.801379584992133e-08<!--kg N-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">7.801379584992133e-08<!--kg N-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">3.350178384269446e-07<!--kg N-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">3.993538687337119e-05<!--kg N-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">1.8931499023412252e-07<!--kg N-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">2.0001097922202896e-06<!--kg N-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">2.4583637808525386e-06<!--kg N-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">3.24090281272104e-07<!--kg N-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">5.324878036346701e-05<!--kg N-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">1.2620338010041512e-05<!--kg N-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.001017401372542616<!--kg N-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">2.2971148123319585e-06<!--kg N-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">6.0593239084885354e-05<!--kg N-Eq for component wing in production phase--></wing>
+        </production>
+      </eutrophication_marine>
+      <eutrophication_marine_normalized>
+        <sum is_input="False">0.0002517683116319703</sum>
+        <distribution>
+          <sum is_input="False">5.2157270268836216e-08</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">4.4617987843996965e-08</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">3.145478907026099e-05</electricity_for_mission>
+          <sum is_input="False">3.145478907026099e-05</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">6.973619083542818e-07</assembly>
+          <battery_pack_1 is_input="False">9.088401508418475e-05</battery_pack_1>
+          <battery_pack_2 is_input="False">9.088401508418475e-05</battery_pack_2>
+          <dc_bus_1 is_input="False">3.553543863708612e-08</dc_bus_1>
+          <dc_splitter_1 is_input="False">1.932987074587823e-08</dc_splitter_1>
+          <dc_sspc_1 is_input="False">1.688610299781847e-08</dc_sspc_1>
+          <dc_sspc_2 is_input="False">1.688610299781847e-08</dc_sspc_2>
+          <flight_controls is_input="False">7.25146836421958e-08</flight_controls>
+          <fuselage is_input="False">8.644023132764327e-06</fuselage>
+          <harness_1 is_input="False">4.097727061344643e-08</harness_1>
+          <horizontal_tail is_input="False">4.3292419745027913e-07</horizontal_tail>
+          <inverter_1 is_input="False">5.321133724789045e-07</inverter_1>
+          <landing_gear is_input="False">7.014941153075844e-08</landing_gear>
+          <motor_1 is_input="False">1.152571003538247e-05</motor_1>
+          <propeller_1 is_input="False">2.731674893948379e-06</propeller_1>
+          <sum is_input="False">0.00022021674730359652</sum>
+          <vertical_tail is_input="False">4.972109983402508e-07</vertical_tail>
+          <wing is_input="False">1.311541971534315e-05</wing>
+        </production>
+      </eutrophication_marine_normalized>
+      <human_toxicity_carcinogenic>
+        <normalization_factor is_input="True">10.3</normalization_factor>
+        <sum is_input="False">1.1156539763011517<!--kg 1,4-DCB-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.0010449723694174555<!--kg 1,4-DCB-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">8.27508955487731e-05<!--kg 1,4-DCB-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg 1,4-DCB-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg 1,4-DCB-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.05833772634397408<!--kg 1,4-DCB-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.05833772634397408<!--kg 1,4-DCB-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.0012933645201501913<!--kg 1,4-DCB-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.43012346433987864<!--kg 1,4-DCB-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.43012346433987864<!--kg 1,4-DCB-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">0.0003645477286946102<!--kg 1,4-DCB-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">0.00019829952145338485<!--kg 1,4-DCB-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">9.020797124193246e-05<!--kg 1,4-DCB-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">9.020797124193246e-05<!--kg 1,4-DCB-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">0.0025962761064658845<!--kg 1,4-DCB-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.05151223070974679<!--kg 1,4-DCB-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">0.0008962720975442508<!--kg 1,4-DCB-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.0025799203445397317<!--kg 1,4-DCB-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.006802746733040975<!--kg 1,4-DCB-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">0.00518292255258779<!--kg 1,4-DCB-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.026934163520028014<!--kg 1,4-DCB-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.016278839748557285<!--kg 1,4-DCB-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">1.0561885266922113<!--kg 1,4-DCB-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.002963023960549693<!--kg 1,4-DCB-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.0781585745266119<!--kg 1,4-DCB-Eq for component wing in production phase--></wing>
+        </production>
+      </human_toxicity_carcinogenic>
+      <human_toxicity_carcinogenic_normalized>
+        <sum is_input="False">0.10831592002923802</sum>
+        <distribution>
+          <sum is_input="False">0.00010145362809878208</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">8.034067529007097e-06</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">0.005663856926599425</electricity_for_mission>
+          <sum is_input="False">0.005663856926599425</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.00012556937088836808</assembly>
+          <battery_pack_1 is_input="False">0.041759559644648406</battery_pack_1>
+          <battery_pack_2 is_input="False">0.041759559644648406</battery_pack_2>
+          <dc_bus_1 is_input="False">3.539298336840875e-05</dc_bus_1>
+          <dc_splitter_1 is_input="False">1.9252380723629596e-05</dc_splitter_1>
+          <dc_sspc_1 is_input="False">8.758055460381792e-06</dc_sspc_1>
+          <dc_sspc_2 is_input="False">8.758055460381792e-06</dc_sspc_2>
+          <flight_controls is_input="False">0.00025206564140445477</flight_controls>
+          <fuselage is_input="False">0.005001187447548232</fuselage>
+          <harness_1 is_input="False">8.701670849944182e-05</harness_1>
+          <horizontal_tail is_input="False">0.000250477703353372</horizontal_tail>
+          <inverter_1 is_input="False">0.0006604608478680558</inverter_1>
+          <landing_gear is_input="False">0.0005031963643289117</landing_gear>
+          <motor_1 is_input="False">0.0026149673320415546</motor_1>
+          <propeller_1 is_input="False">0.0015804698785007072</propeller_1>
+          <sum is_input="False">0.1025425754070108</sum>
+          <vertical_tail is_input="False">0.0002876722291795818</vertical_tail>
+          <wing is_input="False">0.007588211119088533</wing>
+        </production>
+      </human_toxicity_carcinogenic_normalized>
+      <human_toxicity_non-carcinogenic>
+        <normalization_factor is_input="True">31300.0</normalization_factor>
+        <sum is_input="False">47.41838566055937<!--kg 1,4-DCB-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.004232146494273766<!--kg 1,4-DCB-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">0.001595301234463664<!--kg 1,4-DCB-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg 1,4-DCB-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg 1,4-DCB-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">1.124655464272194<!--kg 1,4-DCB-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">1.124655464272194<!--kg 1,4-DCB-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.02493394182533033<!--kg 1,4-DCB-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">21.04056888536492<!--kg 1,4-DCB-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">21.04056888536492<!--kg 1,4-DCB-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">0.036522259069483635<!--kg 1,4-DCB-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">0.01986666196442613<!--kg 1,4-DCB-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">0.0013888498113921917<!--kg 1,4-DCB-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">0.0013888498113921917<!--kg 1,4-DCB-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">0.021372796298075793<!--kg 1,4-DCB-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">1.0209690075402895<!--kg 1,4-DCB-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">0.11801311135817158<!--kg 1,4-DCB-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.05113385068760652<!--kg 1,4-DCB-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.4526441062639842<!--kg 1,4-DCB-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">0.007534096789669637<!--kg 1,4-DCB-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.5205271990642997<!--kg 1,4-DCB-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.322645527731866<!--kg 1,4-DCB-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">46.287902748558444<!--kg 1,4-DCB-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.05872693903252221<!--kg 1,4-DCB-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">1.5490977805800976<!--kg 1,4-DCB-Eq for component wing in production phase--></wing>
+        </production>
+      </human_toxicity_non-carcinogenic>
+      <human_toxicity_non-carcinogenic_normalized>
+        <sum is_input="False">0.0015149643981009384</sum>
+        <distribution>
+          <sum is_input="False">1.3521234805986474e-07</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">5.096809055794453e-08</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">3.5931484481539744e-05</electricity_for_mission>
+          <sum is_input="False">3.5931484481539744e-05</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">7.96611559914707e-07</assembly>
+          <battery_pack_1 is_input="False">0.0006722226480947259</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0006722226480947259</battery_pack_2>
+          <dc_bus_1 is_input="False">1.1668453376831833e-06</dc_bus_1>
+          <dc_splitter_1 is_input="False">6.347176346462022e-07</dc_splitter_1>
+          <dc_sspc_1 is_input="False">4.437219844703488e-08</dc_sspc_1>
+          <dc_sspc_2 is_input="False">4.437219844703488e-08</dc_sspc_2>
+          <flight_controls is_input="False">6.828369424305365e-07</flight_controls>
+          <fuselage is_input="False">3.261881813227762e-05</fuselage>
+          <harness_1 is_input="False">3.7703869443505298e-06</harness_1>
+          <horizontal_tail is_input="False">1.633669351041742e-06</horizontal_tail>
+          <inverter_1 is_input="False">1.446147304357777e-05</inverter_1>
+          <landing_gear is_input="False">2.4070596772107467e-07</landing_gear>
+          <motor_1 is_input="False">1.6630261950936093e-05</motor_1>
+          <propeller_1 is_input="False">1.0308163825299233e-05</propeller_1>
+          <sum is_input="False">0.0014788467331807809</sum>
+          <vertical_tail is_input="False">1.8762600329879301e-06</vertical_tail>
+          <wing is_input="False">4.949194187156862e-05</wing>
+        </production>
+      </human_toxicity_non-carcinogenic_normalized>
+      <ionising_radiation>
+        <normalization_factor is_input="True">480.0</normalization_factor>
+        <sum is_input="False">8.350834915796133<!--kBq Co-60-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.0009590235533598792<!--kBq Co-60-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">0.010159950849556886<!--kBq Co-60-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kBq Co-60-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kBq Co-60-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">7.162562149920616<!--kBq Co-60-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">7.162562149920616<!--kBq Co-60-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.15879610568735975<!--kBq Co-60-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.36753986133554656<!--kBq Co-60-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.36753986133554656<!--kBq Co-60-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">0.000266417768108156<!--kBq Co-60-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">0.00014492071068911665<!--kBq Co-60-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">0.00016431781580132282<!--kBq Co-60-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">0.00016431781580132282<!--kBq Co-60-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">0.00026690573498951636<!--kBq Co-60-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.09366993099155173<!--kBq Co-60-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">0.00016444729446465757<!--kBq Co-60-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.004691331695542581<!--kBq Co-60-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.003621359980313222<!--kBq Co-60-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">0.00014669308914922572<!--kBq Co-60-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.0028641918911004164<!--kBq Co-60-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.029601470851879974<!--kBq Co-60-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">1.1771537914726002<!--kBq Co-60-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.0053879679852126584<!--kBq Co-60-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.14212368948954368<!--kBq Co-60-Eq for component wing in production phase--></wing>
+        </production>
+      </ionising_radiation>
+      <ionising_radiation_normalized>
+        <sum is_input="False">0.017397572741241943</sum>
+        <distribution>
+          <sum is_input="False">1.997965736166415e-06</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">2.116656426991018e-05</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">0.014922004479001282</electricity_for_mission>
+          <sum is_input="False">0.014922004479001282</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.00033082522018199946</assembly>
+          <battery_pack_1 is_input="False">0.0007657080444490554</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0007657080444490554</battery_pack_2>
+          <dc_bus_1 is_input="False">5.550370168919917e-07</dc_bus_1>
+          <dc_splitter_1 is_input="False">3.0191814726899304e-07</dc_splitter_1>
+          <dc_sspc_1 is_input="False">3.4232878291942255e-07</dc_sspc_1>
+          <dc_sspc_2 is_input="False">3.4232878291942255e-07</dc_sspc_2>
+          <flight_controls is_input="False">5.560536145614925e-07</flight_controls>
+          <fuselage is_input="False">0.00019514568956573278</fuselage>
+          <harness_1 is_input="False">3.4259853013470325e-07</harness_1>
+          <horizontal_tail is_input="False">9.773607699047043e-06</horizontal_tail>
+          <inverter_1 is_input="False">7.544499958985879e-06</inverter_1>
+          <landing_gear is_input="False">3.0561060239422026e-07</landing_gear>
+          <motor_1 is_input="False">5.967066439792534e-06</motor_1>
+          <propeller_1 is_input="False">6.166973094141661e-05</propeller_1>
+          <sum is_input="False">0.002452403732234584</sum>
+          <vertical_tail is_input="False">1.1224933302526372e-05</vertical_tail>
+          <wing is_input="False">0.0002960910197698827</wing>
+        </production>
+      </ionising_radiation_normalized>
+      <land_use>
+        <normalization_factor is_input="True">6170.0</normalization_factor>
+        <sum is_input="False">0.3632483945635199<!--m2*a crop-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.00032675353358966317<!--m2*a crop-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">4.5684571080551865e-05<!--m2*a crop-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--m2*a crop-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--m2*a crop-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.03220670892036746<!--m2*a crop-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.03220670892036746<!--m2*a crop-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.0007140321921838231<!--m2*a crop-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.10809950108302585<!--m2*a crop-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.10809950108302585<!--m2*a crop-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">0.0001036698959306607<!--m2*a crop-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">5.639231610572964e-05<!--m2*a crop-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">4.026036570232766e-05<!--m2*a crop-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">4.026036570232766e-05<!--m2*a crop-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">0.00018190758221777888<!--m2*a crop-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.03694214201545782<!--m2*a crop-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">0.000257979286107225<!--m2*a crop-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.0018501971753772674<!--m2*a crop-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.001498502522508316<!--m2*a crop-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">0.00015344179502508465<!--m2*a crop-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.0027804599694992355<!--m2*a crop-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.011674415989216565<!--m2*a crop-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.33066924753848226<!--m2*a crop-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.0021249410176507793<!--m2*a crop-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.05605164288374561<!--m2*a crop-Eq for component wing in production phase--></wing>
+        </production>
+      </land_use>
+      <land_use_normalized>
+        <sum is_input="False">5.887332164724796e-05</sum>
+        <distribution>
+          <sum is_input="False">5.295843332085303e-08</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">7.40430649603758e-09</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">5.219887993576574e-06</electricity_for_mission>
+          <sum is_input="False">5.219887993576574e-06</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.1572644930045754e-07</assembly>
+          <battery_pack_1 is_input="False">1.7520178457540657e-05</battery_pack_1>
+          <battery_pack_2 is_input="False">1.7520178457540657e-05</battery_pack_2>
+          <dc_bus_1 is_input="False">1.6802252176768346e-08</dc_bus_1>
+          <dc_splitter_1 is_input="False">9.13975949849751e-09</dc_splitter_1>
+          <dc_sspc_1 is_input="False">6.5251808269574806e-09</dc_sspc_1>
+          <dc_sspc_2 is_input="False">6.5251808269574806e-09</dc_sspc_2>
+          <flight_controls is_input="False">2.9482590310823156e-08</flight_controls>
+          <fuselage is_input="False">5.987381201857021e-06</fuselage>
+          <harness_1 is_input="False">4.181187781316451e-08</harness_1>
+          <horizontal_tail is_input="False">2.9986988255709356e-07</horizontal_tail>
+          <inverter_1 is_input="False">2.428691284454321e-07</inverter_1>
+          <landing_gear is_input="False">2.4869010538911613e-08</landing_gear>
+          <motor_1 is_input="False">4.506418102916103e-07</motor_1>
+          <propeller_1 is_input="False">1.8921257681064125e-06</propeller_1>
+          <sum is_input="False">5.35930709138545e-05</sum>
+          <vertical_tail is_input="False">3.443988683388621e-07</vertical_tail>
+          <wing is_input="False">9.084545037884215e-06</wing>
+        </production>
+      </land_use_normalized>
+      <line_test>
+        <duration units="h" is_input="True">5.0<!--Duration of line tests--></duration>
+        <mission_ratio is_input="False">5.151181659415279<!--Ratio of fuel used during the line tests to fuel used during cruise--></mission_ratio>
+      </line_test>
+      <material_resources_metals_minerals>
+        <normalization_factor is_input="True">120000.0</normalization_factor>
+        <sum is_input="False">2.530044365935374<!--kg Cu-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">0.00026142813405177285<!--kg Cu-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">2.678351272913427e-05<!--kg Cu-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg Cu-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg Cu-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.018881840803785084<!--kg Cu-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.018881840803785084<!--kg Cu-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.0004186159540525566<!--kg Cu-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">1.055115262412602<!--kg Cu-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">1.055115262412602<!--kg Cu-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">0.0001476893381328456<!--kg Cu-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">8.033714866468024e-05<!--kg Cu-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">1.0279084185038593e-05<!--kg Cu-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">1.0279084185038593e-05<!--kg Cu-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">0.00025590740261982565<!--kg Cu-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.004901994130782306<!--kg Cu-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">0.00039184956114800235<!--kg Cu-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.0002455097403581611<!--kg Cu-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.0019338353250657318<!--kg Cu-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">0.004097716856975621<!--kg Cu-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.37888097867209214<!--kg Cu-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.0015491229132166915<!--kg Cu-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">2.510874313484808<!--kg Cu-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.00028196655170737285<!--kg Cu-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.007437706896418081<!--kg Cu-Eq for component wing in production phase--></wing>
+        </production>
+      </material_resources_metals_minerals>
+      <material_resources_metals_minerals_normalized>
+        <sum is_input="False">2.1083703049461453e-05</sum>
+        <distribution>
+          <sum is_input="False">2.178567783764774e-09</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">2.2319593940945226e-10</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">1.573486733648757e-07</electricity_for_mission>
+          <sum is_input="False">1.573486733648757e-07</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">3.4884662837713046e-09</assembly>
+          <battery_pack_1 is_input="False">8.792627186771683e-06</battery_pack_1>
+          <battery_pack_2 is_input="False">8.792627186771683e-06</battery_pack_2>
+          <dc_bus_1 is_input="False">1.23074448444038e-09</dc_bus_1>
+          <dc_splitter_1 is_input="False">6.694762388723353e-10</dc_splitter_1>
+          <dc_sspc_1 is_input="False">8.565903487532161e-11</dc_sspc_1>
+          <dc_sspc_2 is_input="False">8.565903487532161e-11</dc_sspc_2>
+          <flight_controls is_input="False">2.132561688498547e-09</flight_controls>
+          <fuselage is_input="False">4.0849951089852546e-08</fuselage>
+          <harness_1 is_input="False">3.265413009566686e-09</harness_1>
+          <horizontal_tail is_input="False">2.045914502984676e-09</horizontal_tail>
+          <inverter_1 is_input="False">1.6115294375547764e-08</inverter_1>
+          <landing_gear is_input="False">3.414764047479684e-08</landing_gear>
+          <motor_1 is_input="False">3.157341488934101e-06</motor_1>
+          <propeller_1 is_input="False">1.2909357610139095e-08</propeller_1>
+          <sum is_input="False">2.0923952612373403e-05</sum>
+          <vertical_tail is_input="False">2.349721264228107e-09</vertical_tail>
+          <wing is_input="False">6.198089080348401e-08</wing>
+        </production>
+      </material_resources_metals_minerals_normalized>
+      <ozone_depletion>
+        <normalization_factor is_input="True">0.06</normalization_factor>
+        <sum is_input="False">4.432736695821464e-06<!--kg CFC-11-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">2.030192717666369e-09<!--kg CFC-11-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">4.3548492687975615e-10<!--kg CFC-11-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg CFC-11-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg CFC-11-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">3.0700816375169055e-07<!--kg CFC-11-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">3.0700816375169055e-07<!--kg CFC-11-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">6.8064611234872215e-09<!--kg CFC-11-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">1.507136498248886e-06<!--kg CFC-11-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">1.507136498248886e-06<!--kg CFC-11-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">1.4289905907340004e-09<!--kg CFC-11-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">7.773142664161977e-10<!--kg CFC-11-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">6.655198017723438e-10<!--kg CFC-11-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">6.655198017723438e-10<!--kg CFC-11-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">3.4833770503526907e-09<!--kg CFC-11-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">3.565408241408305e-07<!--kg CFC-11-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">1.9288907816507135e-09<!--kg CFC-11-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">1.7856864538499676e-08<!--kg CFC-11-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">2.0798065438885056e-08<!--kg CFC-11-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">1.2415138519835059e-09<!--kg CFC-11-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">2.2641426734984088e-08<!--kg CFC-11-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">1.126736477927158e-07<!--kg CFC-11-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">4.123262854425228e-06<!--kg CFC-11-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">2.0508508179272525e-08<!--kg CFC-11-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">5.409729338340998e-07<!--kg CFC-11-Eq for component wing in production phase--></wing>
+        </production>
+      </ozone_depletion>
+      <ozone_depletion_normalized>
+        <sum is_input="False">7.387894493035774e-05</sum>
+        <distribution>
+          <sum is_input="False">3.383654529443948e-08</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">7.258082114662603e-09</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">5.116802729194843e-06</electricity_for_mission>
+          <sum is_input="False">5.116802729194843e-06</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.1344101872478702e-07</assembly>
+          <battery_pack_1 is_input="False">2.5118941637481434e-05</battery_pack_1>
+          <battery_pack_2 is_input="False">2.5118941637481434e-05</battery_pack_2>
+          <dc_bus_1 is_input="False">2.3816509845566673e-08</dc_bus_1>
+          <dc_splitter_1 is_input="False">1.2955237773603296e-08</dc_splitter_1>
+          <dc_sspc_1 is_input="False">1.109199669620573e-08</dc_sspc_1>
+          <dc_sspc_2 is_input="False">1.109199669620573e-08</dc_sspc_2>
+          <flight_controls is_input="False">5.8056284172544845e-08</flight_controls>
+          <fuselage is_input="False">5.9423470690138424e-06</fuselage>
+          <harness_1 is_input="False">3.214817969417856e-08</harness_1>
+          <horizontal_tail is_input="False">2.976144089749946e-07</horizontal_tail>
+          <inverter_1 is_input="False">3.466344239814176e-07</inverter_1>
+          <landing_gear is_input="False">2.0691897533058432e-08</landing_gear>
+          <motor_1 is_input="False">3.773571122497348e-07</motor_1>
+          <propeller_1 is_input="False">1.8778941298785968e-06</propeller_1>
+          <sum is_input="False">6.87210475737538e-05</sum>
+          <vertical_tail is_input="False">3.418084696545421e-07</vertical_tail>
+          <wing is_input="False">9.016215563901662e-06</wing>
+        </production>
+      </ozone_depletion_normalized>
+      <particulate_matter_formation>
+        <normalization_factor is_input="True">25.6</normalization_factor>
+        <sum is_input="False">0.02973050765935349<!--kg PM2.5-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">1.1115700912065272e-05<!--kg PM2.5-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.3137650739634314e-06<!--kg PM2.5-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg PM2.5-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg PM2.5-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.0009261781018427402<!--kg PM2.5-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.0009261781018427402<!--kg PM2.5-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">2.0533640430214968e-05<!--kg PM2.5-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.010194940001669149<!--kg PM2.5-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.010194940001669149<!--kg PM2.5-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">9.431202849002332e-06<!--kg PM2.5-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">5.130200696583336e-06<!--kg PM2.5-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">5.1154066415941555e-06<!--kg PM2.5-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">5.1154066415941555e-06<!--kg PM2.5-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">2.6105841373387545e-05<!--kg PM2.5-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.0026991033901981433<!--kg PM2.5-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">2.9663527899822533e-05<!--kg PM2.5-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.0001351809396029664<!--kg PM2.5-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.0001367810388634402<!--kg PM2.5-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">1.7787616851308833e-05<!--kg PM2.5-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.00020854889865118338<!--kg PM2.5-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.0008529677505406418<!--kg PM2.5-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.028791900091524724<!--kg PM2.5-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.00015525454648277878<!--kg PM2.5-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.004095300680463764<!--kg PM2.5-Eq for component wing in production phase--></wing>
+        </production>
+      </particulate_matter_formation>
+      <particulate_matter_formation_normalized>
+        <sum is_input="False">0.0011613479554434957</sum>
+        <distribution>
+          <sum is_input="False">4.3420706687754966e-07</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">5.131894820169654e-08</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">3.617883210323204e-05</electricity_for_mission>
+          <sum is_input="False">3.617883210323204e-05</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">8.020953293052722e-07</assembly>
+          <battery_pack_1 is_input="False">0.0003982398438152011</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0003982398438152011</battery_pack_2>
+          <dc_bus_1 is_input="False">3.684063612891536e-07</dc_bus_1>
+          <dc_splitter_1 is_input="False">2.0039846471028655e-07</dc_splitter_1>
+          <dc_sspc_1 is_input="False">1.998205719372717e-07</dc_sspc_1>
+          <dc_sspc_2 is_input="False">1.998205719372717e-07</dc_sspc_2>
+          <flight_controls is_input="False">1.019759428647951e-06</flight_controls>
+          <fuselage is_input="False">0.00010543372617961497</fuselage>
+          <harness_1 is_input="False">1.1587315585868176e-06</harness_1>
+          <horizontal_tail is_input="False">5.280505453240875e-06</horizontal_tail>
+          <inverter_1 is_input="False">5.3430093306031324e-06</inverter_1>
+          <landing_gear is_input="False">6.948287832542512e-07</landing_gear>
+          <motor_1 is_input="False">8.14644135356185e-06</motor_1>
+          <propeller_1 is_input="False">3.331905275549382e-05</propeller_1>
+          <sum is_input="False">0.0011246835973251846</sum>
+          <vertical_tail is_input="False">6.064630721983545e-06</vertical_tail>
+          <wing is_input="False">0.00015997268283061576</wing>
+        </production>
+      </particulate_matter_formation_normalized>
+      <photochemical_oxidant_formation_human_health>
+        <normalization_factor is_input="True">20.6</normalization_factor>
+        <sum is_input="False">0.029643315441854255<!--kg NOx-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">4.530393784289809e-05<!--kg NOx-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">2.808029603358683e-06<!--kg NOx-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg NOx-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg NOx-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.001979604709775805<!--kg NOx-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.001979604709775805<!--kg NOx-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.0001511723048721701<!--kg NOx-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.008834804455800647<!--kg NOx-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.008834804455800647<!--kg NOx-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">1.065887202698502e-05<!--kg NOx-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">5.798004090582747e-06<!--kg NOx-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">5.960186331865168e-06<!--kg NOx-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">5.960186331865168e-06<!--kg NOx-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">3.616641357388076e-05<!--kg NOx-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.003180321435877875<!--kg NOx-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">1.6021206863027546e-05<!--kg NOx-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.0001592820940104357<!--kg NOx-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.00015680116485812087<!--kg NOx-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">2.6538330547049895e-05<!--kg NOx-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.0001778892034558983<!--kg NOx-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.0010050417597963054<!--kg NOx-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.027615598764632193<!--kg NOx-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.0001829345863481102<!--kg NOx-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.004825444104046724<!--kg NOx-Eq for component wing in production phase--></wing>
+        </production>
+      </photochemical_oxidant_formation_human_health>
+      <photochemical_oxidant_formation_human_health_normalized>
+        <sum is_input="False">0.0014389958952356434</sum>
+        <distribution>
+          <sum is_input="False">2.1992202836358296e-06</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.363121166678972e-07</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">9.609731600853421e-05</electricity_for_mission>
+          <sum is_input="False">9.609731600853421e-05</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">7.338461401561655e-06</assembly>
+          <battery_pack_1 is_input="False">0.00042887400270876923</battery_pack_1>
+          <battery_pack_2 is_input="False">0.00042887400270876923</battery_pack_2>
+          <dc_bus_1 is_input="False">5.174209721837388e-07</dc_bus_1>
+          <dc_splitter_1 is_input="False">2.8145650925158967e-07</dc_splitter_1>
+          <dc_sspc_1 is_input="False">2.893294335856877e-07</dc_sspc_1>
+          <dc_sspc_2 is_input="False">2.893294335856877e-07</dc_sspc_2>
+          <flight_controls is_input="False">1.7556511443631436e-06</flight_controls>
+          <fuselage is_input="False">0.00015438453572222692</fuselage>
+          <harness_1 is_input="False">7.777284884964827e-07</harness_1>
+          <horizontal_tail is_input="False">7.73214048594348e-06</horizontal_tail>
+          <inverter_1 is_input="False">7.611707031947614e-06</inverter_1>
+          <landing_gear is_input="False">1.288268473157762e-06</landing_gear>
+          <motor_1 is_input="False">8.635398226014479e-06</motor_1>
+          <propeller_1 is_input="False">4.878843494156822e-05</propeller_1>
+          <sum is_input="False">0.0013405630468268054</sum>
+          <vertical_tail is_input="False">8.880319725636416e-06</vertical_tail>
+          <wing is_input="False">0.00023424485941974388</wing>
+        </production>
+      </photochemical_oxidant_formation_human_health_normalized>
+      <photochemical_oxidant_formation_terrestrial_ecosystems>
+        <normalization_factor is_input="True">17.7</normalization_factor>
+        <sum is_input="False">0.030750620153392548<!--kg NOx-Eq for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">4.643723214125301e-05<!--kg NOx-Eq for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">2.9470850047613974e-06<!--kg NOx-Eq for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--kg NOx-Eq for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--kg NOx-Eq for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.002077635986656691<!--kg NOx-Eq for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.002077635986656691<!--kg NOx-Eq for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.00021890805077526108<!--kg NOx-Eq for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.00918574956893503<!--kg NOx-Eq for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.00918574956893503<!--kg NOx-Eq for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">1.0902496509539962e-05<!--kg NOx-Eq for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">5.930526156974346e-06<!--kg NOx-Eq for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">6.179966363317483e-06<!--kg NOx-Eq for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">6.179966363317483e-06<!--kg NOx-Eq for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">3.676241600413258e-05<!--kg NOx-Eq for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.0032561375020021886<!--kg NOx-Eq for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">1.6456677040743537e-05<!--kg NOx-Eq for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.00016307923905234273<!--kg NOx-Eq for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.00016262250251483683<!--kg NOx-Eq for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">2.878668995440154e-05<!--kg NOx-Eq for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.00018337957371120342<!--kg NOx-Eq for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.0010290010714743057<!--kg NOx-Eq for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.028623599849589842<!--kg NOx-Eq for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.00018729558600636136<!--kg NOx-Eq for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.004940478447790849<!--kg NOx-Eq for component wing in production phase--></wing>
+        </production>
+      </photochemical_oxidant_formation_terrestrial_ecosystems>
+      <photochemical_oxidant_formation_terrestrial_ecosystems_normalized>
+        <sum is_input="False">0.0017373231725080537</sum>
+        <distribution>
+          <sum is_input="False">2.6235724373589273e-06</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">1.6650197767013545e-07</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">0.00011738056421789214</electricity_for_mission>
+          <sum is_input="False">0.00011738056421789214</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">1.2367686484478028e-05</assembly>
+          <battery_pack_1 is_input="False">0.0005189689021997192</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0005189689021997192</battery_pack_2>
+          <dc_bus_1 is_input="False">6.159602547762691e-07</dc_bus_1>
+          <dc_splitter_1 is_input="False">3.3505797497030207e-07</dc_splitter_1>
+          <dc_sspc_1 is_input="False">3.4915064199533806e-07</dc_sspc_1>
+          <dc_sspc_2 is_input="False">3.4915064199533806e-07</dc_sspc_2>
+          <flight_controls is_input="False">2.076972655600711e-06</flight_controls>
+          <fuselage is_input="False">0.00018396257073458692</fuselage>
+          <harness_1 is_input="False">9.297557650137591e-07</harness_1>
+          <horizontal_tail is_input="False">9.213516330640832e-06</horizontal_tail>
+          <inverter_1 is_input="False">9.187712006487957e-06</inverter_1>
+          <landing_gear is_input="False">1.6263666640904826e-06</landing_gear>
+          <motor_1 is_input="False">1.036042789328833e-05</motor_1>
+          <propeller_1 is_input="False">5.81356537556105e-05</propeller_1>
+          <sum is_input="False">0.0016171525338751324</sum>
+          <vertical_tail is_input="False">1.0581671525783128e-05</vertical_tail>
+          <wing is_input="False">0.0002791230761463757</wing>
+        </production>
+      </photochemical_oxidant_formation_terrestrial_ecosystems_normalized>
+      <water_use>
+        <normalization_factor is_input="True">267.0</normalization_factor>
+        <sum is_input="False">0.41830489232199136<!--m3 for the whole process--></sum>
+        <distribution>
+          <sum is_input="False">3.805311375677884e-05<!--m3 for the whole distribution phase--></sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">5.5408643204173356e-05<!--m3 for the whole manufacturing phase--></sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0<!--m3 for component battery_pack_1 in operation phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.0<!--m3 for component battery_pack_2 in operation phase--></battery_pack_2>
+          <electricity_for_mission is_input="False">0.03906198528607815<!--m3 for component electricity_for_mission in operation phase--></electricity_for_mission>
+          <sum is_input="False">0.03906198528607815<!--m3 for the whole operation phase--></sum>
+        </operation>
+        <production>
+          <assembly is_input="False">0.0008660156818206311<!--m3 for component assembly in production phase--></assembly>
+          <battery_pack_1 is_input="False">0.17769675525321965<!--m3 for component battery_pack_1 in production phase--></battery_pack_1>
+          <battery_pack_2 is_input="False">0.17769675525321965<!--m3 for component battery_pack_2 in production phase--></battery_pack_2>
+          <dc_bus_1 is_input="False">2.5370195857543765e-05<!--m3 for component dc_bus_1 in production phase--></dc_bus_1>
+          <dc_splitter_1 is_input="False">1.3800381408888356e-05<!--m3 for component dc_splitter_1 in production phase--></dc_splitter_1>
+          <dc_sspc_1 is_input="False">1.0655460156692978e-05<!--m3 for component dc_sspc_1 in production phase--></dc_sspc_1>
+          <dc_sspc_2 is_input="False">1.0655460156692978e-05<!--m3 for component dc_sspc_2 in production phase--></dc_sspc_2>
+          <flight_controls is_input="False">8.279837935275808e-05<!--m3 for component flight_controls in production phase--></flight_controls>
+          <fuselage is_input="False">0.007400770333100696<!--m3 for component fuselage in production phase--></fuselage>
+          <harness_1 is_input="False">3.7814921270265425e-05<!--m3 for component harness_1 in production phase--></harness_1>
+          <horizontal_tail is_input="False">0.0003706575639330613<!--m3 for component horizontal_tail in production phase--></horizontal_tail>
+          <inverter_1 is_input="False">0.00037394566715064786<!--m3 for component inverter_1 in production phase--></inverter_1>
+          <landing_gear is_input="False">6.700151640170494e-05<!--m3 for component landing_gear in production phase--></landing_gear>
+          <motor_1 is_input="False">0.0005029128459947363<!--m3 for component motor_1 in production phase--></motor_1>
+          <propeller_1 is_input="False">0.002338783481291313<!--m3 for component propeller_1 in production phase--></propeller_1>
+          <sum is_input="False">0.3791494452789523<!--m3 for the whole production phase--></sum>
+          <vertical_tail is_input="False">0.00042569812103581664<!--m3 for component vertical_tail in production phase--></vertical_tail>
+          <wing is_input="False">0.011229054763581455<!--m3 for component wing in production phase--></wing>
+        </production>
+      </water_use>
+      <water_use_normalized>
+        <sum is_input="False">0.001566684989970005</sum>
+        <distribution>
+          <sum is_input="False">1.425210253062878e-07</sum>
+        </distribution>
+        <manufacturing>
+          <sum is_input="False">2.075230082553309e-07</sum>
+        </manufacturing>
+        <operation>
+          <battery_pack_1 is_input="False">0.0</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0</battery_pack_2>
+          <electricity_for_mission is_input="False">0.00014629957035984325</electricity_for_mission>
+          <sum is_input="False">0.00014629957035984325</sum>
+        </operation>
+        <production>
+          <assembly is_input="False">3.2435044262944987e-06</assembly>
+          <battery_pack_1 is_input="False">0.0006655309185513845</battery_pack_1>
+          <battery_pack_2 is_input="False">0.0006655309185513845</battery_pack_2>
+          <dc_bus_1 is_input="False">9.501946014061336e-08</dc_bus_1>
+          <dc_splitter_1 is_input="False">5.1686821756136165e-08</dc_splitter_1>
+          <dc_sspc_1 is_input="False">3.990809047450553e-08</dc_sspc_1>
+          <dc_sspc_2 is_input="False">3.990809047450553e-08</dc_sspc_2>
+          <flight_controls is_input="False">3.101062897107044e-07</flight_controls>
+          <fuselage is_input="False">2.7718240947942684e-05</fuselage>
+          <harness_1 is_input="False">1.416289186152263e-07</harness_1>
+          <horizontal_tail is_input="False">1.3882305765283195e-06</horizontal_tail>
+          <inverter_1 is_input="False">1.4005455698526136e-06</inverter_1>
+          <landing_gear is_input="False">2.509420089951496e-07</landing_gear>
+          <motor_1 is_input="False">1.8835687115907726e-06</motor_1>
+          <propeller_1 is_input="False">8.759488693974955e-06</propeller_1>
+          <sum is_input="False">0.0014200353755766002</sum>
+          <vertical_tail is_input="False">1.5943749851528714e-06</vertical_tail>
+          <wing is_input="False">4.2056384882327545e-05</wing>
+        </production>
+      </water_use_normalized>
+      <operation>
+        <sizing>
+          <he_power_train>
+            <battery_pack>
+              <battery_pack_1>
+                <CO units="g" is_input="True">0.0</CO>
+                <CO2 units="g" is_input="True">0.0</CO2>
+                <H2O units="g" is_input="True">0.0</H2O>
+                <HC units="g" is_input="True">0.0</HC>
+                <NOx units="g" is_input="True">0.0</NOx>
+                <SOx units="g" is_input="True">0.0</SOx>
+              </battery_pack_1>
+              <battery_pack_2>
+                <CO units="g" is_input="True">0.0</CO>
+                <CO2 units="g" is_input="True">0.0</CO2>
+                <H2O units="g" is_input="True">0.0</H2O>
+                <HC units="g" is_input="True">0.0</HC>
+                <NOx units="g" is_input="True">0.0</NOx>
+                <SOx units="g" is_input="True">0.0</SOx>
+              </battery_pack_2>
+            </battery_pack>
+          </he_power_train>
+        </sizing>
+      </operation>
+    </environmental_impact>
+    <mission>
+      <sizing>
+        <duration units="s" is_input="True">3494.343859355023</duration>
+      </sizing>
+    </mission>
+    <weight>
+      <aircraft>
+        <OWE units="kg" is_input="True">428.758457169088<!--operating weight - empty--></OWE>
+        <OWE_per_fu units="kg" is_input="False">0.12163705556727508</OWE_per_fu>
+      </aircraft>
+      <airframe>
+        <flight_controls>
+          <mass units="lbm" is_input="True">18.272260687014608<!--flight controls total mass--></mass>
+          <mass_per_fu units="kg" is_input="False">0.002351317209078494</mass_per_fu>
+        </flight_controls>
+        <fuselage>
+          <mass units="lbm" is_input="True">132.42260056888406<!--fuselage total mass using Raymer's formula (not used but implemented)--></mass>
+          <mass_per_fu units="kg" is_input="False">0.017040449724418698</mass_per_fu>
+        </fuselage>
+        <horizontal_tail>
+          <mass units="lbm" is_input="True">6.632206692999609<!--horizontal tail total mass--></mass>
+          <mass_per_fu units="kg" is_input="False">0.0008534478573030596</mass_per_fu>
+        </horizontal_tail>
+        <landing_gear>
+          <mass_per_fu units="kg" is_input="False">0.005747131747665848</mass_per_fu>
+          <front>
+            <mass units="lbm" is_input="True">15.812834086813446<!--front landing gear mass--></mass>
+          </front>
+          <main>
+            <mass units="lbm" is_input="True">28.848553619834586<!--main landing gear mass--></mass>
+          </main>
+        </landing_gear>
+        <vertical_tail>
+          <mass units="lbm" is_input="True">7.617051969944356<!--vertical tail total mass--></mass>
+          <mass_per_fu units="kg" is_input="False">0.0009801800492099716</mass_per_fu>
+        </vertical_tail>
+        <wing>
+          <mass units="kg" is_input="True">91.13687351953338<!--wing total mass--></mass>
+          <mass_per_fu units="kg" is_input="False">0.0258551656840005</mass_per_fu>
+        </wing>
+      </airframe>
+    </weight>
+    <LCA>
+      <distribution>
+        <he_power_train>
+          <electricity>
+            <energy_per_fu units="W*h" is_input="False">76.196299731366</energy_per_fu>
+          </electricity>
+          <battery_pack>
+            <battery_pack_1>
+              <CO2_per_fu units="kg" is_input="False">0.0<!--Amount of CO2release during distribution of the aircraft via air, might not be used if delivered via cargo or train--></CO2_per_fu>
+              <CO_per_fu units="kg" is_input="False">0.0<!--Amount of COrelease during distribution of the aircraft via air, might not be used if delivered via cargo or train--></CO_per_fu>
+              <H2O_per_fu units="kg" is_input="False">0.0<!--Amount of H2Orelease during distribution of the aircraft via air, might not be used if delivered via cargo or train--></H2O_per_fu>
+              <HC_per_fu units="kg" is_input="False">0.0<!--Amount of HCrelease during distribution of the aircraft via air, might not be used if delivered via cargo or train--></HC_per_fu>
+              <NOx_per_fu units="kg" is_input="False">0.0<!--Amount of NOxrelease during distribution of the aircraft via air, might not be used if delivered via cargo or train--></NOx_per_fu>
+              <SOx_per_fu units="kg" is_input="False">0.0<!--Amount of SOxrelease during distribution of the aircraft via air, might not be used if delivered via cargo or train--></SOx_per_fu>
+            </battery_pack_1>
+            <battery_pack_2>
+              <CO2_per_fu units="kg" is_input="False">0.0<!--Amount of CO2release during distribution of the aircraft via air, might not be used if delivered via cargo or train--></CO2_per_fu>
+              <CO_per_fu units="kg" is_input="False">0.0<!--Amount of COrelease during distribution of the aircraft via air, might not be used if delivered via cargo or train--></CO_per_fu>
+              <H2O_per_fu units="kg" is_input="False">0.0<!--Amount of H2Orelease during distribution of the aircraft via air, might not be used if delivered via cargo or train--></H2O_per_fu>
+              <HC_per_fu units="kg" is_input="False">0.0<!--Amount of HCrelease during distribution of the aircraft via air, might not be used if delivered via cargo or train--></HC_per_fu>
+              <NOx_per_fu units="kg" is_input="False">0.0<!--Amount of NOxrelease during distribution of the aircraft via air, might not be used if delivered via cargo or train--></NOx_per_fu>
+              <SOx_per_fu units="kg" is_input="False">0.0<!--Amount of SOxrelease during distribution of the aircraft via air, might not be used if delivered via cargo or train--></SOx_per_fu>
+            </battery_pack_2>
+          </battery_pack>
+        </he_power_train>
+      </distribution>
+      <manufacturing>
+        <he_power_train>
+          <electricity>
+            <energy_per_fu units="W*h" is_input="False">18.91141093604605</energy_per_fu>
+          </electricity>
+          <battery_pack>
+            <battery_pack_1>
+              <CO2_per_fu units="kg" is_input="False">0.0</CO2_per_fu>
+              <CO_per_fu units="kg" is_input="False">0.0</CO_per_fu>
+              <H2O_per_fu units="kg" is_input="False">0.0</H2O_per_fu>
+              <HC_per_fu units="kg" is_input="False">0.0</HC_per_fu>
+              <NOx_per_fu units="kg" is_input="False">0.0</NOx_per_fu>
+              <SOx_per_fu units="kg" is_input="False">0.0</SOx_per_fu>
+            </battery_pack_1>
+            <battery_pack_2>
+              <CO2_per_fu units="kg" is_input="False">0.0</CO2_per_fu>
+              <CO_per_fu units="kg" is_input="False">0.0</CO_per_fu>
+              <H2O_per_fu units="kg" is_input="False">0.0</H2O_per_fu>
+              <HC_per_fu units="kg" is_input="False">0.0</HC_per_fu>
+              <NOx_per_fu units="kg" is_input="False">0.0</NOx_per_fu>
+              <SOx_per_fu units="kg" is_input="False">0.0</SOx_per_fu>
+            </battery_pack_2>
+          </battery_pack>
+        </he_power_train>
+      </manufacturing>
+      <operation>
+        <he_power_train>
+          <electricity>
+            <energy_per_fu units="W*h" is_input="False">13332.166481693748</energy_per_fu>
+          </electricity>
+          <battery_pack>
+            <battery_pack_1>
+              <CO2_per_fu units="kg" is_input="False">0.0</CO2_per_fu>
+              <CO_per_fu units="kg" is_input="False">0.0</CO_per_fu>
+              <H2O_per_fu units="kg" is_input="False">0.0</H2O_per_fu>
+              <HC_per_fu units="kg" is_input="False">0.0</HC_per_fu>
+              <NOx_per_fu units="kg" is_input="False">0.0</NOx_per_fu>
+              <SOx_per_fu units="kg" is_input="False">0.0</SOx_per_fu>
+            </battery_pack_1>
+            <battery_pack_2>
+              <CO2_per_fu units="kg" is_input="False">0.0</CO2_per_fu>
+              <CO_per_fu units="kg" is_input="False">0.0</CO_per_fu>
+              <H2O_per_fu units="kg" is_input="False">0.0</H2O_per_fu>
+              <HC_per_fu units="kg" is_input="False">0.0</HC_per_fu>
+              <NOx_per_fu units="kg" is_input="False">0.0</NOx_per_fu>
+              <SOx_per_fu units="kg" is_input="False">0.0</SOx_per_fu>
+            </battery_pack_2>
+          </battery_pack>
+        </he_power_train>
+      </operation>
+    </LCA>
+    <propulsion>
+      <he_power_train>
+        <DC_SSPC>
+          <dc_sspc_1>
+            <mass units="kg" is_input="True">1.0511153545190257<!--Mass of the SSPC--></mass>
+            <mass_per_fu units="kg" is_input="False">0.0002981972125504342<!--Mass of the SSPC required for a functional unit--></mass_per_fu>
+          </dc_sspc_1>
+          <dc_sspc_2>
+            <mass units="kg" is_input="True">1.0511153545190257<!--Mass of the SSPC--></mass>
+            <mass_per_fu units="kg" is_input="False">0.0002981972125504342<!--Mass of the SSPC required for a functional unit--></mass_per_fu>
+          </dc_sspc_2>
+        </DC_SSPC>
+        <DC_bus>
+          <dc_bus_1>
+            <mass units="kg" is_input="True">0.21750162289932592<!--Weight of the bus bar--></mass>
+            <mass_per_fu units="kg" is_input="False">6.170433853423526e-05<!--Weight of the bus bar required for a functional unit--></mass_per_fu>
+          </dc_bus_1>
+        </DC_bus>
+        <DC_cable_harness>
+          <harness_1>
+            <length units="m" is_input="True">1.5<!--Length of the harness--></length>
+            <length_per_fu units="m" is_input="False">0.00042554398706346277<!--Length of the cable required for a functional unit--></length_per_fu>
+            <number_cables is_input="True">1.0</number_cables>
+          </harness_1>
+        </DC_cable_harness>
+        <DC_splitter>
+          <dc_splitter_1>
+            <mass units="kg" is_input="True">0.11831226569622177<!--Weight of the splitter--></mass>
+            <mass_per_fu units="kg" is_input="False">3.356471550858798e-05<!--Weight of thesplitter required for a functional unit--></mass_per_fu>
+          </dc_splitter_1>
+        </DC_splitter>
+        <PMSM>
+          <motor_1>
+            <lifespan units="year" is_input="True">15.0<!--Expected lifetime of the PMSM, typically around 15 year--></lifespan>
+            <mass units="kg" is_input="True">20.39726906801662</mass>
+            <mass_per_fu units="kg" is_input="False">0.005786623469606689<!--Weight of the PMSM required for a functional unit--></mass_per_fu>
+          </motor_1>
+        </PMSM>
+        <battery_pack>
+          <battery_pack_1>
+            <energy_consumed_mission units="W*h" is_input="True">6470.4408440563075</energy_consumed_mission>
+            <lifespan is_input="True">500.0<!--Expected lifetime of the inverter, expressed in cycles. Default value is the number of cycle required for the reference cell to reach 60% nominal capacity--></lifespan>
+            <mass units="kg" is_input="True">75.00000000000001<!--Mass of the battery pack--></mass>
+            <mass_per_fu units="kg" is_input="False">0.17021759482538512<!--Weight of the battery pack required for a functional unit--></mass_per_fu>
+          </battery_pack_1>
+          <battery_pack_2>
+            <energy_consumed_mission units="W*h" is_input="True">6470.4408440563075</energy_consumed_mission>
+            <lifespan is_input="True">500.0<!--Expected lifetime of the inverter, expressed in cycles. Default value is the number of cycle required for the reference cell to reach 60% nominal capacity--></lifespan>
+            <mass units="kg" is_input="True">75.00000000000001<!--Mass of the battery pack--></mass>
+            <mass_per_fu units="kg" is_input="False">0.17021759482538512<!--Weight of the battery pack required for a functional unit--></mass_per_fu>
+          </battery_pack_2>
+        </battery_pack>
+        <inverter>
+          <inverter_1>
+            <lifespan units="year" is_input="True">15.0<!--Expected lifetime of the inverter, typically around 15 year--></lifespan>
+            <mass units="kg" is_input="True">4.110404811561852<!--Mass of the inverter--></mass>
+            <mass_per_fu units="kg" is_input="False">0.0011661053679712478<!--Mass of the inverter required for a functional unit--></mass_per_fu>
+          </inverter_1>
+        </inverter>
+        <propeller>
+          <propeller_1>
+            <mass units="kg" is_input="True">18.98195518783249</mass>
+            <mass_per_fu units="kg" is_input="False">0.005385104595260146<!--Weight of the propeller required for a functional unit--></mass_per_fu>
+            <material is_input="True">1.0</material>
+          </propeller_1>
+        </propeller>
+      </he_power_train>
+    </propulsion>
+  </data>
+</FASTOAD_model>

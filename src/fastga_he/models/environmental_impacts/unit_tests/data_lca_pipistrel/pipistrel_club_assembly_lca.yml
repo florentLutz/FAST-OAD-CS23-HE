@@ -1,7 +1,7 @@
-project: sr22_propulsion
+project: pipistrel_club_assembly
 
 ecoinvent:
-    version: 3.9.1
+    version: 3.10.1
     model: cutoff
 
 model:
@@ -73,8 +73,8 @@ model:
                 # the production of materials was already included and as per :cite:`arvidsson:2024`, most
                 # of the things except electricity can be discarded.
                 electricity:
-                  name: 'market group for electricity, high voltage'
-                  loc: 'RER'
+                  name: 'electricity, high voltage, production mix'
+                  loc: 'FR'
                   amount: 2.43 # We are giving here the amount for 1 kg of OWE since we are defining a custom process
         
                 VOC:
@@ -112,7 +112,7 @@ model:
         
             name: 'internal combustion engine production, passenger car'
             loc: 'GLO'
-            amount: data__propulsion__he_power_train__ICE__ice_1__mass_per_fu
+            amount: data__propulsion__he_power_train__high_rpm_ICE__ice_1__mass_per_fu
 
         fuel_system_1:
             custom_attributes:
@@ -147,28 +147,28 @@ model:
         ice_1:
         
             CO2:
-              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__CO2_per_fu
+              amount: data__LCA__manufacturing__he_power_train__high_rpm_ICE__ice_1__CO2_per_fu
               name: 'carbon dioxide, fossil'  # this is a biosphere process
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             CO:
-              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__CO_per_fu
+              amount: data__LCA__manufacturing__he_power_train__high_rpm_ICE__ice_1__CO_per_fu
               name: 'carbon monoxide, fossil'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             SOx:
-              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__SOx_per_fu
+              amount: data__LCA__manufacturing__he_power_train__high_rpm_ICE__ice_1__SOx_per_fu
               name: 'sulfur dioxide'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             NOx:
-              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__NOx_per_fu
+              amount: data__LCA__manufacturing__he_power_train__high_rpm_ICE__ice_1__NOx_per_fu
               name: 'nitrogen oxides'
               categories:
                 - 'air'
@@ -176,21 +176,21 @@ model:
         
         #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
         #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-        #      amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__H2O_per_fu
+        #      amount: data__LCA__manufacturing__he_power_train__high_rpm_ICE__ice_1__H2O_per_fu
         #      name: 'water'
         #      categories:
         #        - 'air'
         #        - 'lower stratosphere + upper troposphere'
         
             PM:
-              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__HC_per_fu
+              amount: data__LCA__manufacturing__he_power_train__high_rpm_ICE__ice_1__HC_per_fu
               name: 'Particulate Matter, < 2.5 um'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             lead:
-              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__lead_per_fu
+              amount: data__LCA__manufacturing__he_power_train__high_rpm_ICE__ice_1__lead_per_fu
               name: 'Lead II'
               categories:
                 - 'air'
@@ -218,73 +218,10 @@ model:
             - attribute: "phase"
               value: "distribution"
 
-        ice_1:
-        
-            CO2:
-              amount: data__LCA__distribution__he_power_train__ICE__ice_1__CO2_per_fu
-              name: 'carbon dioxide, fossil'  # this is a biosphere process
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-        
-            CO:
-              amount: data__LCA__distribution__he_power_train__ICE__ice_1__CO_per_fu
-              name: 'carbon monoxide, fossil'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-        
-            SOx:
-              amount: data__LCA__distribution__he_power_train__ICE__ice_1__SOx_per_fu
-              name: 'sulfur dioxide'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-        
-            NOx:
-              amount: data__LCA__distribution__he_power_train__ICE__ice_1__NOx_per_fu
-              name: 'nitrogen oxides'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-        
-        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
-        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-        #      amount: data__LCA__distribution__he_power_train__ICE__ice_1__H2O_per_fu
-        #      name: 'water'
-        #      categories:
-        #        - 'air'
-        #        - 'lower stratosphere + upper troposphere'
-        
-            PM:
-              amount: data__LCA__distribution__he_power_train__ICE__ice_1__HC_per_fu
-              name: 'Particulate Matter, < 2.5 um'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-        
-            lead:
-              amount: data__LCA__distribution__he_power_train__ICE__ice_1__lead_per_fu
-              name: 'Lead II'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-
-        gasoline_for_mission_production:
-        
-            gasoline:
-                amount: data__LCA__distribution__he_power_train__gasoline__mass_per_fu
-                unit: kilogram
-        
-                # There is no process for Gasoline, much less for AvGas so we'll approximate it like that
-                unleaded_petrol:
-                    name: 'market for petrol, unleaded'
-                    loc: RoW
-                    amount: 1
-        
-                lead:
-                    name: 'market for lead'
-                    amount: 0.794 / 1000  # 0.794 g / kg of fuel and then the unit for lead is kg
+        transport_via_train:
+            name: 'market group for transport, freight train'
+            loc: 'RER'
+            amount: data__environmental_impact__delivery__cargo_transport_per_fu
 
 
     use:
@@ -298,28 +235,28 @@ model:
                   value: ice_1_operation
         
             CO2:
-              amount: data__LCA__operation__he_power_train__ICE__ice_1__CO2_per_fu
+              amount: data__LCA__operation__he_power_train__high_rpm_ICE__ice_1__CO2_per_fu
               name: 'carbon dioxide, fossil'  # this is a biosphere process
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             CO:
-              amount: data__LCA__operation__he_power_train__ICE__ice_1__CO_per_fu
+              amount: data__LCA__operation__he_power_train__high_rpm_ICE__ice_1__CO_per_fu
               name: 'carbon monoxide, fossil'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             SOx:
-              amount: data__LCA__operation__he_power_train__ICE__ice_1__SOx_per_fu
+              amount: data__LCA__operation__he_power_train__high_rpm_ICE__ice_1__SOx_per_fu
               name: 'sulfur dioxide'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             NOx:
-              amount: data__LCA__operation__he_power_train__ICE__ice_1__NOx_per_fu
+              amount: data__LCA__operation__he_power_train__high_rpm_ICE__ice_1__NOx_per_fu
               name: 'nitrogen oxides'
               categories:
                 - 'air'
@@ -327,21 +264,21 @@ model:
         
         #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
         #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-        #      amount: data__LCA__operation__he_power_train__ICE__ice_1__H2O_per_fu
+        #      amount: data__LCA__operation__he_power_train__high_rpm_ICE__ice_1__H2O_per_fu
         #      name: 'water'
         #      categories:
         #        - 'air'
         #        - 'lower stratosphere + upper troposphere'
         
             PM:
-              amount: data__LCA__operation__he_power_train__ICE__ice_1__HC_per_fu
+              amount: data__LCA__operation__he_power_train__high_rpm_ICE__ice_1__HC_per_fu
               name: 'Particulate Matter, < 2.5 um'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             lead:
-              amount: data__LCA__operation__he_power_train__ICE__ice_1__lead_per_fu
+              amount: data__LCA__operation__he_power_train__high_rpm_ICE__ice_1__lead_per_fu
               name: 'Lead II'
               categories:
                 - 'air'
@@ -368,24 +305,8 @@ model:
 
 
 methods:
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'acidification: terrestrial', 'terrestrial acidification potential (TAP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'climate change',  'global warming potential (GWP100)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: freshwater', 'freshwater ecotoxicity potential (FETP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: marine', 'marine ecotoxicity potential (METP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: terrestrial', 'terrestrial ecotoxicity potential (TETP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'energy resources: non-renewable, fossil', 'fossil fuel potential (FFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: freshwater', 'freshwater eutrophication potential (FEP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: marine', 'marine eutrophication potential (MEP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: carcinogenic', 'human toxicity potential (HTPc)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: non-carcinogenic', 'human toxicity potential (HTPnc)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ionising radiation', 'ionising radiation potential (IRP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'land use', 'agricultural land occupation (LOP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'material resources: metals/minerals', 'surplus ore potential (SOP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ozone depletion', 'ozone depletion potential (ODPinfinite)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'particulate matter formation', 'particulate matter formation potential (PMFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: human health', 'photochemical oxidant formation potential: humans (HOFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: terrestrial ecosystems', 'photochemical oxidant formation potential: ecosystems (EOFP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'water use', 'water consumption potential (WCP)')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: ecosystem quality', 'ecosystem quality')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: human health', 'human health')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: natural resources', 'natural resources')"
+    - "('IMPACT World+ v2.0.1, footprint version', 'climate change', 'carbon footprint')"
+    - "('IMPACT World+ v2.0.1, footprint version', 'ecosystem quality', 'remaining ecosystem quality damage')"
+    - "('IMPACT World+ v2.0.1, footprint version', 'energy resources: non-renewable', 'fossil and nuclear energy use')"
+    - "('IMPACT World+ v2.0.1, footprint version', 'human health', 'remaining human health damage')"
+    - "('IMPACT World+ v2.0.1, footprint version', 'water use', 'water scarcity footprint')"

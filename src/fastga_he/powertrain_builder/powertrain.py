@@ -54,7 +54,7 @@ PROMOTION_FROM_MISSION = {
     "exterior_temperature": "degK",
 }
 # TODO: Find a more generic way to do that, as an attributes in registered_components.py maybe ?
-TYPE_TO_FUEL = {"turboshaft": "jet_fuel", "ICE": "avgas"}
+TYPE_TO_FUEL = {"turboshaft": "jet_fuel", "ICE": "avgas", "high_rpm_ICE": "avgas"}
 
 DEFAULT_VOLTAGE_VALUE = 737.800
 
