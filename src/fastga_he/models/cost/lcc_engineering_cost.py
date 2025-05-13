@@ -9,6 +9,7 @@ import openmdao.api as om
 class LCCEngineeringCost(om.ExplicitComponent):
     """
     Computation of the airframe engineering labor cost as obtained from :cite:`gudmundsson:2013`.
+    Default engineering cost per hour is provided by :cite:`stefana:2024`.
     """
 
     def setup(self):
@@ -21,7 +22,7 @@ class LCCEngineeringCost(om.ExplicitComponent):
         )
         self.add_input(
             "data:cost:production:engineering_cost_per_hour",
-            val=np.nan,
+            val=126.54,
             units="USD/h",
             desc="Engineering cost per hour",
         )

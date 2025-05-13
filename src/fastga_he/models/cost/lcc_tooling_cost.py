@@ -9,7 +9,7 @@ import openmdao.api as om
 class LCCToolingCost(om.ExplicitComponent):
     """
     Computation of the airframe cost per aircraft of tooling labor obtained from
-    :cite:`gudmundsson:2013`.
+    :cite:`gudmundsson:2013`. Default tooling cost per hour is provided by :cite:`stefana:2024`.
     """
 
     def setup(self):
@@ -22,7 +22,7 @@ class LCCToolingCost(om.ExplicitComponent):
         )
         self.add_input(
             "data:cost:production:tooling_cost_per_hour",
-            val=np.nan,
+            val=83.97,
             units="USD/h",
             desc="Tooling labor cost per hour",
         )

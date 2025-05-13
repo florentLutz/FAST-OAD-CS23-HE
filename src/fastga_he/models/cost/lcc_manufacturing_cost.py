@@ -9,7 +9,8 @@ import openmdao.api as om
 class LCCManufacturingCost(om.ExplicitComponent):
     """
     Computation of the airframe cost per aircraft of manufacturing labor obtained from
-    :cite:`gudmundsson:2013`.
+    :cite:`gudmundsson:2013`. Default manufacturing cost per hour is provided by
+    :cite:`stefana:2024`.
     """
 
     def setup(self):
@@ -22,7 +23,7 @@ class LCCManufacturingCost(om.ExplicitComponent):
         )
         self.add_input(
             "data:cost:production:manufacturing_cost_per_hour",
-            val=np.nan,
+            val=72.97,
             units="USD/h",
             desc="Manufacturing labor cost per hour",
         )
