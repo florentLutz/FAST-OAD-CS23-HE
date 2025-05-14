@@ -103,7 +103,7 @@ Powertrain production cost
 
 Engine purchase cost
 ********************
-The engine purchase cost is provided by :cite:`gudmundsson:2013`.
+The engine purchase cost calculation obtained from :cite:`gudmundsson:2013`.
 
 .. math::
 
@@ -118,7 +118,7 @@ shaft-horse power of the turboshaft engine.
 
 Propeller purchase cost
 ***********************
-Unit purchase cost of the propeller from :cite:`gudmundsson:2013`.
+The propeller purchase cost calculation obtained from :cite:`gudmundsson:2013`.
 
 .. math::
 
@@ -132,7 +132,8 @@ Unit purchase cost of the propeller from :cite:`gudmundsson:2013`.
 
 Synchronous motor / Generator purchase cost
 *******************************************
-Unit purchase cost is obtained from regression model based on product retail prices of `Emrax <https://emrax.com/e-motors/>`_.
+This unit purchase cost is obtained from regression model based on product retail prices
+of `Emrax <https://emrax.com/e-motors/>`_.
 
 .. math::
 
@@ -142,11 +143,11 @@ Unit purchase cost is obtained from regression model based on product retail pri
 
 Battery purchase cost
 *********************
-Unit purchase cost is modeled with power regression from :cite:`Wesley:2023`.
+Battery purchase cost is modeled with power regression from :cite:`Wesley:2023`.
 
 .. math::
 
-    C_{\text{bat (\$)}} = 1.08 \cdot C_{2022}  E_{\text{bat}} Y_{2022}^{-0.228}
+    C_{\text{bat (\$)}} = 1.08 \cdot C_{2022} \cdot E_{\text{bat}} \cdot Y_{2022}^{-0.228}
 
 :math:`C_{2022}` is the energy per dollar of battery in 2022, :math:`E_{bat}` is the maximum energy supply from battery,
 and :math:`Y_{2022}` is the amount of year from 2022.
@@ -173,11 +174,11 @@ The purchase cost of both electronics are obtained from logarithmic regression b
     C_{\text{inverter (\$)}} = 2167 \cdot \ln{P_{inv}} + 6910 \\
     C_{\text{converter (\$)}} = 733 \cdot \ln{P_{con}} + 2295
 
-:math:`\ln{P_{inv}}` is the inverter power rating and :math:`\ln{P_{con}}` is the converter power rating.
+:math:`P_{inv}` is the inverter power rating and :math:`P_{con}` is the converter power rating.
 
 Rectifier purchase cost
 ***********************
-The purchase cost of the rectifier is obtained from logarithmic regression with the maximum AC current (:math:`I_{AC}`)
+The purchase cost of the rectifier is obtained from linear regression with the maximum AC current (:math:`I_{AC}`)
 and the retail price of `ATO <https://www.ato.com/plating-rectifier>`_.
 
 .. math::
