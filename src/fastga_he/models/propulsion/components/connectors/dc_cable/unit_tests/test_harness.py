@@ -949,9 +949,8 @@ def test_core_cost():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:properties:density",
-        val=8960.0,
-        units="kg/m**3",
+        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:material",
+        val=1.0,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -971,9 +970,9 @@ def test_wire_cost():
     )
 
     ivc.add_output(
-        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_volume",
-        val=92556.8,
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_volume",
         units="USD/m**3",
+        val=92556.8,
     )
 
     # Run problem and check obtained value(s) is/(are) correct

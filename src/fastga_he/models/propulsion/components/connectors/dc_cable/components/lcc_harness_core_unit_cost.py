@@ -3,7 +3,9 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
-from .sizing_material_core import RHO_COPPER
+
+COST_COPPER = 92556.8
+COST_ALU = 6775.0
 
 
 class LCCHarnessCoreUnitCost(om.ExplicitComponent):
@@ -23,11 +25,9 @@ class LCCHarnessCoreUnitCost(om.ExplicitComponent):
         harness_id = self.options["harness_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":properties:density",
-            val=RHO_COPPER * 1e3,
-            units="kg/m**3",
+            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material",
+            val=1.0,
+            desc="1.0 for copper, 0.0 for aluminium",
         )
 
         self.add_output(
@@ -38,20 +38,29 @@ class LCCHarnessCoreUnitCost(om.ExplicitComponent):
             val=6775.0,
         )
 
-        self.declare_partials(of="*", wrt="*", method="fd")
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume",
+            wrt="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material",
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         harness_id = self.options["harness_id"]
 
-        rho_c = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":properties:density"
+        material = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material"
         ]
 
-        if rho_c < RHO_COPPER * 1e3:
-            outputs[
-                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume"
-            ] = 6775.0  # USD/m^3
-        else:
-            outputs[
-                "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume"
-            ] = 92556.8  # USD/m^3
+        # Linear variation between densities of copper and aluminum to allow for easy partial
+        # derivatives computation
+        outputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume"
+        ] = COST_ALU + (COST_COPPER - COST_ALU) * material
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        harness_id = self.options["harness_id"]
+
+        partials[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":material",
+        ] = COST_COPPER - COST_ALU

@@ -2359,6 +2359,7 @@
         <propeller>
           <propeller_1>
             <activity_factor is_input="True">156.0<!--Activity factor of the propeller--></activity_factor>
+            <type>1.0</type>
             <advance_ratio_max is_input="False">1.0053404525684901<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">25.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <cl_clean_ref is_input="False">0.0<!--Value of the clean lift coefficient of the section behind the propeller for reference wing lift coefficient--></cl_clean_ref>
