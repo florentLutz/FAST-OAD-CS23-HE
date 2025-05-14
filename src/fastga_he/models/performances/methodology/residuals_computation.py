@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     input_ivc.add_output(name="tsfc", val=7.3e-6, units="kg/N/s")
 
-    prob = om.Problem()
+    prob = om.Problem(reports=False)
     prob.model.add_subsystem(name="inputs_definition", subsys=input_ivc, promotes=["*"])
     prob.model.add_subsystem(name="mtow_solving", subsys=SizingLoopMTOW(), promotes=["*"])
 

@@ -74,7 +74,7 @@ def get_ivc_all_data(power_design, t41t_design, opr_design, altitude_design, mac
 
 
 def run_design_point(ivc):
-    prob = om.Problem()
+    prob = om.Problem(reports=False)
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
         "turboshaft_sizing",
@@ -115,7 +115,7 @@ def run_design_point(ivc):
 
 
 def get_fuel_problem(ivc):
-    prob = om.Problem()
+    prob = om.Problem(reports=False)
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
         "turboshaft_off_design_fuel",

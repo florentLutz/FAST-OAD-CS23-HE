@@ -83,7 +83,7 @@ def get_ivc_all_data(
 
 
 def run_design_point(ivc):
-    prob = om.Problem()
+    prob = om.Problem(reports=False)
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
         "turboshaft_sizing",
@@ -116,7 +116,7 @@ def run_design_point(ivc):
 
 
 def get_fuel_problem(ivc):
-    prob = om.Problem()
+    prob = om.Problem(reports=False)
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
         "turboshaft_off_design_fuel",
@@ -225,7 +225,7 @@ def run_max_power_opr_limit(altitude_off_design: list, mach_off_design: list, iv
     ivc.add_output("altitude", val=altitude_off_design[0], units="ft")
     ivc.add_output("mach_0", val=mach_off_design[0])
 
-    prob = om.Problem()
+    prob = om.Problem(reports=False)
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
         "turboshaft_off_design_max_power_opr_limit",
@@ -291,7 +291,7 @@ def run_max_power_itt_limit(altitude_off_design: list, mach_off_design: list, iv
     ivc.add_output("altitude", val=altitude_off_design[0], units="ft")
     ivc.add_output("mach_0", val=mach_off_design[0])
 
-    prob = om.Problem()
+    prob = om.Problem(reports=False)
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
         "turboshaft_off_design_max_power_opr_limit",
