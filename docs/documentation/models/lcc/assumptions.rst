@@ -6,7 +6,9 @@ Life Cycle Cost model assumptions
 
 The following assumptions have been made in the calculation of the Life Cycle Cost (LCC).
 
+* Each powertrain component’s production cost is defined as its purchase cost.
 * Engines and propellers operational costs are the overhaul cost divided over Time Between Overhauls (TBO).
 * Electric sources and electronics operational costs are their replacement cost divided over their lifespan.
 * The purchase cost of the electronics are estimated based on the amount of electric loads.
 * The storage tank and transmission maintenance costs are included in the aircraft annual maintenance cost.
+* For simplicity, the shield and core unit costs are set equal, as are the insulation and sheath costs.
