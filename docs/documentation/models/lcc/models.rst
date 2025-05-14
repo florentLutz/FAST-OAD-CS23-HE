@@ -81,8 +81,8 @@ Cost of materials
     C_{\text{material (\$)}} = 24.896 \cdot  W_{\text{airframe}}^{0.689} \cdot V_H^{0.624} \cdot N^{0.792}
                             \cdot CPI_{\text{2012}} \cdot F_{CF} \cdot F_{\text{press}}
 
-:math:`F_{CF}` is the complex flap system factor = 1.02 if complex flap system applied and  :math:`F_{\text{press}}`
-is the pressurized factor = 1.01 if having pressurized cabin.
+:math:`F_{CF}` is the complex flap system factor = 1.02 if complex flap system are used and  :math:`F_{\text{press}}`
+is the pressurized factor = 1.01 if the aircraft has a pressurized cabin.
 
 Cost of certification
 ***************
