@@ -55,7 +55,7 @@ the aircraft development. As numerous types of labor are included, this cost can
 
 Cost of flight test
 *******************
-Cost of development and certification flight test.
+This includes items such as the cost of development and certification flight test.
 
 .. math::
 
