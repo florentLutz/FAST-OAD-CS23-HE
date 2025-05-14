@@ -313,7 +313,7 @@ Constant-speed with turboshaft          4000 - 6800
 power of the turboshaft engine at sea level.
 
 *********************
-Computation Structure
+Cost model structure
 *********************
 This is a reference model structure of the LCC model using TBM-900 as the base aircraft.
 
