@@ -22,6 +22,10 @@ from .lcc_operational_cost_sum import LCCSumOperationalCost
 
 
 class LCCOperationalCost(om.Group):
+    """
+    Group collects all the operational cost calculation.
+    """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

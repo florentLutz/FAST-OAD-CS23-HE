@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCDCSSPCCost(om.ExplicitComponent):
     """
-    Computation of the SSPC cost. Estimated from the MSRP of the IGBT modules from:
+    Computation of the DC SSPC cost. Estimated from the MSRP of the IGBT modules from:
     https://www.semikron-danfoss.com/.
     """
 

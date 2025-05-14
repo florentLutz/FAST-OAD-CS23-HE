@@ -10,7 +10,7 @@ from .lcc_harness_unit_cost import LCCHarnessUnitCost
 
 class LCCHarnessCost(om.Group):
     """
-    Class collect all required computation of the DC cable harness.
+    Class collect all required computations of the DC cable harness.
     """
 
     def initialize(self):

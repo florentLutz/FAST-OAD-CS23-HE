@@ -5,6 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
+GROSS_MARGIN = 0.45
+
 
 class LCCHarnessUnitCost(om.ExplicitComponent):
     """
@@ -108,7 +110,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_unit"
-        ] = c_cable / 0.55
+        ] = c_cable / (1.0 - GROSS_MARGIN)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         harness_id = self.options["harness_id"]
@@ -148,7 +150,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
-        ] = (c_conductor + c_i + c_shield + c_sheath) / 0.55
+        ] = (c_conductor + c_i + c_shield + c_sheath) / (1.0 - GROSS_MARGIN)
 
         partials[
             output_str,
@@ -158,7 +160,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             * np.pi
             * length
             * (cost_core * r_c + cost_ins * t_in + cost_core * t_shield + cost_ins * t_sheath)
-        ) / 0.55
+        ) / (1.0 - GROSS_MARGIN)
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:"
@@ -169,7 +171,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             * np.pi
             * length
             * (cost_ins * (t_in + r_c) + cost_core * t_shield + cost_ins * t_sheath)
-            / 0.55
+            / (1.0 - GROSS_MARGIN)
         )
         partials[
             output_str,
@@ -179,14 +181,26 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             * np.pi
             * length
             * (cost_core * (t_shield + r_c + t_in) + cost_ins * t_sheath)
-            / 0.55
+            / (1.0 - GROSS_MARGIN)
         )
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
-        ] = 2.0 * np.pi * cost_ins * length * (r_c + t_in + t_shield + t_sheath) / 0.55
+        ] = (
+            2.0
+            * np.pi
+            * cost_ins
+            * length
+            * (r_c + t_in + t_shield + t_sheath)
+            / (1.0 - GROSS_MARGIN)
+        )
 
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume",
-        ] = length * np.pi * ((r_c**2.0) + ((2.0 * (r_c + t_in) + t_shield) * t_shield)) / 0.55
+        ] = (
+            length
+            * np.pi
+            * ((r_c**2.0) + ((2.0 * (r_c + t_in) + t_shield) * t_shield))
+            / (1.0 - GROSS_MARGIN)
+        )

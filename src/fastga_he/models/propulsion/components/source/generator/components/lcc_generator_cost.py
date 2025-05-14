@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCGeneratorCost(om.ExplicitComponent):
     """
-    Computation of the cost of the generator. This is based on the PMSM regression model.
+    Computation of the generator purchase cost. This is based on the PMSM regression model.
     """
 
     def initialize(self):

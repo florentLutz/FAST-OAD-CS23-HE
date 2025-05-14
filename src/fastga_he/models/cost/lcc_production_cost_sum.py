@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCSumProductionCost(om.ExplicitComponent):
     """
-    Computation of summing all the costs and reductions for both production phase.
+    Computation of summing all the costs and reductions for production phase.
     """
 
     def initialize(self):

@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCHighRPMICECost(om.ExplicitComponent):
     """
-    Computation of ICE engine purchasing cost from :cite:`gudmundsson:2013`.
+    Computation of ICE engine purchase cost from :cite:`gudmundsson:2013`.
     """
 
     def initialize(self):

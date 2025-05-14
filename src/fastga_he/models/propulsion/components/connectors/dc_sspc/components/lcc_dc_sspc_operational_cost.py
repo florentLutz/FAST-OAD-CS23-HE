@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCDCSSPCOperationalCost(om.ExplicitComponent):
     """
-    Computation of the SSPC annual operational cost. The lifespan expectancy is obtained from
+    Computation of the DC SSPC annual operational cost. The lifespan expectancy is obtained from
     :cite:`cao:2023`.
     """
 

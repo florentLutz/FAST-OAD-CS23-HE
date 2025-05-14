@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCHighRPMICEOperationalCost(om.ExplicitComponent):
     """
-    Computation of ICE engine operational cost from
+    Computation of ICE engine annual operational cost from
     http://blog.overhaulbids.com/lycoming-overhaul-cost/.
     """
 

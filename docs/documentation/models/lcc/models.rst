@@ -29,7 +29,7 @@ Cost of engineering, toolong, and manufacturing
 ***********************************************
 The cost of the engineering labor, tooling labor, and manufacturing labor share a similar computation structure. It begins
 with estimating the total man-hours required for the development process for the first 5-year production period . Then,
-the cost is simply calculated by multiplying the number of human-hour (:math:`H_{\text{labor}}`) and cost rate of labor
+the cost is simply calculated by multiplying the number of man-hour (:math:`H_{\text{labor}}`) and cost rate of labor
 (:math:`R_{\text{labor}}`) for each subcategory with the inflation adjustment.
 
 .. math::

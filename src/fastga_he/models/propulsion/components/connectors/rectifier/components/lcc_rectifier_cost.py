@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCRectifierCost(om.ExplicitComponent):
     """
-    Computation of the rectifier purchase cost. Based on the retail price provided by
+    Computation of the rectifier purchase cost. The retail price is provided by
     https://www.ato.com/plating-rectifier.
     """
 

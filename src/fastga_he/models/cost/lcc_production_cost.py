@@ -27,6 +27,10 @@ from .lcc_delivery_cost import LCCDeliveryCost
 
 
 class LCCProductionCost(om.Group):
+    """
+    Group collects all the production cost calculation.
+    """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

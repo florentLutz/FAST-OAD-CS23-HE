@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCPMSMCost(om.ExplicitComponent):
     """
-    Computation of the cost of the motor including the electronics of the powertrain. PMSM
+    Computation of the cost of the motor including the electronics of the powertrain. The PMSM
     regression model obtained based on the price of the products from: https://emrax.com/e-motors/.
     """
 

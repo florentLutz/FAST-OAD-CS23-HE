@@ -8,7 +8,7 @@ import numpy as np
 
 class LCCBatteryPackOperationalCost(om.ExplicitComponent):
     """
-    Computation of the battery pack operational cost and electricity cost.
+    Computation of the battery pack annual operational cost.
     """
 
     def initialize(self):

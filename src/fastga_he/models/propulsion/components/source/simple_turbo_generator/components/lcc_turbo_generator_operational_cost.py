@@ -10,8 +10,8 @@ EXPECTED_LIFESPAN = 1250.0  # hours
 
 class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
     """
-    Cost computation of the turbo generator operational cost is based on its purchase price and the
-    expected lifespan from https://naasco.com/starter-generators/.
+    Computation of the turbo generator annual operational cost is based on its purchase price and
+    the expected lifespan from https://naasco.com/starter-generators/.
     """
 
     def initialize(self):

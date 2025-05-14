@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCMaterialCost(om.ExplicitComponent):
     """
-    Computation of the raw material cost per aircraft obtained from :cite:`gudmundsson:2013`.
+    Computation of the raw material cost per aircraft, obtained from :cite:`gudmundsson:2013`.
     """
 
     def setup(self):

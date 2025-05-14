@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCPEMFCStackOperationalCost(om.ExplicitComponent):
     """
-    Computation of the PEMFC stack operational cost based on the PEMFC lifespan from
+    Computation of the PEMFC stack annual operational cost based on the PEMFC lifespan from
     :cite:`fuhren:2022`.
     """
 
