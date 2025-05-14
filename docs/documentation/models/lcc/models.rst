@@ -28,43 +28,46 @@ Aircraft production cost
 Cost of engineering, toolong, and manufacturing
 ***********************************************
 The cost of the engineering labor, tooling labor, and manufacturing labor share a similar computation structure. It begins
-with estimating the total man-hours required for the development process for the first 5-year production period . Then, the cost is simply calculated by multiplying the number of human-hour
-(:math:`H_{\text{labor}}`) and cost rate of labor (:math:`R_{\text{labor}}`) for each subcategory with the inflation
-adjustment.
+with estimating the total man-hours required for the development process for the first 5-year production period . Then,
+the cost is simply calculated by multiplying the number of human-hour (:math:`H_{\text{labor}}`) and cost rate of labor
+(:math:`R_{\text{labor}}`) for each subcategory with the inflation adjustment.
 
 .. math::
 
-    H_{\text{labor}} = f(W_{\text{airframe}},N,V_H,Q_m,F) \\
+    H_{\text{labor}} = f(M_{\text{airframe}},N,V_H,Q_m,F) \\
     C_{\text{labor (\$)}} = 2.0969 \cdot H_{\text{labor}} \cdot R_{\text{labor}} \cdot CPI_{\text{2012}}
 
-:math:`W_{\text{airframe}}` is the weight of airframe, :math:`N` is the number of aircraft produced for a
+:math:`M_{\text{airframe}}` is the weight of airframe, :math:`N` is the number of aircraft produced for a
 5-year period, :math:`V_H` maximum cruise true airspeed in knots, :math:`Q_m` is the estimated aircraft production
 rate per month, and :math:`F` is the combination of factors based on aircraft design specifications detailed in :cite:`gudmundsson:2013`.
 
 Cost of development support
 ***************************
-Indirect development labor cost includes items such as overheads, administration, logistics, human resources, facilities maintenance during
-the aircraft development. As numerous types of labor are included, this cost can not be estimated with a fixed cost rate.
+Indirect development labor cost, provided by :cite:`gudmundsson:2013`, includes items such as overheads, administration,
+logistics, human resources, facilities maintenance during the aircraft development. As numerous types of labor are
+included, this cost can not be estimated with a fixed cost rate.
 
 .. math::
 
-    C_{\text{dev (\$)}} = 0.06458 \cdot W_{\text{airframe}}^{0.873} \cdot V_H^{1.89} \cdot N_p^{0.346} \cdot CPI_{\text{2012}}
+    C_{\text{dev (\$)}} = 0.06458 \cdot M_{\text{airframe}}^{0.873} \cdot V_H^{1.89} \cdot N_p^{0.346} \cdot CPI_{\text{2012}}
                     \cdot F
 
 :math:`N_p` is the number of prototype produced during the development period.
 
 Cost of flight test
 *******************
-This includes items such as the cost of development and certification flight test.
+The flight test cost, provided by :cite:`gudmundsson:2013`, includes items such as the cost of development and
+certification flight test.
 
 .. math::
 
-    C_{\text{ft (\$)}} = 0.009646 \cdot W_{\text{airframe}}^{1.16} \cdot V_H^{1.3718} \cdot N_p^{1.281} \cdot CPI_{\text{2012}}
+    C_{\text{ft (\$)}} = 0.009646 \cdot M_{\text{airframe}}^{1.16} \cdot V_H^{1.3718} \cdot N_p^{1.281} \cdot CPI_{\text{2012}}
 
 
-Cost of quality control
-***********************
-This includes items such as the cost of manufacturing quality control, the cost of technicians and the cost of equipments.
+Cost of quality control (QC)
+****************************
+The QC cost, provided by :cite:`gudmundsson:2013`, includes items such as the cost of manufacturing quality control, the
+cost of technicians and the cost of equipments.
 
 .. math::
 
@@ -74,21 +77,21 @@ This includes items such as the cost of manufacturing quality control, the cost 
 proportion of the airframe made of composite material.
 
 Cost of materials
-****************
+*****************
+The material cost, provided by :cite:`gudmundsson:2013`, computes the raw material purchase cost for the airframe.
 
 .. math::
 
-    C_{\text{material (\$)}} = 24.896 \cdot  W_{\text{airframe}}^{0.689} \cdot V_H^{0.624} \cdot N^{0.792}
+    C_{\text{material (\$)}} = 24.896 \cdot  M_{\text{airframe}}^{0.689} \cdot V_H^{0.624} \cdot N^{0.792}
                             \cdot CPI_{\text{2012}} \cdot F_{CF} \cdot F_{\text{press}}
 
 :math:`F_{CF}` is the complex flap system factor = 1.02 if complex flap system are used and  :math:`F_{\text{press}}`
 is the pressurized factor = 1.01 if the aircraft has a pressurized cabin.
 
 Cost of certification
-***************
-
-The cost of certification is the sum of engineering labor cost, development support cost, flight test cost, and the
-tooling labor cost.
+*********************
+The cost of certification, provided by :cite:`gudmundsson:2013`, is the sum of engineering labor cost, development
+support cost, flight test cost, and the tooling labor cost.
 
 .. math::
 
@@ -100,7 +103,7 @@ Powertrain production cost
 
 Engine purchase cost
 ********************
-This represents the purchase cost of an engine as presented in :cite:`gudmundsson:2013`.
+The engine purchase cost is provided by :cite:`gudmundsson:2013`.
 
 .. math::
 
@@ -129,7 +132,7 @@ Unit purchase cost of the propeller from :cite:`gudmundsson:2013`.
 
 Synchronous motor / Generator purchase cost
 *******************************************
-Unit purchase cost obtained from regression model based on product retail prices of `Emrax <https://emrax.com/e-motors/>`_.
+Unit purchase cost is obtained from regression model based on product retail prices of `Emrax <https://emrax.com/e-motors/>`_.
 
 .. math::
 
@@ -139,23 +142,64 @@ Unit purchase cost obtained from regression model based on product retail prices
 
 Battery purchase cost
 *********************
-Unit purchase cost obtained with logarithmic regression from :cite:`Wesley:2023`.
+Unit purchase cost is modeled with power regression from :cite:`Wesley:2023`.
 
 .. math::
 
-    C_{\text{bat (\$)}} = C_{2022}  E_{\text{bat}} (1.01 - 0.156 \ln{Y_{2022}})
+    C_{\text{bat (\$)}} = 1.08 \cdot C_{2022}  E_{\text{bat}} Y_{2022}^{-0.228}
 
 :math:`C_{2022}` is the energy per dollar of battery in 2022, :math:`E_{bat}` is the maximum energy supply from battery,
 and :math:`Y_{2022}` is the amount of year from 2022.
 
+DC cable purchase cost
+**********************
+The purchase cost DC cable is based on the metal material cost, non-metal material cost, and the gross
+margin (:math:`\Gamma_{\text{gross}}`) of the cable manufacturing industry. The material cost assumption is detailed
+in :ref:`assumptions <assumptions-lcc>`.
 
-********************
-Operation cost model
-********************
-Similar as the production cost model, the operational cost model is also built by separating aircraft and powertrain costs. As the maintenance cost at aircraft level already includes the cost of all connector and tank components, their individual costs are not calculated separately. For electronic components such as the engine and generator, the operating costs are estimated as an annual fraction of the purchase price.
+.. math::
 
-Aircraft operational cost
-===================
+    C_{\text{cable (\$)}} =\sum \frac{ C_n \cdot V_n}{1 - \Gamma_{\text{gross}}}
+
+Where :math:`n \in \{\text{core, insulation, shield, sheath}\}`
+
+Inverter/ DC-DC converter purchase cost
+***************************************
+The purchase cost of both electronics are obtained from logarithmic regression based on the retail price of
+`MidContinent <https://www.mcico.com/truebluepower>`_.
+
+.. math::
+
+    C_{\text{inverter (\$)}} = 2167 \cdot \ln{P_{inv}} + 6910 \\
+    C_{\text{converter (\$)}} = 733 \cdot \ln{P_{con}} + 2295
+
+:math:`\ln{P_{inv}}` is the inverter power rating and :math:`\ln{P_{con}}` is the converter power rating.
+
+Rectifier purchase cost
+***********************
+The purchase cost of the rectifier is obtained from logarithmic regression with the maximum AC current (:math:`I_{AC}`)
+and the retail price of `ATO <https://www.ato.com/plating-rectifier>`_.
+
+.. math::
+
+    C_{\text{rectifier (\$)}} = 1.72 \cdot I_{AC} + 2034
+
+DC SSPC purchase cost
+*********************
+The purchase cost of the DC SSPC is based on the price of IGBT modules from `Semikron <https://www.semikron-danfoss.com/>`_,
+the maximum current (:math:`I_{max}`), and a price adjust factor (:math:`k_{\text{SSPC}}`) to consider price difference.
+
+.. math::
+
+    C_{\text{SSPC (\$)}} = k_{\text{SSPC}} (1.21 \cdot I_{max} + 83.8)
+
+**********************
+Operational cost model
+**********************
+Similar as the production cost model, the operational cost model is also built by separating aircraft and powertrain costs.
+As the maintenance cost at aircraft level already includes the cost of the storage tank and transmission mechanisms,
+their individual costs are not calculated separately. For all electronics, motors, and battery, the operational
+costs are estimated as an annual fraction of their purchase price.
 
 Annual maintenance & miscellaneous cost
 ***************************************
@@ -164,7 +208,7 @@ These cost models are based on a regression derived with the data from
 
 .. math::
 
-    C_{\text{maintenance (\$)}} = 195 \cdot FH_{\text{year}} \cdot e^{0.000232 OWE} \\
+    C_{\text{maintenance (\$)}} =  FH_{\text{year}} \cdot \left(331 - 0.072 \cdot \text{OWE} + 2.75 \times 10^{-5} \cdot \text{OWE}^2\right) \\
     C_{\text{miscellaneous (\$)}} = 80 \cdot FH_{\text{year}}
 
 Annual loan cost
@@ -181,13 +225,12 @@ payback periods.
 
 Annual insurance cost
 *********************
-
 Yearly insurance cost estimation provided by :cite:`gudmundsson:2013`, slight value adjustments applied
 from `Sunset aviation insurance <https://sunsetais.com/aircraft-hull-liability/>`_.
 
 .. math::
 
-   C_{\text{ins (\$)}} = 500 + 0.01 \cdot Price
+   C_{\text{insurance (\$)}} = 500 + 0.01 \cdot Price
 
 :math:`Price` is the purchase price of the aircraft
 
@@ -217,9 +260,6 @@ MTOW (Tons)                Daily parking cost (€)            Landing cost per 
 
 :math:`w` is the MTOW of the aircraft in tons.
 
-
-Powertrain level cost
-=====================
 
 Fuel cost
 *********
@@ -275,7 +315,6 @@ power of the turboshaft engine at sea level.
 *********************
 Computation Structure
 *********************
-
 This is a reference model structure of the LCC model using TBM-900 as the base aircraft.
 
 .. raw:: html
