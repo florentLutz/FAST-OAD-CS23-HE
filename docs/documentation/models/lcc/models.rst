@@ -70,7 +70,7 @@ This includes items such as the cost of manufacturing quality control, the cost 
 
     C_{\text{QC (\$)}} = 0.13 * C_{\text{MFG}} * (1 + 0.5f_{\text{comp}})
 
-:math:`C_{\text{MFG}}` is the manufacturing cost of a 5-year period, :math:`f_{\text{comp}}` represents the
+:math:`C_{\text{MFG}}` is the manufacturing cost of a 5-year period and :math:`f_{\text{comp}}` is the
 proportion of the airframe made of composite material.
 
 Cost of materials
