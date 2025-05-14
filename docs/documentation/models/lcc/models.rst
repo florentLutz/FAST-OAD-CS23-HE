@@ -129,7 +129,7 @@ Unit purchase cost of the propeller from :cite:`gudmundsson:2013`.
 
 Synchronous motor / Generator purchase cost
 *******************************************
-Unit purchase cost obtained from `Emrax <https://emrax.com/e-motors/>`_.
+Unit purchase cost obtained from regression model based on product retail prices of `Emrax <https://emrax.com/e-motors/>`_.
 
 .. math::
 
@@ -152,17 +152,14 @@ and :math:`Y_{2022}` is the amount of year from 2022.
 ********************
 Operation cost model
 ********************
-Similar as the production cost model, the operation cost is also built with the cost from aircraft level and powertrain
-level. Since the aircraft-level maintenance cost already includes all costs of connector and tank components, their individual costs are
-not calculated separately. For electronic components such as the motor and generator, operational costs are estimated as an annual
-fraction of the purchase price.
+Similar as the production cost model, the operational cost model is also built by separating aircraft and powertrain costs. As the maintenance cost at aircraft level already includes the cost of all connector and tank components, their individual costs are not calculated separately. For electronic components such as the engine and generator, the operating costs are estimated as an annual fraction of the purchase price.
 
-Aircraft level cost
+Aircraft operational cost
 ===================
 
 Annual maintenance & miscellaneous cost
 ***************************************
-For better cost estimation, these cost model achieved with a regression model derived with the data from
+These cost models are based on a regression derived with the data from
 `Guardianjet <https://www.guardianjet.com/jet-aircraft-online-tools>`_.
 
 .. math::
@@ -226,7 +223,7 @@ Powertrain level cost
 
 Fuel cost
 *********
-Fuel cost estimation obtained from :cite:`sens:2024` and `Orleans loire-valley airport <https://orleans.aeroport.fr>`_.
+Fuel cost estimation are obtained from :cite:`sens:2024` and `Orleans loire-valley airport <https://orleans.aeroport.fr>`_.
 
 .. raw:: html
 
