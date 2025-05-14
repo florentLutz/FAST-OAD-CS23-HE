@@ -315,7 +315,7 @@ power of the turboshaft engine at sea level.
 *********************
 Cost model structure
 *********************
-This is a reference model structure of the LCC model using TBM-900 as the base aircraft.
+This diagram presents the structure of the LCC model using the TBM-900 as a support.
 
 .. raw:: html
 
