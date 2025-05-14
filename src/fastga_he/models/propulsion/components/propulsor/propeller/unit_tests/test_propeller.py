@@ -960,7 +960,7 @@ def test_verification_height_impact_overflow():
     reported in :cite:`patterson:2016`
     """
 
-    problem = om.Problem()
+    problem = om.Problem(reports=False)
     model = problem.model
 
     model.add_subsystem(

@@ -2143,7 +2143,7 @@ def test_recording():
     # Define used files depending on options
     xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
 
-    problem = om.Problem()
+    problem = om.Problem(reports=False)
     model = problem.model
 
     group = om.Group()
