@@ -18,16 +18,16 @@ import openmdao.api as om
 import fastoad.api as oad
 
 from fastga.models.weight.mass_breakdown.c_systems.constants import (
-    SUBMODEL_POWER_SYSTEM_MASS,
-    SUBMODEL_LIFE_SUPPORT_SYSTEM_MASS,
-    SUBMODEL_AVIONICS_SYSTEM_MASS,
-    SUBMODEL_RECORDING_SYSTEM_MASS,
+    SERVICE_POWER_SYSTEM_MASS,
+    SERVICE_LIFE_SUPPORT_SYSTEM_MASS,
+    SERVICE_AVIONICS_SYSTEM_MASS,
+    SERVICE_RECORDING_SYSTEM_MASS,
 )
 
-from fastga.models.weight.mass_breakdown.constants import SUBMODEL_SYSTEMS_MASS
+from fastga.models.weight.mass_breakdown.constants import SERVICE_SYSTEMS_MASS
 
 
-@oad.RegisterSubmodel(SUBMODEL_SYSTEMS_MASS, "fastga_he.submodel.weight.mass.systems.weight_nan")
+@oad.RegisterSubmodel(SERVICE_SYSTEMS_MASS, "fastga_he.submodel.weight.mass.systems.weight_nan")
 class SystemsWeight(om.Group):
     """Computes mass of systems by summing the contribution of each systems, sets the default
     value at nan contrarily to the legacy submodel."""
@@ -35,22 +35,22 @@ class SystemsWeight(om.Group):
     def setup(self):
         self.add_subsystem(
             "navigation_systems_weight",
-            oad.RegisterSubmodel.get_submodel(SUBMODEL_AVIONICS_SYSTEM_MASS),
+            oad.RegisterSubmodel.get_submodel(SERVICE_AVIONICS_SYSTEM_MASS),
             promotes=["*"],
         )
         self.add_subsystem(
             "power_systems_weight",
-            oad.RegisterSubmodel.get_submodel(SUBMODEL_POWER_SYSTEM_MASS),
+            oad.RegisterSubmodel.get_submodel(SERVICE_POWER_SYSTEM_MASS),
             promotes=["*"],
         )
         self.add_subsystem(
             "life_support_systems_weight",
-            oad.RegisterSubmodel.get_submodel(SUBMODEL_LIFE_SUPPORT_SYSTEM_MASS),
+            oad.RegisterSubmodel.get_submodel(SERVICE_LIFE_SUPPORT_SYSTEM_MASS),
             promotes=["*"],
         )
         self.add_subsystem(
             "recording_systems_weight",
-            oad.RegisterSubmodel.get_submodel(SUBMODEL_RECORDING_SYSTEM_MASS),
+            oad.RegisterSubmodel.get_submodel(SERVICE_RECORDING_SYSTEM_MASS),
             promotes=["*"],
         )
 

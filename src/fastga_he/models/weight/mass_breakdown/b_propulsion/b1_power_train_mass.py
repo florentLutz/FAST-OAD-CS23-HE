@@ -6,11 +6,11 @@ import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
 
-from fastga.models.weight.mass_breakdown.constants import SUBMODEL_PROPULSION_MASS
+from fastga.models.weight.mass_breakdown.constants import SERVICE_PROPULSION_MASS
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_PROPULSION_MASS, "fastga_he.submodel.weight.mass.propulsion.power_train"
+    SERVICE_PROPULSION_MASS, "fastga_he.submodel.weight.mass.propulsion.power_train"
 )
 class PowerTrainMass(om.ExplicitComponent):
     def initialize(self):

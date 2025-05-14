@@ -7,15 +7,15 @@ from openmdao import api as om
 
 import fastoad.api as oad
 
-from fastga.models.weight.mass_breakdown.constants import SUBMODEL_PAYLOAD_MASS
+from fastga.models.weight.mass_breakdown.constants import SERVICE_PAYLOAD_MASS
 
 # Register FAST-GA submodel as defaults
-oad.RegisterSubmodel.active_models[SUBMODEL_PAYLOAD_MASS] = (
+oad.RegisterSubmodel.active_models[SERVICE_PAYLOAD_MASS] = (
     "fastga.submodel.weight.mass.payload.legacy"
 )
 
 
-@oad.RegisterSubmodel(SUBMODEL_PAYLOAD_MASS, "fastga_he.weight.payload_for_retrofit")
+@oad.RegisterSubmodel(SERVICE_PAYLOAD_MASS, "fastga_he.weight.payload_for_retrofit")
 class ComputePayloadForRetrofit(om.ExplicitComponent):
     """
     In the case of a retrofit where we aim to keep the MTOW constant  we must sacrifice payload

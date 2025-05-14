@@ -29,12 +29,12 @@ from .wing_components.compute_primary_mass import ComputePrimaryMass
 from .wing_components.compute_secondary_mass import ComputeSecondaryMass
 from .wing_components.update_wing_mass import UpdateWingMass
 
-from fastga.models.weight.mass_breakdown.a_airframe.constants import SUBMODEL_WING_MASS
+from fastga.models.weight.mass_breakdown.a_airframe.constants import SERVICE_WING_MASS
 from .constants import SUBMODEL_WING_SKIN_MASS
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_WING_MASS, "fastga_he.submodel.weight.mass.airframe.wing.analytical_he"
+    SERVICE_WING_MASS, "fastga_he.submodel.weight.mass.airframe.wing.analytical_he"
 )
 class ComputeWingMassAnalytical(om.Group):
     """

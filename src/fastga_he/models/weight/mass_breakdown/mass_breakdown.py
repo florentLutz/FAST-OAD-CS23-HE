@@ -18,7 +18,7 @@ import openmdao.api as om
 
 import fastoad.api as oad
 
-from fastga.models.weight.mass_breakdown.constants import SUBMODEL_OWE, SUBMODEL_PAYLOAD_MASS
+from fastga.models.weight.mass_breakdown.constants import SERVICE_OWE, SERVICE_PAYLOAD_MASS
 from fastga.models.weight.constants import SUBMODEL_MASS_BREAKDOWN
 
 from .constants import SUBMODEL_MZFW_MLW
@@ -70,12 +70,12 @@ class MassBreakdown(om.Group):
     def setup(self):
         if self.options[PAYLOAD_FROM_NPAX]:
             self.add_subsystem(
-                "payload", oad.RegisterSubmodel.get_submodel(SUBMODEL_PAYLOAD_MASS), promotes=["*"]
+                "payload", oad.RegisterSubmodel.get_submodel(SERVICE_PAYLOAD_MASS), promotes=["*"]
             )
         propulsion_option = {"propulsion_id": self.options["propulsion_id"]}
         self.add_subsystem(
             "owe",
-            oad.RegisterSubmodel.get_submodel(SUBMODEL_OWE, options=propulsion_option),
+            oad.RegisterSubmodel.get_submodel(SERVICE_OWE, options=propulsion_option),
             promotes=["*"],
         )
         self.add_subsystem(
