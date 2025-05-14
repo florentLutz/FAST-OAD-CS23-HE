@@ -73,7 +73,7 @@ This includes items such as the cost of manufacturing quality control, the cost 
 :math:`C_{\text{MFG}}` is the manufacturing cost of a 5-year period, :math:`f_{\text{comp}}` represents the
 proportion of the airframe made of composite material.
 
-Cost of material
+Cost of materials
 ****************
 
 .. math::
