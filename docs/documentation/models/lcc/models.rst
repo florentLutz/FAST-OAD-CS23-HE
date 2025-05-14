@@ -100,7 +100,7 @@ Powertrain production cost
 
 Engine purchase cost
 ********************
-Unit purchase cost of the engine from :cite:`gudmundsson:2013`.
+This represents the purchase cost of an engine as presented in :cite:`gudmundsson:2013`.
 
 .. math::
 
