@@ -64,7 +64,7 @@ Cost of development and certification flight test.
 
 Cost of quality control
 ***********************
-Cost of manufacturing quality control, which consist with the cost of technicians and equipments.
+This includes items such as the cost of manufacturing quality control, the cost of technicians and the cost of equipments.
 
 .. math::
 
