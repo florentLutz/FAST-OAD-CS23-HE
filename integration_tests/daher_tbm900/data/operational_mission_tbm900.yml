@@ -29,11 +29,11 @@ model:
 
 submodels:
     service.weight.mass.payload: null
-    submodel.weight.mass.propulsion.installed_engine: fastga.submodel.weight.mass.propulsion.installed_engine.raymer
-    submodel.weight.mass.propulsion.fuel_system: fastga.submodel.weight.mass.propulsion.fuel_system.flops
+    service.weight.mass.propulsion.installed_engine: fastga.submodel.weight.mass.propulsion.installed_engine.raymer
+    service.weight.mass.propulsion.fuel_system: fastga.submodel.weight.mass.propulsion.fuel_system.flops
     service.weight.mass.airframe.paint: fastga.submodel.weight.mass.airframe.paint.by_wet_area
     #    submodel.weight.mass.airframe.tail: fastga.submodel.weight.mass.airframe.tail.torenbeek_gd
-    submodel.weight.mass.airframe.wing: fastga.submodel.weight.mass.airframe.wing.analytical
+    service.weight.mass.airframe.wing: fastga.submodel.weight.mass.airframe.wing.analytical
     service.weight.mass.airframe.fuselage: fastga.submodel.weight.mass.airframe.fuselage.analytical
     service.weight.mass.airframe.flight_controls: fastga.submodel.weight.mass.airframe.flight_controls.flops
     service.weight.mass.furniture.seats: null

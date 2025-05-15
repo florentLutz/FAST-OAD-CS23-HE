@@ -1567,7 +1567,7 @@ files = []
 develop = false
 
 [package.dependencies]
-fast-oad-core = "^1.7.3"
+fast-oad-core = "^1.7"
 pyparsing = "*"
 stdatm = ">=0.2.0"
 
@@ -1578,7 +1578,7 @@ jupyterlab = ["jupyterlab (>=3.3.0,<4.0.0)"]
 type = "git"
 url = "https://github.com/supaero-aircraft-design/FAST-GA.git"
 reference = "main"
-resolved_reference = "de0bcd511a0a59d4dfb2616779b1770a4cf2bf5a"
+resolved_reference = "604b7ce29eddef52a901b572e59a649bb66bb128"
 
 [[package]]
 name = "fasteners"
