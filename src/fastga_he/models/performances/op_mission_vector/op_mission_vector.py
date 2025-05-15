@@ -43,6 +43,8 @@ from fastga_he.models.performances.mission_vector.initialization.constants impor
 
 from fastga_he.models.performances.mission_vector.mission.thrust_taxi import MIN_POWER_TAXI
 
+from fastga_he._utils.arrays import scalarize
+
 _LOGGER = logging.getLogger(__name__)
 
 DENSITY_SL = Atmosphere(0.0).density
@@ -1195,23 +1197,23 @@ class OperationalMissionVector(om.Group):
         # inputs. This should be kept in mind !
         dummy_tas_array = self._get_initial_guess_true_airspeed(
             mass=outputs["solve_equilibrium.update_mass.mass"],
-            wing_area=float(
+            wing_area=scalarize(
                 inputs[
                     "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.data:geometry:wing:area"
                 ]
             ),
-            cruise_altitude=float(
+            cruise_altitude=scalarize(
                 inputs[
                     "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
                 ]
             ),
-            cl_max_clean=float(
+            cl_max_clean=scalarize(
                 inputs[
                     "initialization.initialize_reserve_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
                 ]
             ),
-            cruise_tas=float(inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"]),
-            reserve_altitude=float(
+            cruise_tas=scalarize(inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"]),
+            reserve_altitude=scalarize(
                 inputs[
                     "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
                 ]
@@ -1388,12 +1390,12 @@ class OperationalMissionVector(om.Group):
         """
 
         dummy_altitude = self._get_initial_guess_altitude(
-            cruise_altitude=float(
+            cruise_altitude=scalarize(
                 inputs[
                     "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
                 ]
             ),
-            reserve_altitude=float(
+            reserve_altitude=scalarize(
                 inputs[
                     "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
                 ]
