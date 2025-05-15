@@ -82,7 +82,7 @@ submodels:
   submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
   submodel.propulsion.dc_dc_converter.inductor.inductance: null
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
-  submodel.weight.mass.airframe.wing: fastga_he.submodel.weight.mass.airframe.wing.analytical_he # No real use for this submodel as there are no electric components in the wing
+  service.weight.mass.airframe.wing: fastga_he.submodel.weight.mass.airframe.wing.analytical_he # No real use for this submodel as there are no electric components in the wing
   submodel.handling_qualities.vertical_tail.area: null
 
 optimization: # This section is needed only if optimization process is run

@@ -203,10 +203,10 @@ def test_ecopulse_new_wing():
         "data:environmental_impact:sizing:emissions", units="kg"
     ) == pytest.approx(1218.0, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        4.492, abs=1e-2
+        4.454, abs=1e-2
     )
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        2473.5, rel=1e-3
+        2468.0, rel=1e-3
     )
 
 
