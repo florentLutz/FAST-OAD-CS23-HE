@@ -198,7 +198,7 @@ the maximum current (:math:`I_{max}`), and a price adjustement factor (:math:`k_
 Operational cost model
 **********************
 Similarly to the production cost model, the operational cost model is also built by separating aircraft and powertrain costs.
-As the maintenance cost at aircraft level already includes the cost of the storage tank and transmission mechanisms,
+As the maintenance cost at aircraft level already includes the cost of the storage tank and gearboxes,
 their individual costs are not calculated separately. For all electronics, motors, and battery, the operational
 costs are estimated as an annual fraction of their purchase price.
 
