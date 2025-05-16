@@ -11,7 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class LCCElectricEnergyCost(om.ExplicitComponent):
     """
-    Computation of the electric energy cost of the aircraft for single mission. The
+    Computation of the electric energy cost of the aircraft for a single mission. The
     charging cost is estimated from https://eniplenitude.eu/e-mobility/pricing.
     """
 
