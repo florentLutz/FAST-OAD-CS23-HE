@@ -69,6 +69,7 @@
             <losses_max units="W" is_input="False">4040.0662177276454</losses_max>
             <mass units="kg" is_input="False">759.0236029975191<!--Mass of the converter--></mass>
             <power_density units="kW/kg" is_input="False">0.26346440582752356<!--Power density of the DC/DC converter--></power_density>
+            <power_rating_max units="kW" is_input="False">195.00448489434953</power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT module in the converter--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
@@ -619,6 +620,7 @@
             <modulation_idx_max is_input="False">0.1152009835555314<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_density units="kW/kg" is_input="False">1.9512013505497448<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
+            <power_rating_max units="kW" is_input="False">174.64540011830852<!--Maximum value of the usable power--></power_rating_max>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -789,6 +791,7 @@
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <shaft_power_in_max units="W" is_input="False">171526.7765569521<!--Maximum value of the propeller input shaft power--></shaft_power_in_max>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
             <tip_mach_max is_input="False">0.44243515198268096<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
             <torque_max units="N*m" is_input="False">818.9800308497388<!--Maximum value of the propeller torque--></torque_max>

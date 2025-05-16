@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 
 import openmdao.api as om
@@ -20,6 +20,8 @@ from ..components.sizing_tank_drag import SizingFuelTankDrag
 from ..components.sizing_tank_prep_for_loads import SizingFuelTankPreparationForLoads
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAFuelTankProdWeightPerFU
+
+from ..components.lcc_fuel_tank_cost import LCCFuelTankCost
 
 from ..components.cstr_enforce import ConstraintsFuelTankCapacityEnforce
 from ..components.cstr_ensure import ConstraintsFuelTankCapacityEnsure
@@ -455,5 +457,19 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:mass_per_fu", units="kg"
     ) == pytest.approx(1.4e-06, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:volume", units="L", val=393.0
+    )
+
+    problem = run_system(LCCFuelTankCost(fuel_tank_id="fuel_tank_1"), ivc)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:purchase_cost", units="USD"
+    ) == pytest.approx(4194.31, rel=1e-2)
 
     problem.check_partials(compact_print=True)

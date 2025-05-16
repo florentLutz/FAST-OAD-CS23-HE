@@ -58,7 +58,11 @@ if __name__ == "__main__":
         yanchor="bottom",
     )
 
-    fig.update_layout(title="Logarithmic Regression", xaxis_title="X", yaxis_title="Y")
+    fig.update_layout(
+        title="Logarithmic Regression",
+        xaxis_title="Power max (kW)",
+        yaxis_title="Specific power (kW/kg)",
+    )
     fig.show()
 
     print(f"Logarithmic: y = {log_params[0]:.4f}ln(x) + {log_params[1]:.4f}")

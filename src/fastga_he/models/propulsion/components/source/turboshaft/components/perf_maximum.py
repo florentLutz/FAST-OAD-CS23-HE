@@ -51,8 +51,12 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="*",
-            wrt="*",
+            of="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_max",
+            wrt=[
+                "power_required",
+                "equivalent_rated_power_opr_limit",
+                "equivalent_rated_power_itt_limit",
+            ],
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),

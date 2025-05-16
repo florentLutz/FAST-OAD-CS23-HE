@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import pytest
@@ -59,6 +59,8 @@ from ..components.slipstream_propeller import SlipstreamPropeller
 from ..components.cstr_enforce import ConstraintsTorqueEnforce
 from ..components.cstr_ensure import ConstraintsTorqueEnsure
 from ..components.pre_lca_prod_weight_per_fu import PreLCAPropellerProdWeightPerFU
+from ..components.lcc_propeller_cost import LCCPropellerCost
+from ..components.lcc_propeller_operational_cost import LCCPropellerOperationalCost
 
 from ..components.perf_propeller import PerformancesPropeller
 from ..components.sizing_propeller import SizingPropeller
@@ -643,6 +645,11 @@ def test_maximum():
         "tip_mach",
         val=np.array([0.639, 0.64, 0.641, 0.643, 0.644, 0.646, 0.647, 0.649, 0.65, 0.652]),
     )
+    ivc.add_output(
+        "shaft_power_in",
+        val=np.array([178.0, 178.8, 179.1, 181.5, 181.8, 182.6, 183.1, 183.4, 184.2, 186.4]),
+        units="kW",
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -662,6 +669,9 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_1:rpm_max", units="min**-1"
     ) == pytest.approx(2500.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:shaft_power_in_max", units="kW"
+    ) == pytest.approx(186.4, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1549,5 +1559,47 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_1:mass_per_fu", units="kg"
     ) == pytest.approx(3.40194277e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    inputs_list = [
+        "data:cost:cpi_2012",
+        "data:propulsion:he_power_train:propeller:propeller_1:shaft_power_in_max",
+        "data:propulsion:he_power_train:propeller:propeller_1:diameter",
+        "data:propulsion:he_power_train:propeller:propeller_1:constant_speed_prop",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+    ivc.add_output("data:cost:cpi_2012", val=1.4)
+    ivc.add_output(
+        "data:propulsion:he_power_train:propeller:propeller_1:shaft_power_in_max",
+        val=186.4,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCPropellerCost(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:purchase_cost", units="USD"
+    ) == pytest.approx(2059.097, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:propeller:propeller_1:constant_speed_prop", val=1.0
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCPropellerOperationalCost(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:operational_cost", units="USD/yr"
+    ) == pytest.approx(517.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
