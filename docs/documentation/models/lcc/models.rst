@@ -45,7 +45,7 @@ Cost of development support
 ***************************
 The indirect development labor cost, provided by :cite:`gudmundsson:2013`, includes items such as overheads, administration,
 logistics, human resources, facilities maintenance during the aircraft development. As numerous types of labor are
-included, this cost can not be estimated with a fixed cost rate.
+included, this cost cannot be estimated with a fixed cost rate.
 
 .. math::
 
