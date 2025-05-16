@@ -245,21 +245,21 @@ The aircraft landing and parking cost before VAT are obtained from
 
    <div style="display: flex; justify-content: center;">
 
-========================  =======================  =============================================
-MTOW (Tons)                Daily parking cost (€)            Landing cost per operation (€)
-========================  =======================  =============================================
-:math:`w \leq 1.5`               :math:`1.63`                       :math:`31.8`
-:math:`1.5 < w \leq 2.5`          :math:`3.2`                       :math:`41.13`
-:math:`2.5 < w \leq 6`           :math:`5.49`                         :math:`55.29`
-:math:`6 < w \leq 7`            :math:`5.68  w`                 :math:`55.29`
-:math:`w > 7`               :math:`5.68  w`                :math:`50.35 + 0.55(w-6)`
-========================  =======================  =============================================
+============================  =======================  =============================================
+MTOW (Tons)                    Daily parking cost (€)            Landing cost per operation (€)
+============================  =======================  =============================================
+:math:`MTOW \leq 1.5`               :math:`1.63`                       :math:`31.8`
+:math:`1.5 < MTOW \leq 2.5`          :math:`3.2`                       :math:`41.13`
+:math:`2.5 < MTOW \leq 6`           :math:`5.49`                         :math:`55.29`
+:math:`6 < MTOW \leq 7`         :math:`5.68  MTOW`                 :math:`55.29`
+:math:`MTOW > 7`                :math:`5.68  MTOW`                :math:`50.35 + 0.55(MTOW-6)`
+============================  =======================  =============================================
 
 .. raw:: html
 
    </div>
 
-:math:`w` is the MTOW of the aircraft in tons.
+The :math:`MTOW` of the aircraft is in tons for the parking cost table.
 
 
 Fuel cost
