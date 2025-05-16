@@ -166,7 +166,7 @@ Where :math:`n \in \{\text{core, insulation, shield, sheath}\}`
 
 Inverter/ DC-DC converter purchase cost
 ***************************************
-The purchase cost of both electronics are obtained from logarithmic regression based on the retail price of
+The purchase cost of power electronics is obtained from logarithmic regression based on the retail price of
 `MidContinent <https://www.mcico.com/truebluepower>`_.
 
 .. math::
