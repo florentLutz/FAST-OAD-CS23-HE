@@ -178,7 +178,7 @@ The purchase cost of power electronics is obtained from logarithmic regression b
 
 Rectifier purchase cost
 ***********************
-The purchase cost of the rectifier is obtained from linear regression with the maximum AC current (:math:`I_{AC}`)
+The purchase cost of the rectifier is obtained from a linear regression with the maximum AC current (:math:`I_{AC}`)
 and the retail price of `ATO <https://www.ato.com/plating-rectifier>`_.
 
 .. math::
