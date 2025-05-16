@@ -118,7 +118,7 @@ shaft-horse power of the turboshaft engine.
 
 Propeller purchase cost
 ***********************
-The propeller purchase cost calculation obtained from :cite:`gudmundsson:2013`.
+The propeller purchase cost calculation is obtained from :cite:`gudmundsson:2013`.
 
 .. math::
 
