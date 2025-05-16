@@ -133,7 +133,7 @@ The propeller purchase cost calculation obtained from :cite:`gudmundsson:2013`.
 Synchronous motor / Generator purchase cost
 *******************************************
 This unit purchase cost is obtained from regression model based on product retail prices
-of `Emrax <https://emrax.com/e-motors/>`_.
+of `EMRAX <https://emrax.com/e-motors/>`_.
 
 .. math::
 
