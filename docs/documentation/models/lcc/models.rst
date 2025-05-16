@@ -29,8 +29,8 @@ Cost of engineering, toolong, and manufacturing
 ***********************************************
 The cost of the engineering labor, tooling labor, and manufacturing labor share a similar computation structure. It begins
 with estimating the total man-hours required for the development process for the first 5-year production period . Then,
-the cost is simply calculated by multiplying the number of man-hour (:math:`H_{\text{labor}}`) and cost rate of labor
-(:math:`R_{\text{labor}}`) for each subcategory with the inflation adjustment.
+the cost is simply calculated by multiplying the number of man-hours (:math:`H_{\text{labor}}`) by the labor cost rate
+(:math:`R_{\text{labor}}`) for each subcategory, adjusted for inflation.
 
 .. math::
 
@@ -133,7 +133,7 @@ The propeller purchase cost calculation obtained from :cite:`gudmundsson:2013`.
 Synchronous motor / Generator purchase cost
 *******************************************
 This unit purchase cost is obtained from regression model based on product retail prices
-of `Emrax <https://emrax.com/e-motors/>`_.
+of `EMRAX <https://emrax.com/e-motors/>`_.
 
 .. math::
 
@@ -237,7 +237,7 @@ from `Sunset aviation insurance <https://sunsetais.com/aircraft-hull-liability/>
 
 Landing / Parking cost
 **********************
-The aircraft landing and parking cost before VAT obtained from
+The aircraft landing and parking cost before VAT are obtained from
 `Toulouse Blagnac airport <https://www.toulouse.aeroport.fr/sites/default/files/2023-03/2023_03_23_Redevances_A_EN_v1.pdf>`_.
 
 

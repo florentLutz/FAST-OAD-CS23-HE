@@ -5,7 +5,7 @@ Life Cycle Cost options
 =======================
 
 The Life Cycle Cost (LCC) module can be parametrized according to several criterion which are implemented under
-the form of group options. A description of those options are available here.
+the form of group options. A description of those options is available here.
 
 .. code:: yaml
 
