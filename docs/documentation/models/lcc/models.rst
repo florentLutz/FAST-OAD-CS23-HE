@@ -143,7 +143,7 @@ of `EMRAX <https://emrax.com/e-motors/>`_.
 
 Battery purchase cost
 *********************
-Battery purchase cost is modeled with power regression from :cite:`Wesley:2023`.
+The battery purchase cost is modeled with power regression from :cite:`Wesley:2023`.
 
 .. math::
 
@@ -166,7 +166,7 @@ Where :math:`n \in \{\text{core, insulation, shield, sheath}\}`
 
 Inverter/ DC-DC converter purchase cost
 ***************************************
-The purchase cost of both electronics are obtained from logarithmic regression based on the retail price of
+The purchase cost of power electronics is obtained from logarithmic regression based on the retail price of
 `MidContinent <https://www.mcico.com/truebluepower>`_.
 
 .. math::
@@ -178,7 +178,7 @@ The purchase cost of both electronics are obtained from logarithmic regression b
 
 Rectifier purchase cost
 ***********************
-The purchase cost of the rectifier is obtained from linear regression with the maximum AC current (:math:`I_{AC}`)
+The purchase cost of the rectifier is obtained from a linear regression with the maximum AC current (:math:`I_{AC}`)
 and the retail price of `ATO <https://www.ato.com/plating-rectifier>`_.
 
 .. math::
@@ -187,8 +187,8 @@ and the retail price of `ATO <https://www.ato.com/plating-rectifier>`_.
 
 DC SSPC purchase cost
 *********************
-The purchase cost of the DC SSPC is based on the price of IGBT modules from `Semikron <https://www.semikron-danfoss.com/>`_,
-the maximum current (:math:`I_{max}`), and a price adjust factor (:math:`k_{\text{SSPC}}`) to consider price difference.
+The purchase cost of DC SSPC is based on the price of IGBT modules from `Semikron <https://www.semikron-danfoss.com/>`_,
+the maximum current (:math:`I_{max}`), and a price adjustement factor (:math:`k_{\text{SSPC}}`) to account for price difference.
 
 .. math::
 
@@ -197,8 +197,8 @@ the maximum current (:math:`I_{max}`), and a price adjust factor (:math:`k_{\tex
 **********************
 Operational cost model
 **********************
-Similar as the production cost model, the operational cost model is also built by separating aircraft and powertrain costs.
-As the maintenance cost at aircraft level already includes the cost of the storage tank and transmission mechanisms,
+Similarly to the production cost model, the operational cost model is also built by separating aircraft and powertrain costs.
+As the maintenance cost at aircraft level already includes the cost of the storage tank and gearboxes,
 their individual costs are not calculated separately. For all electronics, motors, and battery, the operational
 costs are estimated as an annual fraction of their purchase price.
 
@@ -222,11 +222,11 @@ on regular house mortgage from :cite:`gudmundsson:2013`.
    C_{\text{loan (\$)}} = \frac{P \cdot R_{\text{interest}}}{1-\frac{1}{(1 + R_{\text{interest}})^n}}
 
 :math:`P` is the principal of the loan, :math:`R_{\text{interest}}` is the annual interest rate, and :math:`n` is the
-payback periods.
+payback period.
 
 Annual insurance cost
 *********************
-Yearly insurance cost estimation provided by :cite:`gudmundsson:2013`, slight value adjustments applied
+The yearly insurance cost estimation as provided by :cite:`gudmundsson:2013`, a slight value adjustments is applied
 from `Sunset aviation insurance <https://sunsetais.com/aircraft-hull-liability/>`_.
 
 .. math::
