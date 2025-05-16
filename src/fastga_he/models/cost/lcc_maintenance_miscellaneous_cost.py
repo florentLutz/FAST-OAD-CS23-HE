@@ -7,7 +7,7 @@ import openmdao.api as om
 
 class LCCMaintenanceMiscellaneousCost(om.ExplicitComponent):
     """
-    Computation of  the annual miscellaneous cost of the aircraft. The calculation is adjusted
+    Computation of the annual miscellaneous cost of the aircraft. The calculation is adjusted
     based on the cost rate from https://www.guardianjet.com/jet-aircraft-online-tools.
     """
 
