@@ -63,7 +63,6 @@ class LCCProductionCost(om.Group):
             subsys=LCCEngineeringManHours(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="tooling_man_hours",
             subsys=LCCToolingManHours(),
@@ -89,31 +88,26 @@ class LCCProductionCost(om.Group):
         self.add_subsystem(
             name="quality_control_cost_per_unit", subsys=LCCQualityControlCost(), promotes=["*"]
         )
-
         self.add_subsystem(
             name="material_cost_per_unit",
             subsys=LCCMaterialCost(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="dev_support_cost_per_unit",
             subsys=LCCDevSupportCost(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="avionics_cost_per_unit",
             subsys=LCCAvionicsCost(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="certification_cost_per_unit",
             subsys=LCCCertificationCost(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="landing_gear_cost_reduction",
             subsys=LCCLandingGearCostReduction(),
@@ -166,7 +160,6 @@ class LCCProductionCost(om.Group):
             ),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="sale_price",
             subsys=LCCMSP(),
@@ -182,7 +175,6 @@ class LCCProductionCost(om.Group):
                 ),
                 promotes=["*"],
             )
-
             self.add_subsystem(
                 name="electric_energy_cost",
                 subsys=LCCElectricEnergyCost(

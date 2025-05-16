@@ -21,7 +21,6 @@ class LCCManufacturingManHours(om.ExplicitComponent):
             val=np.nan,
             desc="Number of planned aircraft to be produced over a 5-year period or 60 months",
         )
-
         self.add_input(
             "data:cost:production:composite_fraction",
             val=0.0,

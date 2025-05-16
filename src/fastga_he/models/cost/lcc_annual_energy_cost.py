@@ -18,14 +18,12 @@ class LCCAnnualEnergyCost(om.ExplicitComponent):
             units="USD",
             desc="Electric energy cost for single flight mission",
         )
-
         self.add_input(
             name="data:cost:fuel_cost",
             val=0.0,
             units="USD",
             desc="Fuel cost for single flight mission",
         )
-
         self.add_input(
             name="data:TLAR:flight_per_year",
             val=np.nan,
@@ -37,12 +35,12 @@ class LCCAnnualEnergyCost(om.ExplicitComponent):
             val=1000.0,
             units="USD/yr",
         )
-
         self.add_output(
             name="data:cost:operation:annual_electric_energy_cost",
             val=1000.0,
             units="USD/yr",
         )
+
         self.declare_partials("*", "data:TLAR:flight_per_year", method="exact")
         self.declare_partials(
             of="data:cost:operation:annual_fuel_cost",

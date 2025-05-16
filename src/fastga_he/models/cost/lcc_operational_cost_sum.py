@@ -25,54 +25,46 @@ class LCCSumOperationalCost(om.ExplicitComponent):
             units="USD/yr",
             desc="Annual flight crew cost of the aircraft",
         )
-
         self.add_input(
             "data:cost:operation:annual_airport_cost",
             val=np.nan,
             units="USD/yr",
             desc="Annual airport cost of the aircraft",
         )
-
         self.add_input(
             "data:cost:operation:annual_insurance_cost",
             val=np.nan,
             units="USD/yr",
             desc="Annual insurance cost of the aircraft",
         )
-
         self.add_input(
             "data:cost:operation:annual_loan_cost",
             val=0.0,
             units="USD/yr",
             desc="Annual loan cost of the aircraft",
         )
-
         self.add_input(
             "data:cost:operation:miscellaneous_cost",
             val=np.nan,
             units="USD/yr",
             desc="Annual miscellaneous cost per aircraft",
         )
-
         self.add_input(
             "data:cost:operation:maintenance_cost",
             val=np.nan,
             units="USD/yr",
             desc="Annual maintenance cost per aircraft",
         )
-
         self.add_input(
             name="data:cost:operation:annual_fuel_cost",
             val=np.nan,
             units="USD/yr",
         )
-
         self.add_input(
             name="data:cost:operation:annual_electric_energy_cost",
             val=np.nan,
             units="USD/yr",
         )
-
         self.add_input(
             "data:cost:operation:additional_cost",
             val=0.0,

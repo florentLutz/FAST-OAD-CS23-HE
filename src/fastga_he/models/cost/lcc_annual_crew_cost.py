@@ -28,6 +28,7 @@ class LCCAnnualCrewCost(om.ExplicitComponent):
             units="USD/yr",
             desc="Annual flight crew cost of the aircraft",
         )
+
         self.declare_partials(
             "data:cost:operation:annual_crew_cost",
             "data:cost:operation:number_of_pilot",

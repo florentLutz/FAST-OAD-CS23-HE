@@ -25,6 +25,7 @@ class LCCLandingGearCostReduction(om.ExplicitComponent):
             units="USD",
             desc="Cost reduction if fixed landing gear design is selected",
         )
+
         self.declare_partials(
             of="data:cost:production:landing_gear_cost_reduction",
             wrt="data:geometry:landing_gear:type",

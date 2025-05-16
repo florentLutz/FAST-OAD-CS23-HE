@@ -33,7 +33,6 @@ class LCCTurboshaftOperationalCost(om.ExplicitComponent):
             units="h",
             desc="Expected number of hours flown per year",
         )
-
         self.add_input(
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
             units="kW",

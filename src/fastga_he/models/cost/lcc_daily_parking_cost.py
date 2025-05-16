@@ -19,7 +19,6 @@ class LCCDailyParkingCost(om.ExplicitComponent):
             units="t",
             val=np.nan,
         )
-
         self.add_input(
             "data:cost:operation:parking_fee_per_ton",
             val=11.8,
@@ -33,6 +32,7 @@ class LCCDailyParkingCost(om.ExplicitComponent):
             units="USD/d",
             desc="Daily parking cost of the aircraft",
         )
+
         self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

@@ -32,7 +32,6 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
             units="USD",
             val=np.nan,
         )
-
         self.add_input(
             name="data:TLAR:flight_hours_per_year",
             val=283.2,
@@ -47,6 +46,7 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
             units="USD/yr",
             val=5.0e2,
         )
+
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

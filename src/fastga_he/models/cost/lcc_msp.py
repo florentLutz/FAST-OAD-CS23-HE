@@ -25,6 +25,7 @@ class LCCMSP(om.ExplicitComponent):
             units="USD",
             desc="Manufacturer suggested price of the aircraft",
         )
+
         self.declare_partials(
             of="data:cost:msp_per_unit", wrt="data:cost:production_cost_per_unit", val=1.11
         )

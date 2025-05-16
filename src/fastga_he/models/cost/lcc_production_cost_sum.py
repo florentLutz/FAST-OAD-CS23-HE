@@ -25,63 +25,54 @@ class LCCSumProductionCost(om.ExplicitComponent):
             units="USD",
             desc="Engineering adjusted cost per aircraft",
         )
-
         self.add_input(
             "data:cost:production:tooling_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Tooling adjusted cost per aircraft",
         )
-
         self.add_input(
             "data:cost:production:manufacturing_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Manufacturing adjusted cost per aircraft",
         )
-
         self.add_input(
             "data:cost:production:flight_test_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Development flight test adjusted cost per aircraft",
         )
-
         self.add_input(
             "data:cost:production:quality_control_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Quality control adjusted cost per aircraft",
         )
-
         self.add_input(
             "data:cost:production:material_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Material adjusted cost per aircraft",
         )
-
         self.add_input(
             "data:cost:production:dev_support_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Development support adjusted cost per aircraft",
         )
-
         self.add_input(
             "data:cost:production:avionics_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Avionics adjusted cost per aircraft",
         )
-
         self.add_input(
             "data:cost:production:certification_cost_per_unit",
             val=np.nan,
             units="USD",
             desc="Certification adjusted cost per aircraft",
         )
-
         self.add_input(
             "data:cost:production:landing_gear_cost_reduction",
             val=0.0,

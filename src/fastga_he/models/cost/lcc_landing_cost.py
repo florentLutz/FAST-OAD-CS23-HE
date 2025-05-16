@@ -18,7 +18,6 @@ class LCCLandingCost(om.ExplicitComponent):
             units="t",
             val=np.nan,
         )
-
         self.add_input(
             "data:cost:operation:airport_charge_VAT",
             val=0.2,
@@ -31,6 +30,7 @@ class LCCLandingCost(om.ExplicitComponent):
             units="USD",
             desc="Landing cost per operation of the aircraft",
         )
+
         self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

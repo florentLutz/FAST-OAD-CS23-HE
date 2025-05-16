@@ -40,6 +40,7 @@ class LCCTurboGeneratorCost(om.ExplicitComponent):
             units="USD",
             val=5.0e3,
         )
+
         self.declare_partials(of="*", wrt="*", val=328.4)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

@@ -43,6 +43,7 @@ class LCCBatteryPackCost(om.ExplicitComponent):
             val=3.0,
             desc="Number of years from 2022",
         )
+
         self.add_output(
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit",
             units="USD",

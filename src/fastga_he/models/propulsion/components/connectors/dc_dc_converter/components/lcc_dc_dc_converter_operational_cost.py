@@ -29,7 +29,6 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
             val=np.nan,
             units="USD",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id

@@ -28,7 +28,6 @@ class LCCICEOperationalCost(om.ExplicitComponent):
             units="inch**3",
             val=np.nan,
         )
-
         self.add_input(
             name="data:TLAR:flight_hours_per_year",
             val=283.2,

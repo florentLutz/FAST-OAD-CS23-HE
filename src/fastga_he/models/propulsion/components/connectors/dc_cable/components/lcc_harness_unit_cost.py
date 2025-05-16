@@ -32,7 +32,6 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             units="m",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
@@ -40,7 +39,6 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             units="m",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
@@ -48,19 +46,16 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             units="USD/m**3",
             val=np.nan,
         )
-
         self.add_input(
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
             units="m",
             val=0.2e-3,
         )
-
         self.add_input(
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
             units="m",
             val=0.2e-2,
         )
-
         self.add_input(
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length",
             units="m",

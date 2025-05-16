@@ -29,14 +29,12 @@ class LCCPEMFCStackOperationalCost(om.ExplicitComponent):
             val=np.nan,
             desc="Purchase cost of PEMFC stack",
         )
-
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan",
             units="h",
             val=12.5e3,
             desc="The PEMFC stack lifespan in hours",
         )
-
         self.add_input(
             name="data:TLAR:flight_hours_per_year",
             val=np.nan,

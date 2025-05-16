@@ -50,14 +50,12 @@ class LCCDeliveryCost(om.ExplicitComponent):
                 units="USD",
                 desc="Electric energy cost for single flight mission",
             )
-
             self.add_input(
                 name="data:cost:fuel_cost",
                 val=0.0,
                 units="USD",
                 desc="Fuel cost for single flight mission",
             )
-
             self.add_input(
                 "data:cost:production:flight_cost_factor",
                 val=1.0,

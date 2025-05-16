@@ -56,25 +56,21 @@ class LCCOperationalCost(om.Group):
             subsys=LCCLandingCost(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="annual_crew_cost",
             subsys=LCCAnnualCrewCost(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="daily_parking_cost",
             subsys=LCCDailyParkingCost(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="annual_airport_cost",
             subsys=LCCAnnualAirportCost(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="annual_insurance_cost", subsys=LCCAnnualInsuranceCost(), promotes=["*"]
         )
@@ -85,13 +81,11 @@ class LCCOperationalCost(om.Group):
         self.add_subsystem(
             name="annual_depreciation", subsys=LCCAnnualDepreciation(), promotes=["*"]
         )
-
         self.add_subsystem(
             name="airframe_maintenance",
             subsys=LCCMaintenanceCost(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="airframe_maintenance_miscellaneous",
             subsys=LCCMaintenanceMiscellaneousCost(),
@@ -145,7 +139,6 @@ class LCCOperationalCost(om.Group):
             ),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="electric_energy_cost",
             subsys=LCCElectricEnergyCost(
@@ -154,13 +147,11 @@ class LCCOperationalCost(om.Group):
             ),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="annual_energy_cost",
             subsys=LCCAnnualEnergyCost(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="operational_cost_sum",
             subsys=LCCSumOperationalCost(

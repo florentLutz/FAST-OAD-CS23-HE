@@ -17,13 +17,11 @@ class LCCAnnualDepreciation(om.ExplicitComponent):
             units="USD",
             val=np.nan,
         )
-
         self.add_input(
             "data:cost:operation:depreciation_rate",
             val=0.9,
             desc="The portion of value that depreciates over the service life",
         )
-
         self.add_input(
             name="data:TLAR:aircraft_lifespan",
             val=20.0,
@@ -37,6 +35,7 @@ class LCCAnnualDepreciation(om.ExplicitComponent):
             units="USD/yr",
             desc="Annual depreciation cost of the aircraft",
         )
+
         self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

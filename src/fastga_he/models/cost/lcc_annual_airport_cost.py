@@ -18,14 +18,12 @@ class LCCAnnualAirportCost(om.ExplicitComponent):
             units="USD",
             desc="Landing cost per operation of the aircraft",
         )
-
         self.add_input(
             "data:cost:operation:daily_parking_cost",
             val=np.nan,
             units="USD/d",
             desc="Daily parking cost of the aircraft",
         )
-
         self.add_input(
             name="data:TLAR:flight_per_year",
             val=np.nan,
@@ -38,6 +36,7 @@ class LCCAnnualAirportCost(om.ExplicitComponent):
             units="USD/yr",
             desc="Annual airport related cost for the aircraft",
         )
+
         self.declare_partials(
             of="*",
             wrt=["data:cost:operation:landing_cost", "data:TLAR:flight_per_year"],

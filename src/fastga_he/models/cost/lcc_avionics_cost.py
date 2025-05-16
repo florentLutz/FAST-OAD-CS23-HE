@@ -24,6 +24,7 @@ class LCCAvionicsCost(om.ExplicitComponent):
             units="USD",
             desc="Avionics adjusted cost per aircraft",
         )
+
         self.declare_partials(
             of="data:cost:production:avionics_cost_per_unit", wrt="data:cost:cpi_2012", val=15000.0
         )

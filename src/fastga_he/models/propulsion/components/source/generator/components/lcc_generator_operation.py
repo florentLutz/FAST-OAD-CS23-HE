@@ -24,7 +24,6 @@ class LCCGeneratorOperationalCost(om.ExplicitComponent):
             units="USD",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:generator:" + generator_id + ":lifespan",
             units="yr",

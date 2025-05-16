@@ -38,6 +38,7 @@ class LCCToolingCost(om.ExplicitComponent):
             units="USD",
             desc="Tooling adjusted cost per aircraft",
         )
+
         self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

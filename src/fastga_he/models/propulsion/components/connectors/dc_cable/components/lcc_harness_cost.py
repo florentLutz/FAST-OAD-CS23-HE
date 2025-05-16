@@ -29,7 +29,6 @@ class LCCHarnessCost(om.Group):
             subsys=LCCHarnessCoreUnitCost(harness_id=harness_id),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="harness_unit_cost",
             subsys=LCCHarnessUnitCost(harness_id=harness_id),

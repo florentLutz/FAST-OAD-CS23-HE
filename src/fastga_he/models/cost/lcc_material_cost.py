@@ -37,6 +37,7 @@ class LCCMaterialCost(om.ExplicitComponent):
             units="USD",
             desc="Development flight test adjusted cost per aircraft",
         )
+
         self.declare_partials("*", "*", method="exact")
         self.declare_partials("*", "data:geometry:flap_type", method="fd")
 

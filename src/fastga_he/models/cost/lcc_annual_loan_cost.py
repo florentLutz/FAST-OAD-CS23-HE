@@ -19,13 +19,11 @@ class LCCAnnualLoanCost(om.ExplicitComponent):
             units="USD",
             val=np.nan,
         )
-
         self.add_input(
             "data:cost:operation:annual_interest_rate",
             val=0.07,
             desc="Annual interest rate of aircraft financing loan",
         )
-
         self.add_input(
             "data:cost:operation:pay_period",
             val=15.0,
