@@ -112,7 +112,7 @@
                 </aux_load>
                 <PEMFC_stack>
                     <pemfc_stack_1>
-                        <cost_per_unit unit="USD">13639.32</cost_per_unit>
+                        <purchase_cost unit="USD">13639.32</purchase_cost>
                         <mass units="kg">327.988</mass>
                         <specific_power units="kW/kg">0.345</specific_power>
                         <power_density units="kW/m**3">124</power_density>
@@ -208,7 +208,7 @@
                 </gaseous_hydrogen_tank>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
-                        <cost_per_unit unit="USD">6576.2</cost_per_unit>
+                        <purchase_cost unit="USD">6576.2</purchase_cost>
                         <losses_max units="W" is_input="True">1958.0316619368884</losses_max>
                         <power_rating_max units="kW">344.0</power_rating_max>
                         <CG>
@@ -290,7 +290,7 @@
                 </DC_DC_converter>
                 <DC_SSPC>
                     <dc_sspc_412>
-                        <cost_per_unit unit="USD">718.4</cost_per_unit>
+                        <purchase_cost unit="USD">718.4</purchase_cost>
                         <efficiency>0.99</efficiency>
                         <low_speed>
                             <CD0>0.0</CD0>
@@ -319,7 +319,7 @@
                     </dc_sspc_412>
                     <dc_sspc_1>
                         <efficiency>0.99</efficiency>
-                        <cost_per_unit unit="USD">717.0</cost_per_unit>
+                        <purchase_cost unit="USD">717.0</purchase_cost>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -347,7 +347,7 @@
                     </dc_sspc_1>
                     <dc_sspc_2>
                         <efficiency>0.99</efficiency>
-                        <cost_per_unit unit="USD">717.0</cost_per_unit>
+                        <purchase_cost unit="USD">717.0</purchase_cost>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -375,7 +375,7 @@
                     </dc_sspc_2>
                     <dc_sspc_1337>
                         <efficiency>0.99</efficiency>
-                        <cost_per_unit unit="USD">717.0</cost_per_unit>
+                        <purchase_cost unit="USD">717.0</purchase_cost>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>
@@ -455,7 +455,7 @@
                 </DC_cable_harness>
                 <inverter>
                     <inverter_1>
-                        <cost_per_unit unit="USD">18391.45</cost_per_unit>
+                        <purchase_cost unit="USD">18391.45</purchase_cost>
                         <CG>
                             <x units="m">2.69</x>
                             <y_ratio>0.34</y_ratio>
@@ -556,7 +556,7 @@
                 </inverter>
                 <PMSM>
                     <motor_1>
-                        <cost_per_unit unit="USD">43154.99</cost_per_unit>
+                        <purchase_cost unit="USD">43154.99</purchase_cost>
                         <voltage_ac_max units="V" is_input="True">414.83894592299646<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
                         <CG>
                             <x units="m">2.39</x>

@@ -987,7 +987,7 @@
         </DC_cable_harness>
         <PMSM>
           <motor_1>
-            <cost_per_unit unit="USD">15762.9</cost_per_unit>
+            <purchase_cost unit="USD">15762.9</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
@@ -1034,7 +1034,7 @@
             </scaling>
           </motor_1>
           <motor_2>
-            <cost_per_unit unit="USD">15762.9</cost_per_unit>
+            <purchase_cost unit="USD">15762.9</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
@@ -1081,7 +1081,7 @@
             </scaling>
           </motor_2>
           <motor_3>
-            <cost_per_unit unit="USD">15762.9</cost_per_unit>
+            <purchase_cost unit="USD">15762.9</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
@@ -1128,7 +1128,7 @@
             </scaling>
           </motor_3>
           <motor_4>
-            <cost_per_unit unit="USD">15762.9</cost_per_unit>
+            <purchase_cost unit="USD">15762.9</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
@@ -1175,7 +1175,7 @@
             </scaling>
           </motor_4>
           <motor_5>
-            <cost_per_unit unit="USD">15762.9</cost_per_unit>
+            <purchase_cost unit="USD">15762.9</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
@@ -1222,7 +1222,7 @@
             </scaling>
           </motor_5>
           <motor_6>
-            <cost_per_unit unit="USD">15762.9</cost_per_unit>
+            <purchase_cost unit="USD">15762.9</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
             <from_LE units="m" is_input="True">0.05<!--Distance between the PMSM front face and the leading edge--></from_LE>
@@ -1384,7 +1384,7 @@
         </gearbox>
         <inverter>
           <inverter_1>
-            <cost_per_unit unit="USD">16988.3</cost_per_unit>
+            <purchase_cost unit="USD">16988.3</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
             <current_dc_max units="A" is_input="False">133.45740622569897<!--Maximum value of the current at the input of the inverter--></current_dc_max>
@@ -1546,7 +1546,7 @@
             </properties>
           </inverter_1>
           <inverter_2>
-            <cost_per_unit unit="USD">16988.3</cost_per_unit>
+            <purchase_cost unit="USD">16988.3</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
             <current_dc_max units="A" is_input="False">133.41054587225565<!--Maximum value of the current at the input of the inverter--></current_dc_max>
@@ -1708,7 +1708,7 @@
             </properties>
           </inverter_2>
           <inverter_3>
-            <cost_per_unit unit="USD">16988.3</cost_per_unit>
+            <purchase_cost unit="USD">16988.3</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
             <current_dc_max units="A" is_input="False">133.3682264972979<!--Maximum value of the current at the input of the inverter--></current_dc_max>
@@ -1870,7 +1870,7 @@
             </properties>
           </inverter_3>
           <inverter_4>
-            <cost_per_unit unit="USD">16988.3</cost_per_unit>
+            <purchase_cost unit="USD">16988.3</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
             <current_dc_max units="A" is_input="False">133.3682264972979<!--Maximum value of the current at the input of the inverter--></current_dc_max>
@@ -2032,7 +2032,7 @@
             </properties>
           </inverter_4>
           <inverter_5>
-            <cost_per_unit unit="USD">16988.3</cost_per_unit>
+            <purchase_cost unit="USD">16988.3</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
             <current_dc_max units="A" is_input="False">133.41054587225565<!--Maximum value of the current at the input of the inverter--></current_dc_max>
@@ -2194,7 +2194,7 @@
             </properties>
           </inverter_5>
           <inverter_6>
-            <cost_per_unit unit="USD">16988.3</cost_per_unit>
+            <purchase_cost unit="USD">16988.3</purchase_cost>
             <current_ac_max units="A" is_input="False">84.5527761311885<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
             <current_caliber units="A" is_input="False">84.5527761311885<!--Current caliber of one arm of the inverter--></current_caliber>
             <current_dc_max units="A" is_input="False">133.45740622569897<!--Maximum value of the current at the input of the inverter--></current_dc_max>
@@ -2624,7 +2624,7 @@
         </propeller>
         <rectifier>
           <rectifier>
-            <cost_per_unit unit="USD">2497.4</cost_per_unit>
+            <purchase_cost unit="USD">2497.4</purchase_cost>
             <current_ac_caliber units="A" is_input="False">269.43691888815187<!--Caliber RMS current flowing through one arm of the rectifier, used for sizing--></current_ac_caliber>
             <current_ac_max units="A" is_input="False">269.43691888815187<!--Maximum RMS current flowing through one arm of the rectifier--></current_ac_max>
             <current_dc_max units="A" is_input="False">800.4723571905051<!--Maximum value of the current at the output of the rectifier--></current_dc_max>
@@ -2784,7 +2784,7 @@
         <turbo_generator>
           <turbo_generator>
             <efficiency is_input="True">0.96</efficiency>
-            <cost_per_unit unit="USD">221207.7</cost_per_unit>
+            <purchase_cost unit="USD">221207.7</purchase_cost>
             <mass units="kg" is_input="False">134.71845944407593</mass>
             <power_density units="kW/kg" is_input="True">5.0<!--Power density of the turbo generator--></power_density>
             <power_rating units="kW" is_input="False">673.5922972203797<!--Max continuous power of the turbo generator--></power_rating>
