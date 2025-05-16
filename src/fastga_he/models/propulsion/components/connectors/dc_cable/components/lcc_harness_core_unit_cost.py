@@ -35,7 +35,7 @@ class LCCHarnessCoreUnitCost(om.ExplicitComponent):
             + harness_id
             + ":cost_per_volume",
             units="USD/m**3",
-            val=6775.0,
+            val=COST_ALU,
         )
 
         self.declare_partials(
