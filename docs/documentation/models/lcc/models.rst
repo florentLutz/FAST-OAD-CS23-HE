@@ -237,7 +237,7 @@ from `Sunset aviation insurance <https://sunsetais.com/aircraft-hull-liability/>
 
 Landing / Parking cost
 **********************
-The aircraft landing and parking cost before VAT obtained from
+The aircraft landing and parking cost before VAT are obtained from
 `Toulouse Blagnac airport <https://www.toulouse.aeroport.fr/sites/default/files/2023-03/2023_03_23_Redevances_A_EN_v1.pdf>`_.
 
 
