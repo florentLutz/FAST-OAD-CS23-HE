@@ -380,7 +380,7 @@ def test_cost():
     problem = run_system(LCCGearboxCost(gearbox_id="gearbox_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:gearbox:gearbox_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:gearbox:gearbox_1:purchase_cost", units="USD"
     ) == pytest.approx(7590.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

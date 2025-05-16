@@ -36,7 +36,7 @@ class LCCTurboGeneratorCost(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
             units="USD",
             val=5.0e3,
         )
@@ -49,7 +49,7 @@ class LCCTurboGeneratorCost(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":cost_per_unit"
+            + ":purchase_cost"
         ] = (
             328.4
             * inputs[

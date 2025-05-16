@@ -978,7 +978,7 @@ def test_wire_cost():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(LCCHarnessUnitCost(harness_id="harness_1"), ivc)
     assert problem.get_val(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_unit",
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:purchase_cost",
         units="USD",
     ) == pytest.approx(148.07, rel=1e-2)
 
@@ -994,7 +994,7 @@ def test_cost():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(LCCHarnessCost(harness_id="harness_1"), ivc)
     assert problem.get_val(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_unit",
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:purchase_cost",
         units="USD",
     ) == pytest.approx(148.07, rel=1e-2)
 

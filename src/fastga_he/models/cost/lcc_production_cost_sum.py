@@ -86,7 +86,7 @@ class LCCSumProductionCost(om.ExplicitComponent):
                 + component_type
                 + ":"
                 + component_name
-                + ":cost_per_unit",
+                + ":purchase_cost",
                 units="USD",
                 val=np.nan,
             )

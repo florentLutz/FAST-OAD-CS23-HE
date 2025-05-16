@@ -20,7 +20,7 @@ class LCCGeneratorOperationalCost(om.ExplicitComponent):
         generator_id = self.options["generator_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:generator:" + generator_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:generator:" + generator_id + ":purchase_cost",
             units="USD",
             val=np.nan,
         )
@@ -45,7 +45,7 @@ class LCCGeneratorOperationalCost(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:generator:" + generator_id + ":operational_cost"
         ] = (
-            inputs["data:propulsion:he_power_train:generator:" + generator_id + ":cost_per_unit"]
+            inputs["data:propulsion:he_power_train:generator:" + generator_id + ":purchase_cost"]
             / inputs["data:propulsion:he_power_train:generator:" + generator_id + ":lifespan"]
         )
 
@@ -54,14 +54,14 @@ class LCCGeneratorOperationalCost(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:generator:" + generator_id + ":operational_cost",
-            "data:propulsion:he_power_train:generator:" + generator_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:generator:" + generator_id + ":purchase_cost",
         ] = 1.0 / inputs["data:propulsion:he_power_train:generator:" + generator_id + ":lifespan"]
 
         partials[
             "data:propulsion:he_power_train:generator:" + generator_id + ":operational_cost",
             "data:propulsion:he_power_train:generator:" + generator_id + ":lifespan",
         ] = (
-            -inputs["data:propulsion:he_power_train:generator:" + generator_id + ":cost_per_unit"]
+            -inputs["data:propulsion:he_power_train:generator:" + generator_id + ":purchase_cost"]
             / inputs["data:propulsion:he_power_train:generator:" + generator_id + ":lifespan"]
             ** 2.0
         )

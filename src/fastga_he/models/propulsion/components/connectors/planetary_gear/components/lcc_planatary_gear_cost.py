@@ -34,7 +34,7 @@ class LCCPlanetaryGearCost(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:planetary_gear:"
             + planetary_gear_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
             val=1.0e3,
             units="USD",
         )
@@ -45,7 +45,7 @@ class LCCPlanetaryGearCost(om.ExplicitComponent):
         planetary_gear_id = self.options["planetary_gear_id"]
 
         outputs[
-            "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":cost_per_unit"
+            "data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":purchase_cost"
         ] = (
             230.98
             * inputs["data:propulsion:he_power_train:planetary_gear:" + planetary_gear_id + ":mass"]

@@ -414,17 +414,17 @@ def test_cost_sum():
     )
 
     ivc.add_output(
-        "data:propulsion:he_power_train:propeller:propeller_1:cost_per_unit",
+        "data:propulsion:he_power_train:propeller:propeller_1:purchase_cost",
         units="USD",
         val=4403.0,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit",
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:purchase_cost",
         units="USD",
         val=3.0e5,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:cost_per_unit",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:purchase_cost",
         units="USD",
         val=1000.0,
     )
@@ -525,7 +525,7 @@ def test_production_cost():
     ) == pytest.approx(27808.7, rel=1e-3)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:ICE:ice_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:ICE:ice_1:purchase_cost", units="USD"
     ) == pytest.approx(70956.47, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
@@ -558,16 +558,16 @@ def test_production_cost_hydrogen():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:cost_per_unit",
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:purchase_cost",
         units="USD",
     ) == pytest.approx(104.25, rel=1e-3)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:purchase_cost", units="USD"
     ) == pytest.approx(13639.32, rel=1e-3)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PMSM:motor_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost", units="USD"
     ) == pytest.approx(60485.41, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
@@ -600,16 +600,16 @@ def test_production_cost_hybrid_tbm_900():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:purchase_cost", units="USD"
     ) == pytest.approx(449215.82, rel=1e-3)
     assert problem.get_val(
-        "data:propulsion:he_power_train:gearbox:gearbox_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:gearbox:gearbox_1:purchase_cost", units="USD"
     ) == pytest.approx(1959.02, rel=1e-3)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PMSM:motor_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost", units="USD"
     ) == pytest.approx(15762.91, rel=1e-3)
     assert problem.get_val(
-        "data:propulsion:he_power_train:turbo_generator:turbo_generator:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator:purchase_cost", units="USD"
     ) == pytest.approx(221207.71, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
@@ -646,7 +646,7 @@ def test_production_cost_tbm_900():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:purchase_cost", units="USD"
     ) == pytest.approx(449215.82, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
@@ -1159,7 +1159,7 @@ def test_cost_tbm_900():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:purchase_cost", units="USD"
     ) == pytest.approx(449215.82, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(

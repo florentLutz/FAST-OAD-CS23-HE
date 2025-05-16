@@ -34,7 +34,7 @@ class LCCBatteryPackOperationalCost(om.ExplicitComponent):
             "number of cycle required for the reference cell to reach 60% nominal capacity",
         )
         self.add_input(
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost",
             units="USD",
             val=np.nan,
             desc="battery pack cost per unit",
@@ -56,7 +56,7 @@ class LCCBatteryPackOperationalCost(om.ExplicitComponent):
         ] = (
             inputs["data:TLAR:flight_per_year"]
             * inputs[
-                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit"
+                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost"
             ]
             / inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"]
         )
@@ -65,7 +65,7 @@ class LCCBatteryPackOperationalCost(om.ExplicitComponent):
         battery_pack_id = self.options["battery_pack_id"]
 
         cost = inputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit"
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost"
         ]
 
         lifespan = inputs[
@@ -76,7 +76,7 @@ class LCCBatteryPackOperationalCost(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost",
         ] = flight_per_year / lifespan
 
         partials[

@@ -950,7 +950,7 @@ def test_cost():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_unit",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:purchase_cost",
         units="USD",
     ) == pytest.approx(
         13.14,
@@ -963,7 +963,7 @@ def test_cost():
 def test_operational_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:cost_per_unit",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:purchase_cost",
         units="USD",
         val=10000.0,
     )

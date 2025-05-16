@@ -1583,7 +1583,7 @@ def test_cost():
     problem = run_system(LCCPropellerCost(propeller_id="propeller_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:propeller:propeller_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:propeller:propeller_1:purchase_cost", units="USD"
     ) == pytest.approx(2059.097, rel=1e-3)
 
     problem.check_partials(compact_print=True)

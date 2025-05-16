@@ -32,7 +32,7 @@ class LCCPEMFCStackCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost",
             units="USD",
             val=1e4,
         )
@@ -43,7 +43,7 @@ class LCCPEMFCStackCost(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         outputs[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit"
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost"
         ] = (
             65.7
             * inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max"]

@@ -1192,7 +1192,7 @@ def test_cost():
         ivc,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cost_per_unit",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:purchase_cost",
         units="USD",
     ) == pytest.approx(170524.19, rel=1e-2)
 
@@ -1208,7 +1208,7 @@ def test_operational_cost():
     )
 
     ivc.add_output(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cost_per_unit",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:purchase_cost",
         units="USD",
         val=170524.19,
     )

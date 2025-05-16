@@ -26,7 +26,7 @@ class LCCGeneratorCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:generator:" + generator_id + ":cost_per_unit",
+            name="data:propulsion:he_power_train:generator:" + generator_id + ":purchase_cost",
             units="USD",
             val=1e4,
         )
@@ -39,7 +39,7 @@ class LCCGeneratorCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_max"
         ]
 
-        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":cost_per_unit"] = (
+        outputs["data:propulsion:he_power_train:generator:" + generator_id + ":purchase_cost"] = (
             893.51 * np.exp(0.0281 * power_max)
         )
 
@@ -50,6 +50,6 @@ class LCCGeneratorCost(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:generator:" + generator_id + ":purchase_cost",
             "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_max",
         ] = 25.108 * np.exp(0.0281 * power_max)

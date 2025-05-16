@@ -34,7 +34,7 @@ class LCCSpeedReducerCost(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:speed_reducer:"
             + speed_reducer_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
             val=1.0e3,
             units="USD",
         )
@@ -45,7 +45,7 @@ class LCCSpeedReducerCost(om.ExplicitComponent):
         speed_reducer_id = self.options["speed_reducer_id"]
 
         outputs[
-            "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":cost_per_unit"
+            "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":purchase_cost"
         ] = (
             230.98
             * inputs["data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":mass"]

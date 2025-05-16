@@ -36,7 +36,7 @@ class LCCDCSSPCCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":cost_per_unit",
+            name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
             val=1000.0,
             units="USD",
         )
@@ -50,7 +50,7 @@ class LCCDCSSPCCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":price_factor"
         ]
 
-        outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":cost_per_unit"] = (
+        outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost"] = (
             price_factor * (1.21 * current + 83.8)
         )
 
@@ -62,11 +62,11 @@ class LCCDCSSPCCost(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max",
         ] = 1.21 * price_factor
 
         partials[
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":price_factor",
         ] = 1.21 * current + 83.8

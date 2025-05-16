@@ -429,7 +429,7 @@ def test_cost():
     problem = run_system(LCCTurboGeneratorCost(turbo_generator_id="turbo_generator_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:cost_per_unit",
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:purchase_cost",
         units="USD",
     ) == pytest.approx(2298.8, rel=1e-2)
 
@@ -439,7 +439,7 @@ def test_cost():
 def test_operational_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:cost_per_unit",
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:purchase_cost",
         2298.8,
         units="USD",
     )

@@ -21,7 +21,7 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_unit",
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost",
             units="USD",
             val=np.nan,
         )
@@ -44,7 +44,7 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost"] = (
-            inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_unit"]
+            inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost"]
             / inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan"]
         )
 
@@ -53,12 +53,12 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost",
         ] = 1 / inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan"]
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan",
         ] = (
-            -inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":cost_per_unit"]
+            -inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost"]
             / inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan"] ** 2.0
         )

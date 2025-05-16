@@ -64,7 +64,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_unit",
+            name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":purchase_cost",
             units="USD",
             val=200.0,
         )
@@ -104,14 +104,14 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
         c_cable = (c_conductor + c_i + c_shield + c_sheath) * length
 
         outputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_unit"
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":purchase_cost"
         ] = c_cable / (1.0 - GROSS_MARGIN)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         harness_id = self.options["harness_id"]
 
         output_str = (
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_unit"
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":purchase_cost"
         )
 
         r_c = inputs[

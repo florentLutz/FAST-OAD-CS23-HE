@@ -37,7 +37,7 @@ class LCCHighRPMICECost(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:high_rpm_ICE:"
             + high_rpm_ice_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
             units="USD",
             val=1e4,
         )
@@ -48,7 +48,7 @@ class LCCHighRPMICECost(om.ExplicitComponent):
         high_rpm_ice_id = self.options["high_rpm_ice_id"]
 
         outputs[
-            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":cost_per_unit"
+            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":purchase_cost"
         ] = (
             174.0
             * inputs[
@@ -61,11 +61,11 @@ class LCCHighRPMICECost(om.ExplicitComponent):
         high_rpm_ice_id = self.options["high_rpm_ice_id"]
 
         partials[
-            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":purchase_cost",
             "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_max_SL",
         ] = 174.0 * inputs["data:cost:cpi_2012"]
         partials[
-            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":purchase_cost",
             "data:cost:cpi_2012",
         ] = (
             174.0

@@ -1382,7 +1382,7 @@ def test_cost():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:cost_per_unit",
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:purchase_cost",
         units="USD",
     ) == pytest.approx(6617.61, rel=1e-2)
 
@@ -1393,7 +1393,7 @@ def test_operational_cost():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:cost_per_unit",
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:purchase_cost",
         6617.61,
         units="USD",
     )

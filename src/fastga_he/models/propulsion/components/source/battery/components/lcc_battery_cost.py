@@ -45,7 +45,7 @@ class LCCBatteryPackCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost",
             units="USD",
             val=50e3,
         )
@@ -70,7 +70,7 @@ class LCCBatteryPackCost(om.ExplicitComponent):
         ]
 
         outputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit"
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost"
         ] = 1.08 * num_year**-0.228 * cost_22 * energy
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -90,17 +90,17 @@ class LCCBatteryPackCost(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_from_2022",
         ] = -0.24624 * num_year**-1.228 * cost_22 * energy
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_median_2022",
         ] = 1.08 * num_year**-0.228 * energy
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost",
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":energy_consumed_mission",

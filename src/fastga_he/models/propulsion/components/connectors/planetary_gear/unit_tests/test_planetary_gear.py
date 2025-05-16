@@ -615,7 +615,7 @@ def test_cost():
     problem = run_system(LCCPlanetaryGearCost(planetary_gear_id="planetary_gear_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:purchase_cost", units="USD"
     ) == pytest.approx(7590.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

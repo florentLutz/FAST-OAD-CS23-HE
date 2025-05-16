@@ -35,7 +35,7 @@ class LCCDCDCConverterCost(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
             units="USD",
             val=750.0,
         )
@@ -54,7 +54,7 @@ class LCCDCDCConverterCost(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":cost_per_unit"
+            + ":purchase_cost"
         ] = 733.0 * np.log(power) + 2295.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -63,7 +63,7 @@ class LCCDCDCConverterCost(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":power_rating_max",

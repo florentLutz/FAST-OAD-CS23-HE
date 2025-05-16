@@ -24,7 +24,7 @@ class LCCPEMFCStackOperationalCost(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost",
             units="USD",
             val=np.nan,
             desc="Purchase cost of PEMFC stack",
@@ -57,7 +57,7 @@ class LCCPEMFCStackOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost"
         ] = (
             inputs[
-                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit"
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost"
             ]
             * inputs["data:TLAR:flight_hours_per_year"]
             / inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan"]
@@ -66,7 +66,7 @@ class LCCPEMFCStackOperationalCost(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
         cost = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit"
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost"
         ]
         lifespan = inputs[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan"
@@ -75,7 +75,7 @@ class LCCPEMFCStackOperationalCost(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost",
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost",
         ] = flight_hour / lifespan
 
         partials[

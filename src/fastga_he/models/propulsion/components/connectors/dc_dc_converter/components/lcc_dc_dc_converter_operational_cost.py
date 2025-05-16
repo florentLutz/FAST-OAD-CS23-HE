@@ -25,7 +25,7 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
             val=np.nan,
             units="USD",
         )
@@ -53,7 +53,7 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
         cost = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":cost_per_unit"
+            + ":purchase_cost"
         ]
 
         lifespan = inputs[
@@ -71,7 +71,7 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
         cost = inputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":cost_per_unit"
+            + ":purchase_cost"
         ]
 
         lifespan = inputs[
@@ -84,7 +84,7 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
             + ":operational_cost",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
         ] = 1.0 / lifespan
 
         partials[

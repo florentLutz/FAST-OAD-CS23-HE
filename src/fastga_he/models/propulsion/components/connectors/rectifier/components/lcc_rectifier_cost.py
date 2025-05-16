@@ -31,7 +31,7 @@ class LCCRectifierCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":cost_per_unit",
+            name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost",
             units="USD",
             val=3500.0,
         )
@@ -45,7 +45,7 @@ class LCCRectifierCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         rectifier_id = self.options["rectifier_id"]
 
-        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":cost_per_unit"] = (
+        outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost"] = (
             1.72
             * inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_max"]
             + 2034.0

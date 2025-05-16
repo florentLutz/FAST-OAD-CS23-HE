@@ -715,7 +715,7 @@ def test_cost():
     problem = run_system(LCCGeneratorCost(generator_id="generator_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:generator:generator_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:generator:generator_1:purchase_cost", units="USD"
     ) == pytest.approx(6387.88, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -724,7 +724,7 @@ def test_cost():
 def test_operational_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:generator:generator_1:cost_per_unit",
+        "data:propulsion:he_power_train:generator:generator_1:purchase_cost",
         2895.61,
         units="USD",
     )

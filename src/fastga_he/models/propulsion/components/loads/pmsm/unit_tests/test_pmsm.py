@@ -755,7 +755,7 @@ def test_cost():
     problem = run_system(LCCPMSMCost(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PMSM:motor_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost", units="USD"
     ) == pytest.approx(6387.87, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -764,7 +764,7 @@ def test_cost():
 def test_operational_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PMSM:motor_1:cost_per_unit",
+        "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost",
         20815.61,
         units="USD",
     )

@@ -1386,7 +1386,7 @@ def test_cost():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:cost_per_unit", units="USD"
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:purchase_cost", units="USD"
     ) == pytest.approx(
         407535.115,
         rel=1e-2,

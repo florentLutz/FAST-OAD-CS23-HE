@@ -28,7 +28,7 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
             units="USD",
             val=np.nan,
         )
@@ -55,7 +55,7 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
         cost = inputs[
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":cost_per_unit"
+            + ":purchase_cost"
         ]
 
         outputs[
@@ -70,7 +70,7 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
         cost = inputs[
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":cost_per_unit"
+            + ":purchase_cost"
         ]
 
         partials[
@@ -79,7 +79,7 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
             + ":operational_cost",
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
         ] = flight_hour / EXPECTED_LIFESPAN
 
         partials[

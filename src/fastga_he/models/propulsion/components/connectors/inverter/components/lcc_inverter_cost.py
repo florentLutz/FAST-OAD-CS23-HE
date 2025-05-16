@@ -31,7 +31,7 @@ class LCCInverterCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
             units="USD",
             val=3500.0,
         )
@@ -45,7 +45,7 @@ class LCCInverterCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_rating_max"
         ]
 
-        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":cost_per_unit"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"] = (
             2167.0 * np.log(power_rating) + 6910.0
         )
 
@@ -53,7 +53,7 @@ class LCCInverterCost(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_rating_max",
         ] = (
             2167.0

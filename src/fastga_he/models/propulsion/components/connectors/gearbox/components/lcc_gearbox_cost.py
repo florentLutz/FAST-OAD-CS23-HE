@@ -32,7 +32,7 @@ class LCCGearboxCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:gearbox:" + gearbox_id + ":cost_per_unit",
+            name="data:propulsion:he_power_train:gearbox:" + gearbox_id + ":purchase_cost",
             val=1.0e3,
             units="USD",
         )
@@ -42,6 +42,6 @@ class LCCGearboxCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         gearbox_id = self.options["gearbox_id"]
 
-        outputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":cost_per_unit"] = (
+        outputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":purchase_cost"] = (
             230.98 * inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":mass"]
         )

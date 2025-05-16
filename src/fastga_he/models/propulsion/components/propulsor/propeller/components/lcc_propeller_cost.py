@@ -50,7 +50,7 @@ class LCCPropellerCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+            "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost",
             units="USD",
             val=1000.0,
         )
@@ -73,17 +73,17 @@ class LCCPropellerCost(om.ExplicitComponent):
 
         if prop_type == 1.0:
             outputs[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit"
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost"
             ] = 3145.0 * cpi_2012
 
         elif prop_type == 2.0:
             outputs[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit"
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost"
             ] = 209.69 * cpi_2012 * d_prop**2.0 * (shaft_power_max / d_prop) ** 0.12
 
         else:
             outputs[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit"
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost"
             ] = 3145.0 * cpi_2012
             _LOGGER.warning("Propeller type %f does not exist, replaced by type 1.0!", prop_type)
 
@@ -98,28 +98,28 @@ class LCCPropellerCost(om.ExplicitComponent):
 
         if prop_type == 1.0:
             partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost",
                 "data:cost:cpi_2012",
             ] = 3145.0
 
         elif prop_type == 2.0:
             partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost",
                 "data:cost:cpi_2012",
             ] = 209.69 * d_prop**2.0 * (shaft_power_max / d_prop) ** 0.12
 
             partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":shaft_power_in_max",
             ] = 25.1628 * cpi_2012 * d_prop**1.88 / shaft_power_max**0.88
 
             partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
             ] = 394.2172 * cpi_2012 * d_prop**0.88 * shaft_power_max**0.12
 
         else:
             partials[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":cost_per_unit",
+                "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost",
                 "data:cost:cpi_2012",
             ] = 3145.0

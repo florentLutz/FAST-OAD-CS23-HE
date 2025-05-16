@@ -36,7 +36,7 @@ class LCCGaseousHydrogenTankCost(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":cost_per_unit",
+            + ":purchase_cost",
             units="USD",
             val=200.0,
         )
@@ -49,7 +49,7 @@ class LCCGaseousHydrogenTankCost(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
             + gaseous_hydrogen_tank_id
-            + ":cost_per_unit"
+            + ":purchase_cost"
         ] = (
             6.38
             * inputs[

@@ -24,7 +24,7 @@ class LCCDCSSPCOperationalCost(om.ExplicitComponent):
         dc_sspc_id = self.options["dc_sspc_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":cost_per_unit",
+            name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
             val=np.nan,
             units="USD",
             desc="Maximum current flowing through the SSPC",
@@ -42,5 +42,5 @@ class LCCDCSSPCOperationalCost(om.ExplicitComponent):
         dc_sspc_id = self.options["dc_sspc_id"]
 
         outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operational_cost"] = (
-            0.1 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":cost_per_unit"]
+            0.1 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost"]
         )

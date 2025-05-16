@@ -24,7 +24,7 @@ class LCCInverterOperationalCost(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":cost_per_unit",
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
             units="USD",
             val=np.nan,
         )
@@ -42,5 +42,5 @@ class LCCInverterOperationalCost(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost"] = (
             0.1
-            * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":cost_per_unit"]
+            * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"]
         )
