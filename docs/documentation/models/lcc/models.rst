@@ -187,7 +187,7 @@ and the retail price of `ATO <https://www.ato.com/plating-rectifier>`_.
 
 DC SSPC purchase cost
 *********************
-The purchase cost of the DC SSPC is based on the price of IGBT modules from `Semikron <https://www.semikron-danfoss.com/>`_,
+The purchase cost of DC SSPC is based on the price of IGBT modules from `Semikron <https://www.semikron-danfoss.com/>`_,
 the maximum current (:math:`I_{max}`), and a price adjust factor (:math:`k_{\text{SSPC}}`) to consider price difference.
 
 .. math::
