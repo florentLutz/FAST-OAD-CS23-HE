@@ -143,7 +143,7 @@ of `EMRAX <https://emrax.com/e-motors/>`_.
 
 Battery purchase cost
 *********************
-Battery purchase cost is modeled with power regression from :cite:`Wesley:2023`.
+The battery purchase cost is modeled with power regression from :cite:`Wesley:2023`.
 
 .. math::
 
