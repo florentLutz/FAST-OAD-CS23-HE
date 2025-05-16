@@ -204,7 +204,7 @@ costs are estimated as an annual fraction of their purchase price.
 
 Annual maintenance & miscellaneous cost
 ***************************************
-These cost models are based on a regression derived with the data from
+These cost models are based on a regression derived from data from
 `Guardianjet <https://www.guardianjet.com/jet-aircraft-online-tools>`_.
 
 .. math::
