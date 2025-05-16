@@ -56,7 +56,7 @@ class LCCHighRPMICEOperationalCost(om.ExplicitComponent):
         ]
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
-        v_clipped = np.clip(volume, 42.8156, np.inf)
+        v_clipped = np.clip(volume, 42.8156, None)
 
         outputs[
             "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":operational_cost"
@@ -71,7 +71,7 @@ class LCCHighRPMICEOperationalCost(om.ExplicitComponent):
         ]
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
-        v_clipped = np.clip(volume, 42.8156, np.inf)
+        v_clipped = np.clip(volume, 42.8156, None)
 
         partials[
             "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":operational_cost",

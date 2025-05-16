@@ -48,7 +48,7 @@ class LCCICEOperationalCost(om.ExplicitComponent):
         volume = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume"]
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
-        v_clipped = np.clip(volume, 42.8156, np.inf)
+        v_clipped = np.clip(volume, 42.8156, None)
 
         outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":operational_cost"] = (
             (0.103 * v_clipped - 4.41) * flight_hour / 1.8
@@ -59,7 +59,7 @@ class LCCICEOperationalCost(om.ExplicitComponent):
         volume = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume"]
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
-        v_clipped = np.clip(volume, 42.8156, np.inf)
+        v_clipped = np.clip(volume, 42.8156, None)
 
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":operational_cost",
