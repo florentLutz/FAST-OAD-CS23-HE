@@ -43,7 +43,7 @@ rate per month, and :math:`F` is the combination of factors based on aircraft de
 
 Cost of development support
 ***************************
-Indirect development labor cost, provided by :cite:`gudmundsson:2013`, includes items such as overheads, administration,
+The indirect development labor cost, provided by :cite:`gudmundsson:2013`, includes items such as overheads, administration,
 logistics, human resources, facilities maintenance during the aircraft development. As numerous types of labor are
 included, this cost can not be estimated with a fixed cost rate.
 
