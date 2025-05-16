@@ -103,7 +103,7 @@ Powertrain production cost
 
 Engine purchase cost
 ********************
-The engine purchase cost calculation obtained from :cite:`gudmundsson:2013`.
+The engine purchase cost calculation is obtained from :cite:`gudmundsson:2013`.
 
 .. math::
 
