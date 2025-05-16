@@ -222,7 +222,7 @@ on regular house mortgage from :cite:`gudmundsson:2013`.
    C_{\text{loan (\$)}} = \frac{P \cdot R_{\text{interest}}}{1-\frac{1}{(1 + R_{\text{interest}})^n}}
 
 :math:`P` is the principal of the loan, :math:`R_{\text{interest}}` is the annual interest rate, and :math:`n` is the
-payback periods.
+payback period.
 
 Annual insurance cost
 *********************
