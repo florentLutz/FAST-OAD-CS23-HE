@@ -154,7 +154,7 @@ and :math:`Y_{2022}` is the amount of year from 2022.
 
 DC cable purchase cost
 **********************
-The purchase cost DC cable is based on the metal material cost, non-metal material cost, and the gross
+The purchase cost of DC cables is based on the metal material cost, non-metal material cost, and the gross
 margin (:math:`\Gamma_{\text{gross}}`) of the cable manufacturing industry. The material cost assumption is detailed
 in :ref:`assumptions <assumptions-lcc>`.
 
