@@ -37,7 +37,7 @@ the cost is simply calculated by multiplying the number of man-hours (:math:`H_{
     H_{\text{labor}} = f(M_{\text{airframe}},N,V_H,Q_m,F) \\
     C_{\text{labor (\$)}} = 2.0969 \cdot H_{\text{labor}} \cdot R_{\text{labor}} \cdot CPI_{\text{2012}}
 
-:math:`M_{\text{airframe}}` is the weight of airframe, :math:`N` is the number of aircraft produced for a
+:math:`M_{\text{airframe}}` is the weight of airframe, :math:`N` is the number of aircraft produced in a
 5-year period, :math:`V_H` maximum cruise true airspeed in knots, :math:`Q_m` is the estimated aircraft production
 rate per month, and :math:`F` is the combination of factors based on aircraft design specifications detailed in :cite:`gudmundsson:2013`.
 
@@ -227,7 +227,7 @@ payback period.
 Annual insurance cost
 *********************
 The yearly insurance cost estimation as provided by :cite:`gudmundsson:2013`, a slight value adjustments is applied
-from `Sunset aviation insurance <https://sunsetais.com/aircraft-hull-liability/>`_.
+using values from `Sunset aviation insurance <https://sunsetais.com/aircraft-hull-liability/>`_.
 
 .. math::
 
