@@ -51,20 +51,26 @@ class LCCManufacturingCost(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        mh_tooling = inputs["data:cost:production:manufacturing_man_hours_5_years"]
-        cost_rate_tooling = inputs["data:cost:production:manufacturing_cost_per_hour"]
-        cpi_2012 = inputs["data:cost:cpi_2012"]
-
         partials[
             "data:cost:production:manufacturing_cost_per_unit",
             "data:cost:production:manufacturing_man_hours_5_years",
-        ] = 2.0969 * cost_rate_tooling * cpi_2012
+        ] = (
+            2.0969
+            * inputs["data:cost:production:manufacturing_cost_per_hour"]
+            * inputs["data:cost:cpi_2012"]
+        )
 
         partials[
             "data:cost:production:manufacturing_cost_per_unit",
             "data:cost:production:manufacturing_cost_per_hour",
-        ] = 2.0969 * mh_tooling * cpi_2012
+        ] = (
+            2.0969
+            * inputs["data:cost:production:manufacturing_man_hours_5_years"]
+            * inputs["data:cost:cpi_2012"]
+        )
 
         partials["data:cost:production:manufacturing_cost_per_unit", "data:cost:cpi_2012"] = (
-            2.0969 * mh_tooling * cost_rate_tooling
+            2.0969
+            * inputs["data:cost:production:manufacturing_man_hours_5_years"]
+            * inputs["data:cost:production:manufacturing_cost_per_hour"]
         )

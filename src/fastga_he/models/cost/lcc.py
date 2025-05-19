@@ -47,7 +47,6 @@ class LCC(om.Group):
             ),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="operational_cost",
             subsys=LCCOperationalCost(

@@ -50,20 +50,26 @@ class LCCEngineeringCost(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        mh_engineering = inputs["data:cost:production:engineering_man_hours_5_years"]
-        cost_rate_engineering = inputs["data:cost:production:engineering_cost_per_hour"]
-        cpi_2012 = inputs["data:cost:cpi_2012"]
-
         partials[
             "data:cost:production:engineering_cost_per_unit",
             "data:cost:production:engineering_man_hours_5_years",
-        ] = 2.0969 * cost_rate_engineering * cpi_2012
+        ] = (
+            2.0969
+            * inputs["data:cost:production:engineering_cost_per_hour"]
+            * inputs["data:cost:cpi_2012"]
+        )
 
         partials[
             "data:cost:production:engineering_cost_per_unit",
             "data:cost:production:engineering_cost_per_hour",
-        ] = 2.0969 * mh_engineering * cpi_2012
+        ] = (
+            2.0969
+            * inputs["data:cost:production:engineering_man_hours_5_years"]
+            * inputs["data:cost:cpi_2012"]
+        )
 
         partials["data:cost:production:engineering_cost_per_unit", "data:cost:cpi_2012"] = (
-            2.0969 * mh_engineering * cost_rate_engineering
+            2.0969
+            * inputs["data:cost:production:engineering_man_hours_5_years"]
+            * inputs["data:cost:production:engineering_cost_per_hour"]
         )

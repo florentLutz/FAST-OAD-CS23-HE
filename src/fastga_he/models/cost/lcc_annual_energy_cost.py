@@ -54,27 +54,27 @@ class LCCAnnualEnergyCost(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        electricity_cost = inputs["data:cost:electric_energy_cost"]
-        fuel_cost = inputs["data:cost:fuel_cost"]
-        flight_per_year = inputs["data:TLAR:flight_per_year"]
-
-        outputs["data:cost:operation:annual_fuel_cost"] = flight_per_year * fuel_cost
-        outputs["data:cost:operation:annual_electricity_cost"] = flight_per_year * electricity_cost
+        outputs["data:cost:operation:annual_fuel_cost"] = (
+            inputs["data:TLAR:flight_per_year"] * inputs["data:cost:fuel_cost"]
+        )
+        outputs["data:cost:operation:annual_electricity_cost"] = (
+            inputs["data:TLAR:flight_per_year"] * inputs["data:cost:electric_energy_cost"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        electricity_cost = inputs["data:cost:electric_energy_cost"]
-        fuel_cost = inputs["data:cost:fuel_cost"]
-        flight_per_year = inputs["data:TLAR:flight_per_year"]
-
         partials[
             "data:cost:operation:annual_electricity_cost",
             "data:cost:electric_energy_cost",
-        ] = flight_per_year
+        ] = inputs["data:TLAR:flight_per_year"]
 
-        partials["data:cost:operation:annual_fuel_cost", "data:cost:fuel_cost"] = flight_per_year
+        partials["data:cost:operation:annual_fuel_cost", "data:cost:fuel_cost"] = inputs[
+            "data:TLAR:flight_per_year"
+        ]
 
         partials["data:cost:operation:annual_electricity_cost", "data:TLAR:flight_per_year"] = (
-            electricity_cost
+            inputs["data:cost:electric_energy_cost"]
         )
 
-        partials["data:cost:operation:annual_fuel_cost", "data:TLAR:flight_per_year"] = fuel_cost
+        partials["data:cost:operation:annual_fuel_cost", "data:TLAR:flight_per_year"] = inputs[
+            "data:cost:fuel_cost"
+        ]

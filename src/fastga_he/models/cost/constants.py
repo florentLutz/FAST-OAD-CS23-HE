@@ -4,3 +4,10 @@
 
 FUEL_STORAGE_TYPES = ["fuel_tank", "gaseous_hydrogen_tank"]
 ELECTRICITY_STORAGE_TYPES = ["battery_pack"]
+
+TYPE_TO_FUEL = {
+    "turboshaft": "jet_fuel",
+    "ICE": "avgas",
+    "high_rpm_ICE": "avgas",
+    "hydrogen_gaseous_tank": "hydrogen",
+}
