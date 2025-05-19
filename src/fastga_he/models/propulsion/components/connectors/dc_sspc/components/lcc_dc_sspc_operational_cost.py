@@ -29,6 +29,12 @@ class LCCDCSSPCOperationalCost(om.ExplicitComponent):
             units="USD",
             desc="Maximum current flowing through the SSPC",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":lifespan",
+            val=10.0,
+            units="yr",
+            desc="Maximum current flowing through the SSPC",
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operational_cost",
@@ -36,11 +42,29 @@ class LCCDCSSPCOperationalCost(om.ExplicitComponent):
             units="USD/yr",
         )
 
-        self.declare_partials(of="*", wrt="*", val=0.1)
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_sspc_id = self.options["dc_sspc_id"]
 
         outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operational_cost"] = (
-            0.1 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost"]
+            inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost"]
+            / inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":lifespan"]
         )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        dc_sspc_id = self.options["dc_sspc_id"]
+        purchase_cost = inputs[
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost"
+        ]
+        lifespan = inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":lifespan"]
+
+        partials[
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operational_cost",
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
+        ] = 1.0 / lifespan
+
+        partials[
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operational_cost",
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":lifespan",
+        ] = -purchase_cost / lifespan**2.0
