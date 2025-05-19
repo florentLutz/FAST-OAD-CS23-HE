@@ -297,7 +297,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
         ivc.add_output(name="true_airspeed", val=np.array([stall_speed]), units="m/s")
         ivc.add_output(name="engine_setting", val=np.array([EngineSetting.TAKEOFF]))
 
-        problem = om.Problem()
+        problem = om.Problem(reports=False)
         model = problem.model
 
         model.add_subsystem("ivc", ivc, promotes_outputs=["*"])
@@ -316,6 +316,14 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
             promotes_outputs=["*"],
         )
         model.add_subsystem("thrust_rate_id", _IDThrustRate(), promotes=["*"])
+
+        if pt_file_path:
+            configurator = FASTGAHEPowerTrainConfigurator()
+            configurator.load(pt_file_path)
+            slip_ins, perf_outs = configurator.get_performances_to_slipstream_element_lists()
+
+            for perf_out, slip_in in zip(perf_outs, slip_ins):
+                model.connect("power_train_performances." + perf_out, slip_in)
 
         # SLSQP uses gradient ?
         problem.driver = om.ScipyOptimizeDriver()
