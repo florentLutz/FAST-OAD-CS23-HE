@@ -13,7 +13,6 @@ class LCCTurboshaftOperationalCost(om.ExplicitComponent):
     https://www.aopa.org/news-and-media/all-news/2020/february/24/turboprop-engine-repairs-for-less.
     The Overhaul cost rate is obtained from
     https://standardaero.com/engines/prattwhitneycanada/pt6a/pt6aflatrateoverhaulprogram/.
-    The yearly maintenance cost estimation is obtained from :cite:`gudmundsson:2013`.
     """
 
     def initialize(self):
