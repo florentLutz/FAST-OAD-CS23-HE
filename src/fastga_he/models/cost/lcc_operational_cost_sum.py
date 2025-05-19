@@ -61,7 +61,7 @@ class LCCSumOperationalCost(om.ExplicitComponent):
             units="USD/yr",
         )
         self.add_input(
-            name="data:cost:operation:annual_electric_energy_cost",
+            name="data:cost:operation:annual_electricity_cost",
             val=np.nan,
             units="USD/yr",
         )

@@ -933,7 +933,7 @@ def test_energy_cost():
     )
 
     assert problem.get_val(
-        "data:cost:operation:annual_electric_energy_cost", units="USD/yr"
+        "data:cost:operation:annual_electricity_cost", units="USD/yr"
     ) == pytest.approx(82.04, rel=1e-3)
 
     assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
@@ -973,7 +973,7 @@ def test_operational_sum():
         val=1000.0,
     )
     ivc.add_output(
-        "data:cost:operation:annual_electric_energy_cost",
+        "data:cost:operation:annual_electricity_cost",
         units="USD/yr",
         val=0.0,
     )
@@ -1044,7 +1044,7 @@ def test_operational_cost_hydrogen():
         units="USD/yr",
     ) == pytest.approx(8643.26, rel=1e-3)
     assert problem.get_val(
-        "data:cost:operation:annual_electric_energy_cost",
+        "data:cost:operation:annual_electricity_cost",
         units="USD/yr",
     ) == pytest.approx(0.0, rel=1e-3)
 
