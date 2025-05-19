@@ -64,27 +64,32 @@ class LCCBatteryPackOperationalCost(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         battery_pack_id = self.options["battery_pack_id"]
 
-        cost = inputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost"
-        ]
-
-        lifespan = inputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"
-        ]
-
-        flight_per_year = inputs["data:TLAR:flight_per_year"]
-
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost",
-        ] = flight_per_year / lifespan
+        ] = (
+            inputs["data:TLAR:flight_per_year"]
+            / inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"]
+        )
 
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
             "data:TLAR:flight_per_year",
-        ] = cost / lifespan
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost"
+            ]
+            / inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"]
+        )
 
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":operational_cost",
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
-        ] = -cost * flight_per_year / lifespan**2.0
+        ] = (
+            -inputs[
+                "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost"
+            ]
+            * inputs["data:TLAR:flight_per_year"]
+            / inputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"]
+            ** 2.0
+        )

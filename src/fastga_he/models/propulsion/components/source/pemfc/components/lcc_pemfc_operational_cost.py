@@ -30,7 +30,9 @@ class LCCPEMFCStackOperationalCost(om.ExplicitComponent):
             desc="Purchase cost of PEMFC stack",
         )
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan",
+            "data:propulsion:he_power_train:PEMFC_stack:"
+            + pemfc_stack_id
+            + ":lifespan_flight_hours",
             units="h",
             val=12.5e3,
             desc="The PEMFC stack lifespan in hours",
@@ -60,30 +62,56 @@ class LCCPEMFCStackOperationalCost(om.ExplicitComponent):
                 "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost"
             ]
             * inputs["data:TLAR:flight_hours_per_year"]
-            / inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan"]
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:"
+                + pemfc_stack_id
+                + ":lifespan_flight_hours"
+            ]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
-        cost = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost"
-        ]
-        lifespan = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan"
-        ]
-        flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost",
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost",
-        ] = flight_hour / lifespan
+        ] = (
+            inputs["data:TLAR:flight_hours_per_year"]
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:"
+                + pemfc_stack_id
+                + ":lifespan_flight_hours"
+            ]
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost",
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":lifespan",
-        ] = -cost * flight_hour / lifespan**2.0
+            "data:propulsion:he_power_train:PEMFC_stack:"
+            + pemfc_stack_id
+            + ":lifespan_flight_hours",
+        ] = (
+            -inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost"
+            ]
+            * inputs["data:TLAR:flight_hours_per_year"]
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:"
+                + pemfc_stack_id
+                + ":lifespan_flight_hours"
+            ]
+            ** 2.0
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = cost / lifespan
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost"
+            ]
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:"
+                + pemfc_stack_id
+                + ":lifespan_flight_hours"
+            ]
+        )

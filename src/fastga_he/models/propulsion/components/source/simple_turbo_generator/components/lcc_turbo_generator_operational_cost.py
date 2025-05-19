@@ -5,8 +5,6 @@
 import numpy as np
 import openmdao.api as om
 
-EXPECTED_LIFESPAN = 1250.0  # hours
-
 
 class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
     """
@@ -38,6 +36,14 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
             units="h",
             desc="Expected number of hours flown per year",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":lifespan_flight_hours",
+            units="h",
+            val=1250.0,
+            desc="Expected life expectancy of the generator, typically around 1250 flight hour",
+        )
 
         self.add_output(
             "data:propulsion:he_power_train:turbo_generator:"
@@ -51,27 +57,27 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         turbo_generator_id = self.options["turbo_generator_id"]
-        flight_hour = inputs["data:TLAR:flight_hours_per_year"]
-        cost = inputs[
-            "data:propulsion:he_power_train:turbo_generator:"
-            + turbo_generator_id
-            + ":purchase_cost"
-        ]
 
         outputs[
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
             + ":operational_cost"
-        ] = cost * flight_hour / EXPECTED_LIFESPAN
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":purchase_cost"
+            ]
+            * inputs["data:TLAR:flight_hours_per_year"]
+            / inputs[
+                "data:propulsion:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":lifespan_flight_hours"
+            ]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         turbo_generator_id = self.options["turbo_generator_id"]
-        flight_hour = inputs["data:TLAR:flight_hours_per_year"]
-        cost = inputs[
-            "data:propulsion:he_power_train:turbo_generator:"
-            + turbo_generator_id
-            + ":purchase_cost"
-        ]
 
         partials[
             "data:propulsion:he_power_train:turbo_generator:"
@@ -80,11 +86,51 @@ class LCCTurboGeneratorOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
             + ":purchase_cost",
-        ] = flight_hour / EXPECTED_LIFESPAN
+        ] = (
+            inputs["data:TLAR:flight_hours_per_year"]
+            / inputs[
+                "data:propulsion:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":lifespan_flight_hours"
+            ]
+        )
 
         partials[
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
             + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = cost / EXPECTED_LIFESPAN
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":purchase_cost"
+            ]
+            / inputs[
+                "data:propulsion:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":lifespan_flight_hours"
+            ]
+        )
+
+        partials[
+            "data:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":operational_cost",
+            "data:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":lifespan_flight_hours",
+        ] = (
+            -inputs[
+                "data:propulsion:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":purchase_cost"
+            ]
+            * inputs["data:TLAR:flight_hours_per_year"]
+            / inputs[
+                "data:propulsion:he_power_train:turbo_generator:"
+                + turbo_generator_id
+                + ":lifespan_flight_hours"
+            ]
+            ** 2.0
+        )

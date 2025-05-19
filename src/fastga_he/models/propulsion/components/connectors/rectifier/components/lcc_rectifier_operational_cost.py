@@ -45,24 +45,27 @@ class LCCRectifierOperationalCost(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         rectifier_id = self.options["rectifier_id"]
-        cost = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost"]
-        lifespan = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
 
         outputs[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operational_cost"
-        ] = cost / lifespan
+        ] = (
+            inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost"]
+            / inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         rectifier_id = self.options["rectifier_id"]
-        cost = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost"]
-        lifespan = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
 
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operational_cost",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost",
-        ] = 1.0 / lifespan
+        ] = 1.0 / inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
 
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operational_cost",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan",
-        ] = -cost / lifespan**2.0
+        ] = (
+            -inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost"]
+            / inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
+            ** 2.0
+        )

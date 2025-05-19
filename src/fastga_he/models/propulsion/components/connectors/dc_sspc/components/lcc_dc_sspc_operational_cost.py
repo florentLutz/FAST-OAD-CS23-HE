@@ -54,17 +54,16 @@ class LCCDCSSPCOperationalCost(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         dc_sspc_id = self.options["dc_sspc_id"]
-        purchase_cost = inputs[
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost"
-        ]
-        lifespan = inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":lifespan"]
 
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operational_cost",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
-        ] = 1.0 / lifespan
+        ] = 1.0 / inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":lifespan"]
 
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":operational_cost",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":lifespan",
-        ] = -purchase_cost / lifespan**2.0
+        ] = (
+            -inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost"]
+            / inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":lifespan"] ** 2.0
+        )

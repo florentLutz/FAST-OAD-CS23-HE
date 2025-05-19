@@ -50,33 +50,24 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
-        cost = inputs[
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":purchase_cost"
-        ]
-
-        lifespan = inputs[
-            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
-        ]
 
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":operational_cost"
-        ] = cost / lifespan
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":purchase_cost"
+            ]
+            / inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
+            ]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
-        cost = inputs[
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":purchase_cost"
-        ]
-
-        lifespan = inputs[
-            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
-        ]
 
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
@@ -85,11 +76,26 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":purchase_cost",
-        ] = 1.0 / lifespan
+        ] = (
+            1.0
+            / inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
+            ]
+        )
 
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":operational_cost",
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan",
-        ] = -cost / lifespan**2.0
+        ] = (
+            -inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":purchase_cost"
+            ]
+            / inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
+            ]
+            ** 2.0
+        )

@@ -53,17 +53,15 @@ class LCCInverterOperationalCost(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         inverter_id = self.options["inverter_id"]
 
-        purchase_cost = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"
-        ]
-        lifespan = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan"]
-
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
-        ] = 1.0 / lifespan
+        ] = 1.0 / inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan"]
 
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan",
-        ] = -purchase_cost / lifespan**2.0
+        ] = (
+            -inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"]
+            / inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan"] ** 2.0
+        )
