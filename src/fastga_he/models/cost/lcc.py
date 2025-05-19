@@ -39,14 +39,11 @@ class LCC(om.Group):
         )
 
     def setup(self):
-        loan = self.options["loan"]
-        delivery_method = self.options["delivery_method"]
-
         self.add_subsystem(
             name="production_cost",
             subsys=LCCProductionCost(
                 power_train_file_path=self.options["power_train_file_path"],
-                delivery_method=delivery_method,
+                delivery_method=self.options["delivery_method"],
             ),
             promotes=["*"],
         )
@@ -55,7 +52,7 @@ class LCC(om.Group):
             name="operational_cost",
             subsys=LCCOperationalCost(
                 power_train_file_path=self.options["power_train_file_path"],
-                loan=loan,
+                loan=self.options["loan"],
             ),
             promotes=["*"],
         )
