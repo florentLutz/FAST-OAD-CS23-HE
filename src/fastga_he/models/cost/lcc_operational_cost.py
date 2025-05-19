@@ -20,6 +20,8 @@ from .lcc_electricity_cost import LCCElectricityCost
 from .lcc_annual_energy_cost import LCCAnnualEnergyCost
 from .lcc_operational_cost_sum import LCCSumOperationalCost
 
+from .constants import ELECTRICITY_STORAGE_TYPES
+
 
 class LCCOperationalCost(om.Group):
     """
@@ -49,7 +51,6 @@ class LCCOperationalCost(om.Group):
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
         loan = self.options["loan"]
-        energy_components = ["battery_pack", "fuel_tank", "gaseous_hydrogen_tank"]
 
         self.add_subsystem(
             name="landing_cost_per_operation",
@@ -97,8 +98,8 @@ class LCCOperationalCost(om.Group):
 
         cost_components_type = []
         cost_components_name = []
-        cost_energy_components_type = []
-        cost_energy_components_name = []
+        electricity_components_type = []
+        electricity_components_name = []
         (
             components_name,
             components_name_id,
@@ -107,6 +108,8 @@ class LCCOperationalCost(om.Group):
             _,
             _,
         ) = self.configurator.get_sizing_element_lists()
+
+        tank_names, tank_types, fuel_types = self.configurator.get_fuel_tank_list_and_fuel()
 
         for (
             component_name,
@@ -125,25 +128,22 @@ class LCCOperationalCost(om.Group):
                 cost_components_type.append(component_type)
                 cost_components_name.append(component_name)
 
-                self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
+                if components_type in ELECTRICITY_STORAGE_TYPES:
+                    electricity_components_type.append(component_type)
+                    electricity_components_name.append(component_name)
 
-            if component_type in energy_components:
-                cost_energy_components_type.append(component_type)
-                cost_energy_components_name.append(component_name)
+                self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
 
         self.add_subsystem(
             name="fuel_cost",
-            subsys=LCCFuelCost(
-                cost_components_type=cost_energy_components_type,
-                cost_components_name=cost_energy_components_name,
-            ),
+            subsys=LCCFuelCost(tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types),
             promotes=["*"],
         )
         self.add_subsystem(
             name="electric_energy_cost",
             subsys=LCCElectricityCost(
-                cost_components_type=cost_energy_components_type,
-                cost_components_name=cost_energy_components_name,
+                electricity_components_type=electricity_components_type,
+                electricity_components_name=electricity_components_name,
             ),
             promotes=["*"],
         )

@@ -5,9 +5,4 @@
 FUEL_STORAGE_TYPES = ["fuel_tank", "gaseous_hydrogen_tank"]
 ELECTRICITY_STORAGE_TYPES = ["battery_pack"]
 
-TYPE_TO_FUEL = {
-    "turboshaft": "jet_fuel",
-    "ICE": "avgas",
-    "high_rpm_ICE": "avgas",
-    "hydrogen_gaseous_tank": "hydrogen",
-}
+DEFAULT_FUEL_UNIT_COST = {"jet_fuel": 2.967, "diesel": 1.977, "avgas": 3.66, "hydrogen": 6.54}

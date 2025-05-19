@@ -76,7 +76,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             shape=number_of_points,
         )
         self.add_input(
-            "power_rating",
+            "dc_power_in",
             units="kW",
             val=np.full(number_of_points, np.nan),
             shape=number_of_points,
@@ -220,15 +220,15 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":power_rating_max",
+            + ":power_dc_in_max",
             units="kW",
             val=1e3,
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":power_rating_max",
-            wrt="power_rating",
+            + ":power_dc_in_max",
+            wrt="dc_power_in",
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
@@ -303,8 +303,8 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":power_rating_max"
-        ] = np.max(inputs["power_rating"])
+            + ":power_dc_in_max"
+        ] = np.max(inputs["dc_power_in"])
 
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
@@ -372,9 +372,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":power_rating_max",
-            "power_rating",
-        ] = np.where(inputs["power_rating"] == np.max(inputs["power_rating"]), 1.0, 0.0)
+            + ":power_dc_in_max",
+            "dc_power_in",
+        ] = np.where(inputs["dc_power_in"] == np.max(inputs["dc_power_in"]), 1.0, 0.0)
 
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"

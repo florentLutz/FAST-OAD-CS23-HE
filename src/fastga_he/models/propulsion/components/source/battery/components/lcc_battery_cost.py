@@ -38,10 +38,10 @@ class LCCBatteryPackCost(om.ExplicitComponent):
             desc="The Cost median per kW*h of the Li-ion battery pack in 2022",
         )
         self.add_input(
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_from_2022",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_since_2022",
             units="yr",
             val=3.0,
-            desc="Number of years from 2022",
+            desc="Number of years since 2022",
         )
 
         self.add_output(
@@ -66,7 +66,7 @@ class LCCBatteryPackCost(om.ExplicitComponent):
         ]
 
         num_year = inputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_from_2022"
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_since_2022"
         ]
 
         outputs[
@@ -86,12 +86,12 @@ class LCCBatteryPackCost(om.ExplicitComponent):
         ]
 
         num_year = inputs[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_from_2022"
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_since_2022"
         ]
 
         partials[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":purchase_cost",
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_from_2022",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_since_2022",
         ] = -0.24624 * num_year**-1.228 * cost_22 * energy
 
         partials[

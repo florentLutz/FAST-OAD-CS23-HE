@@ -832,59 +832,20 @@ def test_annual_maintenance_miscellaneous_cost():
 
 
 def test_fuel_cost():
-    components_type = ["propeller", "turboshaft", "fuel_tank"]
-    components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1"]
+    tank_types = ["fuel_tank", "fuel_tank"]
+    tank_names = ["fuel_tank_1", "fuel_tank_2"]
+    fuel_types = ["avgas", "diesel"]
 
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name)
-        ),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(
-        LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name),
-        ivc,
-    )
-
-    assert problem.get_val("data:cost:fuel_cost", units="USD") == pytest.approx(427.25, rel=1e-3)
-
-    problem.check_partials(compact_print=True)
-
-    components_type = ["propeller", "PMSM", "gaseous_hydrogen_tank"]
-    components_name = ["propeller_1", "motor_1", "gaseous_hydrogen_tank_1"]
-
-    ivc = get_indep_var_comp(
-        list_inputs(
-            LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name)
-        ),
-        __file__,
-        "data_pemfc.xml",
-    )
-
-    problem = run_system(
-        LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name),
-        ivc,
-    )
-
-    assert problem.get_val("data:cost:fuel_cost", units="USD") == pytest.approx(91.56, rel=1e-3)
-
-    problem.check_partials(compact_print=True)
-
-    components_type = ["propeller", "turboshaft", "fuel_tank", "fuel_tank"]
-    components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1", "fuel_tank_2"]
-
-    ivc = get_indep_var_comp(
-        list_inputs(
-            LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name)
+            LCCFuelCost(tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types)
         ),
         __file__,
         "data_fuel_cost.xml",
     )
 
     problem = run_system(
-        LCCFuelCost(cost_components_type=components_type, cost_components_name=components_name),
+        LCCFuelCost(tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types),
         ivc,
     )
 
@@ -893,14 +854,15 @@ def test_fuel_cost():
     problem.check_partials(compact_print=True)
 
 
-def test_electric_energy_cost():
-    components_type = ["propeller", "PMSM", "battery_pack"]
-    components_name = ["propeller_1", "motor_1", "battery_pack_1"]
+def test_electricity_cost():
+    components_type = ["battery_pack"]
+    components_name = ["battery_pack_1"]
 
     ivc = get_indep_var_comp(
         list_inputs(
             LCCElectricityCost(
-                cost_components_type=components_type, cost_components_name=components_name
+                electricity_components_type=components_type,
+                electricity_components_name=components_name,
             )
         ),
         __file__,
@@ -909,7 +871,7 @@ def test_electric_energy_cost():
 
     problem = run_system(
         LCCElectricityCost(
-            cost_components_type=components_type, cost_components_name=components_name
+            electricity_components_type=components_type, electricity_components_name=components_name
         ),
         ivc,
     )

@@ -6,7 +6,7 @@ import logging
 import numpy as np
 import openmdao.api as om
 
-from .constants import FUEL_STORAGE_TYPES
+DEFAULT_FUEL_UNIT_COST = {"jet_fuel": 2.967, "diesel": 1.977, "avgas": 3.66, "hydrogen": 6.54}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,25 +19,16 @@ class LCCFuelCost(om.ExplicitComponent):
     """
 
     def initialize(self):
-        self.options.declare("cost_components_type", types=list, default=[])
-        self.options.declare("cost_components_name", types=list, default=[])
+        self.options.declare("tank_types", types=list, default=[])
+        self.options.declare("tank_names", types=list, default=[])
+        self.options.declare("fuel_types", types=list, default=[])
 
     def setup(self):
-        cost_components_type = self.options["cost_components_type"]
-        cost_components_name = self.options["cost_components_name"]
+        tank_types = self.options["tank_types"]
+        tank_names = self.options["tank_names"]
+        fuel_types = self.options["fuel_types"]
 
-        self.add_output(
-            name="data:cost:fuel_cost",
-            val=1000.0,
-            units="USD",
-            desc="Fuel cost for single flight mission",
-        )
-
-        for tank_type, tank_id in [
-            (comp_type, comp_name)
-            for comp_type, comp_name in zip(cost_components_type, cost_components_name)
-            if comp_type in FUEL_STORAGE_TYPES
-        ]:
+        for tank_type, tank_id, fuel_type in zip(tank_types, tank_names, fuel_types):
             self.add_input(
                 "data:propulsion:he_power_train:"
                 + tank_type
@@ -48,108 +39,88 @@ class LCCFuelCost(om.ExplicitComponent):
                 val=np.nan,
                 desc="Amount of fuel from that tank which will be consumed during mission",
             )
+            if fuel_type not in DEFAULT_FUEL_UNIT_COST:
+                _LOGGER.warning("Fuel type does not exist, replaced by Jet-A1!")
+                fuel_type = "jet_fuel"
+            self.add_input(
+                "data:propulsion:he_power_train:"
+                + tank_type
+                + ":"
+                + tank_id
+                + ":fuel_type_cost:"
+                + fuel_type,
+                val=DEFAULT_FUEL_UNIT_COST[fuel_type],
+                units="USD/kg",
+                desc="Amount of fuel from that tank which will be consumed during mission",
+            )
 
-            self.declare_partials(
-                of="*",
-                wrt="data:propulsion:he_power_train:"
+        self.add_output(
+            name="data:cost:fuel_cost",
+            val=0.0,
+            units="USD",
+            desc="Fuel cost for single flight mission",
+        )
+
+        self.declare_partials(of="*", wrt="*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        tank_types = self.options["tank_types"]
+        tank_names = self.options["tank_names"]
+        fuel_types = self.options["fuel_types"]
+
+        for tank_type, tank_id, fuel_type in zip(tank_types, tank_names, fuel_types):
+            outputs["data:cost:fuel_cost"] += (
+                inputs[
+                    "data:propulsion:he_power_train:"
+                    + tank_type
+                    + ":"
+                    + tank_id
+                    + ":fuel_type_cost:"
+                    + fuel_type
+                ]
+                * inputs[
+                    "data:propulsion:he_power_train:"
+                    + tank_type
+                    + ":"
+                    + tank_id
+                    + ":fuel_consumed_mission"
+                ]
+            )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        tank_types = self.options["tank_types"]
+        tank_names = self.options["tank_names"]
+        fuel_types = self.options["fuel_types"]
+
+        for tank_type, tank_id, fuel_type in zip(tank_types, tank_names, fuel_types):
+            partials[
+                "data:cost:fuel_cost",
+                "data:propulsion:he_power_train:"
                 + tank_type
                 + ":"
                 + tank_id
                 + ":fuel_consumed_mission",
-                method="exact",
-            )
+            ] = inputs[
+                "data:propulsion:he_power_train:"
+                + tank_type
+                + ":"
+                + tank_id
+                + ":fuel_type_cost:"
+                + fuel_type
+            ]
 
-            if tank_type == "fuel_tank":
-                self.add_input(
-                    "data:propulsion:he_power_train:fuel_tank:" + tank_id + ":fuel_type",
-                    val=1.0,
-                    desc="Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1",
-                )
-
-                self.declare_partials(
-                    "*",
-                    "data:propulsion:he_power_train:fuel_tank:" + tank_id + ":fuel_type",
-                    method="fd",
-                )
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        cost_components_type = self.options["cost_components_type"]
-        cost_components_name = self.options["cost_components_name"]
-        outputs["data:cost:fuel_cost"] = 0.0
-
-        for tank_type, tank_id in [
-            (comp_type, comp_name)
-            for comp_type, comp_name in zip(cost_components_type, cost_components_name)
-            if (comp_type == "fuel_tank" or comp_type == "gaseous_hydrogen_tank")
-        ]:
-            if tank_type == "fuel_tank":
-                fuel_type = inputs[
-                    "data:propulsion:he_power_train:fuel_tank:" + tank_id + ":fuel_type"
-                ]
-
-                if fuel_type == 1.0:
-                    price_fuel = 3.66  # gasoline price [USD/kg], Avgas
-                elif fuel_type == 2.0:
-                    price_fuel = 1.977  # Diesel price [USD/kg]
-                elif fuel_type == 3.0:
-                    price_fuel = 2.967  # Jet-A1 price [USD/kg]
-                else:
-                    price_fuel = 3.66
-                    _LOGGER.warning("Fuel type %f does not exist, replaced by type 1!", fuel_type)
-
-                outputs["data:cost:fuel_cost"] += (
-                    price_fuel
-                    * inputs[
-                        "data:propulsion:he_power_train:fuel_tank:"
-                        + tank_id
-                        + ":fuel_consumed_mission"
-                    ]
-                )
-
-            elif tank_type == "gaseous_hydrogen_tank":
-                outputs["data:cost:fuel_cost"] += (
-                    6.54
-                    * inputs[
-                        "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                        + tank_id
-                        + ":fuel_consumed_mission"
-                    ]
-                )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        cost_components_type = self.options["cost_components_type"]
-        cost_components_name = self.options["cost_components_name"]
-
-        for tank_type, tank_id in [
-            (comp_type, comp_name)
-            for comp_type, comp_name in zip(cost_components_type, cost_components_name)
-            if (comp_type == "fuel_tank" or comp_type == "gaseous_hydrogen_tank")
-        ]:
-            if tank_type == "fuel_tank":
-                fuel_type = inputs[
-                    "data:propulsion:he_power_train:fuel_tank:" + tank_id + ":fuel_type"
-                ]
-
-                if fuel_type == 1.0:
-                    price_fuel = 3.66  # gasoline price [USD/kg], Avgas
-                elif fuel_type == 2.0:
-                    price_fuel = 1.977  # Diesel price [USD/kg]
-                elif fuel_type == 3.0:
-                    price_fuel = 2.967  # Jet-A1 price [USD/kg]
-                else:
-                    price_fuel = 3.66
-
-                partials[
-                    "data:cost:fuel_cost",
-                    "data:propulsion:he_power_train:fuel_tank:"
-                    + tank_id
-                    + ":fuel_consumed_mission",
-                ] = price_fuel
-
-            elif tank_type == "gaseous_hydrogen_tank":
-                partials[
-                    "data:cost:fuel_cost",
-                    "data:propulsion:he_power_train:gaseous_hydrogen_tank:"
-                    + tank_id
-                    + ":fuel_consumed_mission",
-                ] = 6.54
+            partials[
+                "data:cost:fuel_cost",
+                "data:propulsion:he_power_train:"
+                + tank_type
+                + ":"
+                + tank_id
+                + ":fuel_type_cost:"
+                + fuel_type,
+            ] += inputs[
+                "data:propulsion:he_power_train:"
+                + tank_type
+                + ":"
+                + tank_id
+                + ":fuel_consumed_mission"
+            ]

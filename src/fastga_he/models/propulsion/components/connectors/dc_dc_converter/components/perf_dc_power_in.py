@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesPowerRating(om.ExplicitComponent):
+class PerformancesDCPowerIn(om.ExplicitComponent):
     """
-    Component of the power rating of the DC-DC converter.
+    Component of the  power of the DC-DC converter from the input side.
     """
 
     def initialize(self):
@@ -19,10 +19,10 @@ class PerformancesPowerRating(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
-        self.add_input("dc_voltage_out", units="V", val=np.full(number_of_points, np.nan))
+        self.add_input("dc_current_in", units="A", val=np.full(number_of_points, np.nan))
+        self.add_input("dc_voltage_in", units="V", val=np.full(number_of_points, np.nan))
 
-        self.add_output("power_rating", units="W", val=200.0, shape=number_of_points)
+        self.add_output("dc_power_in", units="W", val=200.0, shape=number_of_points)
 
         self.declare_partials(
             of="*",
@@ -33,8 +33,8 @@ class PerformancesPowerRating(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["power_rating"] = inputs["dc_current_out"] * inputs["dc_voltage_out"]
+        outputs["dc_power_in"] = inputs["dc_current_in"] * inputs["dc_voltage_in"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["power_rating", "dc_current_out"] = inputs["dc_voltage_out"]
-        partials["power_rating", "dc_voltage_out"] = inputs["dc_current_out"]
+        partials["dc_power_in", "dc_current_in"] = inputs["dc_voltage_in"]
+        partials["dc_power_in", "dc_voltage_in"] = inputs["dc_current_in"]

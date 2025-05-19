@@ -150,7 +150,7 @@ The battery purchase cost is modeled with power regression from :cite:`Wesley:20
     C_{\text{bat (\$)}} = 1.08 \cdot C_{2022} \cdot E_{\text{bat}} \cdot Y_{2022}^{-0.228}
 
 :math:`C_{2022}` is the energy per dollar of battery in 2022, :math:`E_{bat}` is the maximum energy supply from battery,
-and :math:`Y_{2022}` is the amount of year from 2022.
+and :math:`Y_{2022}` is the amount of years since 2022.
 
 DC cable purchase cost
 **********************

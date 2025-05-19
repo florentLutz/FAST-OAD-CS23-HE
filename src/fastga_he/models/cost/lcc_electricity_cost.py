@@ -1,13 +1,9 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
-import logging
+
 import numpy as np
 import openmdao.api as om
-
-from .constants import ELECTRICITY_STORAGE_TYPES
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class LCCElectricityCost(om.ExplicitComponent):
@@ -17,25 +13,16 @@ class LCCElectricityCost(om.ExplicitComponent):
     """
 
     def initialize(self):
-        self.options.declare("cost_components_type", types=list, default=[])
-        self.options.declare("cost_components_name", types=list, default=[])
+        self.options.declare("electricity_components_type", types=list, default=[])
+        self.options.declare("electricity_components_name", types=list, default=[])
 
     def setup(self):
-        cost_components_type = self.options["cost_components_type"]
-        cost_components_name = self.options["cost_components_name"]
+        electricity_components_type = self.options["electricity_components_type"]
+        electricity_components_name = self.options["electricity_components_name"]
 
-        self.add_output(
-            name="data:cost:electric_energy_cost",
-            val=1000.0,
-            units="USD",
-            desc="Electric energy cost for single flight mission",
-        )
-
-        for electricity_storage_type, electricity_storage_id in [
-            (comp_type, comp_name)
-            for comp_type, comp_name in zip(cost_components_type, cost_components_name)
-            if comp_type in ELECTRICITY_STORAGE_TYPES
-        ]:
+        for electricity_storage_type, electricity_storage_id in zip(
+            electricity_components_type, electricity_components_name
+        ):
             self.add_input(
                 "data:propulsion:he_power_train:"
                 + electricity_storage_type
@@ -46,19 +33,30 @@ class LCCElectricityCost(om.ExplicitComponent):
                 val=np.nan,
                 desc="Energy drawn from the battery for the mission",
             )
+            self.declare_partials(
+                of="data:cost:electric_energy_cost",
+                wrt="data:propulsion:he_power_train:"
+                + electricity_storage_type
+                + ":"
+                + electricity_storage_id
+                + ":energy_consumed_mission",
+                val=0.655,
+            )
 
-            self.declare_partials(of="*", wrt="*", val=0.655)
+        self.add_output(
+            name="data:cost:electric_energy_cost",
+            val=0.0,
+            units="USD",
+            desc="Electric energy cost for single flight mission",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        cost_components_type = self.options["cost_components_type"]
-        cost_components_name = self.options["cost_components_name"]
-        outputs["data:cost:electric_energy_cost"] = 0.0
+        electricity_components_type = self.options["electricity_components_type"]
+        electricity_components_name = self.options["electricity_components_name"]
 
-        for electricity_storage_type, electricity_storage_id in [
-            (comp_type, comp_name)
-            for comp_type, comp_name in zip(cost_components_type, cost_components_name)
-            if comp_type == "battery_pack"
-        ]:
+        for electricity_storage_type, electricity_storage_id in zip(
+            electricity_components_type, electricity_components_name
+        ):
             outputs["data:cost:electric_energy_cost"] += (
                 0.655
                 * inputs[

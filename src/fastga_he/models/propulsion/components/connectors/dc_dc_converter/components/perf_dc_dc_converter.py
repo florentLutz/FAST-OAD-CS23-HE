@@ -17,7 +17,7 @@ from .perf_currents import PerformancesCurrents
 from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_conduction_losses import PerformancesConductionLosses
 from .perf_total_losses import PerformancesLosses
-from .perf_power_rating import PerformancesPowerRating
+from .perf_dc_power_in import PerformancesDCPowerIn
 from .perf_maximum import PerformancesMaximum
 
 from ..constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
@@ -105,7 +105,7 @@ class PerformancesDCDCConverter(om.Group):
         )
         self.add_subsystem(
             "power_rating",
-            PerformancesPowerRating(number_of_points=number_of_points),
+            PerformancesDCPowerIn(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(

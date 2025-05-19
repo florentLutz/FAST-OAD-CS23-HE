@@ -6,8 +6,10 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesPowerRating(om.ExplicitComponent):
-    """Computation of the power rating of the inverter."""
+class PerformancesACPowerOut(om.ExplicitComponent):
+    """
+    Computation of the power of the inverter at the output side.
+    """
 
     def initialize(self):
         self.options.declare(
@@ -24,7 +26,7 @@ class PerformancesPowerRating(om.ExplicitComponent):
         self.add_input("ac_voltage_rms_out", units="V", val=np.full(number_of_points, np.nan))
 
         self.add_output(
-            "power_rating",
+            "ac_power_out",
             units="W",
             val=np.full(number_of_points, 250.0),
         )
@@ -44,11 +46,11 @@ class PerformancesPowerRating(om.ExplicitComponent):
         current = inputs["ac_current_rms_out_one_phase"]
         ac_voltage_rms_out = inputs["ac_voltage_rms_out"]
 
-        outputs["power_rating"] = 3.0 * current * ac_voltage_rms_out
+        outputs["ac_power_out"] = 3.0 * current * ac_voltage_rms_out
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         current = inputs["ac_current_rms_out_one_phase"]
         ac_voltage_rms_out = inputs["ac_voltage_rms_out"]
 
-        partials["power_rating", "ac_voltage_rms_out"] = 3.0 * current
-        partials["power_rating", "ac_current_rms_out_one_phase"] = 3.0 * ac_voltage_rms_out
+        partials["ac_power_out", "ac_voltage_rms_out"] = 3.0 * current
+        partials["ac_power_out", "ac_current_rms_out_one_phase"] = 3.0 * ac_voltage_rms_out

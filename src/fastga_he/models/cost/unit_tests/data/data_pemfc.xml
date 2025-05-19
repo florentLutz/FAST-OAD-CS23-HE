@@ -504,7 +504,7 @@
                         <current_ac_max units="A">400.0</current_ac_max>
                         <voltage_caliber units="V">500.0</voltage_caliber>
                         <voltage_ac_max units="V">500.0</voltage_ac_max>
-                        <power_rating_max units="kW">200.0</power_rating_max>
+                        <power_ac_out_max units="kW">200.0</power_ac_out_max>
                         <switching_frequency units="Hz">15.0e3</switching_frequency>
                         <switching_frequency_max units="Hz" is_input="True">12000.0</switching_frequency_max>
                         <power_factor>1.0</power_factor>
