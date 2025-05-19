@@ -31,16 +31,16 @@ class LCCElectricityCost(om.ExplicitComponent):
             desc="Electric energy cost for single flight mission",
         )
 
-        for battery_type, battery_id in [
+        for electricity_storage_type, electricity_storage_id in [
             (comp_type, comp_name)
             for comp_type, comp_name in zip(cost_components_type, cost_components_name)
             if comp_type in ELECTRICITY_STORAGE_TYPES
         ]:
             self.add_input(
                 "data:propulsion:he_power_train:"
-                + battery_type
+                + electricity_storage_type
                 + ":"
-                + battery_id
+                + electricity_storage_id
                 + ":energy_consumed_mission",
                 units="kW*h",
                 val=np.nan,
@@ -54,7 +54,7 @@ class LCCElectricityCost(om.ExplicitComponent):
         cost_components_name = self.options["cost_components_name"]
         outputs["data:cost:electric_energy_cost"] = 0.0
 
-        for battery_type, battery_id in [
+        for electricity_storage_type, electricity_storage_id in [
             (comp_type, comp_name)
             for comp_type, comp_name in zip(cost_components_type, cost_components_name)
             if comp_type == "battery_pack"
@@ -63,9 +63,9 @@ class LCCElectricityCost(om.ExplicitComponent):
                 0.655
                 * inputs[
                     "data:propulsion:he_power_train:"
-                    + battery_type
+                    + electricity_storage_type
                     + ":"
-                    + battery_id
+                    + electricity_storage_id
                     + ":energy_consumed_mission"
                 ]
             )

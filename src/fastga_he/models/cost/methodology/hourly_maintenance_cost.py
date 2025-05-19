@@ -3,54 +3,25 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
-from scipy import optimize
 import plotly.graph_objects as go
-
-
-# Polynomial function (2nd order)
-def polynomial_func(x, a, b, c):
-    return a * x**2 + b * x + c  # ax^2 + bx + c form
 
 
 if __name__ == "__main__":
     # Updated data points
-    x = np.array(
-        [
-            2048,
-            1550,
-            3087,
-            4535,
-            2089,
-            1727,
-        ]
-    )
-    y = np.array(
-        [
-            270,
-            282,
-            349,
-            575,
-            374,
-            266,
-        ]
-    )
+    x = np.array([2048, 1550, 3087, 4535, 2089, 1727])
+    y = np.array([270, 282, 349, 575, 374, 266])
 
-    # Initial parameter guess for polynomial fit
-    # Starting with small values for all parameters
-    initial_guess = [0.0001, 0.01, 200]
-
-    # Fit polynomial regression
-    polynomial_params, pcov = optimize.curve_fit(
-        polynomial_func, x, y, p0=initial_guess, maxfev=10000
-    )
+    # Fit polynomial regression using numpy.polyfit (2nd order)
+    coeffs = np.polyfit(x, y, 2)  # Returns [a, b, c] for ax^2 + bx + c
+    a, b, c = coeffs
 
     # Calculate fitted y values and R-squared
-    y_polynomial = polynomial_func(x, *polynomial_params)
+    y_polynomial = np.polyval(coeffs, x)
     r2_polynomial = 1 - np.sum((y - y_polynomial) ** 2) / np.sum((y - np.mean(y)) ** 2)
 
     # Generate points for smooth curve
     x_smooth = np.linspace(min(x), max(x), 100)
-    y_smooth = polynomial_func(x_smooth, *polynomial_params)
+    y_smooth = np.polyval(coeffs, x_smooth)
 
     # Create interactive plot
     fig = go.Figure()
@@ -68,7 +39,6 @@ if __name__ == "__main__":
     )
 
     # Add function text to the plot
-    a, b, c = polynomial_params
     function_text = f"y = {a:.6f}x² + {b:.4f}x + {c:.2f}"
     fig.add_annotation(
         x=(max(x) + min(x)) / 2,
@@ -97,13 +67,14 @@ if __name__ == "__main__":
     # Print residuals for model evaluation
     print("\nResiduals:")
     for i in range(len(x)):
+        fitted = y_polynomial[i]
         print(
-            f"Point {i+1} (x={x[i]}): Actual={y[i]}, Fitted={y_polynomial[i]:.2f}, Residual={y[i] - y_polynomial[i]:.2f}"
+            f"Point {i+1} (x={x[i]}): Actual={y[i]}, Fitted={fitted:.2f}, Residual={y[i] - fitted:.2f}"
         )
 
     # For prediction purposes, demonstrate extrapolation
     test_points = [1500, 2000, 3000, 4500]
     print("\nPredictions at specific points:")
     for point in test_points:
-        prediction = polynomial_func(point, *polynomial_params)
+        prediction = np.polyval(coeffs, point)
         print(f"At x={point}: Predicted y={prediction:.2f}")
