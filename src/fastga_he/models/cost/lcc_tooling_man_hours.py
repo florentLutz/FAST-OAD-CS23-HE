@@ -34,15 +34,17 @@ class LCCToolingManHours(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:production:tooling_man_hours",
+            "data:cost:production:tooling_man_hours_5_years",
             val=2.0e5,
             units="h",
             desc="Number of tooling man-hours required per aircraft",
         )
 
-        self.declare_partials(of="data:cost:production:tooling_man_hours", wrt="*", method="exact")
         self.declare_partials(
-            "data:cost:production:tooling_man_hours",
+            of="data:cost:production:tooling_man_hours_5_years", wrt="*", method="exact"
+        )
+        self.declare_partials(
+            "data:cost:production:tooling_man_hours_5_years",
             ["data:geometry:flap_type", "data:geometry:wing:taper_ratio"],
             method="fd",
         )
@@ -58,7 +60,7 @@ class LCCToolingManHours(om.ExplicitComponent):
         else:
             f_tapered = 0.95
 
-        outputs["data:cost:production:tooling_man_hours"] = (
+        outputs["data:cost:production:tooling_man_hours_5_years"] = (
             0.76565
             * inputs["data:weight:airframe:mass"] ** 0.764
             * inputs["data:cost:v_cruise_design"] ** 0.899
@@ -87,7 +89,7 @@ class LCCToolingManHours(om.ExplicitComponent):
             f_tapered = 0.95
 
         partials[
-            "data:cost:production:tooling_man_hours",
+            "data:cost:production:tooling_man_hours_5_years",
             "data:weight:airframe:mass",
         ] = (
             0.5849566
@@ -100,7 +102,7 @@ class LCCToolingManHours(om.ExplicitComponent):
         ) / m_airframe**0.236
 
         partials[
-            "data:cost:production:tooling_man_hours",
+            "data:cost:production:tooling_man_hours_5_years",
             "data:cost:v_cruise_design",
         ] = (
             0.68831935
@@ -114,7 +116,7 @@ class LCCToolingManHours(om.ExplicitComponent):
         )
 
         partials[
-            "data:cost:production:tooling_man_hours",
+            "data:cost:production:tooling_man_hours_5_years",
             "data:cost:production:number_aircraft_5_years",
         ] = (
             -0.5788314
@@ -127,7 +129,7 @@ class LCCToolingManHours(om.ExplicitComponent):
         ) / num_5years**1.756
 
         partials[
-            "data:cost:production:tooling_man_hours",
+            "data:cost:production:tooling_man_hours_5_years",
             "data:cost:production:composite_fraction",
         ] = (
             0.76565
@@ -140,7 +142,7 @@ class LCCToolingManHours(om.ExplicitComponent):
         )
 
         partials[
-            "data:cost:production:tooling_man_hours",
+            "data:cost:production:tooling_man_hours_5_years",
             "data:geometry:cabin:pressurized",
         ] = (
             0.0076565

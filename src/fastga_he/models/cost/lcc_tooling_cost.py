@@ -14,7 +14,7 @@ class LCCToolingCost(om.ExplicitComponent):
 
     def setup(self):
         self.add_input(
-            "data:cost:production:tooling_man_hours",
+            "data:cost:production:tooling_man_hours_5_years",
             val=np.nan,
             units="h",
             desc="Number of tooling man-hours required for a certain amount of aircraft been "
@@ -44,19 +44,19 @@ class LCCToolingCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:production:tooling_cost_per_unit"] = (
             2.0969
-            * inputs["data:cost:production:tooling_man_hours"]
+            * inputs["data:cost:production:tooling_man_hours_5_years"]
             * inputs["data:cost:production:tooling_cost_per_hour"]
             * inputs["data:cost:cpi_2012"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        mh_tooling = inputs["data:cost:production:tooling_man_hours"]
+        mh_tooling = inputs["data:cost:production:tooling_man_hours_5_years"]
         cost_rate_tooling = inputs["data:cost:production:tooling_cost_per_hour"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
 
         partials[
             "data:cost:production:tooling_cost_per_unit",
-            "data:cost:production:tooling_man_hours",
+            "data:cost:production:tooling_man_hours_5_years",
         ] = 2.0969 * cost_rate_tooling * cpi_2012
 
         partials[

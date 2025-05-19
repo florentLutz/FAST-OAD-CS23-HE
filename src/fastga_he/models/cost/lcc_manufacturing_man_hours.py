@@ -28,7 +28,7 @@ class LCCManufacturingManHours(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:production:manufacturing_man_hours",
+            "data:cost:production:manufacturing_man_hours_5_years",
             val=2.0e5,
             units="h",
             desc="Number of engineering man-hours required per aircraft",
@@ -43,7 +43,7 @@ class LCCManufacturingManHours(om.ExplicitComponent):
         else:
             f_flap = 1.0
 
-        outputs["data:cost:production:manufacturing_man_hours"] = (
+        outputs["data:cost:production:manufacturing_man_hours_5_years"] = (
             9.6613
             * inputs["data:weight:airframe:mass"] ** 0.74
             * inputs["data:cost:v_cruise_design"] ** 0.543
@@ -64,14 +64,14 @@ class LCCManufacturingManHours(om.ExplicitComponent):
             f_flap = 1.0
 
         partials[
-            "data:cost:production:manufacturing_man_hours",
+            "data:cost:production:manufacturing_man_hours_5_years",
             "data:weight:airframe:mass",
         ] = (
             7.149362 * v_cruise**0.543 * num_5years**-0.476 * f_flap * (1.0 + 0.25 * f_composite)
         ) / m_airframe**0.26
 
         partials[
-            "data:cost:production:manufacturing_man_hours",
+            "data:cost:production:manufacturing_man_hours_5_years",
             "data:cost:v_cruise_design",
         ] = (
             5.2460859
@@ -83,13 +83,13 @@ class LCCManufacturingManHours(om.ExplicitComponent):
         )
 
         partials[
-            "data:cost:production:manufacturing_man_hours",
+            "data:cost:production:manufacturing_man_hours_5_years",
             "data:cost:production:number_aircraft_5_years",
         ] = (
             -4.5987788 * m_airframe**0.74 * v_cruise**0.543 * f_flap * (1.0 + 0.25 * f_composite)
         ) / num_5years**1.476
 
         partials[
-            "data:cost:production:manufacturing_man_hours",
+            "data:cost:production:manufacturing_man_hours_5_years",
             "data:cost:production:composite_fraction",
         ] = 2.415325 * m_airframe**0.74 * v_cruise**0.543 * num_5years**-0.476 * f_flap

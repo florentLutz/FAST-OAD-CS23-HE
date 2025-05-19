@@ -59,17 +59,17 @@ class LCCProductionCost(om.Group):
 
         # Calculate first the labor resources required for R&D and manufacturing of airframe
         self.add_subsystem(
-            name="engineering_man_hours",
+            name="engineering_man_hours_5_years",
             subsys=LCCEngineeringManHours(),
             promotes=["*"],
         )
         self.add_subsystem(
-            name="tooling_man_hours",
+            name="tooling_man_hours_5_years",
             subsys=LCCToolingManHours(),
             promotes=["*"],
         )
         self.add_subsystem(
-            name="manufacturing_man_hours",
+            name="manufacturing_man_hours_5_years",
             subsys=LCCManufacturingManHours(),
             promotes=["*"],
         )

@@ -14,7 +14,7 @@ class LCCEngineeringCost(om.ExplicitComponent):
 
     def setup(self):
         self.add_input(
-            "data:cost:production:engineering_man_hours",
+            "data:cost:production:engineering_man_hours_5_years",
             val=np.nan,
             units="h",
             desc="Number of engineering man-hours required for a certain number of aircraft to be"
@@ -44,19 +44,19 @@ class LCCEngineeringCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:production:engineering_cost_per_unit"] = (
             2.0969
-            * inputs["data:cost:production:engineering_man_hours"]
+            * inputs["data:cost:production:engineering_man_hours_5_years"]
             * inputs["data:cost:production:engineering_cost_per_hour"]
             * inputs["data:cost:cpi_2012"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        mh_engineering = inputs["data:cost:production:engineering_man_hours"]
+        mh_engineering = inputs["data:cost:production:engineering_man_hours_5_years"]
         cost_rate_engineering = inputs["data:cost:production:engineering_cost_per_hour"]
         cpi_2012 = inputs["data:cost:cpi_2012"]
 
         partials[
             "data:cost:production:engineering_cost_per_unit",
-            "data:cost:production:engineering_man_hours",
+            "data:cost:production:engineering_man_hours_5_years",
         ] = 2.0969 * cost_rate_engineering * cpi_2012
 
         partials[

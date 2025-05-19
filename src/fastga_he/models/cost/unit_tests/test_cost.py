@@ -50,7 +50,7 @@ DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
-def test_engineering_man_hours():
+def test_engineering_man_hours_5_years():
     input_list = [
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
@@ -72,13 +72,13 @@ def test_engineering_man_hours():
     )
 
     assert problem.get_val(
-        "data:cost:production:engineering_man_hours", units="h"
+        "data:cost:production:engineering_man_hours_5_years", units="h"
     ) == pytest.approx(74.86, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
-def test_tooling_man_hours():
+def test_tooling_man_hours_5_years():
     input_list = [
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
@@ -100,14 +100,14 @@ def test_tooling_man_hours():
         ivc,
     )
 
-    assert problem.get_val("data:cost:production:tooling_man_hours", units="h") == pytest.approx(
-        89.75, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:tooling_man_hours_5_years", units="h"
+    ) == pytest.approx(89.75, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
-def test_manufacturing_man_hours():
+def test_manufacturing_man_hours_5_years():
     input_list = [
         "data:weight:airframe:mass",
         "data:cost:v_cruise_design",
@@ -129,7 +129,7 @@ def test_manufacturing_man_hours():
     )
 
     assert problem.get_val(
-        "data:cost:production:manufacturing_man_hours", units="h"
+        "data:cost:production:manufacturing_man_hours_5_years", units="h"
     ) == pytest.approx(694.9, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -137,7 +137,7 @@ def test_manufacturing_man_hours():
 
 def test_engineering_cost():
     input_list = [
-        "data:cost:production:engineering_man_hours",
+        "data:cost:production:engineering_man_hours_5_years",
         "data:cost:production:engineering_cost_per_hour",
         "data:cost:cpi_2012",
     ]
@@ -193,7 +193,7 @@ def test_development_support_cost():
 
 def test_tooling_cost():
     input_list = [
-        "data:cost:production:tooling_man_hours",
+        "data:cost:production:tooling_man_hours_5_years",
         "data:cost:production:tooling_cost_per_hour",
         "data:cost:cpi_2012",
     ]
@@ -219,7 +219,7 @@ def test_tooling_cost():
 
 def test_manufacturing_cost():
     input_list = [
-        "data:cost:production:manufacturing_man_hours",
+        "data:cost:production:manufacturing_man_hours_5_years",
         "data:cost:production:manufacturing_cost_per_hour",
         "data:cost:cpi_2012",
     ]

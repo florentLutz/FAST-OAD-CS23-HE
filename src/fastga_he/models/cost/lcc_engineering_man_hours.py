@@ -33,7 +33,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:production:engineering_man_hours",
+            "data:cost:production:engineering_man_hours_5_years",
             val=2.0e5,
             units="h",
             desc="Number of engineering man-hours required per aircraft",
@@ -48,7 +48,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         else:
             f_flap = 1.0
 
-        outputs["data:cost:production:engineering_man_hours"] = (
+        outputs["data:cost:production:engineering_man_hours_5_years"] = (
             0.0396
             * inputs["data:weight:airframe:mass"] ** 0.791
             * inputs["data:cost:v_cruise_design"] ** 1.526
@@ -71,7 +71,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
             f_flap = 1.0
 
         partials[
-            "data:cost:production:engineering_man_hours",
+            "data:cost:production:engineering_man_hours_5_years",
             "data:weight:airframe:mass",
         ] = (
             0.0313236
@@ -83,7 +83,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         ) / m_airframe**0.209
 
         partials[
-            "data:cost:production:engineering_man_hours",
+            "data:cost:production:engineering_man_hours_5_years",
             "data:cost:v_cruise_design",
         ] = (
             0.0604296
@@ -96,7 +96,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         )
 
         partials[
-            "data:cost:production:engineering_man_hours",
+            "data:cost:production:engineering_man_hours_5_years",
             "data:cost:production:number_aircraft_5_years",
         ] = (
             -0.0323532
@@ -108,7 +108,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         ) / num_5years**1.817
 
         partials[
-            "data:cost:production:engineering_man_hours",
+            "data:cost:production:engineering_man_hours_5_years",
             "data:cost:production:composite_fraction",
         ] = (
             0.0396
@@ -120,7 +120,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         )
 
         partials[
-            "data:cost:production:engineering_man_hours",
+            "data:cost:production:engineering_man_hours_5_years",
             "data:geometry:cabin:pressurized",
         ] = (
             0.001188
