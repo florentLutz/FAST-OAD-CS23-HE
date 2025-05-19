@@ -86,6 +86,40 @@ def test_advanced_cl():
     )
 
 
+def test_advanced_cl_with_proper_submodels_turboshaft():
+    xml_file = "kodiak_100.xml"
+    propulsion_file = pth.join(DATA_FOLDER_PATH, "turboshaft_propulsion.yml")
+
+    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
+        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+    )
+    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
+        "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    )
+
+    inputs_list = list_inputs(
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            power_train_file_path=propulsion_file,
+        )
+    )
+    # Research independent input value in .xml file
+    ivc_loop = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        xml_file,
+    )
+
+    problem_loop = run_system(
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            power_train_file_path=propulsion_file,
+        ),
+        ivc_loop,
+    )
+    assert_allclose(problem_loop["wing_area"], 23.36, atol=1e-2)
+
+
 def test_advanced_cl_with_proper_submodels():
     xml_file = "pipistrel_like.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
