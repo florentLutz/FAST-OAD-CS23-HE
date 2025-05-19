@@ -227,7 +227,7 @@ payback period.
 Annual insurance cost
 *********************
 The yearly insurance cost estimation as provided by :cite:`gudmundsson:2013`, a slight value adjustments is applied
-from `Sunset aviation insurance <https://sunsetais.com/aircraft-hull-liability/>`_.
+using values from `Sunset aviation insurance <https://sunsetais.com/aircraft-hull-liability/>`_.
 
 .. math::
 
