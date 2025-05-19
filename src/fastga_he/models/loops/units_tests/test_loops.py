@@ -117,7 +117,7 @@ def test_advanced_cl_with_proper_submodels_turboshaft():
         ),
         ivc_loop,
     )
-    assert_allclose(problem_loop["wing_area"], 23.03, atol=1e-2)
+    assert_allclose(problem_loop["wing_area"], 23.36, atol=1e-2)
 
 
 def test_advanced_cl_with_proper_submodels():

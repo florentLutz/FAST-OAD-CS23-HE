@@ -317,6 +317,13 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
         )
         model.add_subsystem("thrust_rate_id", _IDThrustRate(), promotes=["*"])
 
+        configurator = FASTGAHEPowerTrainConfigurator()
+        configurator.load(pt_file_path)
+        slip_ins, perf_outs = configurator.get_performances_to_slipstream_element_lists()
+
+        for perf_out, slip_in in zip(perf_outs, slip_ins):
+            model.connect("power_train_performances." + perf_out, slip_in)
+
         # SLSQP uses gradient ?
         problem.driver = om.ScipyOptimizeDriver()
         problem.driver.options["disp"] = False
