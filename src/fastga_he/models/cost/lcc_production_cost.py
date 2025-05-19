@@ -22,7 +22,7 @@ from .lcc_certification_cost import LCCCertificationCost
 from .lcc_msp import LCCMSP
 from .lcc_production_cost_sum import LCCSumProductionCost
 from .lcc_fuel_cost import LCCFuelCost
-from .lcc_electric_energy_cost import LCCElectricEnergyCost
+from .lcc_electricity_cost import LCCElectricityCost
 from .lcc_delivery_cost import LCCDeliveryCost
 
 
@@ -177,7 +177,7 @@ class LCCProductionCost(om.Group):
             )
             self.add_subsystem(
                 name="electric_energy_cost",
-                subsys=LCCElectricEnergyCost(
+                subsys=LCCElectricityCost(
                     cost_components_type=cost_energy_components_type,
                     cost_components_name=cost_energy_components_name,
                 ),

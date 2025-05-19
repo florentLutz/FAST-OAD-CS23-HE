@@ -38,7 +38,7 @@ from ..lcc_annual_depreciation import LCCAnnualDepreciation
 from ..lcc_maintenance_cost import LCCMaintenanceCost
 from ..lcc_maintenance_miscellaneous_cost import LCCMaintenanceMiscellaneousCost
 from ..lcc_fuel_cost import LCCFuelCost
-from ..lcc_electric_energy_cost import LCCElectricEnergyCost
+from ..lcc_electricity_cost import LCCElectricityCost
 from ..lcc_annual_energy_cost import LCCAnnualEnergyCost
 from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
@@ -899,7 +899,7 @@ def test_electric_energy_cost():
 
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCElectricEnergyCost(
+            LCCElectricityCost(
                 cost_components_type=components_type, cost_components_name=components_name
             )
         ),
@@ -908,7 +908,7 @@ def test_electric_energy_cost():
     )
 
     problem = run_system(
-        LCCElectricEnergyCost(
+        LCCElectricityCost(
             cost_components_type=components_type, cost_components_name=components_name
         ),
         ivc,

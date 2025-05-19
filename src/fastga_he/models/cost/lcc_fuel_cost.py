@@ -6,6 +6,8 @@ import logging
 import numpy as np
 import openmdao.api as om
 
+from .constants import FUEL_STORAGE_TYPES
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -34,7 +36,7 @@ class LCCFuelCost(om.ExplicitComponent):
         for tank_type, tank_id in [
             (comp_type, comp_name)
             for comp_type, comp_name in zip(cost_components_type, cost_components_name)
-            if (comp_type == "fuel_tank" or comp_type == "gaseous_hydrogen_tank")
+            if comp_type in FUEL_STORAGE_TYPES
         ]:
             self.add_input(
                 "data:propulsion:he_power_train:"

@@ -2,16 +2,17 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 import logging
-
 import numpy as np
 import openmdao.api as om
+
+from .constants import ELECTRICITY_STORAGE_TYPES
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class LCCElectricEnergyCost(om.ExplicitComponent):
+class LCCElectricityCost(om.ExplicitComponent):
     """
-    Computation of the electric energy cost of the aircraft for a single mission. The
+    Computation of the aircraft electricity cost of the aircraft for a single mission. The
     charging cost is estimated from https://eniplenitude.eu/e-mobility/pricing.
     """
 
@@ -33,7 +34,7 @@ class LCCElectricEnergyCost(om.ExplicitComponent):
         for battery_type, battery_id in [
             (comp_type, comp_name)
             for comp_type, comp_name in zip(cost_components_type, cost_components_name)
-            if comp_type == "battery_pack"
+            if comp_type in ELECTRICITY_STORAGE_TYPES
         ]:
             self.add_input(
                 "data:propulsion:he_power_train:"
