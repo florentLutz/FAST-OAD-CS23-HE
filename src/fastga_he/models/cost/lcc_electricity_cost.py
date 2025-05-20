@@ -20,6 +20,12 @@ class LCCElectricityCost(om.ExplicitComponent):
         electricity_components_type = self.options["electricity_components_type"]
         electricity_components_name = self.options["electricity_components_name"]
 
+        self.add_input(
+            "data:cost:operation:electricity_unit_price",
+            units="USD/kW/h",
+            val=0.655,
+            desc="Price per kW.h of electricity",
+        )
         for electricity_storage_type, electricity_storage_id in zip(
             electricity_components_type, electricity_components_name
         ):
@@ -33,15 +39,6 @@ class LCCElectricityCost(om.ExplicitComponent):
                 val=np.nan,
                 desc="Energy drawn from the battery for the mission",
             )
-            self.declare_partials(
-                of="data:cost:electric_energy_cost",
-                wrt="data:propulsion:he_power_train:"
-                + electricity_storage_type
-                + ":"
-                + electricity_storage_id
-                + ":energy_consumed_mission",
-                val=0.655,
-            )
 
         self.add_output(
             name="data:cost:electric_energy_cost",
@@ -49,6 +46,8 @@ class LCCElectricityCost(om.ExplicitComponent):
             units="USD",
             desc="Electric energy cost for single flight mission",
         )
+
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         electricity_components_type = self.options["electricity_components_type"]
@@ -58,7 +57,7 @@ class LCCElectricityCost(om.ExplicitComponent):
             electricity_components_type, electricity_components_name
         ):
             outputs["data:cost:electric_energy_cost"] += (
-                0.655
+                inputs["data:cost:operation:electricity_unit_price"]
                 * inputs[
                     "data:propulsion:he_power_train:"
                     + electricity_storage_type
@@ -67,3 +66,29 @@ class LCCElectricityCost(om.ExplicitComponent):
                     + ":energy_consumed_mission"
                 ]
             )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        electricity_components_type = self.options["electricity_components_type"]
+        electricity_components_name = self.options["electricity_components_name"]
+
+        for electricity_storage_type, electricity_storage_id in zip(
+            electricity_components_type, electricity_components_name
+        ):
+            partials[
+                "data:cost:electric_energy_cost",
+                "data:propulsion:he_power_train:"
+                + electricity_storage_type
+                + ":"
+                + electricity_storage_id
+                + ":energy_consumed_mission",
+            ] = inputs["data:cost:operation:electricity_unit_price"]
+
+            partials[
+                "data:cost:electric_energy_cost", "data:cost:operation:electricity_unit_price"
+            ] += inputs[
+                "data:propulsion:he_power_train:"
+                + electricity_storage_type
+                + ":"
+                + electricity_storage_id
+                + ":energy_consumed_mission"
+            ]
