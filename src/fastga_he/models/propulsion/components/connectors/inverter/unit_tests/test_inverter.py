@@ -32,7 +32,7 @@ from ..components.perf_modulation_index import PerformancesModulationIndex
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_gate_voltage import PerformancesGateVoltage
-from ..components.perf_power_rating import PerformancesACPowerOut
+from ..components.perf_ac_power_out import PerformancesACPowerOut
 from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_total_loss import PerformancesLosses
 from fastga_he.models.propulsion.components.connectors.inverter.components.stale.perf_temperature_derivative import (

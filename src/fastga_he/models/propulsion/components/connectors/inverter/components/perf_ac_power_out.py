@@ -23,11 +23,11 @@ class PerformancesACPowerOut(om.ExplicitComponent):
         self.add_input(
             "ac_current_rms_out_one_phase", units="A", val=np.full(number_of_points, np.nan)
         )
-        self.add_input("ac_voltage_rms_out", units="V", val=np.full(number_of_points, np.nan))
+        self.add_input("ac_voltage_rms_out", units="kV", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             "ac_power_out",
-            units="W",
+            units="kW",
             val=np.full(number_of_points, 250.0),
         )
 
