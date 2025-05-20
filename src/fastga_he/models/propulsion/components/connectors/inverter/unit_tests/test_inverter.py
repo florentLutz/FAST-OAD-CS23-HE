@@ -1526,7 +1526,7 @@ def test_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:purchase_cost", units="USD"
-    ) == pytest.approx(18391.45, rel=1e-3)
+    ) == pytest.approx(7629.22, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

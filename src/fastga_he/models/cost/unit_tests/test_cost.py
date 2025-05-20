@@ -45,7 +45,7 @@ from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
 
 
-XML_FILE = "data.xml"
+XML_FILE = "tbm_900_inputs.xml"
 DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
@@ -74,7 +74,7 @@ def test_engineering_man_hours_5_years():
 
     assert problem.get_val(
         "data:cost:production:engineering_man_hours_5_years", units="h"
-    ) == pytest.approx(74.86, rel=1e-3)
+    ) == pytest.approx(2102.74, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -103,7 +103,7 @@ def test_tooling_man_hours_5_years():
 
     assert problem.get_val(
         "data:cost:production:tooling_man_hours_5_years", units="h"
-    ) == pytest.approx(89.75, rel=1e-3)
+    ) == pytest.approx(1143.41, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -131,14 +131,13 @@ def test_manufacturing_man_hours_5_years():
 
     assert problem.get_val(
         "data:cost:production:manufacturing_man_hours_5_years", units="h"
-    ) == pytest.approx(694.9, rel=1e-3)
+    ) == pytest.approx(5134.6, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_engineering_cost():
     input_list = [
-        "data:cost:production:engineering_man_hours_5_years",
         "data:cost:production:engineering_cost_per_hour",
         "data:cost:cpi_2012",
     ]
@@ -148,6 +147,7 @@ def test_engineering_cost():
         __file__,
         XML_FILE,
     )
+    ivc.add_output("data:cost:production:engineering_man_hours_5_years", units="h", val=2102.74)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -157,7 +157,7 @@ def test_engineering_cost():
 
     assert problem.get_val(
         "data:cost:production:engineering_cost_per_unit", units="USD"
-    ) == pytest.approx(26998.679, rel=1e-3)
+    ) == pytest.approx(781122.525, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -187,14 +187,13 @@ def test_development_support_cost():
 
     assert problem.get_val(
         "data:cost:production:dev_support_cost_per_unit", units="USD"
-    ) == pytest.approx(771.88, rel=1e-3)
+    ) == pytest.approx(39760.8, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_tooling_cost():
     input_list = [
-        "data:cost:production:tooling_man_hours_5_years",
         "data:cost:production:tooling_cost_per_hour",
         "data:cost:cpi_2012",
     ]
@@ -204,6 +203,7 @@ def test_tooling_cost():
         __file__,
         XML_FILE,
     )
+    ivc.add_output("data:cost:production:tooling_man_hours_5_years", units="h", val=1143.41)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -213,14 +213,13 @@ def test_tooling_cost():
 
     assert problem.get_val(
         "data:cost:production:tooling_cost_per_unit", units="USD"
-    ) == pytest.approx(21690.978, rel=1e-3)
+    ) == pytest.approx(281858.99, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_manufacturing_cost():
     input_list = [
-        "data:cost:production:manufacturing_man_hours_5_years",
         "data:cost:production:manufacturing_cost_per_hour",
         "data:cost:cpi_2012",
     ]
@@ -230,6 +229,7 @@ def test_manufacturing_cost():
         __file__,
         XML_FILE,
     )
+    ivc.add_output("data:cost:production:manufacturing_man_hours_5_years", units="h", val=5134.6)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -239,22 +239,15 @@ def test_manufacturing_cost():
 
     assert problem.get_val(
         "data:cost:production:manufacturing_cost_per_unit", units="USD"
-    ) == pytest.approx(147385.351, rel=1e-3)
+    ) == pytest.approx(1099908.9, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_quality_control_cost():
-    input_list = [
-        "data:cost:production:manufacturing_cost_per_unit",
-        "data:cost:production:composite_fraction",
-    ]
-
-    ivc = get_indep_var_comp(
-        input_list,
-        __file__,
-        XML_FILE,
-    )
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:production:manufacturing_cost_per_unit", units="USD", val=1099908.9)
+    ivc.add_output("data:cost:production:composite_fraction", val=0.0)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -264,7 +257,7 @@ def test_quality_control_cost():
 
     assert problem.get_val(
         "data:cost:production:quality_control_cost_per_unit", units="USD"
-    ) == pytest.approx(19160.096, rel=1e-3)
+    ) == pytest.approx(142988.157, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -292,7 +285,7 @@ def test_flight_test_cost():
 
     assert problem.get_val(
         "data:cost:production:flight_test_cost_per_unit", units="USD"
-    ) == pytest.approx(93.1, rel=1e-3)
+    ) == pytest.approx(4138.9, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -320,21 +313,14 @@ def test_material_cost():
 
     assert problem.get_val(
         "data:cost:production:material_cost_per_unit", units="USD"
-    ) == pytest.approx(8909.8, rel=1e-3)
+    ) == pytest.approx(66638.15, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_avionics_cost():
-    input_list = [
-        "data:cost:cpi_2012",
-    ]
-
-    ivc = get_indep_var_comp(
-        input_list,
-        __file__,
-        XML_FILE,
-    )
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:cpi_2012", val=1.4)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -371,21 +357,14 @@ def test_certification_cost():
 
     assert problem.get_val(
         "data:cost:production:certification_cost_per_unit", units="USD"
-    ) == pytest.approx(49547.05, rel=1e-3)
+    ) == pytest.approx(1106881.2, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
 def test_landing_gear_cost_reduction():
-    input_list = [
-        "data:geometry:landing_gear:type",
-    ]
-
-    ivc = get_indep_var_comp(
-        input_list,
-        __file__,
-        XML_FILE,
-    )
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:geometry:landing_gear:type", val=0.0)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -438,22 +417,15 @@ def test_cost_sum():
     )
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        600777.59, rel=1e-3
+        3849700.62, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
 
 
 def test_aircraft_MSP():
-    input_list = [
-        "data:cost:production_cost_per_unit",
-    ]
-
-    ivc = get_indep_var_comp(
-        input_list,
-        __file__,
-        XML_FILE,
-    )
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:production_cost_per_unit", units="USD", val=3849700.62)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -462,7 +434,7 @@ def test_aircraft_MSP():
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        412758.77, rel=1e-3
+        4273167.688, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -520,43 +492,6 @@ def test_delivery_cost():
     problem.check_partials(compact_print=True)
 
 
-def test_production_cost():
-    ivc = get_indep_var_comp(
-        list_inputs(
-            LCCProductionCost(
-                power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml",
-                delivery_method="train",
-            )
-        ),
-        __file__,
-        XML_FILE,
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        LCCProductionCost(
-            power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml", delivery_method="train"
-        ),
-        ivc,
-    )
-
-    assert problem.get_val(
-        "data:cost:production:engineering_cost_per_unit", units="USD"
-    ) == pytest.approx(27808.7, rel=1e-3)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:ICE:ice_1:purchase_cost", units="USD"
-    ) == pytest.approx(70956.47, rel=1e-3)
-
-    assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        368697.76, rel=1e-3
-    )
-
-    problem.check_partials(compact_print=True)
-
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
-
-
 def test_production_cost_hydrogen():
     ivc = get_indep_var_comp(
         list_inputs(
@@ -591,7 +526,7 @@ def test_production_cost_hydrogen():
     ) == pytest.approx(60485.41, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        396456.1, rel=1e-3
+        385693.87, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -633,7 +568,7 @@ def test_production_cost_hybrid_tbm_900():
     ) == pytest.approx(221207.71, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        4507074.58, rel=1e-3
+        4452653.5, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
@@ -654,7 +589,7 @@ def test_production_cost_tbm_900():
             )
         ),
         __file__,
-        "tbm_900_inputs.xml",
+        XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -826,7 +761,7 @@ def test_annual_maintenance_cost():
     )
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
-        86458.2, rel=1e-3
+        90181.16, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -846,7 +781,7 @@ def test_annual_maintenance_miscellaneous_cost():
 
     assert problem.get_val(
         "data:cost:operation:miscellaneous_cost", units="USD/yr"
-    ) == pytest.approx(22656.0, rel=1e-3)
+    ) == pytest.approx(24000.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -869,7 +804,7 @@ def test_fuel_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:fuel_cost", units="USD") == pytest.approx(658.03, rel=1e-3)
+    assert problem.get_val("data:cost:fuel_cost", units="USD") == pytest.approx(2257.1, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -972,41 +907,9 @@ def test_operational_sum():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(484145.23, rel=1e-3)
+    ) == pytest.approx(569682.25, rel=1e-3)
 
     problem.check_partials(compact_print=True)
-
-
-def test_operational_cost():
-    ivc = get_indep_var_comp(
-        list_inputs(
-            LCCOperationalCost(power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml")
-        ),
-        __file__,
-        XML_FILE,
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        LCCOperationalCost(power_train_file_path=DATA_FOLDER_PATH / "fuel_propulsion.yml"),
-        ivc,
-    )
-
-    assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
-        86458.2, rel=1e-3
-    )
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:ICE:ice_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(9153.7, rel=1e-3)
-
-    assert problem.get_val(
-        "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(386309.03, rel=1e-3)
-
-    problem.check_partials(compact_print=True)
-
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_operational_cost_hydrogen():
@@ -1054,7 +957,7 @@ def test_operational_cost_tbm_900():
             )
         ),
         __file__,
-        "tbm_900_inputs.xml",
+        XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -1132,7 +1035,7 @@ def test_cost_tbm_900():
             )
         ),
         __file__,
-        "tbm_900_inputs.xml",
+        XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -1158,6 +1061,47 @@ def test_cost_tbm_900():
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
     ) == pytest.approx(475603.2, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_cost_pipistrel():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCC(
+                power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
+                delivery_method="train",
+            )
+        ),
+        __file__,
+        "pipistrel_source.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCC(
+            power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
+            delivery_method="train",
+        ),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost", units="USD"
+    ) == pytest.approx(3688.43, rel=1e-3)
+
+    assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
+        405615.42, rel=1e-3
+    )
+
+    assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
+        450233.11, rel=1e-3
+    )
+
+    assert problem.get_val(
+        "data:cost:operation:annual_cost_per_unit", units="USD/yr"
+    ) == pytest.approx(149298.47, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

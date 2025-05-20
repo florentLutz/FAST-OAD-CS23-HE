@@ -55,14 +55,30 @@ class LCCFuelCost(om.ExplicitComponent):
                 desc="Amount of fuel from that tank which will be consumed during mission",
             )
 
+            self.declare_partials(
+                of="*",
+                wrt=[
+                    "data:propulsion:he_power_train:"
+                    + tank_type
+                    + ":"
+                    + tank_id
+                    + ":fuel_consumed_mission",
+                    "data:propulsion:he_power_train:"
+                    + tank_type
+                    + ":"
+                    + tank_id
+                    + ":fuel_type_cost:"
+                    + fuel_type,
+                ],
+                method="exact",
+            )
+
         self.add_output(
             name="data:cost:fuel_cost",
             val=0.0,
             units="USD",
             desc="Fuel cost for single flight mission",
         )
-
-        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         tank_types = self.options["tank_types"]

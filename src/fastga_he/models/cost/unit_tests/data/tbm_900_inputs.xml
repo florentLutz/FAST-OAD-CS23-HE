@@ -248,13 +248,27 @@
       <production>
         <number_aircraft_5_years>75.0</number_aircraft_5_years>
         <engineering_cost_per_hour unit="USD/h">126.54</engineering_cost_per_hour>
+        <engineering_cost_per_unit unit="USD">781122.525</engineering_cost_per_unit>
         <tooling_cost_per_hour unit="USD/h">83.97</tooling_cost_per_hour>
+        <tooling_cost_per_unit unit="USD">281858.99</tooling_cost_per_unit>
         <manufacturing_cost_per_hour unit="USD/h">72.97</manufacturing_cost_per_hour>
+        <manufacturing_cost_per_unit unit="USD">1099908.9</manufacturing_cost_per_unit>
+        <dev_support_cost_per_unit unit="USD">39760.8</dev_support_cost_per_unit>
+        <flight_test_cost_per_unit unit="USD">4138.9</flight_test_cost_per_unit>
+        <quality_control_cost_per_unit unit="USD">142988.157</quality_control_cost_per_unit>
+        <material_cost_per_unit unit="USD">66638.15</material_cost_per_unit>
+        <avionics_cost_per_unit unit="USD">21000.0</avionics_cost_per_unit>
+        <certification_cost_per_unit unit="USD">1106881.2</certification_cost_per_unit>
         <fixed_landing_gear>0.0</fixed_landing_gear>
       </production>
       <operation>
         <number_of_pilot>1.0</number_of_pilot>
         <loan_principal unit="USD">42000.0</loan_principal>
+        <annual_airport_cost unit="USD/yr">4650.0</annual_airport_cost>
+        <annual_crew_cost unit="USD/yr">138756.7</annual_crew_cost>
+        <annual_insurance_cost unit="USD/yr">6691.38</annual_insurance_cost>
+        <maintenance_cost unit="USD/yr">90181.17</maintenance_cost>
+        <miscellaneous_cost unit="USD/yr">24000.0</miscellaneous_cost>
       </operation>
     </cost>
     <propulsion>

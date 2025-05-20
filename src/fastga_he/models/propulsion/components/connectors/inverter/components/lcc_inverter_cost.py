@@ -46,7 +46,7 @@ class LCCInverterCost(om.ExplicitComponent):
         ]
 
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"] = (
-            2167.0 * np.log(power_rating) + 6910.0
+            4666.0 * power_rating**0.0928
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -56,6 +56,7 @@ class LCCInverterCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max",
         ] = (
-            2167.0
-            / inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max"]
+            -433.0048
+            * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max"]
+            ** -0.9072
         )
