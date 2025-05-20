@@ -45,7 +45,7 @@ class LCCDeliveryCost(om.ExplicitComponent):
 
         elif delivery_method == "flight":
             self.add_input(
-                name="data:cost:electric_energy_cost",
+                name="data:cost:electricity_cost",
                 val=0.0,
                 units="USD",
                 desc="Electric energy cost for single flight mission",
@@ -81,7 +81,7 @@ class LCCDeliveryCost(om.ExplicitComponent):
 
         elif delivery_method == "flight":
             outputs["data:cost:delivery_cost_per_unit"] = (
-                inputs["data:cost:fuel_cost"] + inputs["data:cost:electric_energy_cost"]
+                inputs["data:cost:fuel_cost"] + inputs["data:cost:electricity_cost"]
             ) * inputs["data:cost:production:flight_cost_factor"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -92,10 +92,10 @@ class LCCDeliveryCost(om.ExplicitComponent):
                 "data:cost:production:flight_cost_factor"
             ]
 
-            partials["data:cost:delivery_cost_per_unit", "data:cost:electric_energy_cost"] = inputs[
+            partials["data:cost:delivery_cost_per_unit", "data:cost:electricity_cost"] = inputs[
                 "data:cost:production:flight_cost_factor"
             ]
 
             partials[
                 "data:cost:delivery_cost_per_unit", "data:cost:production:flight_cost_factor"
-            ] = inputs["data:cost:fuel_cost"] + inputs["data:cost:electric_energy_cost"]
+            ] = inputs["data:cost:fuel_cost"] + inputs["data:cost:electricity_cost"]

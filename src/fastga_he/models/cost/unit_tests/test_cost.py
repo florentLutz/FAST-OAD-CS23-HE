@@ -484,7 +484,7 @@ def test_delivery_cost():
     problem.check_partials(compact_print=True)
 
     ivc = om.IndepVarComp()
-    ivc.add_output("data:cost:electric_energy_cost", units="USD", val=8.204)
+    ivc.add_output("data:cost:electricity_cost", units="USD", val=8.204)
     ivc.add_output("data:cost:fuel_cost", units="USD", val=91.56)
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -876,7 +876,7 @@ def test_electricity_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:electric_energy_cost", units="USD") == pytest.approx(
+    assert problem.get_val("data:cost:electricity_cost", units="USD") == pytest.approx(
         8.204, rel=1e-3
     )
 
@@ -885,7 +885,7 @@ def test_electricity_cost():
 
 def test_energy_cost():
     ivc = om.IndepVarComp()
-    ivc.add_output("data:cost:electric_energy_cost", units="USD", val=8.204)
+    ivc.add_output("data:cost:electricity_cost", units="USD", val=8.204)
     ivc.add_output("data:cost:fuel_cost", units="USD", val=91.56)
     ivc.add_output("data:TLAR:flight_per_year", val=10.0)
 

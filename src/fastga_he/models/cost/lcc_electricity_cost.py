@@ -41,7 +41,7 @@ class LCCElectricityCost(om.ExplicitComponent):
             )
 
         self.add_output(
-            name="data:cost:electric_energy_cost",
+            name="data:cost:electricity_cost",
             val=0.0,
             units="USD",
             desc="Electric energy cost for single flight mission",
@@ -56,7 +56,7 @@ class LCCElectricityCost(om.ExplicitComponent):
         for electricity_storage_type, electricity_storage_id in zip(
             electricity_components_type, electricity_components_name
         ):
-            outputs["data:cost:electric_energy_cost"] += (
+            outputs["data:cost:electricity_cost"] += (
                 inputs["data:cost:operation:electricity_unit_price"]
                 * inputs[
                     "data:propulsion:he_power_train:"
@@ -75,7 +75,7 @@ class LCCElectricityCost(om.ExplicitComponent):
             electricity_components_type, electricity_components_name
         ):
             partials[
-                "data:cost:electric_energy_cost",
+                "data:cost:electricity_cost",
                 "data:propulsion:he_power_train:"
                 + electricity_storage_type
                 + ":"
@@ -84,7 +84,7 @@ class LCCElectricityCost(om.ExplicitComponent):
             ] = inputs["data:cost:operation:electricity_unit_price"]
 
             partials[
-                "data:cost:electric_energy_cost", "data:cost:operation:electricity_unit_price"
+                "data:cost:electricity_cost", "data:cost:operation:electricity_unit_price"
             ] += inputs[
                 "data:propulsion:he_power_train:"
                 + electricity_storage_type
