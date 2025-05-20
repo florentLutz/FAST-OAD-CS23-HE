@@ -57,6 +57,11 @@ class LCCDeliveryCost(om.ExplicitComponent):
                 desc="Fuel cost for single flight mission",
             )
             self.add_input(
+                name="data:cost:production:delivery_duration_ratio",
+                val=np.nan,
+                desc="Ratio between the delivery flight duration and the sizing mission duration",
+            )
+            self.add_input(
                 "data:cost:production:flight_cost_factor",
                 val=1.0,
                 desc="Adjustment factor to consider other flight delivery related costs",
@@ -81,21 +86,32 @@ class LCCDeliveryCost(om.ExplicitComponent):
 
         elif delivery_method == "flight":
             outputs["data:cost:delivery_cost_per_unit"] = (
-                inputs["data:cost:fuel_cost"] + inputs["data:cost:electricity_cost"]
-            ) * inputs["data:cost:production:flight_cost_factor"]
+                (inputs["data:cost:fuel_cost"] + inputs["data:cost:electricity_cost"])
+                * inputs["data:cost:production:flight_cost_factor"]
+                * inputs["data:cost:production:delivery_duration_ratio"]
+            )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         delivery_method = self.options["delivery_method"]
 
         if delivery_method == "flight":
-            partials["data:cost:delivery_cost_per_unit", "data:cost:fuel_cost"] = inputs[
-                "data:cost:production:flight_cost_factor"
-            ]
+            cost_factor = inputs["data:cost:production:flight_cost_factor"]
+            duration_ratio = inputs["data:cost:production:delivery_duration_ratio"]
+            fuel_cost = inputs["data:cost:fuel_cost"]
+            electricity_cost = inputs["data:cost:electricity_cost"]
 
-            partials["data:cost:delivery_cost_per_unit", "data:cost:electricity_cost"] = inputs[
-                "data:cost:production:flight_cost_factor"
-            ]
+            partials["data:cost:delivery_cost_per_unit", "data:cost:fuel_cost"] = (
+                cost_factor * duration_ratio
+            )
+
+            partials["data:cost:delivery_cost_per_unit", "data:cost:electricity_cost"] = (
+                cost_factor * duration_ratio
+            )
 
             partials[
                 "data:cost:delivery_cost_per_unit", "data:cost:production:flight_cost_factor"
-            ] = inputs["data:cost:fuel_cost"] + inputs["data:cost:electricity_cost"]
+            ] = (fuel_cost + electricity_cost) * duration_ratio
+
+            partials[
+                "data:cost:delivery_cost_per_unit", "data:cost:production:delivery_duration_ratio"
+            ] = (fuel_cost + electricity_cost) * cost_factor

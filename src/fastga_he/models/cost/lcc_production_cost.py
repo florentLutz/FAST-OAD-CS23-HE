@@ -24,6 +24,8 @@ from .lcc_production_cost_sum import LCCSumProductionCost
 from .lcc_fuel_cost import LCCFuelCost
 from .lcc_electricity_cost import LCCElectricityCost
 from .lcc_delivery_cost import LCCDeliveryCost
+from .lcc_deliveray_duration_ratio import LCCDeliveryDurationRatio
+
 from .constants import ELECTRICITY_STORAGE_TYPES
 
 
@@ -182,6 +184,11 @@ class LCCProductionCost(om.Group):
                     electricity_components_type=electricity_components_type,
                     electricity_components_name=electricity_components_name,
                 ),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                name="delivery_duration_ratio",
+                subsys=LCCDeliveryDurationRatio(),
                 promotes=["*"],
             )
 

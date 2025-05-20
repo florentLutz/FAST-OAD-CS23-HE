@@ -29,6 +29,7 @@ from ..lcc_production_cost_sum import LCCSumProductionCost
 from ..lcc_annual_insurance_cost import LCCAnnualInsuranceCost
 from ..lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 from ..lcc_delivery_cost import LCCDeliveryCost
+from ..lcc_deliveray_duration_ratio import LCCDeliveryDurationRatio
 from ..lcc_landing_cost import LCCLandingCost
 from ..lcc_daily_parking_cost import LCCDailyParkingCost
 from ..lcc_annual_crew_cost import LCCAnnualCrewCost
@@ -467,6 +468,24 @@ def test_aircraft_MSP():
     problem.check_partials(compact_print=True)
 
 
+def test_delivery_duration_ratio():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:mission:sizing:duration", val=5.0, units="h")
+    ivc.add_output("data:cost:production:delivery_duration", val=3.0, units="h")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCDeliveryDurationRatio(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:production:delivery_duration_ratio") == pytest.approx(
+        0.6, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_delivery_cost():
     ivc = om.IndepVarComp()
     ivc.add_output("data:weight:aircraft:OWE", val=426.58, units="kg")
@@ -484,6 +503,7 @@ def test_delivery_cost():
     problem.check_partials(compact_print=True)
 
     ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:production:delivery_duration_ratio", val=1.0)
     ivc.add_output("data:cost:electricity_cost", units="USD", val=8.204)
     ivc.add_output("data:cost:fuel_cost", units="USD", val=91.56)
 
