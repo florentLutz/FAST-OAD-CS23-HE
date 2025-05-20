@@ -6,7 +6,7 @@ import logging
 import numpy as np
 import openmdao.api as om
 
-DEFAULT_FUEL_UNIT_COST = {"jet_fuel": 2.967, "diesel": 1.977, "avgas": 3.66, "hydrogen": 6.54}
+DEFAULT_FUEL_UNIT_COST = {"jet_fuel": 2.967, "diesel": 1.977, "avgas": 3.66, "hydrogen": 6.94}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -15,7 +15,8 @@ class LCCFuelCost(om.ExplicitComponent):
     """
     Computation of the fuel cost of the aircraft for single mission. The cost of unit hydrogen is
     obtained from :cite:`sens:2024`. The unit price of avgas 100LL and Jet-A1 are obtained from
-    https://orleans.aeroport.fr.
+    https://orleans.aeroport.fr. The reference unit price of hydrogen is obtained from
+    https://www.energymarketprice.com/home/en/news/1172424.
     """
 
     def initialize(self):

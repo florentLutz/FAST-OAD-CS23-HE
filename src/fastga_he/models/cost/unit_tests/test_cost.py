@@ -1004,7 +1004,7 @@ def test_operational_cost_hydrogen():
     assert problem.get_val(
         "data:cost:operation:annual_fuel_cost",
         units="USD/yr",
-    ) == pytest.approx(8643.26, rel=1e-3)
+    ) == pytest.approx(9171.9, rel=1e-3)
     assert problem.get_val(
         "data:cost:operation:annual_electricity_cost",
         units="USD/yr",
@@ -1016,7 +1016,7 @@ def test_operational_cost_hydrogen():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(133205.17, rel=1e-3)
+    ) == pytest.approx(133733.81, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

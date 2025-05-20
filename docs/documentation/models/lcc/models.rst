@@ -276,7 +276,7 @@ Fuel Type                     Unit cost (€/kg)
     Avgas 100LL                     3.36
     Jet-A1                          2.72
     Diesel                          1.81
-Pressurized Hydrogen                6
+Pressurized Hydrogen                6.1
 ========================  =======================
 
 .. raw:: html
