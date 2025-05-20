@@ -42,22 +42,30 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         # Ones_like or Zeros_like ?
-        outputs["ac_voltage_rms_in"] = np.where(
-            inputs["ac_current_rms_in"] != 0.0,
-            inputs["apparent_power"] / inputs["ac_current_rms_in"],
-            np.ones_like(inputs["ac_current_rms_in"]),
+        ac_voltage_rms_in = np.ones_like(inputs["ac_current_rms_in"])
+        np.divide(
+            inputs["apparent_power"],
+            inputs["ac_current_rms_in"],
+            out=ac_voltage_rms_in,
+            where=inputs["ac_current_rms_in"] != 0.0
         )
+        outputs["ac_voltage_rms_in"] = ac_voltage_rms_in
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["ac_voltage_rms_in", "apparent_power"] = np.where(
-            inputs["ac_current_rms_in"] != 0.0,
-            1.0 / (inputs["ac_current_rms_in"]),
-            np.full_like(inputs["ac_current_rms_in"], 1e-6),
+        partial_apparent_power = np.full_like(inputs["apparent_power"], 1e-6)
+        np.divide(
+            1.0,
+            inputs["ac_current_rms_in"],
+            out=partial_apparent_power,
+            where=inputs["ac_current_rms_in"] != 0.0
         )
-        partials["ac_voltage_rms_in", "ac_current_rms_in"] = -(
-            np.where(
-                inputs["ac_current_rms_in"] != 0.0,
-                inputs["apparent_power"] / (inputs["ac_current_rms_in"] ** 2.0),
-                np.full_like(inputs["ac_current_rms_in"], -1e-6),
-            )
+        partials["ac_voltage_rms_in", "apparent_power"] = partial_apparent_power
+
+        partial_ac_current = np.full_like(inputs["ac_current_rms_in"], 1e-6)
+        np.divide(
+            inputs["apparent_power"],
+            -inputs["ac_current_rms_in"] ** 2.0,
+            out=partial_ac_current,
+            where=inputs["ac_current_rms_in"] != 0.0
         )
+        partials["ac_voltage_rms_in", "ac_current_rms_in"] = partial_ac_current

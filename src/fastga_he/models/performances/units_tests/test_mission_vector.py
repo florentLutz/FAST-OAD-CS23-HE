@@ -97,7 +97,7 @@ XML_FILE = "sample_ac.xml"
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def catch_warnings():
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
