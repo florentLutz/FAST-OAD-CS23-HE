@@ -841,7 +841,7 @@ def test_fuel_cost():
             LCCFuelCost(tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types)
         ),
         __file__,
-        "data_fuel_cost.xml",
+        XML_FILE,
     )
 
     problem = run_system(
@@ -855,18 +855,21 @@ def test_fuel_cost():
 
 
 def test_electricity_cost():
-    components_type = ["battery_pack"]
-    components_name = ["battery_pack_1"]
+    components_type = ["battery_pack", "battery_pack"]
+    components_name = ["battery_pack_1", "battery_pack_2"]
 
-    ivc = get_indep_var_comp(
-        list_inputs(
-            LCCElectricityCost(
-                electricity_components_type=components_type,
-                electricity_components_name=components_name,
-            )
-        ),
-        __file__,
-        "pipistrel.xml",
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1" ":energy_consumed_mission",
+        units="W*h",
+        val=12525.12,
+    )
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2" ":energy_consumed_mission",
+        units="W*h",
+        val=12525.12,
     )
 
     problem = run_system(
@@ -877,7 +880,7 @@ def test_electricity_cost():
     )
 
     assert problem.get_val("data:cost:electricity_cost", units="USD") == pytest.approx(
-        8.204, rel=1e-3
+        16.408, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
