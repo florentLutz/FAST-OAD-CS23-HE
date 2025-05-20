@@ -149,11 +149,11 @@ class PowerTrainDistributedLoadsFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        distributed_masses_y_ratio_start = []
-        distributed_masses_y_ratio_end = []
-        distributed_masses_chord_start = []
-        distributed_masses_chord_slope = []
-        distributed_masses_masses = []
+        distributed_masses_y_ratio_start = np.array([])
+        distributed_masses_y_ratio_end = np.array([])
+        distributed_masses_chord_start = np.array([])
+        distributed_masses_chord_slope = np.array([])
+        distributed_masses_masses = np.array([])
 
         for distributed_mass_name, distributed_mass_type in zip(
             self.curated_name_list, self.curated_type_list
@@ -190,11 +190,19 @@ class PowerTrainDistributedLoadsFromFile(om.ExplicitComponent):
                 PT_DATA_PREFIX + distributed_mass_type + ":" + distributed_mass_name + ":mass"
             )
 
-            distributed_masses_y_ratio_start.append(float(inputs[y_ratio_start_name]))
-            distributed_masses_y_ratio_end.append(float(inputs[y_ratio_end_name]))
-            distributed_masses_chord_start.append(float(inputs[chord_start_name]))
-            distributed_masses_chord_slope.append(float(inputs[chord_slope_name]))
-            distributed_masses_masses.append(float(inputs[mass_name]))
+            distributed_masses_y_ratio_start = np.append(
+                distributed_masses_y_ratio_start, inputs[y_ratio_start_name]
+            )
+            distributed_masses_y_ratio_end = np.append(
+                distributed_masses_y_ratio_end, inputs[y_ratio_end_name]
+            )
+            distributed_masses_chord_start = np.append(
+                distributed_masses_chord_start, inputs[chord_start_name]
+            )
+            distributed_masses_chord_slope = np.append(
+                distributed_masses_chord_slope, inputs[chord_slope_name]
+            )
+            distributed_masses_masses = np.append(distributed_masses_masses, inputs[mass_name])
 
         outputs["data:weight:airframe:wing:distributed_mass:y_ratio_start"] = (
             distributed_masses_y_ratio_start

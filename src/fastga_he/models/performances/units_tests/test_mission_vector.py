@@ -18,6 +18,7 @@ import os
 import os.path as pth
 import pytest
 import copy
+import warnings
 
 import numpy as np
 import openmdao.api as om
@@ -94,6 +95,17 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 XML_FILE = "sample_ac.xml"
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+
+@pytest.fixture()
+def catch_warnings():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        yield
+
+        for warning in w:
+            print(warning)
 
 
 def test_initialize_altitude():
