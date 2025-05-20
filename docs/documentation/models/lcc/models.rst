@@ -285,8 +285,9 @@ Pressurized Hydrogen                6.1
 
 Propeller / Engine maintenance cost
 ***********************************
-The maintenance cost of propeller, turboshaft, and ICE is calculated as the annual split of the overhaul cost, which is
-required in a specific operation hours. The overhaul cost of propeller is provided by
+The maintenance cost of the propeller, turboshaft, and internal combustion engine (ICE) is calculated as the annual
+portion of the overhaul cost, based on their time between overhaul and flight hours per year. The overhaul cost of
+propeller is provided by
 `Aircraft accessories of Oklahoma <https://aircraftaccessoriesofok.com/aircraft-propeller-overhaul-cost/>`_.
 
 .. raw:: html
