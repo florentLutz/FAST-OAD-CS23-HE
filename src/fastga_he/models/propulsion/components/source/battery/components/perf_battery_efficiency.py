@@ -28,7 +28,6 @@ class PerformancesBatteryEfficiency(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-
         # Doing it like this instead of using where straight up allows to avoid computing the
         # division by zero, should there be any. With where, in addition to the condition, both
         # array are fully computed

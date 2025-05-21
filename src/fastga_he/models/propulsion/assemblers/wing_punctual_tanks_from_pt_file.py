@@ -95,9 +95,9 @@ class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        punctual_tanks_y_ratio = []
+        punctual_tanks_y_ratio = np.array([])
         # Is named masses but really, it is their capacity
-        punctual_tanks_masses = []
+        punctual_tanks_masses = np.array([])
 
         for punctual_tanks_name, punctual_tanks_type in zip(
             self.curated_name_list, self.curated_type_list
@@ -113,8 +113,8 @@ class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
                 + ":fuel_total_mission"
             )
 
-            punctual_tanks_y_ratio.append(float(inputs[y_ratio_name]))
-            punctual_tanks_masses.append(float(inputs[mass_name]))
+            punctual_tanks_y_ratio = np.append(punctual_tanks_y_ratio, inputs[y_ratio_name])
+            punctual_tanks_masses = np.append(punctual_tanks_masses, inputs[mass_name])
 
         outputs["data:weight:airframe:wing:punctual_tanks:y_ratio"] = punctual_tanks_y_ratio
         outputs["data:weight:airframe:wing:punctual_tanks:fuel_inside"] = punctual_tanks_masses

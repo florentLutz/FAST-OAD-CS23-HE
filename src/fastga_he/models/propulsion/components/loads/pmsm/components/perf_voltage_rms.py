@@ -47,7 +47,7 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
             inputs["apparent_power"],
             inputs["ac_current_rms_in"],
             out=ac_voltage_rms_in,
-            where=inputs["ac_current_rms_in"] != 0.0
+            where=inputs["ac_current_rms_in"] != 0.0,
         )
         outputs["ac_voltage_rms_in"] = ac_voltage_rms_in
 
@@ -57,15 +57,15 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
             1.0,
             inputs["ac_current_rms_in"],
             out=partial_apparent_power,
-            where=inputs["ac_current_rms_in"] != 0.0
+            where=inputs["ac_current_rms_in"] != 0.0,
         )
         partials["ac_voltage_rms_in", "apparent_power"] = partial_apparent_power
 
         partial_ac_current = np.full_like(inputs["ac_current_rms_in"], 1e-6)
         np.divide(
             inputs["apparent_power"],
-            -inputs["ac_current_rms_in"] ** 2.0,
+            -(inputs["ac_current_rms_in"] ** 2.0),
             out=partial_ac_current,
-            where=inputs["ac_current_rms_in"] != 0.0
+            where=inputs["ac_current_rms_in"] != 0.0,
         )
         partials["ac_voltage_rms_in", "ac_current_rms_in"] = partial_ac_current
