@@ -7,8 +7,6 @@ import logging
 import numpy as np
 import openmdao.api as om
 
-from fastga_he._utils.arrays import scalarize
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -172,7 +170,7 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
         climb_rate_cl = inputs["data:mission:sizing:main_route:climb:climb_rate:cruise_level"]
         descent_rate = inputs["data:mission:sizing:main_route:descent:descent_rate"]
 
-        reserve_duration = inputs["data:mission:sizing:main_route:reserve:duration"]
+        reserve_duration = inputs["data:mission:sizing:main_route:reserve:duration"].item()
         v_tas_reserve = inputs["data:mission:sizing:main_route:reserve:v_tas"]
 
         if descent_rate > 0.0:
@@ -232,10 +230,8 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
 
         # Reserve time computation, position won't really matter. Time however, is of the essence
         # for SoC computation.
-        reserve_time_step = scalarize(reserve_duration) / number_of_points_reserve
-        reserve_time = np.linspace(
-            reserve_time_step, scalarize(reserve_duration), number_of_points_reserve
-        )
+        reserve_time_step = reserve_duration / number_of_points_reserve
+        reserve_time = np.linspace(reserve_time_step, reserve_duration, number_of_points_reserve)
         reserve_position = reserve_time * v_tas_reserve
         reserve_time += time_descent[-1]
         reserve_position += position_descent[-1]

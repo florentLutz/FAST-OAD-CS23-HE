@@ -36,8 +36,6 @@ from fastga_he.models.propulsion.assemblers.delta_from_pt_file import DEP_EFFECT
 
 from fastga_he.models.performances.mission_vector.mission.thrust_taxi import MIN_POWER_TAXI
 
-from fastga_he._utils.arrays import scalarize
-
 _LOGGER = logging.getLogger(__name__)
 
 DENSITY_SL = Atmosphere(0.0).density
@@ -884,27 +882,19 @@ class MissionVector(om.Group):
         # inputs. This should be kept in mind !
         dummy_tas_array = self._get_initial_guess_true_airspeed(
             mass=outputs["solve_equilibrium.update_mass.mass"],
-            wing_area=scalarize(
-                inputs[
-                    "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.data:geometry:wing:area"
-                ]
-            ),
-            cruise_altitude=scalarize(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
-                ]
-            ),
-            cl_max_clean=scalarize(
-                inputs[
-                    "initialization.initialize_reserve_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
-                ]
-            ),
-            cruise_tas=scalarize(inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"]),
-            reserve_altitude=scalarize(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
-                ]
-            ),
+            wing_area=inputs[
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.data:geometry:wing:area"
+            ].item(),
+            cruise_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
+            ].item(),
+            cl_max_clean=inputs[
+                "initialization.initialize_reserve_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
+            ].item(),
+            cruise_tas=inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"].item(),
+            reserve_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
+            ].item(),
         )
 
         outputs["initialization.initialize_airspeed.true_airspeed"] = dummy_tas_array
@@ -1077,16 +1067,12 @@ class MissionVector(om.Group):
         """
 
         dummy_altitude = self._get_initial_guess_altitude(
-            cruise_altitude=scalarize(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
-                ]
-            ),
-            reserve_altitude=scalarize(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
-                ]
-            ),
+            cruise_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
+            ].item(),
+            reserve_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
+            ].item(),
         )
 
         outputs["initialization.initialize_altitude.altitude"] = dummy_altitude
