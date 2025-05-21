@@ -27,19 +27,15 @@ class PerformancesDensityRatio(om.ExplicitComponent):
 
         self.add_output("density_ratio", val=1.0, shape=number_of_points, lower=0.0)
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="density_ratio",
             wrt="density",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
             val=np.full(number_of_points, 1.0 / DENSITY_SL),
-        )
-        self.declare_partials(
-            of="density_ratio",
-            wrt="rpm",
-            rows=np.arange(number_of_points),
-            cols=np.arange(number_of_points),
-            val=np.zeros(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

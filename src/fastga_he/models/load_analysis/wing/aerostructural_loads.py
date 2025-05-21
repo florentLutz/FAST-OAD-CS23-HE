@@ -241,7 +241,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         cruise_v_tas = inputs["data:TLAR:v_cruise"]
         v_c = inputs["data:mission:sizing:cs23:characteristic_speed:vc"]
 
-        factor_of_safety = float(inputs["data:mission:sizing:cs23:safety_factor"])
+        factor_of_safety = inputs["data:mission:sizing:cs23:safety_factor"].item()
         shear_max_conditions = []
         rbm_max_conditions = []
 
@@ -301,20 +301,26 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         for mass_tag in mass_tag_array:
             if mass_tag == "mtow":
                 mass = mtow
-                load_factor_list = [
-                    float(inputs["data:mission:sizing:cs23:sizing_factor:ultimate_mtow:positive"])
-                    / factor_of_safety,
-                    float(inputs["data:mission:sizing:cs23:sizing_factor:ultimate_mtow:negative"])
-                    / factor_of_safety,
-                ]
+                load_factor_list = (
+                    np.concatenate(
+                        (
+                            inputs["data:mission:sizing:cs23:sizing_factor:ultimate_mtow:positive"],
+                            inputs["data:mission:sizing:cs23:sizing_factor:ultimate_mtow:negative"],
+                        )
+                    )
+                    / factor_of_safety
+                )
             else:
                 mass = min(mzfw, mtow)
-                load_factor_list = [
-                    float(inputs["data:mission:sizing:cs23:sizing_factor:ultimate_mzfw:positive"])
-                    / factor_of_safety,
-                    float(inputs["data:mission:sizing:cs23:sizing_factor:ultimate_mzfw:negative"])
-                    / factor_of_safety,
-                ]
+                (
+                    np.concatenate(
+                        (
+                            inputs["data:mission:sizing:cs23:sizing_factor:ultimate_mzfw:positive"],
+                            inputs["data:mission:sizing:cs23:sizing_factor:ultimate_mzfw:negative"],
+                        )
+                    )
+                    / factor_of_safety
+                )
 
             if abs(mass - mzfw) < 5.0:
                 # No fuel inside the tanks so we multiply their capacity by 0.0
@@ -727,7 +733,7 @@ class AerostructuralLoadHE(om.ExplicitComponent):
 
         # STEP 1/XX - WE EXTRACT THE NECESSARY OUTPUT FROM THE INPUTS
 
-        semi_span = float(inputs["data:geometry:wing:span"]) / 2.0
+        semi_span = inputs["data:geometry:wing:span"].item() / 2.0
 
         # STEP 2/XX - WE CREATE THE INTERPOLATION VECTOR FOR THE CHORD AND THE MASSES. WE ALSO
         # CREATE A VECTOR TO STOCK WHERE THE MASS ARE ADDED AND HAVE A WAY TO READJUST THE

@@ -206,7 +206,7 @@
               <power_ratio is_input="True">1.2<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
             </design_point>
             <limit>
-              <ITT is_input="True">1080.0<!--Limit ITT of the turboshaft--></ITT>
+              <ITT units="degK" is_input="True">1080.0<!--Limit ITT of the turboshaft--></ITT>
               <OPR is_input="True">8.5<!--Limit OPR of the turboshaft--></OPR>
             </limit>
           </turboshaft_1>

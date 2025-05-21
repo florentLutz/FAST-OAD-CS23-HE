@@ -34,7 +34,7 @@
                         <efficiency>0.98</efficiency>
                         <front_length_ratio>0.9</front_length_ratio>
                         <rear_length_ratio>0.1</rear_length_ratio>
-                        <power_split>66.66</power_split>
+                        <power_split units="percent">66.66</power_split>
                         <power_share units="kW">66.66</power_share>
                         <scaling>
                             <dimensions>1.34</dimensions>

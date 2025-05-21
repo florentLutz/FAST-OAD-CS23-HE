@@ -379,7 +379,7 @@ def test_constraints_ensure_tank_capacity():
 def test_fuel_consumed_mission():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST))
+    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST), units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -407,7 +407,7 @@ def test_fuel_remaining_mission():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("fuel_consumed_t", val=np.full(NB_POINTS_TEST, 14.0))
+    ivc.add_output("fuel_consumed_t", val=np.full(NB_POINTS_TEST, 14.0), units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -426,7 +426,7 @@ def test_fuel_remaining_mission():
 def test_performances_fuel_tank():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST))
+    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST), units="kg")
 
     problem = run_system(
         PerformancesFuelTank(fuel_tank_id="fuel_tank_1", number_of_points=NB_POINTS_TEST),

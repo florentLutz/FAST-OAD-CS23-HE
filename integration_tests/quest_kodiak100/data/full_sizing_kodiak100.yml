@@ -61,31 +61,31 @@ model:
             id: fastga.loop.wing_area
 
 submodels:
-    submodel.weight.mass.payload: null
-    submodel.weight.mass.airframe.fuselage: fastga.submodel.weight.mass.airframe.fuselage.roskam
-    submodel.weight.mass.airframe.paint: fastga.submodel.weight.mass.airframe.paint.by_wet_area
-    submodel.weight.mass.airframe.flight_controls: fastga.submodel.weight.mass.airframe.flight_controls.flops
-    submodel.weight.mass.system.life_support_system: null
-    submodel.weight.mass.system.recording_system: null
+    service.weight.mass.payload: null
+    service.weight.mass.airframe.fuselage: fastga.submodel.weight.mass.airframe.fuselage.roskam
+    service.weight.mass.airframe.paint: fastga.submodel.weight.mass.airframe.paint.by_wet_area
+    service.weight.mass.airframe.flight_controls: fastga.submodel.weight.mass.airframe.flight_controls.flops
+    service.weight.mass.system.life_support_system: null
+    service.weight.mass.system.recording_system: null
     submodel.loop.wing_area.update.geom: fastga_he.submodel.loop.wing_area.update.geom.advanced
     submodel.loop.wing_area.constraint.geom: fastga_he.submodel.loop.wing_area.constraint.geom.advanced
-    submodel.geometry.wing.thickness_ratio: null
+    service.geometry.wing.thickness_ratio: null
     submodel.aerodynamics.high_lift.delta: null
-    submodel.geometry.mfw: fastga.submodel.geometry.mfw.advanced
-    submodel.geometry.vertical_tail.position.fd: null
+    service.geometry.mfw: fastga.submodel.geometry.mfw.advanced
+    service.geometry.vertical_tail.distance.fd: null
     submodel.performances.mission_vector.descent_speed: null
     submodel.performances.mission_vector.climb_speed: null
     submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
     submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
     submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.ensure
-    submodel.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
+    service.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
     submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
     submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
-    submodel.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
-    submodel.weight.mass.system.power_system: null
-    submodel.geometry.nacelle.dimension: null
+    service.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
+    service.weight.mass.system.power_system: null
+    service.geometry.nacelle.dimension: null
     submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
     submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
     submodel.weight.mass_breakdown: fastga_he.submodel.weight.mass_breakdown.modular
     submodel.aerodynamics.wing.extreme_lift_coefficient.clean: null
-    submodel.weight.mass.furniture.seats: null
+    service.weight.mass.furniture.seats: null

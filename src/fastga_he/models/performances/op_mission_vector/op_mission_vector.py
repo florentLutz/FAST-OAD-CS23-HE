@@ -1195,27 +1195,19 @@ class OperationalMissionVector(om.Group):
         # inputs. This should be kept in mind !
         dummy_tas_array = self._get_initial_guess_true_airspeed(
             mass=outputs["solve_equilibrium.update_mass.mass"],
-            wing_area=float(
-                inputs[
-                    "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.data:geometry:wing:area"
-                ]
-            ),
-            cruise_altitude=float(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
-                ]
-            ),
-            cl_max_clean=float(
-                inputs[
-                    "initialization.initialize_reserve_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
-                ]
-            ),
-            cruise_tas=float(inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"]),
-            reserve_altitude=float(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
-                ]
-            ),
+            wing_area=inputs[
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.data:geometry:wing:area"
+            ].item(),
+            cruise_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
+            ].item(),
+            cl_max_clean=inputs[
+                "initialization.initialize_reserve_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
+            ].item(),
+            cruise_tas=inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"].item(),
+            reserve_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
+            ].item(),
         )
 
         outputs["initialization.initialize_airspeed.true_airspeed"] = dummy_tas_array
@@ -1388,16 +1380,12 @@ class OperationalMissionVector(om.Group):
         """
 
         dummy_altitude = self._get_initial_guess_altitude(
-            cruise_altitude=float(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
-                ]
-            ),
-            reserve_altitude=float(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
-                ]
-            ),
+            cruise_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
+            ].item(),
+            reserve_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
+            ].item(),
         )
 
         outputs["initialization.initialize_altitude.altitude"] = dummy_altitude

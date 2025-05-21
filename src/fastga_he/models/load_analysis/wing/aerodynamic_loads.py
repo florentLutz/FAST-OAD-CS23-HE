@@ -223,13 +223,13 @@ class AerodynamicLoadsHE(om.ExplicitComponent):
         cl_ref = inputs["data:aerodynamics:wing:cruise:CL_ref"]
         v_ref = inputs["data:aerodynamics:slipstream:wing:cruise:prop_on:velocity"]
 
-        semi_span = float(inputs["data:geometry:wing:span"]) / 2.0
-        root_chord = float(inputs["data:geometry:wing:root:chord"])
-        tip_chord = float(inputs["data:geometry:wing:tip:chord"])
-        wing_area = float(inputs["data:geometry:wing:area"])
+        semi_span = inputs["data:geometry:wing:span"].item() / 2.0
+        root_chord = inputs["data:geometry:wing:root:chord"].item()
+        tip_chord = inputs["data:geometry:wing:tip:chord"].item()
+        wing_area = inputs["data:geometry:wing:area"].item()
 
-        load_factor_shear = float(inputs["data:loads:max_shear:load_factor"])
-        load_factor_rbm = float(inputs["data:loads:max_rbm:load_factor"])
+        load_factor_shear = inputs["data:loads:max_shear:load_factor"].item()
+        load_factor_rbm = inputs["data:loads:max_rbm:load_factor"].item()
 
         cruise_alt = inputs["data:mission:sizing:main_route:cruise:altitude"]
 

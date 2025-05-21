@@ -105,7 +105,7 @@ def get_ivc_all_data(
 
 
 def get_fuel_problem(ivc):
-    prob = om.Problem()
+    prob = om.Problem(reports=False)
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
         "turboshaft_off_design_fuel",
@@ -129,7 +129,7 @@ def get_fuel_problem(ivc):
 
 def get_missing_turboshaft_data(ivc, altitudes, machs, shaft_powers):
     # First get the turboshaft geometry parameters from design
-    prob = om.Problem()
+    prob = om.Problem(reports=False)
     prob.model.add_subsystem("ivc", ivc, promotes=["*"])
     prob.model.add_subsystem(
         "turboshaft_sizing",

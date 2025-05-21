@@ -226,8 +226,8 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
 
                 inner_fuel_array[idx] = fuel_that_mission
                 inner_energy_array[idx] = energy_that_mission
-                inner_emissions_array[idx] = emission_that_mission
-                inner_emission_factor_array[idx] = emission_factor_that_mission
+                inner_emissions_array[idx] = emission_that_mission.item()
+                inner_emission_factor_array[idx] = emission_factor_that_mission.item()
 
             else:
                 inner_fuel_array[idx] = INVALID_COMPUTATION_RESULT

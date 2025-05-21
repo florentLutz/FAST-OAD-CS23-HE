@@ -237,12 +237,12 @@ class StructuralLoadsHE(om.ExplicitComponent):
         y_vector = inputs["data:aerodynamics:wing:low_speed:Y_vector"]
         chord_vector = inputs["data:aerodynamics:wing:low_speed:chord_vector"]
 
-        semi_span = float(inputs["data:geometry:wing:span"]) / 2.0
+        semi_span = inputs["data:geometry:wing:span"].item() / 2.0
         root_chord = inputs["data:geometry:wing:root:chord"]
         tip_chord = inputs["data:geometry:wing:tip:chord"]
 
-        load_factor_shear = float(inputs["data:loads:max_shear:load_factor"])
-        load_factor_rbm = float(inputs["data:loads:max_rbm:load_factor"])
+        load_factor_shear = inputs["data:loads:max_shear:load_factor"]
+        load_factor_rbm = inputs["data:loads:max_rbm:load_factor"]
         wing_mass = inputs["data:weight:airframe:wing:mass"]
 
         # STEP 2/XX - DELETE THE ADDITIONAL ZEROS WE HAD TO PUT TO FIT OPENMDAO AND ADD A POINT
@@ -273,11 +273,11 @@ class StructuralLoadsHE(om.ExplicitComponent):
             inputs, y_vector_orig, chord_vector_orig, 0.0, 0.0, False, True
         )
 
-        point_mass_array = max(load_factor_shear, load_factor_rbm) * point_mass_array_orig
-        wing_mass_array = max(load_factor_shear, load_factor_rbm) * wing_mass_array_orig
-        fuel_mass_array = max(load_factor_shear, load_factor_rbm) * fuel_mass_array_orig
+        point_mass_array = np.maximum(load_factor_shear, load_factor_rbm) * point_mass_array_orig
+        wing_mass_array = np.maximum(load_factor_shear, load_factor_rbm) * wing_mass_array_orig
+        fuel_mass_array = np.maximum(load_factor_shear, load_factor_rbm) * fuel_mass_array_orig
         distributed_mass_array = (
-            max(load_factor_shear, load_factor_rbm) * distributed_mass_array_orig
+            np.maximum(load_factor_shear, load_factor_rbm) * distributed_mass_array_orig
         )
 
         additional_zeros = np.zeros(SPAN_MESH_POINT_LOADS - len(y_vector))

@@ -1603,11 +1603,9 @@ class FASTGAHEPowerTrainConfigurator:
         # we have all the info we need
 
         try:
-            number_of_cell_in_series = float(
-                inputs[
-                    PT_DATA_PREFIX + component_type + ":" + component_name + ":module:number_cells"
-                ]
-            )
+            number_of_cell_in_series = inputs[
+                PT_DATA_PREFIX + component_type + ":" + component_name + ":module:number_cells"
+            ].item()
 
         except RuntimeError as e:
             error_message = e.args[0]
@@ -1617,10 +1615,10 @@ class FASTGAHEPowerTrainConfigurator:
             # Sometimes the number of cells is not one deep but two deep so we try both
             try:
                 proper_abs_name = ".".join(split_abs_name[1:])
-                number_of_cell_in_series = float(inputs[proper_abs_name])
+                number_of_cell_in_series = inputs[proper_abs_name].item()
             except KeyError:
                 proper_abs_name = ".".join(split_abs_name[2:])
-                number_of_cell_in_series = float(inputs[proper_abs_name])
+                number_of_cell_in_series = inputs[proper_abs_name].item()
 
         return number_of_cell_in_series
 

@@ -211,7 +211,7 @@ def test_switching_losses():
     ivc.add_output(
         "ac_current_rms_in_one_phase", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A"
     )
-    ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST))
+    ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST), units="Hz")
 
     problem = run_system(
         PerformancesSwitchingLosses(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
