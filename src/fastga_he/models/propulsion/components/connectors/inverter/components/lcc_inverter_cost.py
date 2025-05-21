@@ -9,7 +9,9 @@ import openmdao.api as om
 class LCCInverterCost(om.ExplicitComponent):
     """
     Computation of the inverter purchase cost. Based on the retail price provided by
-    https://www.mcico.com/truebluepower/inverters?purchase_type=New+Outright%2CNew+Exchange.
+    https://www.mcico.com/truebluepower/inverters?purchase_type=New+Outright%2CNew+Exchange and
+    several high power inverters from
+    https://emrax.com/wp-content/uploads/2020/03/recommended_controllers_for_emrax_motors_5.3.xlsx.
     """
 
     def initialize(self):
@@ -41,12 +43,10 @@ class LCCInverterCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         inverter_id = self.options["inverter_id"]
 
-        power_rating = inputs[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max"
-        ]
-
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"] = (
-            4666.0 * power_rating**0.0928
+            4666.0
+            * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max"]
+            ** 0.0928
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -56,7 +56,7 @@ class LCCInverterCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max",
         ] = (
-            -433.0048
+            433.0048
             * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max"]
             ** -0.9072
         )

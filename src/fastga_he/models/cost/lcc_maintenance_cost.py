@@ -9,7 +9,8 @@ import openmdao.api as om
 class LCCMaintenanceCost(om.ExplicitComponent):
     """
     Computation of the annual maintenance cost of the aircraft. The calculation is adjusted
-    based on the cost rate from https://www.guardianjet.com/jet-aircraft-online-tools.
+    based on the cost rate from https://www.guardianjet.com/jet-aircraft-online-tools and
+    https://planephd.com/wizard.
     """
 
     def setup(self):
@@ -35,21 +36,21 @@ class LCCMaintenanceCost(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        owe_clipped = np.clip(inputs["data:weight:aircraft:OWE"], 500.0, None)
+
         outputs["data:cost:operation:maintenance_cost"] = inputs[
             "data:TLAR:flight_hours_per_year"
-        ] * (
-            331.0
-            - 0.072 * inputs["data:weight:aircraft:OWE"]
-            + 2.75e-5 * inputs["data:weight:aircraft:OWE"] ** 2.0
-        )
+        ] * (-49.2 + 0.147 * owe_clipped)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["data:cost:operation:maintenance_cost", "data:weight:aircraft:OWE"] = inputs[
-            "data:TLAR:flight_hours_per_year"
-        ] * (5.5e-5 * inputs["data:weight:aircraft:OWE"] - 0.072)
+        owe_clipped = np.clip(inputs["data:weight:aircraft:OWE"], 500.0, None)
+
+        partials["data:cost:operation:maintenance_cost", "data:weight:aircraft:OWE"] = np.where(
+            inputs["data:weight:aircraft:OWE"] == owe_clipped,
+            0.147 * inputs["data:TLAR:flight_hours_per_year"],
+            1e-6,
+        )
 
         partials["data:cost:operation:maintenance_cost", "data:TLAR:flight_hours_per_year"] = (
-            331.0
-            - 0.072 * inputs["data:weight:aircraft:OWE"]
-            + 2.75e-5 * inputs["data:weight:aircraft:OWE"] ** 2.0
+            -49.2 + 0.147 * owe_clipped
         )

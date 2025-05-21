@@ -7,7 +7,8 @@
       <v_approach units="knot" is_input="True">58.5<!--approach speed--></v_approach>
       <v_cruise units="knot" is_input="True">93.0<!--cruise speed--></v_cruise>
       <v_max_sl units="knot" is_input="True">110.0<!--maximum speed at sea level--></v_max_sl>
-      <flight_per_year>500.0</flight_per_year>
+      <flight_per_year>284.0</flight_per_year>
+      <flight_hours_per_year units="h">283.2</flight_hours_per_year>
     </TLAR>
     <cost>
       <cpi_2012>1.4</cpi_2012>
@@ -15,6 +16,8 @@
       <prototype_number>3.0</prototype_number>
       <production>
         <number_aircraft_5_years>50.0</number_aircraft_5_years>
+        <similar_aircraft_made>1500</similar_aircraft_made>
+        <learning_curve_percentage units="percent">80</learning_curve_percentage>
         <landing_gear_cost_reduction>1.0</landing_gear_cost_reduction>
         <composite_fraction>1.0</composite_fraction>
       </production>

@@ -32,6 +32,11 @@ class LCCManufacturingCost(om.ExplicitComponent):
             val=np.nan,
             desc="Consumer price index relative to the year 2012",
         )
+        self.add_input(
+            "data:cost:production:maturity_discount",
+            val=1.0,
+            desc="The discount rate in manufacturing and tooling bsed on process maturity",
+        )
 
         self.add_output(
             "data:cost:production:manufacturing_cost_per_unit",
@@ -48,29 +53,30 @@ class LCCManufacturingCost(om.ExplicitComponent):
             * inputs["data:cost:production:manufacturing_man_hours_5_years"]
             * inputs["data:cost:production:manufacturing_cost_per_hour"]
             * inputs["data:cost:cpi_2012"]
+            * inputs["data:cost:production:maturity_discount"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
+        cost_per_hour = inputs["data:cost:production:manufacturing_cost_per_hour"]
+        cpi_2022 = inputs["data:cost:cpi_2012"]
+        discount = inputs["data:cost:production:maturity_discount"]
+        man_hours = inputs["data:cost:production:manufacturing_man_hours_5_years"]
+
         partials[
             "data:cost:production:manufacturing_cost_per_unit",
             "data:cost:production:manufacturing_man_hours_5_years",
-        ] = (
-            2.0969
-            * inputs["data:cost:production:manufacturing_cost_per_hour"]
-            * inputs["data:cost:cpi_2012"]
-        )
+        ] = 2.0969 * cost_per_hour * cpi_2022 * discount
 
         partials[
             "data:cost:production:manufacturing_cost_per_unit",
             "data:cost:production:manufacturing_cost_per_hour",
-        ] = (
-            2.0969
-            * inputs["data:cost:production:manufacturing_man_hours_5_years"]
-            * inputs["data:cost:cpi_2012"]
-        )
+        ] = 2.0969 * man_hours * cpi_2022 * discount
 
         partials["data:cost:production:manufacturing_cost_per_unit", "data:cost:cpi_2012"] = (
-            2.0969
-            * inputs["data:cost:production:manufacturing_man_hours_5_years"]
-            * inputs["data:cost:production:manufacturing_cost_per_hour"]
+            2.0969 * man_hours * cost_per_hour * discount
         )
+
+        partials[
+            "data:cost:production:manufacturing_cost_per_unit",
+            "data:cost:production:maturity_discount",
+        ] = 2.0969 * man_hours * cost_per_hour * cpi_2022

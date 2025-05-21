@@ -32,6 +32,13 @@ class LCC(om.Group):
             allow_none=False,
         )
         self.options.declare(
+            name="learning_curve",
+            default=False,
+            types=bool,
+            desc="Learning curve for providing the discount rate of the manufacturing and tooling "
+            "man hours.",
+        )
+        self.options.declare(
             name="loan",
             default=True,
             types=bool,
@@ -44,6 +51,7 @@ class LCC(om.Group):
             subsys=LCCProductionCost(
                 power_train_file_path=self.options["power_train_file_path"],
                 delivery_method=self.options["delivery_method"],
+                learning_curve=self.options["learning_curve"],
             ),
             promotes=["*"],
         )

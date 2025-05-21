@@ -43,6 +43,8 @@ from ..lcc_electricity_cost import LCCElectricityCost
 from ..lcc_annual_energy_cost import LCCAnnualEnergyCost
 from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
+from ..lcc_leaarning_curve_factor import LCCLearningCurveFactor
+from ..lcc_leaarning_curve_discount import LCCLearningCurveDiscount
 
 
 XML_FILE = "tbm_900_inputs.xml"
@@ -379,6 +381,42 @@ def test_landing_gear_cost_reduction():
     problem.check_partials(compact_print=True)
 
 
+def test_learning_curve_factor():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:production:learning_curve_percentage", units="percent", val=85.0)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCLearningCurveFactor(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:production:learning_curve_factor") == pytest.approx(
+        0.757, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_learning_curve_discount():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:production:learning_curve_factor", val=0.757)
+    ivc.add_output("data:cost:production:similar_aircraft_made", val=1500.0)
+    ivc.add_output("data:cost:production:number_aircraft_5_years", val=50.0)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCLearningCurveDiscount(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:production:maturity_discount") == pytest.approx(
+        0.4376, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_cost_sum():
     components_type = ["propeller", "turboshaft", "fuel_tank"]
     components_name = ["propeller_1", "turboshaft_1", "fuel_tank_1"]
@@ -572,7 +610,7 @@ def test_production_cost_hybrid_tbm_900():
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        5002852.79, rel=1e-3
+        4942445.38, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -761,7 +799,7 @@ def test_annual_maintenance_cost():
     )
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
-        90181.16, rel=1e-3
+        77369.07, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -781,7 +819,7 @@ def test_annual_maintenance_miscellaneous_cost():
 
     assert problem.get_val(
         "data:cost:operation:miscellaneous_cost", units="USD/yr"
-    ) == pytest.approx(24000.0, rel=1e-3)
+    ) == pytest.approx(21926.83, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -942,7 +980,7 @@ def test_operational_cost_hydrogen():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(133733.81, rel=1e-3)
+    ) == pytest.approx(31543.8, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -976,12 +1014,12 @@ def test_operational_cost_tbm_900():
     )
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
-        90181.17, rel=1e-3
+        77369.07, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(472667.57, rel=1e-3)
+    ) == pytest.approx(457782.31, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1013,7 +1051,7 @@ def test_operational_cost_hybrid_tbm_900():
     ) == pytest.approx(50116.82, rel=1e-3)
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
-        92775.92, rel=1e-3
+        93059.0, rel=1e-3
     )
 
     assert problem.get_val(
@@ -1060,7 +1098,7 @@ def test_cost_tbm_900():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(475603.2, rel=1e-3)
+    ) == pytest.approx(460976.68, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1073,6 +1111,7 @@ def test_cost_pipistrel():
             LCC(
                 power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
                 delivery_method="train",
+                learning_curve=True,
             )
         ),
         __file__,
@@ -1084,6 +1123,7 @@ def test_cost_pipistrel():
         LCC(
             power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
             delivery_method="train",
+            learning_curve=True,
         ),
         ivc,
     )
@@ -1092,16 +1132,16 @@ def test_cost_pipistrel():
     ) == pytest.approx(3688.43, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        405615.42, rel=1e-3
+        337912.0, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        450233.11, rel=1e-3
+        375082.32, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(149298.47, rel=1e-3)
+    ) == pytest.approx(37085.4, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

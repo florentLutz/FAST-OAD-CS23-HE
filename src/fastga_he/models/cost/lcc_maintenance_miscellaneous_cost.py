@@ -2,13 +2,15 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
+import numpy as np
 import openmdao.api as om
 
 
 class LCCMaintenanceMiscellaneousCost(om.ExplicitComponent):
     """
     Computation of the annual miscellaneous cost of the aircraft. The calculation is adjusted
-    based on the cost rate from https://www.guardianjet.com/jet-aircraft-online-tools.
+    based on the cost rate from https://www.guardianjet.com/jet-aircraft-online-tools and
+    https://planephd.com/wizard.
     """
 
     def setup(self):
@@ -18,6 +20,11 @@ class LCCMaintenanceMiscellaneousCost(om.ExplicitComponent):
             units="h",
             desc="Expected number of hours flown per year",
         )
+        self.add_input(
+            "data:weight:aircraft:OWE",
+            units="kg",
+            val=np.nan,
+        )
 
         self.add_output(
             "data:cost:operation:miscellaneous_cost",
@@ -26,9 +33,24 @@ class LCCMaintenanceMiscellaneousCost(om.ExplicitComponent):
             desc="Annual airframe maintenance material cost per aircraft",
         )
 
-        self.declare_partials(of="*", wrt="*", val=80.0)
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:operation:miscellaneous_cost"] = (
-            80.0 * inputs["data:TLAR:flight_hours_per_year"]
+        owe_clipped = np.clip(inputs["data:weight:aircraft:OWE"], 500.0, None)
+
+        outputs["data:cost:operation:miscellaneous_cost"] = inputs[
+            "data:TLAR:flight_hours_per_year"
+        ] * (-22.8 + 0.0459 * owe_clipped)
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        owe_clipped = np.clip(inputs["data:weight:aircraft:OWE"], 500.0, None)
+
+        partials["data:cost:operation:miscellaneous_cost", "data:TLAR:flight_hours_per_year"] = (
+            -22.8 + 0.0459 * owe_clipped
+        )
+
+        partials["data:cost:operation:miscellaneous_cost", "data:weight:aircraft:OWE"] = np.where(
+            inputs["data:weight:aircraft:OWE"] == owe_clipped,
+            0.0459 * inputs["data:TLAR:flight_hours_per_year"],
+            1e-6,
         )

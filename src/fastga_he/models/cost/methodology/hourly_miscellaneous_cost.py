@@ -7,8 +7,8 @@ import plotly.graph_objects as go
 
 if __name__ == "__main__":
     # Data points
-    x = np.array([2048, 1550, 3087, 4535, 2089, 1727, 1020.6, 734.83, 1115.85, 535.24])
-    y = np.array([270, 282, 349, 575, 374, 266, 17.85, 16.6, 48.75, 13.46])
+    x = np.array([2048, 1550, 3087, 4535, 2089, 734.83, 1115.85, 1020.6, 535.24])
+    y = np.array([80, 75, 82, 200, 78, 8.8, 19.33, 13.63, 6.12])
 
     # Linear regression using numpy.polyfit (1st order)
     coeffs = np.polyfit(x, y, 1)  # Returns [m, b] for y = mx + b

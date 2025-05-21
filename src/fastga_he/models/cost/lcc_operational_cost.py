@@ -128,7 +128,7 @@ class LCCOperationalCost(om.Group):
                 cost_components_type.append(component_type)
                 cost_components_name.append(component_name)
 
-                if components_type in ELECTRICITY_STORAGE_TYPES:
+                if component_type in ELECTRICITY_STORAGE_TYPES:
                     electricity_components_type.append(component_type)
                     electricity_components_name.append(component_name)
 

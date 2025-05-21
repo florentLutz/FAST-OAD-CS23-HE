@@ -25,6 +25,8 @@ from .lcc_fuel_cost import LCCFuelCost
 from .lcc_electricity_cost import LCCElectricityCost
 from .lcc_delivery_cost import LCCDeliveryCost
 from .lcc_deliveray_duration_ratio import LCCDeliveryDurationRatio
+from .lcc_leaarning_curve_factor import LCCLearningCurveFactor
+from .lcc_leaarning_curve_discount import LCCLearningCurveDiscount
 
 from .constants import ELECTRICITY_STORAGE_TYPES
 
@@ -47,6 +49,12 @@ class LCCProductionCost(om.Group):
             "end user. Can be either flown or carried by train",
             allow_none=False,
             values=["flight", "train"],
+        )
+        self.options.declare(
+            name="learning_curve",
+            default=False,
+            desc="Learning curve for providing the discount rate of the manufacturing and tooling "
+            "man hours.",
         )
         self.options.declare(
             name="power_train_file_path",
@@ -75,6 +83,18 @@ class LCCProductionCost(om.Group):
             subsys=LCCManufacturingManHours(),
             promotes=["*"],
         )
+
+        if self.options["learning_curve"]:
+            self.add_subsystem(
+                name="learning_curve_factor",
+                subsys=LCCLearningCurveFactor(),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                name="learning_curve_discount",
+                subsys=LCCLearningCurveDiscount(),
+                promotes=["*"],
+            )
 
         # Calculate cost
         self.add_subsystem(

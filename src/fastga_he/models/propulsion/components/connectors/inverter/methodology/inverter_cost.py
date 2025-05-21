@@ -6,26 +6,26 @@ import numpy as np
 import plotly.graph_objects as go
 from scipy import optimize
 
-# Data points from the graph
-x = np.array([0.25, 0.25, 0.25, 0.5, 1.5])
-y = np.array([3545, 3545, 4777, 5165, 7882])
+# Data points
+x = np.array([150, 140, 220, 150, 250, 340, 0.25, 0.5])
+y = np.array([9728.25, 5100, 5176.41, 7976, 14663, 6386.31, 3545, 5165])
 
 
-# Logarithmic fit
-def log_func(x, a, b):
-    return a * np.log(x) + b
+# Power-law function: y = a * x^b
+def power_func(x, a, b):
+    return a * np.power(x, b)
 
 
 if __name__ == "__main__":
-    # Fixed curvefit to curve_fit and added proper parameters
-    log_params, log_covariance = optimize.curve_fit(log_func, x, y)
+    # Fit the power-law model
+    power_params, power_covariance = optimize.curve_fit(power_func, x, y, maxfev=10000)
 
-    y_log = log_func(x, *log_params)
-    r2_log = 1 - np.sum((y - y_log) ** 2) / np.sum((y - np.mean(y)) ** 2)
+    y_power = power_func(x, *power_params)
+    r2_power = 1 - np.sum((y - y_power) ** 2) / np.sum((y - np.mean(y)) ** 2)
 
-    # Generate points for smooth curves
+    # Smooth curve for plotting
     x_smooth = np.linspace(min(x), max(x), 100)
-    y_smooth = log_func(x_smooth, *log_params)
+    y_smooth = power_func(x_smooth, *power_params)
 
     # Create interactive plot
     fig = go.Figure()
@@ -37,24 +37,24 @@ if __name__ == "__main__":
             x=x_smooth,
             y=y_smooth,
             mode="lines",
-            name=f"Logarithmic (R² = {r2_log:.3f})",
-            line=dict(color="red"),
+            name=f"Power-law (R² = {r2_power:.3f})",
+            line=dict(color="green"),
         )
     )
 
     # Add function text to the plot
-    function_text = f"y = {log_params[0]:.4f}ln(x) + {log_params[1]:.4f}"
+    function_text = f"y = {power_params[0]:.4f} * x^{power_params[1]:.4f}"
     fig.add_annotation(
         x=max(x),
         y=min(y),
         text=function_text,
         showarrow=False,
-        font=dict(size=12, color="blue"),
+        font=dict(size=12, color="green"),
         xanchor="right",
         yanchor="bottom",
     )
 
-    fig.update_layout(title="Logarithmic Regression", xaxis_title="Power (kW)", yaxis_title="USD")
+    fig.update_layout(title="Power-Law Regression", xaxis_title="Power (kW)", yaxis_title="USD")
     fig.show()
 
-    print(f"Logarithmic: y = {log_params[0]:.4f}ln(x) + {log_params[1]:.4f}")
+    print(f"Power-law: y = {power_params[0]:.4f} * x^{power_params[1]:.4f}")
