@@ -52,7 +52,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         cp = inputs["power_coefficient"]
 
         partials_advance_ratio = np.full_like(j, 1e-6)
-        np.divide(ct, cp, out=partials_advance_ratio, where= cp != 0)
+        np.divide(ct, cp, out=partials_advance_ratio, where=cp != 0)
         partials["efficiency", "advance_ratio"] = partials_advance_ratio
 
         partials_ct = np.full_like(ct, 1e-6)

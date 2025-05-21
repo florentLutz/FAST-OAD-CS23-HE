@@ -823,7 +823,9 @@ def test_initialize_airspeed_derivatives():
             0.0,
         ]
     )
-    assert problem.get_val("d_vx_dt", units="m/s**2") == pytest.approx(expected_derivative, abs=1e-1)
+    assert problem.get_val("d_vx_dt", units="m/s**2") == pytest.approx(
+        expected_derivative, abs=1e-1
+    )
 
     problem.check_partials(compact_print=True)
 
