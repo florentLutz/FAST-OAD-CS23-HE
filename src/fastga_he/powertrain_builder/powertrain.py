@@ -1598,11 +1598,9 @@ class FASTGAHEPowerTrainConfigurator:
         # we have all the info we need
 
         try:
-            number_of_cell_in_series = float(
-                inputs[
-                    PT_DATA_PREFIX + component_type + ":" + component_name + ":module:number_cells"
-                ]
-            )
+            number_of_cell_in_series = inputs[
+                PT_DATA_PREFIX + component_type + ":" + component_name + ":module:number_cells"
+            ].item()
 
         except RuntimeError as e:
             error_message = e.args[0]

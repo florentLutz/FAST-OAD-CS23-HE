@@ -39,7 +39,7 @@
                         <from_LE units="m">0.15</from_LE>
                         <length units="m">0.088</length>
                         <diameter units="m">0.268</diameter>
-                        <front_length_ratio units="m">0.5</front_length_ratio>
+                        <front_length_ratio>0.5</front_length_ratio>
                         <torque_constant units="N*m/A">1.46</torque_constant>
                         <torque_max units="N*m">150.0</torque_max>
                         <torque_rating units="N*m">150.0</torque_rating>

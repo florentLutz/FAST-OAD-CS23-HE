@@ -1069,7 +1069,7 @@ def test_section_lift():
             __file__,
             XML_FILE,
         )
-        ivc.add_output("cl_wing_clean", val=np.full(NB_POINTS_TEST, 0.6533), units="deg")
+        ivc.add_output("cl_wing_clean", val=np.full(NB_POINTS_TEST, 0.6533))
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(
@@ -1204,7 +1204,7 @@ def test_blown_wing_lift_increase_group():
     density = Atmosphere(altitude=np.full(NB_POINTS_TEST, 0.0)).density
     ivc.add_output("density", val=density, units="kg/m**3")
     ivc.add_output("alpha", val=np.full(NB_POINTS_TEST, 5.0), units="deg")
-    ivc.add_output("cl_wing_clean", val=np.full(NB_POINTS_TEST, 0.6533), units="deg")
+    ivc.add_output("cl_wing_clean", val=np.full(NB_POINTS_TEST, 0.6533))
     ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
     ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
 
@@ -1460,7 +1460,7 @@ def test_slipstream_propeller():
         ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
         ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
         ivc.add_output("alpha", val=np.full(NB_POINTS_TEST, 5.0), units="deg")
-        ivc.add_output("cl_wing_clean", val=np.full(NB_POINTS_TEST, 0.6533), units="deg")
+        ivc.add_output("cl_wing_clean", val=np.full(NB_POINTS_TEST, 0.6533))
 
         problem = run_system(
             SlipstreamPropeller(

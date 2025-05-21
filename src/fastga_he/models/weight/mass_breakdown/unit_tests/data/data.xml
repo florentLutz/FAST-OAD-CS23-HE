@@ -96,11 +96,11 @@
             <airframe>
                 <wing>
                     <punctual_mass>
-                        <mass>175.92</mass>
+                        <mass units="kg">175.92</mass>
                         <y_ratio>0.34</y_ratio>
                     </punctual_mass>
                     <punctual_tanks>
-                        <fuel_inside>0.0</fuel_inside>
+                        <fuel_inside units="kg">0.0</fuel_inside>
                         <y_ratio>0.0</y_ratio>
                     </punctual_tanks>
                     <distributed_mass>
@@ -132,7 +132,7 @@
         </weight>
         <mission>
             <sizing>
-                <fuel>250.</fuel>
+                <fuel units="kg">250.</fuel>
                 <main_route>
                     <cruise>
                         <altitude units="ft" is_input="True">8000.0<!--altitude during cruise phase in sizing mission--></altitude>

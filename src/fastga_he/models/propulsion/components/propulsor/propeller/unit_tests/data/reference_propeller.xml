@@ -72,10 +72,10 @@
                         <diameter_to_span_ratio>0.312</diameter_to_span_ratio>
                         <depth units="m">0.3</depth>
                         <from_LE units="m">0.15</from_LE>
-                        <from_wing_LE_ratio units="m">0.25</from_wing_LE_ratio>
+                        <from_wing_LE_ratio>0.25</from_wing_LE_ratio>
                         <from_wing_AC units="m">0.341</from_wing_AC>
                         <y_ratio>0.34</y_ratio>
-                        <rpm_mission>2500.0</rpm_mission>
+                        <rpm_mission units="1/min">2500.0</rpm_mission>
                         <solidity>0.2</solidity>
                         <activity_factor>150</activity_factor>
                         <blade_twist units="deg">22.6</blade_twist>
