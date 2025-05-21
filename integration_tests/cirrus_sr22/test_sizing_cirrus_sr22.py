@@ -8,7 +8,6 @@ import logging
 
 import pytest
 
-import openmdao.api as om
 import fastoad.api as oad
 
 from utils.filter_residuals import filter_residuals
