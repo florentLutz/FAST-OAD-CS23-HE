@@ -2,7 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-FUEL_STORAGE_TYPES = ["fuel_tank", "gaseous_hydrogen_tank"]
-ELECTRICITY_STORAGE_TYPES = ["battery_pack"]
+SERVICE_COST_CERTIFICATION = "submodel.cost.production.certification"
 
+ELECTRICITY_STORAGE_TYPES = ["battery_pack"]
 DEFAULT_FUEL_UNIT_COST = {"jet_fuel": 2.967, "diesel": 1.977, "avgas": 3.66, "hydrogen": 6.54}

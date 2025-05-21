@@ -7,6 +7,7 @@ import pathlib
 import pytest
 import os.path as pth
 import openmdao.api as om
+import fastoad.api as oad
 
 from ..lcc import LCC
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -45,6 +46,8 @@ from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
 from ..lcc_leaarning_curve_factor import LCCLearningCurveFactor
 from ..lcc_leaarning_curve_discount import LCCLearningCurveDiscount
+
+from ..constants import SERVICE_COST_CERTIFICATION
 
 
 XML_FILE = "tbm_900_inputs.xml"
@@ -1118,6 +1121,8 @@ def test_cost_pipistrel():
         "pipistrel_source.xml",
     )
 
+    oad.RegisterSubmodel.active_models[SERVICE_COST_CERTIFICATION] = None
+
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         LCC(
@@ -1132,16 +1137,16 @@ def test_cost_pipistrel():
     ) == pytest.approx(3688.43, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        337912.0, rel=1e-3
+        237762.43, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        375082.32, rel=1e-3
+        263916.3, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(37085.4, rel=1e-3)
+    ) == pytest.approx(35973.7, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

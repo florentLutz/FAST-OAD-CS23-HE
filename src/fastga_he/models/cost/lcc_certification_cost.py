@@ -4,8 +4,15 @@
 
 import numpy as np
 import openmdao.api as om
+import fastoad.api as oad
+
+from .constants import SERVICE_COST_CERTIFICATION
 
 
+@oad.RegisterSubmodel(
+    SERVICE_COST_CERTIFICATION,
+    "fastga_he.submodel.cost.production.certification",
+)
 class LCCCertificationCost(om.ExplicitComponent):
     """
     Computation of the certification cost per aircraft from :cite:`gudmundsson:2013`.

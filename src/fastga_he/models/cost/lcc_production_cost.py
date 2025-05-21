@@ -3,6 +3,7 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
+import fastoad.api as oad
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 import fastga_he.models.propulsion.components as he_comp
 
@@ -18,7 +19,6 @@ from .lcc_material_cost import LCCMaterialCost
 from .lcc_flight_test_cost import LCCFlightTestCost
 from .lcc_avionics_cost import LCCAvionicsCost
 from .lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
-from .lcc_certification_cost import LCCCertificationCost
 from .lcc_msp import LCCMSP
 from .lcc_production_cost_sum import LCCSumProductionCost
 from .lcc_fuel_cost import LCCFuelCost
@@ -28,7 +28,7 @@ from .lcc_deliveray_duration_ratio import LCCDeliveryDurationRatio
 from .lcc_leaarning_curve_factor import LCCLearningCurveFactor
 from .lcc_leaarning_curve_discount import LCCLearningCurveDiscount
 
-from .constants import ELECTRICITY_STORAGE_TYPES
+from .constants import ELECTRICITY_STORAGE_TYPES, SERVICE_COST_CERTIFICATION
 
 
 class LCCProductionCost(om.Group):
@@ -127,7 +127,7 @@ class LCCProductionCost(om.Group):
         )
         self.add_subsystem(
             name="certification_cost_per_unit",
-            subsys=LCCCertificationCost(),
+            subsys=oad.RegisterSubmodel.get_submodel(SERVICE_COST_CERTIFICATION),
             promotes=["*"],
         )
         self.add_subsystem(

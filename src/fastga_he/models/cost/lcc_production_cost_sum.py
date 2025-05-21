@@ -69,7 +69,7 @@ class LCCSumProductionCost(om.ExplicitComponent):
         )
         self.add_input(
             "data:cost:production:certification_cost_per_unit",
-            val=np.nan,
+            val=0.0,
             units="USD",
             desc="Certification adjusted cost per aircraft",
         )
