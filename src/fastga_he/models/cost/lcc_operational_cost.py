@@ -140,7 +140,7 @@ class LCCOperationalCost(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            name="electric_energy_cost",
+            name="electricity_cost",
             subsys=LCCElectricityCost(
                 electricity_components_type=electricity_components_type,
                 electricity_components_name=electricity_components_name,

@@ -41,6 +41,21 @@ the cost is simply calculated by multiplying the number of man-hours (:math:`H_{
 5-year period, :math:`V_H` maximum cruise true airspeed in knots, :math:`Q_m` is the estimated aircraft production
 rate per month, and :math:`F` is the combination of factors based on aircraft design specifications detailed in :cite:`gudmundsson:2013`.
 
+Learning curve reduction
+************************
+As the manufacturing process matures with increasing production volume, both manufacturing and tooling man-hours are
+reduced. This reduction is modeled using a learning curve, characterized by a learning curve factor (:math:`x`) and a
+resulting man-hour reduction factor (:math:`\phi`). The learning curve factor is derived from the learning curve
+percentage (:math:`\theta`), which typically ranges between 90\% and 80\% in aircraft production, as noted by
+:cite:`bongers:2017`.
+
+.. math::
+
+    x = -5.64 + 1.44 \ln(\theta) \\
+    \phi = \left( \frac{N_{\text{made}}}{N} \right)^{x - 1}
+
+:math:`N_{\text{made}}` represents the number of similar aircraft already produced by the manufacturer.
+
 Cost of development support
 ***************************
 The indirect development labor cost, provided by :cite:`gudmundsson:2013`, includes items such as overheads, administration,
@@ -62,7 +77,6 @@ certification flight test.
 .. math::
 
     C_{\text{ft (\$)}} = 0.009646 \cdot M_{\text{airframe}}^{1.16} \cdot V_H^{1.3718} \cdot N_p^{1.281} \cdot CPI_{\text{2012}}
-
 
 Cost of quality control (QC)
 ****************************
@@ -96,7 +110,6 @@ support cost, flight test cost, and the tooling labor cost.
 .. math::
 
     C_{\text{certify (\$)}} =  C_{\text{eng}} + C_{\text{dev}} + C_{\text{ft}} + C_{\text{tool}}
-
 
 Powertrain production cost
 ==========================
@@ -317,8 +330,9 @@ power of the turboshaft engine at sea level.
 *********************
 Cost model structure
 *********************
-This diagram presents the structure of the LCC model using the TBM-900 as a support.
+The following diagrams present the structure of the LCC model using the TBM-900 and Pipistrel Velis Electro as support.
 
 .. raw:: html
 
    <a href="../../../../../n2/n2_tbm_900_lcc.html" target="_blank">LCC N2 diagram with TBM 900</a><br>
+   <a href="../../../../../n2/n2_pipistrel_electro_lcc.html" target="_blank">LCC N2 diagram with Pipistrel Velis Electro</a><br>
