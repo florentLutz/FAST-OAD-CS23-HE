@@ -189,12 +189,10 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        thrust_taxi_out = float(inputs["data:mission:sizing:taxi_out:thrust"])
-        thrust_taxi_in = float(inputs["data:mission:sizing:taxi_in:thrust"])
+        thrust_taxi_out = inputs["data:mission:sizing:taxi_out:thrust"]
+        thrust_taxi_in = inputs["data:mission:sizing:taxi_in:thrust"]
 
-        thrust_econ = np.concatenate(
-            (np.array([thrust_taxi_out]), inputs["thrust"], np.array([thrust_taxi_in]))
-        )
+        thrust_econ = np.concatenate((thrust_taxi_out, inputs["thrust"], thrust_taxi_in))
         if np.any(thrust_econ) < 50.0:
             thrust_econ = np.maximum(
                 thrust_econ,
@@ -216,8 +214,8 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
             (temp_sl, inputs["exterior_temperature"], temp_sl)
         )
 
-        time_step_taxi_out = float(inputs["data:mission:sizing:taxi_out:duration"])
-        time_step_taxi_in = float(inputs["data:mission:sizing:taxi_in:duration"])
+        time_step_taxi_out = inputs["data:mission:sizing:taxi_out:duration"]
+        time_step_taxi_in = inputs["data:mission:sizing:taxi_in:duration"]
         # Here we have to do an additional change. Since time step is computed for point i based
         # on time(i+1) - time(i) the last time step of climb will be computed with the first time
         # of cruise which means, since the cruise time step is very wide, that it will be very
@@ -227,13 +225,13 @@ class PrepareForEnergyConsumption(om.ExplicitComponent):
         # start of reserve.
         time_step = inputs["time_step"]
         outputs["time_step_econ"] = np.concatenate(
-            (np.array([time_step_taxi_out]), time_step, np.array([time_step_taxi_in]))
+            (time_step_taxi_out, time_step, time_step_taxi_in)
         )
 
-        tas_taxi_out = float(inputs["data:mission:sizing:taxi_out:speed"])
-        tas_taxi_in = float(inputs["data:mission:sizing:taxi_in:speed"])
+        tas_taxi_out = inputs["data:mission:sizing:taxi_out:speed"]
+        tas_taxi_in = inputs["data:mission:sizing:taxi_in:speed"]
         outputs["true_airspeed_econ"] = np.concatenate(
-            (np.array([tas_taxi_out]), inputs["true_airspeed"], np.array([tas_taxi_in]))
+            (tas_taxi_out, inputs["true_airspeed"], tas_taxi_in)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):

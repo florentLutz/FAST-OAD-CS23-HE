@@ -63,7 +63,7 @@ def test_airframe_lift():
             __file__,
             XML_FILE,
         )
-        ivc.add_output("cl_wing_clean", val=np.full(NB_POINTS_TEST, 0.6533), units="deg")
+        ivc.add_output("cl_wing_clean", val=np.full(NB_POINTS_TEST, 0.6533))
 
         # Run problem and check obtained value(s) is/(are) correct
         problem = run_system(

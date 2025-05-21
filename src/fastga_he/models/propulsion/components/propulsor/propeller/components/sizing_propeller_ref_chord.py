@@ -48,6 +48,7 @@ class SizingPropellerReferenceChord(om.ExplicitComponent):
         self.add_input(
             "data:aerodynamics:wing:low_speed:chord_vector",
             val=np.nan,
+            units="m",
             shape_by_conn=True,
             copy_shape="data:aerodynamics:wing:low_speed:Y_vector",
         )

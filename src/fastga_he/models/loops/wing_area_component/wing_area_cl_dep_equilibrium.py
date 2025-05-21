@@ -288,7 +288,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
         ivc.add_output(name="mass", val=np.array([mlw]), units="kg")
         # x_cg should be evaluated at the worst case scenario so either max aft or max fwd
         ivc.add_output(name="x_cg", val=np.array([cg_max_fwd]), units="m")
-        ivc.add_output(name="gamma", val=np.array([0.0]), units=None)
+        ivc.add_output(name="gamma", val=np.array([0.0]), units="deg")
         ivc.add_output(name="altitude", val=np.array([0.0]), units="m")
         ivc.add_output(name="density", val=Atmosphere(np.array([0.0])).density, units="kg/m**3")
         ivc.add_output(name="exterior_temperature", val=Atmosphere(0.0).temperature, units="degK")

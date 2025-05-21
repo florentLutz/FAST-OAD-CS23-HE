@@ -20,7 +20,7 @@ from openmdao.core.explicitcomponent import ExplicitComponent
 from openmdao.core.group import Group
 from stdatm import Atmosphere
 
-from .xfoil_polar import _DEFAULT_AIRFOIL_FILE, XfoilPolar
+from .xfoil_polar import _DEFAULT_AIRFOIL_FILE, XfoilPolarMod
 
 
 class XfoilGroup(Group):
@@ -37,7 +37,7 @@ class XfoilGroup(Group):
         )
         self.add_subsystem(
             "pre_xfoil_polar",
-            XfoilPolar(
+            XfoilPolarMod(
                 airfoil_folder_path=self.options["airfoil_folder_path"],
                 airfoil_file=self.options["airfoil_file"],
                 alpha_end=20.0,

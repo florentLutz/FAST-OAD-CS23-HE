@@ -8,7 +8,6 @@ import logging
 
 import pytest
 
-import openmdao.api as om
 import fastoad.api as oad
 
 from utils.filter_residuals import filter_residuals
@@ -43,14 +42,14 @@ def test_sizing_sr22(cleanup):
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_cirrus.html")
+    # n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_cirrus.html")
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
     problem.setup()
 
-    om.n2(problem, show_browser=False, outfile=n2_path)
+    # om.n2(problem, show_browser=False, outfile=n2_path)
 
     problem.run_model()
 

@@ -138,7 +138,7 @@ class ComputeSkinMass(om.ExplicitComponent):
         mach_interp = inputs["data:aerodynamics:aircraft:mach_interpolation:mach_vector"]
         v_interp = []
         for mach in mach_interp:
-            v_interp.append(float(mach * atm.speed_of_sound))
+            v_interp.append(mach * atm.speed_of_sound.item())
         cl_alpha_interp = inputs["data:aerodynamics:aircraft:mach_interpolation:CL_alpha_vector"]
         cl_alpha_fct = interp1d(
             v_interp, cl_alpha_interp, fill_value="extrapolate", kind="quadratic"

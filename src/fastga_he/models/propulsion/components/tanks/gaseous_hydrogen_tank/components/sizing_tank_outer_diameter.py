@@ -108,7 +108,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + gaseous_hydrogen_tank_id
                 + ":number_of_tank"
             ]
-            multi_tank_factor = 1 / MULTI_TANK_FACTOR.get(int(nb_tank))
+            multi_tank_factor = 1 / MULTI_TANK_FACTOR.get(int(nb_tank.item()))
         # multi_tank_factor divides the outer diameter with respect to the number of tanks.
         d_tank = (
             diameter_height_ratio
@@ -175,7 +175,7 @@ class SizingGaseousHydrogenTankOuterDiameter(om.ExplicitComponent):
                 + gaseous_hydrogen_tank_id
                 + ":number_of_tank"
             ]
-            multi_tank_factor = 1 / MULTI_TANK_FACTOR.get(int(nb_tank))
+            multi_tank_factor = 1 / MULTI_TANK_FACTOR.get(int(nb_tank.item()))
 
         d_tank = (
             diameter_height_ratio

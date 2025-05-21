@@ -155,11 +155,11 @@ class PowerTrainDistributedTanksFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        distributed_tanks_y_ratio_start = []
-        distributed_tanks_y_ratio_end = []
-        distributed_tanks_chord_start = []
-        distributed_tanks_chord_slope = []
-        distributed_tanks_masses = []
+        distributed_tanks_y_ratio_start = np.array([])
+        distributed_tanks_y_ratio_end = np.array([])
+        distributed_tanks_chord_start = np.array([])
+        distributed_tanks_chord_slope = np.array([])
+        distributed_tanks_masses = np.array([])
 
         for distributed_tank_name, distributed_tank_type in zip(
             self.curated_name_list, self.curated_type_list
@@ -200,11 +200,19 @@ class PowerTrainDistributedTanksFromFile(om.ExplicitComponent):
                 + ":fuel_total_mission"
             )
 
-            distributed_tanks_y_ratio_start.append(float(inputs[y_ratio_start_name]))
-            distributed_tanks_y_ratio_end.append(float(inputs[y_ratio_end_name]))
-            distributed_tanks_chord_start.append(float(inputs[chord_start_name]))
-            distributed_tanks_chord_slope.append(float(inputs[chord_slope_name]))
-            distributed_tanks_masses.append(float(inputs[mass_name]))
+            distributed_tanks_y_ratio_start = np.append(
+                distributed_tanks_y_ratio_start, inputs[y_ratio_start_name]
+            )
+            distributed_tanks_y_ratio_end = np.append(
+                distributed_tanks_y_ratio_end, inputs[y_ratio_end_name]
+            )
+            distributed_tanks_chord_start = np.append(
+                distributed_tanks_chord_start, inputs[chord_start_name]
+            )
+            distributed_tanks_chord_slope = np.append(
+                distributed_tanks_chord_slope, inputs[chord_slope_name]
+            )
+            distributed_tanks_masses = np.append(distributed_tanks_masses, inputs[mass_name])
 
         outputs["data:weight:airframe:wing:distributed_tanks:y_ratio_start"] = (
             distributed_tanks_y_ratio_start

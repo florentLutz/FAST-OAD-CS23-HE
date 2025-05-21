@@ -63,6 +63,7 @@ class SizingFuelTankLength(om.ExplicitComponent):
             )
             self.add_input(
                 "data:aerodynamics:wing:low_speed:chord_vector",
+                units="m",
                 val=np.nan,
                 shape_by_conn=True,
                 copy_shape="data:aerodynamics:wing:low_speed:Y_vector",

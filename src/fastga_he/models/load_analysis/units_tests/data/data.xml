@@ -741,7 +741,7 @@
             <y_ratio>0.34</y_ratio>
           </punctual_mass>
           <punctual_tanks>
-            <fuel_inside>0.0</fuel_inside>
+            <fuel_inside units="kg">0.0</fuel_inside>
             <y_ratio>0.0</y_ratio>
           </punctual_tanks>
           <distributed_mass>
