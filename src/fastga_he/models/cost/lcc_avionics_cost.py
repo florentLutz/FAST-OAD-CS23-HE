@@ -8,7 +8,8 @@ import openmdao.api as om
 
 class LCCAvionicsCost(om.ExplicitComponent):
     """
-    Computation of the avionics cost as obtained from :cite:`gudmundsson:2013`.
+    Computation of the avionics cost and the default cost are obtained from
+    :cite:`gudmundsson:2013`.
     """
 
     def setup(self):
@@ -16,6 +17,11 @@ class LCCAvionicsCost(om.ExplicitComponent):
             "data:cost:cpi_2012",
             val=np.nan,
             desc="Consumer price index relative to the year 2012",
+        )
+        self.add_input(
+            "data:cost:production:avionics",
+            val=15000.0,
+            desc="Default avionics cost based on the USD of 2022",
         )
 
         self.add_output(
@@ -25,11 +31,18 @@ class LCCAvionicsCost(om.ExplicitComponent):
             desc="Avionics adjusted cost per aircraft",
         )
 
-        self.declare_partials(
-            of="data:cost:production:avionics_cost_per_unit", wrt="data:cost:cpi_2012", val=15000.0
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:production:avionics_cost_per_unit"] = (
-            15000.0 * inputs["data:cost:cpi_2012"]
+            inputs["data:cost:production:avionics"] * inputs["data:cost:cpi_2012"]
         )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        partials["data:cost:production:avionics_cost_per_unit", "data:cost:production:avionics"] = (
+            inputs["data:cost:cpi_2012"]
+        )
+
+        partials["data:cost:production:avionics_cost_per_unit", "data:cost:cpi_2012"] = inputs[
+            "data:cost:production:avionics"
+        ]
