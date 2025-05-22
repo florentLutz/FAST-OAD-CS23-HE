@@ -25,8 +25,8 @@ from .lcc_fuel_cost import LCCFuelCost
 from .lcc_electricity_cost import LCCElectricityCost
 from .lcc_delivery_cost import LCCDeliveryCost
 from .lcc_deliveray_duration_ratio import LCCDeliveryDurationRatio
-from .lcc_leaarning_curve_factor import LCCLearningCurveFactor
-from .lcc_leaarning_curve_discount import LCCLearningCurveDiscount
+from .lcc_learning_curve_factor import LCCLearningCurveFactor
+from .lcc_learning_curve_discount import LCCLearningCurveDiscount
 
 from .constants import ELECTRICITY_STORAGE_TYPES, SERVICE_COST_CERTIFICATION
 

@@ -44,8 +44,8 @@ from ..lcc_electricity_cost import LCCElectricityCost
 from ..lcc_annual_energy_cost import LCCAnnualEnergyCost
 from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
-from ..lcc_leaarning_curve_factor import LCCLearningCurveFactor
-from ..lcc_leaarning_curve_discount import LCCLearningCurveDiscount
+from ..lcc_learning_curve_factor import LCCLearningCurveFactor
+from ..lcc_learning_curve_discount import LCCLearningCurveDiscount
 
 from ..constants import SERVICE_COST_CERTIFICATION
 
