@@ -21,7 +21,7 @@ class LCCLearningCurveDiscount(om.ExplicitComponent):
         self.add_input(
             "data:cost:production:similar_aircraft_made",
             val=1.0,
-            desc="The amount of similar models of aircraft produced by the manufacturer",
+            desc="The number of similar models of aircraft produced by the manufacturer",
         )
         self.add_input(
             "data:cost:production:number_aircraft_5_years",

@@ -1,5 +1,5 @@
 """
-Constants applied in aircraft Life Cycle Cost (cost) assessment
+Python module for constants applied in aircraft Life Cycle Cost (cost) assessment and submodels/service naming strings
 """
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.

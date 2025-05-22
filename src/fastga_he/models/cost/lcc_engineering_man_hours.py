@@ -40,7 +40,7 @@ class LCCEngineeringManHours(om.ExplicitComponent):
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
-        self.declare_partials("*", "data:geometry:flap_type", method="fd")
+        self.declare_partials(of="*", wrt="data:geometry:flap_type", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         if inputs["data:geometry:flap_type"] != 0.0:

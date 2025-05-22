@@ -25,7 +25,7 @@ between 2012 and today.
 Aircraft production cost
 ========================
 
-Cost of engineering, toolong, and manufacturing
+Cost of engineering, tooling, and manufacturing
 ***********************************************
 The cost of the engineering labor, tooling labor, and manufacturing labor share a similar computation structure. It begins
 with estimating the total man-hours required for the development process for the first 5-year production period. Then,
@@ -87,7 +87,7 @@ cost of technicians and the cost of equipments.
 
     C_{\text{QC (\$)}} = 0.13 * C_{\text{MFG}} * (1 + 0.5f_{\text{comp}})
 
-:math:`C_{\text{MFG}}` is the manufacturing cost of a 5-year period and :math:`f_{\text{comp}}` is the
+:math:`C_{\text{MFG}}` is the manufacturing cost on a 5-year period and :math:`f_{\text{comp}}` is the
 proportion of the airframe made of composite material.
 
 Cost of materials
@@ -163,7 +163,7 @@ The battery purchase cost is modeled with power regression from :cite:`Wesley:20
     C_{\text{bat (\$)}} = 1.08 \cdot C_{2022} \cdot E_{\text{bat}} \cdot Y_{2022}^{-0.228}
 
 :math:`C_{2022}` is the energy per dollar of battery in 2022, :math:`E_{bat}` is the maximum energy supply from battery,
-and :math:`Y_{2022}` is the amount of years since 2022.
+and :math:`Y_{2022}` is the number of years since 2022.
 
 DC cable purchase cost
 **********************
@@ -177,7 +177,7 @@ in :ref:`assumptions <assumptions-lcc>`.
 
 Where :math:`n \in \{\text{core, insulation, shield, sheath}\}`
 
-Inverter/ DC-DC converter purchase cost
+Inverter/DC-DC converter purchase cost
 ***************************************
 The purchase cost of power electronics is obtained from regression model based on the retail price of
 `MidContinent <https://www.mcico.com/truebluepower>`_ and other products suggested by

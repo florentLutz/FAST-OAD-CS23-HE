@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesDCPowerIn(om.ExplicitComponent):
     """
-    Component of the  power of the DC-DC converter from the input side.
+    Component of the power of the DC-DC converter on the input side.
     """
 
     def initialize(self):
