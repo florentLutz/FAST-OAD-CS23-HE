@@ -88,19 +88,16 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
         t_sheath = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
         ]
-
         cost_core = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume"
         ]
         length = inputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length"]
-
         cost_ins = 86000.0  # USD/m^3
 
         c_conductor = np.pi * cost_core * (r_c**2.0)
         c_i = np.pi * cost_ins * ((2.0 * r_c + t_in) * t_in)
         c_shield = np.pi * cost_core * ((2.0 * (r_c + t_in) + t_shield) * t_shield)
         c_sheath = np.pi * cost_ins * ((2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath)
-
         c_cable = (c_conductor + c_i + c_shield + c_sheath) * length
 
         outputs[
@@ -113,7 +110,6 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
         output_str = (
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":purchase_cost"
         )
-
         r_c = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius"
         ]
@@ -128,13 +124,10 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
         t_sheath = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
         ]
-
         length = inputs["data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":length"]
-
         cost_core = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":cost_per_volume"
         ]
-
         cost_ins = 86000.0  # USD/m^3
 
         c_conductor = np.pi * cost_core * (r_c**2.0)
@@ -156,6 +149,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             * length
             * (cost_core * r_c + cost_ins * t_in + cost_core * t_shield + cost_ins * t_sheath)
         ) / (1.0 - GROSS_MARGIN)
+
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:"
@@ -168,6 +162,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             * (cost_ins * (t_in + r_c) + cost_core * t_shield + cost_ins * t_sheath)
             / (1.0 - GROSS_MARGIN)
         )
+
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
@@ -178,6 +173,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             * (cost_core * (t_shield + r_c + t_in) + cost_ins * t_sheath)
             / (1.0 - GROSS_MARGIN)
         )
+
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",

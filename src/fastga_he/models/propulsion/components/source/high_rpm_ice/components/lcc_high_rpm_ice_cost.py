@@ -64,6 +64,7 @@ class LCCHighRPMICECost(om.ExplicitComponent):
             "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":purchase_cost",
             "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_max_SL",
         ] = 174.0 * inputs["data:cost:cpi_2012"]
+
         partials[
             "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":purchase_cost",
             "data:cost:cpi_2012",

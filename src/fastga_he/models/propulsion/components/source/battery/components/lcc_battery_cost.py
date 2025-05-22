@@ -58,13 +58,11 @@ class LCCBatteryPackCost(om.ExplicitComponent):
         cost_22 = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_median_2022"
         ]
-
         energy = inputs[
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":energy_consumed_mission"
         ]
-
         num_year = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_since_2022"
         ]
@@ -75,16 +73,15 @@ class LCCBatteryPackCost(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         battery_pack_id = self.options["battery_pack_id"]
+
         cost_22 = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cost_median_2022"
         ]
-
         energy = inputs[
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":energy_consumed_mission"
         ]
-
         num_year = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":years_since_2022"
         ]

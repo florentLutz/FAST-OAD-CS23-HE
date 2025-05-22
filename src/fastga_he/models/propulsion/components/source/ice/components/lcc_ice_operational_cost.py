@@ -45,6 +45,7 @@ class LCCICEOperationalCost(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         ice_id = self.options["ice_id"]
+
         volume = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume"]
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 
@@ -56,6 +57,7 @@ class LCCICEOperationalCost(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         ice_id = self.options["ice_id"]
+
         volume = inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":displacement_volume"]
         flight_hour = inputs["data:TLAR:flight_hours_per_year"]
 

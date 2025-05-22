@@ -55,6 +55,7 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost",
         ] = 1 / inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan"]
+
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":lifespan",

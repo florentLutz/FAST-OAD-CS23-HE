@@ -61,6 +61,7 @@ class LCCTurboshaftCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":purchase_cost",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
         ] = 377.4 * inputs["data:cost:cpi_2012"]
+
         partials[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":purchase_cost",
             "data:cost:cpi_2012",

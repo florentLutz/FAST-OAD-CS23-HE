@@ -49,28 +49,33 @@ class LCCTurboshaftOperationalCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         turboshaft_id = self.options["turboshaft_id"]
 
-        flight_hour = inputs["data:TLAR:flight_hours_per_year"]
-        power_rating = inputs[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"
-        ]
-
         outputs[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":operational_cost"
-        ] = flight_hour / 3.5 * (0.202 * power_rating + 259.0)
+        ] = (
+            inputs["data:TLAR:flight_hours_per_year"]
+            / 3.5
+            * (
+                0.202
+                * inputs[
+                    "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"
+                ]
+                + 259.0
+            )
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         turboshaft_id = self.options["turboshaft_id"]
 
-        flight_hour = inputs["data:TLAR:flight_hours_per_year"]
-        power_rating = inputs[
-            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"
-        ]
-
         partials[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":operational_cost",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
-        ] = 0.202 * flight_hour / 3.5
+        ] = 0.202 * inputs["data:TLAR:flight_hours_per_year"] / 3.5
+
         partials[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = (0.202 * power_rating + 259.0) / 3.5
+        ] = (
+            0.202
+            * inputs["data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"]
+            + 259.0
+        ) / 3.5

@@ -45,28 +45,26 @@ class LCCDCSSPCCost(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_sspc_id = self.options["dc_sspc_id"]
-        current = inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"]
-        price_factor = inputs[
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":price_factor"
-        ]
 
-        outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost"] = (
-            price_factor * (1.21 * current + 83.8)
+        outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost"] = inputs[
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":price_factor"
+        ] * (
+            1.21 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"]
+            + 83.8
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         dc_sspc_id = self.options["dc_sspc_id"]
-        current = inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"]
-        price_factor = inputs[
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":price_factor"
-        ]
 
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max",
-        ] = 1.21 * price_factor
+        ] = 1.21 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":price_factor"]
 
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":price_factor",
-        ] = 1.21 * current + 83.8
+        ] = (
+            1.21 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"]
+            + 83.8
+        )

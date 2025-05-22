@@ -45,17 +45,21 @@ class LCCDCDCConverterCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
-        power = inputs[
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":power_rating_max"
-        ]
-
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":purchase_cost"
-        ] = 733.0 * np.log(power) + 2295.0
+        ] = (
+            733.0
+            * np.log(
+                inputs[
+                    "data:propulsion:he_power_train:DC_DC_converter:"
+                    + dc_dc_converter_id
+                    + ":power_rating_max"
+                ]
+            )
+            + 2295.0
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]

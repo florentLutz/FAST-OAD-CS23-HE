@@ -64,6 +64,7 @@ class LCCPropellerCost(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         propeller_id = self.options["propeller_id"]
+
         cpi_2012 = inputs["data:cost:cpi_2012"]
         shaft_power_max = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":shaft_power_in_max"
@@ -89,6 +90,7 @@ class LCCPropellerCost(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]
+
         cpi_2012 = inputs["data:cost:cpi_2012"]
         shaft_power_max = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":shaft_power_in_max"

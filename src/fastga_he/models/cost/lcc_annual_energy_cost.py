@@ -57,6 +57,7 @@ class LCCAnnualEnergyCost(om.ExplicitComponent):
         outputs["data:cost:operation:annual_fuel_cost"] = (
             inputs["data:TLAR:flight_per_year"] * inputs["data:cost:fuel_cost"]
         )
+
         outputs["data:cost:operation:annual_electricity_cost"] = (
             inputs["data:TLAR:flight_per_year"] * inputs["data:cost:electricity_cost"]
         )

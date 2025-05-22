@@ -35,6 +35,7 @@ class LCCGeneratorCost(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         generator_id = self.options["generator_id"]
+
         power_max = inputs[
             "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_max"
         ]
@@ -45,6 +46,7 @@ class LCCGeneratorCost(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         generator_id = self.options["generator_id"]
+
         power_max = inputs[
             "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_max"
         ]

@@ -55,6 +55,7 @@ class LCCDailyParkingCost(om.ExplicitComponent):
             partials["data:cost:operation:daily_parking_cost", "data:weight:aircraft:MTOW"] = (
                 inputs["data:cost:operation:parking_fee_per_ton"]
             )
+
             partials[
                 "data:cost:operation:daily_parking_cost", "data:cost:operation:parking_fee_per_ton"
             ] = inputs["data:weight:aircraft:MTOW"]
