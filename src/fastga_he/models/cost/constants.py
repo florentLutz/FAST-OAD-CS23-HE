@@ -8,4 +8,6 @@ Python module for constants applied in aircraft Life Cycle Cost (cost) assessmen
 SERVICE_COST_CERTIFICATION = "submodel.cost.production.certification"
 
 ELECTRICITY_STORAGE_TYPES = ["battery_pack"]
+#The unit of the fuel unit cost is USD/kg
 DEFAULT_FUEL_UNIT_COST = {"jet_fuel": 2.967, "diesel": 1.977, "avgas": 3.66, "hydrogen": 6.54}
+
