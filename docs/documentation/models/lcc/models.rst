@@ -273,9 +273,6 @@ MTOW (Tons)                    Daily parking cost (€)            Landing cost 
 
    </div>
 
-The :math:`MTOW` of the aircraft is in tons for the parking cost table.
-
-
 Fuel cost
 *********
 Fuel cost estimations are obtained from :cite:`sens:2024` and `Orleans loire-valley airport <https://orleans.aeroport.fr>`_.
