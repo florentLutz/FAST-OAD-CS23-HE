@@ -179,12 +179,13 @@ Where :math:`n \in \{\text{core, insulation, shield, sheath}\}`
 
 Inverter/ DC-DC converter purchase cost
 ***************************************
-The purchase cost of power electronics is obtained from logarithmic regression based on the retail price of
-`MidContinent <https://www.mcico.com/truebluepower>`_.
+The purchase cost of power electronics is obtained from regression model based on the retail price of
+`MidContinent <https://www.mcico.com/truebluepower>`_ and other products suggested by
+`the list from EMRAX <https://emrax.com/wp-content/uploads/2020/03/recommended_controllers_for_emrax_motors_5.3.xlsx>`_.
 
 .. math::
 
-    C_{\text{inverter (\$)}} = 2167 \cdot \ln{P_{inv}} + 6910 \\
+    C_{\text{inverter (\$)}} = 4666 \cdot P_{inv}^{0.0928} \\
     C_{\text{converter (\$)}} = 733 \cdot \ln{P_{con}} + 2295
 
 :math:`P_{inv}` is the inverter power rating and :math:`P_{con}` is the converter power rating.
@@ -218,12 +219,12 @@ costs are estimated as an annual fraction of their purchase price.
 Annual maintenance & miscellaneous cost
 ***************************************
 These cost models are based on a regression derived from data from
-`Guardianjet <https://www.guardianjet.com/jet-aircraft-online-tools>`_.
+`Guardianjet <https://www.guardianjet.com/jet-aircraft-online-tools>`_ and `PLANEPHD <https://planephd.com/wizard/>`_.
 
 .. math::
 
-    C_{\text{maintenance (\$)}} =  FH_{\text{year}} \cdot \left(331 - 0.072 \cdot \text{OWE} + 2.75 \times 10^{-5} \cdot \text{OWE}^2\right) \\
-    C_{\text{miscellaneous (\$)}} = 80 \cdot FH_{\text{year}}
+    C_{\text{maintenance (\$)}} =  FH_{\text{year}} \cdot \left(0.147 \cdot OWE - 49.2 \right) \\
+    C_{\text{miscellaneous (\$)}} = FH_{\text{year}} \cdot \left(0.0459 \cdot OWE - 22.8 \right)
 
 Annual loan cost
 ****************
