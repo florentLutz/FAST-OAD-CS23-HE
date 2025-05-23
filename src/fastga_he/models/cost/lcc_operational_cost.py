@@ -40,7 +40,6 @@ class LCCOperationalCost(om.Group):
             desc="Path to the file containing the description of the powertrain",
             allow_none=False,
         )
-
         self.options.declare(
             name="loan",
             default=True,

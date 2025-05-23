@@ -35,7 +35,7 @@ class LCCManufacturingCost(om.ExplicitComponent):
         self.add_input(
             "data:cost:production:maturity_discount",
             val=1.0,
-            desc="The discount rate in manufacturing and tooling bsed on process maturity",
+            desc="The discount factor in manufacturing and tooling bsed on process maturity",
         )
 
         self.add_output(

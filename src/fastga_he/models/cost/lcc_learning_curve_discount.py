@@ -9,14 +9,17 @@ import openmdao.api as om
 class LCCLearningCurveDiscount(om.ExplicitComponent):
     """
     Computation of the aircraft production learning curve discount for tooling and manufacturing.
-    The computation is obtained from http://www.ae.metu.edu.tr/~ae452sc2/lecture8_cost.pdf.
+    The computation is obtained from http://www.ae.metu.edu.tr/~ae452sc2/lecture8_cost.pdf. The
+    learning curve percentage falls between 80% to 90% based on the results from
+    :cite:`bongers:2017`.
     """
 
     def setup(self):
         self.add_input(
-            "data:cost:production:learning_curve_factor",
-            val=1.0,
-            desc="Learning curve factor for defining the man hours discount curve",
+            "data:cost:production:learning_curve_percentage",
+            val=85.0,
+            units="percent",
+            desc="The percentage decrease in unit production cost after extensive learning",
         )
         self.add_input(
             "data:cost:production:similar_aircraft_made",
@@ -32,7 +35,7 @@ class LCCLearningCurveDiscount(om.ExplicitComponent):
         self.add_output(
             "data:cost:production:maturity_discount",
             val=1.0,
-            desc="The discount rate in manufacturing and tooling bsed on process maturity",
+            desc="The discount factor in manufacturing and tooling bsed on process maturity",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
@@ -41,12 +44,12 @@ class LCCLearningCurveDiscount(om.ExplicitComponent):
         outputs["data:cost:production:maturity_discount"] = (
             inputs["data:cost:production:similar_aircraft_made"]
             / inputs["data:cost:production:number_aircraft_5_years"]
-        ) ** (inputs["data:cost:production:learning_curve_factor"] - 1.0)
+        ) ** (np.log2(0.02 * inputs["data:cost:production:learning_curve_percentage"]) - 1.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         aircraft_made = inputs["data:cost:production:similar_aircraft_made"]
         aircraft_planned = inputs["data:cost:production:number_aircraft_5_years"]
-        factor = inputs["data:cost:production:learning_curve_factor"]
+        factor = np.log2(0.02 * inputs["data:cost:production:learning_curve_percentage"])
 
         partials[
             "data:cost:production:maturity_discount",
@@ -60,7 +63,9 @@ class LCCLearningCurveDiscount(om.ExplicitComponent):
 
         partials[
             "data:cost:production:maturity_discount",
-            "data:cost:production:learning_curve_factor",
-        ] = np.log(aircraft_made / aircraft_planned) * (aircraft_made / aircraft_planned) ** (
-            factor - 1.0
+            "data:cost:production:learning_curve_percentage",
+        ] = (
+            (aircraft_made / aircraft_planned) ** (factor - 1.0)
+            * np.log(aircraft_made / aircraft_planned)
+            / (inputs["data:cost:production:learning_curve_percentage"] * np.log(2.0))
         )

@@ -1277,9 +1277,6 @@ def test_ac_power_out():
         units="A",
     )
 
-    # Won't be representative since the modulation index used for the computation of the losses
-    # is not equal to the modulation index computed based on bus voltage
-    # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesACPowerOut(number_of_points=NB_POINTS_TEST),
         ivc,

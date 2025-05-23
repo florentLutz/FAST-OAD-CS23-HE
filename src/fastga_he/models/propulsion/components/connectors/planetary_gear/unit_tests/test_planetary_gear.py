@@ -28,7 +28,7 @@ from ..components.sizing_cg_x import SizingPlanetaryGearCGX
 from ..components.sizing_cg_y import SizingPlanetaryGearCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAPlanetaryGearProdWeightPerFU
-from ..components.lcc_planatary_gear_cost import LCCPlanetaryGearCost
+from ..components.lcc_planetary_gear_cost import LCCPlanetaryGearCost
 
 from ..components.perf_planetary_gear import PerformancesPlanetaryGear
 from ..components.sizing_planetary_gear import SizingPlanetaryGear

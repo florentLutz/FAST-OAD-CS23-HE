@@ -44,7 +44,6 @@ from ..lcc_electricity_cost import LCCElectricityCost
 from ..lcc_annual_energy_cost import LCCAnnualEnergyCost
 from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
-from ..lcc_learning_curve_factor import LCCLearningCurveFactor
 from ..lcc_learning_curve_discount import LCCLearningCurveDiscount
 
 from ..constants import SERVICE_COST_CERTIFICATION
@@ -384,26 +383,9 @@ def test_landing_gear_cost_reduction():
     problem.check_partials(compact_print=True)
 
 
-def test_learning_curve_factor():
-    ivc = om.IndepVarComp()
-    ivc.add_output("data:cost:production:learning_curve_percentage", units="percent", val=85.0)
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        LCCLearningCurveFactor(),
-        ivc,
-    )
-
-    assert problem.get_val("data:cost:production:learning_curve_factor") == pytest.approx(
-        0.757, rel=1e-3
-    )
-
-    problem.check_partials(compact_print=True)
-
-
 def test_learning_curve_discount():
     ivc = om.IndepVarComp()
-    ivc.add_output("data:cost:production:learning_curve_factor", val=0.757)
+    ivc.add_output("data:cost:production:learning_curve_percentage", units="percent", val=85.0)
     ivc.add_output("data:cost:production:similar_aircraft_made", val=1500.0)
     ivc.add_output("data:cost:production:number_aircraft_5_years", val=50.0)
 
@@ -414,7 +396,7 @@ def test_learning_curve_discount():
     )
 
     assert problem.get_val("data:cost:production:maturity_discount") == pytest.approx(
-        0.4376, rel=1e-3
+        0.4504, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1137,11 +1119,11 @@ def test_cost_pipistrel():
     ) == pytest.approx(3688.43, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        237762.43, rel=1e-3
+        240732.0, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        263916.3, rel=1e-3
+        267212.5, rel=1e-3
     )
 
     assert problem.get_val(

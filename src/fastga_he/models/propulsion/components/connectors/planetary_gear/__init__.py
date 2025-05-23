@@ -9,4 +9,4 @@ from .components.sizing_planetary_gear import SizingPlanetaryGear
 from .components.perf_planetary_gear import PerformancesPlanetaryGear
 from .components.slipstream_planetary_gear import SlipstreamPlanetaryGear
 from .components.pre_lca_planetary_gear import PreLCAPlanetaryGear
-from .components.lcc_planatary_gear_cost import LCCPlanetaryGearCost
+from .components.lcc_planetary_gear_cost import LCCPlanetaryGearCost

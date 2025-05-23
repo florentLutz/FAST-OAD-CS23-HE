@@ -104,7 +104,7 @@ class PerformancesDCDCConverter(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "power_rating",
+            "dc_power_in",
             PerformancesDCPowerIn(number_of_points=number_of_points),
             promotes=["*"],
         )

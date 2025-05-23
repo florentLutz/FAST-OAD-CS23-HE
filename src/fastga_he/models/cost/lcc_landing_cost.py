@@ -52,6 +52,8 @@ class LCCLandingCost(om.ExplicitComponent):
         mtow = inputs["data:weight:aircraft:MTOW"]
         vat = inputs["data:cost:operation:airport_charge_VAT"]
 
+        partials["data:cost:operation:landing_cost", "data:weight:aircraft:MTOW"] = 0.0
+
         if mtow >= 7.0:
             partials["data:cost:operation:landing_cost", "data:weight:aircraft:MTOW"] = 0.56 * (
                 1.0 + vat
