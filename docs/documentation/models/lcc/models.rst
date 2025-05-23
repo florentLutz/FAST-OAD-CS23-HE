@@ -180,8 +180,8 @@ Where :math:`n \in \{\text{core, insulation, shield, sheath}\}`
 Inverter/DC-DC converter purchase cost
 ***************************************
 The purchase cost of power electronics is obtained from regression model based on the retail price of
-`MidContinent <https://www.mcico.com/truebluepower>`_ and other products suggested by
-`the list from EMRAX <https://emrax.com/wp-content/uploads/2020/03/recommended_controllers_for_emrax_motors_5.3.xlsx>`_.
+`MidContinent <https://www.mcico.com/truebluepower>`_ and other products suggested for
+`the EMRAX electric motors <https://emrax.com/wp-content/uploads/2020/03/recommended_controllers_for_emrax_motors_5.3.xlsx>`_.
 
 .. math::
 
