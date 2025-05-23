@@ -8,10 +8,10 @@ import openmdao.api as om
 
 class LCCLearningCurveDiscount(om.ExplicitComponent):
     """
-    Computation of the aircraft production learning curve discount for tooling and manufacturing.
-    The computation is obtained from http://www.ae.metu.edu.tr/~ae452sc2/lecture8_cost.pdf. The
-    learning curve percentage falls between 80% to 90% based on the results from
-    :cite:`bongers:2017`.
+    Computation of the aircraft production learning curve discount factor for tooling and
+    manufacturing. The computation is obtained from
+    http://www.ae.metu.edu.tr/~ae452sc2/lecture8_cost.pdf. The learning curve percentage falls
+    between 80% to 90% based on the results from :cite:`bongers:2017`.
     """
 
     def setup(self):
