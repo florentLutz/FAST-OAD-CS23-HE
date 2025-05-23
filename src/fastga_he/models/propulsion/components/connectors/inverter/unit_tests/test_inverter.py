@@ -1409,7 +1409,7 @@ def test_maximum():
         "data:propulsion:he_power_train:inverter:inverter_1:voltage_dc_max", units="V"
     ) == pytest.approx(1000.5, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:inverter:inverter_1:power_ac_out_max", units="kW"
+        "data:propulsion:he_power_train:inverter:inverter_1:ac_power_out_max", units="kW"
     ) == pytest.approx(1090.65, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:igbt:temperature_max", units="degK"
@@ -1511,7 +1511,7 @@ def test_weight_per_fu():
 def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        name="data:propulsion:he_power_train:inverter:inverter_1:power_ac_out_max",
+        name="data:propulsion:he_power_train:inverter:inverter_1:ac_power_out_max",
         val=200.0,
         units="kW",
     )

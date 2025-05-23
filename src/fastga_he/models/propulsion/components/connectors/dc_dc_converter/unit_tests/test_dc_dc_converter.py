@@ -1335,7 +1335,7 @@ def test_maximum():
         units="W",
     ) == pytest.approx(4967.6, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:power_dc_in_max",
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dc_power_in_max",
         units="kW",
     ) == pytest.approx(364.0, rel=1e-2)
     assert problem.get_val(
@@ -1371,7 +1371,7 @@ def test_cost():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:power_rating_max",
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dc_power_in_max",
         364.0,
         units="kW",
     )

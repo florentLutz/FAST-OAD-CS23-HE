@@ -136,13 +136,13 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max",
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
             units="kW",
             val=0.2,
             desc="Maximum value of the output side",
         )
         self.declare_partials(
-            of="data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max",
+            of="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
             wrt="ac_power_out",
             method="exact",
             rows=np.zeros(number_of_points),
@@ -244,7 +244,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_dc_max"] = (
             np.max(inputs["dc_voltage_in"])
         )
-        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max"] = (
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max"] = (
             np.max(inputs["ac_power_out"])
         )
         outputs[
@@ -293,7 +293,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             "dc_voltage_in",
         ] = np.where(inputs["dc_voltage_in"] == np.max(inputs["dc_voltage_in"]), 1.0, 0.0)
         partials[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":power_ac_out_max",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
             "ac_power_out",
         ] = np.where(inputs["ac_power_out"] == np.max(inputs["ac_power_out"]), 1.0, 0.0)
         partials[

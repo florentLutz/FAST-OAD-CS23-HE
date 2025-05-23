@@ -584,7 +584,7 @@
             <losses_max units="W" is_input="False">1020.3721626776777</losses_max>
             <mass units="kg" is_input="False">4.110404807480042<!--Mass of the inverter--></mass>
             <modulation_idx_max is_input="False">1.5157890158251377<!--Maximum modulation index during the mission--></modulation_idx_max>
-            <power_ac_out_max units="kW" is_input="False">57.140888375996326<!--Maximum value of the output side--></power_ac_out_max>
+            <ac_power_out_max units="kW" is_input="False">57.140888375996326<!--Maximum value of the output side--></ac_power_out_max>
             <power_density units="kW/kg" is_input="False">17.03766130255721<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
