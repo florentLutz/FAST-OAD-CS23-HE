@@ -24,7 +24,7 @@ class LCCDeliveryDurationRatio(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:cost:production:delivery_duration_ratio",
+            name="data:cost:production:delivery:mission_ratio",
             val=0.5,
             desc="Ratio between the delivery flight duration and the sizing mission duration",
         )
@@ -32,17 +32,17 @@ class LCCDeliveryDurationRatio(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:production:delivery_duration_ratio"] = (
+        outputs["data:cost:production:delivery:mission_ratio"] = (
             inputs["data:cost:production:delivery_duration"]
             / inputs["data:mission:sizing:duration"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         partials[
-            "data:cost:production:delivery_duration_ratio", "data:cost:production:delivery_duration"
+            "data:cost:production:delivery:mission_ratio", "data:cost:production:delivery_duration"
         ] = 1.0 / inputs["data:mission:sizing:duration"]
 
-        partials["data:cost:production:delivery_duration_ratio", "data:mission:sizing:duration"] = (
+        partials["data:cost:production:delivery:mission_ratio", "data:mission:sizing:duration"] = (
             -inputs["data:cost:production:delivery_duration"]
             / inputs["data:mission:sizing:duration"] ** 2.0
         )
