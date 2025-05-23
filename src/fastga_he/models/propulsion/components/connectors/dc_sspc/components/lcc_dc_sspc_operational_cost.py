@@ -33,7 +33,7 @@ class LCCDCSSPCOperationalCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":lifespan",
             val=10.0,
             units="yr",
-            desc="Maximum current flowing through the SSPC",
+            desc="Expected lifespan of the DC SSPC electronic",
         )
 
         self.add_output(
