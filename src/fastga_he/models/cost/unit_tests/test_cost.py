@@ -833,8 +833,8 @@ def test_fuel_cost():
 
 
 def test_electricity_cost():
-    components_type = ["battery_pack", "battery_pack"]
-    components_name = ["battery_pack_1", "battery_pack_2"]
+    components_types = ["battery_pack", "battery_pack"]
+    components_names = ["battery_pack_1", "battery_pack_2"]
 
     ivc = om.IndepVarComp()
 
@@ -852,7 +852,8 @@ def test_electricity_cost():
 
     problem = run_system(
         LCCElectricityCost(
-            electricity_components_type=components_type, electricity_components_name=components_name
+            electricity_components_types=components_types,
+            electricity_components_names=components_names,
         ),
         ivc,
     )
@@ -1128,7 +1129,7 @@ def test_cost_pipistrel():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(37179.9, rel=1e-3)
+    ) == pytest.approx(32520.05, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

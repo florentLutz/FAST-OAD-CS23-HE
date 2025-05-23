@@ -27,7 +27,7 @@ from .lcc_delivery_cost import LCCDeliveryCost
 from .lcc_deliveray_duration_ratio import LCCDeliveryDurationRatio
 from .lcc_learning_curve_discount import LCCLearningCurveDiscount
 
-from .constants import ELECTRICITY_STORAGE_TYPES, SERVICE_COST_CERTIFICATION
+from .constants import SERVICE_COST_CERTIFICATION
 
 
 class LCCProductionCost(om.Group):
@@ -135,8 +135,7 @@ class LCCProductionCost(om.Group):
 
         cost_components_type = []
         cost_components_name = []
-        electricity_components_type = []
-        electricity_components_name = []
+
         (
             components_name,
             components_name_id,
@@ -147,6 +146,9 @@ class LCCProductionCost(om.Group):
         ) = self.configurator.get_sizing_element_lists()
 
         tank_names, tank_types, fuel_types = self.configurator.get_fuel_tank_list_and_fuel()
+        electricity_components_names, electricity_components_types = (
+            self.configurator.get_electricity_storage_list()
+        )
 
         for (
             component_name,
@@ -166,10 +168,6 @@ class LCCProductionCost(om.Group):
                 cost_components_name.append(component_name)
 
                 self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
-
-            if components_type in ELECTRICITY_STORAGE_TYPES:
-                electricity_components_type.append(component_type)
-                electricity_components_name.append(component_name)
 
         self.add_subsystem(
             name="cost_sum",
@@ -195,8 +193,8 @@ class LCCProductionCost(om.Group):
             self.add_subsystem(
                 name="electric_energy_cost",
                 subsys=LCCElectricityCost(
-                    electricity_components_type=electricity_components_type,
-                    electricity_components_name=electricity_components_name,
+                    electricity_components_types=electricity_components_types,
+                    electricity_components_names=electricity_components_names,
                 ),
                 promotes=["*"],
             )
