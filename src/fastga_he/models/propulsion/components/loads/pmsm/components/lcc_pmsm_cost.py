@@ -58,7 +58,7 @@ class LCCPMSMCost(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost",
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating",
-        ] = 893.51 * np.exp(0.0281 * power_rating) * (0.0562 * np.pi * torque_rating /60.0)
+        ] = 893.51 * np.exp(0.0281 * power_rating) * (0.0562 * np.pi * torque_rating / 60.0)
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost",

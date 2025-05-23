@@ -595,8 +595,7 @@ def test_production_cost_hybrid_tbm_900():
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        5283687.68
-        , rel=1e-3
+        5283687.68, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)

@@ -72,9 +72,7 @@ class LCCPropellerCost(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
 
         cpi_2012 = inputs["data:cost:cpi_2012"]
-        rpm_max = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max"
-        ]
+        rpm_max = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max"]
         torque_max = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_max"
         ]
@@ -101,12 +99,10 @@ class LCCPropellerCost(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
 
         cpi_2012 = inputs["data:cost:cpi_2012"]
-        rpm_max = inputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max"
-            ]
+        rpm_max = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max"]
         torque_max = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_max"
-            ]
+        ]
         d_prop = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter"]
         prop_type = inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":type"]
 
@@ -125,18 +121,17 @@ class LCCPropellerCost(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max",
-            ] = 25.1628 * cpi_2012 * d_prop**1.88 * (torque_max/ 5252.0)**0.12 / rpm_max**0.88
+            ] = 25.1628 * cpi_2012 * d_prop**1.88 * (torque_max / 5252.0) ** 0.12 / rpm_max**0.88
 
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_max",
-            ] = (25.1628 * cpi_2012 * d_prop ** 1.88 * (rpm_max / 5252.0) ** 0.12 / torque_max **
-                 0.88)
+            ] = 25.1628 * cpi_2012 * d_prop**1.88 * (rpm_max / 5252.0) ** 0.12 / torque_max**0.88
 
             partials[
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost",
                 "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter",
-            ] = 394.2172 * cpi_2012 * d_prop**0.88 * (rpm_max * torque_max / 5252.0)**0.12
+            ] = 394.2172 * cpi_2012 * d_prop**0.88 * (rpm_max * torque_max / 5252.0) ** 0.12
 
         else:
             partials[

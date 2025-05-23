@@ -15,7 +15,6 @@ class PerformancesACPowerOut(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
-        # Needed even if not used because of the other submodel ...
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
