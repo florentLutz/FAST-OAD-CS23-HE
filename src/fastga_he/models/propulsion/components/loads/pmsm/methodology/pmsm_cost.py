@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     # Fit exponential regression
     exponential_params, pcov = optimize.curve_fit(
-        exponential_func, x, y, p0=initial_guess, maxfev=10000
+        exponential_func, x, y, p0=initial_guess, maxfev=100
     )
 
     # Calculate fitted y values and R-squared

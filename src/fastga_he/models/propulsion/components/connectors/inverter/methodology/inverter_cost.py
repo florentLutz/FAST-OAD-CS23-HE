@@ -18,7 +18,7 @@ def power_func(x, a, b):
 
 if __name__ == "__main__":
     # Fit the power-law model
-    power_params, power_covariance = optimize.curve_fit(power_func, x, y, maxfev=10000)
+    power_params, power_covariance = optimize.curve_fit(power_func, x, y, maxfev=100)
 
     y_power = power_func(x, *power_params)
     r2_power = 1 - np.sum((y - y_power) ** 2) / np.sum((y - np.mean(y)) ** 2)
