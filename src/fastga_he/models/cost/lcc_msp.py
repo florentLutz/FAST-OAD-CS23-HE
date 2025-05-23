@@ -27,8 +27,10 @@ class LCCMSP(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="data:cost:msp_per_unit", wrt="data:cost:production_cost_per_unit", val=1.11
+            of="data:cost:msp_per_unit", wrt="data:cost:production_cost_per_unit", val=1.0 / 0.9
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:msp_per_unit"] = 1.11 * inputs["data:cost:production_cost_per_unit"]
+        outputs["data:cost:msp_per_unit"] = (1.0 / 0.9) * inputs[
+            "data:cost:production_cost_per_unit"
+        ]

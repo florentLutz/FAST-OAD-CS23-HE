@@ -457,7 +457,7 @@ def test_aircraft_MSP():
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4273167.688, rel=1e-3
+        4277445.133, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -595,7 +595,7 @@ def test_production_cost_hybrid_tbm_900():
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4942445.38, rel=1e-3
+        4947392.78, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -632,7 +632,7 @@ def test_production_cost_tbm_900():
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4509912.75, rel=1e-3
+        4514427.18, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1078,7 +1078,7 @@ def test_cost_tbm_900():
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4509912.75, rel=1e-3
+        4514427.18, rel=1e-3
     )
 
     assert problem.get_val(
@@ -1123,7 +1123,7 @@ def test_cost_pipistrel():
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        267212.5, rel=1e-3
+        267480.0, rel=1e-3
     )
 
     assert problem.get_val(
