@@ -23,7 +23,7 @@ class LCCHighRPMICECost(om.ExplicitComponent):
         high_rpm_ice_id = self.options["high_rpm_ice_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_max_SL",
+            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_rating_SL",
             units="hp",
             val=np.nan,
             desc="Maximum power the motor has to provide at Sea Level",
@@ -52,7 +52,9 @@ class LCCHighRPMICECost(om.ExplicitComponent):
         ] = (
             174.0
             * inputs[
-                "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_max_SL"
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":power_rating_SL"
             ]
             * inputs["data:cost:cpi_2012"]
         )
@@ -62,7 +64,7 @@ class LCCHighRPMICECost(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":purchase_cost",
-            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_max_SL",
+            "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_rating_SL",
         ] = 174.0 * inputs["data:cost:cpi_2012"]
 
         partials[
@@ -71,6 +73,8 @@ class LCCHighRPMICECost(om.ExplicitComponent):
         ] = (
             174.0
             * inputs[
-                "data:propulsion:he_power_train:high_rpm_ICE:" + high_rpm_ice_id + ":power_max_SL"
+                "data:propulsion:he_power_train:high_rpm_ICE:"
+                + high_rpm_ice_id
+                + ":power_rating_SL"
             ]
         )

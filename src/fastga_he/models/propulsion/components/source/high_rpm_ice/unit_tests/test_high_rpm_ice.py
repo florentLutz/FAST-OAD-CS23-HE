@@ -67,7 +67,7 @@ NB_POINTS_TEST = 10
 
 def test_constraint_power_enforce():
     ivc = get_indep_var_comp(
-        ["data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_max_SL"], __file__, XML_FILE
+        ["data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL"], __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -83,7 +83,7 @@ def test_constraint_power_enforce():
 def test_constraint_power_ensure():
     ivc = get_indep_var_comp(
         [
-            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_max_SL",
+            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL",
             "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL",
         ],
         __file__,
@@ -1074,7 +1074,7 @@ def test_maximum():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_max_SL", units="W"
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL", units="W"
     ) == pytest.approx(50e3, rel=1e-2)
 
     assert problem.get_val(
@@ -1137,7 +1137,7 @@ def test_performances_ice():
         rel=1e-2,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_max_SL", units="W"
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL", units="W"
     ) == pytest.approx(50e3, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -1149,7 +1149,7 @@ def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output("data:cost:cpi_2012", val=1.4)
     ivc.add_output(
-        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_max_SL",
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL",
         val=250.0,
         units="kW",
     )

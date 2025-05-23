@@ -23,7 +23,7 @@ class LCCICECost(om.ExplicitComponent):
         ice_id = self.options["ice_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
             units="hp",
             val=np.nan,
             desc="Maximum power the motor has to provide at Sea Level",
@@ -47,7 +47,7 @@ class LCCICECost(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":purchase_cost"] = (
             174.0
-            * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL"]
+            * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL"]
             * inputs["data:cost:cpi_2012"]
         )
 
@@ -56,10 +56,10 @@ class LCCICECost(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":purchase_cost",
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
         ] = 174.0 * inputs["data:cost:cpi_2012"]
 
         partials[
             "data:propulsion:he_power_train:ICE:" + ice_id + ":purchase_cost",
             "data:cost:cpi_2012",
-        ] = 174.0 * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL"]
+        ] = 174.0 * inputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL"]
