@@ -2,6 +2,7 @@
   <data>
     <TLAR>
       <v_cruise units="knot" is_input="True">320.0<!--cruise speed--></v_cruise>
+      <v_max_sl units="knot" is_input="True">330.0</v_max_sl>
       <flight_per_year>66.0</flight_per_year>
     </TLAR>
     <geometry>
@@ -278,7 +279,6 @@
       </operation>
     </environmental_impact>
     <cost>
-      <v_cruise_design units="knot" is_input="True">330.0<!--aircraft design cruise speed--></v_cruise_design>
       <cpi_2012>1.4</cpi_2012>
       <prototype_number>2.0</prototype_number>
       <msp_per_unit unit="USD">4190476.61</msp_per_unit>

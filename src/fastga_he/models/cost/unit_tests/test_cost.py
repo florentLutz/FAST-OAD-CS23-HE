@@ -58,7 +58,7 @@ IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 def test_engineering_man_hours_5_years():
     input_list = [
         "data:weight:airframe:mass",
-        "data:cost:v_cruise_design",
+        "data:TLAR:v_max_sl",
         "data:cost:production:number_aircraft_5_years",
         "data:cost:production:composite_fraction",
         "data:geometry:flap_type",
@@ -86,7 +86,7 @@ def test_engineering_man_hours_5_years():
 def test_tooling_man_hours_5_years():
     input_list = [
         "data:weight:airframe:mass",
-        "data:cost:v_cruise_design",
+        "data:TLAR:v_max_sl",
         "data:cost:production:number_aircraft_5_years",
         "data:cost:production:composite_fraction",
         "data:geometry:flap_type",
@@ -115,7 +115,7 @@ def test_tooling_man_hours_5_years():
 def test_manufacturing_man_hours_5_years():
     input_list = [
         "data:weight:airframe:mass",
-        "data:cost:v_cruise_design",
+        "data:TLAR:v_max_sl",
         "data:cost:production:number_aircraft_5_years",
         "data:cost:production:composite_fraction",
         "data:geometry:flap_type",
@@ -169,7 +169,7 @@ def test_engineering_cost():
 def test_development_support_cost():
     input_list = [
         "data:weight:airframe:mass",
-        "data:cost:v_cruise_design",
+        "data:TLAR:v_max_sl",
         "data:cost:prototype_number",
         "data:cost:production:number_aircraft_5_years",
         "data:cost:production:composite_fraction",
@@ -269,7 +269,7 @@ def test_quality_control_cost():
 def test_flight_test_cost():
     input_list = [
         "data:weight:airframe:mass",
-        "data:cost:v_cruise_design",
+        "data:TLAR:v_max_sl",
         "data:cost:prototype_number",
         "data:cost:production:number_aircraft_5_years",
         "data:cost:cpi_2012",
@@ -297,7 +297,7 @@ def test_flight_test_cost():
 def test_material_cost():
     input_list = [
         "data:weight:airframe:mass",
-        "data:cost:v_cruise_design",
+        "data:TLAR:v_max_sl",
         "data:cost:production:number_aircraft_5_years",
         "data:cost:cpi_2012",
         "data:geometry:flap_type",
@@ -549,7 +549,7 @@ def test_production_cost_hydrogen():
     ) == pytest.approx(60485.41, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        385693.87, rel=1e-3
+        426805.78, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1119,16 +1119,16 @@ def test_cost_pipistrel():
     ) == pytest.approx(3688.43, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        240732.0, rel=1e-3
+        277433.0, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        267480.0, rel=1e-3
+        308258.9, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(35973.7, rel=1e-3)
+    ) == pytest.approx(36417.15, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

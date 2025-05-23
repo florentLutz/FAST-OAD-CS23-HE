@@ -7,6 +7,7 @@
       <range units="nmi" is_input="True">1100.0<!--design range--></range>
       <v_approach units="knot" is_input="True">85.0<!--approach speed--></v_approach>
       <v_cruise units="knot" is_input="True">320.0<!--cruise speed--></v_cruise>
+      <v_max_sl units="knot" is_input="True">330.0</v_max_sl>
       <flight_hours_per_year unit="h">300.0</flight_hours_per_year>
       <flight_per_year>66.0</flight_per_year>
     </TLAR>
@@ -242,7 +243,6 @@
     </handling_qualities>
     <cost>
       <cpi_2012>1.4</cpi_2012>
-      <v_cruise_design units="knot" is_input="True">330.0<!--aircraft design cruise speed--></v_cruise_design>
       <prototype_number>2.0</prototype_number>
       <msp_per_unit unit="USD">4190476.61</msp_per_unit>
       <production>

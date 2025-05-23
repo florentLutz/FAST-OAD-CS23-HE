@@ -12,7 +12,6 @@
     </TLAR>
     <cost>
       <cpi_2012>1.4</cpi_2012>
-      <v_cruise_design units="knot" is_input="True">93.0<!--cruise speed--></v_cruise_design>
       <prototype_number>3.0</prototype_number>
       <production>
         <number_aircraft_5_years>50.0</number_aircraft_5_years>

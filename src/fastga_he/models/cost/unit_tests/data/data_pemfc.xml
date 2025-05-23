@@ -85,7 +85,6 @@
         </geometry>
         <cost>
             <cpi_2012>1.4</cpi_2012>
-            <v_cruise_design units="knot" is_input="True">93.0<!--design cruise speed--></v_cruise_design>
             <msp_per_unit unit="USD">412758.77</msp_per_unit>
             <prototype_number>2.0</prototype_number>
             <production>
