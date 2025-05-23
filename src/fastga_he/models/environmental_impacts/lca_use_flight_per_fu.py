@@ -96,7 +96,7 @@ class LCAUseFlightPerFUFlightHours(om.ExplicitComponent):
         self.add_output(
             "data:environmental_impact:flight_per_fu",
             val=1e-8,
-            desc="Number of flight required to perform a functionnal unit, defined here as "
+            desc="Number of flight required to perform a functional unit, defined here as "
             "flying one hour",
         )
 

@@ -36,7 +36,7 @@ class ConstraintsSeaLevelPowerEnforce(om.ExplicitComponent):
         ice_id = self.options["ice_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
             units="kW",
             val=np.nan,
             desc="Maximum power the motor has to provide at Sea Level",
@@ -51,7 +51,7 @@ class ConstraintsSeaLevelPowerEnforce(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
-            wrt="data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL",
+            wrt="data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
             val=1.0,
         )
 
@@ -59,5 +59,5 @@ class ConstraintsSeaLevelPowerEnforce(om.ExplicitComponent):
         ice_id = self.options["ice_id"]
 
         outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL"] = inputs[
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL"
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL"
         ]

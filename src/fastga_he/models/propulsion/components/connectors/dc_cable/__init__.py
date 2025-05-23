@@ -9,3 +9,4 @@ from .components.perf_harness import PerformancesHarness
 from .components.sizing_harness import SizingHarness
 from .components.slipstream_harness import SlipstreamHarness
 from .components.pre_lca_harness import PreLCAHarness
+from .components.lcc_harness_cost import LCCHarnessCost

@@ -39,6 +39,9 @@ from ..components.perf_maximum import PerformancesMaximum
 from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
 from ..components.cstr_ensure import ConstraintsCurrentEnsure, ConstraintsVoltageEnsure
 from ..components.pre_lca_prod_length_per_fu import PreLCAHarnessProdLengthPerFU
+from ..components.lcc_harness_core_unit_cost import LCCHarnessCoreUnitCost
+from ..components.lcc_harness_unit_cost import LCCHarnessUnitCost
+from ..components.lcc_harness_cost import LCCHarnessCost
 
 from ..components.perf_harness import PerformancesHarness
 from ..components.sizing_harness import SizingHarness
@@ -938,5 +941,61 @@ def test_length_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:length_per_fu", units="m"
     ) == pytest.approx(7e-6, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_core_cost():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:material",
+        val=1.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHarnessCoreUnitCost(harness_id="harness_1"), ivc)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_volume",
+        units="USD/m**3",
+    ) == pytest.approx(92556.8, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_wire_cost():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(LCCHarnessUnitCost(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_volume",
+        units="USD/m**3",
+        val=92556.8,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHarnessUnitCost(harness_id="harness_1"), ivc)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:purchase_cost",
+        units="USD",
+    ) == pytest.approx(148.07, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(LCCHarnessCost(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHarnessCost(harness_id="harness_1"), ivc)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:purchase_cost",
+        units="USD",
+    ) == pytest.approx(148.07, rel=1e-2)
 
     problem.check_partials(compact_print=True)

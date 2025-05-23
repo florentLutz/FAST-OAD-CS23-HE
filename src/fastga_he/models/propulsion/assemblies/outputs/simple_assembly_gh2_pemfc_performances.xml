@@ -10,8 +10,9 @@
       <he_power_train>
         <DC_DC_converter>
           <dc_dc_converter_1>
-            <current_in_max units="A" is_input="False">594.9689303977257</current_in_max>
+            <current_in_max units="A" is_input="False">594.9689303977259</current_in_max>
             <losses_max units="W" is_input="False">5018.884891062073</losses_max>
+            <power_rating_max units="kW" is_input="False">202.5860324858418</power_rating_max>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_in_max units="V" is_input="False">350.75546455506185</voltage_in_max>
@@ -110,11 +111,11 @@
         <PEMFC_stack>
           <pemfc_stack_1>
             <area_ohmic_resistance units="ohm*cm**2" is_input="True">0.24<!--Area ohmic resistance of the single-layered PEMFC--></area_ohmic_resistance>
-            <current_max units="A" is_input="False">594.9689303977257<!--Maximum current the PEMFC stack has to provide during mission--></current_max>
+            <current_max units="A" is_input="False">594.9689303977259<!--Maximum current the PEMFC stack has to provide during mission--></current_max>
             <effective_area units="cm**2" is_input="True">2000.0<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
             <nominal_pressure units="atm" is_input="True">1.0<!--The nominal pressure at which the PEMFC stack operates.--></nominal_pressure>
             <number_of_layers is_input="True">450.0<!--Total number of layers in the PEMFC stack--></number_of_layers>
-            <power_max units="kW" is_input="False">207.60491737652492<!--Maximum power of the PEMFC stack has to provide during the mission--></power_max>
+            <power_max units="kW" is_input="False">207.604917376525<!--Maximum power of the PEMFC stack has to provide during the mission--></power_max>
           </pemfc_stack_1>
         </PEMFC_stack>
         <PMSM>
@@ -146,6 +147,7 @@
             <losses_max units="W" is_input="False">5046.78903275565</losses_max>
             <modulation_idx_max is_input="False">0.5068656359036223<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_factor is_input="True">1.0</power_factor>
+            <power_rating_max units="kW" is_input="False">189.36477486953362<!--Maximum value of the usable power--></power_rating_max>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
             <voltage_ac_max units="V" is_input="False">413.4513065482845<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
@@ -201,6 +203,7 @@
             <diameter units="inch" is_input="True">78.0<!--Diameter of the propeller--></diameter>
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
+            <shaft_power_in_max units="W" is_input="False">171526.7765569521<!--Maximum value of the propeller input shaft power--></shaft_power_in_max>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
             <tip_mach_max is_input="False">0.44243515198268096<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
             <torque_max units="N*m" is_input="False">818.9800308497388<!--Maximum value of the propeller torque--></torque_max>
