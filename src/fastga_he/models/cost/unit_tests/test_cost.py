@@ -546,10 +546,10 @@ def test_production_cost_hydrogen():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost", units="USD"
-    ) == pytest.approx(60485.41, rel=1e-3)
+    ) == pytest.approx(8120.33, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        426805.78, rel=1e-3
+        374494.10, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -585,17 +585,18 @@ def test_production_cost_hybrid_tbm_900():
     ) == pytest.approx(1959.02, rel=1e-3)
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost", units="USD"
-    ) == pytest.approx(15762.91, rel=1e-3)
+    ) == pytest.approx(66207.14, rel=1e-3)
     assert problem.get_val(
         "data:propulsion:he_power_train:turbo_generator:turbo_generator:purchase_cost", units="USD"
     ) == pytest.approx(221207.71, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        4452653.5, rel=1e-3
+        4755318.92, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4947392.78, rel=1e-3
+        5283687.68
+        , rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1116,19 +1117,19 @@ def test_cost_pipistrel():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost", units="USD"
-    ) == pytest.approx(3688.43, rel=1e-3)
+    ) == pytest.approx(13495.22, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        277433.0, rel=1e-3
+        287239.8, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        308258.9, rel=1e-3
+        319155.37, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(36417.15, rel=1e-3)
+    ) == pytest.approx(37179.9, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

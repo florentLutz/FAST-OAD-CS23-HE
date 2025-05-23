@@ -19,8 +19,8 @@ class PerformancesDCPowerIn(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("dc_current_in", units="A", val=np.full(number_of_points, np.nan))
-        self.add_input("dc_voltage_in", units="kV", val=np.full(number_of_points, np.nan))
+        self.add_input("dc_current_in", units="kA", val=np.full(number_of_points, np.nan))
+        self.add_input("dc_voltage_in", units="V", val=np.full(number_of_points, np.nan))
 
         self.add_output("dc_power_in", units="kW", val=200.0, shape=number_of_points)
 

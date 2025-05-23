@@ -21,9 +21,15 @@ class LCCPMSMCost(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max",
-            units="kW",
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating",
             val=np.nan,
+            units="kN*m",
+            desc="Max continuous torque of the motor",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating",
+            val=np.nan,
+            units="min**-1",
         )
 
         self.add_output(
@@ -36,17 +42,25 @@ class LCCPMSMCost(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
-        power_max = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max"]
+        torque_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating"]
+        rpm_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating"]
 
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost"] = (
-            893.51 * np.exp(0.0281 * power_max)
+            893.51 * np.exp(0.0562 * np.pi * torque_rating * rpm_rating / 60.0)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
-        power_max = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max"]
+        torque_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating"]
+        rpm_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating"]
+        power_rating = 2.0 * np.pi * torque_rating * rpm_rating / 60.0
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":shaft_power_max",
-        ] = 25.108 * np.exp(0.0281 * power_max)
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating",
+        ] = 893.51 * np.exp(0.0281 * power_rating) * (0.0562 * np.pi * torque_rating /60.0)
+
+        partials[
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating",
+        ] = 893.51 * np.exp(0.0281 * power_rating) * (0.0562 * np.pi * rpm_rating / 60.0)

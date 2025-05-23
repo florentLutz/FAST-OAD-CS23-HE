@@ -27,7 +27,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_input("advance_ratio", val=np.full(number_of_points, np.nan))
         self.add_input("torque_in", units="N*m", val=np.full(number_of_points, np.nan))
         self.add_input("rpm", units="min**-1", val=np.full(number_of_points, np.nan))
-        self.add_input("shaft_power_in", units="W", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":tip_mach_max",
@@ -82,19 +81,6 @@ class PerformancesMaximum(om.ExplicitComponent):
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
         )
-        self.add_output(
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":shaft_power_in_max",
-            units="W",
-            val=5.0e3,
-            desc="Maximum value of the propeller input shaft power",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:propeller:" + propeller_id + ":shaft_power_in_max",
-            wrt="shaft_power_in",
-            method="exact",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         propeller_id = self.options["propeller_id"]
@@ -111,9 +97,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max"] = np.max(
             inputs["rpm"]
         )
-        outputs[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":shaft_power_in_max"
-        ] = np.max(inputs["shaft_power_in"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]
@@ -131,7 +114,3 @@ class PerformancesMaximum(om.ExplicitComponent):
         partials["data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max", "rpm"] = (
             np.where(inputs["rpm"] == np.max(inputs["rpm"]), 1.0, 0.0)
         )
-        partials[
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":shaft_power_in_max",
-            "shaft_power_in",
-        ] = np.where(inputs["shaft_power_in"] == np.max(inputs["shaft_power_in"]), 1.0, 0.0)

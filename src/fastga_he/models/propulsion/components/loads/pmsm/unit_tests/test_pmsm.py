@@ -744,19 +744,20 @@ def test_weight_per_fu():
 
 
 def test_cost():
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "data:propulsion:he_power_train:PMSM:motor_1:shaft_power_max",
-        70.0,
-        units="kW",
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsRPMEnsure(motor_id="motor_1")), __file__, XML_FILE
     )
-
+    ivc.add_output(
+        "data:propulsion:he_power_train:PMSM:motor_1:torque_rating",
+        150.0,
+        units="N*m",
+    )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(LCCPMSMCost(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost", units="USD"
-    ) == pytest.approx(6387.87, rel=1e-2)
+    ) == pytest.approx(8120.33, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

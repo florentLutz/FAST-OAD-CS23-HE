@@ -645,11 +645,6 @@ def test_maximum():
         "tip_mach",
         val=np.array([0.639, 0.64, 0.641, 0.643, 0.644, 0.646, 0.647, 0.649, 0.65, 0.652]),
     )
-    ivc.add_output(
-        "shaft_power_in",
-        val=np.array([178.0, 178.8, 179.1, 181.5, 181.8, 182.6, 183.1, 183.4, 184.2, 186.4]),
-        units="kW",
-    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -669,9 +664,6 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:propeller:propeller_1:rpm_max", units="min**-1"
     ) == pytest.approx(2500.0, rel=1e-2)
-    assert problem.get_val(
-        "data:propulsion:he_power_train:propeller:propeller_1:shaft_power_in_max", units="kW"
-    ) == pytest.approx(186.4, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1566,7 +1558,6 @@ def test_weight_per_fu():
 def test_cost():
     inputs_list = [
         "data:cost:cpi_2012",
-        "data:propulsion:he_power_train:propeller:propeller_1:shaft_power_in_max",
         "data:propulsion:he_power_train:propeller:propeller_1:diameter",
         "data:propulsion:he_power_train:propeller:propeller_1:constant_speed_prop",
     ]
@@ -1574,9 +1565,14 @@ def test_cost():
     ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
     ivc.add_output("data:cost:cpi_2012", val=1.4)
     ivc.add_output(
-        "data:propulsion:he_power_train:propeller:propeller_1:shaft_power_in_max",
-        val=186.4,
-        units="kW",
+        "data:propulsion:he_power_train:propeller:propeller_1:torque_max",
+        val=712.0,
+        units="N*m",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:propeller:propeller_1:rpm_max",
+        val=2500.0,
+        units="min**-1",
     )
 
     # Run problem and check obtained value(s) is/(are) correct
