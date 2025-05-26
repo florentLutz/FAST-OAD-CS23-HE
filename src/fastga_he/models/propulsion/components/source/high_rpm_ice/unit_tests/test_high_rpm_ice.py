@@ -67,7 +67,7 @@ NB_POINTS_TEST = 10
 
 def test_constraint_power_enforce():
     ivc = get_indep_var_comp(
-        ["data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL"], __file__, XML_FILE
+        ["data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_max_SL"], __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -83,7 +83,7 @@ def test_constraint_power_enforce():
 def test_constraint_power_ensure():
     ivc = get_indep_var_comp(
         [
-            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL",
+            "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_max_SL",
             "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL",
         ],
         __file__,
