@@ -1074,7 +1074,7 @@ def test_maximum():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL", units="W"
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_max_SL", units="W"
     ) == pytest.approx(50e3, rel=1e-2)
 
     assert problem.get_val(
@@ -1137,7 +1137,7 @@ def test_performances_ice():
         rel=1e-2,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL", units="W"
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_max_SL", units="W"
     ) == pytest.approx(50e3, rel=1e-2)
 
     problem.check_partials(compact_print=True)

@@ -30,13 +30,13 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
 
         self.add_output(
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL",
             units="W",
             val=250e3,
             desc="Maximum power the motor has to provide at Sea Level",
         )
         self.declare_partials(
-            of="data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
+            of="data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL",
             wrt="equivalent_SL_power",
             method="exact",
             rows=np.zeros(number_of_points),
@@ -61,7 +61,7 @@ class PerformancesMaximum(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         ice_id = self.options["ice_id"]
 
-        outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL"] = np.max(
+        outputs["data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL"] = np.max(
             inputs["equivalent_SL_power"]
         )
 
@@ -73,7 +73,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         ice_id = self.options["ice_id"]
 
         partials[
-            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_rating_SL",
+            "data:propulsion:he_power_train:ICE:" + ice_id + ":power_max_SL",
             "equivalent_SL_power",
         ] = np.where(
             inputs["equivalent_SL_power"] == np.max(inputs["equivalent_SL_power"]), 1.0, 0.0

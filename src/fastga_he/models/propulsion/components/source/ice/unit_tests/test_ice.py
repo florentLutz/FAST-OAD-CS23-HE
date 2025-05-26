@@ -477,7 +477,7 @@ def test_maximum():
     problem = run_system(PerformancesMaximum(ice_id="ice_1", number_of_points=NB_POINTS_TEST), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:ICE:ice_1:power_rating_SL", units="W"
+        "data:propulsion:he_power_train:ICE:ice_1:power_max_SL", units="W"
     ) == pytest.approx(250e3, rel=1e-2)
 
     assert problem.get_val(
@@ -523,7 +523,7 @@ def test_performances_ice():
         rel=1e-2,
     )
     assert problem.get_val(
-        "data:propulsion:he_power_train:ICE:ice_1:power_rating_SL", units="W"
+        "data:propulsion:he_power_train:ICE:ice_1:power_max_SL", units="W"
     ) == pytest.approx(250e3, rel=1e-2)
 
     problem.check_partials(compact_print=True)
