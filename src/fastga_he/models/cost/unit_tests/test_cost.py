@@ -466,7 +466,7 @@ def test_aircraft_MSP():
 def test_delivery_duration_ratio():
     ivc = om.IndepVarComp()
     ivc.add_output("data:mission:sizing:duration", val=5.0, units="h")
-    ivc.add_output("data:cost:delivery_duration", val=3.0, units="h")
+    ivc.add_output("data:cost:delivery:duration", val=3.0, units="h")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(

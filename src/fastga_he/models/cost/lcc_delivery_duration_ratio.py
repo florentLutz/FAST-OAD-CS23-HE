@@ -13,7 +13,7 @@ class LCCDeliveryDurationRatio(om.ExplicitComponent):
 
     def setup(self):
         self.add_input(
-            name="data:cost:delivery_duration",
+            name="data:cost:delivery:duration",
             val=np.nan,
             units="h",
         )
@@ -33,14 +33,14 @@ class LCCDeliveryDurationRatio(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:delivery:mission_ratio"] = (
-            inputs["data:cost:delivery_duration"] / inputs["data:mission:sizing:duration"]
+            inputs["data:cost:delivery:duration"] / inputs["data:mission:sizing:duration"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["data:cost:delivery:mission_ratio", "data:cost:delivery_duration"] = (
+        partials["data:cost:delivery:mission_ratio", "data:cost:delivery:duration"] = (
             1.0 / inputs["data:mission:sizing:duration"]
         )
 
         partials["data:cost:delivery:mission_ratio", "data:mission:sizing:duration"] = (
-            -inputs["data:cost:delivery_duration"] / inputs["data:mission:sizing:duration"] ** 2.0
+            -inputs["data:cost:delivery:duration"] / inputs["data:mission:sizing:duration"] ** 2.0
         )

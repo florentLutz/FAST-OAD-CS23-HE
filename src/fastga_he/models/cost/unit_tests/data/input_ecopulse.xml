@@ -2375,6 +2375,7 @@
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <mass units="kg" is_input="False">70.0</mass>
             <rpm_max units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_max>
+            <rpm_rating units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_rating>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
             <shaft_power_in_max units="W" is_input="False">0.0<!--Maximum value of the propeller input shaft power--></shaft_power_in_max>
             <solidity is_input="True">0.25<!--Solidity of the propeller--></solidity>
@@ -2412,6 +2413,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_max>
+            <rpm_rating units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_rating>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
             <shaft_power_in_max units="W" is_input="False">102144.3913559564<!--Maximum value of the propeller input shaft power--></shaft_power_in_max>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
@@ -2450,6 +2452,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_max>
+            <rpm_rating units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_rating>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
             <shaft_power_in_max units="W" is_input="False">102144.3913559564<!--Maximum value of the propeller input shaft power--></shaft_power_in_max>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
@@ -2488,6 +2491,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_max>
+            <rpm_rating units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_rating>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
             <shaft_power_in_max units="W" is_input="False">102144.3913559564<!--Maximum value of the propeller input shaft power--></shaft_power_in_max>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
@@ -2526,6 +2530,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_max>
+            <rpm_rating units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_rating>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
             <shaft_power_in_max units="W" is_input="False">102144.3913559564<!--Maximum value of the propeller input shaft power--></shaft_power_in_max>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
@@ -2564,6 +2569,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_max>
+            <rpm_rating units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_rating>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
             <shaft_power_in_max units="W" is_input="False">102144.3913559564<!--Maximum value of the propeller input shaft power--></shaft_power_in_max>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
@@ -2602,6 +2608,7 @@
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_max>
+            <rpm_rating units="1/min" is_input="False">3000.0<!--Maximum value of the propeller rpm--></rpm_rating>
             <rpm_mission units="1/min" is_input="True">3000.0<!--RPM of the propeller for the points--></rpm_mission>
             <shaft_power_in_max units="W" is_input="False">102144.3913559564<!--Maximum value of the propeller input shaft power--></shaft_power_in_max>
             <solidity is_input="True">0.15<!--Solidity of the propeller--></solidity>
