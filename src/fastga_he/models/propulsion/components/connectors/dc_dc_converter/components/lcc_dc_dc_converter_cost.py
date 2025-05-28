@@ -26,7 +26,7 @@ class LCCDCDCConverterCost(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":dc_power_in_max",
+            + ":dc_power_in_rating",
             val=np.nan,
             units="kW",
             desc="Maximum power rating of the converter",
@@ -56,7 +56,7 @@ class LCCDCDCConverterCost(om.ExplicitComponent):
                 inputs[
                     "data:propulsion:he_power_train:DC_DC_converter:"
                     + dc_dc_converter_id
-                    + ":dc_power_in_max"
+                    + ":dc_power_in_rating"
                 ]
             )
             + 2295.0
@@ -71,12 +71,12 @@ class LCCDCDCConverterCost(om.ExplicitComponent):
             + ":purchase_cost",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
-            + ":dc_power_in_max",
+            + ":dc_power_in_rating",
         ] = (
             733.0
             / inputs[
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
-                + ":dc_power_in_max"
+                + ":dc_power_in_rating"
             ]
         )

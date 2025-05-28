@@ -209,7 +209,7 @@
                     <dc_dc_converter_1>
                         <purchase_cost unit="USD">6576.2</purchase_cost>
                         <losses_max units="W" is_input="True">1958.0316619368884</losses_max>
-                        <dc_power_in_max units="kW">344.0</dc_power_in_max>
+                        <dc_power_in_rating units="kW">344.0</dc_power_in_rating>
                         <CG>
                             <x units="m">2.69</x>
                             <y_ratio>0.34</y_ratio>

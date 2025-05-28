@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 from ..constants import (
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_INDUCTOR,
@@ -11,6 +11,7 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY,
+SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN
 )
 
 import openmdao.api as om
@@ -931,4 +932,104 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":switching_frequency",
+        ] = -1.0
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN,
+    "fastga_he.submodel.propulsion.constraints.dc_dc_converter.power.input.ensure",
+)
+class ConstraintsPowerInputEnsure(om.ExplicitComponent):
+    """
+    Class that computes the difference between the maximum power seen at the input of the
+    DC/DC converter during the mission and the value used for sizing, ensuring each component
+    works below its maxima.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="dc_dc_converter_id",
+            default=None,
+            desc="Identifier of the DC/DC converter",
+            allow_none=False,
+        )
+
+    def setup(self):
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_max",
+            val=np.nan,
+            units="kW",
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_rating",
+            val=np.nan,
+            units="kW",
+        )
+
+        self.add_output(
+            "constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_rating",
+            val=0.0,
+            units="kW",
+            desc="Respected if negative",
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_rating",
+            wrt=[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":dc_power_in_max",
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":dc_power_in_rating",
+            ],
+            method="exact",
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        outputs[
+            "constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_rating"
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":dc_power_in_max"
+            ]
+            - inputs[
+                "data:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":dc_power_in_rating"
+            ]
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        partials[
+            "constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_rating",
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_max",
+        ] = 1.0
+        partials[
+            "constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_rating",
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_rating",
         ] = -1.0

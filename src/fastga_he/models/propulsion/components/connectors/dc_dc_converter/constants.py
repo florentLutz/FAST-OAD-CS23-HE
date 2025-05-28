@@ -26,6 +26,9 @@ SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY = (
 SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES = (
     "submodel.propulsion.constraints.dc_dc_converter.losses"
 )
+SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN = (
+    "submodel.propulsion.constraints.dc_dc_converter.power.input"
+)
 
 SUBMODEL_DC_DC_CONVERTER_WEIGHT = "submodel.propulsion.dc_dc_converter.weight"
 SUBMODEL_DC_DC_CONVERTER_INDUCTANCE = "submodel.propulsion.dc_dc_converter.inductor.inductance"
