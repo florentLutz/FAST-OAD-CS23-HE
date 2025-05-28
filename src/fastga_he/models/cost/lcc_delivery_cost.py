@@ -57,7 +57,7 @@ class LCCDeliveryCost(om.ExplicitComponent):
                 desc="Fuel cost for single flight mission",
             )
             self.add_input(
-                name="data:cost:production:delivery:mission_ratio",
+                name="data:cost:delivery:mission_ratio",
                 val=np.nan,
                 desc="Ratio between the delivery flight duration and the sizing mission duration",
             )
@@ -88,7 +88,7 @@ class LCCDeliveryCost(om.ExplicitComponent):
             outputs["data:cost:delivery_cost_per_unit"] = (
                 (inputs["data:cost:fuel_cost"] + inputs["data:cost:electricity_cost"])
                 * inputs["data:cost:production:flight_cost_factor"]
-                * inputs["data:cost:production:delivery:mission_ratio"]
+                * inputs["data:cost:delivery:mission_ratio"]
             )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -96,7 +96,7 @@ class LCCDeliveryCost(om.ExplicitComponent):
 
         if delivery_method == "flight":
             cost_factor = inputs["data:cost:production:flight_cost_factor"]
-            duration_ratio = inputs["data:cost:production:delivery:mission_ratio"]
+            duration_ratio = inputs["data:cost:delivery:mission_ratio"]
             fuel_cost = inputs["data:cost:fuel_cost"]
             electricity_cost = inputs["data:cost:electricity_cost"]
 
@@ -113,5 +113,5 @@ class LCCDeliveryCost(om.ExplicitComponent):
             ] = (fuel_cost + electricity_cost) * duration_ratio
 
             partials[
-                "data:cost:delivery_cost_per_unit", "data:cost:production:delivery:mission_ratio"
+                "data:cost:delivery_cost_per_unit", "data:cost:delivery:mission_ratio"
             ] = (fuel_cost + electricity_cost) * cost_factor
