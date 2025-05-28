@@ -75,6 +75,12 @@ class PerformancesMaximum(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
             shape=number_of_points,
         )
+        self.add_input(
+            "dc_power_in",
+            units="kW",
+            val=np.full(number_of_points, np.nan),
+            shape=number_of_points,
+        )
         self.add_input("switching_frequency", units="Hz", val=np.full(number_of_points, np.nan))
 
         self.add_output(
@@ -214,6 +220,23 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
+            + ":dc_power_in_max",
+            units="kW",
+            val=1e2,
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_max",
+            wrt="dc_power_in",
+            method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+
+        self.add_output(
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
             + ":switching_frequency_max",
             units="Hz",
             val=15e3,
@@ -280,6 +303,12 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
+            + ":dc_power_in_max"
+        ] = np.max(inputs["dc_power_in"])
+
+        outputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
             + ":switching_frequency_max"
         ] = np.max(inputs["switching_frequency"])
 
@@ -339,6 +368,13 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":losses_max",
             "losses_converter",
         ] = np.where(inputs["losses_converter"] == np.max(inputs["losses_converter"]), 1.0, 0.0)
+
+        partials[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_max",
+            "dc_power_in",
+        ] = np.where(inputs["dc_power_in"] == np.max(inputs["dc_power_in"]), 1.0, 0.0)
 
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"

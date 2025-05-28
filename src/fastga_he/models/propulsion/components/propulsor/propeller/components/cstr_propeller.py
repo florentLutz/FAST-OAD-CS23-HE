@@ -1,12 +1,12 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE
+from ..constants import SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE, SUBMODEL_CONSTRAINTS_PROPELLER_RPM
 
 
 class ConstraintsPropeller(om.Group):
@@ -26,6 +26,13 @@ class ConstraintsPropeller(om.Group):
             name="constraints_torque_propeller",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_PROPELLER_TORQUE, options=option_propeller_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="constraints_rpm_propeller",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_PROPELLER_RPM, options=option_propeller_id
             ),
             promotes=["*"],
         )

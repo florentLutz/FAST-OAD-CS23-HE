@@ -47,6 +47,9 @@ from ..components.perf_maximum import PerformancesMaximum
 from ..components.pre_lca_prod_weight_per_fu import PreLCAHighRPMICEProdWeightPerFU
 from ..components.pre_lca_use_emission_per_fu import PreLCAHighRPMICEUseEmissionPerFU
 
+from ..components.lcc_high_rpm_ice_cost import LCCHighRPMICECost
+from ..components.lcc_high_rpm_ice_operational_cost import LCCHighRPMICEOperationalCost
+
 from ...ice.components.perf_fuel_consumption import PerformancesICEFuelConsumption
 from ...ice.components.perf_fuel_consumed import PerformancesICEFuelConsumed
 from ...ice.components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
@@ -1140,3 +1143,65 @@ def test_performances_ice():
     problem.check_partials(compact_print=True)
 
     om.n2(problem, show_browser=False, outfile=pathlib.Path(__file__).parent / "n2.html")
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:cpi_2012", val=1.4)
+    ivc.add_output(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL",
+        val=250.0,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHighRPMICECost(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:purchase_cost", units="USD"
+    ) == pytest.approx(
+        81668.231,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:displacement_volume",
+        val=0.0107,
+        units="m**3",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHighRPMICEOperationalCost(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:operational_cost", units="USD/yr"
+    ) == pytest.approx(
+        9887.5,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:displacement_volume",
+        val=0.0007,
+        units="m**3",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHighRPMICEOperationalCost(high_rpm_ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:high_rpm_ICE:ice_1:operational_cost", units="USD/yr"
+    ) == pytest.approx(
+        0.00106987,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)

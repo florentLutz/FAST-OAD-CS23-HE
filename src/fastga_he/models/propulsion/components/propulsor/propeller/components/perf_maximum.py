@@ -71,7 +71,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max",
             units="min**-1",
-            val=5000.0,
+            val=1000.0,
             desc="Maximum value of the propeller rpm",
         )
         self.declare_partials(

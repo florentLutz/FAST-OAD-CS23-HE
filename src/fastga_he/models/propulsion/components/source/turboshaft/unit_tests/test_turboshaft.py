@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import pytest
 import numpy as np
@@ -21,6 +21,9 @@ from ..components.sizing_turboshaft_cg_y import SizingTurboshaftCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCATurboshaftProdWeightPerFU
 from ..components.pre_lca_use_emission_per_fu import PreLCATurboshaftUseEmissionPerFU
+
+from ..components.lcc_turboshaft_cost import LCCTurboshaftCost
+from ..components.lcc_turboshaft_operational_cost import LCCTurboshaftOperationalCost
 
 from ..components.perf_density_ratio import PerformancesDensityRatio
 from ..components.perf_mach import PerformancesMach
@@ -635,7 +638,6 @@ def test_maximum():
         ),
         units="kW",
     )
-
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesMaximum(turboshaft_id="turboshaft_1", number_of_points=NB_POINTS_TEST), ivc
@@ -1365,5 +1367,53 @@ def test_emissions_per_fu():
     assert problem.get_val(
         "data:LCA:distribution:he_power_train:turboshaft:turboshaft_1:HC_per_fu", units="kg"
     ) == pytest.approx(2.00190663e-06, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:cpi_2012", val=1.4)
+    ivc.add_output(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_rating",
+        val=575.174,
+        units="kW",
+    )
+
+    problem = run_system(
+        LCCTurboshaftCost(turboshaft_id="turboshaft_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:purchase_cost", units="USD"
+    ) == pytest.approx(
+        407535.115,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_rating",
+        val=575.174,
+        units="kW",
+    )
+
+    problem = run_system(
+        LCCTurboshaftOperationalCost(turboshaft_id="turboshaft_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:operational_cost",
+        units="USD/yr",
+    ) == pytest.approx(
+        30357.83,
+        rel=1e-2,
+    )
 
     problem.check_partials(compact_print=True)

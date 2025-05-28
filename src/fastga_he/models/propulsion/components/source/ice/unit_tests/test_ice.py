@@ -29,6 +29,9 @@ from ..components.sizing_ice_cg_y import SizingICECGY
 from ..components.pre_lca_prod_weight_per_fu import PreLCAICEProdWeightPerFU
 from ..components.pre_lca_use_emission_per_fu import PreLCAICEUseEmissionPerFU
 
+from ..components.lcc_ice_cost import LCCICECost
+from ..components.lcc_ice_operational_cost import LCCICEOperationalCost
+
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_equivalent_sl_power import PerformancesEquivalentSeaLevelPower
 from ..components.perf_mean_effective_pressure import PerformancesMeanEffectivePressure
@@ -972,5 +975,67 @@ def test_emissions_per_fu():
     assert problem.get_val(
         "data:LCA:distribution:he_power_train:ICE:ice_1:lead_per_fu", units="kg"
     ) == pytest.approx(2.2911664e-07, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:cpi_2012", val=1.4)
+    ivc.add_output(
+        "data:propulsion:he_power_train:ICE:ice_1:power_rating_SL",
+        val=250.0,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCICECost(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:purchase_cost", units="USD"
+    ) == pytest.approx(
+        81668.231,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:ICE:ice_1:displacement_volume",
+        val=0.0107,
+        units="m**3",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCICEOperationalCost(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:operational_cost", units="USD/yr"
+    ) == pytest.approx(
+        9887.5,
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:ICE:ice_1:displacement_volume",
+        val=0.0007,
+        units="m**3",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCICEOperationalCost(ice_id="ice_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:ICE:ice_1:operational_cost", units="USD/yr"
+    ) == pytest.approx(
+        0.00106987,
+        rel=1e-2,
+    )
 
     problem.check_partials(compact_print=True)

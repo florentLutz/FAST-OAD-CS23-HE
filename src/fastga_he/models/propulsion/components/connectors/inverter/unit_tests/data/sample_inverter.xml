@@ -31,6 +31,8 @@
                     <inverter_1>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <ac_power_out_max units="kW">200.0</ac_power_out_max>
+                        <ac_power_out_rating unit="kW">200.0</ac_power_out_rating>
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>
