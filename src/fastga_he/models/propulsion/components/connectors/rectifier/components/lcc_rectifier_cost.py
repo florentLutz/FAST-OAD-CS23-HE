@@ -34,6 +34,7 @@ class LCCRectifierCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost",
             units="USD",
             val=3500.0,
+            desc="Unit purchase cost of the rectifier"
         )
 
         self.declare_partials(

@@ -37,6 +37,7 @@ class LCCTurboshaftCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":purchase_cost",
             units="USD",
             val=1e4,
+            desc="Unit purchase cost of the turboshaft engine"
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

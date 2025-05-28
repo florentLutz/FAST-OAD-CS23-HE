@@ -59,6 +59,7 @@ class LCCPropellerCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":purchase_cost",
             units="USD",
             val=1000.0,
+            desc="Unit purchase cost of the propeller"
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

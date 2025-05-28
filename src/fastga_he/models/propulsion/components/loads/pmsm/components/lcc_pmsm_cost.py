@@ -36,6 +36,7 @@ class LCCPMSMCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost",
             units="USD",
             val=1e4,
+            desc="Unit purchase cost of the PMS motor"
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

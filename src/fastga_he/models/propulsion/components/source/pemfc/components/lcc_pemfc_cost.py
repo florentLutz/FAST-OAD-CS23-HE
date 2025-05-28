@@ -35,6 +35,7 @@ class LCCPEMFCStackCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost",
             units="USD",
             val=1e4,
+            desc="Unit purchase cost of the pemfc stack"
         )
 
         self.declare_partials(of="*", wrt="*", val=65.7)

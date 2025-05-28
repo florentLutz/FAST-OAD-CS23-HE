@@ -39,6 +39,7 @@ class LCCDCSSPCCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
             val=1000.0,
             units="USD",
+            desc="Unit purchase cost of the SSPC"
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

@@ -39,6 +39,7 @@ class LCCTurboGeneratorCost(om.ExplicitComponent):
             + ":purchase_cost",
             units="USD",
             val=5.0e3,
+            desc="Unit purchase cost of the turbo generator"
         )
 
         self.declare_partials(of="*", wrt="*", val=328.4)

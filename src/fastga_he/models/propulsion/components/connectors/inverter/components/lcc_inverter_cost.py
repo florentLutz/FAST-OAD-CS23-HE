@@ -36,6 +36,7 @@ class LCCInverterCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
             units="USD",
             val=3500.0,
+            desc="Unit purchase cost of the inverter"
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
