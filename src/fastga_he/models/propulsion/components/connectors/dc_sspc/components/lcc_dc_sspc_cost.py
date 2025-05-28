@@ -29,10 +29,10 @@ class LCCDCSSPCCost(om.ExplicitComponent):
             desc="The factor of the SSPC compared to the IGBT module",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max",
+            name="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
             val=np.nan,
             units="A",
-            desc="Maximum current flowing through the SSPC",
+            desc="Current caliber of the SSPC",
         )
 
         self.add_output(
@@ -50,7 +50,8 @@ class LCCDCSSPCCost(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost"] = inputs[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":price_factor"
         ] * (
-            1.21 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"]
+            1.21
+            * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber"]
             + 83.8
         )
 
@@ -59,13 +60,14 @@ class LCCDCSSPCCost(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max",
+            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
         ] = 1.21 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":price_factor"]
 
         partials[
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":purchase_cost",
             "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":price_factor",
         ] = (
-            1.21 * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"]
+            1.21
+            * inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber"]
             + 83.8
         )

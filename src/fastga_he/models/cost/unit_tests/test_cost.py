@@ -547,7 +547,7 @@ def test_production_cost_hydrogen():
     ) == pytest.approx(8120.33, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        374494.10, rel=1e-3
+        376167.34, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)

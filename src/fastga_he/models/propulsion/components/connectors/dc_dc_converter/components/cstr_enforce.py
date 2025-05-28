@@ -11,7 +11,7 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES,
-SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN,
+    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN,
 )
 
 import openmdao.api as om
@@ -46,6 +46,7 @@ oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENC
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN] = (
     "fastga_he.submodel.propulsion.constraints.dc_dc_converter.power.input.enforce"
 )
+
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_CURRENT_CAPACITOR,
@@ -661,6 +662,7 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
             + ":switching_frequency_max"
         ]
 
+
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN,
     "fastga_he.submodel.propulsion.constraints.dc_dc_converter.power.input.enforce",
@@ -695,7 +697,7 @@ class ConstraintsPowerInputEnforce(om.ExplicitComponent):
             + ":dc_power_in_rating",
             val=1.0e3,
             units="kW",
-            desc="Maximum power rating of the converter",
+            desc="Power rating of the converter",
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
@@ -715,5 +717,7 @@ class ConstraintsPowerInputEnforce(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":dc_power_in_rating"
         ] = inputs[
-            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":dc_power_in_max"
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_max"
         ]

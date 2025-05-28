@@ -419,7 +419,7 @@ def test_weight_per_fu():
 def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:current_max", units="A", val=400
+        "data:propulsion:he_power_train:DC_SSPC:dc_sspc_1:current_caliber", units="A", val=400
     )
 
     problem = run_system(LCCDCSSPCCost(dc_sspc_id="dc_sspc_1"), ivc)

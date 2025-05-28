@@ -26,7 +26,7 @@ class LCCInverterCost(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
             units="kW",
             val=np.nan,
             desc="Max power at the output side of the inverter",
@@ -46,7 +46,9 @@ class LCCInverterCost(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"] = (
             4666.0
-            * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max"]
+            * inputs[
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating"
+            ]
             ** 0.0928
         )
 
@@ -55,9 +57,11 @@ class LCCInverterCost(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
         ] = (
             433.0048
-            * inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max"]
+            * inputs[
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating"
+            ]
             ** -0.9072
         )

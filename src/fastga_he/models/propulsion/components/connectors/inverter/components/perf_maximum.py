@@ -138,7 +138,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
             units="kW",
-            val=0.2,
+            val=200.0,
             desc="Maximum value of the output side",
         )
         self.declare_partials(

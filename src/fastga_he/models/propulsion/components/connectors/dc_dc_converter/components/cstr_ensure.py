@@ -11,7 +11,7 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY,
-SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN
+    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN,
 )
 
 import openmdao.api as om
@@ -933,6 +933,7 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":switching_frequency",
         ] = -1.0
+
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN,

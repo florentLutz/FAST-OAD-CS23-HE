@@ -45,7 +45,7 @@ from ..components.cstr_enforce import (
     ConstraintsVoltageInputEnforce,
     ConstraintsLossesEnforce,
     ConstraintsFrequencyEnforce,
-ConstraintsPowerInputEnforce,
+    ConstraintsPowerInputEnforce,
 )
 from ..components.cstr_ensure import (
     ConstraintsCurrentCapacitorEnsure,
@@ -56,7 +56,7 @@ from ..components.cstr_ensure import (
     ConstraintsVoltageInputEnsure,
     ConstraintsLossesEnsure,
     ConstraintsFrequencyEnsure,
-ConstraintsPowerInputEnsure,
+    ConstraintsPowerInputEnsure,
 )
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCADCDCConverterProdWeightPerFU
@@ -653,6 +653,7 @@ def test_constraints_frequency_enforce():
 
     problem.check_partials(compact_print=True)
 
+
 def test_constraints_power_input_enforce():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -661,9 +662,7 @@ def test_constraints_power_input_enforce():
         XML_FILE,
     )
 
-    problem = run_system(
-        ConstraintsPowerInputEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc
-    )
+    problem = run_system(ConstraintsPowerInputEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dc_power_in_rating",
@@ -824,6 +823,7 @@ def test_constraints_frequency_ensure():
     ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
 
 def test_constraints_power_input_ensure():
     # Research independent input value in .xml file

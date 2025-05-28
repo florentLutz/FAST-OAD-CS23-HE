@@ -58,12 +58,14 @@ from ..components.cstr_enforce import (
     ConstraintsVoltageEnforce,
     ConstraintsLossesEnforce,
     ConstraintsFrequencyEnforce,
+    ConstraintsPowerOutputEnforce,
 )
 from ..components.cstr_ensure import (
     ConstraintsCurrentEnsure,
     ConstraintsVoltageEnsure,
     ConstraintsLossesEnsure,
     ConstraintsFrequencyEnsure,
+    ConstraintsPowerOutputEnsure,
 )
 
 from .....sub_components import SizingHeatSink, SizingCapacitor, SizingInductor
@@ -616,6 +618,24 @@ def test_constraints_enforce_frequency():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_enforce_power_output():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsPowerOutputEnforce(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsPowerOutputEnforce(inverter_id="inverter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:ac_power_out_rating",
+        units="kW",
+    ) == pytest.approx(200.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraints_ensure_current():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -684,6 +704,24 @@ def test_constraints_ensure_frequency():
         "constraints:propulsion:he_power_train:inverter:inverter_1:switching_frequency",
         units="Hz",
     ) == pytest.approx(-3.0e3, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure_power_output():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsPowerOutputEnsure(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsPowerOutputEnsure(inverter_id="inverter_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:inverter:inverter_1:ac_power_out_rating",
+        units="kW",
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1511,7 +1549,7 @@ def test_weight_per_fu():
 def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        name="data:propulsion:he_power_train:inverter:inverter_1:ac_power_out_max",
+        name="data:propulsion:he_power_train:inverter:inverter_1:ac_power_out_rating",
         val=200.0,
         units="kW",
     )

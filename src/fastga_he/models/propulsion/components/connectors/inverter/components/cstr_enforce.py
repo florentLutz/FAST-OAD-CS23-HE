@@ -1,12 +1,13 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 from ..constants import (
     SUBMODEL_CONSTRAINTS_INVERTER_CURRENT,
     SUBMODEL_CONSTRAINTS_INVERTER_VOLTAGE,
     SUBMODEL_CONSTRAINTS_INVERTER_LOSSES,
     SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY,
+    SUBMODEL_CONSTRAINTS_INVERTER_POWER_OUT,
 )
 
 import openmdao.api as om
@@ -25,6 +26,9 @@ oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_INVERTER_LOSSES] = (
 )
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY] = (
     "fastga_he.submodel.propulsion.constraints.inverter.frequency.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_INVERTER_POWER_OUT] = (
+    "fastga_he.submodel.propulsion.constraints.inverter.power.output.enforce"
 )
 
 
@@ -215,3 +219,49 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
         ] = inputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency_max"
         ]
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_INVERTER_POWER_OUT,
+    "fastga_he.submodel.propulsion.constraints.inverter.power.output.enforce",
+)
+class ConstraintsPowerOutputEnforce(om.ExplicitComponent):
+    """
+    Class that enforces that the maximum power output seen by the inverter during the mission is
+    used for the sizing, ensuring a fitted design of each component.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="inverter_id",
+            default=None,
+            desc="Identifier of the inverter",
+            allow_none=False,
+        )
+
+    def setup(self):
+        inverter_id = self.options["inverter_id"]
+
+        self.add_input(
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
+            val=np.nan,
+            units="kW",
+        )
+        self.add_output(
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
+            val=200.0,
+            units="kW",
+            desc="Power rating of the inverter",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        inverter_id = self.options["inverter_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating"
+        ] = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max"]
