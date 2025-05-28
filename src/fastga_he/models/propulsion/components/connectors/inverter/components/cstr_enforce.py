@@ -58,11 +58,13 @@ class ConstraintsCurrentEnforce(om.ExplicitComponent):
             val=np.nan,
             units="A",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
             val=200.0,
             units="A",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
             wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max",
@@ -103,11 +105,13 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
             val=np.nan,
             units="V",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",
             val=800.0,
             units="V",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",
             wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max",
@@ -148,11 +152,13 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
             val=np.nan,
             units="W",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
             val=800.0,
             units="W",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
             wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max",
@@ -197,12 +203,14 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
             desc="Maximum switching frequency seen by the IGBT modules in the inverter during the "
             "mission",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency",
             val=12.0e3,
             units="Hz",
             desc="Maximum switching frequency of the IGBT modules in the inverter, used for sizing",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency",
             wrt="data:propulsion:he_power_train:inverter:"
@@ -247,12 +255,14 @@ class ConstraintsPowerOutputEnforce(om.ExplicitComponent):
             val=np.nan,
             units="kW",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
             val=200.0,
             units="kW",
             desc="Power rating of the inverter",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
             wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",

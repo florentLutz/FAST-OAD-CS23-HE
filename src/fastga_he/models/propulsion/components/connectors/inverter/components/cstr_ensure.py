@@ -47,6 +47,7 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
             val=np.nan,
             units="A",
         )
+
         self.add_output(
             name="constraints:propulsion:he_power_train:inverter:"
             + inverter_id
@@ -55,6 +56,7 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
             units="A",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
             wrt=[
@@ -118,6 +120,7 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
             val=np.nan,
             units="V",
         )
+
         self.add_output(
             name="constraints:propulsion:he_power_train:inverter:"
             + inverter_id
@@ -126,6 +129,7 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
             units="V",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",
             wrt=[
@@ -189,6 +193,7 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
             val=np.nan,
             units="W",
         )
+
         self.add_output(
             name="constraints:propulsion:he_power_train:inverter:"
             + inverter_id
@@ -197,6 +202,7 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
             units="W",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
             wrt=[
@@ -265,6 +271,7 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             units="Hz",
             desc="Maximum switching frequency of the IGBT modules in the inverter, used for sizing",
         )
+
         self.add_output(
             name="constraints:propulsion:he_power_train:inverter:"
             + inverter_id
@@ -274,6 +281,7 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             desc="Constraints on the maximum switching frequency of the IGBT modules in the "
             "inverter, respected when <0",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:inverter:"
             + inverter_id
@@ -352,6 +360,7 @@ class ConstraintsPowerOutputEnsure(om.ExplicitComponent):
             val=np.nan,
             units="kW",
         )
+
         self.add_output(
             name="constraints:propulsion:he_power_train:inverter:"
             + inverter_id
@@ -360,6 +369,7 @@ class ConstraintsPowerOutputEnsure(om.ExplicitComponent):
             units="kW",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:inverter:"
             + inverter_id
