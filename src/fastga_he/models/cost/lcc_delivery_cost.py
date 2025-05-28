@@ -112,6 +112,6 @@ class LCCDeliveryCost(om.ExplicitComponent):
                 "data:cost:delivery_cost_per_unit", "data:cost:production:flight_cost_factor"
             ] = (fuel_cost + electricity_cost) * duration_ratio
 
-            partials[
-                "data:cost:delivery_cost_per_unit", "data:cost:delivery:mission_ratio"
-            ] = (fuel_cost + electricity_cost) * cost_factor
+            partials["data:cost:delivery_cost_per_unit", "data:cost:delivery:mission_ratio"] = (
+                fuel_cost + electricity_cost
+            ) * cost_factor

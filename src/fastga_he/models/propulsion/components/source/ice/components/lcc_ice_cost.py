@@ -38,7 +38,7 @@ class LCCICECost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:ICE:" + ice_id + ":purchase_cost",
             units="USD",
             val=1e4,
-            desc="Unit purchase cost of the IC engine"
+            desc="Unit purchase cost of the IC engine",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

@@ -38,7 +38,7 @@ class LCCDCDCConverterCost(om.ExplicitComponent):
             + ":purchase_cost",
             units="USD",
             val=750.0,
-            desc="Unit purchase cost of the converter"
+            desc="Unit purchase cost of the converter",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

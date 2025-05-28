@@ -30,7 +30,7 @@ from ..lcc_production_cost_sum import LCCSumProductionCost
 from ..lcc_annual_insurance_cost import LCCAnnualInsuranceCost
 from ..lcc_landing_gear_cost_reduction import LCCLandingGearCostReduction
 from ..lcc_delivery_cost import LCCDeliveryCost
-from ..lcc_deliveray_duration_ratio import LCCDeliveryDurationRatio
+from ..lcc_delivery_duration_ratio import LCCDeliveryDurationRatio
 from ..lcc_landing_cost import LCCLandingCost
 from ..lcc_daily_parking_cost import LCCDailyParkingCost
 from ..lcc_annual_crew_cost import LCCAnnualCrewCost
@@ -474,9 +474,7 @@ def test_delivery_duration_ratio():
         ivc,
     )
 
-    assert problem.get_val("data:cost:delivery:mission_ratio") == pytest.approx(
-        0.6, rel=1e-3
-    )
+    assert problem.get_val("data:cost:delivery:mission_ratio") == pytest.approx(0.6, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

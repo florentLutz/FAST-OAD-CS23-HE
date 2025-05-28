@@ -24,7 +24,7 @@ from .lcc_production_cost_sum import LCCSumProductionCost
 from .lcc_fuel_cost import LCCFuelCost
 from .lcc_electricity_cost import LCCElectricityCost
 from .lcc_delivery_cost import LCCDeliveryCost
-from .lcc_deliveray_duration_ratio import LCCDeliveryDurationRatio
+from .lcc_delivery_duration_ratio import LCCDeliveryDurationRatio
 from .lcc_learning_curve_discount import LCCLearningCurveDiscount
 
 from .constants import SERVICE_COST_CERTIFICATION

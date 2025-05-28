@@ -39,7 +39,7 @@ class LCCGaseousHydrogenTankCost(om.ExplicitComponent):
             + ":purchase_cost",
             units="USD",
             val=200.0,
-            desc="Unit purchase cost of the gaseous hydrogen tank"
+            desc="Unit purchase cost of the gaseous hydrogen tank",
         )
 
         self.declare_partials(of="*", wrt="*", val=6.38)

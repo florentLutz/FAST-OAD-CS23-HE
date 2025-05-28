@@ -67,7 +67,7 @@ class LCCHarnessUnitCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":purchase_cost",
             units="USD",
             val=200.0,
-            desc="Unit purchase cost of the DC cable harness"
+            desc="Unit purchase cost of the DC cable harness",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

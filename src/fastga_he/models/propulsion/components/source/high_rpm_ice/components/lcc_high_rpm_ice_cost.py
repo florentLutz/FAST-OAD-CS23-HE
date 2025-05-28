@@ -40,7 +40,7 @@ class LCCHighRPMICECost(om.ExplicitComponent):
             + ":purchase_cost",
             units="USD",
             val=1e4,
-            desc="Unit purchase cost of the high RPM IC engine"
+            desc="Unit purchase cost of the high RPM IC engine",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")

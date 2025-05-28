@@ -29,7 +29,7 @@ class LCCGeneratorCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:generator:" + generator_id + ":purchase_cost",
             units="USD",
             val=1e4,
-            desc="Unit purchase cost of the generator"
+            desc="Unit purchase cost of the generator",
         )
 
         self.declare_partials(of="*", wrt="*", method="exact")
