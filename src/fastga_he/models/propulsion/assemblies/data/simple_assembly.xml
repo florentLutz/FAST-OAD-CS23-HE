@@ -106,6 +106,7 @@
                 <DC_DC_converter>
                     <dc_dc_converter_1>
                         <losses_max units="W" is_input="True">1958.0316619368884</losses_max>
+                        <dc_power_in_max units="kW" is_input="False">206.09751659509152</dc_power_in_max>
                         <CG>
                             <x units="m">2.69</x>
                             <y_ratio>0.34</y_ratio>
@@ -346,6 +347,7 @@
                 </DC_cable_harness>
                 <inverter>
                     <inverter_1>
+                        <ac_power_out_max units="kW">189.365</ac_power_out_max>
                         <CG>
                             <x units="m">2.69</x>
                             <y_ratio>0.34</y_ratio>
@@ -511,6 +513,7 @@
                         <material>0.0</material>
                         <torque_rating units="N*m">817.0</torque_rating>
                         <torque_max units="N*m">817.0</torque_max>
+                        <rpm_max units="1/min">2000.0</rpm_max>
                     </propeller_1>
                 </propeller>
                 <DC_bus>
