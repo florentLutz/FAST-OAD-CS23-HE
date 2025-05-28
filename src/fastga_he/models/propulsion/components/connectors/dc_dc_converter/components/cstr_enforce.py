@@ -706,7 +706,7 @@ class ConstraintsPowerInputEnforce(om.ExplicitComponent):
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":dc_power_in_rating",
-            val=1.0e3,
+            val=1.0e2,
             units="kW",
             desc="Power rating of the converter",
         )

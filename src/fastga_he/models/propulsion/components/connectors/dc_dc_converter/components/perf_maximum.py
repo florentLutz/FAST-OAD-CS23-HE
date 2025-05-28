@@ -222,7 +222,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":dc_power_in_max",
             units="kW",
-            val=1e3,
+            val=1e2,
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
