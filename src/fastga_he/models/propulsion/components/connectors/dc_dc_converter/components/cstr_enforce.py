@@ -84,6 +84,7 @@ class ConstraintsCurrentCapacitorEnforce(om.ExplicitComponent):
             val=500.0,
             units="A",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -144,6 +145,7 @@ class ConstraintsCurrentInductorEnforce(om.ExplicitComponent):
             val=500.0,
             units="A",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -211,6 +213,7 @@ class ConstraintsCurrentModuleEnforce(om.ExplicitComponent):
             val=500.0,
             units="A",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -332,6 +335,7 @@ class ConstraintsCurrentInputEnforce(om.ExplicitComponent):
             val=500.0,
             units="A",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -399,6 +403,7 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
             val=800.0,
             units="V",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -521,6 +526,7 @@ class ConstraintsVoltageInputEnforce(om.ExplicitComponent):
             val=500.0,
             units="V",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -573,6 +579,7 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
             val=np.nan,
             units="W",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -580,6 +587,7 @@ class ConstraintsLossesEnforce(om.ExplicitComponent):
             val=800.0,
             units="W",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -631,6 +639,7 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
             val=np.nan,
             desc="Maximum switching frequency seen during the mission in the converter",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -639,6 +648,7 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
             val=15.0e3,
             desc="Maximum switching frequency of the IGBT module in the converter",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -691,6 +701,7 @@ class ConstraintsPowerInputEnforce(om.ExplicitComponent):
             val=np.nan,
             units="kW",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -699,6 +710,7 @@ class ConstraintsPowerInputEnforce(om.ExplicitComponent):
             units="kW",
             desc="Power rating of the converter",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id

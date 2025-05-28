@@ -167,6 +167,7 @@ class ConstraintsCurrentInductorEnsure(om.ExplicitComponent):
             units="A",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -275,6 +276,7 @@ class ConstraintsCurrentModuleEnsure(om.ExplicitComponent):
             units="A",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -423,6 +425,7 @@ class ConstraintsCurrentInputEnsure(om.ExplicitComponent):
             units="A",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -531,6 +534,7 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
             units="V",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -678,6 +682,7 @@ class ConstraintsVoltageInputEnsure(om.ExplicitComponent):
             units="V",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -770,6 +775,7 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
             val=np.nan,
             units="W",
         )
+
         self.add_output(
             name="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -778,6 +784,7 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
             units="W",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -870,6 +877,7 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             val=np.nan,
             desc="Maximum switching frequency of the IGBT module in the converter",
         )
+
         self.add_output(
             name="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -879,6 +887,7 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             desc="Constraints on maximum switching frequency of the IGBT module in the converter, "
             "respected if <0",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
@@ -980,6 +989,7 @@ class ConstraintsPowerInputEnsure(om.ExplicitComponent):
             units="kW",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id

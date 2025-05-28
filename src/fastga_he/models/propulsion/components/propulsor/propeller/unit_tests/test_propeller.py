@@ -56,8 +56,8 @@ from ..components.slipstream_delta_cm0 import SlipstreamPropellerDeltaCM0
 from ..components.slipstream_delta_cm_alpha import SlipstreamPropellerDeltaCMAlpha
 from ..components.slipstream_delta_cm import SlipstreamPropellerDeltaCM
 from ..components.slipstream_propeller import SlipstreamPropeller
-from ..components.cstr_enforce import ConstraintsTorqueEnforce
-from ..components.cstr_ensure import ConstraintsTorqueEnsure
+from ..components.cstr_enforce import ConstraintsTorqueEnforce, ConstraintsRPMEnforce
+from ..components.cstr_ensure import ConstraintsTorqueEnsure, ConstraintsRPMEnsure
 from ..components.pre_lca_prod_weight_per_fu import PreLCAPropellerProdWeightPerFU
 from ..components.lcc_propeller_cost import LCCPropellerCost
 from ..components.lcc_propeller_operational_cost import LCCPropellerOperationalCost
@@ -309,6 +309,20 @@ def test_constraints_torque_enforce():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_rpm_enforce():
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsRPMEnforce(propeller_id="propeller_1")), __file__, XML_FILE
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsRPMEnforce(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:propeller:propeller_1:rpm_rating", units="min**-1"
+    ) == pytest.approx(2500.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraints_torque_ensure():
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsTorqueEnsure(propeller_id="propeller_1")), __file__, XML_FILE
@@ -318,6 +332,20 @@ def test_constraints_torque_ensure():
 
     assert problem.get_val(
         "constraints:propulsion:he_power_train:propeller:propeller_1:torque_rating", units="N*m"
+    ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_rpm_ensure():
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsRPMEnsure(propeller_id="propeller_1")), __file__, XML_FILE
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsRPMEnsure(propeller_id="propeller_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:propeller:propeller_1:rpm_rating", units="min**-1"
     ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -1565,12 +1593,12 @@ def test_cost():
     ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
     ivc.add_output("data:cost:cpi_2012", val=1.4)
     ivc.add_output(
-        "data:propulsion:he_power_train:propeller:propeller_1:torque_max",
+        "data:propulsion:he_power_train:propeller:propeller_1:torque_rating",
         val=712.0,
         units="N*m",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:propeller:propeller_1:rpm_max",
+        "data:propulsion:he_power_train:propeller:propeller_1:rpm_rating",
         val=2500.0,
         units="min**-1",
     )
