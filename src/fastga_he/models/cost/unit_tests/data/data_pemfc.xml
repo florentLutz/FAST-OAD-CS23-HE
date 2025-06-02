@@ -115,7 +115,7 @@
                         <mass units="kg">327.988</mass>
                         <specific_power units="kW/kg">0.345</specific_power>
                         <power_density units="kW/m**3">124</power_density>
-                        <power_max units="kW">207.6</power_max>
+                        <power_rating units="kW">207.6</power_rating>
                         <low_speed>
                             <CD0>0.0</CD0>
                         </low_speed>

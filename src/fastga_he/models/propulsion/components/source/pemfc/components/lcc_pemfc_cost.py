@@ -25,10 +25,10 @@ class LCCPEMFCStackCost(om.ExplicitComponent):
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating",
             units="kW",
             val=np.nan,
-            desc="Maximum power of the PEMFC stack has to provide during the mission",
+            desc="Maximum power of the PEMFC stack can provide",
         )
 
         self.add_output(
@@ -47,5 +47,7 @@ class LCCPEMFCStackCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":purchase_cost"
         ] = (
             65.7
-            * inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max"]
+            * inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating"
+            ]
         )

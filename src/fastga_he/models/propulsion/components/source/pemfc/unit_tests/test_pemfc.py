@@ -42,8 +42,14 @@ from ..components.perf_pemfc_polarization_curve import (
 )
 from ..components.perf_pemfc_stack import PerformancesPEMFCStack
 
-from ..components.cstr_ensure import ConstraintsPEMFCStackEffectiveAreaEnsure
-from ..components.cstr_enforce import ConstraintsPEMFCStackEffectiveAreaEnforce
+from ..components.cstr_ensure import (
+    ConstraintsPEMFCStackEffectiveAreaEnsure,
+    ConstraintsPEMFCStackPowerEnsure,
+)
+from ..components.cstr_enforce import (
+    ConstraintsPEMFCStackEffectiveAreaEnforce,
+    ConstraintsPEMFCStackPowerEnforce,
+)
 
 from ..components.lcc_pemfc_cost import LCCPEMFCStackCost
 from ..components.lcc_pemfc_operational_cost import LCCPEMFCStackOperationalCost
@@ -331,6 +337,26 @@ def test_constraints_enforce_effective_area():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_enforce_power():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max",
+        val=0.2,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        ConstraintsPEMFCStackPowerEnforce(pemfc_stack_id="pemfc_stack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_rating", units="kW"
+    ) == pytest.approx(0.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraints_ensure_effective_area():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -353,6 +379,32 @@ def test_constraints_ensure_effective_area():
         "constraints:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
         units="cm**2",
     ) == pytest.approx(3.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure_power():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsPEMFCStackPowerEnsure(pemfc_stack_id="pemfc_stack_1")),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max",
+        val=0.2,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        ConstraintsPEMFCStackPowerEnsure(pemfc_stack_id="pemfc_stack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_rating",
+        units="kW",
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -939,7 +991,7 @@ def test_performances_pemfc_stack_analytical():
 def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_max",
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:power_rating",
         units="kW",
         val=0.2,
     )
