@@ -8,6 +8,7 @@ import numpy as np
 from plotly.colors import DEFAULT_PLOTLY_COLORS as COLS
 import plotly.graph_objects as go
 
+MARKER_DICTIONARY = ["circle-open",  "square",  "diamond",  "cross"]
 
 if __name__ == "__main__":
     # Data will be provided in the following order:
@@ -112,47 +113,86 @@ if __name__ == "__main__":
     abscissa = list(df.index)
     abscissa = [int(x) for x in abscissa]
 
-    for idx, column_name in enumerate(list(df.columns)):
-        group_name = " ".join(column_name.split(" ")[0:2])
+    data_to_show = [
+        "Piston 1 engine total",
+        "Piston 2 engine total",
+        "TP 1 engine total",
+        "TP 2 engines total",
+    ]
 
-        local_data = df[column_name].values
+    count = 0
+    for _, column_name in enumerate(list(df.columns)):
+        if column_name in data_to_show:
+            group_name = " ".join(column_name.split(" ")[0:2])
 
-        fig.add_trace(
-            go.Scatter(
-                x=abscissa,
-                y=local_data,
-                mode="lines+markers",
-                name=column_name,
-                showlegend=True,
-                legendgroup=group_name,
-                line=dict(color=COLS[idx]),
+            local_data = df[column_name].values
+
+            fig.add_trace(
+                go.Scatter(
+                    x=abscissa,
+                    y=local_data,
+                    mode="lines+markers",
+                    name=column_name,
+                    showlegend=True,
+                    legendgroup=group_name,
+                    line=dict(color=COLS[count]),
+                    marker=dict(symbol=MARKER_DICTIONARY[count], color=COLS[count], size=10),
+                )
             )
-        )
 
-        index_2009 = abscissa.index(2009)
-        index_2020 = abscissa.index(2020)
+            index_2009 = abscissa.index(2009)
+            index_2020 = abscissa.index(2020)
 
-        x_for_regression = abscissa[index_2009:index_2020]
-        y_for_regression = local_data[index_2009:index_2020]
+            x_for_regression = abscissa[index_2009:index_2020]
+            y_for_regression = local_data[index_2009:index_2020]
 
-        mean = np.mean(np.array(y_for_regression))
-        std = np.std(np.array(y_for_regression))
-        fig.add_trace(
-            go.Scatter(
-                x=[abscissa[0], abscissa[-1]],
-                y=[mean, mean],
-                mode="lines",
-                name="Mean: " + str(np.round(mean, 1)) + " hours, std: " + str(np.round(std, 1)),
-                showlegend=True,
-                legendgroup=group_name,
-                line=dict(color=COLS[idx], dash="dot"),
+            mean = np.mean(np.array(y_for_regression))
+            std = np.std(np.array(y_for_regression))
+            fig.add_trace(
+                go.Scatter(
+                    x=[abscissa[0], abscissa[-1]],
+                    y=[mean, mean],
+                    mode="lines",
+                    name="Mean: "
+                    + str(np.round(mean, 1))
+                    + " hours, std: "
+                    + str(np.round(std, 1)),
+                    showlegend=True,
+                    legendgroup=group_name,
+                    line=dict(color=COLS[count], dash="dot"),
+                )
             )
-        )
+            count +=1
 
     fig.update_layout(
         title_text="Average airframe hours per category",
         xaxis_title="Year [-]",
         yaxis_title="Average airframe hours [h]",
         title_x=0.5,
+        height=800.0,
+        width=1600.0,
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+    )
+    fig.update_xaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+    )
+    fig.update_yaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        side="right",
     )
     fig.show()
