@@ -70,15 +70,19 @@ class ConstraintsCurrentCapacitorEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":capacitor:current_caliber",
-            wrt=[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":capacitor:current_max",
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":capacitor:current_caliber",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":capacitor:current_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":capacitor:current_caliber",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":capacitor:current_caliber",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -100,26 +104,6 @@ class ConstraintsCurrentCapacitorEnsure(om.ExplicitComponent):
                 + ":capacitor:current_caliber"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":capacitor:current_caliber",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":capacitor:current_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":capacitor:current_caliber",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":capacitor:current_caliber",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -172,15 +156,19 @@ class ConstraintsCurrentInductorEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":inductor:current_caliber",
-            wrt=[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":inductor:current_max",
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":inductor:current_caliber",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":inductor:current_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":inductor:current_caliber",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":inductor:current_caliber",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -202,26 +190,6 @@ class ConstraintsCurrentInductorEnsure(om.ExplicitComponent):
                 + ":inductor:current_caliber"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:current_caliber",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:current_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:current_caliber",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":inductor:current_caliber",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -430,15 +398,19 @@ class ConstraintsCurrentInputEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":current_in_caliber",
-            wrt=[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":current_in_max",
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":current_in_caliber",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":current_in_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":current_in_caliber",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":current_in_caliber",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -460,26 +432,6 @@ class ConstraintsCurrentInputEnsure(om.ExplicitComponent):
                 + ":current_in_caliber"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":current_in_caliber",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":current_in_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":current_in_caliber",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":current_in_caliber",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -687,15 +639,19 @@ class ConstraintsVoltageInputEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":voltage_in_caliber",
-            wrt=[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":voltage_in_max",
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":voltage_in_caliber",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":voltage_in_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":voltage_in_caliber",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":voltage_in_caliber",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -717,26 +673,6 @@ class ConstraintsVoltageInputEnsure(om.ExplicitComponent):
                 + ":voltage_in_caliber"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":voltage_in_caliber",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":voltage_in_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":voltage_in_caliber",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":voltage_in_caliber",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -789,15 +725,19 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":dissipable_heat",
-            wrt=[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":losses_max",
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":dissipable_heat",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":losses_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dissipable_heat",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -819,24 +759,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
                 + ":dissipable_heat"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":dissipable_heat",
-            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":losses_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":dissipable_heat",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":dissipable_heat",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -892,15 +814,19 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":switching_frequency",
-            wrt=[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":switching_frequency_max",
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":switching_frequency",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":switching_frequency",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -922,26 +848,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
                 + ":switching_frequency"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":switching_frequency",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":switching_frequency_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":switching_frequency",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":switching_frequency",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -994,15 +900,19 @@ class ConstraintsPowerInputEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":dc_power_in_rating",
-            wrt=[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":dc_power_in_max",
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":dc_power_in_rating",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_rating",
+            wrt="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":dc_power_in_rating",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -1024,23 +934,3 @@ class ConstraintsPowerInputEnsure(om.ExplicitComponent):
                 + ":dc_power_in_rating"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        dc_dc_converter_id = self.options["dc_dc_converter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":dc_power_in_rating",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":dc_power_in_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":dc_power_in_rating",
-            "data:propulsion:he_power_train:DC_DC_converter:"
-            + dc_dc_converter_id
-            + ":dc_power_in_rating",
-        ] = -1.0
