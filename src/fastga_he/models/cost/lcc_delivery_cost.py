@@ -71,9 +71,9 @@ class LCCDeliveryCost(om.ExplicitComponent):
 
         else:
             _LOGGER.warning(
-                "Delivery method"
+                "Delivery method "
                 + delivery_method
-                + " does not exist, replaced by flight delivery!"
+                + " does not exist, replaced with a delivery by flight."
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

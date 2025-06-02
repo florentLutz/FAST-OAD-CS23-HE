@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCDeliveryDurationRatio(om.ExplicitComponent):
     """
-    Computation of the ratio between the flight delivery duration and the sizing mission duration.
+    Computation of the ratio between the delivery flight duration and the sizing mission duration.
     """
 
     def setup(self):
