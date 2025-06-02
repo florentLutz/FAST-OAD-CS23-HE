@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import pytest
@@ -158,6 +158,8 @@ def test_constraints_ensure_power():
         "constraints:propulsion:he_power_train:turbo_generator:turbo_generator_1:power_rating",
         units="kW",
     ) == pytest.approx(-50.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_constraint_power_for_power_rate():
@@ -420,7 +422,7 @@ def test_weight_per_fu():
 def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:shaft_power_max",
+        "data:propulsion:he_power_train:turbo_generator:turbo_generator_1:shaft_power_rating",
         7.0,
         units="kW",
     )

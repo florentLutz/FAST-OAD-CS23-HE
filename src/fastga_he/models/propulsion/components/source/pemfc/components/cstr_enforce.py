@@ -8,12 +8,16 @@ import fastoad.api as oad
 
 from ..constants import (
     SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA,
+    SUBMODEL_CONSTRAINTS_PEMFC_POWER,
     MAX_CURRENT_DENSITY_EMPIRICAL,
     MAX_CURRENT_DENSITY_ANALYTICAL,
 )
 
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = (
     "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.enforce"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_POWER] = (
+    "fastga_he.submodel.propulsion.constraints.pemfc_stack.power.enforce"
 )
 
 
@@ -86,3 +90,52 @@ class ConstraintsPEMFCStackEffectiveAreaEnforce(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":current_max"]
             / max_current_density
         )
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_PEMFC_POWER,
+    "fastga_he.submodel.propulsion.constraints.pemfc_stack.power.enforce",
+)
+class ConstraintsPEMFCStackPowerEnforce(om.ExplicitComponent):
+    """
+    Class that enforcing the maximum power seen by the PEMFC stack during the mission is used for
+    sizing.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_id = self.options["pemfc_stack_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
+            units="kW",
+            val=np.nan,
+            desc="Maximum power that the PEMFC stack has to provide during mission",
+        )
+
+        self.add_output(
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating",
+            units="kW",
+            val=16.8,
+            desc="Maximum power that ",
+        )
+
+        self.declare_partials(
+            of="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating",
+            wrt="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_id = self.options["pemfc_stack_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating"
+        ] = inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max"]

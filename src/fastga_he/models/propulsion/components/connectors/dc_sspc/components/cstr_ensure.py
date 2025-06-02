@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 from ..constants import SUBMODEL_CONSTRAINTS_CURRENT_DC_SSPC, SUBMODEL_CONSTRAINTS_VOLTAGE_DC_SSPC
 
@@ -52,7 +52,16 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
             "mission, constraint is respected if < 0",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
+            wrt="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
+            wrt="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
+            val=-1.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_sspc_id = self.options["dc_sspc_id"]
@@ -63,18 +72,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max"]
             - inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        dc_sspc_id = self.options["dc_sspc_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":current_caliber",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -119,7 +116,16 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
             "mission, constraint is respected if < 0",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber",
+            wrt="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber",
+            wrt="data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber",
+            val=-1.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_sspc_id = self.options["dc_sspc_id"]
@@ -130,15 +136,3 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_max"]
             - inputs["data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        dc_sspc_id = self.options["dc_sspc_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber",
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber",
-            "data:propulsion:he_power_train:DC_SSPC:" + dc_sspc_id + ":voltage_caliber",
-        ] = -1.0

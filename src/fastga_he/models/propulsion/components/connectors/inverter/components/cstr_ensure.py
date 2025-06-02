@@ -59,11 +59,13 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
 
         self.declare_partials(
             of="constraints:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
-            wrt=[
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max",
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -75,18 +77,6 @@ class ConstraintsCurrentEnsure(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max"]
             - inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        inverter_id = self.options["inverter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":current_caliber",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -132,11 +122,13 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
 
         self.declare_partials(
             of="constraints:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",
-            wrt=[
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max",
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -148,18 +140,6 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max"]
             - inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        inverter_id = self.options["inverter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_ac_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_caliber",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -205,11 +185,13 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
 
         self.declare_partials(
             of="constraints:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
-            wrt=[
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max",
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -221,18 +203,6 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max"]
             - inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        inverter_id = self.options["inverter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":losses_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":dissipable_heat",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -286,13 +256,17 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:inverter:"
             + inverter_id
             + ":switching_frequency",
-            wrt=[
-                "data:propulsion:he_power_train:inverter:"
-                + inverter_id
-                + ":switching_frequency_max",
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":switching_frequency_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":switching_frequency",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -310,22 +284,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        inverter_id = self.options["inverter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:inverter:"
-            + inverter_id
-            + ":switching_frequency",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:inverter:"
-            + inverter_id
-            + ":switching_frequency",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":switching_frequency",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -374,11 +332,15 @@ class ConstraintsPowerOutputEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:inverter:"
             + inverter_id
             + ":ac_power_out_rating",
-            wrt=[
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:inverter:"
+            + inverter_id
+            + ":ac_power_out_rating",
+            wrt="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -392,19 +354,3 @@ class ConstraintsPowerOutputEnsure(om.ExplicitComponent):
                 "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        inverter_id = self.options["inverter_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:inverter:"
-            + inverter_id
-            + ":ac_power_out_rating",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:inverter:"
-            + inverter_id
-            + ":ac_power_out_rating",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
-        ] = -1.0

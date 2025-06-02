@@ -1279,7 +1279,9 @@ def test_weight_per_fu():
 def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:rectifier:rectifier_1:current_ac_max", units="A", val=133.0
+        "data:propulsion:he_power_train:rectifier:rectifier_1:current_ac_caliber",
+        units="A",
+        val=150.0,
     )
 
     problem = run_system(
@@ -1289,7 +1291,7 @@ def test_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:purchase_cost", units="USD"
-    ) == pytest.approx(2262.76, rel=1e-2)
+    ) == pytest.approx(2292.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1299,7 +1301,7 @@ def test_operational_cost():
     ivc.add_output(
         "data:propulsion:he_power_train:rectifier:rectifier_1:purchase_cost",
         units="USD",
-        val=2262.76,
+        val=2292.0,
     )
 
     problem = run_system(
@@ -1309,6 +1311,6 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(150.85, rel=1e-2)
+    ) == pytest.approx(152.8, rel=1e-2)
 
     problem.check_partials(compact_print=True)

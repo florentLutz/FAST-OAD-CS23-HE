@@ -8,6 +8,7 @@ import fastoad.api as oad
 
 from ..constants import (
     SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA,
+    SUBMODEL_CONSTRAINTS_PEMFC_POWER,
     MAX_CURRENT_DENSITY_EMPIRICAL,
     MAX_CURRENT_DENSITY_ANALYTICAL,
 )
@@ -54,7 +55,6 @@ class ConstraintsPEMFCStackEffectiveAreaEnsure(om.ExplicitComponent):
             val=np.nan,
             desc="Maximum current the PEMFC stack has to provide during mission",
         )
-
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area",
             units="cm**2",
@@ -104,5 +104,74 @@ class ConstraintsPEMFCStackEffectiveAreaEnsure(om.ExplicitComponent):
             / max_current_density
             - inputs[
                 "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":effective_area"
+            ]
+        )
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_PEMFC_POWER,
+    "fastga_he.submodel.propulsion.constraints.pemfc_stack.power.ensure",
+)
+class ConstraintsPEMFCStackPowerEnsure(om.ExplicitComponent):
+    """
+    Class that ensuring the maximum power seen by the PEMFC stack during the mission is below
+    the one used for sizing. This ensures each component working below its maximum.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_id = self.options["pemfc_stack_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
+            units="kW",
+            val=np.nan,
+            desc="Maximum current the PEMFC stack has to provide during mission",
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating",
+            units="kW",
+            val=np.nan,
+            desc="Effective area of the PEMFC's polymer electrolyte membrane",
+        )
+
+        self.add_output(
+            "constraints:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating",
+            units="kW",
+            val=-0.0,
+            desc="Respected if <0",
+        )
+
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:PEMFC_stack:"
+            + pemfc_stack_id
+            + ":power_rating",
+            wrt="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:PEMFC_stack:"
+            + pemfc_stack_id
+            + ":power_rating",
+            wrt="data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating",
+            val=-1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_id = self.options["pemfc_stack_id"]
+
+        outputs[
+            "constraints:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating"
+        ] = (
+            inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max"]
+            - inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating"
             ]
         )

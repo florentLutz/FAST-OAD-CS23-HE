@@ -28,7 +28,7 @@ class LCCTurboGeneratorCost(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
-            + ":shaft_power_max",
+            + ":shaft_power_rating",
             units="kW",
             val=np.nan,
         )
@@ -56,6 +56,6 @@ class LCCTurboGeneratorCost(om.ExplicitComponent):
             * inputs[
                 "data:propulsion:he_power_train:turbo_generator:"
                 + turbo_generator_id
-                + ":shaft_power_max"
+                + ":shaft_power_rating"
             ]
         )

@@ -24,10 +24,10 @@ class LCCRectifierCost(om.ExplicitComponent):
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_max",
+            name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber",
             units="A",
             val=np.nan,
-            desc="Maximum RMS current flowing through one arm of the rectifier",
+            desc="Caliber RMS current flowing through one arm of the rectifier, used for sizing",
         )
 
         self.add_output(
@@ -48,6 +48,8 @@ class LCCRectifierCost(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost"] = (
             1.72
-            * inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_max"]
+            * inputs[
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber"
+            ]
             + 2034.0
         )

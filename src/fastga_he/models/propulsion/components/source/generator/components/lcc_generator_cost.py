@@ -20,7 +20,7 @@ class LCCGeneratorCost(om.ExplicitComponent):
         generator_id = self.options["generator_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_max",
+            "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_rating",
             units="kW",
             val=np.nan,
         )
@@ -37,22 +37,22 @@ class LCCGeneratorCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         generator_id = self.options["generator_id"]
 
-        power_max = inputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_max"
+        power_rating = inputs[
+            "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_rating"
         ]
 
         outputs["data:propulsion:he_power_train:generator:" + generator_id + ":purchase_cost"] = (
-            893.51 * np.exp(0.0281 * power_max)
+            893.51 * np.exp(0.0281 * power_rating)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         generator_id = self.options["generator_id"]
 
-        power_max = inputs[
-            "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_max"
+        power_rating = inputs[
+            "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_rating"
         ]
 
         partials[
             "data:propulsion:he_power_train:generator:" + generator_id + ":purchase_cost",
-            "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_max",
-        ] = 25.108 * np.exp(0.0281 * power_max)
+            "data:propulsion:he_power_train:generator:" + generator_id + ":shaft_power_rating",
+        ] = 25.108 * np.exp(0.0281 * power_rating)
