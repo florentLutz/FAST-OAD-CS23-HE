@@ -6,7 +6,7 @@ SUBMODEL_CONSTRAINTS_INVERTER_CURRENT = "submodel.propulsion.constraints.inverte
 SUBMODEL_CONSTRAINTS_INVERTER_VOLTAGE = "submodel.propulsion.constraints.inverter.voltage"
 SUBMODEL_CONSTRAINTS_INVERTER_LOSSES = "submodel.propulsion.constraints.inverter.losses"
 SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY = "submodel.propulsion.constraints.inverter.frequency"
-SUBMODEL_CONSTRAINTS_INVERTER_POWER_OUT = "submodel.propulsion.constraints.inverter.power.output"
+SUBMODEL_CONSTRAINTS_INVERTER_POWER_OUT = "submodel.propulsion.constraints.inverter.output_power"
 
 SUBMODEL_INVERTER_JUNCTION_TEMPERATURE = "submodel.propulsion.inverter.junction_temperature"
 SUBMODEL_INVERTER_EFFICIENCY = "submodel.propulsion.inverter.efficiency"

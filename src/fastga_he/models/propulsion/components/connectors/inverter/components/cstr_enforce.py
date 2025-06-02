@@ -235,7 +235,7 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
 )
 class ConstraintsPowerOutputEnforce(om.ExplicitComponent):
     """
-    Class that enforces that the maximum power output seen by the inverter during the mission is
+    Class that enforces that the maximum current at the output of the inverter during the mission is
     used for the sizing, ensuring a fitted design of each component.
     """
 
