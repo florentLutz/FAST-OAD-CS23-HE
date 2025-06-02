@@ -50,11 +50,13 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
 
         self.declare_partials(
             of="constraints:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
-            wrt=[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_max",
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
+            wrt="data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -66,18 +68,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_max"]
             - inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        propeller_id = self.options["propeller_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":torque_rating",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -120,11 +110,13 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
 
         self.declare_partials(
             of="constraints:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_rating",
-            wrt=[
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max",
-                "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_rating",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_rating",
+            wrt="data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_rating",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -136,15 +128,3 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max"]
             - inputs["data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_rating"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        propeller_id = self.options["propeller_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_rating",
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_rating",
-            "data:propulsion:he_power_train:propeller:" + propeller_id + ":rpm_rating",
-        ] = -1.0
