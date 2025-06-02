@@ -64,7 +64,6 @@ class LCCProductionCost(om.Group):
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
-        delivery_method = self.options["delivery_method"]
 
         # Calculate first the labor resources required for R&D and manufacturing of airframe
         self.add_subsystem(
@@ -182,7 +181,7 @@ class LCCProductionCost(om.Group):
             promotes=["*"],
         )
 
-        if delivery_method == "flight":
+        if self.options["delivery_method"] == "flight":
             self.add_subsystem(
                 name="fuel_cost",
                 subsys=LCCFuelCost(
@@ -206,6 +205,6 @@ class LCCProductionCost(om.Group):
 
         self.add_subsystem(
             name="delivery_cost",
-            subsys=LCCDeliveryCost(delivery_method=delivery_method),
+            subsys=LCCDeliveryCost(delivery_method=self.options["delivery_method"]),
             promotes=["*"],
         )
