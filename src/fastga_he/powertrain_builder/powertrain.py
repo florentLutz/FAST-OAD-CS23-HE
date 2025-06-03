@@ -54,8 +54,13 @@ PROMOTION_FROM_MISSION = {
     "exterior_temperature": "degK",
 }
 # TODO: Find a more generic way to do that, as an attributes in registered_components.py maybe ?
-TYPE_TO_FUEL = {"turboshaft": "jet_fuel", "ICE": "avgas", "high_rpm_ICE": "avgas"}
-
+TYPE_TO_FUEL = {
+    "turboshaft": "jet_fuel",
+    "ICE": "avgas",
+    "high_rpm_ICE": "avgas",
+    "PEMFC_stack": "hydrogen",
+}
+ELECTRICITY_STORAGE_TYPES = ["battery_pack"]
 DEFAULT_VOLTAGE_VALUE = 737.800
 
 
@@ -1030,6 +1035,24 @@ class FASTGAHEPowerTrainConfigurator:
             fuel_types.append(TYPE_TO_FUEL[name_to_type[closest_source]])
 
         return fuel_tanks_names, fuel_tanks_types, fuel_types
+
+    def get_electricity_storage_list(self) -> Tuple[list, list]:
+        """
+        Returns the list of electricity storage components inside the power train.
+        """
+
+        self._get_components()
+        components_names = []
+        components_types = []
+
+        for component_id, component_name, component_type in zip(
+            self._components_id, self._components_name, self._components_type
+        ):
+            if component_id in ELECTRICITY_STORAGE_TYPES:
+                components_names.append(component_name)
+                components_types.append(component_type)
+
+        return components_names, components_types
 
     def get_residuals_watcher_elements_list(self) -> tuple:
         """

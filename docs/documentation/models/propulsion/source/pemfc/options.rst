@@ -9,10 +9,10 @@ Fuel cell position option
 *************************
 The PEMFC stack model has four possible installation positions shown as:
 
-| "wing_pod" : Stack installed under the wing with user specified position.
-| "underbelly" : Stack installed under and outside the fuselage.
-| "in_the_front" : Stack installed at the front section inside the fuselage.
-| "in_the_back" : Stack installed at the rear section inside the fuselage.
+| ``wing_pod`` : Stack installed under the wing with user specified position.
+| ``underbelly`` : Stack installed under and outside the fuselage.
+| ``in_the_front`` : Stack installed at the front section inside the fuselage.
+| ``in_the_back`` : Stack installed at the rear section inside the fuselage.
 
 *********************
 Model fidelity option

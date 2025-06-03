@@ -84,6 +84,8 @@
                         <material>0.0</material>
                         <torque_rating units="N*m">817.0</torque_rating>
                         <torque_max units="N*m">817.0</torque_max>
+                        <rpm_max units="1/min">2500</rpm_max>
+                        <rpm_rating units="1/min">2500</rpm_rating>
                         <CG>
                             <y_ratio>0.66</y_ratio>
                         </CG>

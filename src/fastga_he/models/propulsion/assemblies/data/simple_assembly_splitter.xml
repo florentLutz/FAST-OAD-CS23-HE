@@ -332,6 +332,7 @@
                         <voltage_caliber units="V">860.0</voltage_caliber>
                         <voltage_in_caliber units="V">860.0</voltage_in_caliber>
                         <voltage_in_max units="V">860.0</voltage_in_max>
+                        <dc_power_in_max units="kW">300.0</dc_power_in_max>
                         <voltage_out_max units="V">850.0</voltage_out_max>
                         <current_ripple>0.1</current_ripple>
                         <switching_frequency units="Hz">12000.0</switching_frequency>
@@ -410,6 +411,7 @@
                         <voltage_in_max units="V">860.0</voltage_in_max>
                         <voltage_out_max units="V">850.0</voltage_out_max>
                         <current_ripple>0.1</current_ripple>
+                        <dc_power_in_max units="kW">300.0</dc_power_in_max>
                         <switching_frequency units="Hz">12000.0</switching_frequency>
                         <switching_frequency_max units="Hz" is_input="True">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
                         <scaling>
@@ -702,6 +704,7 @@
                         <switching_frequency units="Hz">15.0e3</switching_frequency>
                         <switching_frequency_max units="Hz" is_input="True">12000.0</switching_frequency_max>
                         <power_factor>1.0</power_factor>
+                        <ac_power_out_max units="kW">189.365</ac_power_out_max>
                         <capacitor>
                             <capacity units="F">2.02e-3</capacity>
                             <current_caliber units="A">199.18</current_caliber>
@@ -816,6 +819,7 @@
                         <material>0.0</material>
                         <torque_rating units="N*m">817.0</torque_rating>
                         <torque_max units="N*m">817.0</torque_max>
+                        <rpm_max units="1/min">2000.0</rpm_max>
                     </propeller_1>
                 </propeller>
                 <DC_splitter>

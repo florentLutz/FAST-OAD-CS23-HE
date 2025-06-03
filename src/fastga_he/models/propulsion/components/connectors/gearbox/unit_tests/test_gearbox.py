@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import pytest
@@ -23,6 +23,7 @@ from ..components.sizing_cg_x import SizingGearboxCGX
 from ..components.sizing_cg_y import SizingGearboxCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAGearboxProdWeightPerFU
+from ..components.lcc_gearbox_cost import LCCGearboxCost
 
 from ..components.perf_gearbox import PerformancesGearbox
 from ..components.sizing_gearbox import SizingGearbox
@@ -367,5 +368,19 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:gearbox:gearbox_1:mass_per_fu", units="kg"
     ) == pytest.approx(3.286e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:propulsion:he_power_train:gearbox:gearbox_1:mass", val=32.86, units="kg")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCGearboxCost(gearbox_id="gearbox_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gearbox:gearbox_1:purchase_cost", units="USD"
+    ) == pytest.approx(7590.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)

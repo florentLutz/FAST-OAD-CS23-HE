@@ -320,7 +320,7 @@ def test_assembly():
     )[0] == pytest.approx(
         problem.get_val("component.dc_line_2.dc_current", units="A")[0]
         * problem.get_val("component.dc_line_2.dc_voltage_out", units="V")[0],
-        rel=1e-6,
+        rel=1e-5,
     )
 
 

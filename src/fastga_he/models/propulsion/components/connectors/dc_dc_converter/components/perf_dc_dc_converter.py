@@ -17,6 +17,7 @@ from .perf_currents import PerformancesCurrents
 from .perf_switching_losses import PerformancesSwitchingLosses
 from .perf_conduction_losses import PerformancesConductionLosses
 from .perf_total_losses import PerformancesLosses
+from .perf_dc_power_in import PerformancesDCPowerIn
 from .perf_maximum import PerformancesMaximum
 
 from ..constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
@@ -100,6 +101,11 @@ class PerformancesDCDCConverter(om.Group):
             oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_DC_DC_CONVERTER_EFFICIENCY, options=option_efficiency
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "dc_power_in",
+            PerformancesDCPowerIn(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(

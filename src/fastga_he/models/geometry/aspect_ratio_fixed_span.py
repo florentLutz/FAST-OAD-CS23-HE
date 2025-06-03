@@ -29,8 +29,7 @@ class AspectRatioFromTargetSpan(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         partials["data:geometry:wing:aspect_ratio", "data:geometry:wing:target_span"] = (
-            2.0
-            * np.sqrt(inputs["data:geometry:wing:area"] / inputs["data:geometry:wing:target_span"])
+            2.0 * inputs["data:geometry:wing:target_span"] / inputs["data:geometry:wing:area"]
         )
         partials["data:geometry:wing:aspect_ratio", "data:geometry:wing:area"] = (
             -(inputs["data:geometry:wing:target_span"] ** 2.0)

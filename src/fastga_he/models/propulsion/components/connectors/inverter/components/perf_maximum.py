@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -77,6 +77,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
         self.add_input("switching_frequency", units="Hz", val=np.full(number_of_points, np.nan))
         self.add_input("modulation_index", val=np.full(number_of_points, np.nan))
+        self.add_input("ac_power_out", units="kW", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":current_ac_max",
@@ -129,6 +130,20 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_dc_max",
             wrt="dc_voltage_in",
+            method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+
+        self.add_output(
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
+            units="kW",
+            val=200.0,
+            desc="Maximum value of the output side",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
+            wrt="ac_power_out",
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
@@ -229,6 +244,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_dc_max"] = (
             np.max(inputs["dc_voltage_in"])
         )
+        outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max"] = (
+            np.max(inputs["ac_power_out"])
+        )
         outputs[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:temperature_max"
         ] = np.max(inputs["IGBT_temperature"])
@@ -274,6 +292,10 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":voltage_dc_max",
             "dc_voltage_in",
         ] = np.where(inputs["dc_voltage_in"] == np.max(inputs["dc_voltage_in"]), 1.0, 0.0)
+        partials[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_max",
+            "ac_power_out",
+        ] = np.where(inputs["ac_power_out"] == np.max(inputs["ac_power_out"]), 1.0, 0.0)
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":igbt:temperature_max",
             "IGBT_temperature",

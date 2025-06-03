@@ -44,6 +44,8 @@ from ..components.cstr_ensure import ConstraintsSOCEnsure
 from ..components.cstr_enforce import ConstraintsSOCEnforce
 from ..components.pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
 from ..components.pre_lca_use_emission_per_fu import PreLCABatteryUseEmissionPerFU
+from ..components.lcc_battery_cost import LCCBatteryPackCost
+from ..components.lcc_battery_operational_cost import LCCBatteryPackOperationalCost
 
 from ..components.sizing_battery_pack import SizingBatteryPack
 from ..components.perf_battery_pack import PerformancesBatteryPack
@@ -1173,5 +1175,56 @@ def test_emissions_per_fu():
     assert problem.get_val(
         "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:HC_per_fu", units="kg"
     ) == pytest.approx(0.0, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
+        units="kW*h",
+        val=421.867,
+    )
+
+    problem = run_system(
+        LCCBatteryPackCost(battery_pack_id="battery_pack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:purchase_cost",
+        units="USD",
+    ) == pytest.approx(170524.19, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
+        units="kW*h",
+        val=421.867,
+    )
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:purchase_cost",
+        units="USD",
+        val=170524.19,
+    )
+
+    ivc.add_output(
+        "data:TLAR:flight_per_year",
+        val=100.0,
+    )
+
+    problem = run_system(
+        LCCBatteryPackOperationalCost(battery_pack_id="battery_pack_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:operational_cost",
+        units="USD/yr",
+    ) == pytest.approx(34104.84, rel=1e-2)
 
     problem.check_partials(compact_print=True)

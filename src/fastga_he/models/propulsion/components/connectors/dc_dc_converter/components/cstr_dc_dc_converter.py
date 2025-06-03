@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 
@@ -15,6 +15,7 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_VOLTAGE_IN,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_LOSSES,
     SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY,
+    SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN,
 )
 
 
@@ -90,6 +91,13 @@ class ConstraintsDCDCConverter(om.Group):
             name="constraints_frequency",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_FREQUENCY, options=option_dc_dc_converter_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="constraints_input_power",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_DC_DC_CONVERTER_POWER_IN, options=option_dc_dc_converter_id
             ),
             promotes=["*"],
         )
