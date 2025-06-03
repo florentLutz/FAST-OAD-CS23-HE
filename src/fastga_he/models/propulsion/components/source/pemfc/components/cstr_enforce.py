@@ -124,7 +124,7 @@ class ConstraintsPEMFCStackPowerEnforce(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating",
             units="kW",
             val=16.8,
-            desc="Maximum power that PEMFC stack can supply continuously",
+            desc="Maximum power that the PEMFC stack can supply continuously",
         )
 
         self.declare_partials(
