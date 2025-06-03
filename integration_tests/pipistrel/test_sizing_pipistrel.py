@@ -681,3 +681,129 @@ def test_pipistrel_velis_club():
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(63, rel=5e-2)
+
+
+def test_plot_power_profile_results_club():
+    mission_data_file = pth.join(RESULTS_FOLDER_PATH, "club_mission_data.csv")
+    pt_data_file = pth.join(RESULTS_FOLDER_PATH, "pipistrel_club_pt_data.csv")
+
+    columns_to_drop = []
+    for mission_variable_name in list(PROMOTION_FROM_MISSION.keys()):
+        columns_to_drop.append(
+            mission_variable_name + " [" + PROMOTION_FROM_MISSION[mission_variable_name] + "]"
+        )
+
+    # Read the two CSV and concatenate them so that all data can be displayed against all
+    # data
+    power_train_data = pd.read_csv(pt_data_file, index_col=0)
+    # Remove the taxi power train data because they are not stored in the mission data
+    # either
+    power_train_data = power_train_data.drop([0]).iloc[:-1]
+    # We readjust the index
+    power_train_data = power_train_data.set_index(np.arange(len(power_train_data.index)))
+    power_train_data = power_train_data.drop(columns_to_drop, axis=1)
+
+    mission_data = pd.read_csv(mission_data_file, index_col=0)
+    all_data = pd.concat([power_train_data, mission_data], axis=1)
+
+    fig = go.Figure()
+
+    x_name = "time"
+    y_name = "propeller_1 shaft_power_in [kW]"
+
+    name_to_flight_phase = {
+        "sizing:main_route:climb": "Climb",
+        "sizing:main_route:cruise": "Cruise",
+        "sizing:main_route:descent": "Descent",
+        "sizing:main_route:reserve": "Reserve",
+    }
+
+    for name in [
+        "sizing:main_route:climb",
+        "sizing:main_route:cruise",
+        "sizing:main_route:descent",
+        "sizing:main_route:reserve",
+    ]:
+        # pylint: disable=invalid-name # that's a common naming
+        x = all_data.loc[all_data["name"] == name, x_name]
+        # pylint: disable=invalid-name # that's a common naming
+        y = all_data.loc[all_data["name"] == name, y_name]
+
+        scatter = go.Scatter(
+            x=x/3600.0,
+            y=y,
+            mode="markers",
+            marker={
+                "color": COLOR_DICTIONARY[name],
+                "symbol": MARKER_DICTIONARY[name],
+                "size": 8,
+            },
+            name=name_to_flight_phase[name],
+            legendgroup="Primary axis",
+            legendgrouptitle_text="Flight phase",
+        )
+
+        fig.add_trace(scatter)
+
+    fig.update_layout(
+        xaxis_title="time [h]",
+        yaxis_title=y_name,
+        showlegend=True,
+    )
+    fig.update_layout(
+        height=800,
+        width=1600,
+        font_size=18,
+    )
+    fig.update_layout(
+        annotations=[
+            go.layout.Annotation(
+                text=" <u><b>Climb @ 1020 ft/min, in ISA conditions:</b></u> <br>"
+                + "POH: 69kW (Maximum Continuous Power) <br>"
+                + "Computed: Around 64.5kW",
+                align="left",
+                font=dict(size=25),
+                showarrow=False,
+                xref="paper",
+                yref="paper",
+                x=0.08,
+                y=0.97,
+                bordercolor="black",
+                borderwidth=1,
+                bgcolor="white",
+            ),
+            go.layout.Annotation(
+                text=" <u><b>Cruise @ 2000 ft, 119 KTAS:</b></u> <br>"
+                + "POH: 51.8kW (75% MCP) <br>"
+                + "Computed: 54kW",
+                align="left",
+                font=dict(size=25),
+                showarrow=False,
+                xref="paper",
+                yref="paper",
+                x=0.08,
+                y=0.75,
+                bordercolor="black",
+                borderwidth=1,
+                bgcolor="white",
+            ),
+            go.layout.Annotation(
+                text=" <u><b>Reserve @ 4000 ft, 121 KTAS:</b></u> <br>"
+                + "POH: 48.3kW (70% MCP)<br>"
+                + "Computed: 53kW",
+                align="left",
+                font=dict(size=25),
+                showarrow=False,
+                xref="paper",
+                yref="paper",
+                x=0.98,
+                y=0.74,
+                bordercolor="black",
+                borderwidth=1,
+                bgcolor="white",
+            ),
+        ]
+    )
+
+    # fig.show()
+    fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_club_performances_comparison.svg"))
