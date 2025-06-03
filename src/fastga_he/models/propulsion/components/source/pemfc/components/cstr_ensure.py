@@ -133,13 +133,13 @@ class ConstraintsPEMFCStackPowerEnsure(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_max",
             units="kW",
             val=np.nan,
-            desc="Maximum current the PEMFC stack has to provide during mission",
+            desc="Maximum power the PEMFC stack has to provide during mission",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating",
             units="kW",
             val=np.nan,
-            desc="Effective area of the PEMFC's polymer electrolyte membrane",
+            desc="Maximum power that the PEMFC stack can supply continuously",
         )
 
         self.add_output(

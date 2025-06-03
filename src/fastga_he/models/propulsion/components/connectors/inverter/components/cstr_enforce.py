@@ -28,7 +28,7 @@ oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY] = (
     "fastga_he.submodel.propulsion.constraints.inverter.frequency.enforce"
 )
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_INVERTER_POWER_OUT] = (
-    "fastga_he.submodel.propulsion.constraints.inverter.power.output.enforce"
+    "fastga_he.submodel.propulsion.constraints.inverter.output_power.enforce"
 )
 
 
@@ -231,7 +231,7 @@ class ConstraintsFrequencyEnforce(om.ExplicitComponent):
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_INVERTER_POWER_OUT,
-    "fastga_he.submodel.propulsion.constraints.inverter.power.output.enforce",
+    "fastga_he.submodel.propulsion.constraints.inverter.output_power.enforce",
 )
 class ConstraintsPowerOutputEnforce(om.ExplicitComponent):
     """

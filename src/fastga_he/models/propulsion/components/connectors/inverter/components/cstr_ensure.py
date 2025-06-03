@@ -288,7 +288,7 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_INVERTER_POWER_OUT,
-    "fastga_he.submodel.propulsion.constraints.inverter.power.output.ensure",
+    "fastga_he.submodel.propulsion.constraints.inverter.output_power.ensure",
 )
 class ConstraintsPowerOutputEnsure(om.ExplicitComponent):
     """

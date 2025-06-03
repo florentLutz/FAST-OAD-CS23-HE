@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 from ..constants import (
     SUBMODEL_CONSTRAINTS_PMSM_TORQUE,
@@ -52,6 +52,7 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
             val=250.0,
             desc="Max continuous torque of the motor",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating",
             wrt="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_max",
@@ -90,12 +91,14 @@ class ConstraintsRPMEnforce(om.ExplicitComponent):
             val=np.nan,
             desc="Maximum value of the motor rpm during the mission",
         )
+
         self.add_output(
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating",
             units="min**-1",
             val=5000.0,
             desc="Max continuous rpm of the motor",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating",
             wrt="data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_max",
@@ -134,12 +137,14 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
             val=np.nan,
             desc="Maximum value of the peak voltage at the input of the motor",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
             val=800.0,
             units="V",
             desc="Max voltage of the motor",
         )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_caliber",
             wrt="data:propulsion:he_power_train:PMSM:" + motor_id + ":voltage_ac_max",
