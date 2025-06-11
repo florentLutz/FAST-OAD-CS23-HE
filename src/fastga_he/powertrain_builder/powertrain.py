@@ -1987,6 +1987,9 @@ class FASTGAHEPowerTrainConfigurator:
                                 if output_name not in self._components_connection_outputs:
                                     output_name = component_name + ".dc_current_in"
 
+                            if name_to_id[component_name] == "fastga_he.pt_component.dc_line":
+                                output_name = component_name + ".dc_current"
+
                             # We look at the number of the corresponding splitter input
                             index = self._components_connection_outputs.index(output_name)
                             splitter_input_name = self._components_connection_inputs[index]
