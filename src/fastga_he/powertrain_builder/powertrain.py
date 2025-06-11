@@ -636,6 +636,42 @@ class FASTGAHEPowerTrainConfigurator:
 
         return distance_from_propulsive_load, propulsive_load_names
 
+    def get_distance_from_propulsor(self):
+        propulsor_names = []
+
+        # First and for reason that will appear clear later, we get a list of propulsor
+        for component_type_class, component_name in zip(
+            self._components_type_class, self._components_name
+        ):
+            if "propulsor" in component_type_class:
+                propulsor_names.append(component_name)
+
+        self._construct_connection_graph()
+        graph = self._connection_graph
+
+        distance_from_propulsor = {}
+        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
+
+        for component_name in self._components_name:
+            # When there are two separate sub propulsion chain in the same propulsion file,
+            # these line will cause an issue because, as it will browse all propulsive load he
+            # will attempt to reach loads he is not connected to and therefore not in
+            # connections_length_between_nodes. So first we must make sure to only browse
+            # connected loads.
+
+            connected_components = list(connections_length_between_nodes[component_name].keys())
+            connected_propulsors = list(set(propulsor_names) & set(connected_components))
+
+            min_distance = np.inf
+            for prop in connected_propulsors:
+                distance_to_load = connections_length_between_nodes[component_name][prop]
+                if distance_to_load < min_distance:
+                    min_distance = distance_to_load
+
+            distance_from_propulsor[component_name] = min_distance
+
+        return distance_from_propulsor
+
     def check_sspc_states(self, declared_state):
         self._construct_connection_graph()
         graph = self._connection_graph
