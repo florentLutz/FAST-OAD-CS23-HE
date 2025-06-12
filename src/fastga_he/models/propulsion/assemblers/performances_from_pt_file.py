@@ -118,7 +118,6 @@ class PowerTrainPerformancesFromFile(om.Group):
         )
 
         if self.options["sort_component"]:
-            prop_order_dict, sort_map = self.create_propeller_order_map(components_name)
             (
                 components_name,
                 components_name_id,
@@ -126,7 +125,6 @@ class PowerTrainPerformancesFromFile(om.Group):
                 components_options,
                 components_promotes,
             ) = self.reorder_components(
-                sort_map,
                 components_name,
                 components_name_id,
                 components_om_type,
@@ -235,19 +233,18 @@ class PowerTrainPerformancesFromFile(om.Group):
         # Let's first check the coherence of the voltage
         self.configurator.check_voltage_coherence(inputs=inputs, number_of_points=number_of_points)
 
-    def create_propeller_order_map(self, key_list=None):
+    def reorder_components(self, name_list, *lists):
         """
-        Reorders dictionary elements by their values and assigns proper sequential indices.
-        Optionally maps a list of keys to their corresponding proper indices.
+        Reorders components by their nearest distance from propeller and assigns proper sequential
+        indices. Maps the component name list to their corresponding proper indices and reorders
+        other property lists according to the same mapping.
 
         Args:
-            key_list (list, optional): List of keys to be replaced with indices.
-                                     If None, only returns the reindexed dictionary.
+            name_list (list): List of the component names to be replaced with indices.
+            *lists: Other property lists to be reordered according to the component name mapping.
 
         Returns:
-            tuple or dict:
-                - If key_list is provided: (reindexed_dict, indexed_list)
-                - If key_list is None: reindexed_dict only
+            tuple: (reordered_name_list, *reordered_lists)
         """
         # Sort items by value first, then by original key order to maintain consistency
         distance_from_prop = self.configurator.get_distance_from_propulsor()
@@ -258,26 +255,36 @@ class PowerTrainPerformancesFromFile(om.Group):
         for index, (key, original_value) in enumerate(sorted_items):
             reindexed_dict[key] = index
 
-        # If no key_list provided, return only the reindexed dictionary
-        if key_list is None:
-            return reindexed_dict
-
-        # Replace keys in list with indices
-        indexed_list = []
-        for key in key_list:
+        # Create mapping from old positions to new positions
+        index_map = []
+        for key in name_list:
             if key in reindexed_dict:
-                indexed_list.append(reindexed_dict[key])
+                index_map.append(reindexed_dict[key])
             else:
                 print(f"Warning: Key '{key}' not found in re-indexed dictionary")
-                indexed_list.append(None)
+                index_map.append(None)
 
-        return reindexed_dict, indexed_list
+        # Reorder the name_list according to the new indices
+        reordered_name_list = [None] * len(name_list)
+        for old_pos, new_pos in enumerate(index_map):
+            if new_pos is not None:
+                reordered_name_list[new_pos] = name_list[old_pos]
 
-    def reorder_components(self, index_map, *lists):
-        result = []
+        # Reorder other property lists according to the same mapping
+        reordered_lists = []
         for lst in lists:
+            if len(lst) != len(name_list):
+                print(
+                    f"Warning: List length {len(lst)} doesn't match name_list length {len(name_list)}"
+                )
+                reordered_lists.append(lst)  # Return original list if lengths don't match
+                continue
+
             reordered = [None] * len(lst)
-            for i, new_pos in enumerate(index_map):
-                reordered[new_pos] = lst[i]
-            result.append(reordered)
-        return tuple(result)
+            for old_pos, new_pos in enumerate(index_map):
+                if new_pos is not None:
+                    reordered[new_pos] = lst[old_pos]
+            reordered_lists.append(reordered)
+
+        # Return the reordered name list and all reordered lists
+        return (reordered_name_list, *reordered_lists)
