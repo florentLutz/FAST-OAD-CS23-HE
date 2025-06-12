@@ -185,7 +185,7 @@ def test_lca_sensitivity_analysis_advanced_components_and_phase():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
-def test_lca_sensitivity_analysis_advanced_components_and_phase():
+def test_lca_sensitivity_analysis_advanced_components_and_phase_pipistrel():
     fig = lca_score_sensitivity_advanced_components_and_phase(
         results_folder_path=PIPISTREL_SENSITIVITY_STUDIES_FOLDER_PATH,
         prefix="pipistrel_out",
