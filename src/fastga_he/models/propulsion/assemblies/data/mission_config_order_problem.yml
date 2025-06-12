@@ -21,6 +21,7 @@ model:
       out_file: ../results/simulation_results.csv
       use_linesearch: false
       pre_condition_pt: true
+      sort_component: true
     weight:
       id: fastga.weight.legacy
       propulsion_id: fastga.wrapper.propulsion.basicTurboprop

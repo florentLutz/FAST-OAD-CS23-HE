@@ -52,7 +52,7 @@ class PowerTrainPerformancesFromFile(om.Group):
         )
         self.options.declare(
             name="sort_component",
-            default=True,
+            default=False,
             desc="Boolean to sort the component with proper order for adding subsystem operations",
             allow_none=False,
         )

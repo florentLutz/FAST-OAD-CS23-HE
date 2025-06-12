@@ -48,6 +48,12 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            allow_none=False,
+        )
+        self.options.declare(
             name="pre_condition_pt",
             default=False,
             desc="Boolean to pre_condition the different components of the PT, "
@@ -78,6 +84,7 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
             "number_of_points": number_of_points,
             "add_solver": False,
             "pre_condition_pt": pre_condition_pt,
+            "sort_component": self.options["sort_component"],
         }
 
         # For some reasons that I only knew when I coded the mission vector, all flight

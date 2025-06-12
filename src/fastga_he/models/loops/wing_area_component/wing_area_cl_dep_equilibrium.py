@@ -63,6 +63,12 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             default="",
             desc="Path to the file containing the description of the power",
         )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            allow_none=False,
+        )
 
     def setup(self):
         if self.options["power_train_file_path"]:
@@ -77,7 +83,10 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
 
         input_zip = zip_equilibrium_input(
-            self.options["propulsion_id"], self.simplified_file_path, self.control_parameter_list
+            self.options["propulsion_id"],
+            self.simplified_file_path,
+            self.options["sort_component"],
+            self.control_parameter_list,
         )[0]
         for (
             var_names,
@@ -147,6 +156,7 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             self.options["propulsion_id"],
             self.simplified_file_path,
             self.control_parameter_list,
+            self.options["sort_component"],
         )
 
         # Again with the damned optimizer. It can sometimes happen that he simply does not care
@@ -233,7 +243,9 @@ class _IDThrustRate(om.ExplicitComponent):
         partials["thrust_rate", "thrust_rate_t_econ"] = d_t_r_econ_d_t_r
 
 
-def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_list) -> float:
+def compute_wing_area(
+    inputs, propulsion_id, pt_file_path, control_parameter_list, sort_component
+) -> float:
     # To deactivate all the logging messages from matplotlib
     logging.getLogger("matplotlib.font_manager").disabled = True
     logging.getLogger("matplotlib.pyplot").disabled = True
@@ -271,7 +283,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
 
     try:
         input_zip, inputs_name_for_promotion = zip_equilibrium_input(
-            propulsion_id, pt_file_path, control_parameter_list
+            propulsion_id, pt_file_path, sort_component, control_parameter_list
         )
 
         ivc = om.IndepVarComp()
@@ -308,6 +320,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
             "propulsion_id": propulsion_id,
             "power_train_file_path": pt_file_path,
             "flaps_position": "landing",
+            "sort_component": sort_component,
         }
         model.add_subsystem(
             "equilibrium",
@@ -385,7 +398,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
     return wing_area_approach
 
 
-def zip_equilibrium_input(propulsion_id, pt_file_path, control_parameter_list=None):
+def zip_equilibrium_input(propulsion_id, pt_file_path, sort_component, control_parameter_list=None):
     """
     Returns a list of the variables needed for the computation of the equilibrium. Based on
     the submodel currently registered and the propulsion_id required.
@@ -403,6 +416,7 @@ def zip_equilibrium_input(propulsion_id, pt_file_path, control_parameter_list=No
         "propulsion_id": propulsion_id,
         "power_train_file_path": pt_file_path,
         "flaps_position": "landing",
+        "sort_component": sort_component,
     }
     new_component.add_subsystem(
         "system",
