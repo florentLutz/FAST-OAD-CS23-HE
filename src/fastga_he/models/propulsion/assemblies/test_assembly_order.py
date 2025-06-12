@@ -5,7 +5,6 @@
 import os.path as pth
 import fastoad.api as oad
 import logging
-from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 OUT_FOLDER_PATH = pth.join(pth.dirname(__file__), "outputs")
@@ -27,25 +26,14 @@ def test_assembly_from_pt_file():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, XML_FILE)
-    # n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_cirrus.html")
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
     problem.setup()
 
-    # om.n2(problem, show_browser=False, outfile=n2_path)
-
     problem.run_model()
 
-    _, _, residuals = problem.model.get_nonlinear_vectors()
-    residuals = filter_residuals(residuals)
-
-    problem.write_outputs()
-
-
-def test_assembly_from_pt_file_correct():
-    logging.basicConfig(level=logging.WARNING)
+    # Run with another order
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
@@ -56,18 +44,8 @@ def test_assembly_from_pt_file_correct():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, XML_FILE)
-    # n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_cirrus.html")
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
     problem.setup()
-
-    # om.n2(problem, show_browser=False, outfile=n2_path)
-
     problem.run_model()
-
-    _, _, residuals = problem.model.get_nonlinear_vectors()
-    residuals = filter_residuals(residuals)
-
-    problem.write_outputs()

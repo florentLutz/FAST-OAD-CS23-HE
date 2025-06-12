@@ -51,6 +51,12 @@ class PowerTrainPerformancesFromFile(om.Group):
             allow_none=False,
         )
         self.options.declare(
+            name="sort_component",
+            default=True,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            allow_none=False,
+        )
+        self.options.declare(
             name="sspc_closed_list",
             default=[],
             types=list,
@@ -110,6 +116,23 @@ class PowerTrainPerformancesFromFile(om.Group):
             subsys=oad.RegisterSubmodel.get_submodel(SUBMODEL_THRUST_DISTRIBUTOR, options=options),
             promotes=["data:*", "thrust"],
         )
+
+        if self.options["sort_component"]:
+            prop_order_dict, sort_map = self.create_propeller_order_map(components_name)
+            (
+                components_name,
+                components_name_id,
+                components_om_type,
+                components_options,
+                components_promotes,
+            ) = self.reorder_components(
+                sort_map,
+                components_name,
+                components_name_id,
+                components_om_type,
+                components_options,
+                components_promotes,
+            )
 
         # Enforces SSPC are added last, not done before because it might breaks the connections
         # necessary to ensure the coherence of SSPC states when connected to both end of a cable
@@ -211,3 +234,50 @@ class PowerTrainPerformancesFromFile(om.Group):
 
         # Let's first check the coherence of the voltage
         self.configurator.check_voltage_coherence(inputs=inputs, number_of_points=number_of_points)
+
+    def create_propeller_order_map(self, key_list=None):
+        """
+        Reorders dictionary elements by their values and assigns proper sequential indices.
+        Optionally maps a list of keys to their corresponding proper indices.
+
+        Args:
+            key_list (list, optional): List of keys to be replaced with indices.
+                                     If None, only returns the reindexed dictionary.
+
+        Returns:
+            tuple or dict:
+                - If key_list is provided: (reindexed_dict, indexed_list)
+                - If key_list is None: reindexed_dict only
+        """
+        # Sort items by value first, then by original key order to maintain consistency
+        distance_from_prop = self.configurator.get_distance_from_propulsor()
+        sorted_items = sorted(distance_from_prop.items(), key=lambda x: (x[1], x[0]))
+
+        # Create new dictionary with proper sequential indices
+        reindexed_dict = {}
+        for index, (key, original_value) in enumerate(sorted_items):
+            reindexed_dict[key] = index
+
+        # If no key_list provided, return only the reindexed dictionary
+        if key_list is None:
+            return reindexed_dict
+
+        # Replace keys in list with indices
+        indexed_list = []
+        for key in key_list:
+            if key in reindexed_dict:
+                indexed_list.append(reindexed_dict[key])
+            else:
+                print(f"Warning: Key '{key}' not found in re-indexed dictionary")
+                indexed_list.append(None)
+
+        return reindexed_dict, indexed_list
+
+    def reorder_components(self, index_map, *lists):
+        result = []
+        for lst in lists:
+            reordered = [None] * len(lst)
+            for i, new_pos in enumerate(index_map):
+                reordered[new_pos] = lst[i]
+            result.append(reordered)
+        return tuple(result)
