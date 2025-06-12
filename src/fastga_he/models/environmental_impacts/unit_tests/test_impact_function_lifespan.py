@@ -19,6 +19,9 @@ from ..lca import LCA
 DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "results" / "parametric_study"
 RESULTS2_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "results" / "parametric_study_2"
+RESULTS_PIPISTREL_FOLDER_PATH = (
+    pathlib.Path(__file__).parents[0] / "results" / "parametric_study_pipistrel"
+)
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
@@ -399,4 +402,171 @@ def test_environmental_impact_function_span_conventional():
 
         file_name = input_file_name.split(".")[0] + "_" + str(int(airframe_hours)) + ".xml"
         problem.output_file_path = RESULTS_FOLDER_PATH / file_name
+        problem.write_outputs()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_environmental_impact_function_span_pipistrel_velis_electro():
+    input_file_name = "pipistrel_out.xml"
+
+    pipistrel_data = pathlib.Path(__file__).parents[0] / "data_lca_pipistrel" / input_file_name
+
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
+        functional_unit="Flight hours",
+        aircraft_lifespan_in_hours=True,
+        component_level_breakdown=True,
+        airframe_material="composite",
+        delivery_method="train",
+        electric_mix="french",
+        normalization=True,
+        weighting=True,
+        ecoinvent_version="3.9.1",
+        impact_assessment_method="EF v3.1",
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(component),
+        __file__,
+        pipistrel_data,
+    )
+
+    # First run of the problem but unused, just to be able to change the values without having to
+    # recreate a problem each time
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    # The energy stored in the battery does not consider the fuel necessary for takeoff,
+    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
+    # not include the energy necessary for the reserve as it does not contribute to the
+    # functional unit
+    datafile = oad.DataFile(pipistrel_data)
+
+    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
+    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
+    energy_for_fu = total_energy_mission - energy_reserves
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
+        units="W*h",
+        val=energy_for_fu / 2.0,
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
+        units="W*h",
+        val=energy_for_fu / 2.0,
+    )
+
+    mean_airframe_hours = 2956.7
+    std_airframe_hours = 93.7
+
+    # To have a widespread, we cover values of airframe hours that goes from the average airframe
+    # hours of the fleet (with confidence interval) to an estimate of the average max airframe
+    # hours of the fleet (which we'll estimate as twice the average airframe hours of the fleet,
+    # with the confidence interval)
+
+    print("First run done")
+
+    for airframe_hours in np.linspace(
+        mean_airframe_hours - 3.0 * std_airframe_hours,
+        2.0 * mean_airframe_hours + 6.0 * std_airframe_hours,
+        100,
+    ):
+        problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
+
+        problem.run_model()
+
+        file_name = input_file_name.split(".")[0] + "_" + str(int(airframe_hours)) + ".xml"
+        problem.output_file_path = RESULTS_PIPISTREL_FOLDER_PATH / file_name
+        problem.write_outputs()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_environmental_impact_function_span_pipistrel_velis_electro_longer_battery():
+    input_file_name = "pipistrel_out.xml"
+
+    pipistrel_data = pathlib.Path(__file__).parents[0] / "data_lca_pipistrel" / input_file_name
+
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
+        functional_unit="Flight hours",
+        aircraft_lifespan_in_hours=True,
+        component_level_breakdown=True,
+        airframe_material="composite",
+        delivery_method="train",
+        electric_mix="french",
+        normalization=True,
+        weighting=True,
+        ecoinvent_version="3.9.1",
+        impact_assessment_method="EF v3.1",
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(component),
+        __file__,
+        pipistrel_data,
+    )
+
+    # First run of the problem but unused, just to be able to change the values without having to
+    # recreate a problem each time
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    # The energy stored in the battery does not consider the fuel necessary for takeoff,
+    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
+    # not include the energy necessary for the reserve as it does not contribute to the
+    # functional unit
+    datafile = oad.DataFile(pipistrel_data)
+
+    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
+    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
+    energy_for_fu = total_energy_mission - energy_reserves
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
+        units="W*h",
+        val=energy_for_fu / 2.0,
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
+        units="W*h",
+        val=energy_for_fu / 2.0,
+    )
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan",
+        val=700,
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:lifespan",
+        val=700,
+    )
+
+    mean_airframe_hours = 2956.7
+    std_airframe_hours = 93.7
+
+    # To have a widespread, we cover values of airframe hours that goes from the average airframe
+    # hours of the fleet (with confidence interval) to an estimate of the average max airframe
+    # hours of the fleet (which we'll estimate as twice the average airframe hours of the fleet,
+    # with the confidence interval)
+
+    print("First run done")
+
+    for airframe_hours in np.linspace(
+        mean_airframe_hours - 3.0 * std_airframe_hours,
+        2.0 * mean_airframe_hours + 6.0 * std_airframe_hours,
+        100,
+    ):
+        problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
+
+        problem.run_model()
+
+        file_name = (
+            "long_batt" + input_file_name.split(".")[0] + "_" + str(int(airframe_hours)) + ".xml"
+        )
+        problem.output_file_path = RESULTS_PIPISTREL_FOLDER_PATH / file_name
         problem.write_outputs()

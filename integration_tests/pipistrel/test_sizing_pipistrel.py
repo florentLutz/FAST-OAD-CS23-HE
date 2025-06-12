@@ -730,7 +730,7 @@ def test_plot_power_profile_results_club():
         y = all_data.loc[all_data["name"] == name, y_name]
 
         scatter = go.Scatter(
-            x=x/3600.0,
+            x=x / 3600.0,
             y=y,
             mode="markers",
             marker={

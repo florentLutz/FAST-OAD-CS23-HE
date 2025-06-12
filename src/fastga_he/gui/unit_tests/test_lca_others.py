@@ -47,6 +47,14 @@ SENSITIVITY_STUDIES_FOLDER_PATH_2 = (
     / "results"
     / "parametric_study_2"
 )
+PIPISTREL_SENSITIVITY_STUDIES_FOLDER_PATH = (
+    pathlib.Path(__file__).parents[2]
+    / "models"
+    / "environmental_impacts"
+    / "unit_tests"
+    / "results"
+    / "parametric_study_pipistrel"
+)
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
@@ -174,6 +182,50 @@ def test_lca_sensitivity_analysis_advanced_components_and_phase():
 
     fig.update_xaxes(domain=[0, 0.95])
     fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_sensitivity_analysis_advanced_components_and_phase():
+    fig = lca_score_sensitivity_advanced_components_and_phase(
+        results_folder_path=PIPISTREL_SENSITIVITY_STUDIES_FOLDER_PATH,
+        prefix="pipistrel_out",
+        name="Pipistrel Velis Electro",
+        cutoff_criteria=2,
+    )
+    fig.add_vline(x=4000.0, line_width=3, line_dash="dash", line_color="red")
+    fig.update_xaxes(domain=[0, 0.95])
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_single_score_sensitivity_analysis_two_plots_pipistrel():
+    # Check that we can create a plot
+    fig = lca_score_sensitivity_simple(
+        results_folder_path=PIPISTREL_SENSITIVITY_STUDIES_FOLDER_PATH,
+        prefix="pipistrel_out",
+        name="Pipistrel Velis Electro",
+    )
+
+    fig = lca_score_sensitivity_simple(
+        results_folder_path=PIPISTREL_SENSITIVITY_STUDIES_FOLDER_PATH,
+        prefix="long_battpipistrel_out",
+        name="Pipistrel Velis Electro (long battery lifespan)",
+        fig=fig,
+    )
+    fig.add_vline(x=4000.0, line_width=3, line_dash="dash", line_color="red")
+
+    # We do that so that the legend doesn't overlap the y-axis, which as a reminder, we have to
+    # put on the right otherwise we can't change the font without changing the yaxis range
+    fig.update_xaxes(domain=[0, 0.95])
+
+    fig = go.FigureWidget(fig)
+
+    fig.show()
+
+    fig.update_layout(height=800, width=1600)
+    fig.write_image(RESULT_FOLDER_PATH / "ga_impacts_batt_life.pdf")
+    time.sleep(3)
+    fig.write_image(RESULT_FOLDER_PATH / "ga_impacts_batt_life.pdf")
 
 
 def test_lca_bar_chart():

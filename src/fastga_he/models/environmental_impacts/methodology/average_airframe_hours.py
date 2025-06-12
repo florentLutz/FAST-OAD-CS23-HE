@@ -8,7 +8,7 @@ import numpy as np
 from plotly.colors import DEFAULT_PLOTLY_COLORS as COLS
 import plotly.graph_objects as go
 
-MARKER_DICTIONARY = ["circle-open",  "square",  "diamond",  "cross"]
+MARKER_DICTIONARY = ["circle-open", "square", "diamond", "cross"]
 
 if __name__ == "__main__":
     # Data will be provided in the following order:
@@ -162,7 +162,7 @@ if __name__ == "__main__":
                     line=dict(color=COLS[count], dash="dot"),
                 )
             )
-            count +=1
+            count += 1
 
     fig.update_layout(
         title_text="Average airframe hours per category",
