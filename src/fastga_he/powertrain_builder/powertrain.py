@@ -4,7 +4,7 @@ power train module with the aircraft sizing modules from FAST-OAD-GA based on th
 """
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import copy
 import json
