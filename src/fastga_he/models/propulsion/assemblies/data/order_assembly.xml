@@ -1224,6 +1224,7 @@
     <weight>
       <aircraft>
         <max_payload units="kg" is_input="True">1140.0<!--max payload weight--></max_payload>
+        <MTOW units="kg" >2627.4504846976<!--maximum takeoff weight of the aircraft--></MTOW>
         <payload units="kg" is_input="True">310.0<!--design payload weight--></payload>
         <CG>
           <aft>
@@ -1234,6 +1235,12 @@
           </fwd>
         </CG>
       </aircraft>
+      <aircraft_empty>
+        <mass units="kg">1780.0733852136048<!--mass of empty aircraft--></mass>
+        <CG>
+          <x units="m" >4.747900671352082<!--X-position center of gravity of empty aircraft--></x>
+        </CG>
+      </aircraft_empty>
       <airframe>
         <fuselage>
           <k_factor is_input="True">1.0<!--proportional corrective factor for fuselage mass--></k_factor>
