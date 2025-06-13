@@ -2,6 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
+import pytest
+import copy
+
 import os.path as pth
 import fastoad.api as oad
 import logging
@@ -14,7 +17,15 @@ NB_POINTS_TEST = 50
 COEFF_DIFF = 0.0
 
 
-def test_assembly_from_pt_file():
+@pytest.fixture()
+def restore_submodels():
+
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
+
+
+def test_assembly_from_pt_file(restore_submodels):
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
