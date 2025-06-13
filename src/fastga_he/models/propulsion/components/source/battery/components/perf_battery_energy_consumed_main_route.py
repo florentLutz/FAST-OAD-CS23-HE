@@ -6,11 +6,10 @@ import openmdao.api as om
 import numpy as np
 
 
-class PerformancesFuelConsumedMainRoute(om.ExplicitComponent):
+class PerformancesEnergyConsumedMainRoute(om.ExplicitComponent):
     """
-    Computation of the amount of fuel in that particular tank which will be consumed during the
-    main route, this quantity is of importance because for the LCA the fuel for reserve should not
-    be included.
+    Summation over all the main route of the energy drawn for that battery. We have a computation at
+    aircraft level but we need one at component level as well.
     """
 
     def initialize(self):
@@ -26,32 +25,30 @@ class PerformancesFuelConsumedMainRoute(om.ExplicitComponent):
             types=int,
         )
         self.options.declare(
-            name="fuel_tank_id",
+            name="battery_pack_id",
             default=None,
-            desc="Identifier of the fuel tank",
+            desc="Identifier of the battery pack",
             allow_none=False,
         )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         number_of_points_reserve = self.options["number_of_points_reserve"]
-        fuel_tank_id = self.options["fuel_tank_id"]
+        battery_pack_id = self.options["battery_pack_id"]
 
         self.add_input(
-            "fuel_consumed_t",
-            units="kg",
+            "non_consumable_energy_t",
             val=np.full(number_of_points, np.nan),
-            desc="Fuel from this tank consumed at each time step",
+            desc="fuel consumed at each time step in the battery",
+            units="W*h",
         )
-
         self.add_output(
-            "data:propulsion:he_power_train:fuel_tank:"
-            + fuel_tank_id
-            + ":fuel_consumed_main_route",
-            units="kg",
-            val=50.0,
-            desc="Amount of fuel from that tank which will be consumed during the main route (does "
-            "not account for takeoff and initial climb, the amount used for sizing does)",
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":energy_consumed_main_route",
+            units="W*h",
+            val=50e3,
+            desc="Energy drawn from the battery for the mission",
         )
 
         val_partial = np.ones(number_of_points)
@@ -66,13 +63,15 @@ class PerformancesFuelConsumedMainRoute(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        fuel_tank_id = self.options["fuel_tank_id"]
+        battery_pack_id = self.options["battery_pack_id"]
         number_of_points_reserve = self.options["number_of_points_reserve"]
 
         # TODO: this way of "extracting" the reserve will only work with the current "format" for
         #  the points in the mission (1pt taxi_out -> climb -> cruise -> descent -> 1pt taxi_in)
         outputs[
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_consumed_main_route"
-        ] = np.sum(inputs["fuel_consumed_t"]) - np.sum(
-            inputs["fuel_consumed_t"][-number_of_points_reserve - 1 : -1]
+            "data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":energy_consumed_main_route"
+        ] = np.sum(inputs["non_consumable_energy_t"]) - np.sum(
+            inputs["non_consumable_energy_t"][-number_of_points_reserve - 1 : -1]
         )

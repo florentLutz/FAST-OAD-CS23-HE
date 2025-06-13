@@ -27,6 +27,7 @@ from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 from ..components.perf_battery_energy_consumed import PerformancesEnergyConsumed
+from ..components.perf_battery_energy_consumed_main_route import PerformancesEnergyConsumedMainRoute
 from ..components.perf_inflight_emissions import PerformancesBatteryPackInFlightEmissions
 
 
@@ -42,6 +43,12 @@ class PerformancesBatteryPack(om.Group):
             allow_none=False,
         )
         self.options.declare(
+            "number_of_points_reserve",
+            default=None,  # By default, for retro-compatibility, we want it disabled
+            desc="number of equilibrium to be treated in reserve",
+            types=int,
+        )
+        self.options.declare(
             name="direct_bus_connection",
             default=False,
             types=bool,
@@ -53,6 +60,7 @@ class PerformancesBatteryPack(om.Group):
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
         direct_bus_connection = self.options["direct_bus_connection"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         self.add_subsystem(
             "cell_temperature",
@@ -187,6 +195,16 @@ class PerformancesBatteryPack(om.Group):
             ),
             promotes=["*"],
         )
+        if number_of_points_reserve:
+            self.add_subsystem(
+                "energy_consumed",
+                PerformancesEnergyConsumedMainRoute(
+                    number_of_points=number_of_points,
+                    battery_pack_id=battery_pack_id,
+                    number_of_points_reserve=number_of_points_reserve,
+                ),
+                promotes=["*"],
+            )
 
         fuel_consumed = om.IndepVarComp()
         fuel_consumed.add_output("fuel_consumed_t", np.full(number_of_points, 0.0), units="kg")

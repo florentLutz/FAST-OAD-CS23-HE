@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
 import copy
@@ -40,6 +40,7 @@ from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
 from ..components.perf_battery_power import PerformancesBatteryPower
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 from ..components.perf_battery_energy_consumed import PerformancesEnergyConsumed
+from ..components.perf_battery_energy_consumed_main_route import PerformancesEnergyConsumedMainRoute
 from ..components.cstr_ensure import ConstraintsSOCEnsure
 from ..components.cstr_enforce import ConstraintsSOCEnforce
 from ..components.pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
@@ -1029,6 +1030,32 @@ def test_energy_consumed():
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
         units="kW*h",
     ) == pytest.approx(421.867, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_energy_consumed_main_route():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "non_consumable_energy_t",
+        units="kW*h",
+        val=np.array(
+            [44.556, 43.788, 43.015, 42.574, 42.13, 41.682, 41.457, 41.118, 40.889, 40.658]
+        ),
+    )
+
+    problem = run_system(
+        PerformancesEnergyConsumedMainRoute(
+            number_of_points=NB_POINTS_TEST,
+            battery_pack_id="battery_pack_1",
+            number_of_points_reserve=2,
+        ),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route",
+        units="kW*h",
+    ) == pytest.approx(339.86, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
