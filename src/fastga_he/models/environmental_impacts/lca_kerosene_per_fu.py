@@ -73,7 +73,7 @@ class LCAKerosenePerFU(om.ExplicitComponent):
                 + tank_type
                 + ":"
                 + tank_name
-                + ":fuel_consumed_mission"
+                + ":fuel_consumed_main_route"
             )
             self.add_input(input_name, units="kg", val=np.nan)
 
@@ -91,7 +91,7 @@ class LCAKerosenePerFU(om.ExplicitComponent):
                 + tank_type
                 + ":"
                 + tank_name
-                + ":fuel_consumed_mission"
+                + ":fuel_consumed_main_route"
             ]
 
         outputs["data:LCA:operation:he_power_train:kerosene:mass_per_fu"] = (
@@ -122,7 +122,7 @@ class LCAKerosenePerFU(om.ExplicitComponent):
                 + tank_type
                 + ":"
                 + tank_name
-                + ":fuel_consumed_mission",
+                + ":fuel_consumed_main_route",
             ] = inputs["data:environmental_impact:flight_per_fu"]
 
             partials[
@@ -131,7 +131,7 @@ class LCAKerosenePerFU(om.ExplicitComponent):
                 + tank_type
                 + ":"
                 + tank_name
-                + ":fuel_consumed_mission",
+                + ":fuel_consumed_main_route",
             ] = (
                 inputs["data:environmental_impact:line_test:mission_ratio"]
                 * inputs["data:environmental_impact:aircraft_per_fu"]
@@ -143,7 +143,7 @@ class LCAKerosenePerFU(om.ExplicitComponent):
                 + tank_type
                 + ":"
                 + tank_name
-                + ":fuel_consumed_mission",
+                + ":fuel_consumed_main_route",
             ] = (
                 inputs["data:environmental_impact:delivery:mission_ratio"]
                 * inputs["data:environmental_impact:aircraft_per_fu"]
@@ -154,7 +154,7 @@ class LCAKerosenePerFU(om.ExplicitComponent):
                 + tank_type
                 + ":"
                 + tank_name
-                + ":fuel_consumed_mission"
+                + ":fuel_consumed_main_route"
             ]
 
         partials[

@@ -54,6 +54,7 @@ class PreLCAHighRPMICEUseEmissionPerFU(om.ExplicitComponent):
                 + high_rpm_ice_id
                 + ":"
                 + specie
+                + "_main_route"
             )
             self.add_input(name=input_name, val=np.nan, units="kg")
 
@@ -119,6 +120,7 @@ class PreLCAHighRPMICEUseEmissionPerFU(om.ExplicitComponent):
                 + high_rpm_ice_id
                 + ":"
                 + specie
+                + "_main_route"
             )
             operation_output_name = (
                 "data:LCA:operation:he_power_train:high_rpm_ICE:"
@@ -172,6 +174,7 @@ class PreLCAHighRPMICEUseEmissionPerFU(om.ExplicitComponent):
                 + high_rpm_ice_id
                 + ":"
                 + specie
+                + "_main_route"
             )
             operation_output_name = (
                 "data:LCA:operation:he_power_train:high_rpm_ICE:"

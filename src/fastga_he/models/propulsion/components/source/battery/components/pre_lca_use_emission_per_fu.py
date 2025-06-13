@@ -54,6 +54,7 @@ class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
                 + battery_pack_id
                 + ":"
                 + specie
+                + "_main_route"
             )
             self.add_input(name=input_name, val=np.nan, units="kg")
 
@@ -127,6 +128,7 @@ class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
                 + battery_pack_id
                 + ":"
                 + specie
+                + "_main_route"
             )
             operation_output_name = (
                 "data:LCA:operation:he_power_train:battery_pack:"
@@ -182,6 +184,7 @@ class PreLCABatteryUseEmissionPerFU(om.ExplicitComponent):
                 + battery_pack_id
                 + ":"
                 + specie
+                + "_main_route"
             )
             operation_output_name = (
                 "data:LCA:operation:he_power_train:battery_pack:"

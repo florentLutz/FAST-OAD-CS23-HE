@@ -60,7 +60,7 @@ class PerformancesBatteryPackInFlightEmissionsSum(om.ExplicitComponent):
                 cols=np.arange(number_of_points),
                 val=np.ones(number_of_points),
             )
-            
+
             if number_of_points_reserve:
                 self.add_output(
                     "data:environmental_impact:operation:sizing:he_power_train:battery_pack:"
@@ -101,7 +101,7 @@ class PerformancesBatteryPackInFlightEmissionsSum(om.ExplicitComponent):
                 + ":"
                 + specie
             ] = np.sum(inputs[specie + "_emissions"])
-            
+
             if number_of_points_reserve:
                 outputs[
                     "data:environmental_impact:operation:sizing:he_power_train:battery_pack:"

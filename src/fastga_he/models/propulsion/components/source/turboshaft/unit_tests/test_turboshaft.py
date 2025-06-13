@@ -956,7 +956,6 @@ def test_in_flight_emissions_sum():
 
     problem.check_partials(compact_print=True)
 
-
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesTurboshaftInFlightEmissionsSum(
@@ -982,7 +981,6 @@ def test_in_flight_emissions_sum():
     ) == pytest.approx(115.105, rel=1e-2)
 
     problem.check_partials(compact_print=True)
-
 
 
 def test_in_flight_emissions():
