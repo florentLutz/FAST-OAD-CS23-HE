@@ -25,6 +25,7 @@ model:
     power_train_file_path: simple_assembly.yml
     use_linesearch: False
     pre_condition_pt: True
+    sort_component: True
 
 submodels:
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file

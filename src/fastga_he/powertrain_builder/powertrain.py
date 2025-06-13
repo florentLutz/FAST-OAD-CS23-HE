@@ -4,7 +4,7 @@ power train module with the aircraft sizing modules from FAST-OAD-GA based on th
 """
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import copy
 import json
@@ -635,6 +635,36 @@ class FASTGAHEPowerTrainConfigurator:
             distance_from_propulsive_load[component_name] = min_distance
 
         return distance_from_propulsive_load, propulsive_load_names
+
+    def get_distance_from_propulsor(self):
+        propulsor_names = []
+
+        # First and for reason that will appear clear later, we get a list of propulsor
+        for component_type_class, component_name in zip(
+            self._components_type_class, self._components_name
+        ):
+            if "propulsor" in component_type_class:
+                propulsor_names.append(component_name)
+
+        self._construct_connection_graph()
+        graph = self._connection_graph
+
+        distance_from_propulsor = {}
+        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
+
+        for component_name in self._components_name:
+            connected_components = list(connections_length_between_nodes[component_name].keys())
+            connected_propulsors = list(set(propulsor_names) & set(connected_components))
+
+            min_distance = np.inf
+            for prop in connected_propulsors:
+                distance_to_load = connections_length_between_nodes[component_name][prop]
+                if distance_to_load < min_distance:
+                    min_distance = distance_to_load
+
+            distance_from_propulsor[component_name] = min_distance
+
+        return distance_from_propulsor
 
     def check_sspc_states(self, declared_state):
         self._construct_connection_graph()
@@ -1986,6 +2016,9 @@ class FASTGAHEPowerTrainConfigurator:
                             if name_to_id[component_name] == "fastga_he.pt_component.dc_sspc":
                                 if output_name not in self._components_connection_outputs:
                                     output_name = component_name + ".dc_current_in"
+
+                            if name_to_id[component_name] == "fastga_he.pt_component.dc_line":
+                                output_name = component_name + ".dc_current"
 
                             # We look at the number of the corresponding splitter input
                             index = self._components_connection_outputs.index(output_name)

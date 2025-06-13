@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -48,6 +48,12 @@ class PowerTrainPerformancesFromFile(om.Group):
             default=False,
             desc="Boolean to pre_condition the different components of the PT, "
             "can save some time in specific cases",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
             allow_none=False,
         )
         self.options.declare(
@@ -110,6 +116,21 @@ class PowerTrainPerformancesFromFile(om.Group):
             subsys=oad.RegisterSubmodel.get_submodel(SUBMODEL_THRUST_DISTRIBUTOR, options=options),
             promotes=["data:*", "thrust"],
         )
+
+        if self.options["sort_component"]:
+            (
+                components_name,
+                components_name_id,
+                components_om_type,
+                components_options,
+                components_promotes,
+            ) = self.reorder_components(
+                components_name,
+                components_name_id,
+                components_om_type,
+                components_options,
+                components_promotes,
+            )
 
         # Enforces SSPC are added last, not done before because it might breaks the connections
         # necessary to ensure the coherence of SSPC states when connected to both end of a cable
@@ -211,3 +232,59 @@ class PowerTrainPerformancesFromFile(om.Group):
 
         # Let's first check the coherence of the voltage
         self.configurator.check_voltage_coherence(inputs=inputs, number_of_points=number_of_points)
+
+    def reorder_components(self, name_list, *lists):
+        """
+        Reorders components by their distance from the nearest propeller and assigns proper sequential
+        indices. Maps the component name list to their corresponding proper indices and reorders
+        other property lists according to the same mapping.
+
+        Args:
+            name_list (list): List of the component names to be replaced with indices.
+            *lists: Other property lists to be reordered according to the component name mapping.
+
+        Returns:
+            tuple: (reordered_name_list, *reordered_lists)
+        """
+        # Sort items by value first, then by original key order to maintain consistency
+        distance_from_prop = self.configurator.get_distance_from_propulsor()
+        sorted_items = sorted(distance_from_prop.items(), key=lambda x: (x[1], x[0]))
+
+        # Create new dictionary with proper sequential indices
+        reindexed_dict = {}
+        for index, (key, original_value) in enumerate(sorted_items):
+            reindexed_dict[key] = index
+
+        # Create mapping from old positions to new positions
+        index_map = []
+        for key in name_list:
+            if key in reindexed_dict:
+                index_map.append(reindexed_dict[key])
+            else:
+                print(f"Warning: Key '{key}' not found in re-indexed dictionary")
+                index_map.append(None)
+
+        # Reorder the name_list according to the new indices
+        reordered_name_list = [None] * len(name_list)
+        for old_pos, new_pos in enumerate(index_map):
+            if new_pos is not None:
+                reordered_name_list[new_pos] = name_list[old_pos]
+
+        # Reorder other property lists according to the same mapping
+        reordered_lists = []
+        for lst in lists:
+            if len(lst) != len(name_list):
+                print(
+                    f"Warning: List length {len(lst)} doesn't match name_list length {len(name_list)}"
+                )
+                reordered_lists.append(lst)  # Return original list if lengths don't match
+                continue
+
+            reordered = [None] * len(lst)
+            for old_pos, new_pos in enumerate(index_map):
+                if new_pos is not None:
+                    reordered[new_pos] = lst[old_pos]
+            reordered_lists.append(reordered)
+
+        # Return the reordered name list and all reordered lists
+        return (reordered_name_list, *reordered_lists)

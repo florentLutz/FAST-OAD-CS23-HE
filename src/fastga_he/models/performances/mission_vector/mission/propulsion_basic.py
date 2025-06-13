@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO.
+# Copyright (C) 2025 ISAE-SUPAERO.
 
 import numpy as np
 import openmdao.api as om
@@ -38,6 +38,12 @@ class FuelConsumed(om.ExplicitComponent):
             default=False,
             desc="Boolean to pre_condition the different components of the PT, "
             "can save some time in specific cases",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
             allow_none=False,
         )
 

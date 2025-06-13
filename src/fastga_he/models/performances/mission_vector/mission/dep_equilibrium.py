@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO.
+# Copyright (C) 2025 ISAE-SUPAERO.
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -73,6 +73,12 @@ class DEPEquilibrium(om.Group):
             "can save some time in specific cases",
             allow_none=False,
         )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            allow_none=False,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
@@ -118,6 +124,7 @@ class DEPEquilibrium(om.Group):
                 "propulsion_id": self.options["propulsion_id"],
                 "power_train_file_path": self.options["power_train_file_path"],
                 "pre_condition_pt": self.options["pre_condition_pt"],
+                "sort_component": self.options["sort_component"],
             }
             self.add_subsystem(
                 "compute_energy_consumed",
@@ -170,6 +177,7 @@ class DEPEquilibrium(om.Group):
                 "propulsion_id": self.options["propulsion_id"],
                 "power_train_file_path": self.options["power_train_file_path"],
                 "pre_condition_pt": self.options["pre_condition_pt"],
+                "sort_component": self.options["sort_component"],
             }
             self.add_subsystem(
                 "compute_energy_consumed",
