@@ -45,7 +45,7 @@ jobs:
 
       - name: Assembly unit tests
         run: |
-          poetry run pytest --no-cov src/fastga_he/models/propulsion/assemblies
+          poetry run pytest --no-cov src/fastga_he/models/propulsion/assemblies/test_*.py
         shell: bash
 
       - name: Assembler unit tests
