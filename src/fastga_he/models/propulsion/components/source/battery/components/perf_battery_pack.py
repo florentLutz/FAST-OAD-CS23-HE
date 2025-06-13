@@ -197,7 +197,7 @@ class PerformancesBatteryPack(om.Group):
         )
         if number_of_points_reserve:
             self.add_subsystem(
-                "energy_consumed",
+                "energy_consumed_main_route",
                 PerformancesEnergyConsumedMainRoute(
                     number_of_points=number_of_points,
                     battery_pack_id=battery_pack_id,
