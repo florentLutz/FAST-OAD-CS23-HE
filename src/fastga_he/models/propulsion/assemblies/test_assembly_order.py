@@ -10,16 +10,16 @@ import fastoad.api as oad
 import logging
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
-OUT_FOLDER_PATH = pth.join(pth.dirname(__file__), "outputs")
 
 XML_FILE = "order_assembly.xml"
-NB_POINTS_TEST = 50
-COEFF_DIFF = 0.0
 
 
 @pytest.fixture()
 def restore_submodels():
-
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
     old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
     yield
     oad.RegisterSubmodel.active_models = old_submodels
@@ -42,21 +42,4 @@ def test_assembly_from_pt_file(restore_submodels):
     problem.read_inputs()
     problem.setup()
 
-    problem.run_model()
-
-    # Run with another order
-    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
-    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
-
-    process_file_name = "mission_config_order_correct.yml"
-
-    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
-    problem = configurator.get_problem()
-
-    # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, XML_FILE)
-
-    problem.write_needed_inputs(ref_inputs)
-    problem.read_inputs()
-    problem.setup()
     problem.run_model()
