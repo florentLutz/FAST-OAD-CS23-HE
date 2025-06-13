@@ -159,6 +159,16 @@ def test_environmental_impact_function_span_hybrid():
         problem.output_file_path = RESULTS_FOLDER_PATH / file_name
         problem.write_outputs()
 
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        8.80965454150987e-06, rel=1e-3
+    )
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:kerosene:mass_per_fu", units="kg"
+    ) == pytest.approx(0.030897902770771833, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:turboshaft:turboshaft_1:CO2_per_fu", units="kg"
+    ) == pytest.approx(0.09039783776677315, rel=1e-3)
+
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_environmental_impact_function_span_hybrid_longer():
