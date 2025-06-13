@@ -26,10 +26,7 @@ model:
 submodels:
   submodel.loop.wing_area.update.geom: fastga_he.submodel.loop.wing_area.update.geom.advanced
   submodel.loop.wing_area.constraint.geom: fastga_he.submodel.loop.wing_area.constraint.geom.advanced
-  submodel.geometry.wing.thickness_ratio: null
   submodel.aerodynamics.high_lift.delta: null
-  submodel.geometry.mfw: fastga.submodel.geometry.mfw.advanced
-  submodel.geometry.vertical_tail.position.fd: null
   submodel.performances.mission_vector.descent_speed: null
   submodel.performances.mission_vector.climb_speed: null
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
@@ -39,7 +36,6 @@ submodels:
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
   submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.ensure
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
-  submodel.geometry.nacelle.dimension: null
   submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
   submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
   submodel.propulsion.dc_dc_converter.inductor.inductance: null
