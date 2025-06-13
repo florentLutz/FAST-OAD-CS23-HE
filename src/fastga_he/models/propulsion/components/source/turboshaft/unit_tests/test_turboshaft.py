@@ -957,6 +957,34 @@ def test_in_flight_emissions_sum():
     problem.check_partials(compact_print=True)
 
 
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesTurboshaftInFlightEmissionsSum(
+            turboshaft_id="turboshaft_1",
+            number_of_points=NB_POINTS_TEST,
+            number_of_points_reserve=2,
+        ),
+        ivc,
+    )
+
+    # For sanity, just to check that the option doesn't change the main results
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2",
+        units="kg",
+    ) == pytest.approx(897.4, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:CO2_main_route",
+        units="kg",
+    ) == pytest.approx(725.9, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:turboshaft:turboshaft_1:HC_main_route",
+        units="g",
+    ) == pytest.approx(115.105, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+
 def test_in_flight_emissions():
     ivc = om.IndepVarComp()
     ivc.add_output(

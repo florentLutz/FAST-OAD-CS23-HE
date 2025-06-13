@@ -11,12 +11,20 @@ SPECIES_LIST = ["CO2", "CO", "NOx", "SOx", "HC", "H2O"]
 class PerformancesBatteryPackInFlightEmissionsSum(om.ExplicitComponent):
     """
     Addition of the emissions of all pollutants at each step of the flight. Will be zero for
-    batteries but still added for consistency with turboshaft and ICE.
+    batteries but still added for consistency with turboshaft and battery_pack.
     """
 
     def initialize(self):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        # Default is set as None, so it is not computed when not wanted. In the mission, it
+        # will be enabled
+        self.options.declare(
+            "number_of_points_reserve",
+            default=None,
+            desc="number of equilibrium to be treated in reserve",
+            types=int,
         )
         self.options.declare(
             name="battery_pack_id",
@@ -27,6 +35,7 @@ class PerformancesBatteryPackInFlightEmissionsSum(om.ExplicitComponent):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
         battery_pack_id = self.options["battery_pack_id"]
 
         for specie in SPECIES_LIST:
@@ -51,9 +60,39 @@ class PerformancesBatteryPackInFlightEmissionsSum(om.ExplicitComponent):
                 cols=np.arange(number_of_points),
                 val=np.ones(number_of_points),
             )
+            
+            if number_of_points_reserve:
+                self.add_output(
+                    "data:environmental_impact:operation:sizing:he_power_train:battery_pack:"
+                    + battery_pack_id
+                    + ":"
+                    + specie
+                    + "_main_route",
+                    units="g",
+                    val=0.0,
+                    desc="Emission of "
+                    + specie
+                    + " excluding reserve, quantity of interest for the LCA",
+                )
+
+                val_partial = np.ones(number_of_points)
+                val_partial[-number_of_points_reserve - 1 : -1] = np.zeros(number_of_points_reserve)
+
+                self.declare_partials(
+                    of="data:environmental_impact:operation:sizing:he_power_train:battery_pack:"
+                    + battery_pack_id
+                    + ":"
+                    + specie
+                    + "_main_route",
+                    wrt=specie + "_emissions",
+                    rows=np.zeros(number_of_points),
+                    cols=np.arange(number_of_points),
+                    val=val_partial,
+                )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         battery_pack_id = self.options["battery_pack_id"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         for specie in SPECIES_LIST:
             outputs[
@@ -62,3 +101,14 @@ class PerformancesBatteryPackInFlightEmissionsSum(om.ExplicitComponent):
                 + ":"
                 + specie
             ] = np.sum(inputs[specie + "_emissions"])
+            
+            if number_of_points_reserve:
+                outputs[
+                    "data:environmental_impact:operation:sizing:he_power_train:battery_pack:"
+                    + battery_pack_id
+                    + ":"
+                    + specie
+                    + "_main_route"
+                ] = np.sum(inputs[specie + "_emissions"]) - np.sum(
+                    inputs[specie + "_emissions"][-number_of_points_reserve - 1 : -1]
+                )

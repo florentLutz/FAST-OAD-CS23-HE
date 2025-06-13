@@ -835,6 +835,29 @@ def test_in_flight_emissions_sum():
 
     problem.check_partials(compact_print=True)
 
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesICEInFlightEmissionsSum(
+            ice_id="ice_1", number_of_points=NB_POINTS_TEST, number_of_points_reserve=2
+        ),
+        ivc,
+    )
+
+    # For sanity, just to check that the option doesn't change the main results
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:CO2", units="kg"
+    ) == pytest.approx(223.634, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:CO2_main_route",
+        units="kg",
+    ) == pytest.approx(169.26, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:lead_main_route",
+        units="g",
+    ) == pytest.approx(43.3524, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
 
 def test_in_flight_emissions():
     ivc = om.IndepVarComp()
