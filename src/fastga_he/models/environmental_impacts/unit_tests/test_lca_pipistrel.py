@@ -268,6 +268,16 @@ def test_lca_pipistrel_club():
     problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_club_lca_out_ef_fr_mix.xml"
     problem.write_outputs()
 
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        0.00573781685337617, rel=1e-3
+    )
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:gasoline:mass_per_fu", units="kg"
+    ) == pytest.approx(11.75, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:high_rpm_ICE:ice_1:CO2_per_fu", units="kg"
+    ) == pytest.approx(23.228071669322848, rel=1e-3)
+
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_pipistrel_club_recipe():
