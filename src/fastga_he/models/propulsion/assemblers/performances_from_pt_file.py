@@ -235,7 +235,7 @@ class PowerTrainPerformancesFromFile(om.Group):
 
     def reorder_components(self, name_list, *lists):
         """
-        Reorders components by their nearest distance from propeller and assigns proper sequential
+        Reorders components by their distance from the nearest propeller and assigns proper sequential
         indices. Maps the component name list to their corresponding proper indices and reorders
         other property lists according to the same mapping.
 

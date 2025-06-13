@@ -60,7 +60,7 @@ class MissionCore(om.Group):
         self.options.declare(
             name="sort_component",
             default=False,
-            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            desc="Boolean to enable automatic sorting to improve robustness of the convergence by ensuring components are executed in the right order",
             allow_none=False,
         )
 
