@@ -36,11 +36,14 @@ class PerformancesFuelTank(om.Group):
         )
 
     def setup(self):
+        number_of_points = self.options["number_of_points"]
+        fuel_tank_id = self.options["fuel_tank_id"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
+
         self.add_subsystem(
             "fuel_consumed_mission",
             PerformancesFuelConsumedMission(
-                number_of_points=self.options["number_of_points"],
-                fuel_tank_id=self.options["fuel_tank_id"],
+                number_of_points=number_of_points, fuel_tank_id=fuel_tank_id
             ),
             promotes=["*"],
         )
@@ -49,9 +52,9 @@ class PerformancesFuelTank(om.Group):
             self.add_subsystem(
                 "fuel_consumed_main_route",
                 PerformancesFuelConsumedMainRoute(
-                    number_of_points=self.options["number_of_points"],
-                    fuel_tank_id=self.options["fuel_tank_id"],
-                    number_of_points_reserve=self.options["number_of_points_reserve"],
+                    number_of_points=number_of_points,
+                    fuel_tank_id=fuel_tank_id,
+                    number_of_points_reserve=number_of_points_reserve,
                 ),
                 promotes=["*"],
             )
@@ -59,8 +62,7 @@ class PerformancesFuelTank(om.Group):
         self.add_subsystem(
             "fuel_remaining_mission",
             PerformancesFuelRemainingMission(
-                number_of_points=self.options["number_of_points"],
-                fuel_tank_id=self.options["fuel_tank_id"],
+                number_of_points=number_of_points, fuel_tank_id=fuel_tank_id
             ),
             promotes=["*"],
         )
