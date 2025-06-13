@@ -991,13 +991,13 @@ def test_weight_per_fu():
 
 def test_emissions_per_fu():
     inputs_list = [
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO2",
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO",
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:NOx",
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:SOx",
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:HC",
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:H2O",
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:lead",
+        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO2_main_route",
+        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO_main_route",
+        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:NOx_main_route",
+        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:SOx_main_route",
+        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:HC_main_route",
+        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:H2O_main_route",
+        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:lead_main_route",
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:line_test:mission_ratio",

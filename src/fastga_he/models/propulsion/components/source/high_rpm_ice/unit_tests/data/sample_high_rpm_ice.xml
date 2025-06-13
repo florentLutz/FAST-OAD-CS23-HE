@@ -86,13 +86,13 @@
                     <he_power_train>
                         <high_rpm_ICE>
                             <ice_1>
-                                <CO units="kg" is_input="False">9.96</CO>
-                                <CO2 units="kg" is_input="False">38.70</CO2>
-                                <H2O units="kg" is_input="False">15.44</H2O>
-                                <HC units="g" is_input="False">235.57</HC>
-                                <NOx units="g" is_input="False">39.20</NOx>
-                                <SOx units="g" is_input="False">5.24</SOx>
-                                <lead units="g" is_input="False">9.91</lead>
+                                <CO_main_route units="kg" is_input="False">9.96</CO_main_route>
+                                <CO2_main_route units="kg" is_input="False">38.70</CO2_main_route>
+                                <H2O_main_route units="kg" is_input="False">15.44</H2O_main_route>
+                                <HC_main_route units="g" is_input="False">235.57</HC_main_route>
+                                <NOx_main_route units="g" is_input="False">39.20</NOx_main_route>
+                                <SOx_main_route units="g" is_input="False">5.24</SOx_main_route>
+                                <lead_main_route units="g" is_input="False">9.91</lead_main_route>
                             </ice_1>
                         </high_rpm_ICE>
                     </he_power_train>
