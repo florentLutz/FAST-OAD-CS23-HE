@@ -38,18 +38,16 @@ jobs:
           poetry run ruff check .           # Check coding rules
         shell: bash
 
+      - name: Assembly unit tests
+        run: |
+          for test in src/fastga_he/models/propulsion/assemblies/test_*.py; do
+            poetry run pytest --no-cov $test
+          done
+        shell: bash
+
       - name: Component unit tests
         run: |
           poetry run pytest --no-cov src/fastga_he/models/propulsion/components
-        shell: bash
-
-      - name: Assembly unit tests
-        run: |
-          for test in test_*.py; do
-            echo "Running $test"
-            poetry run pytest --no-cov src/fastga_he/models/propulsion/assemblies/$test
-          done
-        working-directory: src/fastga_he/models/propulsion/assemblies
         shell: bash
 
       - name: Assembler unit tests
