@@ -677,7 +677,7 @@ class FASTGAHEPowerTrainConfigurator:
         contain component names/keys that correspond to keys in the distance_from_propulsor
         dictionary. All subsequent lists will be reordered according to the same mapping.
 
-        :Returns tuple: All input lists reordered according to distance from propulsor, maintaining
+        :return: tuple: All input lists reordered according to distance from propulsor, maintaining
         the same order and count as input lists.
         """
         # Sort items by value first, then by original key order to maintain consistency
