@@ -65,7 +65,12 @@ def test_environmental_impact_function_span_hybrid():
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_main_route",
         units="kg",
     )
-    fuel_mission = 2.0 * datafile["data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission"].value[0]
+    fuel_mission = (
+        2.0
+        * datafile[
+            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission"
+        ].value[0]
+    )
     fuel_takeoff = datafile["data:mission:sizing:takeoff:fuel"].value[0]
     new_fuel = fuel_main_route + fuel_takeoff
     tmp = fuel_mission / (fuel_mission + fuel_takeoff)
@@ -270,7 +275,12 @@ def test_environmental_impact_function_span_conventional():
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_main_route",
         units="kg",
     )
-    fuel_mission = 2.0 * datafile["data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission"].value[0]
+    fuel_mission = (
+        2.0
+        * datafile[
+            "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission"
+        ].value[0]
+    )
     fuel_takeoff = datafile["data:mission:operational:takeoff:fuel"].value[0]
     new_fuel = fuel_main_route + fuel_takeoff
     tmp = fuel_mission / (fuel_mission + fuel_takeoff)
