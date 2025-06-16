@@ -406,6 +406,7 @@ def zip_equilibrium_input(propulsion_id, pt_file_path, sort_component, control_p
     :param propulsion_id: ID of propulsion wrapped to be used for computation of equilibrium.
     :param pt_file_path: Path to the powertrain file.
     :param pt_file_path: Option for powertrain component sorting.
+    :param sort_component: Option to sort the component into correct order
     :param control_parameter_list: a list of control parameters to rename.
     :return inputs_zip: a zip containing a list of name, a list of units, a list of shapes,
     a list of shape_by_conn boolean and a list of copy_shape str.
