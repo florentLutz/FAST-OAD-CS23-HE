@@ -58,27 +58,6 @@ def test_lca_pipistrel():
         ivc,
     )
 
-    # The energy stored in the battery does not consider the fuel necessary for takeoff,
-    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
-    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
-    energy_for_fu = total_energy_mission - energy_reserves
-
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-
     problem.run_model()
     problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_ef_fr_mix.xml"
     problem.write_outputs()
@@ -107,27 +86,6 @@ def test_lca_pipistrel_european_mix():
     problem = run_system(
         component,
         ivc,
-    )
-
-    # The energy stored in the battery does not consider the fuel necessary for takeoff,
-    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
-    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
-    energy_for_fu = total_energy_mission - energy_reserves
-
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
     )
 
     problem.run_model()
@@ -204,109 +162,6 @@ def test_lca_pipistrel_club_recipe():
         ivc,
     )
 
-    # The fuel stored in the tanks does not consider the fuel necessary for takeoff.
-    # It doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_fuel_mission = datafile["data:mission:sizing:fuel"].value[0]
-    fuel_reserves = datafile["data:mission:sizing:main_route:reserve:fuel"].value[0]
-    fuel_for_fu = total_fuel_mission - fuel_reserves
-
-    # We only consider the emissions that were produced in phases of the flight which contribute to
-    # the functional unit
-    ratio_for_emissions = fuel_for_fu / total_fuel_mission
-
-    problem.set_val(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
-        units="kg",
-        val=fuel_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
-        units="kg",
-        val=fuel_for_fu / 2.0,
-    )
-
-    # 1)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 2)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO2",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO2"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO2"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 3)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:H2O",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:H2O"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:H2O"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 4)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:HC",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:HC"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:HC"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 5)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:NOx",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:NOx"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:NOx"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 6)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:SOx",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:SOx"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:SOx"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 7)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:lead",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:lead"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:lead"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-
     problem.run_model()
     problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_club_lca_out_recipe_fr_mix.xml"
     problem.write_outputs()
@@ -335,27 +190,6 @@ def test_lca_pipistrel_recipe():
     problem = run_system(
         component,
         ivc,
-    )
-
-    # The energy stored in the battery does not consider the fuel necessary for takeoff,
-    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
-    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
-    energy_for_fu = total_energy_mission - energy_reserves
-
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
     )
 
     problem.run_model()
@@ -390,109 +224,6 @@ def test_lca_pipistrel_club_iw():
     problem = run_system(
         component,
         ivc,
-    )
-
-    # The fuel stored in the tanks does not consider the fuel necessary for takeoff.
-    # It doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_fuel_mission = datafile["data:mission:sizing:fuel"].value[0]
-    fuel_reserves = datafile["data:mission:sizing:main_route:reserve:fuel"].value[0]
-    fuel_for_fu = total_fuel_mission - fuel_reserves
-
-    # We only consider the emissions that were produced in phases of the flight which contribute to
-    # the functional unit
-    ratio_for_emissions = fuel_for_fu / total_fuel_mission
-
-    problem.set_val(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
-        units="kg",
-        val=fuel_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
-        units="kg",
-        val=fuel_for_fu / 2.0,
-    )
-
-    # 1)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 2)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO2",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO2"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:CO2"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 3)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:H2O",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:H2O"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:H2O"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 4)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:HC",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:HC"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:HC"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 5)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:NOx",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:NOx"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:NOx"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 6)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:SOx",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:SOx"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:SOx"
-        ].value[0]
-        * ratio_for_emissions,
-    )
-    # 7)
-    problem.set_val(
-        "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:lead",
-        units=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:lead"
-        ].units,
-        val=datafile[
-            "data:environmental_impact:operation:sizing:he_power_train:high_rpm_ICE:ice_1:lead"
-        ].value[0]
-        * ratio_for_emissions,
     )
 
     problem.run_model()
@@ -530,27 +261,6 @@ def test_lca_pipistrel_iw():
         ivc,
     )
 
-    # The energy stored in the battery does not consider the fuel necessary for takeoff,
-    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
-    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
-    energy_for_fu = total_energy_mission - energy_reserves
-
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-
     problem.run_model()
     problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_iw_fr_mix.xml"
     problem.write_outputs()
@@ -579,27 +289,6 @@ def test_lca_pipistrel_heavy_recipe():
     problem = run_system(
         component,
         ivc,
-    )
-
-    # The energy stored in the battery does not consider the fuel necessary for takeoff,
-    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
-    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
-    energy_for_fu = total_energy_mission - energy_reserves
-
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
     )
 
     problem.run_model()
@@ -636,27 +325,6 @@ def test_lca_pipistrel_european_mix_btf():
         ivc,
     )
 
-    # The energy stored in the battery does not consider the fuel necessary for takeoff,
-    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
-    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
-    energy_for_fu = total_energy_mission - energy_reserves
-
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-
     problem.run_model()
     problem.output_file_path = (
         RESULTS_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_eu_mix_btf.xml"
@@ -689,27 +357,6 @@ def test_lca_pipistrel_heavy_european_mix_btf():
     problem = run_system(
         component,
         ivc,
-    )
-
-    # The energy stored in the battery does not consider the fuel necessary for takeoff,
-    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
-    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
-    energy_for_fu = total_energy_mission - energy_reserves
-
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
     )
 
     problem.run_model()
@@ -747,27 +394,6 @@ def test_lca_pipistrel_heavy_french_mix_btf():
         ivc,
     )
 
-    # The energy stored in the battery does not consider the fuel necessary for takeoff,
-    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
-    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
-    energy_for_fu = total_energy_mission - energy_reserves
-
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-
     problem.run_model()
     problem.output_file_path = (
         RESULTS_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_fr_mix_btf.xml"
@@ -802,27 +428,6 @@ def test_lca_pipistrel_recipe_with_btf():
     problem = run_system(
         component,
         ivc,
-    )
-
-    # The energy stored in the battery does not consider the fuel necessary for takeoff,
-    # it doesn't affect the sizing but does affect the LCA, this is a temporary fix. Also, we must
-    # not include the energy necessary for the reserve as it does not contribute to the
-    # functional unit
-    datafile = oad.DataFile(DATA_FOLDER_PATH / input_file_name)
-
-    total_energy_mission = datafile["data:mission:sizing:energy"].value[0]
-    energy_reserves = datafile["data:mission:sizing:main_route:reserve:energy"].value[0]
-    energy_for_fu = total_energy_mission - energy_reserves
-
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
-        units="W*h",
-        val=energy_for_fu / 2.0,
     )
 
     problem.run_model()
