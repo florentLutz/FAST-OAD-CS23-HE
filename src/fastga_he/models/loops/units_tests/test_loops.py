@@ -2,7 +2,7 @@
 test module for wing area computation.
 """
 #  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
-#  Copyright (C) 2025  ONERA & ISAE-SUPAERO
+#  Copyright (C) 2022  ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -220,7 +220,6 @@ def test_advanced_cl_octo_propulsion():
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
-            sort_component=True,
         ),
         ivc_loop,
     )
@@ -281,9 +280,7 @@ def test_advanced_cl_group():
     )
 
     problem = run_system(
-        UpdateWingAreaGroupDEP(
-            propulsion_id="", power_train_file_path=propulsion_file, sort_component=True
-        ),
+        UpdateWingAreaGroupDEP(propulsion_id="", power_train_file_path=propulsion_file),
         ivc_loop,
     )
     assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 9.97, atol=1e-2)

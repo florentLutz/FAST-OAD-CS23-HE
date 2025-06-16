@@ -666,6 +666,40 @@ class FASTGAHEPowerTrainConfigurator:
 
         return distance_from_propulsor
 
+    def reorder_components_propeller(self, *lists):
+        """
+        Reorders components by their distance from the nearest propeller and assigns proper
+        sequential indices. Takes multiple property lists where the first list contains component
+        names/keys, and reorders all lists according to the distance-based mapping. This improves
+        robustness by ensuring that variables are passed correctly throughout the architecture.
+
+        :param *lists: Variable number of property lists to be reordered. The first list should
+        contain component names/keys that correspond to keys in the distance_from_propulsor
+        dictionary. All subsequent lists will be reordered according to the same mapping.
+
+        :Returns tuple: All input lists reordered according to distance from propulsor, maintaining
+        the same order and count as input lists.
+        """
+        # Sort items by value first, then by original key order to maintain consistency
+        distance_from_prop = self.get_distance_from_propulsor()
+        sorted_items = sorted(distance_from_prop.items(), key=lambda x: (x[1], x[0]))
+
+        # Create new dictionary with proper sequential indices
+        reindexed_dict = {}
+        for index, (key, original_value) in enumerate(sorted_items):
+            reindexed_dict[key] = index
+
+        # Reorder other property lists using the same mapping
+        reordered_lists = []
+        for lst in lists:
+            reordered = [None] * len(lst)
+            for old_pos, key in enumerate(lists[0]):
+                new_pos = reindexed_dict[key]
+                reordered[new_pos] = lst[old_pos]
+            reordered_lists.append(reordered)
+
+        return tuple(reordered_lists)
+
     def check_sspc_states(self, declared_state):
         self._construct_connection_graph()
         graph = self._connection_graph

@@ -15,6 +15,7 @@ model:
     id: fastga_he.loop.wing_area
     propulsion_id: ""
     power_train_file_path: simple_assembly.yml
+    sort_component: true
 
 submodels:
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
