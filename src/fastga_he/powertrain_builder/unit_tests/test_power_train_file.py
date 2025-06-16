@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import os
 import os.path as pth
@@ -296,6 +296,46 @@ def test_distance_from_propulsive_load():
     assert distance_from_prop_load["dc_bus_3"] == 3
 
     assert distance_from_prop_load["dc_bus_4"] == 7
+
+
+def test_distance_from_propulsor():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_tri_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    print("\n")
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    print("\n")
+    distance_from_prop = power_train_configurator.get_distance_from_propulsor()
+
+    assert distance_from_prop["motor_1"] == 1
+    assert distance_from_prop["inverter_2"] == 2
+    assert distance_from_prop["dc_dc_converter_1"] == 9
+    assert distance_from_prop["battery_pack_1"] == 10
+
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_file_quad_prop.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    print("\n")
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    print("\n")
+    distance_from_prop = power_train_configurator.get_distance_from_propulsor()
+
+    assert distance_from_prop["motor_1"] == 2
+    assert distance_from_prop["dc_bus_4"] == 5
+    assert distance_from_prop["dc_dc_converter_1"] == 6
+    assert distance_from_prop["battery_pack_1"] == 7
 
 
 def test_independent_voltage_subgraph():

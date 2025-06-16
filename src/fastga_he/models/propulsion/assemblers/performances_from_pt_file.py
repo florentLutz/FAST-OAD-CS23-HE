@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -48,6 +48,12 @@ class PowerTrainPerformancesFromFile(om.Group):
             default=False,
             desc="Boolean to pre_condition the different components of the PT, "
             "can save some time in specific cases",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
             allow_none=False,
         )
         self.options.declare(
@@ -110,6 +116,21 @@ class PowerTrainPerformancesFromFile(om.Group):
             subsys=oad.RegisterSubmodel.get_submodel(SUBMODEL_THRUST_DISTRIBUTOR, options=options),
             promotes=["data:*", "thrust"],
         )
+
+        if self.options["sort_component"]:
+            (
+                components_name,
+                components_name_id,
+                components_om_type,
+                components_options,
+                components_promotes,
+            ) = self.configurator.reorder_components(
+                components_name,
+                components_name_id,
+                components_om_type,
+                components_options,
+                components_promotes,
+            )
 
         # Enforces SSPC are added last, not done before because it might breaks the connections
         # necessary to ensure the coherence of SSPC states when connected to both end of a cable

@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO.
+# Copyright (C) 2025 ISAE-SUPAERO.
 
 import logging
 
@@ -103,6 +103,12 @@ class OperationalMissionVectorSuper(om.Group):
             "is to be used, can reduce time depending on the situation",
             allow_none=False,
         )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            allow_none=False,
+        )
 
     def setup(self):
         self.add_subsystem(
@@ -118,6 +124,7 @@ class OperationalMissionVectorSuper(om.Group):
                 use_linesearch=self.options["use_linesearch"],
                 pre_condition_pt=self.options["pre_condition_pt"],
                 use_apply_nonlinear=self.options["use_apply_nonlinear"],
+                sort_component=self.options["sort_component"],
             ),
             promotes=["*"],
         )
@@ -192,6 +199,12 @@ class OperationalMissionVector(om.Group):
             default=True,
             desc="Boolean to declare whether or not the use_apply_nonlinear option of the solver "
             "is to be used, can reduce time depending on the situation",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
             allow_none=False,
         )
 
@@ -329,6 +342,7 @@ class OperationalMissionVector(om.Group):
                 power_train_file_path=self.options["power_train_file_path"],
                 use_linesearch=self.options["use_linesearch"],
                 pre_condition_pt=self.options["pre_condition_pt"],
+                sort_component=self.options["sort_component"],
             ),
             promotes_inputs=[
                 "data:aerodynamics:*",

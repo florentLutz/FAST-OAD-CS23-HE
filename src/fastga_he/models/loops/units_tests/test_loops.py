@@ -280,10 +280,7 @@ def test_advanced_cl_group():
     )
 
     problem = run_system(
-        UpdateWingAreaGroupDEP(
-            propulsion_id="",
-            power_train_file_path=propulsion_file,
-        ),
+        UpdateWingAreaGroupDEP(propulsion_id="", power_train_file_path=propulsion_file),
         ivc_loop,
     )
     assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 9.97, atol=1e-2)
