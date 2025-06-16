@@ -256,7 +256,7 @@
           </dc_bus_2>
         </DC_bus>
         <DC_cable_harness>
-          <dc_cable_harness_1>
+          <harness_1>
             <cable_temperature_mission units="degK" is_input="True">288.15</cable_temperature_mission>
             <length units="m" is_input="True">2.9089002199091203<!--Length of the harness--></length>
             <length_span_ratio is_input="True">0.95<!--Length of the cable as a ratio of the SPAN (not half-span), used when cable is fully or partly inside the wing.--></length_span_ratio>
@@ -270,8 +270,8 @@
             <properties>
               <resistance_temperature_scale_factor units="1/degK" is_input="True">0.00393</resistance_temperature_scale_factor>
             </properties>
-          </dc_cable_harness_1>
-          <dc_cable_harness_2>
+          </harness_1>
+          <harness_2>
             <cable_temperature_mission units="degK" is_input="True">288.15</cable_temperature_mission>
             <length units="m" is_input="True">2.9089002199091203<!--Length of the harness--></length>
             <length_span_ratio is_input="True">0.95<!--Length of the cable as a ratio of the SPAN (not half-span), used when cable is fully or partly inside the wing.--></length_span_ratio>
@@ -285,8 +285,8 @@
             <properties>
               <resistance_temperature_scale_factor units="1/degK" is_input="True">0.00393</resistance_temperature_scale_factor>
             </properties>
-          </dc_cable_harness_2>
-          <dc_cable_harness_3>
+          </harness_2>
+          <harness_3>
             <cable_temperature_mission units="degK" is_input="True">288.15</cable_temperature_mission>
             <length units="m" is_input="True">2.9089002199091203<!--Length of the harness--></length>
             <length_span_ratio is_input="True">0.95<!--Length of the cable as a ratio of the SPAN (not half-span), used when cable is fully or partly inside the wing.--></length_span_ratio>
@@ -300,8 +300,8 @@
             <properties>
               <resistance_temperature_scale_factor units="1/degK" is_input="True">0.00393</resistance_temperature_scale_factor>
             </properties>
-          </dc_cable_harness_3>
-          <dc_cable_harness_4>
+          </harness_3>
+          <harness_4>
             <cable_temperature_mission units="degK" is_input="True">288.15</cable_temperature_mission>
             <length units="m" is_input="True">2.9089002199091203<!--Length of the harness--></length>
             <length_span_ratio is_input="True">0.95<!--Length of the cable as a ratio of the SPAN (not half-span), used when cable is fully or partly inside the wing.--></length_span_ratio>
@@ -315,8 +315,8 @@
             <properties>
               <resistance_temperature_scale_factor units="1/degK" is_input="True">0.00393</resistance_temperature_scale_factor>
             </properties>
-          </dc_cable_harness_4>
-          <dc_cable_harness_5>
+          </harness_4>
+          <harness_5>
             <cable_temperature_mission units="degK" is_input="True">288.15</cable_temperature_mission>
             <length units="m" is_input="True">2.9089002199091203<!--Length of the harness--></length>
             <length_span_ratio is_input="True">0.95<!--Length of the cable as a ratio of the SPAN (not half-span), used when cable is fully or partly inside the wing.--></length_span_ratio>
@@ -330,8 +330,8 @@
             <properties>
               <resistance_temperature_scale_factor units="1/degK" is_input="True">0.00393</resistance_temperature_scale_factor>
             </properties>
-          </dc_cable_harness_5>
-          <dc_cable_harness_6>
+          </harness_5>
+          <harness_6>
             <cable_temperature_mission units="degK" is_input="True">288.15</cable_temperature_mission>
             <length units="m" is_input="True">2.9089002199091203<!--Length of the harness--></length>
             <length_span_ratio is_input="True">0.95<!--Length of the cable as a ratio of the SPAN (not half-span), used when cable is fully or partly inside the wing.--></length_span_ratio>
@@ -345,7 +345,7 @@
             <properties>
               <resistance_temperature_scale_factor units="1/degK" is_input="True">0.00393</resistance_temperature_scale_factor>
             </properties>
-          </dc_cable_harness_6>
+          </harness_6>
         </DC_cable_harness>
         <DC_splitter>
           <dc_splitter_1>
@@ -362,7 +362,7 @@
           </dc_splitter_2>
         </DC_splitter>
         <PMSM>
-          <electric_motor___hybrid_engine_left_1>
+          <motor_1>
             <current_ac_max units="A" is_input="False">140.29477688954208<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.3015</diameter>
             <from_LE units="m" is_input="True">0.05<!--Distance between the turboshaft front face and the leading edge--></from_LE>
@@ -405,8 +405,8 @@
               <phase_resistance is_input="False">0.14123971964744345<!--Scaling factor for the phase resistance of the motor--></phase_resistance>
               <torque_constant is_input="False">0.6738637284045355</torque_constant>
             </scaling>
-          </electric_motor___hybrid_engine_left_1>
-          <electric_motor___hybrid_engine_right_1>
+          </motor_1>
+          <motor_2>
             <current_ac_max units="A" is_input="False">140.29477688954208<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.3015</diameter>
             <from_LE units="m" is_input="True">0.05<!--Distance between the turboshaft front face and the leading edge--></from_LE>
@@ -449,10 +449,10 @@
               <phase_resistance is_input="False">0.14123971964744345<!--Scaling factor for the phase resistance of the motor--></phase_resistance>
               <torque_constant is_input="False">0.6738637284045355</torque_constant>
             </scaling>
-          </electric_motor___hybrid_engine_right_1>
+          </motor_2>
         </PMSM>
         <battery_pack>
-          <seconday_battery_1>
+          <battery_1>
             <SOC_min units="percent" is_input="False">20.000069101683522<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">7.033330576556111<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <c_rate_multiplier is_input="False">0.8791683012829683<!--Multiplier for the the number of module if the c-rate of the battery is the active constraint--></c_rate_multiplier>
@@ -494,8 +494,8 @@
               <number_cells is_input="True">200.0<!--Number of cells in series inside one battery module--></number_cells>
               <volume units="L" is_input="False">4.4075<!--Volume of one module of the battery--></volume>
             </module>
-          </seconday_battery_1>
-          <seconday_battery_2>
+          </battery_1>
+          <battery_2>
             <SOC_min units="percent" is_input="False">20.000069101683522<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">7.033330576556111<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <c_rate_multiplier is_input="False">0.8791683012829683<!--Multiplier for the the number of module if the c-rate of the battery is the active constraint--></c_rate_multiplier>
@@ -537,7 +537,7 @@
               <number_cells is_input="True">200.0<!--Number of cells in series inside one battery module--></number_cells>
               <volume units="L" is_input="False">4.4075<!--Volume of one module of the battery--></volume>
             </module>
-          </seconday_battery_2>
+          </battery_2>
         </battery_pack>
         <fuel_system>
           <fuel_system>
@@ -560,7 +560,7 @@
           </fuel_system>
         </fuel_system>
         <fuel_tank>
-          <kerosene_tank_left_1>
+          <fuel_tank_1>
             <capacity units="kg" is_input="False">98.58214296819602<!--Capacity of the tank in terms of weight--></capacity>
             <fuel_consumed_mission units="kg" is_input="False">97.60607202237439<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
             <fuel_total_mission units="kg" is_input="False">98.58214296819602<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
@@ -591,8 +591,8 @@
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
-          </kerosene_tank_left_1>
-          <kerosene_tank_right_1>
+          </fuel_tank_1>
+          <fuel_tank_2>
             <capacity units="kg" is_input="False">98.58214296819602<!--Capacity of the tank in terms of weight--></capacity>
             <fuel_consumed_mission units="kg" is_input="False">97.60607202237439<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_mission>
             <fuel_total_mission units="kg" is_input="False">98.58214296819602<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
@@ -623,7 +623,7 @@
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
-          </kerosene_tank_right_1>
+          </fuel_tank_2>
         </fuel_tank>
         <inverter>
           <inverter_1>
@@ -1006,7 +1006,7 @@
           </gearbox_2>
         </planetary_gear>
         <propeller>
-          <propeller_left_1>
+          <propeller_1>
             <activity_factor is_input="True">150.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">0.978931649778388<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">25.0<!--Twist between the propeller blade root and tip--></blade_twist>
@@ -1042,8 +1042,8 @@
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
-          </propeller_left_1>
-          <propeller_right_1>
+          </propeller_1>
+          <propeller_2>
             <activity_factor is_input="True">150.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">0.978931649778388<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">25.0<!--Twist between the propeller blade root and tip--></blade_twist>
@@ -1079,7 +1079,7 @@
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
-          </propeller_right_1>
+          </propeller_2>
         </propeller>
         <speed_reducer>
           <speed_reducer_1>
@@ -1138,7 +1138,7 @@
           </speed_reducer_2>
         </speed_reducer>
         <turboshaft>
-          <turbine___hybrid_engine_left_1>
+          <turboshaft_1>
             <from_LE units="m" is_input="True">0.05<!--Distance between the turboshaft front face and the leading edge--></from_LE>
             <mass units="kg" is_input="False">179.47524<!--Installed weight of the turboshaft--></mass>
             <power_max units="kW" is_input="False">326.93877551020415<!--Maximum power the turboshaft has to provide--></power_max>
@@ -1177,8 +1177,8 @@
               <wet_area units="m**2" is_input="False">4.712159209613456<!--Wet area of the turboshaft nacelle--></wet_area>
               <width units="m" is_input="False">0.6778064901232957<!--Width of the turboshaft nacelle--></width>
             </nacelle>
-          </turbine___hybrid_engine_left_1>
-          <turbine___hybrid_engine_right_1>
+          </turboshaft_1>
+          <turboshaft_2>
             <from_LE units="m" is_input="True">0.05<!--Distance between the turboshaft front face and the leading edge--></from_LE>
             <mass units="kg" is_input="False">179.47524<!--Installed weight of the turboshaft--></mass>
             <power_max units="kW" is_input="False">326.93877551020415<!--Maximum power the turboshaft has to provide--></power_max>
@@ -1217,7 +1217,7 @@
               <wet_area units="m**2" is_input="False">4.712159209613456<!--Wet area of the turboshaft nacelle--></wet_area>
               <width units="m" is_input="False">0.6778064901232957<!--Width of the turboshaft nacelle--></width>
             </nacelle>
-          </turbine___hybrid_engine_right_1>
+          </turboshaft_2>
         </turboshaft>
       </he_power_train>
     </propulsion>
@@ -1439,14 +1439,14 @@
           </shielding_tape>
         </DC_cable_harness>
         <PMSM>
-          <electric_motor___hybrid_engine_left_1>
+          <motor_1>
             <k_efficiency is_input="True">0.97<!--K factor for the PMSM efficiency--></k_efficiency>
             <power_factor is_input="True">1.0</power_factor>
-          </electric_motor___hybrid_engine_left_1>
-          <electric_motor___hybrid_engine_right_1>
+          </motor_1>
+          <motor_2>
             <k_efficiency is_input="True">0.97<!--K factor for the PMSM efficiency--></k_efficiency>
             <power_factor is_input="True">1.0</power_factor>
-          </electric_motor___hybrid_engine_right_1>
+          </motor_2>
         </PMSM>
         <inverter>
           <inverter_1>
@@ -1473,24 +1473,24 @@
           </inverter_2>
         </inverter>
         <propeller>
-          <propeller_left_1>
+          <propeller_1>
             <effective_advance_ratio is_input="True">0.95<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
             <installation_effect is_input="True">0.98<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
-          </propeller_left_1>
-          <propeller_right_1>
+          </propeller_1>
+          <propeller_2>
             <effective_advance_ratio is_input="True">0.95<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
             <installation_effect is_input="True">0.98<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
-          </propeller_right_1>
+          </propeller_2>
         </propeller>
         <turboshaft>
-          <turbine___hybrid_engine_left_1>
+          <turboshaft_1>
             <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
             <k_sfc is_input="True">1.11<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
-          </turbine___hybrid_engine_left_1>
-          <turbine___hybrid_engine_right_1>
+          </turboshaft_1>
+          <turboshaft_2>
             <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
             <k_sfc is_input="True">1.11<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
-          </turbine___hybrid_engine_right_1>
+          </turboshaft_2>
         </turboshaft>
       </he_power_train>
     </propulsion>
@@ -1510,22 +1510,22 @@
     <propulsion>
       <he_power_train>
         <PMSM>
-          <electric_motor___hybrid_engine_left_1>
+          <motor_1>
             <rpm_rating units="1/min" is_input="False">0.0<!--Respected if <0--></rpm_rating>
             <voltage_caliber units="V" is_input="False">-100.77942014039854<!--Respected if <0--></voltage_caliber>
-          </electric_motor___hybrid_engine_left_1>
-          <electric_motor___hybrid_engine_right_1>
+          </motor_1>
+          <motor_2>
             <rpm_rating units="1/min" is_input="False">0.0<!--Respected if <0--></rpm_rating>
             <voltage_caliber units="V" is_input="False">-100.77942014039854<!--Respected if <0--></voltage_caliber>
-          </electric_motor___hybrid_engine_right_1>
+          </motor_2>
         </PMSM>
         <turboshaft>
-          <turbine___hybrid_engine_left_1>
+          <turboshaft_1>
             <power_rating units="kW" is_input="False">5.938775510204152<!--Respected if <0--></power_rating>
-          </turbine___hybrid_engine_left_1>
-          <turbine___hybrid_engine_right_1>
+          </turboshaft_1>
+          <turboshaft_2>
             <power_rating units="kW" is_input="False">5.938775510204152<!--Respected if <0--></power_rating>
-          </turbine___hybrid_engine_right_1>
+          </turboshaft_2>
         </turboshaft>
       </he_power_train>
     </propulsion>
@@ -1542,6 +1542,9 @@
           <propeller_1>
             <min_power units="W" is_input="True">5000.0<!--Convergence parameter used to aid convergence since, if power is too low in the network, the code will have trouble converging--></min_power>
           </propeller_1>
+          <propeller_2>
+            <min_power units="W" is_input="True">5000.0<!--Convergence parameter used to aid convergence since, if power is too low in the network, the code will have trouble converging--></min_power>
+          </propeller_2>
         </propeller>
       </he_power_train>
     </propulsion>
