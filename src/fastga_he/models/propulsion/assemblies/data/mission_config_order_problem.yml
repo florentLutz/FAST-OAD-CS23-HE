@@ -1,5 +1,5 @@
 title: Sample OAD Process
-module_folders: null
+module_folders:
 input_file: ../results/oad_process_inputs_he.xml
 output_file: ../results/oad_process_outputs_he.xml
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
