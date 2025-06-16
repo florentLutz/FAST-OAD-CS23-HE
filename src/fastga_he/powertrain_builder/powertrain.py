@@ -671,7 +671,7 @@ class FASTGAHEPowerTrainConfigurator:
         Reorders components by their distance from the nearest propeller and assigns proper
         sequential indices. Takes multiple property lists where the first list contains component
         names/keys, and reorders all lists according to the distance-based mapping. This improves
-        robustness by ensuring that variables are passed correctly throughout the architecture.
+        robustness by ensuring that variables are updated in a correct order for each run.
 
         :param *lists: Variable number of property lists to be reordered. The first list should
         contain component names/keys that correspond to keys in the distance_from_propulsor
