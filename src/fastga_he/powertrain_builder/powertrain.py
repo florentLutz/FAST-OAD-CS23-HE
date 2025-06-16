@@ -666,7 +666,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         return distance_from_propulsor
 
-    def reorder_components_propeller(self, *lists):
+    def reorder_components(self, *lists):
         """
         Reorders components by their distance from the nearest propeller and assigns proper
         sequential indices. Takes multiple property lists where the first list contains component

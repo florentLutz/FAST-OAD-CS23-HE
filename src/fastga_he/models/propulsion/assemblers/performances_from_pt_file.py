@@ -124,7 +124,7 @@ class PowerTrainPerformancesFromFile(om.Group):
                 components_om_type,
                 components_options,
                 components_promotes,
-            ) = self.configurator.reorder_components_propeller(
+            ) = self.configurator.reorder_components(
                 components_name,
                 components_name_id,
                 components_om_type,
