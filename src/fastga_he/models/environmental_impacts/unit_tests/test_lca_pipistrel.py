@@ -10,7 +10,6 @@ from typing import List
 import pytest
 
 import openmdao.api as om
-import fastoad.api as oad
 from fastoad.io import VariableIO
 
 from tests.testing_utilities import run_system, list_inputs

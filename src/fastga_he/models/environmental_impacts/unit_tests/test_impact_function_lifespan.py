@@ -9,8 +9,6 @@ import pytest
 
 import numpy as np
 
-import plotly.graph_objects as go
-
 import fastoad.api as oad
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
