@@ -1,15 +1,109 @@
-.. _assumptions-lcc:
+.. _constraint-id:
 
-=================================
-Life Cycle Cost model assumptions
-=================================
+=====================================
+Powertrain Component Constraints & ID
+=====================================
 
-The following assumptions have been made in the calculation of the Life Cycle Cost (LCC).
+**********
+Connectors
+**********
 
-* Each powertrain component’s production cost is defined as its purchase cost.
-* The costs of the DC bus and DC splitter are neglected due to their close association with the DC cable.
-* Engines and propellers operational costs are the overhaul cost divided by Time Between Overhauls (TBO).
-* Electric sources and electronics operational costs are their replacement cost divided by their lifespan.
-* The purchase cost of the electronics are estimated with $/kW or $/A ratios derived from retail prices.
-* Storage tanks and gearboxes maintenance costs are included in the aircraft’s annual maintenance.
-* In the DC cable model, the shield and core unit costs are set equal, as are the insulation and sheath costs.
+Harness (DC cable)
+==================
+
+DC bus
+======
+
+DC splitter
+===========
+
+DC-DC converter
+===============
+
+Inverter
+========
+
+Rectifier
+=========
+
+Solid state power controller (SSPC)
+===================================
+
+Fuel system
+===========
+
+Hydrogen fuel system
+====================
+
+Gearbox
+=======
+
+Planetary gear
+==============
+
+Speed reducer
+=============
+
+*****
+Loads
+*****
+
+DC_loads
+========
+
+Permanent magnet synchronous motor (PMSM)
+==========================================
+
+*********
+Propulsor
+*********
+
+Propeller
+=========
+
+ID
+**
+
+"fastga_he.pt_component.propeller"
+
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.propeller.torque: fastga_he.submodel.propulsion.constraints.propeller.torque.enforce
+    submodel.propulsion.constraints.propeller.rpm: fastga_he.submodel.propulsion.constraints.propeller.rpm.enforce
+*******
+Sources
+*******
+
+Battery
+=======
+
+Generator
+=========
+
+Internal combustion Engine (ICE)
+================================
+
+High RPM ICE
+============
+
+Proton-exchange membrane fuel cell (PEMFC)
+==========================================
+
+Simple turbo generator
+======================
+
+Turboshaft
+==========
+
+*****
+Tanks
+*****
+
+Fuel tank
+=========
+
+Gaseous hydrogen tank
+=====================

@@ -17,12 +17,12 @@ module. This module can be integrated to the analysis by defining the ``power_tr
     ⋮
     power_train_file_path: ./<powertrain_config>.yml
 
-A description of the LCC module is available here. It includes a description of the models, a description of the options
-available as well as the value they can take and a description of some of the key assumptions that were made.
+A description of the powertrain customization is available here. It includes a description of powertrain configuation
+file, lists of the component constraints available, and simple powertrain templates.
 
 .. toctree::
    :maxdepth: 2
 
     Powertrain configuration (PT) file <pt_file>
+    Component Constraints and ID <constraints>
     PT file templates <templates>
-    Component Constraints <constraints>
