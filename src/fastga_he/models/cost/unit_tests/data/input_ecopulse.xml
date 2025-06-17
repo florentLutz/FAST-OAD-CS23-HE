@@ -1293,6 +1293,7 @@
           <fuel_tank_1>
             <capacity units="kg" is_input="False">167.93236695526886<!--Capacity of the tank in terms of weight--></capacity>
             <fuel_consumed_mission units="kg" is_input="False">166.26967025274143<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <fuel_consumed_main_route units="kg" is_input="False">166.26967025274143<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
             <fuel_total_mission units="kg" is_input="False">167.93236695526886<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
             <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <mass units="kg" is_input="False">1.6626967025274144<!--Weight of the fuel tanks--></mass>
@@ -1325,6 +1326,7 @@
           <fuel_tank_2>
             <capacity units="kg" is_input="False">167.93236695526886<!--Capacity of the tank in terms of weight--></capacity>
             <fuel_consumed_mission units="kg" is_input="False">166.26967025274143<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <fuel_consumed_main_route units="kg" is_input="False">166.26967025274143<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
             <fuel_total_mission units="kg" is_input="False">167.93236695526886<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
             <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <mass units="kg" is_input="False">1.6626967025274144<!--Weight of the fuel tanks--></mass>

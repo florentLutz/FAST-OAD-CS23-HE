@@ -34,10 +34,10 @@ class LCCElectricityCost(om.ExplicitComponent):
                 + electricity_storage_type
                 + ":"
                 + electricity_storage_id
-                + ":energy_consumed_mission",
+                + ":energy_consumed_main_route",
                 units="kW*h",
                 val=np.nan,
-                desc="Energy drawn from the battery for the mission",
+                desc="Energy drawn from the battery for the main_route",
             )
 
         self.add_output(
@@ -63,7 +63,7 @@ class LCCElectricityCost(om.ExplicitComponent):
                     + electricity_storage_type
                     + ":"
                     + electricity_storage_id
-                    + ":energy_consumed_mission"
+                    + ":energy_consumed_main_route"
                 ]
             )
 
@@ -80,7 +80,7 @@ class LCCElectricityCost(om.ExplicitComponent):
                 + electricity_storage_type
                 + ":"
                 + electricity_storage_id
-                + ":energy_consumed_mission",
+                + ":energy_consumed_main_route",
             ] = inputs["data:cost:operation:electricity_unit_price"]
 
             partials[
@@ -90,5 +90,5 @@ class LCCElectricityCost(om.ExplicitComponent):
                 + electricity_storage_type
                 + ":"
                 + electricity_storage_id
-                + ":energy_consumed_mission"
+                + ":energy_consumed_main_route"
             ]
