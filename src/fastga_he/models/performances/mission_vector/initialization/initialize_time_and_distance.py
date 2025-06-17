@@ -217,7 +217,8 @@ class InitializeTimeAndDistance(om.ExplicitComponent):
         cruise_range = mission_range - position_climb[-1] - position_descent[-1]
         if cruise_range < 0.0:
             _LOGGER.warning(
-                "Negative cruise range, consider adjusting range in the TLARs or climb and descent parameters"
+                "Negative cruise range, consider adjusting range in the TLARs or climb and "
+                "descent parameters"
             )
         cruise_distance_step = cruise_range / (number_of_points_cruise + 1)
         position_cruise = np.linspace(
