@@ -16,6 +16,7 @@ module. This module can be integrated to the analysis by defining the ``power_tr
     id: fastga_he.performances.mission_vector
     ⋮
     power_train_file_path: ./<powertrain_config>.yml
+    sort_component: true
 
 A description of the powertrain customization is available here. It includes a description of powertrain configuation
 file, lists of the component constraints available, and simple powertrain templates.
